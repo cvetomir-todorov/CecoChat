@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using CecoChat.Contracts;
 
-namespace CecoChat.Messaging.Server.Client
+namespace CecoChat.Messaging.Server.Clients
 {
     public interface IClientContainer
     {

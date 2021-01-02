@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Grpc.Core;
 using Microsoft.Extensions.Logging;
 
-namespace CecoChat.Messaging.Server.Client
+namespace CecoChat.Messaging.Server.Clients
 {
     /// <summary>
     /// Streams <typeparam name="TMessage"/> instances to a connected client.

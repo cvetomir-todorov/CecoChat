@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace CecoChat.Messaging.Server.Client
+namespace CecoChat.Messaging.Server.Clients
 {
     public interface IStreamingContext<in TMessage> : IDisposable
     {

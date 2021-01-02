@@ -5,7 +5,7 @@ using CecoChat.Contracts;
 using Grpc.Core;
 using Microsoft.Extensions.Logging;
 
-namespace CecoChat.Messaging.Server.Client
+namespace CecoChat.Messaging.Server.Clients
 {
     public sealed class GrpcChatService : Chat.ChatBase
     {
