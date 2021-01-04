@@ -7,7 +7,7 @@ namespace CecoChat.Messaging.Server.Clients
     public sealed class ClientContainer : IClientContainer
     {
         // ReSharper disable once CollectionNeverUpdated.Local
-        private static readonly List<IStreamingContext<GrpcMessage>> _emptyMessageStreamList = new List<IStreamingContext<GrpcMessage>>(capacity: 0);
+        private static readonly List<IStreamingContext<GrpcMessage>> _emptyMessageStreamList = new(capacity: 0);
         private readonly ConcurrentDictionary<int, ClientData> _clientsMap;
 
         public ClientContainer()
@@ -44,7 +44,7 @@ namespace CecoChat.Messaging.Server.Clients
 
         private sealed class ClientData
         {
-            public List<IStreamingContext<GrpcMessage>> MessageStreamList { get; } = new List<IStreamingContext<GrpcMessage>>();
+            public List<IStreamingContext<GrpcMessage>> MessageStreamList { get; } = new();
         }
     }
 }
