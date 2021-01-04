@@ -35,7 +35,6 @@ namespace CecoChat.ConsoleClient
                 {
                     SenderId = userID,
                     ReceiverId = receiverId,
-                    Type = GrpcMessageType.PlainText,
                     PlainTextData = new GrpcPlainTextData {Text = text}
                 };
 
