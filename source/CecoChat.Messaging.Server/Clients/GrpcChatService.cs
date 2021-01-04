@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using CecoChat.Contracts;
+using CecoChat.GrpcContracts;
 using Grpc.Core;
 using Microsoft.Extensions.Logging;
 
@@ -18,9 +18,9 @@ namespace CecoChat.Messaging.Server.Clients
             _clientContainer = clientContainer;
         }
 
-        public override async Task Listen(ListenRequest request, IServerStreamWriter<Message> responseStream, ServerCallContext context)
+        public override async Task Listen(GrpcListenRequest request, IServerStreamWriter<GrpcMessage> responseStream, ServerCallContext context)
         {
-            IStreamingContext<Message> messageStream = new GrpcStreamingContext<Message>(_logger, responseStream);
+            IStreamingContext<GrpcMessage> messageStream = new GrpcStreamingContext<GrpcMessage>(_logger, responseStream);
             try
             {
                 _clientContainer.AddClient(request.UserId, messageStream);
@@ -33,23 +33,23 @@ namespace CecoChat.Messaging.Server.Clients
             }
         }
 
-        public override Task<SendMessageResponse> SendMessage(SendMessageRequest request, ServerCallContext context)
+        public override Task<GrpcSendMessageResponse> SendMessage(GrpcSendMessageRequest request, ServerCallContext context)
         {
-            Message message = request.Message;
-            IReadOnlyCollection<IStreamingContext<Message>> messageStreamList = _clientContainer.GetClients(message.ReceiverId);
+            GrpcMessage message = request.Message;
+            IReadOnlyCollection<IStreamingContext<GrpcMessage>> messageStreamList = _clientContainer.GetClients(message.ReceiverId);
 
-            foreach (IStreamingContext<Message> messageStream in messageStreamList)
+            foreach (IStreamingContext<GrpcMessage> messageStream in messageStreamList)
             {
                 messageStream.AddMessage(message);
             }
 
-            return Task.FromResult(new SendMessageResponse());
+            return Task.FromResult(new GrpcSendMessageResponse());
         }
 
-        public override Task<AckMessageResponse> AckMessage(AckMessageRequest request, ServerCallContext context)
+        public override Task<GrpcAckMessageResponse> AckMessage(GrpcAckMessageRequest request, ServerCallContext context)
         {
             // TODO: add listening for ack
-            return Task.FromResult(new AckMessageResponse());
+            return Task.FromResult(new GrpcAckMessageResponse());
         }
     }
 }

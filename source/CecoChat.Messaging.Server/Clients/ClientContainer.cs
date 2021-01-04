@@ -1,13 +1,13 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
-using CecoChat.Contracts;
+using CecoChat.GrpcContracts;
 
 namespace CecoChat.Messaging.Server.Clients
 {
     public sealed class ClientContainer : IClientContainer
     {
         // ReSharper disable once CollectionNeverUpdated.Local
-        private static readonly List<IStreamingContext<Message>> _emptyMessageStreamList = new List<IStreamingContext<Message>>(capacity: 0);
+        private static readonly List<IStreamingContext<GrpcMessage>> _emptyMessageStreamList = new List<IStreamingContext<GrpcMessage>>(capacity: 0);
         private readonly ConcurrentDictionary<int, ClientData> _clientsMap;
 
         public ClientContainer()
@@ -15,14 +15,14 @@ namespace CecoChat.Messaging.Server.Clients
             _clientsMap = new ConcurrentDictionary<int, ClientData>();
         }
 
-        public void AddClient(in int clientID, IStreamingContext<Message> messageStream)
+        public void AddClient(in int clientID, IStreamingContext<GrpcMessage> messageStream)
         {
             ClientData clientData = _clientsMap.GetOrAdd(clientID, _ => new ClientData());
             // TODO: figure out how to avoid same client being added twice
             clientData.MessageStreamList.Add(messageStream);
         }
 
-        public void RemoveClient(in int clientID, IStreamingContext<Message> messageStream)
+        public void RemoveClient(in int clientID, IStreamingContext<GrpcMessage> messageStream)
         {
             if (_clientsMap.TryGetValue(clientID, out ClientData clientData))
             {
@@ -30,7 +30,7 @@ namespace CecoChat.Messaging.Server.Clients
             }
         }
 
-        public IReadOnlyCollection<IStreamingContext<Message>> GetClients(in int clientID)
+        public IReadOnlyCollection<IStreamingContext<GrpcMessage>> GetClients(in int clientID)
         {
             if (_clientsMap.TryGetValue(clientID, out ClientData clientData))
             {
@@ -44,7 +44,7 @@ namespace CecoChat.Messaging.Server.Clients
 
         private sealed class ClientData
         {
-            public List<IStreamingContext<Message>> MessageStreamList { get; } = new List<IStreamingContext<Message>>();
+            public List<IStreamingContext<GrpcMessage>> MessageStreamList { get; } = new List<IStreamingContext<GrpcMessage>>();
         }
     }
 }

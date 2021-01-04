@@ -1,47 +1,47 @@
 syntax = "proto3";
-option csharp_namespace = "CecoChat.Contracts";
+option csharp_namespace = "CecoChat.GrpcContracts";
 package chat;
 
 service Chat {
-  rpc Listen(ListenRequest) returns (stream Message);
-  rpc SendMessage(SendMessageRequest) returns (SendMessageResponse);
-  rpc AckMessage(AckMessageRequest) returns (AckMessageResponse);
+  rpc Listen(GrpcListenRequest) returns (stream GrpcMessage);
+  rpc SendMessage(GrpcSendMessageRequest) returns (GrpcSendMessageResponse);
+  rpc AckMessage(GrpcAckMessageRequest) returns (GrpcAckMessageResponse);
 }
 
-message ListenRequest {
+message GrpcListenRequest {
   int32 user_id = 1;
 }
 
-enum MessageType {
+enum GrpcMessageType {
   unknown = 0;
   plain_text = 1;
 }
 
-message PlainTextData {
+message GrpcPlainTextData {
   string text = 1;
 }
 
-message Message {
+message GrpcMessage {
   int32 message_id = 1;
   int32 sender_id = 2;
   int32 receiver_id = 3;
-  MessageType type = 4;
+  GrpcMessageType type = 4;
   oneof data {
-    PlainTextData plain_text_data = 5;
+    GrpcPlainTextData plain_text_data = 5;
   }
 }
 
-message SendMessageRequest {
-  Message message = 1;
+message GrpcSendMessageRequest {
+  GrpcMessage message = 1;
 }
 
-message SendMessageResponse {
+message GrpcSendMessageResponse {
 }
 
-message AckMessageRequest {
+message GrpcAckMessageRequest {
   int32 sender_id = 1;
   int32 message_id = 2;
 }
 
-message AckMessageResponse {
+message GrpcAckMessageResponse {
 }
