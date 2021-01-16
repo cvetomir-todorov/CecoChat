@@ -5,10 +5,10 @@ namespace CecoChat.Messaging.Server.Clients
 {
     public interface IClientContainer
     {
-        void AddClient(in int clientID, IStreamingContext<GrpcMessage> messageStream);
+        void AddClient(in int clientID, IStreamer<GrpcMessage> streamer);
 
-        void RemoveClient(in int clientID, IStreamingContext<GrpcMessage> messageStream);
+        void RemoveClient(in int clientID, IStreamer<GrpcMessage> streamer);
 
-        IReadOnlyCollection<IStreamingContext<GrpcMessage>> GetClients(in int clientID);
+        IReadOnlyCollection<IStreamer<GrpcMessage>> GetClients(in int clientID);
     }
 }

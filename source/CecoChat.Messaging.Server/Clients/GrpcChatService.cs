@@ -20,27 +20,27 @@ namespace CecoChat.Messaging.Server.Clients
 
         public override async Task Listen(GrpcListenRequest request, IServerStreamWriter<GrpcMessage> responseStream, ServerCallContext context)
         {
-            IStreamingContext<GrpcMessage> messageStream = new GrpcStreamingContext<GrpcMessage>(_logger, responseStream);
+            IStreamer<GrpcMessage> streamer = new GrpcStreamer<GrpcMessage>(_logger, responseStream);
             try
             {
-                _clientContainer.AddClient(request.UserId, messageStream);
-                await messageStream.ProcessMessages(CancellationToken.None);
+                _clientContainer.AddClient(request.UserId, streamer);
+                await streamer.ProcessMessages(CancellationToken.None);
             }
             finally
             {
-                _clientContainer.RemoveClient(request.UserId, messageStream);
-                messageStream.Dispose();
+                _clientContainer.RemoveClient(request.UserId, streamer);
+                streamer.Dispose();
             }
         }
 
         public override Task<GrpcSendMessageResponse> SendMessage(GrpcSendMessageRequest request, ServerCallContext context)
         {
             GrpcMessage message = request.Message;
-            IReadOnlyCollection<IStreamingContext<GrpcMessage>> messageStreamList = _clientContainer.GetClients(message.ReceiverId);
+            IReadOnlyCollection<IStreamer<GrpcMessage>> streamerList = _clientContainer.GetClients(message.ReceiverId);
 
-            foreach (IStreamingContext<GrpcMessage> messageStream in messageStreamList)
+            foreach (IStreamer<GrpcMessage> streamer in streamerList)
             {
-                messageStream.AddMessage(message);
+                streamer.AddMessage(message);
             }
 
             return Task.FromResult(new GrpcSendMessageResponse());

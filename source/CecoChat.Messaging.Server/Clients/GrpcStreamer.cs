@@ -10,18 +10,18 @@ namespace CecoChat.Messaging.Server.Clients
     /// <summary>
     /// Streams <typeparam name="TMessage"/> instances to a connected client.
     /// </summary>
-    public sealed class GrpcStreamingContext<TMessage> : IStreamingContext<TMessage>
+    public sealed class GrpcStreamer<TMessage> : IStreamer<TMessage>
     {
         private readonly ILogger _logger;
-        private readonly IServerStreamWriter<TMessage> _responseStream;
+        private readonly IServerStreamWriter<TMessage> _streamWriter;
         // TODO: consider adding queue size and drop messages if queue is full
         private readonly ConcurrentQueue<TMessage> _messageQueue;
         private readonly SemaphoreSlim _signalProcessing;
 
-        public GrpcStreamingContext(ILogger logger, IServerStreamWriter<TMessage> responseStream)
+        public GrpcStreamer(ILogger logger, IServerStreamWriter<TMessage> streamWriter)
         {
             _logger = logger;
-            _responseStream = responseStream;
+            _streamWriter = streamWriter;
             _messageQueue = new ConcurrentQueue<TMessage>();
             _signalProcessing = new SemaphoreSlim(initialCount: 0, maxCount: 1);
         }
@@ -47,7 +47,7 @@ namespace CecoChat.Messaging.Server.Clients
                 {
                     try
                     {
-                        await _responseStream.WriteAsync(message);
+                        await _streamWriter.WriteAsync(message);
                         _logger.LogInformation("Success processing {0}", message);
                     }
                     catch (Exception exception)

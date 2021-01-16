@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace CecoChat.Messaging.Server.Clients
 {
-    public interface IStreamingContext<in TMessage> : IDisposable
+    public interface IStreamer<in TMessage> : IDisposable
     {
         void AddMessage(TMessage message);
 
