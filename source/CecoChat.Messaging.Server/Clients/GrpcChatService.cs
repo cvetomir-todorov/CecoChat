@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using CecoChat.GrpcContracts;
+using CecoChat.Contracts.Client;
 using Grpc.Core;
 using Microsoft.Extensions.Logging;
 
@@ -18,9 +18,9 @@ namespace CecoChat.Messaging.Server.Clients
             _clientContainer = clientContainer;
         }
 
-        public override async Task Listen(GrpcListenRequest request, IServerStreamWriter<GrpcMessage> responseStream, ServerCallContext context)
+        public override async Task Listen(ListenRequest request, IServerStreamWriter<ListenResponse> responseStream, ServerCallContext context)
         {
-            IStreamer<GrpcMessage> streamer = new GrpcStreamer<GrpcMessage>(_logger, responseStream);
+            IStreamer<ListenResponse> streamer = new GrpcStreamer<ListenResponse>(_logger, responseStream);
             try
             {
                 _clientContainer.AddClient(request.UserId, streamer);
@@ -33,17 +33,24 @@ namespace CecoChat.Messaging.Server.Clients
             }
         }
 
-        public override Task<GrpcSendMessageResponse> SendMessage(GrpcSendMessageRequest request, ServerCallContext context)
+        public override Task<SendMessageResponse> SendMessage(SendMessageRequest request, ServerCallContext context)
         {
-            GrpcMessage message = request.Message;
-            IReadOnlyCollection<IStreamer<GrpcMessage>> streamerList = _clientContainer.GetClients(message.ReceiverId);
+            Message message = request.Message;
+            IReadOnlyCollection<IStreamer<ListenResponse>> streamerList = _clientContainer.GetClients(message.ReceiverId);
 
-            foreach (IStreamer<GrpcMessage> streamer in streamerList)
+            if (streamerList.Count > 0)
             {
-                streamer.AddMessage(message);
+                ListenResponse response = new ListenResponse
+                {
+                    Message = message
+                };
+                foreach (IStreamer<ListenResponse> streamer in streamerList)
+                {
+                    streamer.AddMessage(response);
+                }
             }
 
-            return Task.FromResult(new GrpcSendMessageResponse());
+            return Task.FromResult(new SendMessageResponse());
         }
     }
 }

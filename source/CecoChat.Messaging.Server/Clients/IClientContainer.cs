@@ -1,14 +1,14 @@
 ﻿using System.Collections.Generic;
-using CecoChat.GrpcContracts;
+using CecoChat.Contracts.Client;
 
 namespace CecoChat.Messaging.Server.Clients
 {
     public interface IClientContainer
     {
-        void AddClient(in int clientID, IStreamer<GrpcMessage> streamer);
+        void AddClient(in int clientID, IStreamer<ListenResponse> streamer);
 
-        void RemoveClient(in int clientID, IStreamer<GrpcMessage> streamer);
+        void RemoveClient(in int clientID, IStreamer<ListenResponse> streamer);
 
-        IReadOnlyCollection<IStreamer<GrpcMessage>> GetClients(in int clientID);
+        IReadOnlyCollection<IStreamer<ListenResponse>> GetClients(in int clientID);
     }
 }

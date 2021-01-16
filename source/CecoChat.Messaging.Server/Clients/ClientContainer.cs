@@ -1,13 +1,13 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
-using CecoChat.GrpcContracts;
+using CecoChat.Contracts.Client;
 
 namespace CecoChat.Messaging.Server.Clients
 {
     public sealed class ClientContainer : IClientContainer
     {
         // ReSharper disable once CollectionNeverUpdated.Local
-        private static readonly List<IStreamer<GrpcMessage>> _emptyStreamerList = new(capacity: 0);
+        private static readonly List<IStreamer<ListenResponse>> _emptyStreamerList = new(capacity: 0);
         private readonly ConcurrentDictionary<int, ClientData> _clientsMap;
 
         public ClientContainer()
@@ -15,14 +15,14 @@ namespace CecoChat.Messaging.Server.Clients
             _clientsMap = new ConcurrentDictionary<int, ClientData>();
         }
 
-        public void AddClient(in int clientID, IStreamer<GrpcMessage> streamer)
+        public void AddClient(in int clientID, IStreamer<ListenResponse> streamer)
         {
             ClientData clientData = _clientsMap.GetOrAdd(clientID, _ => new ClientData());
             // TODO: figure out how to avoid same client being added twice
             clientData.StreamerList.Add(streamer);
         }
 
-        public void RemoveClient(in int clientID, IStreamer<GrpcMessage> streamer)
+        public void RemoveClient(in int clientID, IStreamer<ListenResponse> streamer)
         {
             if (_clientsMap.TryGetValue(clientID, out ClientData clientData))
             {
@@ -30,7 +30,7 @@ namespace CecoChat.Messaging.Server.Clients
             }
         }
 
-        public IReadOnlyCollection<IStreamer<GrpcMessage>> GetClients(in int clientID)
+        public IReadOnlyCollection<IStreamer<ListenResponse>> GetClients(in int clientID)
         {
             if (_clientsMap.TryGetValue(clientID, out ClientData clientData))
             {
@@ -44,7 +44,7 @@ namespace CecoChat.Messaging.Server.Clients
 
         private sealed class ClientData
         {
-            public List<IStreamer<GrpcMessage>> StreamerList { get; } = new();
+            public List<IStreamer<ListenResponse>> StreamerList { get; } = new();
         }
     }
 }

@@ -9,8 +9,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Protobuf Include="..\protos\chat.proto" GrpcServices="Server">
-      <Link>Protos\chat.proto</Link>
+    <Protobuf Include="..\protos\chat-service.proto" GrpcServices="Server">
+      <Link>Protos\chat-service.proto</Link>
+    </Protobuf>
+    <Protobuf Include="..\protos\message.proto">
+      <Link>Protos\message.proto</Link>
     </Protobuf>
   </ItemGroup>
 

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using CecoChat.GrpcContracts;
+using CecoChat.Contracts.Client;
 using Grpc.Core;
 using Grpc.Net.Client;
 
@@ -16,7 +16,7 @@ namespace CecoChat.ConsoleClient
             using GrpcChannel channel = GrpcChannel.ForAddress("https://localhost:5001");
             Chat.ChatClient client = new Chat.ChatClient(channel);
 
-            AsyncServerStreamingCall<GrpcMessage> serverStream = client.Listen(new GrpcListenRequest{UserId = userID});
+            AsyncServerStreamingCall<ListenResponse> serverStream = client.Listen(new ListenRequest{UserId = userID});
             Task _ = Task.Run(async () => await Listen(serverStream));
 
             while (true)
@@ -31,16 +31,16 @@ namespace CecoChat.ConsoleClient
                 Console.Write("Message: ");
                 string text = Console.ReadLine();
 
-                GrpcMessage message = new GrpcMessage
+                Message message = new Message
                 {
                     SenderId = userID,
                     ReceiverId = receiverId,
-                    PlainTextData = new GrpcPlainTextData {Text = text}
+                    PlainTextData = new PlainTextData {Text = text}
                 };
 
                 try
                 {
-                    await client.SendMessageAsync(new GrpcSendMessageRequest {Message = message});
+                    await client.SendMessageAsync(new SendMessageRequest {Message = message});
                 }
                 catch (Exception exception)
                 {
@@ -52,13 +52,13 @@ namespace CecoChat.ConsoleClient
             Console.WriteLine("Bye!");
         }
 
-        private static async Task Listen(AsyncServerStreamingCall<GrpcMessage> serverStream)
+        private static async Task Listen(AsyncServerStreamingCall<ListenResponse> serverStream)
         {
             try
             {
                 while (await serverStream.ResponseStream.MoveNext())
                 {
-                    GrpcMessage message = serverStream.ResponseStream.Current;
+                    Message message = serverStream.ResponseStream.Current.Message;
                     Console.WriteLine($"[{message.SenderId}] {message.PlainTextData.Text}");
                 }
             }
