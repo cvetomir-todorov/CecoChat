@@ -45,11 +45,5 @@ namespace CecoChat.Messaging.Server.Clients
 
             return Task.FromResult(new GrpcSendMessageResponse());
         }
-
-        public override Task<GrpcAckMessageResponse> AckMessage(GrpcAckMessageRequest request, ServerCallContext context)
-        {
-            // TODO: add listening for ack
-            return Task.FromResult(new GrpcAckMessageResponse());
-        }
     }
 }

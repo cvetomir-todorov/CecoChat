@@ -5,7 +5,6 @@ package chat;
 service Chat {
   rpc Listen(GrpcListenRequest) returns (stream GrpcMessage);
   rpc SendMessage(GrpcSendMessageRequest) returns (GrpcSendMessageResponse);
-  rpc AckMessage(GrpcAckMessageRequest) returns (GrpcAckMessageResponse);
 }
 
 message GrpcListenRequest {
@@ -16,12 +15,16 @@ message GrpcPlainTextData {
   string text = 1;
 }
 
+message GrpcAckData {
+}
+
 message GrpcMessage {
   int32 message_id = 1;
   int32 sender_id = 2;
   int32 receiver_id = 3;
   oneof data {
     GrpcPlainTextData plain_text_data = 4;
+    GrpcAckData ack_data = 5;
   }
 }
 
@@ -30,12 +33,4 @@ message GrpcSendMessageRequest {
 }
 
 message GrpcSendMessageResponse {
-}
-
-message GrpcAckMessageRequest {
-  int32 sender_id = 1;
-  int32 message_id = 2;
-}
-
-message GrpcAckMessageResponse {
 }
