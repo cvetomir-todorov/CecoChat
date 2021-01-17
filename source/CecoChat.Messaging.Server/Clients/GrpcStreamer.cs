@@ -47,7 +47,8 @@ namespace CecoChat.Messaging.Server.Clients
             while (!ct.IsCancellationRequested)
             {
                 await _signalProcessing.WaitAsync(ct);
-                bool stop = (await EmptyQueue()).Stop;
+                EmptyQueueResult result = await EmptyQueue(ct);
+                bool stop = result.Stop;
                 if (stop)
                 {
                     break;
@@ -60,9 +61,9 @@ namespace CecoChat.Messaging.Server.Clients
             public bool Stop { get; init; }
         }
 
-        private async Task<EmptyQueueResult> EmptyQueue()
+        private async Task<EmptyQueueResult> EmptyQueue(CancellationToken ct)
         {
-            while (_messageQueue.TryDequeue(out TMessage message))
+            while (!ct.IsCancellationRequested && _messageQueue.TryDequeue(out TMessage message))
             {
                 try
                 {

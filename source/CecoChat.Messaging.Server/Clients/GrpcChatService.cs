@@ -1,4 +1,4 @@
-﻿using System.Threading;
+﻿using System;
 using System.Threading.Tasks;
 using CecoChat.Contracts.Client;
 using CecoChat.Messaging.Server.Servers.Production;
@@ -35,10 +35,9 @@ namespace CecoChat.Messaging.Server.Clients
             try
             {
                 _clientContainer.AddClient(request.UserId, streamer);
-                // TODO: pass a cancellation token
-                await streamer.ProcessMessages(CancellationToken.None);
+                await streamer.ProcessMessages(context.CancellationToken);
             }
-            finally
+            catch (OperationCanceledException)
             {
                 _clientContainer.RemoveClient(request.UserId, streamer);
                 streamer.Dispose();
