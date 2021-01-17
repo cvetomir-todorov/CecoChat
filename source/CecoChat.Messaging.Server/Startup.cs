@@ -26,6 +26,7 @@ namespace CecoChat.Messaging.Server
             services.AddSingleton<IClientContainer, ClientContainer>();
             services.AddSingleton<IPartitionUtility, PartitionUtility>();
             services.AddSingleton<IClientBackendMapper, ClientBackendMapper>();
+            services.AddSingleton<ITopicPartitionFlyweight, TopicPartitionFlyweight>();
             services.AddSingleton<IBackendProducer, KafkaProducer>();
             services.AddSingleton<IBackendConsumer, KafkaConsumer>();
             services.AddHostedService<BackendConsumptionHostedService>();

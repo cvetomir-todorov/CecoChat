@@ -8,19 +8,23 @@ namespace CecoChat.Messaging.Server.Servers.Production
     public sealed class KafkaProducer : IBackendProducer
     {
         private readonly ILogger _logger;
-        private readonly IKafkaOptions _options;
         private readonly IPartitionUtility _partitionUtility;
+        private readonly ITopicPartitionFlyweight _topicPartitionFlyweight;
         private readonly IProducer<Null, Message> _producer;
 
-        public KafkaProducer(ILogger<KafkaProducer> logger, IOptions<KafkaOptions> options, IPartitionUtility partitionUtility)
+        public KafkaProducer(
+            ILogger<KafkaProducer> logger,
+            IOptions<KafkaOptions> options,
+            IPartitionUtility partitionUtility,
+            ITopicPartitionFlyweight topicPartitionFlyweight)
         {
             _logger = logger;
-            _options = options.Value;
             _partitionUtility = partitionUtility;
+            _topicPartitionFlyweight = topicPartitionFlyweight;
 
             ProducerConfig configuration = new()
             {
-                BootstrapServers = string.Join(separator: ',', _options.BootstrapServers),
+                BootstrapServers = string.Join(separator: ',', options.Value.BootstrapServers),
                 Acks = Acks.All,
                 LingerMs = 1.0,
                 MessageTimeoutMs = 300000,
@@ -39,10 +43,8 @@ namespace CecoChat.Messaging.Server.Servers.Production
 
         public void ProduceMessage(Message message)
         {
-            // TODO: use topic partition flyweight
-            string topic = _options.MessagesTopic;
             int partition = _partitionUtility.ChoosePartition(message);
-            TopicPartition topicPartition = new TopicPartition(topic, new Partition(partition));
+            TopicPartition topicPartition = _topicPartitionFlyweight.GetMessagesTopicPartition(partition);
             Message<Null, Message> kafkaMessage = new()
             {
                 Value = message

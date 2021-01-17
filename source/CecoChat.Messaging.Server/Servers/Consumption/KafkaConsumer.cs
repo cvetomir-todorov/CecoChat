@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using CecoChat.Contracts.Client;
 using CecoChat.Messaging.Server.Clients;
@@ -18,18 +19,21 @@ namespace CecoChat.Messaging.Server.Servers.Consumption
         private readonly IKafkaOptions _options;
         private readonly IClientContainer _clientContainer;
         private readonly IClientBackendMapper _mapper;
+        private readonly ITopicPartitionFlyweight _topicPartitionFlyweight;
         private readonly IConsumer<Null, BackendMessage> _consumer;
 
         public KafkaConsumer(
             ILogger<KafkaProducer> logger,
             IOptions<KafkaOptions> options,
             IClientContainer clientContainer,
-            IClientBackendMapper mapper)
+            IClientBackendMapper mapper,
+            ITopicPartitionFlyweight topicPartitionFlyweight)
         {
             _logger = logger;
             _options = options.Value;
             _clientContainer = clientContainer;
             _mapper = mapper;
+            _topicPartitionFlyweight = topicPartitionFlyweight;
 
             ConsumerConfig configuration = new()
             {
@@ -56,8 +60,7 @@ namespace CecoChat.Messaging.Server.Servers.Consumption
             List<TopicPartition> allPartitions = new(capacity: _options.MessagesTopicPartitionCount);
             for (int partition = 0; partition < _options.MessagesTopicPartitionCount; ++partition)
             {
-                // TODO: use topic partition flyweight
-                TopicPartition topicPartition = new TopicPartition(_options.MessagesTopic, partition);
+                TopicPartition topicPartition = _topicPartitionFlyweight.GetMessagesTopicPartition(partition);
                 allPartitions.Add(topicPartition);
             }
 
@@ -68,9 +71,16 @@ namespace CecoChat.Messaging.Server.Servers.Consumption
         {
             while (!ct.IsCancellationRequested)
             {
-                ConsumeResult<Null, BackendMessage> consumeResult = _consumer.Consume(ct);
-                ProcessMessage(consumeResult.Message.Value);
-                _consumer.Commit(consumeResult);
+                try
+                {
+                    ConsumeResult<Null, BackendMessage> consumeResult = _consumer.Consume(ct);
+                    ProcessMessage(consumeResult.Message.Value);
+                    _consumer.Commit(consumeResult);
+                }
+                catch (Exception exception)
+                {
+                    _logger.LogError(exception, "Error during backend consumption.");
+                }
             }
         }
 
@@ -79,7 +89,6 @@ namespace CecoChat.Messaging.Server.Servers.Consumption
             IReadOnlyCollection<IStreamer<ListenResponse>> clients = _clientContainer.GetClients(backendMessage.ReceiverID);
             if (clients.Count <= 0)
             {
-                // TODO: send a push notification
                 return;
             }
 
