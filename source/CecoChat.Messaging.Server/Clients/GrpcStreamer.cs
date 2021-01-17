@@ -47,20 +47,43 @@ namespace CecoChat.Messaging.Server.Clients
             while (!ct.IsCancellationRequested)
             {
                 await _signalProcessing.WaitAsync(ct);
-
-                while (_messageQueue.TryDequeue(out TMessage message))
+                bool stop = (await EmptyQueue()).Stop;
+                if (stop)
                 {
-                    try
-                    {
-                        await _streamWriter.WriteAsync(message);
-                        _logger.LogTrace("Sent {0} message {1}", _clientID, message);
-                    }
-                    catch (Exception exception)
-                    {
-                        _logger.LogError(exception, "Failed to send {0} message {1}", _clientID, message);
-                    }
+                    break;
                 }
             }
+        }
+
+        private struct EmptyQueueResult
+        {
+            public bool Stop { get; init; }
+        }
+
+        private async Task<EmptyQueueResult> EmptyQueue()
+        {
+            while (_messageQueue.TryDequeue(out TMessage message))
+            {
+                try
+                {
+                    await _streamWriter.WriteAsync(message);
+                    _logger.LogTrace("Sent {0} message {1}", _clientID, message);
+                }
+                catch (InvalidOperationException invalidOperationException)
+                    when (invalidOperationException.Message == "Can't write the message because the request is complete.")
+                {
+                    // completed gRPC request is equivalent to client being disconnected
+                    // even if underlying connection is still active
+                    return new EmptyQueueResult {Stop = true};
+                }
+                catch (Exception exception)
+                {
+                    _logger.LogError(exception, "Failed to send {0} message {1}", _clientID, message);
+                    return new EmptyQueueResult {Stop = true};
+                }
+            }
+
+            return new EmptyQueueResult {Stop = false};
         }
     }
 }

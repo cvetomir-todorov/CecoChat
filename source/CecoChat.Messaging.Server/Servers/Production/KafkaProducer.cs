@@ -73,6 +73,7 @@ namespace CecoChat.Messaging.Server.Servers.Production
             };
 
             _producer.Produce(topicPartition, kafkaMessage, DeliveryHandler);
+            _logger.LogTrace("Produced backend message {0}.", message);
         }
 
         private void DeliveryHandler(DeliveryReport<Null, Message> report)

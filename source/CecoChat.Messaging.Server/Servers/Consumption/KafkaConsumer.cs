@@ -101,7 +101,7 @@ namespace CecoChat.Messaging.Server.Servers.Consumption
             IReadOnlyCollection<IStreamer<ListenResponse>> clients = _clientContainer.GetClients(backendMessage.ReceiverID);
             if (clients.Count <= 0)
             {
-                _logger.LogTrace("No receiver for message {0}.", backendMessage);
+                _logger.LogTrace("There are not any connected clients for message {0}.", backendMessage);
                 return;
             }
 
@@ -116,7 +116,7 @@ namespace CecoChat.Messaging.Server.Servers.Consumption
                 streamer.AddMessage(response);
             }
 
-            _logger.LogTrace("Delegated clients message {0}.", backendMessage);
+            _logger.LogTrace("Connected clients were sent message {0}.", backendMessage);
         }
 
         private void HandleConsumerDisposal(Exception exception, CancellationToken ct)
