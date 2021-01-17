@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CecoChat.ConsoleClient", "C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CecoChat.Messaging.Server", "CecoChat.Messaging.Server\CecoChat.Messaging.Server.csproj", "{C7F0F25B-75B3-4AA1-AA20-9D1E0C25366F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CecoChat.Contracts.Backend", "CecoChat.Contracts.Backend\CecoChat.Contracts.Backend.csproj", "{36B908A7-76FE-40D6-B2D2-860D33B55C81}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{C7F0F25B-75B3-4AA1-AA20-9D1E0C25366F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C7F0F25B-75B3-4AA1-AA20-9D1E0C25366F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C7F0F25B-75B3-4AA1-AA20-9D1E0C25366F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{36B908A7-76FE-40D6-B2D2-860D33B55C81}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36B908A7-76FE-40D6-B2D2-860D33B55C81}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36B908A7-76FE-40D6-B2D2-860D33B55C81}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36B908A7-76FE-40D6-B2D2-860D33B55C81}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
