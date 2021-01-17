@@ -1,4 +1,8 @@
 using CecoChat.Messaging.Server.Clients;
+using CecoChat.Messaging.Server.Servers;
+using CecoChat.Messaging.Server.Servers.Consumption;
+using CecoChat.Messaging.Server.Servers.Production;
+using CecoChat.Messaging.Server.Shared;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -20,6 +24,12 @@ namespace CecoChat.Messaging.Server
         {
             services.AddGrpc();
             services.AddSingleton<IClientContainer, ClientContainer>();
+            services.AddSingleton<IPartitionUtility, PartitionUtility>();
+            services.AddSingleton<IClientBackendMapper, ClientBackendMapper>();
+            services.AddSingleton<IBackendProducer, KafkaProducer>();
+            services.AddSingleton<IBackendConsumer, KafkaConsumer>();
+            services.AddHostedService<BackendConsumptionHostedService>();
+            services.Configure<KafkaOptions>(Configuration.GetSection("Kafka"));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
