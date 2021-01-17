@@ -17,5 +17,10 @@ namespace CecoChat.Contracts.Backend
 
         [ProtoMember(4)]
         public MessageType Type { get; set; }
+
+        public override string ToString()
+        {
+            return $"[{MessageID}] {SenderID}->{ReceiverID} {Type}";
+        }
     }
 }

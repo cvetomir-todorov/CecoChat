@@ -1,5 +1,7 @@
-﻿using CecoChat.Contracts.Backend;
+﻿using System;
+using CecoChat.Contracts.Backend;
 using Confluent.Kafka;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -15,12 +17,15 @@ namespace CecoChat.Messaging.Server.Servers.Production
         public KafkaProducer(
             ILogger<KafkaProducer> logger,
             IOptions<KafkaOptions> options,
+            IHostApplicationLifetime applicationLifetime,
             IPartitionUtility partitionUtility,
             ITopicPartitionFlyweight topicPartitionFlyweight)
         {
             _logger = logger;
             _partitionUtility = partitionUtility;
             _topicPartitionFlyweight = topicPartitionFlyweight;
+
+            applicationLifetime.ApplicationStopping.Register(FlushPendingMessages);
 
             ProducerConfig configuration = new()
             {
@@ -39,6 +44,23 @@ namespace CecoChat.Messaging.Server.Servers.Production
         public void Dispose()
         {
             _producer.Dispose();
+        }
+
+        private void FlushPendingMessages()
+        {
+            if (_producer == null)
+                return;
+
+            try
+            {
+                _logger.LogInformation("Flushing pending backend messages...");
+                _producer.Flush();
+                _logger.LogInformation("Flushing pending backend messages succeeded.");
+            }
+            catch (Exception exception)
+            {
+                _logger.LogError(exception, "Flushing pending backend messages failed.");
+            }
         }
 
         public void ProduceMessage(Message message)
@@ -72,11 +94,6 @@ namespace CecoChat.Messaging.Server.Servers.Production
                 _logger.LogError("Backend message {0} topic partition {1} error '{2}'.",
                     message.MessageID, report.TopicPartitionOffsetError.Partition, report.TopicPartitionOffsetError.Error.Reason);
             }
-        }
-
-        public void FlushPendingMessages()
-        {
-            _producer.Flush();
         }
     }
 }

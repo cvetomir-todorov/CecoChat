@@ -23,6 +23,7 @@ namespace CecoChat.Messaging.Server.Servers.Consumption
             _backendConsumer.Prepare();
             Task.Factory.StartNew(() => _backendConsumer.Start(CancellationToken.None), ct, TaskCreationOptions.LongRunning, TaskScheduler.Current);
 
+            _logger.LogInformation("Started backend consumption.");
             return Task.CompletedTask;
         }
 

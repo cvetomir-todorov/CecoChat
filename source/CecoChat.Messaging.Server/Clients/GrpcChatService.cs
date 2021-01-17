@@ -29,7 +29,9 @@ namespace CecoChat.Messaging.Server.Clients
 
         public override async Task Listen(ListenRequest request, IServerStreamWriter<ListenResponse> responseStream, ServerCallContext context)
         {
-            IStreamer<ListenResponse> streamer = new GrpcStreamer<ListenResponse>(_logger, responseStream);
+            string clientID = context.Peer;
+            _logger.LogTrace("Client {0} connected.", clientID);
+            IStreamer<ListenResponse> streamer = new GrpcStreamer<ListenResponse>(_logger, responseStream, context);
             try
             {
                 _clientContainer.AddClient(request.UserId, streamer);
@@ -40,6 +42,7 @@ namespace CecoChat.Messaging.Server.Clients
             {
                 _clientContainer.RemoveClient(request.UserId, streamer);
                 streamer.Dispose();
+                _logger.LogTrace("Client {0} disconnected.", clientID);
             }
         }
 

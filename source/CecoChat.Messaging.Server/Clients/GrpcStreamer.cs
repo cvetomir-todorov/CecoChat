@@ -14,14 +14,19 @@ namespace CecoChat.Messaging.Server.Clients
     {
         private readonly ILogger _logger;
         private readonly IServerStreamWriter<TMessage> _streamWriter;
+        private readonly string _clientID;
         // TODO: consider adding queue size and drop messages if queue is full
         private readonly ConcurrentQueue<TMessage> _messageQueue;
         private readonly SemaphoreSlim _signalProcessing;
 
-        public GrpcStreamer(ILogger logger, IServerStreamWriter<TMessage> streamWriter)
+        public GrpcStreamer(
+            ILogger logger,
+            IServerStreamWriter<TMessage> streamWriter,
+            ServerCallContext context)
         {
             _logger = logger;
             _streamWriter = streamWriter;
+            _clientID = context.Peer;
             _messageQueue = new ConcurrentQueue<TMessage>();
             _signalProcessing = new SemaphoreSlim(initialCount: 0, maxCount: 1);
         }
@@ -48,11 +53,11 @@ namespace CecoChat.Messaging.Server.Clients
                     try
                     {
                         await _streamWriter.WriteAsync(message);
-                        _logger.LogInformation("Success processing {0}", message);
+                        _logger.LogTrace("Sent {0} message {1}", _clientID, message);
                     }
                     catch (Exception exception)
                     {
-                        _logger.LogError(exception, "Error processing {0}", message);
+                        _logger.LogError(exception, "Failed to send {0} message {1}", _clientID, message);
                     }
                 }
             }

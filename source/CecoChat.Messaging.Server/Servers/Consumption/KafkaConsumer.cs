@@ -69,6 +69,8 @@ namespace CecoChat.Messaging.Server.Servers.Consumption
 
         public void Start(CancellationToken ct)
         {
+            _logger.LogInformation("Start consumption hosted service.");
+
             while (!ct.IsCancellationRequested)
             {
                 try
@@ -77,11 +79,21 @@ namespace CecoChat.Messaging.Server.Servers.Consumption
                     ProcessMessage(consumeResult.Message.Value);
                     _consumer.Commit(consumeResult);
                 }
+                catch (AccessViolationException accessViolationException)
+                {
+                    HandleConsumerDisposal(accessViolationException, ct);
+                }
+                catch (ObjectDisposedException objectDisposedException)
+                {
+                    HandleConsumerDisposal(objectDisposedException, ct);
+                }
                 catch (Exception exception)
                 {
                     _logger.LogError(exception, "Error during backend consumption.");
                 }
             }
+
+            _logger.LogInformation("Stopped consumption hosted service.");
         }
 
         private void ProcessMessage(BackendMessage backendMessage)
@@ -89,6 +101,7 @@ namespace CecoChat.Messaging.Server.Servers.Consumption
             IReadOnlyCollection<IStreamer<ListenResponse>> clients = _clientContainer.GetClients(backendMessage.ReceiverID);
             if (clients.Count <= 0)
             {
+                _logger.LogTrace("No receiver for message {0}.", backendMessage);
                 return;
             }
 
@@ -101,6 +114,16 @@ namespace CecoChat.Messaging.Server.Servers.Consumption
             foreach (IStreamer<ListenResponse> streamer in clients)
             {
                 streamer.AddMessage(response);
+            }
+
+            _logger.LogTrace("Delegated clients message {0}.", backendMessage);
+        }
+
+        private void HandleConsumerDisposal(Exception exception, CancellationToken ct)
+        {
+            if (!ct.IsCancellationRequested)
+            {
+                _logger.LogError(exception, "Kafka consumer is disposed without cancellation being requested.");
             }
         }
     }
