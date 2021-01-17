@@ -35,6 +35,7 @@ namespace CecoChat.ConsoleClient
                 {
                     SenderId = userID,
                     ReceiverId = receiverId,
+                    Type = MessageType.PlainText,
                     PlainTextData = new PlainTextData {Text = text}
                 };
 
