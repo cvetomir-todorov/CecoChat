@@ -14,24 +14,30 @@ namespace CecoChat.Messaging.Server.Clients
         private readonly IClientContainer _clientContainer;
         private readonly IBackendProducer _backendProducer;
         private readonly IClientBackendMapper _mapper;
+        private readonly IFactory<IGrpcStreamer<ListenResponse>> _streamerFactory;
 
         public GrpcChatService(
             ILogger<GrpcChatService> logger,
             IClientContainer clientContainer,
             IBackendProducer backendProducer,
-            IClientBackendMapper mapper)
+            IClientBackendMapper mapper,
+            IFactory<IGrpcStreamer<ListenResponse>> streamerFactory)
         {
             _logger = logger;
             _clientContainer = clientContainer;
             _backendProducer = backendProducer;
             _mapper = mapper;
+            _streamerFactory = streamerFactory;
         }
 
         public override async Task Listen(ListenRequest request, IServerStreamWriter<ListenResponse> responseStream, ServerCallContext context)
         {
             string clientID = context.Peer;
             _logger.LogTrace("Client {0} connected.", clientID);
-            IStreamer<ListenResponse> streamer = new GrpcStreamer<ListenResponse>(_logger, responseStream, context);
+
+            IGrpcStreamer<ListenResponse> streamer = _streamerFactory.Create();
+            streamer.Initialize(responseStream, context);
+
             try
             {
                 _clientContainer.AddClient(request.UserId, streamer);
@@ -40,8 +46,11 @@ namespace CecoChat.Messaging.Server.Clients
             catch (OperationCanceledException)
             {
                 _clientContainer.RemoveClient(request.UserId, streamer);
-                streamer.Dispose();
                 _logger.LogTrace("Client {0} disconnected.", clientID);
+            }
+            finally
+            {
+                streamer.Dispose();
             }
         }
 

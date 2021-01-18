@@ -1,3 +1,4 @@
+using CecoChat.Contracts.Client;
 using CecoChat.Messaging.Server.Backend;
 using CecoChat.Messaging.Server.Backend.Consumption;
 using CecoChat.Messaging.Server.Backend.Production;
@@ -25,6 +26,8 @@ namespace CecoChat.Messaging.Server
             // clients
             services.AddGrpc();
             services.AddSingleton<IClientContainer, ClientContainer>();
+            services.AddFactory<IGrpcStreamer<ListenResponse>, GrpcStreamer<ListenResponse>>();
+            services.Configure<ClientOptions>(Configuration.GetSection("Clients"));
 
             // backend
             services.AddSingleton<IPartitionUtility, PartitionUtility>();

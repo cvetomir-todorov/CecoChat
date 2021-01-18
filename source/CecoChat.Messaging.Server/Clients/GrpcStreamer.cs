@@ -4,31 +4,42 @@ using System.Threading;
 using System.Threading.Tasks;
 using Grpc.Core;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace CecoChat.Messaging.Server.Clients
 {
+    public interface IGrpcStreamer<TMessage> : IStreamer<TMessage>
+    {
+        void Initialize(IServerStreamWriter<TMessage> streamWriter, ServerCallContext context);
+    }
+
     /// <summary>
     /// Streams <typeparam name="TMessage"/> instances to a connected client.
     /// </summary>
-    public sealed class GrpcStreamer<TMessage> : IStreamer<TMessage>
+    public sealed class GrpcStreamer<TMessage> : IGrpcStreamer<TMessage>
     {
         private readonly ILogger _logger;
-        private readonly IServerStreamWriter<TMessage> _streamWriter;
-        private readonly string _clientID;
-        // TODO: consider adding queue size and drop messages if queue is full
-        private readonly ConcurrentQueue<TMessage> _messageQueue;
+        private readonly BlockingCollection<TMessage> _messageQueue;
         private readonly SemaphoreSlim _signalProcessing;
 
+        private IServerStreamWriter<TMessage> _streamWriter;
+        private string _clientID;
+
         public GrpcStreamer(
-            ILogger logger,
-            IServerStreamWriter<TMessage> streamWriter,
-            ServerCallContext context)
+            ILogger<GrpcStreamer<TMessage>> logger,
+            IOptions<ClientOptions> options)
         {
             _logger = logger;
+            _messageQueue = new BlockingCollection<TMessage>(
+                collection: new ConcurrentQueue<TMessage>(),
+                boundedCapacity: options.Value.SendMessagesHighWatermark);
+            _signalProcessing = new SemaphoreSlim(initialCount: 0, maxCount: 1);
+        }
+
+        public void Initialize(IServerStreamWriter<TMessage> streamWriter, ServerCallContext context)
+        {
             _streamWriter = streamWriter;
             _clientID = context.Peer;
-            _messageQueue = new ConcurrentQueue<TMessage>();
-            _signalProcessing = new SemaphoreSlim(initialCount: 0, maxCount: 1);
         }
 
         public void Dispose()
@@ -36,10 +47,15 @@ namespace CecoChat.Messaging.Server.Clients
             _signalProcessing.Dispose();
         }
 
-        public void AddMessage(TMessage message)
+        public bool AddMessage(TMessage message)
         {
-            _messageQueue.Enqueue(message);
-            _signalProcessing.Release();
+            bool isAdded = _messageQueue.TryAdd(message);
+            if (isAdded)
+            {
+                _signalProcessing.Release();
+            }
+
+            return isAdded;
         }
 
         public async Task ProcessMessages(CancellationToken ct)
@@ -63,7 +79,7 @@ namespace CecoChat.Messaging.Server.Clients
 
         private async Task<EmptyQueueResult> EmptyQueue(CancellationToken ct)
         {
-            while (!ct.IsCancellationRequested && _messageQueue.TryDequeue(out TMessage message))
+            while (!ct.IsCancellationRequested && _messageQueue.TryTake(out TMessage message))
             {
                 try
                 {

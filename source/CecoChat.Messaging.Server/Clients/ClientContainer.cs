@@ -12,7 +12,7 @@ namespace CecoChat.Messaging.Server.Clients
 
         void RemoveClient(in int userID, IStreamer<ListenResponse> streamer);
 
-        IReadOnlyCollection<IStreamer<ListenResponse>> GetClients(in int userID);
+        IEnumerable<IStreamer<ListenResponse>> GetClients(in int userID);
     }
 
     public sealed class ClientContainer : IClientContainer
@@ -46,7 +46,7 @@ namespace CecoChat.Messaging.Server.Clients
             }
         }
 
-        public IReadOnlyCollection<IStreamer<ListenResponse>> GetClients(in int userID)
+        public IEnumerable<IStreamer<ListenResponse>> GetClients(in int userID)
         {
             if (_userMap.TryGetValue(userID, out UserData userData))
             {

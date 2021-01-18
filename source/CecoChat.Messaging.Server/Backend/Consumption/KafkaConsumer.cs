@@ -98,12 +98,7 @@ namespace CecoChat.Messaging.Server.Backend.Consumption
 
         private void ProcessMessage(BackendMessage backendMessage)
         {
-            IReadOnlyCollection<IStreamer<ListenResponse>> clients = _clientContainer.GetClients(backendMessage.ReceiverID);
-            if (clients.Count <= 0)
-            {
-                _logger.LogTrace("There are not any connected clients for message {0}.", backendMessage);
-                return;
-            }
+            IEnumerable<IStreamer<ListenResponse>> clients = _clientContainer.GetClients(backendMessage.ReceiverID);
 
             ClientMessage clientMessage = _mapper.MapBackendToClientMessage(backendMessage);
             ListenResponse response = new ListenResponse
@@ -111,12 +106,28 @@ namespace CecoChat.Messaging.Server.Backend.Consumption
                 Message = clientMessage
             };
 
+            // do not call clients.Count since it is expensive and uses locks
+            int successCount = 0;
+            int allCount = 0;
+
             foreach (IStreamer<ListenResponse> streamer in clients)
             {
-                streamer.AddMessage(response);
+                if (streamer.AddMessage(response))
+                {
+                    successCount++;
+                }
+
+                allCount++;
             }
 
-            _logger.LogTrace("Connected clients were sent message {0}.", backendMessage);
+            if (successCount < allCount)
+            {
+                _logger.LogWarning("Connected clients ({0} out of {1}) were sent message {2}.", successCount, allCount, backendMessage);
+            }
+            else
+            {
+                _logger.LogTrace("Connected clients (all {0}) were sent message {1}.", successCount, backendMessage);
+            }
         }
 
         private void HandleConsumerDisposal(Exception exception, CancellationToken ct)
