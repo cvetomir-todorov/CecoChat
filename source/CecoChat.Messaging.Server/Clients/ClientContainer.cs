@@ -1,6 +1,8 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using CecoChat.Contracts.Client;
+using ConcurrentCollections;
 
 namespace CecoChat.Messaging.Server.Clients
 {
@@ -27,15 +29,20 @@ namespace CecoChat.Messaging.Server.Clients
         public void AddClient(in int userID, IStreamer<ListenResponse> streamer)
         {
             UserData userData = _userMap.GetOrAdd(userID, _ => new UserData());
-            // TODO: figure out how to avoid same client being added twice
-            userData.StreamerList.Add(streamer);
+            if (!userData.Streamers.Add(streamer))
+            {
+                throw new InvalidOperationException($"Client for user {userID} has already been added.");
+            }
         }
 
         public void RemoveClient(in int userID, IStreamer<ListenResponse> streamer)
         {
             if (_userMap.TryGetValue(userID, out UserData userData))
             {
-                userData.StreamerList.Remove(streamer);
+                if (!userData.Streamers.TryRemove(streamer))
+                {
+                    throw new InvalidOperationException($"Client for user {userID} has already been removed.");
+                }
             }
         }
 
@@ -43,7 +50,7 @@ namespace CecoChat.Messaging.Server.Clients
         {
             if (_userMap.TryGetValue(userID, out UserData userData))
             {
-                return userData.StreamerList;
+                return userData.Streamers;
             }
             else
             {
@@ -53,7 +60,9 @@ namespace CecoChat.Messaging.Server.Clients
 
         private sealed class UserData
         {
-            public List<IStreamer<ListenResponse>> StreamerList { get; } = new();
+            public ConcurrentHashSet<IStreamer<ListenResponse>> Streamers { get; }
+                // we don't usually expect the connected clients to be > 1
+                = new(concurrencyLevel: Environment.ProcessorCount, capacity: 2);
         }
     }
 }
