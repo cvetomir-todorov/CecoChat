@@ -1,23 +1,23 @@
 ﻿using System.Collections.Generic;
 
-namespace CecoChat.Messaging.Server.Servers
+namespace CecoChat.Messaging.Server.Backend
 {
-    public interface IKafkaOptions
+    public interface IBackendOptions
     {
         public List<string> BootstrapServers { get; }
 
-        public string MessagesTopic { get; }
+        public string MessagesTopicName { get; }
 
         public int MessagesTopicPartitionCount { get; }
 
         public string ConsumerGroupID { get; }
     }
 
-    public sealed class KafkaOptions : IKafkaOptions
+    public sealed class BackendOptions : IBackendOptions
     {
         public List<string> BootstrapServers { get; set; }
 
-        public string MessagesTopic { get; set; }
+        public string MessagesTopicName { get; set; }
 
         public int MessagesTopicPartitionCount { get; set; }
 

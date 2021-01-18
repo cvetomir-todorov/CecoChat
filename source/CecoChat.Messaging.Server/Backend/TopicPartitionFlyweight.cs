@@ -2,7 +2,7 @@
 using Confluent.Kafka;
 using Microsoft.Extensions.Options;
 
-namespace CecoChat.Messaging.Server.Servers
+namespace CecoChat.Messaging.Server.Backend
 {
     public interface ITopicPartitionFlyweight
     {
@@ -11,17 +11,15 @@ namespace CecoChat.Messaging.Server.Servers
 
     public sealed class TopicPartitionFlyweight : ITopicPartitionFlyweight
     {
-        private readonly IKafkaOptions _options;
         private readonly TopicPartition[] _messageTopicPartitions;
 
-        public TopicPartitionFlyweight(IOptions<KafkaOptions> options)
+        public TopicPartitionFlyweight(IOptions<BackendOptions> options)
         {
-            _options = options.Value;
-            _messageTopicPartitions = new TopicPartition[_options.MessagesTopicPartitionCount];
+            _messageTopicPartitions = new TopicPartition[options.Value.MessagesTopicPartitionCount];
 
-            for (int partition = 0; partition < _options.MessagesTopicPartitionCount; ++partition)
+            for (int partition = 0; partition < options.Value.MessagesTopicPartitionCount; ++partition)
             {
-                _messageTopicPartitions[partition] = new TopicPartition(_options.MessagesTopic, partition);
+                _messageTopicPartitions[partition] = new TopicPartition(options.Value.MessagesTopicName, partition);
             }
         }
 

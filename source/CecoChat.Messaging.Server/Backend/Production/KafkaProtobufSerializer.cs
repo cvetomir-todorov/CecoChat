@@ -3,7 +3,7 @@ using Confluent.Kafka;
 using ProtoBuf;
 using SerializationContext = Confluent.Kafka.SerializationContext;
 
-namespace CecoChat.Messaging.Server.Servers.Production
+namespace CecoChat.Messaging.Server.Backend.Production
 {
     public sealed class KafkaProtobufSerializer<TMessage> : ISerializer<TMessage>
     {

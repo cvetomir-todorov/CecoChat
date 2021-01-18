@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Threading;
 using CecoChat.Contracts.Client;
+using CecoChat.Messaging.Server.Backend.Production;
 using CecoChat.Messaging.Server.Clients;
-using CecoChat.Messaging.Server.Servers.Production;
 using CecoChat.Messaging.Server.Shared;
 using Confluent.Kafka;
 using Microsoft.Extensions.Logging;
@@ -11,12 +11,12 @@ using Microsoft.Extensions.Options;
 using ClientMessage = CecoChat.Contracts.Client.Message;
 using BackendMessage = CecoChat.Contracts.Backend.Message;
 
-namespace CecoChat.Messaging.Server.Servers.Consumption
+namespace CecoChat.Messaging.Server.Backend.Consumption
 {
     public sealed class KafkaConsumer : IBackendConsumer
     {
         private readonly ILogger _logger;
-        private readonly IKafkaOptions _options;
+        private readonly IBackendOptions _options;
         private readonly IClientContainer _clientContainer;
         private readonly IClientBackendMapper _mapper;
         private readonly ITopicPartitionFlyweight _topicPartitionFlyweight;
@@ -24,7 +24,7 @@ namespace CecoChat.Messaging.Server.Servers.Consumption
 
         public KafkaConsumer(
             ILogger<KafkaProducer> logger,
-            IOptions<KafkaOptions> options,
+            IOptions<BackendOptions> options,
             IClientContainer clientContainer,
             IClientBackendMapper mapper,
             ITopicPartitionFlyweight topicPartitionFlyweight)

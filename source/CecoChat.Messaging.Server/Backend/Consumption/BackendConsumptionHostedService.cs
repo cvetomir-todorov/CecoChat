@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace CecoChat.Messaging.Server.Servers.Consumption
+namespace CecoChat.Messaging.Server.Backend.Consumption
 {
     public class BackendConsumptionHostedService : IHostedService
     {

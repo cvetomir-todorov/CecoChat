@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 
-namespace CecoChat.Messaging.Server.Servers.Consumption
+namespace CecoChat.Messaging.Server.Backend.Consumption
 {
     public interface IBackendConsumer : IDisposable
     {

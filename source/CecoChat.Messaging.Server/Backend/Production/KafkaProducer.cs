@@ -5,7 +5,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace CecoChat.Messaging.Server.Servers.Production
+namespace CecoChat.Messaging.Server.Backend.Production
 {
     public sealed class KafkaProducer : IBackendProducer
     {
@@ -16,7 +16,7 @@ namespace CecoChat.Messaging.Server.Servers.Production
 
         public KafkaProducer(
             ILogger<KafkaProducer> logger,
-            IOptions<KafkaOptions> options,
+            IOptions<BackendOptions> options,
             IHostApplicationLifetime applicationLifetime,
             IPartitionUtility partitionUtility,
             ITopicPartitionFlyweight topicPartitionFlyweight)

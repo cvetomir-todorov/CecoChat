@@ -2,7 +2,7 @@
 using CecoChat.Contracts.Backend;
 using Microsoft.Extensions.Options;
 
-namespace CecoChat.Messaging.Server.Servers
+namespace CecoChat.Messaging.Server.Backend
 {
     public interface IPartitionUtility
     {
@@ -11,9 +11,9 @@ namespace CecoChat.Messaging.Server.Servers
 
     public sealed class PartitionUtility : IPartitionUtility
     {
-        private readonly IKafkaOptions _options;
+        private readonly IBackendOptions _options;
 
-        public PartitionUtility(IOptions<KafkaOptions> options)
+        public PartitionUtility(IOptions<BackendOptions> options)
         {
             _options = options.Value;
         }
