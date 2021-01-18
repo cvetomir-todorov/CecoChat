@@ -6,44 +6,44 @@ namespace CecoChat.Messaging.Server.Clients
 {
     public interface IClientContainer
     {
-        void AddClient(in int clientID, IStreamer<ListenResponse> streamer);
+        void AddClient(in int userID, IStreamer<ListenResponse> streamer);
 
-        void RemoveClient(in int clientID, IStreamer<ListenResponse> streamer);
+        void RemoveClient(in int userID, IStreamer<ListenResponse> streamer);
 
-        IReadOnlyCollection<IStreamer<ListenResponse>> GetClients(in int clientID);
+        IReadOnlyCollection<IStreamer<ListenResponse>> GetClients(in int userID);
     }
 
     public sealed class ClientContainer : IClientContainer
     {
         // ReSharper disable once CollectionNeverUpdated.Local
         private static readonly List<IStreamer<ListenResponse>> _emptyStreamerList = new(capacity: 0);
-        private readonly ConcurrentDictionary<int, ClientData> _clientsMap;
+        private readonly ConcurrentDictionary<int, UserData> _userMap;
 
         public ClientContainer()
         {
-            _clientsMap = new ConcurrentDictionary<int, ClientData>();
+            _userMap = new ConcurrentDictionary<int, UserData>();
         }
 
-        public void AddClient(in int clientID, IStreamer<ListenResponse> streamer)
+        public void AddClient(in int userID, IStreamer<ListenResponse> streamer)
         {
-            ClientData clientData = _clientsMap.GetOrAdd(clientID, _ => new ClientData());
+            UserData userData = _userMap.GetOrAdd(userID, _ => new UserData());
             // TODO: figure out how to avoid same client being added twice
-            clientData.StreamerList.Add(streamer);
+            userData.StreamerList.Add(streamer);
         }
 
-        public void RemoveClient(in int clientID, IStreamer<ListenResponse> streamer)
+        public void RemoveClient(in int userID, IStreamer<ListenResponse> streamer)
         {
-            if (_clientsMap.TryGetValue(clientID, out ClientData clientData))
+            if (_userMap.TryGetValue(userID, out UserData userData))
             {
-                clientData.StreamerList.Remove(streamer);
+                userData.StreamerList.Remove(streamer);
             }
         }
 
-        public IReadOnlyCollection<IStreamer<ListenResponse>> GetClients(in int clientID)
+        public IReadOnlyCollection<IStreamer<ListenResponse>> GetClients(in int userID)
         {
-            if (_clientsMap.TryGetValue(clientID, out ClientData clientData))
+            if (_userMap.TryGetValue(userID, out UserData userData))
             {
-                return clientData.StreamerList;
+                return userData.StreamerList;
             }
             else
             {
@@ -51,7 +51,7 @@ namespace CecoChat.Messaging.Server.Clients
             }
         }
 
-        private sealed class ClientData
+        private sealed class UserData
         {
             public List<IStreamer<ListenResponse>> StreamerList { get; } = new();
         }
