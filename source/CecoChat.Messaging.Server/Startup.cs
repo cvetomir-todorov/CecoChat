@@ -38,6 +38,7 @@ namespace CecoChat.Messaging.Server
             services.Configure<BackendOptions>(Configuration.GetSection("Backend"));
 
             // shared
+            services.AddSingleton<IClock, MonotonicClock>();
             services.AddSingleton<IClientBackendMapper, ClientBackendMapper>();
         }
 

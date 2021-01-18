@@ -21,14 +21,14 @@ namespace CecoChat.ConsoleClient
 
             while (true)
             {
-                Console.Write("Receiver ID: ");
+                Console.WriteLine("Receiver ID:");
                 int receiverId = int.Parse(Console.ReadLine() ?? "0");
                 if (receiverId <= 0)
                 {
                     break;
                 }
 
-                Console.Write("Message: ");
+                Console.WriteLine("Message to {0}:", receiverId);
                 string text = Console.ReadLine();
 
                 Message message = new Message
@@ -60,7 +60,7 @@ namespace CecoChat.ConsoleClient
                 while (await serverStream.ResponseStream.MoveNext())
                 {
                     Message message = serverStream.ResponseStream.Current.Message;
-                    Console.WriteLine($"[{message.SenderId}] {message.PlainTextData.Text}");
+                    Console.WriteLine($"[{message.Timestamp.ToDateTime():F}] {message.SenderId}: {message.PlainTextData.Text}");
                 }
             }
             catch (Exception exception)

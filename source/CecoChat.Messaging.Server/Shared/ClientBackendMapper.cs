@@ -1,6 +1,7 @@
 ﻿using System;
 using CecoChat.Contracts.Backend;
 using CecoChat.Contracts.Client;
+using Google.Protobuf.WellKnownTypes;
 using ClientMessage = CecoChat.Contracts.Client.Message;
 using BackendMessage = CecoChat.Contracts.Backend.Message;
 using ClientMessageType = CecoChat.Contracts.Client.MessageType;
@@ -36,6 +37,7 @@ namespace CecoChat.Messaging.Server.Shared
             backendMessage.MessageID = clientMessage.MessageId;
             backendMessage.SenderID = clientMessage.SenderId;
             backendMessage.ReceiverID = clientMessage.ReceiverId;
+            backendMessage.Timestamp = clientMessage.Timestamp.ToDateTime();
 
             return backendMessage;
         }
@@ -48,6 +50,18 @@ namespace CecoChat.Messaging.Server.Shared
                 SenderId = backendMessage.SenderID,
                 ReceiverId = backendMessage.ReceiverID,
             };
+
+            DateTime messageTimestamp = backendMessage.Timestamp;
+            if (messageTimestamp.Kind == DateTimeKind.Local)
+            {
+                messageTimestamp = messageTimestamp.ToUniversalTime();
+            }
+            else if (messageTimestamp.Kind == DateTimeKind.Unspecified)
+            {
+                messageTimestamp = DateTime.SpecifyKind(messageTimestamp, DateTimeKind.Utc);
+            }
+
+            clientMessage.Timestamp = Timestamp.FromDateTime(messageTimestamp);
 
             switch (backendMessage.Type)
             {

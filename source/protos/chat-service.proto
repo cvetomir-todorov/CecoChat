@@ -2,6 +2,7 @@ syntax = "proto3";
 option csharp_namespace = "CecoChat.Contracts.Client";
 package CecoChat;
 import "message.proto";
+import "google/protobuf/timestamp.proto";
 
 service Chat {
   rpc Listen(ListenRequest) returns (stream ListenResponse);
@@ -21,4 +22,5 @@ message SendMessageRequest {
 }
 
 message SendMessageResponse {
+  google.protobuf.Timestamp message_timestamp = 1;
 }
