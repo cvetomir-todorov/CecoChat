@@ -14,10 +14,12 @@ namespace CecoChat.ConsoleClient
             int userID = int.Parse(Console.ReadLine() ?? string.Empty);
 
             using GrpcChannel channel = GrpcChannel.ForAddress("https://localhost:5001");
-            Chat.ChatClient client = new Chat.ChatClient(channel);
+            Chat.ChatClient client = new(channel);
 
             AsyncServerStreamingCall<ListenResponse> serverStream = client.Listen(new ListenRequest{UserId = userID});
             Task _ = Task.Run(async () => await Listen(serverStream));
+
+            CorrelationIDGenerator generator = new();
 
             while (true)
             {
@@ -33,6 +35,7 @@ namespace CecoChat.ConsoleClient
 
                 Message message = new Message
                 {
+                    MessageId = generator.GenerateCorrelationID(),
                     SenderId = userID,
                     ReceiverId = receiverId,
                     Type = MessageType.PlainText,

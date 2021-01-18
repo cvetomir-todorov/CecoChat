@@ -4,7 +4,7 @@ package CecoChat;
 import "google/protobuf/timestamp.proto";
 
 message Message {
-  int32 message_id = 1;
+  string message_id = 1;
   int32 sender_id = 2;
   int32 receiver_id = 3;
   google.protobuf.Timestamp timestamp = 4;

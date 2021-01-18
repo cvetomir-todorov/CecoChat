@@ -8,7 +8,7 @@ namespace CecoChat.Contracts.Backend
     public abstract class Message
     {
         [ProtoMember(1)]
-        public int MessageID { get; set; }
+        public string MessageID { get; set; }
 
         [ProtoMember(2)]
         public int SenderID { get; set; }
