@@ -26,7 +26,7 @@ namespace CecoChat.Messaging.Server
             }
             finally
             {
-                logger.Information("End.");
+                logger.Information("Ended.");
                 Log.CloseAndFlush();
             }
         }
