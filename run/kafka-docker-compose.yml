@@ -1,11 +1,16 @@
 version: '3'
+networks:
+  cecochat:
 services:
   zookeeper:
     image: zookeeper:3.4.14
     container_name: cecochat-zookeeper
     hostname: zookeeper
+    networks: &networks
+      - cecochat
     ports:
       - "2181:2181"
+    mem_limit: 256M
     environment:
       ZOO_MY_ID: 1
       ZOO_PORT: 2181
@@ -17,8 +22,10 @@ services:
     image: confluentinc/cp-kafka:5.5.3
     container_name: cecochat-kafka1
     hostname: kafka1
+    networks: *networks
     ports:
       - "9091:9091"
+    mem_limit: 512M
     environment: 
       KAFKA_ADVERTISED_LISTENERS: LISTENER_DOCKER_INTERNAL://kafka1:19091,LISTENER_DOCKER_EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9091
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_DOCKER_INTERNAL:PLAINTEXT,LISTENER_DOCKER_EXTERNAL:PLAINTEXT
@@ -36,8 +43,10 @@ services:
     image: confluentinc/cp-kafka:5.5.3
     container_name: cecochat-kafka2
     hostname: kafka2
+    networks: *networks
     ports:
       - "9092:9092"
+    mem_limit: 512M
     environment:
       KAFKA_ADVERTISED_LISTENERS: LISTENER_DOCKER_INTERNAL://kafka2:19092,LISTENER_DOCKER_EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_DOCKER_INTERNAL:PLAINTEXT,LISTENER_DOCKER_EXTERNAL:PLAINTEXT
@@ -55,8 +64,10 @@ services:
     image: obsidiandynamics/kafdrop
     container_name: cecochat-kafdrop
     restart: "no"
+    networks: *networks
     ports: 
       - "9000:9000"
+    mem_limit: 256M
     environment: 
       KAFKA_BROKERCONNECT: "kafka1:19091"
     depends_on: 
