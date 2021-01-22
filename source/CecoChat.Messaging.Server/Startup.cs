@@ -1,4 +1,5 @@
 using CecoChat.Contracts.Client;
+using CecoChat.DependencyInjection;
 using CecoChat.Messaging.Server.Backend;
 using CecoChat.Messaging.Server.Backend.Consumption;
 using CecoChat.Messaging.Server.Backend.Production;

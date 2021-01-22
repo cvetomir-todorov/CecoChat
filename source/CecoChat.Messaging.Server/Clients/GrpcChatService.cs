@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using CecoChat.Contracts.Client;
+using CecoChat.DependencyInjection;
 using CecoChat.Messaging.Server.Backend.Production;
 using CecoChat.Messaging.Server.Shared;
 using Google.Protobuf.WellKnownTypes;
