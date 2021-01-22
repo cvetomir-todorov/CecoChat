@@ -70,7 +70,7 @@ namespace CecoChat.Messaging.Server.Backend.Consumption
 
         public void Start(CancellationToken ct)
         {
-            _logger.LogInformation("Start consumption hosted service.");
+            _logger.LogInformation("Start backend consumption.");
 
             while (!ct.IsCancellationRequested)
             {
@@ -94,7 +94,7 @@ namespace CecoChat.Messaging.Server.Backend.Consumption
                 }
             }
 
-            _logger.LogInformation("Stopped consumption hosted service.");
+            _logger.LogInformation("Stopped backend consumption.");
         }
 
         private void ProcessMessage(BackendMessage backendMessage)
