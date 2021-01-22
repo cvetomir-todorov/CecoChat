@@ -1,0 +1,88 @@
+version: '3'
+networks: 
+  cecochat:
+services:
+  cass1:
+    image: cassandra:3.11.9
+    container_name: cecochat-cass1
+    healthcheck: &healthcheck
+      test: ["CMD", "cqlsh", "-e", "describe keyspaces"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    hostname: cass1
+    networks: &networks
+      - cecochat
+    ports:
+      - "9042:9042"
+    mem_limit: 512M
+    environment:
+      CASSANDRA_SEEDS: "cass1,cass2"
+      CASSANDRA_CLUSTER_NAME: cecochat
+      CASSANDRA_DC: Europe
+      CASSANDRA_RACK: Rack1
+      CASSANDRA_ENDPOINT_SNITCH: GossipingPropertyFileSnitch
+      CASSANDRA_NUM_TOKENS: 128
+      HEAP_NEWSIZE: 128M
+      MAX_HEAP_SIZE: 512M
+    volumes: 
+      - cecochat-cass1-data:/var/lib/cassandra
+      - cecochat-cass1-conf:/etc/cassandra
+  cass2:
+    image: cassandra:3.11.9
+    container_name: cecochat-cass2
+    healthcheck: *healthcheck
+    hostname: cass2
+    networks: *networks
+    ports:
+      - "9043:9042"
+    mem_limit: 512M
+    environment:
+      CASSANDRA_SEEDS: "cass1,cass2"
+      CASSANDRA_CLUSTER_NAME: cecochat
+      CASSANDRA_DC: Europe
+      CASSANDRA_RACK: Rack2
+      CASSANDRA_ENDPOINT_SNITCH: GossipingPropertyFileSnitch
+      CASSANDRA_NUM_TOKENS: 128
+      HEAP_NEWSIZE: 128M
+      MAX_HEAP_SIZE: 512M
+    volumes: 
+      - cecochat-cass2-data:/var/lib/cassandra
+      - cecochat-cass2-conf:/etc/cassandra
+  cass3:
+    image: cassandra:3.11.9
+    container_name: cecochat-cass3
+    healthcheck: *healthcheck
+    hostname: cass3
+    networks: *networks
+    ports:
+      - "9044:9042"
+    mem_limit: 512M
+    environment:
+      CASSANDRA_SEEDS: "cass1,cass2"
+      CASSANDRA_CLUSTER_NAME: cecochat
+      CASSANDRA_DC: Europe
+      CASSANDRA_RACK: Rack3
+      CASSANDRA_ENDPOINT_SNITCH: GossipingPropertyFileSnitch
+      CASSANDRA_NUM_TOKENS: 128
+      HEAP_NEWSIZE: 128M
+      MAX_HEAP_SIZE: 512M
+    volumes: 
+      - cecochat-cass3-data:/var/lib/cassandra
+      - cecochat-cass3-conf:/etc/cassandra
+    depends_on: 
+      - cass1
+      - cass2
+volumes:
+  cecochat-cass1-data:
+    external: true
+  cecochat-cass1-conf:
+    external: true
+  cecochat-cass2-data:
+    external: true
+  cecochat-cass2-conf:
+    external: true
+  cecochat-cass3-data:
+    external: true
+  cecochat-cass3-conf:
+    external: true
