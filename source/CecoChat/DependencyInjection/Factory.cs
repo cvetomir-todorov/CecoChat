@@ -25,13 +25,14 @@ namespace CecoChat.DependencyInjection
 
     public static class FactoryExtensions
     {
-        public static void AddFactory<TService, TImplementation>(this IServiceCollection services)
+        public static IServiceCollection AddFactory<TService, TImplementation>(this IServiceCollection services)
             where TService : class
             where TImplementation : class, TService
         {
-            services.AddTransient<TService, TImplementation>();
-            services.AddSingleton<Func<TService>>(serviceProvider => () => serviceProvider.GetRequiredService<TService>());
-            services.AddSingleton<IFactory<TService>, Factory<TService>>();
+            return services
+                .AddTransient<TService, TImplementation>()
+                .AddSingleton<Func<TService>>(serviceProvider => () => serviceProvider.GetRequiredService<TService>())
+                .AddSingleton<IFactory<TService>, Factory<TService>>();
         }
     }
 }
