@@ -5,7 +5,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Database\Scripts\messaging-messages-table.cql" />
+    <EmbeddedResource Include="Database\Scripts\messaging-keyspace.cql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CassandraCSharpDriver" Version="3.16.2" />
     <PackageReference Include="Serilog.AspNetCore" Version="3.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CecoChat\CecoChat.csproj" />
   </ItemGroup>
 
 </Project>
