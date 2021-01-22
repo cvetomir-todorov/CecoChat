@@ -15,9 +15,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Backend", "Backend", "{8A83
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Client", "Client", "{44AE3E31-FA07-4616-9F29-3D2EACF18A68}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CecoChat.Materialize.Server", "CecoChat.Materialize.Server\CecoChat.Materialize.Server.csproj", "{5BDA0EB2-2E0B-44C1-B44B-9F408B0EB2B7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CecoChat.Materialize.Server", "CecoChat.Materialize.Server\CecoChat.Materialize.Server.csproj", "{5BDA0EB2-2E0B-44C1-B44B-9F408B0EB2B7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CecoChat", "CecoChat\CecoChat.csproj", "{C5D4AA9D-5D7B-4EFC-A56D-112CFB59164D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CecoChat", "CecoChat\CecoChat.csproj", "{C5D4AA9D-5D7B-4EFC-A56D-112CFB59164D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -54,6 +54,7 @@ Global
 		{C7F0F25B-75B3-4AA1-AA20-9D1E0C25366F} = {8A833F6F-10A3-4A3B-9B83-90F03DF415E4}
 		{36B908A7-76FE-40D6-B2D2-860D33B55C81} = {C320D788-140F-4A46-A3A8-7A91FD43290B}
 		{5BDA0EB2-2E0B-44C1-B44B-9F408B0EB2B7} = {8A833F6F-10A3-4A3B-9B83-90F03DF415E4}
+		{C5D4AA9D-5D7B-4EFC-A56D-112CFB59164D} = {C320D788-140F-4A46-A3A8-7A91FD43290B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B5EAA668-8419-44F5-8BE5-9175A9B20BF8}
