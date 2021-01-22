@@ -1,5 +1,6 @@
 ﻿using System;
 using CecoChat.Contracts.Backend;
+using CecoChat.Kafka;
 using Confluent.Kafka;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;

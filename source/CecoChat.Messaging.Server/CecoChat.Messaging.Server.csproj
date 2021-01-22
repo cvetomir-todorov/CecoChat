@@ -8,12 +8,12 @@
     <PackageReference Include="ConcurrentHashSet" Version="1.1.0" />
     <PackageReference Include="Confluent.Kafka" Version="1.5.3" />
     <PackageReference Include="Grpc.AspNetCore" Version="2.34.0" />
-    <PackageReference Include="protobuf-net" Version="3.0.73" />
     <PackageReference Include="Serilog.AspNetCore" Version="3.4.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\CecoChat.Contracts.Backend\CecoChat.Contracts.Backend.csproj" />
+    <ProjectReference Include="..\CecoChat\CecoChat.csproj" />
   </ItemGroup>
 
   <ItemGroup>

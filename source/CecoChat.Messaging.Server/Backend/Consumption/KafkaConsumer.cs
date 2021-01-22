@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using CecoChat.Contracts.Client;
+using CecoChat.Kafka;
 using CecoChat.Messaging.Server.Backend.Production;
 using CecoChat.Messaging.Server.Clients;
 using CecoChat.Messaging.Server.Shared;
