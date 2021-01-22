@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
-namespace CecoChat.Messaging.Server.Shared
+namespace CecoChat
 {
     public interface IClock
     {
