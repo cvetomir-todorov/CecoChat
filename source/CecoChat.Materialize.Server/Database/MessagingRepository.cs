@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Buffers;
 using System.Threading.Tasks;
 using Cassandra;
 using CecoChat.Contracts.Backend;
+using CecoChat.ProtobufNet;
 using Microsoft.Extensions.Logging;
-using ProtoBuf;
 
 namespace CecoChat.Materialize.Server.Database
 {
@@ -18,6 +17,7 @@ namespace CecoChat.Materialize.Server.Database
         private readonly ILogger _logger;
         private readonly ICecoChatDbContext _dbContext;
         private readonly Lazy<PreparedStatement> _insertPrepared;
+        private readonly GenericSerializer<Message> _messageSerializer;
 
         public MessagingRepository(
             ILogger<MessagingRepository> logger,
@@ -26,6 +26,7 @@ namespace CecoChat.Materialize.Server.Database
             _logger = logger;
             _dbContext = dbContext;
             _insertPrepared = new Lazy<PreparedStatement>(CreateInsertPrepared);
+            _messageSerializer = new GenericSerializer<Message>();
         }
 
         private PreparedStatement CreateInsertPrepared()
@@ -39,13 +40,9 @@ namespace CecoChat.Materialize.Server.Database
 
         public async Task InsertMessage(Message message)
         {
-            // TODO: reuse message serialization with kafka serializers
-            ArrayBufferWriter<byte> array = new ArrayBufferWriter<byte>(initialCapacity: 128);
-            Serializer.Serialize(array, message);
-            byte[] data = array.WrittenMemory.ToArray();
-
             // TODO: convert IDs to long
-            BoundStatement insertBound = _insertPrepared.Value.Bind((long)message.ReceiverID, message.Timestamp, data);
+            byte[] messageBytes = _messageSerializer.SerializeToByteArray(message);
+            BoundStatement insertBound = _insertPrepared.Value.Bind((long)message.ReceiverID, message.Timestamp, messageBytes);
             insertBound.SetConsistencyLevel(ConsistencyLevel.Two);
 
             ISession session = _dbContext.Messaging;
