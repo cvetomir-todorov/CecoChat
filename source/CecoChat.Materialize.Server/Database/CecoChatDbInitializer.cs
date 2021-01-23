@@ -4,24 +4,23 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using Cassandra;
-using CecoChat.Cassandra;
 using Microsoft.Extensions.Logging;
 
 namespace CecoChat.Materialize.Server.Database
 {
-    public interface IDbInitializer
+    public interface ICecoChatDbInitializer
     {
         void Initialize();
     }
 
-    public sealed class DbInitializer : IDbInitializer
+    public sealed class CecoChatDbInitializer : ICecoChatDbInitializer
     {
         private readonly ILogger _logger;
-        private readonly ICassandraDbContext _dbContext;
+        private readonly ICecoChatDbContext _dbContext;
 
-        public DbInitializer(
-            ILogger<DbInitializer> logger,
-            ICassandraDbContext dbContext)
+        public CecoChatDbInitializer(
+            ILogger<CecoChatDbInitializer> logger,
+            ICecoChatDbContext dbContext)
         {
             _logger = logger;
             _dbContext = dbContext;
@@ -29,7 +28,7 @@ namespace CecoChat.Materialize.Server.Database
 
         public void Initialize()
         {
-            const string keyspace = "messaging";
+            string keyspace = _dbContext.MessagingKeyspace;
             if (_dbContext.ExistsKeyspace(keyspace))
             {
                 _logger.LogInformation("Keyspace {0} already initialized.", keyspace);
@@ -53,7 +52,7 @@ namespace CecoChat.Materialize.Server.Database
             public string Content { get; init; }
         }
 
-        private static List<CqlScript> GetCqlScripts(string keyspace)
+        private List<CqlScript> GetCqlScripts(string keyspace)
         {
             Assembly targetAssembly = Assembly.GetExecutingAssembly();
             string messagingPrefix = keyspace + "-";
@@ -71,6 +70,11 @@ namespace CecoChat.Materialize.Server.Database
                 .Select(resourceName =>
                 {
                     using Stream resourceStream = targetAssembly.GetManifestResourceStream(resourceName);
+                    if (resourceStream == null)
+                    {
+                        throw new InvalidOperationException($"Failed to load CQL script {resourceName}.");
+                    }
+
                     using StreamReader reader = new StreamReader(resourceStream);
                     string cql = reader.ReadToEnd();
 

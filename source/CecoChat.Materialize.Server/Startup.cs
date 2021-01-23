@@ -19,13 +19,14 @@ namespace CecoChat.Materialize.Server
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddCassandra(Configuration.GetSection("Cassandra"));
-            services.AddSingleton<IDbInitializer, DbInitializer>();
+            services.AddCassandra<ICecoChatDbContext, CecoChatDbContext>(Configuration.GetSection("Cassandra"));
+            services.AddSingleton<ICecoChatDbInitializer, CecoChatDbInitializer>();
+            services.AddSingleton<IMessagingRepository, MessagingRepository>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            IDbInitializer db = app.ApplicationServices.GetRequiredService<IDbInitializer>();
+            ICecoChatDbInitializer db = app.ApplicationServices.GetRequiredService<ICecoChatDbInitializer>();
             db.Initialize();
 
             if (env.IsDevelopment())

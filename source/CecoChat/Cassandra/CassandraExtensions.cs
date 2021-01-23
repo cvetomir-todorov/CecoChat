@@ -11,5 +11,15 @@ namespace CecoChat.Cassandra
                 .AddSingleton<ICassandraDbContext, CassandraDbContext>()
                 .Configure<CassandraOptions>(cassandraConfigurationSection);
         }
+
+        public static IServiceCollection AddCassandra<TDbContext, TDbContextImplementation>(
+                this IServiceCollection services, IConfiguration cassandraConfigurationSection)
+            where TDbContext : class, ICassandraDbContext
+            where TDbContextImplementation : CassandraDbContext, TDbContext
+        {
+            return services
+                .AddSingleton<TDbContext, TDbContextImplementation>()
+                .Configure<CassandraOptions>(cassandraConfigurationSection);
+        }
     }
 }
