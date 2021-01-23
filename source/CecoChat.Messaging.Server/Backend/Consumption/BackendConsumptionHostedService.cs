@@ -21,7 +21,7 @@ namespace CecoChat.Messaging.Server.Backend.Consumption
         public Task StartAsync(CancellationToken ct)
         {
             _backendConsumer.Prepare();
-            Task.Factory.StartNew(() => _backendConsumer.Start(CancellationToken.None), ct, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+            Task.Factory.StartNew(() => _backendConsumer.Start(ct), ct, TaskCreationOptions.LongRunning, TaskScheduler.Current);
 
             _logger.LogInformation("Started backend consumption hosted service.");
             return Task.CompletedTask;
