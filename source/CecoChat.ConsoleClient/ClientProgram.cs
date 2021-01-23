@@ -11,7 +11,7 @@ namespace CecoChat.ConsoleClient
         public static async Task Main(string[] args)
         {
             Console.Write("Your ID: ");
-            int userID = int.Parse(Console.ReadLine() ?? string.Empty);
+            long userID = long.Parse(Console.ReadLine() ?? string.Empty);
 
             using GrpcChannel channel = GrpcChannel.ForAddress("https://localhost:31001");
             Chat.ChatClient client = new(channel);

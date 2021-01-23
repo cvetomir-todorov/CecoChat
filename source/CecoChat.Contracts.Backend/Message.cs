@@ -11,10 +11,10 @@ namespace CecoChat.Contracts.Backend
         public string MessageID { get; set; }
 
         [ProtoMember(2)]
-        public int SenderID { get; set; }
+        public long SenderID { get; set; }
 
         [ProtoMember(3)]
-        public int ReceiverID { get; set; }
+        public long ReceiverID { get; set; }
 
         [ProtoMember(4)]
         public DateTime Timestamp { get; set; }

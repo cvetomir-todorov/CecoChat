@@ -8,25 +8,25 @@ namespace CecoChat.Messaging.Server.Clients
 {
     public interface IClientContainer
     {
-        void AddClient(in int userID, IStreamer<ListenResponse> streamer);
+        void AddClient(in long userID, IStreamer<ListenResponse> streamer);
 
-        void RemoveClient(in int userID, IStreamer<ListenResponse> streamer);
+        void RemoveClient(in long userID, IStreamer<ListenResponse> streamer);
 
-        IEnumerable<IStreamer<ListenResponse>> GetClients(in int userID);
+        IEnumerable<IStreamer<ListenResponse>> GetClients(in long userID);
     }
 
     public sealed class ClientContainer : IClientContainer
     {
         // ReSharper disable once CollectionNeverUpdated.Local
         private static readonly List<IStreamer<ListenResponse>> _emptyStreamerList = new(capacity: 0);
-        private readonly ConcurrentDictionary<int, UserData> _userMap;
+        private readonly ConcurrentDictionary<long, UserData> _userMap;
 
         public ClientContainer()
         {
-            _userMap = new ConcurrentDictionary<int, UserData>();
+            _userMap = new ConcurrentDictionary<long, UserData>();
         }
 
-        public void AddClient(in int userID, IStreamer<ListenResponse> streamer)
+        public void AddClient(in long userID, IStreamer<ListenResponse> streamer)
         {
             UserData userData = _userMap.GetOrAdd(userID, _ => new UserData());
             if (!userData.Streamers.Add(streamer))
@@ -35,7 +35,7 @@ namespace CecoChat.Messaging.Server.Clients
             }
         }
 
-        public void RemoveClient(in int userID, IStreamer<ListenResponse> streamer)
+        public void RemoveClient(in long userID, IStreamer<ListenResponse> streamer)
         {
             if (_userMap.TryGetValue(userID, out UserData userData))
             {
@@ -46,7 +46,7 @@ namespace CecoChat.Messaging.Server.Clients
             }
         }
 
-        public IEnumerable<IStreamer<ListenResponse>> GetClients(in int userID)
+        public IEnumerable<IStreamer<ListenResponse>> GetClients(in long userID)
         {
             if (_userMap.TryGetValue(userID, out UserData userData))
             {

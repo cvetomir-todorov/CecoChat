@@ -40,9 +40,9 @@ namespace CecoChat.Materialize.Server.Database
 
         public async Task InsertMessage(Message message)
         {
-            // TODO: convert IDs to long
             byte[] messageBytes = _messageSerializer.SerializeToByteArray(message);
-            BoundStatement insertBound = _insertPrepared.Value.Bind((long)message.ReceiverID, message.Timestamp, messageBytes);
+            BoundStatement insertBound = _insertPrepared.Value.Bind(message.ReceiverID, message.Timestamp, messageBytes);
+            // TODO: read about cassandra consistencies
             insertBound.SetConsistencyLevel(ConsistencyLevel.Two);
 
             ISession session = _dbContext.Messaging;
