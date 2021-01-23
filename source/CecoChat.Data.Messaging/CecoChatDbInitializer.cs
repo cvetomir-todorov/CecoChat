@@ -6,7 +6,7 @@ using System.Reflection;
 using Cassandra;
 using Microsoft.Extensions.Logging;
 
-namespace CecoChat.Materialize.Server.Database
+namespace CecoChat.Data.Messaging
 {
     public interface ICecoChatDbInitializer
     {

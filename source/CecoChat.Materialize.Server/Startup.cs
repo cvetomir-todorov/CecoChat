@@ -1,6 +1,6 @@
 using CecoChat.Cassandra;
+using CecoChat.Data.Messaging;
 using CecoChat.Materialize.Server.Backend;
-using CecoChat.Materialize.Server.Database;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;

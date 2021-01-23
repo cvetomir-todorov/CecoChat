@@ -1,5 +1,5 @@
 ﻿using CecoChat.Contracts.Backend;
-using CecoChat.Materialize.Server.Database;
+using CecoChat.Data.Messaging;
 using Microsoft.Extensions.Logging;
 
 namespace CecoChat.Materialize.Server.Backend

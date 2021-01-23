@@ -5,7 +5,7 @@ using CecoChat.Contracts.Backend;
 using CecoChat.ProtobufNet;
 using Microsoft.Extensions.Logging;
 
-namespace CecoChat.Materialize.Server.Database
+namespace CecoChat.Data.Messaging
 {
     public interface IMessagingRepository
     {

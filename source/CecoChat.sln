@@ -19,6 +19,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CecoChat.Materialize.Server
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CecoChat", "CecoChat\CecoChat.csproj", "{C5D4AA9D-5D7B-4EFC-A56D-112CFB59164D}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CecoChat.Data.Messaging", "CecoChat.Data.Messaging\CecoChat.Data.Messaging.csproj", "{A47B8947-05D4-4878-8FD0-D7109CFEBA91}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{C5D4AA9D-5D7B-4EFC-A56D-112CFB59164D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C5D4AA9D-5D7B-4EFC-A56D-112CFB59164D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C5D4AA9D-5D7B-4EFC-A56D-112CFB59164D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A47B8947-05D4-4878-8FD0-D7109CFEBA91}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A47B8947-05D4-4878-8FD0-D7109CFEBA91}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A47B8947-05D4-4878-8FD0-D7109CFEBA91}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A47B8947-05D4-4878-8FD0-D7109CFEBA91}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -55,6 +61,7 @@ Global
 		{36B908A7-76FE-40D6-B2D2-860D33B55C81} = {C320D788-140F-4A46-A3A8-7A91FD43290B}
 		{5BDA0EB2-2E0B-44C1-B44B-9F408B0EB2B7} = {8A833F6F-10A3-4A3B-9B83-90F03DF415E4}
 		{C5D4AA9D-5D7B-4EFC-A56D-112CFB59164D} = {C320D788-140F-4A46-A3A8-7A91FD43290B}
+		{A47B8947-05D4-4878-8FD0-D7109CFEBA91} = {C320D788-140F-4A46-A3A8-7A91FD43290B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B5EAA668-8419-44F5-8BE5-9175A9B20BF8}
