@@ -13,7 +13,7 @@ namespace CecoChat.ConsoleClient
             Console.Write("Your ID: ");
             int userID = int.Parse(Console.ReadLine() ?? string.Empty);
 
-            using GrpcChannel channel = GrpcChannel.ForAddress("https://localhost:5001");
+            using GrpcChannel channel = GrpcChannel.ForAddress("https://localhost:31001");
             Chat.ChatClient client = new(channel);
 
             AsyncServerStreamingCall<ListenResponse> serverStream = client.Listen(new ListenRequest{UserId = userID});
