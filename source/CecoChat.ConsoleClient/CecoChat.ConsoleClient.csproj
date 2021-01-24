@@ -18,6 +18,9 @@
     <Protobuf Include="..\protos\chat-service.proto" GrpcServices="Client">
       <Link>Protos\chat-service.proto</Link>
     </Protobuf>
+    <Protobuf Include="..\protos\history-service.proto" GrpcServices="Client">
+      <Link>Protos\history-service.proto</Link>
+    </Protobuf>
     <Protobuf Include="..\protos\message.proto">
       <Link>Protos\message.proto</Link>
     </Protobuf>

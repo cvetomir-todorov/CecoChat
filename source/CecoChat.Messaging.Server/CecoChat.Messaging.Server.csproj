@@ -13,12 +13,16 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CecoChat.Contracts.Backend\CecoChat.Contracts.Backend.csproj" />
+    <ProjectReference Include="..\CecoChat.Data.Messaging\CecoChat.Data.Messaging.csproj" />
     <ProjectReference Include="..\CecoChat\CecoChat.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Protobuf Include="..\protos\chat-service.proto" GrpcServices="Server">
       <Link>Protos\chat-service.proto</Link>
+    </Protobuf>
+    <Protobuf Include="..\protos\history-service.proto" GrpcServices="Server">
+      <Link>Protos\history-service.proto</Link>
     </Protobuf>
     <Protobuf Include="..\protos\message.proto">
       <Link>Protos\message.proto</Link>

@@ -45,6 +45,7 @@ namespace CecoChat.Messaging.Server.Clients
 
             try
             {
+                // TODO: use user ID from auth token
                 _clientContainer.AddClient(request.UserId, streamer);
                 await streamer.ProcessMessages(context.CancellationToken);
             }
