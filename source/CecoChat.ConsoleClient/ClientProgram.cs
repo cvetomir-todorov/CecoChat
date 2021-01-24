@@ -15,14 +15,15 @@ namespace CecoChat.ConsoleClient
             long userID = long.Parse(Console.ReadLine() ?? string.Empty);
 
             using GrpcChannel channel = GrpcChannel.ForAddress("https://localhost:31001");
-            Chat.ChatClient client = new(channel);
-            History.HistoryClient history = new(channel);
+            Listen.ListenClient listenClient = new(channel);
+            Send.SendClient sendClient = new(channel);
+            History.HistoryClient historyClient = new(channel);
 
-            AsyncServerStreamingCall<ListenResponse> serverStream = client.Listen(new ListenRequest{UserId = userID});
+            AsyncServerStreamingCall<ListenResponse> serverStream = listenClient.Listen(new ListenRequest{UserId = userID});
             Task _ = Task.Run(async () => await ListenForNewMessages(serverStream));
 
-            await ShowHistory(history, userID);
-            await Interact(userID, client);
+            await ShowHistory(historyClient, userID);
+            await Interact(userID, sendClient);
 
             await channel.ShutdownAsync();
             Console.WriteLine("Bye!");
@@ -44,14 +45,14 @@ namespace CecoChat.ConsoleClient
             }
         }
 
-        private static async Task ShowHistory(History.HistoryClient client, long userID)
+        private static async Task ShowHistory(History.HistoryClient historyClient, long userID)
         {
             GetHistoryRequest request = new()
             {
                 UserId = userID,
                 NewerThan = Timestamp.FromDateTime(DateTime.UtcNow.AddYears(-1))
             };
-            GetHistoryResponse response = await client.GetHistoryAsync(request);
+            GetHistoryResponse response = await historyClient.GetHistoryAsync(request);
 
             Console.WriteLine("{0} messages from history:", response.Messages.Count);
             foreach (Message message in response.Messages)
@@ -65,7 +66,7 @@ namespace CecoChat.ConsoleClient
             Console.WriteLine($"[{message.Timestamp.ToDateTime():F}] {message.SenderId}: {message.PlainTextData.Text}");
         }
 
-        private static async Task Interact(long userID, Chat.ChatClient client)
+        private static async Task Interact(long userID, Send.SendClient sendClient)
         {
             CorrelationIDGenerator generator = new();
 
@@ -92,7 +93,7 @@ namespace CecoChat.ConsoleClient
 
                 try
                 {
-                    SendMessageResponse response = await client.SendMessageAsync(new SendMessageRequest {Message = message});
+                    SendMessageResponse response = await sendClient.SendMessageAsync(new SendMessageRequest {Message = message});
                     message.Timestamp = response.MessageTimestamp;
                 }
                 catch (Exception exception)

@@ -4,18 +4,8 @@ package CecoChat;
 import "message.proto";
 import "google/protobuf/timestamp.proto";
 
-// TODO split the service
-service Chat {
-  rpc Listen(ListenRequest) returns (stream ListenResponse);
+service Send {
   rpc SendMessage(SendMessageRequest) returns (SendMessageResponse);
-}
-
-message ListenRequest {
-  int64 user_id = 1;
-}
-
-message ListenResponse {
-  Message message = 1;
 }
 
 message SendMessageRequest {

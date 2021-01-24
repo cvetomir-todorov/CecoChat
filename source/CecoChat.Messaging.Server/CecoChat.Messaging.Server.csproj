@@ -18,11 +18,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Protobuf Include="..\protos\chat-service.proto" GrpcServices="Server">
-      <Link>Protos\chat-service.proto</Link>
-    </Protobuf>
     <Protobuf Include="..\protos\history-service.proto" GrpcServices="Server">
       <Link>Protos\history-service.proto</Link>
+    </Protobuf>
+    <Protobuf Include="..\protos\listen-service.proto" GrpcServices="Server">
+      <Link>Protos\listen-service.proto</Link>
+    </Protobuf>
+    <Protobuf Include="..\protos\send-service.proto" GrpcServices="Server">
+      <Link>Protos\send-service.proto</Link>
     </Protobuf>
     <Protobuf Include="..\protos\message.proto">
       <Link>Protos\message.proto</Link>

@@ -60,8 +60,9 @@ namespace CecoChat.Messaging.Server
             app.UseRouting();
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGrpcService<GrpcChatService>();
                 endpoints.MapGrpcService<GrpcHistoryService>();
+                endpoints.MapGrpcService<GrpcListenService>();
+                endpoints.MapGrpcService<GrpcSendService>();
             });
         }
     }

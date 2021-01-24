@@ -1,0 +1,16 @@
+syntax = "proto3";
+option csharp_namespace = "CecoChat.Contracts.Client";
+package CecoChat;
+import "message.proto";
+
+service Listen {
+  rpc Listen(ListenRequest) returns (stream ListenResponse);
+}
+
+message ListenRequest {
+  int64 user_id = 1;
+}
+
+message ListenResponse {
+  Message message = 1;
+}
