@@ -7,19 +7,19 @@ namespace CecoChat.Materialize.Server.Backend
     public sealed class CassandraStateProcessor : IProcessor
     {
         private readonly ILogger _logger;
-        private readonly IMessagingRepository _messagingRepository;
+        private readonly INewMessageRepository _newMessageRepository;
 
         public CassandraStateProcessor(
             ILogger<CassandraStateProcessor> logger,
-            IMessagingRepository messagingRepository)
+            INewMessageRepository newMessageRepository)
         {
             _logger = logger;
-            _messagingRepository = messagingRepository;
+            _newMessageRepository = newMessageRepository;
         }
 
         public void Process(Message message)
         {
-            _messagingRepository.InsertMessage(message).Wait();
+            _newMessageRepository.InsertMessage(message).Wait();
         }
     }
 }

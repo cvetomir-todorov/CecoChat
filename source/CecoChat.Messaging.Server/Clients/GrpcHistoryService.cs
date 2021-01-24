@@ -13,16 +13,16 @@ namespace CecoChat.Messaging.Server.Clients
     public sealed class GrpcHistoryService : History.HistoryBase
     {
         private readonly ILogger _logger;
-        private readonly IMessagingRepository _messagingRepository;
+        private readonly IHistoryRepository _historyRepository;
         private readonly IClientBackendMapper _clientBackendMapper;
 
         public GrpcHistoryService(
             ILogger<GrpcHistoryService> logger,
-            IMessagingRepository messagingRepository,
+            IHistoryRepository historyRepository,
             IClientBackendMapper clientBackendMapper)
         {
             _logger = logger;
-            _messagingRepository = messagingRepository;
+            _historyRepository = historyRepository;
             _clientBackendMapper = clientBackendMapper;
         }
 
@@ -30,7 +30,7 @@ namespace CecoChat.Messaging.Server.Clients
         {
             // TODO: use user ID from auth token
             long userID = request.UserId;
-            IReadOnlyCollection<BackendMessage> backendMessages = await _messagingRepository
+            IReadOnlyCollection<BackendMessage> backendMessages = await _historyRepository
                 .SelectNewerMessagesForReceiver(userID, request.NewerThan.ToDateTime());
             _logger.LogTrace("Responding with {0} message history to user {1}.", backendMessages.Count, userID);
 
