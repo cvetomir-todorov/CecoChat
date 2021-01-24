@@ -20,9 +20,12 @@ namespace CecoChat.Materialize.Server
 
         public void ConfigureServices(IServiceCollection services)
         {
+            // database
             services.AddCassandra<ICecoChatDbContext, CecoChatDbContext>(Configuration.GetSection("Cassandra"));
             services.AddSingleton<ICecoChatDbInitializer, CecoChatDbInitializer>();
             services.AddSingleton<IMessagingRepository, MessagingRepository>();
+
+            // backend
             services.AddSingleton<IBackendConsumer, KafkaConsumer>();
             services.AddSingleton<IProcessor, CassandraStateProcessor>();
             services.AddHostedService<PersistMessagesHostedService>();
