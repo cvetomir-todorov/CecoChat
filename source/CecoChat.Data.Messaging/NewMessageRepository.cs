@@ -15,39 +15,27 @@ namespace CecoChat.Data.Messaging
     {
         private readonly ILogger _logger;
         private readonly ICecoChatDbContext _dbContext;
+        private readonly IDataUtility _dataUtility;
         private readonly Lazy<PreparedStatement> _messagesForUserQuery;
         private readonly Lazy<PreparedStatement> _messagesForDialogQuery;
         private readonly ProtobufSerializer _messageSerializer;
 
         public NewMessageRepository(
             ILogger<NewMessageRepository> logger,
-            ICecoChatDbContext dbContext)
+            ICecoChatDbContext dbContext,
+            IDataUtility dataUtility)
         {
             _logger = logger;
             _dbContext = dbContext;
-            _messagesForUserQuery = new Lazy<PreparedStatement>(PrepareMessagesForUserQuery);
-            _messagesForDialogQuery = new Lazy<PreparedStatement>(PrepareMessagesForDialogQuery);
+            _dataUtility = dataUtility;
+
+            _messagesForUserQuery = new Lazy<PreparedStatement>(() => _dataUtility.PrepareQuery(InsertIntoMessagesForUser));
+            _messagesForDialogQuery = new Lazy<PreparedStatement>(() => _dataUtility.PrepareQuery(InsertIntoMessagesForDialog));
             _messageSerializer = new ProtobufSerializer();
         }
 
-        // TODO: reuse prepare query
-        private PreparedStatement PrepareMessagesForUserQuery()
-        {
-            ISession session = _dbContext.Messaging;
-            const string cql = "INSERT INTO messages_for_user (user_id, when, data) VALUES (?, ?, ?)";
-            PreparedStatement preparedQuery = session.Prepare(cql);
-            _logger.LogTrace("Prepared CQL '{0}'.", cql);
-            return preparedQuery;
-        }
-
-        private PreparedStatement PrepareMessagesForDialogQuery()
-        {
-            ISession session = _dbContext.Messaging;
-            const string cql = "INSERT INTO messages_for_dialog (dialog_id, when, data) VALUES (?, ?, ?)";
-            PreparedStatement preparedQuery = session.Prepare(cql);
-            _logger.LogTrace("Prepared CQL '{0}'.", cql);
-            return preparedQuery;
-        }
+        const string InsertIntoMessagesForUser = "INSERT INTO messages_for_user (user_id, when, data) VALUES (?, ?, ?)";
+        const string InsertIntoMessagesForDialog = "INSERT INTO messages_for_dialog (dialog_id, when, data) VALUES (?, ?, ?)";
 
         public void AddNewDialogMessage(Message message)
         {
@@ -55,7 +43,7 @@ namespace CecoChat.Data.Messaging
             BoundStatement insertForSender = _messagesForUserQuery.Value.Bind(message.SenderID, message.Timestamp, messageBytes);
             BoundStatement insertForReceiver = _messagesForUserQuery.Value.Bind(message.ReceiverID, message.Timestamp, messageBytes);
 
-            string dialogID = CreateDialogID(message.SenderID, message.ReceiverID);
+            string dialogID = _dataUtility.CreateDialogID(message.SenderID, message.ReceiverID);
             BoundStatement insertForDialog = _messagesForDialogQuery.Value.Bind(dialogID, message.Timestamp, messageBytes);
 
             BatchStatement insertBatch = new BatchStatement()
@@ -67,15 +55,6 @@ namespace CecoChat.Data.Messaging
             ISession session = _dbContext.Messaging;
             session.Execute(insertBatch);
             _logger.LogTrace("Persisted dialog message {0}.", message);
-        }
-
-        // TODO: reuse creating dialog ID
-        private static string CreateDialogID(long userID1, long userID2)
-        {
-            long min = Math.Min(userID1, userID2);
-            long max = Math.Max(userID1, userID2);
-
-            return $"{min}-{max}";
         }
     }
 }

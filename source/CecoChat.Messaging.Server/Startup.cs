@@ -43,6 +43,7 @@ namespace CecoChat.Messaging.Server
             // database
             services.AddCassandra<ICecoChatDbContext, CecoChatDbContext>(Configuration.GetSection("Cassandra"));
             services.AddSingleton<IHistoryRepository, HistoryRepository>();
+            services.AddSingleton<IDataUtility, DataUtility>();
 
             // shared
             services.AddSingleton<IClock, MonotonicClock>();

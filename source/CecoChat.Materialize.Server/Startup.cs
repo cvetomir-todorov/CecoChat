@@ -24,6 +24,7 @@ namespace CecoChat.Materialize.Server
             services.AddCassandra<ICecoChatDbContext, CecoChatDbContext>(Configuration.GetSection("Cassandra"));
             services.AddSingleton<ICecoChatDbInitializer, CecoChatDbInitializer>();
             services.AddSingleton<INewMessageRepository, NewMessageRepository>();
+            services.AddSingleton<IDataUtility, DataUtility>();
 
             // backend
             services.AddSingleton<IBackendConsumer, KafkaConsumer>();
