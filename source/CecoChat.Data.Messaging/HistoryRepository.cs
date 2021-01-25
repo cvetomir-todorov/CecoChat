@@ -10,7 +10,7 @@ namespace CecoChat.Data.Messaging
 {
     public interface IHistoryRepository
     {
-        Task<IReadOnlyCollection<Message>> SelectNewerMessagesForReceiver(long receiverID, DateTime newerThan);
+        Task<IReadOnlyCollection<Message>> SelectNewerMessagesForReceiver(long receiverID, DateTime newerThan, int countLimit);
     }
 
     public sealed class HistoryRepository : IHistoryRepository
@@ -39,16 +39,14 @@ namespace CecoChat.Data.Messaging
             return selectPrepared;
         }
 
-        public async Task<IReadOnlyCollection<Message>> SelectNewerMessagesForReceiver(long receiverID, DateTime newerThan)
+        public async Task<IReadOnlyCollection<Message>> SelectNewerMessagesForReceiver(long receiverID, DateTime newerThan, int countLimit)
         {
-            // TODO: consider moving this in configuration
-            const int messageCountLimit = 128;
-            BoundStatement selectBound = _selectPrepared.Value.Bind(receiverID, newerThan, messageCountLimit);
+            BoundStatement selectBound = _selectPrepared.Value.Bind(receiverID, newerThan, countLimit);
             selectBound.SetConsistencyLevel(ConsistencyLevel.LocalOne);
 
             ISession session = _dbContext.Messaging;
             RowSet rows = await session.ExecuteAsync(selectBound);
-            List<Message> messages = new(capacity: messageCountLimit);
+            List<Message> messages = new(capacity: countLimit);
 
             foreach (Row row in rows)
             {
