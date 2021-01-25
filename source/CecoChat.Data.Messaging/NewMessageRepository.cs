@@ -42,8 +42,7 @@ namespace CecoChat.Data.Messaging
         {
             byte[] messageBytes = _messageSerializer.SerializeToByteArray(message);
             BoundStatement insertBound = _insertPrepared.Value.Bind(message.ReceiverID, message.Timestamp, messageBytes);
-            // TODO: read about cassandra consistencies
-            insertBound.SetConsistencyLevel(ConsistencyLevel.LocalOne);
+            insertBound.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
 
             ISession session = _dbContext.Messaging;
             await session.ExecuteAsync(insertBound);

@@ -42,7 +42,7 @@ namespace CecoChat.Data.Messaging
         public async Task<IReadOnlyCollection<Message>> SelectNewerMessagesForReceiver(long receiverID, DateTime newerThan, int countLimit)
         {
             BoundStatement selectBound = _selectPrepared.Value.Bind(receiverID, newerThan, countLimit);
-            selectBound.SetConsistencyLevel(ConsistencyLevel.LocalOne);
+            selectBound.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
 
             ISession session = _dbContext.Messaging;
             RowSet rows = await session.ExecuteAsync(selectBound);
