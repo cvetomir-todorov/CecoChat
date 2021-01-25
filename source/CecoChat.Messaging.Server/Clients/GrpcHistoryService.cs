@@ -36,7 +36,6 @@ namespace CecoChat.Messaging.Server.Clients
             long userID = request.UserId;
             IReadOnlyCollection<BackendMessage> backendMessages = await _historyRepository
                 .GetUserHistory(userID, request.OlderThan.ToDateTime(), _clientOptions.MessageHistoryCountLimit);
-            _logger.LogTrace("Responding with {0} message history to user {1}.", backendMessages.Count, userID);
 
             GetUserHistoryResponse response = new();
             foreach (BackendMessage backendMessage in backendMessages)
@@ -45,6 +44,27 @@ namespace CecoChat.Messaging.Server.Clients
                 response.Messages.Add(clientMessage);
             }
 
+            _logger.LogTrace("Responding with {0} messages for user {1} history.", response.Messages.Count, userID);
+            return response;
+        }
+
+        public override async Task<GetDialogHistoryResponse> GetDialogHistory(GetDialogHistoryRequest request, ServerCallContext context)
+        {
+            // TODO: use user ID from auth token
+            long userID = request.UserId;
+            long otherUserID = request.OtherUserId;
+
+            IReadOnlyCollection<BackendMessage> backendMessages = await _historyRepository
+                .GetDialogHistory(userID, otherUserID, request.OlderThan.ToDateTime(), _clientOptions.MessageHistoryCountLimit);
+
+            GetDialogHistoryResponse response = new();
+            foreach (BackendMessage backendMessage in backendMessages)
+            {
+                ClientMessage clientMessage = _clientBackendMapper.MapBackendToClientMessage(backendMessage);
+                response.Messages.Add(clientMessage);
+            }
+
+            _logger.LogTrace("Responding with {0} messages for dialog between [{1} <-> {2}].", response.Messages.Count, userID, otherUserID);
             return response;
         }
     }

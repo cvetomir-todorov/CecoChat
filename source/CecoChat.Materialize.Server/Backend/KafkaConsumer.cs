@@ -8,6 +8,7 @@ using BackendMessage = CecoChat.Contracts.Backend.Message;
 
 namespace CecoChat.Materialize.Server.Backend
 {
+    // TODO: figure out how to reuse code with messaging server
     public sealed class KafkaConsumer : IBackendConsumer
     {
         private readonly ILogger _logger;

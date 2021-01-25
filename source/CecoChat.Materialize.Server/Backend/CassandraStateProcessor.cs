@@ -19,7 +19,8 @@ namespace CecoChat.Materialize.Server.Backend
 
         public void Process(Message message)
         {
-            _newMessageRepository.InsertMessage(message).Wait();
+            _newMessageRepository.AddNewDialogMessage(message);
+            _logger.LogTrace("Materialized message {0}.", message);
         }
     }
 }

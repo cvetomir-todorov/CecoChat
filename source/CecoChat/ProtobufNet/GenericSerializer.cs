@@ -4,6 +4,7 @@ using ProtoBuf;
 
 namespace CecoChat.ProtobufNet
 {
+    // TODO: rename to protobuf serializer
     public sealed class GenericSerializer<TMessage>
     {
         public byte[] SerializeToByteArray(TMessage message)

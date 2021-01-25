@@ -63,7 +63,7 @@ namespace CecoChat.ConsoleClient
 
         private static void DisplayMessage(Message message)
         {
-            Console.WriteLine($"[{message.Timestamp.ToDateTime():F}] {message.SenderId}: {message.PlainTextData.Text}");
+            Console.WriteLine($"[{message.Timestamp.ToDateTime():F}] {message.SenderId}->{message.ReceiverId}: {message.PlainTextData.Text}");
         }
 
         private static async Task Interact(long userID, Send.SendClient sendClient)
