@@ -38,7 +38,11 @@ namespace CecoChat.Messaging.Server.Clients
                 .SelectNewerMessagesForReceiver(userID, request.NewerThan.ToDateTime(), _clientOptions.MessageHistoryCountLimit);
             _logger.LogTrace("Responding with {0} message history to user {1}.", backendMessages.Count, userID);
 
-            GetHistoryResponse response = new GetHistoryResponse();
+            GetHistoryResponse response = new GetHistoryResponse
+            {
+                More = backendMessages.Count == _clientOptions.MessageHistoryCountLimit
+            };
+
             foreach (BackendMessage backendMessage in backendMessages)
             {
                 ClientMessage clientMessage = _clientBackendMapper.MapBackendToClientMessage(backendMessage);

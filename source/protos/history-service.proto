@@ -15,4 +15,5 @@ message GetHistoryRequest {
 
 message GetHistoryResponse {
   repeated Message messages = 1;
+  bool more = 2;
 }
