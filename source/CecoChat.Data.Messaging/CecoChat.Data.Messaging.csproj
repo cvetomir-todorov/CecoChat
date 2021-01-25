@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Scripts\messaging-keyspace.cql" />
+    <EmbeddedResource Include="Scripts\messaging-messages-for-dialog-table.cql" />
     <EmbeddedResource Include="Scripts\messaging-messages-for-user-table.cql" />
   </ItemGroup>
 

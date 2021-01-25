@@ -1,8 +1,8 @@
 ﻿CREATE TABLE messaging.messages_for_user
 (
-  receiver_id bigint,
+  user_id bigint,
   when timestamp,
   data blob,
-  PRIMARY KEY (receiver_id, when)
+  PRIMARY KEY (user_id, when)
 )
 WITH CLUSTERING ORDER BY (when DESC);
