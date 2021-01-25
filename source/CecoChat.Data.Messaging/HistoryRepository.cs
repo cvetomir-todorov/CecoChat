@@ -21,7 +21,7 @@ namespace CecoChat.Data.Messaging
         private readonly ICecoChatDbContext _dbContext;
         private readonly Lazy<PreparedStatement> _userHistoryQuery;
         private readonly Lazy<PreparedStatement> _dialogHistoryQuery;
-        private readonly GenericSerializer<Message> _messageSerializer;
+        private readonly ProtobufSerializer _messageSerializer;
 
         public HistoryRepository(
             ILogger<NewMessageRepository> logger,
@@ -31,7 +31,7 @@ namespace CecoChat.Data.Messaging
             _dbContext = dbContext;
             _userHistoryQuery = new Lazy<PreparedStatement>(PrepareUserHistoryQuery);
             _dialogHistoryQuery = new Lazy<PreparedStatement>(PrepareDialogHistoryQuery);
-            _messageSerializer = new GenericSerializer<Message>();
+            _messageSerializer = new ProtobufSerializer();
         }
 
         private PreparedStatement PrepareUserHistoryQuery()
@@ -56,7 +56,7 @@ namespace CecoChat.Data.Messaging
             foreach (Row row in rows)
             {
                 byte[] messageBytes = row.GetValue<byte[]>("data");
-                Message message = _messageSerializer.DeserializeFromSpan(messageBytes);
+                Message message = _messageSerializer.DeserializeFromSpan<Message>(messageBytes);
                 messages.Add(message);
             }
 
@@ -86,7 +86,7 @@ namespace CecoChat.Data.Messaging
             foreach (Row row in rows)
             {
                 byte[] messageBytes = row.GetValue<byte[]>("data");
-                Message message = _messageSerializer.DeserializeFromSpan(messageBytes);
+                Message message = _messageSerializer.DeserializeFromSpan<Message>(messageBytes);
                 messages.Add(message);
             }
 

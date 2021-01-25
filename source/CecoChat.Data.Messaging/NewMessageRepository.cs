@@ -17,7 +17,7 @@ namespace CecoChat.Data.Messaging
         private readonly ICecoChatDbContext _dbContext;
         private readonly Lazy<PreparedStatement> _messagesForUserQuery;
         private readonly Lazy<PreparedStatement> _messagesForDialogQuery;
-        private readonly GenericSerializer<Message> _messageSerializer;
+        private readonly ProtobufSerializer _messageSerializer;
 
         public NewMessageRepository(
             ILogger<NewMessageRepository> logger,
@@ -27,7 +27,7 @@ namespace CecoChat.Data.Messaging
             _dbContext = dbContext;
             _messagesForUserQuery = new Lazy<PreparedStatement>(PrepareMessagesForUserQuery);
             _messagesForDialogQuery = new Lazy<PreparedStatement>(PrepareMessagesForDialogQuery);
-            _messageSerializer = new GenericSerializer<Message>();
+            _messageSerializer = new ProtobufSerializer();
         }
 
         // TODO: reuse prepare query

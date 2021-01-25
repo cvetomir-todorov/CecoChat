@@ -7,11 +7,11 @@ namespace CecoChat.Kafka
 {
     public sealed class KafkaProtobufDeserializer<TMessage> : IDeserializer<TMessage>
     {
-        private readonly GenericSerializer<TMessage> _serializer;
+        private readonly ProtobufSerializer _serializer;
 
         public KafkaProtobufDeserializer()
         {
-            _serializer = new GenericSerializer<TMessage>();
+            _serializer = new ProtobufSerializer();
         }
 
         public TMessage Deserialize(ReadOnlySpan<byte> data, bool isNull, SerializationContext context)
@@ -19,7 +19,7 @@ namespace CecoChat.Kafka
             if (isNull)
                 return default;
 
-            TMessage message = _serializer.DeserializeFromSpan(data);
+            TMessage message = _serializer.DeserializeFromSpan<TMessage>(data);
             return message;
         }
     }

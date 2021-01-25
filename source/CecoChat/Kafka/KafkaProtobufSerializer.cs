@@ -6,11 +6,11 @@ namespace CecoChat.Kafka
 {
     public sealed class KafkaProtobufSerializer<TMessage> : ISerializer<TMessage>
     {
-        private readonly GenericSerializer<TMessage> _serializer;
+        private readonly ProtobufSerializer _serializer;
 
         public KafkaProtobufSerializer()
         {
-            _serializer = new GenericSerializer<TMessage>();
+            _serializer = new ProtobufSerializer();
         }
 
         public byte[] Serialize(TMessage data, SerializationContext context)
