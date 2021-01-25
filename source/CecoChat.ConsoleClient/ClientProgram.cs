@@ -47,12 +47,12 @@ namespace CecoChat.ConsoleClient
 
         private static async Task ShowHistory(History.HistoryClient historyClient, long userID)
         {
-            GetHistoryRequest request = new()
+            GetUserHistoryRequest request = new()
             {
                 UserId = userID,
-                NewerThan = Timestamp.FromDateTime(DateTime.UtcNow.AddYears(-1))
+                OlderThan = Timestamp.FromDateTime(DateTime.UtcNow)
             };
-            GetHistoryResponse response = await historyClient.GetHistoryAsync(request);
+            GetUserHistoryResponse response = await historyClient.GetUserHistoryAsync(request);
 
             Console.WriteLine("{0} messages from history:", response.Messages.Count);
             foreach (Message message in response.Messages)

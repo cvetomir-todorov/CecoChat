@@ -30,19 +30,15 @@ namespace CecoChat.Messaging.Server.Clients
             _clientBackendMapper = clientBackendMapper;
         }
 
-        public override async Task<GetHistoryResponse> GetHistory(GetHistoryRequest request, ServerCallContext context)
+        public override async Task<GetUserHistoryResponse> GetUserHistory(GetUserHistoryRequest request, ServerCallContext context)
         {
             // TODO: use user ID from auth token
             long userID = request.UserId;
             IReadOnlyCollection<BackendMessage> backendMessages = await _historyRepository
-                .SelectNewerMessagesForReceiver(userID, request.NewerThan.ToDateTime(), _clientOptions.MessageHistoryCountLimit);
+                .GetUserHistory(userID, request.OlderThan.ToDateTime(), _clientOptions.MessageHistoryCountLimit);
             _logger.LogTrace("Responding with {0} message history to user {1}.", backendMessages.Count, userID);
 
-            GetHistoryResponse response = new GetHistoryResponse
-            {
-                More = backendMessages.Count == _clientOptions.MessageHistoryCountLimit
-            };
-
+            GetUserHistoryResponse response = new();
             foreach (BackendMessage backendMessage in backendMessages)
             {
                 ClientMessage clientMessage = _clientBackendMapper.MapBackendToClientMessage(backendMessage);

@@ -5,15 +5,14 @@ import "message.proto";
 import "google/protobuf/timestamp.proto";
 
 service History {
-  rpc GetHistory(GetHistoryRequest) returns (GetHistoryResponse);
+  rpc GetUserHistory(GetUserHistoryRequest) returns (GetUserHistoryResponse);
 }
 
-message GetHistoryRequest {
+message GetUserHistoryRequest {
   int64 user_id = 1;
-  google.protobuf.Timestamp newer_than = 2;
+  google.protobuf.Timestamp older_than = 2;
 }
 
-message GetHistoryResponse {
+message GetUserHistoryResponse {
   repeated Message messages = 1;
-  bool more = 2;
 }

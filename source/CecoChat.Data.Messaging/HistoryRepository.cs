@@ -10,7 +10,7 @@ namespace CecoChat.Data.Messaging
 {
     public interface IHistoryRepository
     {
-        Task<IReadOnlyCollection<Message>> SelectNewerMessagesForReceiver(long receiverID, DateTime newerThan, int countLimit);
+        Task<IReadOnlyCollection<Message>> GetUserHistory(long userID, DateTime olderThan, int countLimit);
     }
 
     public sealed class HistoryRepository : IHistoryRepository
@@ -33,15 +33,15 @@ namespace CecoChat.Data.Messaging
         private PreparedStatement CreateSelectPrepared()
         {
             ISession session = _dbContext.Messaging;
-            const string selectCql = "SELECT * FROM messages_for_user WHERE receiver_id = ? AND when > ? ORDER BY when DESC LIMIT ?";
+            const string selectCql = "SELECT * FROM messages_for_user WHERE receiver_id = ? AND when < ? ORDER BY when DESC LIMIT ?";
             PreparedStatement selectPrepared = session.Prepare(selectCql);
             _logger.LogTrace("Prepared CQL '{0}'.", selectCql);
             return selectPrepared;
         }
 
-        public async Task<IReadOnlyCollection<Message>> SelectNewerMessagesForReceiver(long receiverID, DateTime newerThan, int countLimit)
+        public async Task<IReadOnlyCollection<Message>> GetUserHistory(long userID, DateTime olderThan, int countLimit)
         {
-            BoundStatement selectBound = _selectPrepared.Value.Bind(receiverID, newerThan, countLimit);
+            BoundStatement selectBound = _selectPrepared.Value.Bind(userID, olderThan, countLimit);
             selectBound.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
 
             ISession session = _dbContext.Messaging;
@@ -55,7 +55,7 @@ namespace CecoChat.Data.Messaging
                 messages.Add(message);
             }
 
-            _logger.LogTrace("Returned {0} messages for user {1} newer than {2}.", messages.Count, receiverID, newerThan);
+            _logger.LogTrace("Returned {0} messages for user {1} older than {2}.", messages.Count, userID, olderThan);
             return messages;
         }
     }
