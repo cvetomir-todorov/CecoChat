@@ -1,0 +1,47 @@
+﻿<UserControl x:Class="CecoChat.Client.Wpf.Views.AllChats.AllChatsControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:allChats="clr-namespace:CecoChat.Client.Wpf.Views.AllChats"
+             xmlns:singleChat="clr-namespace:CecoChat.Client.Wpf.Views.SingleChat"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=allChats:AllChatsViewModel, IsDesignTimeCreatable=False}"
+             Visibility="{Binding Path=CanOperate,Converter={StaticResource BoolToVisibilityConverter}}">
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="*"/>
+    </Grid.RowDefinitions>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="Auto"/>
+      <ColumnDefinition Width="*"/>
+    </Grid.ColumnDefinitions>
+    <ListView ItemsSource="{Binding Path=Chats}"
+              SelectedItem="{Binding Path=SelectedChat}"
+              Width="200"
+              Grid.Row="0" Grid.Column="0">
+      <i:Interaction.Triggers>
+        <i:EventTrigger EventName="SelectionChanged">
+          <i:InvokeCommandAction Command="{Binding Path=SelectionChanged}"/>
+        </i:EventTrigger>
+      </i:Interaction.Triggers>
+      <ListView.ItemTemplate>
+        <DataTemplate>
+          <StackPanel Orientation="Vertical">
+            <TextBlock Text="{Binding Path=UserID}"
+                       FontWeight="ExtraBold"
+                       Style="{StaticResource CommonElementStyle}"/>
+            <TextBlock Text="{Binding Path=LastMessage}"
+                       Foreground="Gray"
+                       Style="{StaticResource CommonElementStyle}"/>
+          </StackPanel>
+        </DataTemplate>
+      </ListView.ItemTemplate>
+    </ListView>
+    <singleChat:SingleChatControl DataContext="{Binding Path=SingleChatVM}"
+                                  Grid.Row="0" Grid.Column="1"
+                                  HorizontalAlignment="Stretch"
+                                  VerticalAlignment="Stretch"/>
+  </Grid>
+</UserControl>

@@ -1,0 +1,18 @@
+﻿<Application x:Class="CecoChat.Client.Wpf.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:infrastructure="clr-namespace:CecoChat.Client.Wpf.Infrastructure"
+             StartupUri="Views/Main/MainWindow.xaml">
+  <Application.Resources>
+    <Style x:Key="CommonElementStyle" TargetType="FrameworkElement">
+      <Setter Property="Margin" Value="3"/>
+      <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+    <Style x:Key="CommonControlStyle" TargetType="Control" BasedOn="{StaticResource CommonElementStyle}">
+      <Setter Property="Padding" Value="3"/>
+      <Setter Property="VerticalContentAlignment" Value="Center"/>
+    </Style>
+    <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+    <infrastructure:BooleanToColorBrushConverter x:Key="BoolToColorBrushConverter"/>
+  </Application.Resources>
+</Application>

@@ -1,0 +1,40 @@
+﻿<UserControl x:Class="CecoChat.Client.Wpf.Views.Connect.ConnectControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:connect="clr-namespace:CecoChat.Client.Wpf.Views.Connect"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=connect:ConnectViewModel, IsDesignTimeCreatable=False}"
+             Visibility="{Binding Path=CanOperate,Converter={StaticResource BoolToVisibilityConverter}}">
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+      <RowDefinition Height="Auto"/>
+    </Grid.RowDefinitions>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="Auto"/>
+      <ColumnDefinition Width="*"/>
+    </Grid.ColumnDefinitions>
+    <TextBlock Grid.Row="0" Grid.Column="0"
+               Text="User ID"
+               Style="{StaticResource CommonElementStyle}"/>
+    <TextBox Grid.Row="0" Grid.Column="1"
+             MinWidth="100"
+             Text="{Binding Path=UserID}"
+             Style="{StaticResource CommonControlStyle}"/>
+    <TextBlock Grid.Row="1" Grid.Column="0"
+               Text="Server"
+               Style="{StaticResource CommonElementStyle}"/>
+    <TextBox Grid.Row="1" Grid.Column="1"
+             MinWidth="100"
+             Text="{Binding Path=Server}"
+             Style="{StaticResource CommonControlStyle}"/>
+    <Button Grid.Row="3" Grid.Column="1"
+            Content="Connect"
+            Command="{Binding Path=Connect}"
+            Style="{StaticResource CommonControlStyle}"/>
+  </Grid>
+</UserControl>
