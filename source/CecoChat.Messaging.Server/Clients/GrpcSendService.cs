@@ -36,6 +36,8 @@ namespace CecoChat.Messaging.Server.Clients
             Contracts.Backend.Message backendMessage = _mapper.MapClientToBackendMessage(clientMessage);
             _backendProducer.ProduceMessage(backendMessage);
 
+            // TODO: send to the same user connected with multiple clients
+
             return Task.FromResult(new SendMessageResponse{MessageTimestamp = clientMessage.Timestamp});
         }
     }
