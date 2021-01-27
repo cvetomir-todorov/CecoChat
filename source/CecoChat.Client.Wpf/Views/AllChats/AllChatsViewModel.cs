@@ -25,6 +25,8 @@ namespace CecoChat.Client.Wpf.Views.AllChats
             Chats = new ObservableCollection<AllChatsItemViewModel>();
             SelectionChanged = new RelayCommand(SelectionChangedOnExecute);
             SingleChatVM = new SingleChatViewModel();
+
+            SingleChatVM.MessageSent += SingleChatVMOnMessageSent;
         }
 
         public bool CanOperate { get; set; }
@@ -62,7 +64,15 @@ namespace CecoChat.Client.Wpf.Views.AllChats
             try
             {
                 IList<Message> messageHistory = await MessagingClient.GetUserHistory(DateTime.UtcNow);
-                AddMessageHistory(messageHistory);
+                foreach (Message message in messageHistory)
+                {
+                    if (!TryGetOtherUserID(message, out long otherUserID))
+                    {
+                        break;
+                    }
+                    MessageStorage.AddMessage(otherUserID, message);
+                    ShowLastMessageFromUser(message, otherUserID);
+                }
             }
             catch (Exception exception)
             {
@@ -70,17 +80,13 @@ namespace CecoChat.Client.Wpf.Views.AllChats
             }
         }
 
-        private void AddMessageHistory(IList<Message> messages)
+        private void SingleChatVMOnMessageSent(object sender, Message message)
         {
-            foreach (Message message in messages)
+            if (!TryGetOtherUserID(message, out long otherUserID))
             {
-                if (!TryGetOtherUserID(message, out long otherUserID))
-                {
-                    break;
-                }
-                MessageStorage.AddMessage(otherUserID, message);
-                ShowLastMessageFromUser(message, otherUserID);
+                return;
             }
+            ShowLastMessageFromUser(message, otherUserID);
         }
 
         private bool TryGetOtherUserID(Message message, out long otherUserID)

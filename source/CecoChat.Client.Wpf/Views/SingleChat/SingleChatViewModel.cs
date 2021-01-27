@@ -1,6 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Threading.Tasks;
+using System.Windows.Input;
 using CecoChat.Contracts.Client;
+using Microsoft.Toolkit.Mvvm.Input;
 using PropertyChanged;
 
 namespace CecoChat.Client.Wpf.Views.SingleChat
@@ -12,11 +16,20 @@ namespace CecoChat.Client.Wpf.Views.SingleChat
         {
             MessagingClient.MessageReceived += MessagingClientOnMessageReceived;
             Messages = new ObservableCollection<SingleChatMessageViewModel>();
+            SendMessage = new AsyncRelayCommand(SendMessageExecuted);
         }
 
         public long OtherUserID { get; set; }
 
         public ObservableCollection<SingleChatMessageViewModel> Messages { get; }
+
+        public bool CanSend { get; set; }
+
+        public string MessageText { get; set; }
+
+        public ICommand SendMessage { get; }
+
+        public event EventHandler<Message> MessageSent;
 
         private void MessagingClientOnMessageReceived(object sender, Message message)
         {
@@ -26,6 +39,22 @@ namespace CecoChat.Client.Wpf.Views.SingleChat
             }
 
             InsertMessage(message);
+        }
+
+        private async Task SendMessageExecuted()
+        {
+            try
+            {
+                Message message = await MessagingClient.SendPlainTextMessage(OtherUserID, MessageText);
+                MessageStorage.AddMessage(OtherUserID, message);
+                InsertMessage(message);
+                MessageText = string.Empty;
+                MessageSent?.Invoke(this, message);
+            }
+            catch (Exception exception)
+            {
+                ErrorService.ShowError(exception);
+            }
         }
 
         public void SetOtherUser(long otherUserID)
@@ -38,6 +67,8 @@ namespace CecoChat.Client.Wpf.Views.SingleChat
             {
                 InsertMessage(message);
             }
+
+            CanSend = true;
         }
 
         private void InsertMessage(Message message)

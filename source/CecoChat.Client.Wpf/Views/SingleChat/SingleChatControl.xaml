@@ -10,6 +10,7 @@
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto"/>
       <RowDefinition Height="*"/>
+      <RowDefinition Height="Auto"/>
     </Grid.RowDefinitions>
     <Grid.ColumnDefinitions>
       <ColumnDefinition Width="*"/>
@@ -37,5 +38,23 @@
         </DataTemplate>
       </ListView.ItemTemplate>
     </ListView>
+    <Grid IsEnabled="{Binding Path=CanSend}"
+          MinHeight="50"
+          Grid.Row="2" Grid.Column="0">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*"/>
+        <ColumnDefinition Width="Auto"/>
+      </Grid.ColumnDefinitions>
+      <TextBox Text="{Binding Path=MessageText}"
+               AcceptsReturn="True"
+               Grid.Column="0"
+               VerticalAlignment="Stretch"
+               Style="{StaticResource CommonElementStyle}"/>
+      <Button Content="Send"
+              Command="{Binding Path=SendMessage}"
+              Grid.Column="1"
+              VerticalAlignment="Stretch"
+              Style="{StaticResource CommonControlStyle}"/>
+    </Grid>
   </Grid>
 </UserControl>
