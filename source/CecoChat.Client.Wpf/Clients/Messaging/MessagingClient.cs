@@ -99,9 +99,10 @@ namespace CecoChat.Client.Wpf.Clients.Messaging
 
         public async Task<Message> SendPlainTextMessage(long receiverID, string text)
         {
+            string messageID = _messageIDGenerator.GenerateMessageID();
             Message message = new()
             {
-                MessageId = _messageIDGenerator.GenerateMessageID(_userID),
+                MessageId = messageID,
                 SenderId = _userID,
                 ReceiverId = receiverID,
                 Type = MessageType.PlainText,

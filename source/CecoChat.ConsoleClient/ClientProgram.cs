@@ -68,7 +68,7 @@ namespace CecoChat.ConsoleClient
 
         private static async Task Interact(long userID, Send.SendClient sendClient)
         {
-            CorrelationIDGenerator generator = new();
+            MessageIDGenerator generator = new();
 
             while (true)
             {
@@ -81,10 +81,11 @@ namespace CecoChat.ConsoleClient
 
                 Console.WriteLine("Message to {0}:", receiverId);
                 string text = Console.ReadLine();
+                string messageID = generator.GenerateMessageID();
 
                 Message message = new Message
                 {
-                    MessageId = generator.GenerateCorrelationID(),
+                    MessageId = messageID,
                     SenderId = userID,
                     ReceiverId = receiverId,
                     Type = MessageType.PlainText,

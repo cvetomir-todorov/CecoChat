@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CecoChat.Client.Wpf.Clients.Messaging
+namespace CecoChat.ConsoleClient
 {
     public sealed class MessageIDGenerator
     {
