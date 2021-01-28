@@ -8,7 +8,8 @@
              xmlns:singleChat="clr-namespace:CecoChat.Client.Wpf.Views.SingleChat"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance Type=allChats:AllChatsViewModel, IsDesignTimeCreatable=False}"
-             Visibility="{Binding Path=CanOperate,Converter={StaticResource BoolToVisibilityConverter}}">
+             Visibility="{Binding Path=CanOperate,Converter={StaticResource BoolToVisibilityConverter}}"
+             IsEnabled="{Binding Path=CanOperate}">
   <Grid>
     <Grid.RowDefinitions>
       <RowDefinition Height="*"/>
