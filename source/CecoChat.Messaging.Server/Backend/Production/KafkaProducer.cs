@@ -1,6 +1,6 @@
 ﻿using System;
 using CecoChat.Contracts.Backend;
-using CecoChat.Kafka;
+using CecoChat.Server.Kafka;
 using Confluent.Kafka;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -13,7 +13,7 @@ namespace CecoChat.Messaging.Server.Backend.Production
         private readonly ILogger _logger;
         private readonly IPartitionUtility _partitionUtility;
         private readonly ITopicPartitionFlyweight _topicPartitionFlyweight;
-        private readonly IProducer<Null, Message> _producer;
+        private readonly IProducer<Null, BackendMessage> _producer;
 
         public KafkaProducer(
             ILogger<KafkaProducer> logger,
@@ -37,8 +37,8 @@ namespace CecoChat.Messaging.Server.Backend.Production
                 MessageSendMaxRetries = 8
             };
 
-            _producer = new ProducerBuilder<Null, Message>(configuration)
-                .SetValueSerializer(new KafkaProtobufSerializer<Message>())
+            _producer = new ProducerBuilder<Null, BackendMessage>(configuration)
+                .SetValueSerializer(new KafkaBackendMessageSerializer())
                 .Build();
         }
 
@@ -64,11 +64,11 @@ namespace CecoChat.Messaging.Server.Backend.Production
             }
         }
 
-        public void ProduceMessage(Message message)
+        public void ProduceMessage(BackendMessage message)
         {
-            int partition = _partitionUtility.ChoosePartition(message);
+            int partition = _partitionUtility.ChoosePartition(message.ReceiverId);
             TopicPartition topicPartition = _topicPartitionFlyweight.GetMessagesTopicPartition(partition);
-            Message<Null, Message> kafkaMessage = new()
+            Message<Null, BackendMessage> kafkaMessage = new()
             {
                 Value = message
             };
@@ -77,24 +77,24 @@ namespace CecoChat.Messaging.Server.Backend.Production
             _logger.LogTrace("Produced backend message {0}.", message);
         }
 
-        private void DeliveryHandler(DeliveryReport<Null, Message> report)
+        private void DeliveryHandler(DeliveryReport<Null, BackendMessage> report)
         {
-            Message message = report.Message.Value;
+            BackendMessage message = report.Message.Value;
 
             if (report.Status != PersistenceStatus.Persisted)
             {
                 _logger.LogError("Backend message {0} persistence status {1}.",
-                    message.MessageID, report.Status);
+                    message.MessageId, report.Status);
             }
             if (report.Error.IsError)
             {
                 _logger.LogError("Backend message {0} error '{1}'.",
-                    message.MessageID, report.Error.Reason);
+                    message.MessageId, report.Error.Reason);
             }
             if (report.TopicPartitionOffsetError.Error.IsError)
             {
                 _logger.LogError("Backend message {0} topic partition {1} error '{2}'.",
-                    message.MessageID, report.TopicPartitionOffsetError.Partition, report.TopicPartitionOffsetError.Error.Reason);
+                    message.MessageId, report.TopicPartitionOffsetError.Partition, report.TopicPartitionOffsetError.Error.Reason);
             }
         }
     }

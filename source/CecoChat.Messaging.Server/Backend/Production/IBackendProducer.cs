@@ -5,6 +5,6 @@ namespace CecoChat.Messaging.Server.Backend.Production
 {
     public interface IBackendProducer : IDisposable
     {
-        void ProduceMessage(Message message);
+        void ProduceMessage(BackendMessage message);
     }
 }

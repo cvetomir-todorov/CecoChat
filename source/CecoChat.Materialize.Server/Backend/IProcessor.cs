@@ -4,6 +4,6 @@ namespace CecoChat.Materialize.Server.Backend
 {
     public interface IProcessor
     {
-        void Process(Message message);
+        void Process(BackendMessage message);
     }
 }

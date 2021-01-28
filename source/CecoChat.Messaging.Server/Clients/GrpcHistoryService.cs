@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using CecoChat.Contracts.Backend;
 using CecoChat.Contracts.Client;
 using CecoChat.Data.Messaging;
 using CecoChat.Messaging.Server.Shared;
 using Grpc.Core;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using BackendMessage = CecoChat.Contracts.Backend.Message;
 
 namespace CecoChat.Messaging.Server.Clients
 {

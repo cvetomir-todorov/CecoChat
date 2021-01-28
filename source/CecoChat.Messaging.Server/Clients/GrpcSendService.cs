@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using CecoChat.Contracts.Backend;
 using CecoChat.Contracts.Client;
 using CecoChat.Messaging.Server.Backend.Production;
 using CecoChat.Messaging.Server.Shared;
@@ -37,7 +38,7 @@ namespace CecoChat.Messaging.Server.Clients
             clientMessage.Timestamp = Timestamp.FromDateTime(_clock.GetNowUtc());
             _logger.LogTrace("Timestamped client message {0}.", clientMessage);
 
-            Contracts.Backend.Message backendMessage = _mapper.MapClientToBackendMessage(clientMessage);
+            BackendMessage backendMessage = _mapper.MapClientToBackendMessage(clientMessage);
             _backendProducer.ProduceMessage(backendMessage);
 
             SendToClientsFromSameSender(clientMessage, context);

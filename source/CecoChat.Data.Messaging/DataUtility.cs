@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Cassandra;
 using CecoChat.Contracts.Backend;
-using CecoChat.ProtobufNet;
+using Google.Protobuf;
 using Microsoft.Extensions.Logging;
 
 namespace CecoChat.Data.Messaging
@@ -12,7 +12,7 @@ namespace CecoChat.Data.Messaging
     {
         PreparedStatement PrepareQuery(string cql);
 
-        Task<List<Message>> GetMessages(IStatement query, int countHint);
+        Task<List<BackendMessage>> GetMessages(IStatement query, int countHint);
 
         string CreateDialogID(long userID1, long userID2);
     }
@@ -21,7 +21,6 @@ namespace CecoChat.Data.Messaging
     {
         private readonly ILogger _logger;
         private readonly ICecoChatDbContext _dbContext;
-        private readonly ProtobufSerializer _messageSerializer;
 
         public DataUtility(
             ILogger<DataUtility> logger,
@@ -29,7 +28,6 @@ namespace CecoChat.Data.Messaging
         {
             _logger = logger;
             _dbContext = dbContext;
-            _messageSerializer = new ProtobufSerializer();
         }
 
         public PreparedStatement PrepareQuery(string cql)
@@ -39,15 +37,17 @@ namespace CecoChat.Data.Messaging
             return preparedQuery;
         }
 
-        public async Task<List<Message>> GetMessages(IStatement query, int countHint)
+        public async Task<List<BackendMessage>> GetMessages(IStatement query, int countHint)
         {
             RowSet rows = await _dbContext.Messaging.ExecuteAsync(query);
-            List<Message> messages = new(capacity: countHint);
+            List<BackendMessage> messages = new(capacity: countHint);
 
             foreach (Row row in rows)
             {
                 byte[] messageBytes = row.GetValue<byte[]>("data");
-                Message message = _messageSerializer.DeserializeFromSpan<Message>(messageBytes);
+                BackendMessage message = new BackendMessage();
+                message.MergeFrom(messageBytes);
+
                 messages.Add(message);
             }
 

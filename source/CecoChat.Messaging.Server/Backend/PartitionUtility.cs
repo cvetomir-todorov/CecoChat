@@ -1,12 +1,11 @@
 ﻿using System;
-using CecoChat.Contracts.Backend;
 using Microsoft.Extensions.Options;
 
 namespace CecoChat.Messaging.Server.Backend
 {
     public interface IPartitionUtility
     {
-        int ChoosePartition(Message message);
+        int ChoosePartition(long receiverID);
     }
 
     public sealed class PartitionUtility : IPartitionUtility
@@ -22,9 +21,9 @@ namespace CecoChat.Messaging.Server.Backend
             _hash = hash;
         }
 
-        public int ChoosePartition(Message message)
+        public int ChoosePartition(long receiverID)
         {
-            int hash = _hash.Compute(message.ReceiverID);
+            int hash = _hash.Compute(receiverID);
             int partition = Math.Abs(hash) % _options.MessagesTopicPartitionCount;
             return partition;
         }

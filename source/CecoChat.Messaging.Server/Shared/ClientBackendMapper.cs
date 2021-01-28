@@ -1,9 +1,6 @@
 ﻿using System;
 using CecoChat.Contracts.Backend;
 using CecoChat.Contracts.Client;
-using Google.Protobuf.WellKnownTypes;
-using BackendMessage = CecoChat.Contracts.Backend.Message;
-using BackendMessageType = CecoChat.Contracts.Backend.MessageType;
 
 namespace CecoChat.Messaging.Server.Shared
 {
@@ -18,24 +15,26 @@ namespace CecoChat.Messaging.Server.Shared
     {
         public BackendMessage MapClientToBackendMessage(ClientMessage clientMessage)
         {
-            BackendMessage backendMessage;
+            BackendMessage backendMessage = new()
+            {
+                MessageId = clientMessage.MessageId,
+                SenderId = clientMessage.SenderId,
+                ReceiverId = clientMessage.ReceiverId,
+                Timestamp = clientMessage.Timestamp
+            };
+
             switch (clientMessage.Type)
             {
                 case ClientMessageType.PlainText:
-                    backendMessage = new PlainTextMessage
+                    backendMessage.Type = BackendMessageType.PlainText;
+                    backendMessage.PlainTextData = new Contracts.Backend.PlainTextData
                     {
-                        Type = BackendMessageType.PlainText,
                         Text = clientMessage.PlainTextData.Text
                     };
                     break;
                 default:
                     throw new NotSupportedException($"{typeof(ClientMessageType).FullName} value {clientMessage.Type} is not supported.");
             }
-
-            backendMessage.MessageID = clientMessage.MessageId;
-            backendMessage.SenderID = clientMessage.SenderId;
-            backendMessage.ReceiverID = clientMessage.ReceiverId;
-            backendMessage.Timestamp = clientMessage.Timestamp.ToDateTime();
 
             return backendMessage;
         }
@@ -44,31 +43,19 @@ namespace CecoChat.Messaging.Server.Shared
         {
             ClientMessage clientMessage = new()
             {
-                MessageId = backendMessage.MessageID,
-                SenderId = backendMessage.SenderID,
-                ReceiverId = backendMessage.ReceiverID,
+                MessageId = backendMessage.MessageId,
+                SenderId = backendMessage.SenderId,
+                ReceiverId = backendMessage.ReceiverId,
+                Timestamp = backendMessage.Timestamp
             };
-
-            DateTime messageTimestamp = backendMessage.Timestamp;
-            if (messageTimestamp.Kind == DateTimeKind.Local)
-            {
-                messageTimestamp = messageTimestamp.ToUniversalTime();
-            }
-            else if (messageTimestamp.Kind == DateTimeKind.Unspecified)
-            {
-                messageTimestamp = DateTime.SpecifyKind(messageTimestamp, DateTimeKind.Utc);
-            }
-
-            clientMessage.Timestamp = Timestamp.FromDateTime(messageTimestamp);
 
             switch (backendMessage.Type)
             {
                 case BackendMessageType.PlainText:
                     clientMessage.Type = ClientMessageType.PlainText;
-                    PlainTextMessage plainTextMessage = (PlainTextMessage) backendMessage;
-                    clientMessage.PlainTextData = new PlainTextData
+                    clientMessage.PlainTextData = new Contracts.Client.PlainTextData
                     {
-                        Text = plainTextMessage.Text
+                        Text = backendMessage.PlainTextData.Text
                     };
                     break;
                 default:

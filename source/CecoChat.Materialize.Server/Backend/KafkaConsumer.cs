@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Threading;
-using CecoChat.Kafka;
+using CecoChat.Contracts.Backend;
+using CecoChat.Server.Kafka;
 using Confluent.Kafka;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using BackendMessage = CecoChat.Contracts.Backend.Message;
 
 namespace CecoChat.Materialize.Server.Backend
 {
@@ -36,7 +36,7 @@ namespace CecoChat.Materialize.Server.Backend
             };
 
             _consumer = new ConsumerBuilder<Null, BackendMessage>(configuration)
-                .SetValueDeserializer(new KafkaProtobufDeserializer<BackendMessage>())
+                .SetValueDeserializer(new KafkaBackendMessageDeserializer())
                 .Build();
         }
 

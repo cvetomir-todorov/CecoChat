@@ -1,14 +1,14 @@
 ﻿using System;
 using Cassandra;
 using CecoChat.Contracts.Backend;
-using CecoChat.ProtobufNet;
+using Google.Protobuf;
 using Microsoft.Extensions.Logging;
 
 namespace CecoChat.Data.Messaging
 {
     public interface INewMessageRepository
     {
-        void AddNewDialogMessage(Message message);
+        void AddNewDialogMessage(BackendMessage message);
     }
 
     public sealed class NewMessageRepository : INewMessageRepository
@@ -18,7 +18,6 @@ namespace CecoChat.Data.Messaging
         private readonly IDataUtility _dataUtility;
         private readonly Lazy<PreparedStatement> _messagesForUserQuery;
         private readonly Lazy<PreparedStatement> _messagesForDialogQuery;
-        private readonly ProtobufSerializer _messageSerializer;
 
         public NewMessageRepository(
             ILogger<NewMessageRepository> logger,
@@ -31,20 +30,20 @@ namespace CecoChat.Data.Messaging
 
             _messagesForUserQuery = new Lazy<PreparedStatement>(() => _dataUtility.PrepareQuery(InsertIntoMessagesForUser));
             _messagesForDialogQuery = new Lazy<PreparedStatement>(() => _dataUtility.PrepareQuery(InsertIntoMessagesForDialog));
-            _messageSerializer = new ProtobufSerializer();
         }
 
         const string InsertIntoMessagesForUser = "INSERT INTO messages_for_user (user_id, when, data) VALUES (?, ?, ?)";
         const string InsertIntoMessagesForDialog = "INSERT INTO messages_for_dialog (dialog_id, when, data) VALUES (?, ?, ?)";
 
-        public void AddNewDialogMessage(Message message)
+        public void AddNewDialogMessage(BackendMessage message)
         {
-            byte[] messageBytes = _messageSerializer.SerializeToByteArray(message);
-            BoundStatement insertForSender = _messagesForUserQuery.Value.Bind(message.SenderID, message.Timestamp, messageBytes);
-            BoundStatement insertForReceiver = _messagesForUserQuery.Value.Bind(message.ReceiverID, message.Timestamp, messageBytes);
+            byte[] messageBytes = message.ToByteArray();
+            DateTime messageTimestamp = message.Timestamp.ToDateTime();
+            BoundStatement insertForSender = _messagesForUserQuery.Value.Bind(message.SenderId, messageTimestamp, messageBytes);
+            BoundStatement insertForReceiver = _messagesForUserQuery.Value.Bind(message.ReceiverId, messageTimestamp, messageBytes);
 
-            string dialogID = _dataUtility.CreateDialogID(message.SenderID, message.ReceiverID);
-            BoundStatement insertForDialog = _messagesForDialogQuery.Value.Bind(dialogID, message.Timestamp, messageBytes);
+            string dialogID = _dataUtility.CreateDialogID(message.SenderId, message.ReceiverId);
+            BoundStatement insertForDialog = _messagesForDialogQuery.Value.Bind(dialogID, messageTimestamp, messageBytes);
 
             BatchStatement insertBatch = new BatchStatement()
                 .Add(insertForSender)

@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using CecoChat.Contracts.Backend;
 using CecoChat.Contracts.Client;
-using CecoChat.Kafka;
 using CecoChat.Messaging.Server.Backend.Production;
 using CecoChat.Messaging.Server.Clients;
 using CecoChat.Messaging.Server.Shared;
+using CecoChat.Server.Kafka;
 using Confluent.Kafka;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using BackendMessage = CecoChat.Contracts.Backend.Message;
 
 namespace CecoChat.Messaging.Server.Backend.Consumption
 {
@@ -46,7 +46,7 @@ namespace CecoChat.Messaging.Server.Backend.Consumption
             };
 
             _consumer = new ConsumerBuilder<Null, BackendMessage>(configuration)
-                .SetValueDeserializer(new KafkaProtobufDeserializer<BackendMessage>())
+                .SetValueDeserializer(new KafkaBackendMessageDeserializer())
                 .Build();
         }
 
@@ -98,7 +98,7 @@ namespace CecoChat.Messaging.Server.Backend.Consumption
 
         private void ProcessMessage(BackendMessage backendMessage)
         {
-            IEnumerable<IStreamer<ListenResponse>> clients = _clientContainer.GetClients(backendMessage.ReceiverID);
+            IEnumerable<IStreamer<ListenResponse>> clients = _clientContainer.GetClients(backendMessage.ReceiverId);
 
             ClientMessage clientMessage = _mapper.MapBackendToClientMessage(backendMessage);
             ListenResponse response = new ListenResponse
