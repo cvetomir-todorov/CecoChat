@@ -48,7 +48,7 @@ namespace CecoChat.Data.Messaging
         public async Task<IReadOnlyCollection<Message>> GetDialogHistory(long userID, long otherUserID, DateTime olderThan, int countLimit)
         {
             string dialogID = _dataUtility.CreateDialogID(userID, otherUserID);
-            BoundStatement query = _dialogHistoryQuery.Value.Bind(dialogID, otherUserID, olderThan, countLimit);
+            BoundStatement query = _dialogHistoryQuery.Value.Bind(dialogID, olderThan, countLimit);
             query.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
             List<Message> messages = await _dataUtility.GetMessages(query, countLimit);
 
