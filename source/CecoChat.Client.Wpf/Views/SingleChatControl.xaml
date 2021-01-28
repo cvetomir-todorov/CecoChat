@@ -4,6 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:viewModels="clr-namespace:CecoChat.Client.ViewModels;assembly=CecoChat.Client"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:infrastructure="clr-namespace:CecoChat.Client.Wpf.Infrastructure"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance Type=viewModels:SingleChatViewModel, IsDesignTimeCreatable=False}">
   <Grid>
@@ -21,6 +23,9 @@
                Style="{StaticResource CommonElementStyle}"/>
     <ListView ItemsSource="{Binding Path=Messages}"
               Grid.Row="1" Grid.Column="0">
+      <i:Interaction.Behaviors>
+        <infrastructure:ScrollIntoViewBehavior />
+      </i:Interaction.Behaviors>
       <ListView.ItemTemplate>
         <DataTemplate>
           <Grid Background="{Binding Path=IsSenderCurrentUser,
