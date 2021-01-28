@@ -39,6 +39,7 @@ namespace CecoChat.Messaging.Server.Clients
         public void Initialize(IServerStreamWriter<TMessage> streamWriter, ServerCallContext context)
         {
             _streamWriter = streamWriter;
+            // TODO: use client ID from metadata or auth token
             _clientID = context.Peer;
         }
 
@@ -46,6 +47,8 @@ namespace CecoChat.Messaging.Server.Clients
         {
             _signalProcessing.Dispose();
         }
+
+        public string ClientID => _clientID;
 
         public bool AddMessage(TMessage message)
         {

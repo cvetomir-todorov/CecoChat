@@ -123,11 +123,11 @@ namespace CecoChat.Messaging.Server.Backend.Consumption
 
             if (successCount < allCount)
             {
-                _logger.LogWarning("Connected clients ({0} out of {1}) were sent message {2}.", successCount, allCount, backendMessage);
+                _logger.LogWarning("Connected recipients ({0} out of {1}) were sent message {2}.", successCount, allCount, backendMessage);
             }
             else
             {
-                _logger.LogTrace("Connected clients (all {0}) were sent message {1}.", successCount, backendMessage);
+                _logger.LogTrace("Connected recipients (all {0}) were sent message {1}.", successCount, backendMessage);
             }
         }
 

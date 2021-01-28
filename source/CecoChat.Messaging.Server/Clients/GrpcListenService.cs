@@ -25,6 +25,7 @@ namespace CecoChat.Messaging.Server.Clients
 
         public override async Task Listen(ListenRequest request, IServerStreamWriter<ListenResponse> responseStream, ServerCallContext context)
         {
+            // TODO: use client ID from metadata or auth token
             string clientID = context.Peer;
             _logger.LogTrace("Client {0} connected.", clientID);
 
