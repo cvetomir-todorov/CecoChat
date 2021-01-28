@@ -5,33 +5,33 @@ using System.Threading.Tasks;
 using CecoChat.Client.Shared;
 using CecoChat.Contracts.Client;
 
-namespace CecoChat.ConsoleClient
+namespace CecoChat.Client.Console
 {
-    public static class ClientProgram
+    public static class Program
     {
         public static async Task Main(string[] args)
         {
-            Console.Write("Your ID: ");
-            long userID = long.Parse(Console.ReadLine() ?? string.Empty);
+            System.Console.Write("Your ID: ");
+            long userID = long.Parse(System.Console.ReadLine() ?? string.Empty);
 
             MessagingClient client = new(new MessageIDGenerator());
             client.Initialize(userID, "https://localhost:31001");
             client.MessageReceived += (_, message) => DisplayMessage(message);
-            client.ExceptionOccurred += (_, exception) => Console.WriteLine(exception);
+            client.ExceptionOccurred += (_, exception) => System.Console.WriteLine(exception);
 
             client.ListenForMessages(CancellationToken.None);
             await ShowHistory(client);
             await Interact(client);
 
             client.Dispose();
-            Console.WriteLine("Bye!");
+            System.Console.WriteLine("Bye!");
         }
 
         private static async Task ShowHistory(MessagingClient client)
         {
             IList<ClientMessage> messageHistory = await client.GetUserHistory(DateTime.UtcNow);
 
-            Console.WriteLine("{0} messages from history:", messageHistory.Count);
+            System.Console.WriteLine("{0} messages from history:", messageHistory.Count);
             foreach (ClientMessage message in messageHistory)
             {
                 DisplayMessage(message);
@@ -42,15 +42,15 @@ namespace CecoChat.ConsoleClient
         {
             while (true)
             {
-                Console.WriteLine("Receiver ID:");
-                int receiverID = int.Parse(Console.ReadLine() ?? "0");
+                System.Console.WriteLine("Receiver ID:");
+                int receiverID = int.Parse(System.Console.ReadLine() ?? "0");
                 if (receiverID <= 0)
                 {
                     break;
                 }
 
-                Console.WriteLine("Message to {0}:", receiverID);
-                string text = Console.ReadLine();
+                System.Console.WriteLine("Message to {0}:", receiverID);
+                string text = System.Console.ReadLine();
 
                 try
                 {
@@ -59,14 +59,14 @@ namespace CecoChat.ConsoleClient
                 }
                 catch (Exception exception)
                 {
-                    Console.WriteLine(exception);
+                    System.Console.WriteLine(exception);
                 }
             }
         }
 
         private static void DisplayMessage(ClientMessage message)
         {
-            Console.WriteLine($"[{message.Timestamp.ToDateTime():F}] {message.SenderId}->{message.ReceiverId}: {message.PlainTextData.Text}");
+            System.Console.WriteLine($"[{message.Timestamp.ToDateTime():F}] {message.SenderId}->{message.ReceiverId}: {message.PlainTextData.Text}");
         }
     }
 }
