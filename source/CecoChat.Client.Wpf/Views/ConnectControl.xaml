@@ -22,6 +22,7 @@
     </Grid.ColumnDefinitions>
     <TextBlock Grid.Row="0" Grid.Column="0"
                Text="User ID"
+               VerticalAlignment="Center"
                Style="{StaticResource CommonElementStyle}"/>
     <TextBox Grid.Row="0" Grid.Column="1"
              MinWidth="100"
@@ -29,6 +30,7 @@
              Style="{StaticResource CommonControlStyle}"/>
     <TextBlock Grid.Row="1" Grid.Column="0"
                Text="Messaging server"
+               VerticalAlignment="Center"
                Style="{StaticResource CommonElementStyle}"/>
     <TextBox Grid.Row="1" Grid.Column="1"
              MinWidth="100"
@@ -36,6 +38,7 @@
              Style="{StaticResource CommonControlStyle}"/>
     <TextBlock Grid.Row="2" Grid.Column="0"
                Text="History server"
+               VerticalAlignment="Center"
                Style="{StaticResource CommonElementStyle}"/>
     <TextBox Grid.Row="2" Grid.Column="1"
              MinWidth="100"

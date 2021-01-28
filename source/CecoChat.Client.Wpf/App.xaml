@@ -5,7 +5,6 @@
   <Application.Resources>
     <Style x:Key="CommonElementStyle" TargetType="FrameworkElement">
       <Setter Property="Margin" Value="3"/>
-      <Setter Property="VerticalAlignment" Value="Center"/>
     </Style>
     <Style x:Key="CommonControlStyle" TargetType="Control" BasedOn="{StaticResource CommonElementStyle}">
       <Setter Property="Padding" Value="3"/>

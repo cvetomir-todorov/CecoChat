@@ -40,7 +40,6 @@ namespace CecoChat.Client.ViewModels
         private void ConnectExecuted()
         {
             MessagingClient.Initialize(long.Parse(UserID), MessagingServer, HistoryServer);
-            // TODO: pass a real cancellation token which gets cancelled when app is shut down or a critical exception happens
             MessagingClient.ListenForMessages(CancellationToken.None);
 
             Connected?.Invoke(this, EventArgs.Empty);

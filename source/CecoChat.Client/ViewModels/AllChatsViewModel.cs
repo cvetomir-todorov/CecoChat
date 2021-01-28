@@ -31,6 +31,7 @@ namespace CecoChat.Client.ViewModels
             CanOperate = true;
             Chats = new ObservableCollection<AllChatsItemViewModel>();
             SelectionChanged = new AsyncRelayCommand(SelectionChangedOnExecute);
+            StartChat = new RelayCommand(StartChatOnExecute);
             SingleChatVM = singleChatVM;
 
             SingleChatVM.MessageSent += SingleChatVMOnMessageSent;
@@ -43,6 +44,10 @@ namespace CecoChat.Client.ViewModels
         public AllChatsItemViewModel SelectedChat { get; set; }
 
         public ICommand SelectionChanged { get; }
+
+        public string StartChatUserID { get; set; }
+
+        public ICommand StartChat { get; }
 
         public SingleChatViewModel SingleChatVM { get; }
 
@@ -59,6 +64,33 @@ namespace CecoChat.Client.ViewModels
         private Task SelectionChangedOnExecute()
         {
             return SingleChatVM.SetOtherUser(SelectedChat.UserID);
+        }
+
+        private void StartChatOnExecute()
+        {
+            if (!long.TryParse(StartChatUserID, out long otherUserID))
+            {
+                ErrorService.ShowError($"User ID should be a long, not '{StartChatUserID}'.");
+                return;
+            }
+            if (_chatsMap.TryGetValue(otherUserID, out AllChatsItemViewModel existingChatVM))
+            {
+                UIThreadDispatcher.Invoke(() => SelectedChat = existingChatVM);
+                return;
+            }
+
+            AllChatsItemViewModel chatVM = new()
+            {
+                UserID = otherUserID,
+                Timestamp = DateTime.MinValue
+            };
+
+            _chatsMap.Add(otherUserID, chatVM);
+            UIThreadDispatcher.Invoke(() =>
+            {
+                Chats.Add(chatVM);
+                SelectedChat = chatVM;
+            });
         }
 
         public void Start()

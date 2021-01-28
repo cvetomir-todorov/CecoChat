@@ -13,6 +13,7 @@
   <Grid>
     <Grid.RowDefinitions>
       <RowDefinition Height="*"/>
+      <RowDefinition Height="Auto"/>
     </Grid.RowDefinitions>
     <Grid.ColumnDefinitions>
       <ColumnDefinition Width="Auto"/>
@@ -21,7 +22,8 @@
     <ListView ItemsSource="{Binding Path=Chats}"
               SelectedItem="{Binding Path=SelectedChat}"
               Width="200"
-              Grid.Row="0" Grid.Column="0">
+              Grid.Row="0" Grid.Column="0"
+              Style="{StaticResource CommonControlStyle}">
       <i:Interaction.Triggers>
         <i:EventTrigger EventName="SelectionChanged">
           <i:InvokeCommandAction Command="{Binding Path=SelectionChanged}"/>
@@ -40,9 +42,30 @@
         </DataTemplate>
       </ListView.ItemTemplate>
     </ListView>
+    <Grid Grid.Row="1" Grid.Column="0">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto"/>
+        <ColumnDefinition Width="*"/>
+        <ColumnDefinition Width="Auto"/>
+      </Grid.ColumnDefinitions>
+      <TextBlock Text="User"
+                 VerticalAlignment="Center"
+                 Style="{StaticResource CommonElementStyle}"/>
+      <TextBox Text="{Binding Path=StartChatUserID}"
+               Grid.Column="1"
+               VerticalAlignment="Stretch"
+               VerticalContentAlignment="Center"
+               HorizontalContentAlignment="Right"
+               Style="{StaticResource CommonElementStyle}"/>
+      <Button Content="Start"
+              Command="{Binding Path=StartChat}"
+              Grid.Column="2"
+              VerticalAlignment="Stretch"
+              Style="{StaticResource CommonControlStyle}"/>
+    </Grid>
     <views:SingleChatControl DataContext="{Binding Path=SingleChatVM}"
-                                  Grid.Row="0" Grid.Column="1"
-                                  HorizontalAlignment="Stretch"
-                                  VerticalAlignment="Stretch"/>
+                             Grid.RowSpan="2" Grid.Column="1"
+                             HorizontalAlignment="Stretch"
+                             VerticalAlignment="Stretch"/>
   </Grid>
 </UserControl>
