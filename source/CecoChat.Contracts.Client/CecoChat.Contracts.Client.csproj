@@ -14,13 +14,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Protobuf Include="..\protos\history-service.proto" GrpcServices="Client">
+    <Protobuf Include="..\protos\history-service.proto" GrpcServices="All">
       <Link>history-service.proto</Link>
     </Protobuf>
-    <Protobuf Include="..\protos\listen-service.proto" GrpcServices="Client">
+    <Protobuf Include="..\protos\listen-service.proto" GrpcServices="All">
       <Link>listen-service.proto</Link>
     </Protobuf>
-    <Protobuf Include="..\protos\send-service.proto" GrpcServices="Client">
+    <Protobuf Include="..\protos\send-service.proto" GrpcServices="All">
       <Link>send-service.proto</Link>
     </Protobuf>
     <Protobuf Include="..\protos\message.proto">

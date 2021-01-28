@@ -13,23 +13,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CecoChat.Contracts.Backend\CecoChat.Contracts.Backend.csproj" />
+    <ProjectReference Include="..\CecoChat.Contracts.Client\CecoChat.Contracts.Client.csproj" />
     <ProjectReference Include="..\CecoChat.Data.Messaging\CecoChat.Data.Messaging.csproj" />
     <ProjectReference Include="..\CecoChat\CecoChat.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Protobuf Include="..\protos\history-service.proto" GrpcServices="Server">
-      <Link>Protos\history-service.proto</Link>
-    </Protobuf>
-    <Protobuf Include="..\protos\listen-service.proto" GrpcServices="Server">
-      <Link>Protos\listen-service.proto</Link>
-    </Protobuf>
-    <Protobuf Include="..\protos\send-service.proto" GrpcServices="Server">
-      <Link>Protos\send-service.proto</Link>
-    </Protobuf>
-    <Protobuf Include="..\protos\message.proto">
-      <Link>Protos\message.proto</Link>
-    </Protobuf>
   </ItemGroup>
 
 </Project>
