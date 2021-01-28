@@ -23,7 +23,7 @@ namespace CecoChat.Client.Wpf.Views.AllChats
 
             CanOperate = true;
             Chats = new ObservableCollection<AllChatsItemViewModel>();
-            SelectionChanged = new RelayCommand(SelectionChangedOnExecute);
+            SelectionChanged = new AsyncRelayCommand(SelectionChangedOnExecute);
             SingleChatVM = new SingleChatViewModel();
 
             SingleChatVM.MessageSent += SingleChatVMOnMessageSent;
@@ -49,9 +49,9 @@ namespace CecoChat.Client.Wpf.Views.AllChats
             ShowLastMessageFromUser(message, otherUserID);
         }
 
-        private void SelectionChangedOnExecute()
+        private Task SelectionChangedOnExecute()
         {
-            SingleChatVM.SetOtherUser(SelectedChat.UserID);
+            return SingleChatVM.SetOtherUser(SelectedChat.UserID);
         }
 
         public void Start()

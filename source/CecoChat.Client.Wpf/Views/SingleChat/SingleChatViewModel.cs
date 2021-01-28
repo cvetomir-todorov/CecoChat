@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using CecoChat.Contracts.Client;
@@ -12,8 +13,12 @@ namespace CecoChat.Client.Wpf.Views.SingleChat
     [AddINotifyPropertyChangedInterface]
     public sealed class SingleChatViewModel : BaseViewModel
     {
+        private readonly HashSet<string> _messageIDs;
+
         public SingleChatViewModel()
         {
+            _messageIDs = new HashSet<string>();
+
             MessagingClient.MessageReceived += MessagingClientOnMessageReceived;
             Messages = new ObservableCollection<SingleChatMessageViewModel>();
             SendMessage = new AsyncRelayCommand(SendMessageExecuted);
@@ -57,13 +62,18 @@ namespace CecoChat.Client.Wpf.Views.SingleChat
             }
         }
 
-        public void SetOtherUser(long otherUserID)
+        public async Task SetOtherUser(long otherUserID)
         {
             OtherUserID = otherUserID;
 
+            _messageIDs.Clear();
             Messages.Clear();
-            IEnumerable<Message> messages = MessageStorage.GetMessages(otherUserID);
-            foreach (Message message in messages)
+
+            IEnumerable<Message> storedMessages = MessageStorage.GetMessages(otherUserID);
+            IList<Message> dialogHistory = await MessagingClient.GetDialogHistory(otherUserID, DateTime.UtcNow);
+            IEnumerable<Message> allMessages = storedMessages.Union(dialogHistory);
+
+            foreach (Message message in allMessages)
             {
                 InsertMessage(message);
             }
@@ -73,6 +83,9 @@ namespace CecoChat.Client.Wpf.Views.SingleChat
 
         private void InsertMessage(Message message)
         {
+            if (_messageIDs.Contains(message.MessageId))
+                return;
+
             int insertionIndex = 0;
 
             for (int i = Messages.Count - 1; i >= 0; i--)
@@ -99,6 +112,8 @@ namespace CecoChat.Client.Wpf.Views.SingleChat
             {
                 UIThreadDispatcher.Invoke(() => Messages.Insert(insertionIndex, messageVM));
             }
+
+            _messageIDs.Add(message.MessageId);
         }
     }
 }
