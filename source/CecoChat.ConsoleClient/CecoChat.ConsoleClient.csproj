@@ -6,27 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Google.Protobuf" Version="3.14.0" />
-    <PackageReference Include="Grpc.Net.Client" Version="2.34.0" />
-    <PackageReference Include="Grpc.Tools" Version="2.34.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Protobuf Include="..\protos\history-service.proto" GrpcServices="Client">
-      <Link>Protos\history-service.proto</Link>
-    </Protobuf>
-    <Protobuf Include="..\protos\listen-service.proto" GrpcServices="Client">
-      <Link>Protos\listen-service.proto</Link>
-    </Protobuf>
-    <Protobuf Include="..\protos\send-service.proto" GrpcServices="Client">
-      <Link>Protos\send-service.proto</Link>
-    </Protobuf>
-    <Protobuf Include="..\protos\message.proto">
-      <Link>Protos\message.proto</Link>
-    </Protobuf>
+    <ProjectReference Include="..\CecoChat.Client\CecoChat.Client.csproj" />
   </ItemGroup>
 
 </Project>

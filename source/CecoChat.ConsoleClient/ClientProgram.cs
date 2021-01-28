@@ -1,9 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
+using CecoChat.Client.Shared;
 using CecoChat.Contracts.Client;
-using Google.Protobuf.WellKnownTypes;
-using Grpc.Core;
-using Grpc.Net.Client;
 
 namespace CecoChat.ConsoleClient
 {
@@ -14,94 +14,59 @@ namespace CecoChat.ConsoleClient
             Console.Write("Your ID: ");
             long userID = long.Parse(Console.ReadLine() ?? string.Empty);
 
-            using GrpcChannel channel = GrpcChannel.ForAddress("https://localhost:31001");
-            Listen.ListenClient listenClient = new(channel);
-            Send.SendClient sendClient = new(channel);
-            History.HistoryClient historyClient = new(channel);
+            MessagingClient client = new(new MessageIDGenerator());
+            client.Initialize(userID, "https://localhost:31001");
+            client.MessageReceived += (_, message) => DisplayMessage(message);
+            client.ExceptionOccurred += (_, exception) => Console.WriteLine(exception);
 
-            AsyncServerStreamingCall<ListenResponse> serverStream = listenClient.Listen(new ListenRequest{UserId = userID});
-            Task _ = Task.Run(async () => await ListenForNewMessages(serverStream));
+            client.ListenForMessages(CancellationToken.None);
+            await ShowHistory(client);
+            await Interact(client);
 
-            await ShowHistory(historyClient, userID);
-            await Interact(userID, sendClient);
-
-            await channel.ShutdownAsync();
+            client.Dispose();
             Console.WriteLine("Bye!");
         }
 
-        private static async Task ListenForNewMessages(AsyncServerStreamingCall<ListenResponse> serverStream)
+        private static async Task ShowHistory(MessagingClient client)
         {
-            try
-            {
-                while (await serverStream.ResponseStream.MoveNext())
-                {
-                    Message message = serverStream.ResponseStream.Current.Message;
-                    DisplayMessage(message);
-                }
-            }
-            catch (Exception exception)
-            {
-                Console.WriteLine(exception);
-            }
-        }
+            IList<Message> messageHistory = await client.GetUserHistory(DateTime.UtcNow);
 
-        private static async Task ShowHistory(History.HistoryClient historyClient, long userID)
-        {
-            GetUserHistoryRequest request = new()
-            {
-                UserId = userID,
-                OlderThan = Timestamp.FromDateTime(DateTime.UtcNow)
-            };
-            GetUserHistoryResponse response = await historyClient.GetUserHistoryAsync(request);
-
-            Console.WriteLine("{0} messages from history:", response.Messages.Count);
-            foreach (Message message in response.Messages)
+            Console.WriteLine("{0} messages from history:", messageHistory.Count);
+            foreach (Message message in messageHistory)
             {
                 DisplayMessage(message);
             }
         }
 
-        private static void DisplayMessage(Message message)
+        private static async Task Interact(MessagingClient client)
         {
-            Console.WriteLine($"[{message.Timestamp.ToDateTime():F}] {message.SenderId}->{message.ReceiverId}: {message.PlainTextData.Text}");
-        }
-
-        private static async Task Interact(long userID, Send.SendClient sendClient)
-        {
-            MessageIDGenerator generator = new();
-
             while (true)
             {
                 Console.WriteLine("Receiver ID:");
-                int receiverId = int.Parse(Console.ReadLine() ?? "0");
-                if (receiverId <= 0)
+                int receiverID = int.Parse(Console.ReadLine() ?? "0");
+                if (receiverID <= 0)
                 {
                     break;
                 }
 
-                Console.WriteLine("Message to {0}:", receiverId);
+                Console.WriteLine("Message to {0}:", receiverID);
                 string text = Console.ReadLine();
-                string messageID = generator.GenerateMessageID();
-
-                Message message = new Message
-                {
-                    MessageId = messageID,
-                    SenderId = userID,
-                    ReceiverId = receiverId,
-                    Type = MessageType.PlainText,
-                    PlainTextData = new PlainTextData { Text = text }
-                };
 
                 try
                 {
-                    SendMessageResponse response = await sendClient.SendMessageAsync(new SendMessageRequest {Message = message});
-                    message.Timestamp = response.MessageTimestamp;
+                    Message message = await client.SendPlainTextMessage(receiverID, text);
+                    DisplayMessage(message);
                 }
                 catch (Exception exception)
                 {
                     Console.WriteLine(exception);
                 }
             }
+        }
+
+        private static void DisplayMessage(Message message)
+        {
+            Console.WriteLine($"[{message.Timestamp.ToDateTime():F}] {message.SenderId}->{message.ReceiverId}: {message.PlainTextData.Text}");
         }
     }
 }

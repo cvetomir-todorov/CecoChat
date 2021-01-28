@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using CecoChat.Contracts.Client;
 
-namespace CecoChat.Client.Wpf.Infrastructure.Storage
+namespace CecoChat.Client.Shared.Storage
 {
     public sealed class DialogStorage
     {

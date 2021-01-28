@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace CecoChat.Client.Wpf.Views.Main
+namespace CecoChat.Client.Wpf.Views
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

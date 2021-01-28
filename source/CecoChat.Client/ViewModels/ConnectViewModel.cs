@@ -1,15 +1,22 @@
 ﻿using System;
 using System.Threading;
 using System.Windows.Input;
+using CecoChat.Client.Shared;
+using CecoChat.Client.Shared.Storage;
 using Microsoft.Toolkit.Mvvm.Input;
 using PropertyChanged;
 
-namespace CecoChat.Client.Wpf.Views.Connect
+namespace CecoChat.Client.ViewModels
 {
     [AddINotifyPropertyChangedInterface]
     public sealed class ConnectViewModel : BaseViewModel
     {
-        public ConnectViewModel()
+        public ConnectViewModel(
+            MessagingClient messagingClient,
+            MessageStorage messageStorage,
+            IDispatcher uiThreadDispatcher,
+            IErrorService errorService)
+            : base(messagingClient, messageStorage, uiThreadDispatcher, errorService)
         {
             CanOperate = true;
             UserID = "1";

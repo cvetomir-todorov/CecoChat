@@ -3,19 +3,26 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using CecoChat.Client.Wpf.Views.SingleChat;
+using CecoChat.Client.Shared;
+using CecoChat.Client.Shared.Storage;
 using CecoChat.Contracts.Client;
 using Microsoft.Toolkit.Mvvm.Input;
 using PropertyChanged;
 
-namespace CecoChat.Client.Wpf.Views.AllChats
+namespace CecoChat.Client.ViewModels
 {
     [AddINotifyPropertyChangedInterface]
     public sealed class AllChatsViewModel : BaseViewModel
     {
         private readonly Dictionary<long, AllChatsItemViewModel> _chatsMap;
 
-        public AllChatsViewModel()
+        public AllChatsViewModel(
+            MessagingClient messagingClient,
+            MessageStorage messageStorage,
+            IDispatcher uiThreadDispatcher,
+            IErrorService errorService,
+            SingleChatViewModel singleChatVM)
+            : base(messagingClient, messageStorage, uiThreadDispatcher, errorService)
         {
             _chatsMap = new Dictionary<long, AllChatsItemViewModel>();
 
@@ -24,7 +31,7 @@ namespace CecoChat.Client.Wpf.Views.AllChats
             CanOperate = true;
             Chats = new ObservableCollection<AllChatsItemViewModel>();
             SelectionChanged = new AsyncRelayCommand(SelectionChangedOnExecute);
-            SingleChatVM = new SingleChatViewModel();
+            SingleChatVM = singleChatVM;
 
             SingleChatVM.MessageSent += SingleChatVMOnMessageSent;
         }

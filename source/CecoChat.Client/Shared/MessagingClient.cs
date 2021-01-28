@@ -7,7 +7,7 @@ using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Grpc.Net.Client;
 
-namespace CecoChat.Client.Wpf.Clients.Messaging
+namespace CecoChat.Client.Shared
 {
     public sealed class MessagingClient : IDisposable
     {

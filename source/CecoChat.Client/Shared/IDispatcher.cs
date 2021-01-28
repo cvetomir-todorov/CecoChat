@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CecoChat.Client.Wpf.Infrastructure
+namespace CecoChat.Client.Shared
 {
     public interface IDispatcher
     {

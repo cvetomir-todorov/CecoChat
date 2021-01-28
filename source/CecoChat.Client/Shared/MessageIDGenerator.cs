@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CecoChat.ConsoleClient
+namespace CecoChat.Client.Shared
 {
     public sealed class MessageIDGenerator
     {

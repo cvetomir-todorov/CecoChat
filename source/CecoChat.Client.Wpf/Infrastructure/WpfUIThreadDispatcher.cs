@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows;
+using CecoChat.Client.Shared;
 
 namespace CecoChat.Client.Wpf.Infrastructure
 {

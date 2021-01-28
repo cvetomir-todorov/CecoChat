@@ -1,22 +1,29 @@
 ﻿using System;
-using CecoChat.Client.Wpf.Views.AllChats;
-using CecoChat.Client.Wpf.Views.Connect;
+using CecoChat.Client.Shared;
+using CecoChat.Client.Shared.Storage;
 using PropertyChanged;
 
-namespace CecoChat.Client.Wpf.Views.Main
+namespace CecoChat.Client.ViewModels
 {
     [AddINotifyPropertyChangedInterface]
     public sealed class MainViewModel : BaseViewModel
     {
-        public MainViewModel()
+        public MainViewModel(
+            MessagingClient messagingClient,
+            MessageStorage messageStorage,
+            IDispatcher uiThreadDispatcher,
+            IErrorService errorService,
+            ConnectViewModel connectVM,
+            AllChatsViewModel allChatsVM)
+            : base(messagingClient, messageStorage, uiThreadDispatcher, errorService)
         {
             MessagingClient.ExceptionOccurred += MessagingClientOnExceptionOccurred;
 
-            ConnectVM = new();
+            ConnectVM = connectVM;
             ConnectVM.CanOperate = true;
             ConnectVM.Connected += ConnectViewModelOnConnected;
 
-            AllChatsVM = new();
+            AllChatsVM = allChatsVM;
             AllChatsVM.CanOperate = false;
         }
 
