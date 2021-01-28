@@ -6,7 +6,6 @@ using CecoChat.Messaging.Server.Shared;
 using Grpc.Core;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using ClientMessage = CecoChat.Contracts.Client.Message;
 using BackendMessage = CecoChat.Contracts.Backend.Message;
 
 namespace CecoChat.Messaging.Server.Clients

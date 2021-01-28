@@ -29,10 +29,10 @@ namespace CecoChat.ConsoleClient
 
         private static async Task ShowHistory(MessagingClient client)
         {
-            IList<Message> messageHistory = await client.GetUserHistory(DateTime.UtcNow);
+            IList<ClientMessage> messageHistory = await client.GetUserHistory(DateTime.UtcNow);
 
             Console.WriteLine("{0} messages from history:", messageHistory.Count);
-            foreach (Message message in messageHistory)
+            foreach (ClientMessage message in messageHistory)
             {
                 DisplayMessage(message);
             }
@@ -54,7 +54,7 @@ namespace CecoChat.ConsoleClient
 
                 try
                 {
-                    Message message = await client.SendPlainTextMessage(receiverID, text);
+                    ClientMessage message = await client.SendPlainTextMessage(receiverID, text);
                     DisplayMessage(message);
                 }
                 catch (Exception exception)
@@ -64,7 +64,7 @@ namespace CecoChat.ConsoleClient
             }
         }
 
-        private static void DisplayMessage(Message message)
+        private static void DisplayMessage(ClientMessage message)
         {
             Console.WriteLine($"[{message.Timestamp.ToDateTime():F}] {message.SenderId}->{message.ReceiverId}: {message.PlainTextData.Text}");
         }

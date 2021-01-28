@@ -46,7 +46,7 @@ namespace CecoChat.Client.ViewModels
 
         public SingleChatViewModel SingleChatVM { get; }
 
-        private void MessagingClientOnMessageReceived(object sender, Message message)
+        private void MessagingClientOnMessageReceived(object sender, ClientMessage message)
         {
             if (!TryGetOtherUserID(message, out long otherUserID))
             {
@@ -70,8 +70,8 @@ namespace CecoChat.Client.ViewModels
         {
             try
             {
-                IList<Message> messageHistory = await MessagingClient.GetUserHistory(DateTime.UtcNow);
-                foreach (Message message in messageHistory)
+                IList<ClientMessage> messageHistory = await MessagingClient.GetUserHistory(DateTime.UtcNow);
+                foreach (ClientMessage message in messageHistory)
                 {
                     if (!TryGetOtherUserID(message, out long otherUserID))
                     {
@@ -87,7 +87,7 @@ namespace CecoChat.Client.ViewModels
             }
         }
 
-        private void SingleChatVMOnMessageSent(object sender, Message message)
+        private void SingleChatVMOnMessageSent(object sender, ClientMessage message)
         {
             if (!TryGetOtherUserID(message, out long otherUserID))
             {
@@ -96,7 +96,7 @@ namespace CecoChat.Client.ViewModels
             ShowLastMessageFromUser(message, otherUserID);
         }
 
-        private bool TryGetOtherUserID(Message message, out long otherUserID)
+        private bool TryGetOtherUserID(ClientMessage message, out long otherUserID)
         {
             if (message.SenderId != MessagingClient.UserID)
             {
@@ -116,7 +116,7 @@ namespace CecoChat.Client.ViewModels
             }
         }
 
-        private void ShowLastMessageFromUser(Message message, long otherUsedID)
+        private void ShowLastMessageFromUser(ClientMessage message, long otherUsedID)
         {
             DateTime messageTimestamp = message.Timestamp.ToDateTime();
             if (_chatsMap.TryGetValue(otherUsedID, out AllChatsItemViewModel chatVM))

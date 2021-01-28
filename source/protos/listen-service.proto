@@ -1,7 +1,7 @@
 syntax = "proto3";
 option csharp_namespace = "CecoChat.Contracts.Client";
 package CecoChat;
-import "message.proto";
+import "client-message.proto";
 
 service Listen {
   rpc Listen(ListenRequest) returns (stream ListenResponse);
@@ -12,5 +12,5 @@ message ListenRequest {
 }
 
 message ListenResponse {
-  Message message = 1;
+  ClientMessage message = 1;
 }

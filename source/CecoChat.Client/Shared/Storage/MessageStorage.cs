@@ -13,13 +13,13 @@ namespace CecoChat.Client.Shared.Storage
             _dialogMap = new();
         }
 
-        public void AddMessage(long userID, Message message)
+        public void AddMessage(long userID, ClientMessage message)
         {
             DialogStorage dialogStorage = _dialogMap.GetOrAdd(userID, _ => new DialogStorage());
             dialogStorage.AddMessage(message);
         }
 
-        public IEnumerable<Message> GetMessages(long userID)
+        public IEnumerable<ClientMessage> GetMessages(long userID)
         {
             DialogStorage dialogStorage = _dialogMap.GetOrAdd(userID, _ => new DialogStorage());
             return dialogStorage.GetMessages();

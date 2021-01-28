@@ -41,9 +41,9 @@ namespace CecoChat.Client.ViewModels
 
         public ICommand SendMessage { get; }
 
-        public event EventHandler<Message> MessageSent;
+        public event EventHandler<ClientMessage> MessageSent;
 
-        private void MessagingClientOnMessageReceived(object sender, Message message)
+        private void MessagingClientOnMessageReceived(object sender, ClientMessage message)
         {
             if (message.SenderId != OtherUserID && message.ReceiverId != OtherUserID)
             {
@@ -57,7 +57,7 @@ namespace CecoChat.Client.ViewModels
         {
             try
             {
-                Message message = await MessagingClient.SendPlainTextMessage(OtherUserID, MessageText);
+                ClientMessage message = await MessagingClient.SendPlainTextMessage(OtherUserID, MessageText);
                 MessageStorage.AddMessage(OtherUserID, message);
                 InsertMessage(message);
                 MessageText = string.Empty;
@@ -76,11 +76,11 @@ namespace CecoChat.Client.ViewModels
             _messageIDs.Clear();
             Messages.Clear();
 
-            IEnumerable<Message> storedMessages = MessageStorage.GetMessages(otherUserID);
-            IList<Message> dialogHistory = await MessagingClient.GetDialogHistory(otherUserID, DateTime.UtcNow);
-            IEnumerable<Message> allMessages = storedMessages.Union(dialogHistory);
+            IEnumerable<ClientMessage> storedMessages = MessageStorage.GetMessages(otherUserID);
+            IList<ClientMessage> dialogHistory = await MessagingClient.GetDialogHistory(otherUserID, DateTime.UtcNow);
+            IEnumerable<ClientMessage> allMessages = storedMessages.Union(dialogHistory);
 
-            foreach (Message message in allMessages)
+            foreach (ClientMessage message in allMessages)
             {
                 InsertMessage(message);
             }
@@ -88,7 +88,7 @@ namespace CecoChat.Client.ViewModels
             CanSend = true;
         }
 
-        private void InsertMessage(Message message)
+        private void InsertMessage(ClientMessage message)
         {
             if (_messageIDs.Contains(message.MessageId))
                 return;

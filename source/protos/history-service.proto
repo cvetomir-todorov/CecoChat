@@ -1,7 +1,7 @@
 syntax = "proto3";
 option csharp_namespace = "CecoChat.Contracts.Client";
 package CecoChat;
-import "message.proto";
+import "client-message.proto";
 import "google/protobuf/timestamp.proto";
 
 service History {
@@ -15,7 +15,7 @@ message GetUserHistoryRequest {
 }
 
 message GetUserHistoryResponse {
-  repeated Message messages = 1;
+  repeated ClientMessage messages = 1;
 }
 
 message GetDialogHistoryRequest {
@@ -25,5 +25,5 @@ message GetDialogHistoryRequest {
 }
 
 message GetDialogHistoryResponse {
-  repeated Message messages = 1;
+  repeated ClientMessage messages = 1;
 }

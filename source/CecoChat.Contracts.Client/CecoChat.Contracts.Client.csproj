@@ -14,6 +14,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Protobuf Include="..\protos\client-message.proto" GrpcServices="All">
+      <Link>client-message.proto</Link>
+    </Protobuf>
     <Protobuf Include="..\protos\history-service.proto" GrpcServices="All">
       <Link>history-service.proto</Link>
     </Protobuf>
@@ -22,9 +25,6 @@
     </Protobuf>
     <Protobuf Include="..\protos\send-service.proto" GrpcServices="All">
       <Link>send-service.proto</Link>
-    </Protobuf>
-    <Protobuf Include="..\protos\message.proto">
-      <Link>message.proto</Link>
     </Protobuf>
   </ItemGroup>
 

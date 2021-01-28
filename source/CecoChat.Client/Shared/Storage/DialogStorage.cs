@@ -6,21 +6,21 @@ namespace CecoChat.Client.Shared.Storage
 {
     public sealed class DialogStorage
     {
-        private readonly ConcurrentDictionary<string, Message> _messageMap;
+        private readonly ConcurrentDictionary<string, ClientMessage> _messageMap;
 
         public DialogStorage()
         {
             _messageMap = new();
         }
 
-        public void AddMessage(Message message)
+        public void AddMessage(ClientMessage message)
         {
             _messageMap.TryAdd(message.MessageId, message);
         }
 
-        public IEnumerable<Message> GetMessages()
+        public IEnumerable<ClientMessage> GetMessages()
         {
-            foreach (KeyValuePair<string, Message> pair in _messageMap)
+            foreach (KeyValuePair<string, ClientMessage> pair in _messageMap)
             {
                 yield return pair.Value;
             }

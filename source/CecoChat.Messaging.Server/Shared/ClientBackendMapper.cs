@@ -2,9 +2,7 @@
 using CecoChat.Contracts.Backend;
 using CecoChat.Contracts.Client;
 using Google.Protobuf.WellKnownTypes;
-using ClientMessage = CecoChat.Contracts.Client.Message;
 using BackendMessage = CecoChat.Contracts.Backend.Message;
-using ClientMessageType = CecoChat.Contracts.Client.MessageType;
 using BackendMessageType = CecoChat.Contracts.Backend.MessageType;
 
 namespace CecoChat.Messaging.Server.Shared

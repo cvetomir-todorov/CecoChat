@@ -1,7 +1,7 @@
 syntax = "proto3";
 option csharp_namespace = "CecoChat.Contracts.Client";
 package CecoChat;
-import "message.proto";
+import "client-message.proto";
 import "google/protobuf/timestamp.proto";
 
 service Send {
@@ -9,7 +9,7 @@ service Send {
 }
 
 message SendMessageRequest {
-  Message message = 1;
+  ClientMessage message = 1;
 }
 
 message SendMessageResponse {

@@ -60,7 +60,7 @@ namespace CecoChat.Client.Shared
             {
                 while (!ct.IsCancellationRequested && await serverStream.ResponseStream.MoveNext())
                 {
-                    Message message = serverStream.ResponseStream.Current.Message;
+                    ClientMessage message = serverStream.ResponseStream.Current.Message;
                     MessageReceived?.Invoke(this, message);
                 }
             }
@@ -70,11 +70,11 @@ namespace CecoChat.Client.Shared
             }
         }
 
-        public event EventHandler<Message> MessageReceived;
+        public event EventHandler<ClientMessage> MessageReceived;
 
         public event EventHandler<Exception> ExceptionOccurred;
 
-        public async Task<IList<Message>> GetUserHistory(DateTime olderThan)
+        public async Task<IList<ClientMessage>> GetUserHistory(DateTime olderThan)
         {
             GetUserHistoryRequest request = new()
             {
@@ -85,7 +85,7 @@ namespace CecoChat.Client.Shared
             return response.Messages;
         }
 
-        public async Task<IList<Message>> GetDialogHistory(long otherUserID, DateTime olderThan)
+        public async Task<IList<ClientMessage>> GetDialogHistory(long otherUserID, DateTime olderThan)
         {
             GetDialogHistoryRequest request = new()
             {
@@ -97,15 +97,15 @@ namespace CecoChat.Client.Shared
             return response.Messages;
         }
 
-        public async Task<Message> SendPlainTextMessage(long receiverID, string text)
+        public async Task<ClientMessage> SendPlainTextMessage(long receiverID, string text)
         {
             string messageID = _messageIDGenerator.GenerateMessageID();
-            Message message = new()
+            ClientMessage message = new()
             {
                 MessageId = messageID,
                 SenderId = _userID,
                 ReceiverId = receiverID,
-                Type = MessageType.PlainText,
+                Type = ClientMessageType.PlainText,
                 PlainTextData = new PlainTextData
                 {
                     Text = text

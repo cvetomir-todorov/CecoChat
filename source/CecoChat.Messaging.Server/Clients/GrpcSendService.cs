@@ -33,7 +33,7 @@ namespace CecoChat.Messaging.Server.Clients
 
         public override Task<SendMessageResponse> SendMessage(SendMessageRequest request, ServerCallContext context)
         {
-            Message clientMessage = request.Message;
+            ClientMessage clientMessage = request.Message;
             clientMessage.Timestamp = Timestamp.FromDateTime(_clock.GetNowUtc());
             _logger.LogTrace("Timestamped client message {0}.", clientMessage);
 
@@ -45,7 +45,7 @@ namespace CecoChat.Messaging.Server.Clients
             return Task.FromResult(new SendMessageResponse{MessageTimestamp = clientMessage.Timestamp});
         }
 
-        private void SendToClientsFromSameSender(Message clientMessage, ServerCallContext context)
+        private void SendToClientsFromSameSender(ClientMessage clientMessage, ServerCallContext context)
         {
             IEnumerable<IStreamer<ListenResponse>> clients = _clientContainer.GetClients(clientMessage.SenderId);
             // TODO: use client ID from metadata or auth token
