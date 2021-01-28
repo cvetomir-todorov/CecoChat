@@ -2,7 +2,7 @@
 using CecoChat.Contracts.Backend;
 using CecoChat.Contracts.Client;
 
-namespace CecoChat.Messaging.Server.Shared
+namespace CecoChat.Server
 {
     public interface IClientBackendMapper
     {

@@ -13,11 +13,13 @@ namespace CecoChat.Client.Shared
     {
         private readonly MessageIDGenerator _messageIDGenerator;
         private long _userID;
-        private string _server;
-        private GrpcChannel _channel;
+        private string _messagingServer;
+        private string _historyServer;
+        private GrpcChannel _messagingChannel;
+        private GrpcChannel _historyChannel;
         private Listen.ListenClient _listenClient;
-        private History.HistoryClient _historyClient;
         private Send.SendClient _sendClient;
+        private History.HistoryClient _historyClient;
 
         public MessagingClient(MessageIDGenerator messageIDGenerator)
         {
@@ -26,24 +28,31 @@ namespace CecoChat.Client.Shared
 
         public void Dispose()
         {
-            _channel?.ShutdownAsync().Wait();
-            _channel?.Dispose();
+            _messagingChannel?.ShutdownAsync().Wait();
+            _messagingChannel?.Dispose();
+
+            _historyChannel?.ShutdownAsync().Wait();
+            _historyChannel?.Dispose();
         }
 
         public long UserID => _userID;
 
-        public string Server => _server;
+        public string MessagingServer => _messagingServer;
 
-        public void Initialize(long userID, string server)
+        public string HistoryServer => _historyServer;
+
+        public void Initialize(long userID, string messagingServer, string historyServer)
         {
             _userID = userID;
-            _server = server;
+            _messagingServer = messagingServer;
+            _historyServer = historyServer;
 
-            _channel = GrpcChannel.ForAddress(server);
+            _messagingChannel = GrpcChannel.ForAddress(messagingServer);
+            _historyChannel = GrpcChannel.ForAddress(historyServer);
 
-            _listenClient = new Listen.ListenClient(_channel);
-            _historyClient = new History.HistoryClient(_channel);
-            _sendClient = new Send.SendClient(_channel);
+            _listenClient = new Listen.ListenClient(_messagingChannel);
+            _sendClient = new Send.SendClient(_messagingChannel);
+            _historyClient = new History.HistoryClient(_historyChannel);
         }
 
         public void ListenForMessages(CancellationToken ct)

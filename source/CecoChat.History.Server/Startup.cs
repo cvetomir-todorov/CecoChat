@@ -1,13 +1,14 @@
 using CecoChat.Cassandra;
 using CecoChat.Data.Messaging;
-using CecoChat.Materialize.Server.Backend;
+using CecoChat.History.Server.Clients;
+using CecoChat.Server;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace CecoChat.Materialize.Server
+namespace CecoChat.History.Server
 {
     public class Startup
     {
@@ -20,24 +21,21 @@ namespace CecoChat.Materialize.Server
 
         public void ConfigureServices(IServiceCollection services)
         {
+            // clients
+            services.AddGrpc();
+            services.Configure<ClientOptions>(Configuration.GetSection("Clients"));
+
             // database
             services.AddCassandra<ICecoChatDbContext, CecoChatDbContext>(Configuration.GetSection("Data.Messaging"));
-            services.AddSingleton<ICecoChatDbInitializer, CecoChatDbInitializer>();
-            services.AddSingleton<INewMessageRepository, NewMessageRepository>();
+            services.AddSingleton<IHistoryRepository, HistoryRepository>();
             services.AddSingleton<IDataUtility, DataUtility>();
 
-            // backend
-            services.AddSingleton<IBackendConsumer, KafkaConsumer>();
-            services.AddSingleton<IProcessor, CassandraStateProcessor>();
-            services.AddHostedService<PersistMessagesHostedService>();
-            services.Configure<BackendOptions>(Configuration.GetSection("Backend"));
+            // shared
+            services.AddSingleton<IClientBackendMapper, ClientBackendMapper>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            ICecoChatDbInitializer db = app.ApplicationServices.GetRequiredService<ICecoChatDbInitializer>();
-            db.Initialize();
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -45,6 +43,10 @@ namespace CecoChat.Materialize.Server
 
             app.UseHttpsRedirection();
             app.UseRouting();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapGrpcService<GrpcHistoryService>();
+            });
         }
     }
 }

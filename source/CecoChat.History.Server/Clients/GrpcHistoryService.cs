@@ -3,14 +3,14 @@ using System.Threading.Tasks;
 using CecoChat.Contracts.Backend;
 using CecoChat.Contracts.Client;
 using CecoChat.Data.Messaging;
-using CecoChat.Messaging.Server.Shared;
+using CecoChat.Server;
 using Grpc.Core;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace CecoChat.Messaging.Server.Clients
+namespace CecoChat.History.Server.Clients
 {
-    public sealed class GrpcHistoryService : History.HistoryBase
+    public sealed class GrpcHistoryService : Contracts.Client.History.HistoryBase
     {
         private readonly ILogger _logger;
         private readonly IClientOptions _clientOptions;

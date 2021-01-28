@@ -1,12 +1,10 @@
-using CecoChat.Cassandra;
 using CecoChat.Contracts.Client;
-using CecoChat.Data.Messaging;
 using CecoChat.DependencyInjection;
 using CecoChat.Messaging.Server.Backend;
 using CecoChat.Messaging.Server.Backend.Consumption;
 using CecoChat.Messaging.Server.Backend.Production;
 using CecoChat.Messaging.Server.Clients;
-using CecoChat.Messaging.Server.Shared;
+using CecoChat.Server;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -40,11 +38,6 @@ namespace CecoChat.Messaging.Server
             services.AddHostedService<BackendConsumptionHostedService>();
             services.Configure<BackendOptions>(Configuration.GetSection("Backend"));
 
-            // database
-            services.AddCassandra<ICecoChatDbContext, CecoChatDbContext>(Configuration.GetSection("Cassandra"));
-            services.AddSingleton<IHistoryRepository, HistoryRepository>();
-            services.AddSingleton<IDataUtility, DataUtility>();
-
             // shared
             services.AddSingleton<IClock, MonotonicClock>();
             services.AddSingleton<INonCryptoHash, FnvHash>();
@@ -62,7 +55,6 @@ namespace CecoChat.Messaging.Server
             app.UseRouting();
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGrpcService<GrpcHistoryService>();
                 endpoints.MapGrpcService<GrpcListenService>();
                 endpoints.MapGrpcService<GrpcSendService>();
             });

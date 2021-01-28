@@ -15,7 +15,7 @@ namespace CecoChat.Client.Console
             long userID = long.Parse(System.Console.ReadLine() ?? string.Empty);
 
             MessagingClient client = new(new MessageIDGenerator());
-            client.Initialize(userID, "https://localhost:31001");
+            client.Initialize(userID, messagingServer: "https://localhost:31001", historyServer: "https://localhost:31003");
             client.MessageReceived += (_, message) => DisplayMessage(message);
             client.ExceptionOccurred += (_, exception) => System.Console.WriteLine(exception);
 

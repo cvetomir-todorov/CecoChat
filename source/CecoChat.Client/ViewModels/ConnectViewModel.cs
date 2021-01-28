@@ -20,7 +20,8 @@ namespace CecoChat.Client.ViewModels
         {
             CanOperate = true;
             UserID = "1";
-            Server = "https://localhost:31001";
+            MessagingServer = "https://localhost:31001";
+            HistoryServer = "https://localhost:31003";
             Connect = new RelayCommand(ConnectExecuted);
         }
 
@@ -28,7 +29,9 @@ namespace CecoChat.Client.ViewModels
 
         public string UserID { get; set; }
 
-        public string Server { get; set; }
+        public string MessagingServer { get; set; }
+
+        public string HistoryServer { get; set; }
 
         public ICommand Connect { get; }
 
@@ -36,7 +39,7 @@ namespace CecoChat.Client.ViewModels
 
         private void ConnectExecuted()
         {
-            MessagingClient.Initialize(long.Parse(UserID), Server);
+            MessagingClient.Initialize(long.Parse(UserID), MessagingServer, HistoryServer);
             // TODO: pass a real cancellation token which gets cancelled when app is shut down or a critical exception happens
             MessagingClient.ListenForMessages(CancellationToken.None);
 

@@ -33,7 +33,7 @@ namespace CecoChat.Data.Messaging
         public PreparedStatement PrepareQuery(string cql)
         {
             PreparedStatement preparedQuery = _dbContext.Messaging.Prepare(cql);
-            _logger.LogTrace("Prepared CQL '{0}'.", cql);
+            _logger.LogDebug("Prepared CQL '{0}'.", cql);
             return preparedQuery;
         }
 
