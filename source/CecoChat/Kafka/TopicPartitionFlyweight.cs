@@ -1,0 +1,63 @@
+﻿using System;
+using System.Collections.Concurrent;
+using Confluent.Kafka;
+using Microsoft.Extensions.Logging;
+
+namespace CecoChat.Kafka
+{
+    public interface ITopicPartitionFlyweight
+    {
+        void Add(string topic, int partitionCount);
+
+        TopicPartition GetTopicPartition(string topic, int partition);
+    }
+
+    public sealed class TopicPartitionFlyweight : ITopicPartitionFlyweight
+    {
+        private readonly ILogger _logger;
+        private readonly ConcurrentDictionary<string, TopicPartition[]> _topicPartitionsMap;
+
+        public TopicPartitionFlyweight(
+            ILogger<TopicPartitionFlyweight> logger)
+        {
+            _logger = logger;
+            _topicPartitionsMap = new();
+        }
+
+        public void Add(string topic, int partitionCount)
+        {
+            if (string.IsNullOrWhiteSpace(topic))
+                throw new ArgumentException($"{nameof(topic)} should be a non-empty non-whitespace string.");
+            if (partitionCount <= 0)
+                throw new ArgumentException($"{nameof(partitionCount)} should be greater than zero.");
+
+            TopicPartition[] topicPartitions = new TopicPartition[partitionCount];
+
+            for (int partition = 0; partition < partitionCount; ++partition)
+            {
+                topicPartitions[partition] = new TopicPartition(topic, partition);
+            }
+
+            if (!_topicPartitionsMap.TryAdd(topic, topicPartitions))
+            {
+                throw new InvalidOperationException($"Topic {topic} is already added.");
+            }
+
+            _logger.LogInformation("Initialized {0} topic {1} partitions flyweight.", topic, partitionCount);
+        }
+
+        public TopicPartition GetTopicPartition(string topic, int partition)
+        {
+            if (string.IsNullOrWhiteSpace(topic))
+                throw new ArgumentException($"{nameof(topic)} should be a non-empty non-whitespace string.");
+            if (partition < 0)
+                throw new ArgumentException($"{nameof(partition)} should be greater than zero.");
+            if (!_topicPartitionsMap.TryGetValue(topic, out TopicPartition[] topicPartitions))
+                throw new InvalidOperationException($"Topic {topic} should be added first.");
+            if (partition >= topicPartitions.Length)
+                throw new InvalidOperationException($"Partition {partition} for topic {topic} should be within [0, {topicPartitions.Length - 1}].");
+
+            return topicPartitions[partition];
+        }
+    }
+}

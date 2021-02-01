@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using CecoChat.Contracts.Backend;
 using CecoChat.Contracts.Client;
-using CecoChat.Messaging.Server.Backend.Production;
+using CecoChat.Messaging.Server.Backend;
 using CecoChat.Server;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;

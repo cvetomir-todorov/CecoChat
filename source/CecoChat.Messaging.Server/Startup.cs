@@ -1,10 +1,12 @@
+using CecoChat.Contracts.Backend;
 using CecoChat.Contracts.Client;
 using CecoChat.DependencyInjection;
+using CecoChat.Kafka;
 using CecoChat.Messaging.Server.Backend;
-using CecoChat.Messaging.Server.Backend.Consumption;
-using CecoChat.Messaging.Server.Backend.Production;
 using CecoChat.Messaging.Server.Clients;
 using CecoChat.Server;
+using CecoChat.Server.Backend;
+using Confluent.Kafka;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -33,9 +35,10 @@ namespace CecoChat.Messaging.Server
             // backend
             services.AddSingleton<IPartitionUtility, PartitionUtility>();
             services.AddSingleton<ITopicPartitionFlyweight, TopicPartitionFlyweight>();
-            services.AddSingleton<IBackendProducer, KafkaProducer>();
-            services.AddSingleton<IBackendConsumer, KafkaConsumer>();
-            services.AddHostedService<BackendConsumptionHostedService>();
+            services.AddSingleton<IBackendProducer, MessagesToBackendProducer>();
+            services.AddSingleton<IBackendConsumer, MessagesToReceiversConsumer>();
+            services.AddFactory<IKafkaConsumer<Null, BackendMessage>, KafkaConsumer<Null, BackendMessage>>();
+            services.AddHostedService<MessagesToReceiversHostedService>();
             services.Configure<BackendOptions>(Configuration.GetSection("Backend"));
 
             // shared

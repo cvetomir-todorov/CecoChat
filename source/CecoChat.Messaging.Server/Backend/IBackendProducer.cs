@@ -1,7 +1,7 @@
 ﻿using System;
 using CecoChat.Contracts.Backend;
 
-namespace CecoChat.Messaging.Server.Backend.Production
+namespace CecoChat.Messaging.Server.Backend
 {
     public interface IBackendProducer : IDisposable
     {

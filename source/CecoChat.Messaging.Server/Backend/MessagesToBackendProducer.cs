@@ -1,36 +1,39 @@
 ﻿using System;
 using CecoChat.Contracts.Backend;
-using CecoChat.Server.Kafka;
+using CecoChat.Kafka;
+using CecoChat.Server.Backend;
 using Confluent.Kafka;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace CecoChat.Messaging.Server.Backend.Production
+namespace CecoChat.Messaging.Server.Backend
 {
-    public sealed class KafkaProducer : IBackendProducer
+    public sealed class MessagesToBackendProducer : IBackendProducer
     {
         private readonly ILogger _logger;
+        private readonly IBackendOptions _backendOptions;
         private readonly IPartitionUtility _partitionUtility;
-        private readonly ITopicPartitionFlyweight _topicPartitionFlyweight;
+        private readonly ITopicPartitionFlyweight _partitionFlyweight;
         private readonly IProducer<Null, BackendMessage> _producer;
 
-        public KafkaProducer(
-            ILogger<KafkaProducer> logger,
-            IOptions<BackendOptions> options,
+        public MessagesToBackendProducer(
+            ILogger<MessagesToBackendProducer> logger,
+            IOptions<BackendOptions> backendOptions,
             IHostApplicationLifetime applicationLifetime,
             IPartitionUtility partitionUtility,
-            ITopicPartitionFlyweight topicPartitionFlyweight)
+            ITopicPartitionFlyweight partitionFlyweight)
         {
             _logger = logger;
+            _backendOptions = backendOptions.Value;
             _partitionUtility = partitionUtility;
-            _topicPartitionFlyweight = topicPartitionFlyweight;
+            _partitionFlyweight = partitionFlyweight;
 
             applicationLifetime.ApplicationStopping.Register(FlushPendingMessages);
 
             ProducerConfig configuration = new()
             {
-                BootstrapServers = string.Join(separator: ',', options.Value.BootstrapServers),
+                BootstrapServers = string.Join(separator: ',', _backendOptions.Kafka.BootstrapServers),
                 Acks = Acks.All,
                 LingerMs = 1.0,
                 MessageTimeoutMs = 300000,
@@ -38,7 +41,7 @@ namespace CecoChat.Messaging.Server.Backend.Production
             };
 
             _producer = new ProducerBuilder<Null, BackendMessage>(configuration)
-                .SetValueSerializer(new KafkaBackendMessageSerializer())
+                .SetValueSerializer(new BackendMessageSerializer())
                 .Build();
         }
 
@@ -66,8 +69,8 @@ namespace CecoChat.Messaging.Server.Backend.Production
 
         public void ProduceMessage(BackendMessage message)
         {
-            int partition = _partitionUtility.ChoosePartition(message.ReceiverId);
-            TopicPartition topicPartition = _topicPartitionFlyweight.GetMessagesTopicPartition(partition);
+            int partition = _partitionUtility.ChoosePartition(message.ReceiverId, _backendOptions.MessagesTopicPartitionCount);
+            TopicPartition topicPartition = _partitionFlyweight.GetTopicPartition(_backendOptions.MessagesTopicName, partition);
             Message<Null, BackendMessage> kafkaMessage = new()
             {
                 Value = message

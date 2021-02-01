@@ -1,6 +1,10 @@
 using CecoChat.Cassandra;
+using CecoChat.Contracts.Backend;
 using CecoChat.Data.Messaging;
+using CecoChat.DependencyInjection;
+using CecoChat.Kafka;
 using CecoChat.Materialize.Server.Backend;
+using Confluent.Kafka;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -27,9 +31,9 @@ namespace CecoChat.Materialize.Server
             services.AddSingleton<IDataUtility, DataUtility>();
 
             // backend
-            services.AddSingleton<IBackendConsumer, KafkaConsumer>();
-            services.AddSingleton<IProcessor, CassandraStateProcessor>();
-            services.AddHostedService<PersistMessagesHostedService>();
+            services.AddSingleton<IBackendConsumer, MaterializeMessagesConsumer>();
+            services.AddFactory<IKafkaConsumer<Null, BackendMessage>, KafkaConsumer<Null, BackendMessage>>();
+            services.AddHostedService<MaterializeMessagesHostedService>();
             services.Configure<BackendOptions>(Configuration.GetSection("Backend"));
         }
 

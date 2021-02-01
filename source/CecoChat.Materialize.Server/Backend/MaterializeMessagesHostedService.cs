@@ -5,13 +5,13 @@ using Microsoft.Extensions.Logging;
 
 namespace CecoChat.Materialize.Server.Backend
 {
-    public class PersistMessagesHostedService : IHostedService
+    public class MaterializeMessagesHostedService : IHostedService
     {
         private readonly ILogger _logger;
         private readonly IBackendConsumer _backendConsumer;
 
-        public PersistMessagesHostedService(
-            ILogger<PersistMessagesHostedService> logger,
+        public MaterializeMessagesHostedService(
+            ILogger<MaterializeMessagesHostedService> logger,
             IBackendConsumer backendConsumer)
         {
             _logger = logger;
@@ -23,7 +23,7 @@ namespace CecoChat.Materialize.Server.Backend
             _backendConsumer.Prepare();
             Task.Factory.StartNew(() => _backendConsumer.Start(ct), ct, TaskCreationOptions.LongRunning, TaskScheduler.Current);
 
-            _logger.LogInformation("Started persist messages hosted service.");
+            _logger.LogInformation("Started materialize messages hosted service.");
             return Task.CompletedTask;
         }
 
