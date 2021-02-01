@@ -7,7 +7,7 @@
         xmlns:viewModels="clr-namespace:CecoChat.Client.ViewModels;assembly=CecoChat.Client"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=viewModels:MainViewModel,IsDesignTimeCreatable=False}"
-        Title="CecoChat"
+        Title="{Binding Path=ConnectVM.UserID, Converter={StaticResource FormattingTextConverter}, ConverterParameter=CecoChat User {0}}"
         MinWidth="300" Width="700"
         MinHeight="300" Height="700">
   <Grid>

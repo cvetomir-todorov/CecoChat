@@ -12,5 +12,6 @@
     </Style>
     <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
     <infrastructure:BooleanToColorBrushConverter x:Key="BoolToColorBrushConverter"/>
+    <infrastructure:FormattingTextConverter x:Key="FormattingTextConverter"/>
   </Application.Resources>
 </Application>

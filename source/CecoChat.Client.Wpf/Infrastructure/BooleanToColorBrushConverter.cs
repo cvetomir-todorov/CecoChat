@@ -5,8 +5,8 @@ using System.Windows.Media;
 
 namespace CecoChat.Client.Wpf.Infrastructure
 {
-    [ValueConversion(typeof(bool), typeof(SolidColorBrush))]
-    class BooleanToColorBrushConverter : IValueConverter
+    [ValueConversion(sourceType: typeof(bool), targetType: typeof(SolidColorBrush))]
+    public class BooleanToColorBrushConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
