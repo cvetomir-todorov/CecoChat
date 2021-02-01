@@ -34,11 +34,11 @@ namespace CecoChat.Data.Messaging
         {
             switch (backendMessage.Type)
             {
-                case BackendMessageType.PlainText: return new Dictionary<string, string>
+                case BackendMessageType.PlainText: return new SortedDictionary<string, string>
                 {
                     {PlainTextKey, backendMessage.PlainTextData.Text}
                 };
-                case BackendMessageType.Ack: return new Dictionary<string, string>();
+                case BackendMessageType.Ack: return new SortedDictionary<string, string>();
                 default:
                     throw new NotSupportedException($"{typeof(BackendMessageType).FullName} value {backendMessage.Type} is not supported.");
             }
