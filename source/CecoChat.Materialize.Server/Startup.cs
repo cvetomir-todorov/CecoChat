@@ -29,6 +29,7 @@ namespace CecoChat.Materialize.Server
             services.AddSingleton<ICecoChatDbInitializer, CecoChatDbInitializer>();
             services.AddSingleton<INewMessageRepository, NewMessageRepository>();
             services.AddSingleton<IDataUtility, DataUtility>();
+            services.AddSingleton<IBackendDbMapper, BackendDbMapper>();
 
             // backend
             services.AddSingleton<IBackendConsumer, MaterializeMessagesConsumer>();

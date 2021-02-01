@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -21,7 +22,17 @@ namespace CecoChat.Materialize.Server.Backend
         public Task StartAsync(CancellationToken ct)
         {
             _backendConsumer.Prepare();
-            Task.Factory.StartNew(() => _backendConsumer.Start(ct), ct, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+            Task.Factory.StartNew(() =>
+            {
+                try
+                {
+                    _backendConsumer.Start(ct);
+                }
+                catch (Exception exception)
+                {
+                    _logger.LogCritical(exception, "Failure in start materialize messages hosted service.");
+                }
+            }, ct, TaskCreationOptions.LongRunning, TaskScheduler.Current);
 
             _logger.LogInformation("Started materialize messages hosted service.");
             return Task.CompletedTask;

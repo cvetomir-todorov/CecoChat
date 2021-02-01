@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using CecoChat.Kafka;
 using Microsoft.Extensions.Hosting;
@@ -30,7 +31,17 @@ namespace CecoChat.Messaging.Server.Backend
         {
             _topicPartitionFlyweight.Add(_backendOptions.MessagesTopicName, _backendOptions.MessagesTopicPartitionCount);
             _backendConsumer.Prepare();
-            Task.Factory.StartNew(() => _backendConsumer.Start(ct), ct, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+            Task.Factory.StartNew(() =>
+            {
+                try
+                {
+                    _backendConsumer.Start(ct);
+                }
+                catch (Exception exception)
+                {
+                    _logger.LogCritical(exception, "Failure in send messages to receivers hosted service.");
+                }
+            }, ct, TaskCreationOptions.LongRunning, TaskScheduler.Current);
 
             _logger.LogInformation("Started send messages to receivers hosted service.");
             return Task.CompletedTask;

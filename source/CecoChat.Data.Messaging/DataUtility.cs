@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Cassandra;
 using CecoChat.Contracts.Backend;
-using Google.Protobuf;
+using Google.Protobuf.WellKnownTypes;
 using Microsoft.Extensions.Logging;
 
 namespace CecoChat.Data.Messaging
@@ -21,13 +21,16 @@ namespace CecoChat.Data.Messaging
     {
         private readonly ILogger _logger;
         private readonly ICecoChatDbContext _dbContext;
+        private readonly IBackendDbMapper _mapper;
 
         public DataUtility(
             ILogger<DataUtility> logger,
-            ICecoChatDbContext dbContext)
+            ICecoChatDbContext dbContext,
+            IBackendDbMapper mapper)
         {
             _logger = logger;
             _dbContext = dbContext;
+            _mapper = mapper;
         }
 
         public PreparedStatement PrepareQuery(string cql)
@@ -44,9 +47,15 @@ namespace CecoChat.Data.Messaging
 
             foreach (Row row in rows)
             {
-                byte[] messageBytes = row.GetValue<byte[]>("data");
-                BackendMessage message = new BackendMessage();
-                message.MergeFrom(messageBytes);
+                BackendMessage message = new();
+
+                message.MessageId = row.GetValue<string>("message_id");
+                message.SenderId = row.GetValue<long>("sender_id");
+                message.ReceiverId = row.GetValue<long>("receiver_id");
+                message.Timestamp = Timestamp.FromDateTimeOffset(row.GetValue<DateTimeOffset>("when"));
+                message.Type = _mapper.MapDbToBackendMessageType(row.GetValue<sbyte>("message_type"));
+                IDictionary<string, string> data = row.GetValue<IDictionary<string, string>>("data");
+                _mapper.MapDbToBackendData(data, message);
 
                 messages.Add(message);
             }

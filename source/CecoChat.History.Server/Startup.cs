@@ -29,6 +29,7 @@ namespace CecoChat.History.Server
             services.AddCassandra<ICecoChatDbContext, CecoChatDbContext>(Configuration.GetSection("Data.Messaging"));
             services.AddSingleton<IHistoryRepository, HistoryRepository>();
             services.AddSingleton<IDataUtility, DataUtility>();
+            services.AddSingleton<IBackendDbMapper, BackendDbMapper>();
 
             // shared
             services.AddSingleton<IClientBackendMapper, ClientBackendMapper>();
