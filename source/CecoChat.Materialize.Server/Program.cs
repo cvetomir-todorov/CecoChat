@@ -1,8 +1,7 @@
 using System;
-using System.IO;
 using System.Reflection;
+using CecoChat.Serilog;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 
@@ -12,7 +11,7 @@ namespace CecoChat.Materialize.Server
     {
         public static void Main(string[] args)
         {
-            SetupLogging();
+            SerilogConfiguration.Setup(Assembly.GetEntryAssembly());
             ILogger logger = Log.ForContext(typeof(Program));
 
             try
@@ -29,25 +28,6 @@ namespace CecoChat.Materialize.Server
                 logger.Information("Ended.");
                 Log.CloseAndFlush();
             }
-        }
-
-        private static void SetupLogging()
-        {
-            Assembly currentAssembly = Assembly.GetExecutingAssembly();
-            string binPath = Path.GetDirectoryName(currentAssembly.Location);
-            Environment.SetEnvironmentVariable("CecoChatLoggingDir", binPath);
-
-            string environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-
-            IConfiguration configuration = new ConfigurationBuilder()
-                .AddJsonFile("logging.json", optional: false)
-                .AddJsonFile($"logging.{environment}.json", optional: true)
-                .Build();
-
-            Log.Logger = new LoggerConfiguration()
-                .ReadFrom.Configuration(configuration)
-                .Enrich.WithProperty("Application", currentAssembly.GetName().Name)
-                .CreateLogger();
         }
 
         private static IHostBuilder CreateHostBuilder(string[] args)
