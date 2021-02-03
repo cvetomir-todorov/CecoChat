@@ -4,6 +4,7 @@ using CecoChat.Data.Messaging;
 using CecoChat.DependencyInjection;
 using CecoChat.Kafka;
 using CecoChat.Materialize.Server.Backend;
+using CecoChat.Materialize.Server.Initialization;
 using Confluent.Kafka;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -36,13 +37,11 @@ namespace CecoChat.Materialize.Server
             services.AddFactory<IKafkaConsumer<Null, BackendMessage>, KafkaConsumer<Null, BackendMessage>>();
             services.AddHostedService<MaterializeMessagesHostedService>();
             services.Configure<BackendOptions>(Configuration.GetSection("Backend"));
+            services.AddHostedService<InitializeDbHostedService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            ICecoChatDbInitializer db = app.ApplicationServices.GetRequiredService<ICecoChatDbInitializer>();
-            db.Initialize();
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
