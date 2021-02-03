@@ -5,10 +5,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="FluentValidation.AspNetCore" Version="9.5.0" />
     <PackageReference Include="Serilog.AspNetCore" Version="3.4.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CecoChat.Data.Configuration\CecoChat.Data.Configuration.csproj" />
+    <ProjectReference Include="..\CecoChat.Server\CecoChat.Server.csproj" />
     <ProjectReference Include="..\CecoChat\CecoChat.csproj" />
   </ItemGroup>
 
