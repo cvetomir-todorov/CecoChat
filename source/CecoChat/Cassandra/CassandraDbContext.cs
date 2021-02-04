@@ -27,7 +27,7 @@ namespace CecoChat.Cassandra
             _sessions = new ConcurrentDictionary<string, ISession>();
         }
 
-        public Cluster CreateCluster()
+        private Cluster CreateCluster()
         {
             Builder clusterBuilder = new Builder()
                 .AddContactPoints(_options.ContactPoints)
