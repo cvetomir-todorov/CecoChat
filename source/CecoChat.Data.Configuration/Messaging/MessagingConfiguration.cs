@@ -29,18 +29,21 @@ namespace CecoChat.Data.Configuration.Messaging
         private readonly ILogger _logger;
         private readonly IRedisContext _redisContext;
         private readonly IMessagingConfigurationRepository _repository;
-        // TODO: consider using partition ranges and binary search
+        private readonly IConfigurationUtility _configurationUtility;
+
         private readonly ConcurrentDictionary<int, string> _partitionServerMap;
         private readonly ConcurrentDictionary<string, string> _serverAddressMap;
 
         public MessagingConfiguration(
             ILogger<MessagingConfiguration> logger,
             IRedisContext redisContext,
-            IMessagingConfigurationRepository repository)
+            IMessagingConfigurationRepository repository,
+            IConfigurationUtility configurationUtility)
         {
             _logger = logger;
             _redisContext = redisContext;
             _repository = repository;
+            _configurationUtility = configurationUtility;
 
             _partitionServerMap = new();
             _serverAddressMap = new();
@@ -69,111 +72,87 @@ namespace CecoChat.Data.Configuration.Messaging
 
         public async Task Initialize(MessagingConfigurationUsage usage)
         {
-            ISubscriber subscriber = _redisContext.GetSubscriber();
-
-            if (usage.UsePartitionCount)
-            {
-                ChannelMessageQueue partitionCountMQ = await subscriber.SubscribeAsync($"__keyspace*__:{MessagingKeys.PartitionCount}");
-                partitionCountMQ.OnMessage(HandlePartitionCount);
-            }
-
-            if (usage.UseServerAddressByPartition)
-            {
-                ChannelMessageQueue serverPartitionsMQ = await subscriber.SubscribeAsync($"__keyspace*__:{MessagingKeys.ServerPartitions}");
-                serverPartitionsMQ.OnMessage(HandleServerPartitions);
-
-                ChannelMessageQueue serverAddressesMQ = await subscriber.SubscribeAsync($"__keyspace*__:{MessagingKeys.ServerAddresses}");
-                serverAddressesMQ.OnMessage(HandleServerAddresses);
-            }
-
-            await LoadValues(usage);
-        }
-
-        private async Task LoadValues(MessagingConfigurationUsage usage)
-        {
             try
             {
-                _logger.LogInformation("Loading messaging configuration...");
+                ISubscriber subscriber = _redisContext.GetSubscriber();
 
                 if (usage.UsePartitionCount)
                 {
-                    await SetPartitionCount();
+                    ChannelMessageQueue partitionCountMQ = await subscriber.SubscribeAsync($"__keyspace*__:{MessagingKeys.PartitionCount}");
+                    partitionCountMQ.OnMessage(channelMessage => _configurationUtility.HandleChange(channelMessage, HandlePartitionCount));
+                    _logger.LogInformation("Subscribed for changes about {0}.", MessagingKeys.PartitionCount);
                 }
 
                 if (usage.UseServerAddressByPartition)
                 {
-                    await SetServerPartitions(strictlyAdd: true);
-                    await SetServerAddresses(strictlyAdd: true);
+                    ChannelMessageQueue serverPartitionsMQ = await subscriber.SubscribeAsync($"__keyspace*__:{MessagingKeys.ServerPartitions}");
+                    serverPartitionsMQ.OnMessage(channelMessage => _configurationUtility.HandleChange(channelMessage, HandleServerPartitions));
+                    _logger.LogInformation("Subscribed for changes about {0}.", MessagingKeys.ServerPartitions);
+
+                    ChannelMessageQueue serverAddressesMQ = await subscriber.SubscribeAsync($"__keyspace*__:{MessagingKeys.ServerAddresses}");
+                    serverAddressesMQ.OnMessage(channelMessage => _configurationUtility.HandleChange(channelMessage, HandleServerAddresses));
+                    _logger.LogInformation("Subscribed for changes about {0}.", MessagingKeys.ServerAddresses);
                 }
 
-                _logger.LogInformation("Loading messaging configuration succeeded.");
+                await LoadValues(usage);
             }
             catch (Exception exception)
             {
-                _logger.LogError(exception, "Loading messaging configuration failed.");
+                _logger.LogError(exception, "Initializing messaging configuration failed.");
             }
+        }
+
+        private async Task LoadValues(MessagingConfigurationUsage usage)
+        {
+            _logger.LogInformation("Loading messaging configuration...");
+
+            if (usage.UsePartitionCount)
+            {
+                await SetPartitionCount();
+            }
+
+            if (usage.UseServerAddressByPartition)
+            {
+                await SetServerPartitions(strictlyAdd: true);
+                await SetServerAddresses(strictlyAdd: true);
+            }
+
+            _logger.LogInformation("Loading messaging configuration succeeded.");
         }
 
         private async Task HandlePartitionCount(ChannelMessage channelMessage)
         {
-            try
+            if (_configurationUtility.ChannelMessageIs(channelMessage, "set"))
             {
-                _logger.LogInformation("Partition count change. {0} -> {1}.", channelMessage.Channel, channelMessage.Message);
-
-                if (ChannelMessageIs(channelMessage, "set"))
-                {
-                    await SetPartitionCount();
-                }
-                if (ChannelMessageIs(channelMessage, "del"))
-                {
-                    _logger.LogError("Key {0} was deleted.", MessagingKeys.PartitionCount);
-                }
+                await SetPartitionCount();
             }
-            catch (Exception exception)
+            if (_configurationUtility.ChannelMessageIs(channelMessage, "del"))
             {
-                _logger.LogError(exception, "Error occurred while processing change from {0}.", channelMessage);
+                _logger.LogError("Key {0} was deleted.", MessagingKeys.PartitionCount);
             }
         }
 
         private async Task HandleServerPartitions(ChannelMessage channelMessage)
         {
-            try
+            if (_configurationUtility.ChannelMessageIs(channelMessage, "hset", "hdel"))
             {
-                _logger.LogInformation("Server partitions change. {0} -> {1}.", channelMessage.Channel, channelMessage.Message);
-
-                if (ChannelMessageIs(channelMessage, "hset", "hdel"))
-                {
-                    await SetServerPartitions(strictlyAdd: false);
-                }
-                if (ChannelMessageIs(channelMessage, "del"))
-                {
-                    _logger.LogError("Key {0} was deleted.", MessagingKeys.ServerPartitions);
-                }
+                await SetServerPartitions(strictlyAdd: false);
             }
-            catch (Exception exception)
+            if (_configurationUtility.ChannelMessageIs(channelMessage, "del"))
             {
-                _logger.LogError(exception, "Error occurred while processing change from {0}.", channelMessage);
+                _logger.LogError("Key {0} was deleted.", MessagingKeys.ServerPartitions);
             }
         }
 
         private async Task HandleServerAddresses(ChannelMessage channelMessage)
         {
-            try
+            if (_configurationUtility.ChannelMessageIs(channelMessage, "hset", "hdel"))
             {
-                _logger.LogInformation("Server addresses change. {0} -> {1}.", channelMessage.Channel, channelMessage.Message);
-
-                if (ChannelMessageIs(channelMessage, "hset", "hdel"))
-                {
-                    await SetServerAddresses(strictlyAdd: false);
-                }
-                if (ChannelMessageIs(channelMessage, "del"))
-                {
-                    _logger.LogError("Key {0} was deleted.", MessagingKeys.ServerAddresses);
-                }
+                await SetServerAddresses(strictlyAdd: false);
             }
-            catch (Exception exception)
+            if (_configurationUtility.ChannelMessageIs(channelMessage, "del"))
             {
-                _logger.LogError(exception, "Error occurred while processing change from {0}.", channelMessage);
+                _logger.LogError("Key {0} was deleted.", MessagingKeys.ServerAddresses);
             }
         }
 
@@ -188,7 +167,7 @@ namespace CecoChat.Data.Configuration.Messaging
         {
             await foreach (KeyValuePair<string, PartitionRange> serverPartitions in _repository.GetServerPartitions())
             {
-                int successfullySet = 0;
+                int successfullySet = strictlyAdd ? 0 : serverPartitions.Value.Length;
 
                 for (int partition = serverPartitions.Value.Lower; partition <= serverPartitions.Value.Upper; ++partition)
                 {
@@ -202,11 +181,10 @@ namespace CecoChat.Data.Configuration.Messaging
                     else
                     {
                         _partitionServerMap.AddOrUpdate(partition, serverPartitions.Key, (_, _) => serverPartitions.Key);
-                        successfullySet = serverPartitions.Value.Length;
                     }
                 }
 
-                _logger.LogDebug("Partitions {0} ({1} out of {2}) assigned to server {3}.",
+                _logger.LogInformation("Partitions {0} ({1} out of {2}) assigned to server {3}.",
                     serverPartitions.Value, successfullySet, serverPartitions.Value.Length, serverPartitions.Key);
             }
         }
@@ -219,28 +197,15 @@ namespace CecoChat.Data.Configuration.Messaging
                 {
                     if (_serverAddressMap.TryAdd(serverAddress.Key, serverAddress.Value))
                     {
-                        _logger.LogDebug("Server {0} assigned address {1}.", serverAddress.Key, serverAddress.Value);
+                        _logger.LogInformation("Server {0} assigned address {1}.", serverAddress.Key, serverAddress.Value);
                     }
                 }
                 else
                 {
                     _serverAddressMap.AddOrUpdate(serverAddress.Key, serverAddress.Value, (_, _) => serverAddress.Value);
-                    _logger.LogDebug("Server {0} assigned address {1}.", serverAddress.Key, serverAddress.Value);
+                    _logger.LogInformation("Server {0} assigned address {1}.", serverAddress.Key, serverAddress.Value);
                 }
             }
-        }
-
-        private static bool ChannelMessageIs(ChannelMessage channelMessage, params string[] expectedMessages)
-        {
-            foreach (string expectedMessage in expectedMessages)
-            {
-                if (string.Equals(channelMessage.Message, expectedMessage, StringComparison.InvariantCultureIgnoreCase))
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
     }
 }

@@ -42,7 +42,7 @@ namespace CecoChat.Redis
         {
             if (_connection.IsValueCreated)
             {
-                return new(_connection.Value.CloseAsync());
+                return new ValueTask(_connection.Value.CloseAsync());
             }
 
             return ValueTask.CompletedTask;

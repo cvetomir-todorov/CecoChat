@@ -23,69 +23,64 @@ namespace CecoChat.Data.Configuration.History
         private readonly ILogger _logger;
         private readonly IRedisContext _redisContext;
         private readonly IHistoryConfigurationRepository _repository;
+        private readonly IConfigurationUtility _configurationUtility;
 
         public HistoryConfiguration(
             ILogger<HistoryConfiguration> logger,
             IRedisContext redisContext,
-            IHistoryConfigurationRepository repository)
+            IHistoryConfigurationRepository repository,
+            IConfigurationUtility configurationUtility)
         {
             _logger = logger;
             _redisContext = redisContext;
             _repository = repository;
+            _configurationUtility = configurationUtility;
         }
 
         public string ServerAddress { get; private set; }
 
         public async Task Initialize(HistoryConfigurationUsage usage)
         {
-            ISubscriber subscriber = _redisContext.GetSubscriber();
-
-            if (usage.UseServerAddress)
+            try
             {
-                ChannelMessageQueue serverAddressMQ = await subscriber.SubscribeAsync($"__keyspace*__:{HistoryKeys.ServerAddress}");
-                serverAddressMQ.OnMessage(HandleServerAddress);
-            }
+                ISubscriber subscriber = _redisContext.GetSubscriber();
 
-            await LoadValues(usage);
+                if (usage.UseServerAddress)
+                {
+                    ChannelMessageQueue serverAddressMQ = await subscriber.SubscribeAsync($"__keyspace*__:{HistoryKeys.ServerAddress}");
+                    serverAddressMQ.OnMessage(channelMessage => _configurationUtility.HandleChange(channelMessage, HandleServerAddress));
+                    _logger.LogInformation("Subscribed for changes about {0}.", HistoryKeys.ServerAddress);
+                }
+
+                await LoadValues(usage);
+            }
+            catch (Exception exception)
+            {
+                _logger.LogError(exception, "Initializing history configuration failed.");
+            }
         }
 
         private async Task LoadValues(HistoryConfigurationUsage usage)
         {
-            try
-            {
-                _logger.LogInformation("Loading history configuration...");
+            _logger.LogInformation("Loading history configuration...");
 
-                if (usage.UseServerAddress)
-                {
-                    await SetServerAddress();
-                }
-
-                _logger.LogInformation("Loading history configuration succeeded.");
-            }
-            catch (Exception exception)
+            if (usage.UseServerAddress)
             {
-                _logger.LogError(exception, "Loading history configuration failed.");
+                await SetServerAddress();
             }
+
+            _logger.LogInformation("Loading history configuration succeeded.");
         }
 
         private async Task HandleServerAddress(ChannelMessage channelMessage)
         {
-            try
+            if (_configurationUtility.ChannelMessageIs(channelMessage, "set"))
             {
-                _logger.LogInformation("Server address change. {0} -> {1}.", channelMessage.Channel, channelMessage.Message);
-
-                if (ChannelMessageIs(channelMessage, "set"))
-                {
-                    await SetServerAddress();
-                }
-                if (ChannelMessageIs(channelMessage, "del"))
-                {
-                    _logger.LogError("Key {0} was deleted.", HistoryKeys.ServerAddress);
-                }
+                await SetServerAddress();
             }
-            catch (Exception exception)
+            if (_configurationUtility.ChannelMessageIs(channelMessage, "del"))
             {
-                _logger.LogError(exception, "Error occurred while processing change from {0}.", channelMessage);
+                _logger.LogError("Key {0} was deleted.", HistoryKeys.ServerAddress);
             }
         }
 
@@ -94,20 +89,6 @@ namespace CecoChat.Data.Configuration.History
             string serverAddress = await _repository.GetServerAddress();
             ServerAddress = serverAddress;
             _logger.LogInformation("Server address set to {1}.", serverAddress);
-        }
-
-        // TODO: consider reusing this
-        private static bool ChannelMessageIs(ChannelMessage channelMessage, params string[] expectedMessages)
-        {
-            foreach (string expectedMessage in expectedMessages)
-            {
-                if (string.Equals(channelMessage.Message, expectedMessage, StringComparison.InvariantCultureIgnoreCase))
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
     }
 }

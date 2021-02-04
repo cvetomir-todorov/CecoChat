@@ -1,4 +1,5 @@
 using CecoChat.Connect.Server.Initialization;
+using CecoChat.Data.Configuration;
 using CecoChat.Data.Configuration.History;
 using CecoChat.Data.Configuration.Messaging;
 using CecoChat.Redis;
@@ -30,6 +31,7 @@ namespace CecoChat.Connect.Server
 
         public void ConfigureServices(IServiceCollection services)
         {
+            // web
             services
                 .AddControllers()
                 .AddFluentValidation(fluentValidation =>
@@ -39,14 +41,18 @@ namespace CecoChat.Connect.Server
                 });
             services.AddSwaggerServices(_swaggerOptions);
 
-            services.AddSingleton<IPartitionUtility, PartitionUtility>();
-            services.AddSingleton<INonCryptoHash, FnvHash>();
+            // configuration
+            services.AddHostedService<InitializeConfigurationHostedService>();
             services.AddSingleton<IMessagingConfiguration, MessagingConfiguration>();
             services.AddSingleton<IMessagingConfigurationRepository, MessagingConfigurationRepository>();
             services.AddSingleton<IHistoryConfiguration, HistoryConfiguration>();
             services.AddSingleton<IHistoryConfigurationRepository, HistoryConfigurationRepository>();
+            services.AddSingleton<IConfigurationUtility, ConfigurationUtility>();
             services.AddRedis(Configuration.GetSection("Redis"));
-            services.AddHostedService<InitializeConfigurationHostedService>();
+
+            // shared
+            services.AddSingleton<IPartitionUtility, PartitionUtility>();
+            services.AddSingleton<INonCryptoHash, FnvHash>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
