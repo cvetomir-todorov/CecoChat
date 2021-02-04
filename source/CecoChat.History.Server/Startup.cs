@@ -40,7 +40,7 @@ namespace CecoChat.History.Server
             services.AddSingleton<IHistoryConfiguration, HistoryConfiguration>();
             services.AddSingleton<IHistoryConfigurationRepository, HistoryConfigurationRepository>();
             services.AddSingleton<IConfigurationUtility, ConfigurationUtility>();
-            services.AddHostedService<InitializeConfigurationHostedService>();
+            services.AddHostedService<ConfigurationHostedService>();
 
             // shared
             services.AddSingleton<IClientBackendMapper, ClientBackendMapper>();

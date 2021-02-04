@@ -42,7 +42,7 @@ namespace CecoChat.Connect.Server
             services.AddSwaggerServices(_swaggerOptions);
 
             // configuration
-            services.AddHostedService<InitializeConfigurationHostedService>();
+            services.AddHostedService<ConfigurationHostedService>();
             services.AddSingleton<IMessagingConfiguration, MessagingConfiguration>();
             services.AddSingleton<IMessagingConfigurationRepository, MessagingConfigurationRepository>();
             services.AddSingleton<IHistoryConfiguration, HistoryConfiguration>();
