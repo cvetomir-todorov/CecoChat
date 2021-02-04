@@ -12,7 +12,6 @@
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto"/>
       <RowDefinition Height="Auto"/>
-      <RowDefinition Height="Auto"/>
       <RowDefinition Height="*"/>
       <RowDefinition Height="Auto"/>
     </Grid.RowDefinitions>
@@ -29,22 +28,14 @@
              Text="{Binding Path=UserID}"
              Style="{StaticResource CommonControlStyle}"/>
     <TextBlock Grid.Row="1" Grid.Column="0"
-               Text="Messaging server"
+               Text="Server"
                VerticalAlignment="Center"
                Style="{StaticResource CommonElementStyle}"/>
     <TextBox Grid.Row="1" Grid.Column="1"
              MinWidth="100"
-             Text="{Binding Path=MessagingServer}"
+             Text="{Binding Path=ConnectServer}"
              Style="{StaticResource CommonControlStyle}"/>
-    <TextBlock Grid.Row="2" Grid.Column="0"
-               Text="History server"
-               VerticalAlignment="Center"
-               Style="{StaticResource CommonElementStyle}"/>
-    <TextBox Grid.Row="2" Grid.Column="1"
-             MinWidth="100"
-             Text="{Binding Path=HistoryServer}"
-             Style="{StaticResource CommonControlStyle}"/>
-    <Button Grid.Row="4" Grid.Column="1"
+    <Button Grid.Row="3" Grid.Column="1"
             Content="Connect"
             Command="{Binding Path=Connect}"
             HorizontalAlignment="Right"

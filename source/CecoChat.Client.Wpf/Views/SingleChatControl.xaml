@@ -17,7 +17,7 @@
     <Grid.ColumnDefinitions>
       <ColumnDefinition Width="*"/>
     </Grid.ColumnDefinitions>
-    <TextBlock Text="{Binding Path=OtherUserID, Converter={StaticResource FormattingTextConverter}, ConverterParameter=Chatee {0}}"
+    <TextBlock Text="{Binding Path=OtherUserID, Converter={StaticResource FormattingTextConverter}, ConverterParameter=Friend {0}}"
                TextAlignment="Center"
                Grid.Row="0" Grid.Column="0"
                Style="{StaticResource CommonElementStyle}"/>

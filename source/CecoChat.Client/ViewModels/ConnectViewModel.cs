@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using CecoChat.Client.Shared;
 using CecoChat.Client.Shared.Storage;
@@ -20,29 +21,33 @@ namespace CecoChat.Client.ViewModels
         {
             CanOperate = true;
             UserID = "1";
-            MessagingServer = "https://localhost:31001";
-            HistoryServer = "https://localhost:31003";
-            Connect = new RelayCommand(ConnectExecuted);
+            ConnectServer = "https://localhost:31000";
+            Connect = new AsyncRelayCommand(ConnectExecuted);
         }
 
         public bool CanOperate { get; set; }
 
         public string UserID { get; set; }
 
-        public string MessagingServer { get; set; }
-
-        public string HistoryServer { get; set; }
+        public string ConnectServer { get; set; }
 
         public ICommand Connect { get; }
 
         public event EventHandler Connected;
 
-        private void ConnectExecuted()
+        private async Task ConnectExecuted()
         {
-            MessagingClient.Initialize(long.Parse(UserID), MessagingServer, HistoryServer);
-            MessagingClient.ListenForMessages(CancellationToken.None);
+            try
+            {
+                await MessagingClient.Initialize(long.Parse(UserID), ConnectServer);
+                MessagingClient.ListenForMessages(CancellationToken.None);
 
-            Connected?.Invoke(this, EventArgs.Empty);
+                Connected?.Invoke(this, EventArgs.Empty);
+            }
+            catch (Exception exception)
+            {
+                ErrorService.ShowError(exception);
+            }
         }
     }
 }

@@ -1,5 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using CecoChat.Contracts.Client;
@@ -12,6 +16,7 @@ namespace CecoChat.Client.Shared
     public sealed class MessagingClient : IDisposable
     {
         private readonly MessageIDGenerator _messageIDGenerator;
+        private readonly HttpClient _httpClient;
         private long _userID;
         private string _messagingServer;
         private string _historyServer;
@@ -24,10 +29,13 @@ namespace CecoChat.Client.Shared
         public MessagingClient(MessageIDGenerator messageIDGenerator)
         {
             _messageIDGenerator = messageIDGenerator;
+            _httpClient = new HttpClient();
         }
 
         public void Dispose()
         {
+            _httpClient.Dispose();
+
             _messagingChannel?.ShutdownAsync().Wait();
             _messagingChannel?.Dispose();
 
@@ -37,22 +45,41 @@ namespace CecoChat.Client.Shared
 
         public long UserID => _userID;
 
-        public string MessagingServer => _messagingServer;
-
-        public string HistoryServer => _historyServer;
-
-        public void Initialize(long userID, string messagingServer, string historyServer)
+        public async Task Initialize(long userID, string connectServer)
         {
             _userID = userID;
-            _messagingServer = messagingServer;
-            _historyServer = historyServer;
+            CreateSessionRequest request = new() {UserID = userID};
+            CreateSessionResponse response = await CreateSession(request, connectServer);
 
-            _messagingChannel = GrpcChannel.ForAddress(messagingServer);
-            _historyChannel = GrpcChannel.ForAddress(historyServer);
+            _messagingServer = response.MessagingServerAddress;
+            _historyServer = response.HistoryServerAddress;
+
+            _messagingChannel = GrpcChannel.ForAddress(_messagingServer);
+            _historyChannel = GrpcChannel.ForAddress(_historyServer);
 
             _listenClient = new Listen.ListenClient(_messagingChannel);
             _sendClient = new Send.SendClient(_messagingChannel);
             _historyClient = new History.HistoryClient(_historyChannel);
+        }
+
+        private async Task<CreateSessionResponse> CreateSession(CreateSessionRequest request, string connectServer)
+        {
+            UriBuilder builder = new(uri: connectServer);
+            builder.Path = "api/session";
+            HttpRequestMessage requestMessage = new(HttpMethod.Post, builder.Uri);
+            requestMessage.Version = HttpVersion.Version20;
+            string requestString = JsonSerializer.Serialize(request);
+            requestMessage.Content = new StringContent(requestString);
+            requestMessage.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            HttpResponseMessage responseMessage = await _httpClient.SendAsync(requestMessage);
+            responseMessage.EnsureSuccessStatusCode();
+
+            string responseString = await responseMessage.Content.ReadAsStringAsync();
+            CreateSessionResponse response = JsonSerializer.Deserialize<CreateSessionResponse>(responseString,
+                new JsonSerializerOptions {PropertyNamingPolicy = JsonNamingPolicy.CamelCase});
+            return response;
         }
 
         public void ListenForMessages(CancellationToken ct)
