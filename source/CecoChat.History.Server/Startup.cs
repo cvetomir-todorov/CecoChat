@@ -1,6 +1,10 @@
 using CecoChat.Cassandra;
+using CecoChat.Data.Configuration;
+using CecoChat.Data.Configuration.History;
 using CecoChat.Data.Messaging;
 using CecoChat.History.Server.Clients;
+using CecoChat.History.Server.Initialization;
+using CecoChat.Redis;
 using CecoChat.Server;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -30,6 +34,13 @@ namespace CecoChat.History.Server
             services.AddSingleton<IHistoryRepository, HistoryRepository>();
             services.AddSingleton<IDataUtility, DataUtility>();
             services.AddSingleton<IBackendDbMapper, BackendDbMapper>();
+
+            // configuration
+            services.AddRedis(Configuration.GetSection("Data.Configuration"));
+            services.AddSingleton<IHistoryConfiguration, HistoryConfiguration>();
+            services.AddSingleton<IHistoryConfigurationRepository, HistoryConfigurationRepository>();
+            services.AddSingleton<IConfigurationUtility, ConfigurationUtility>();
+            services.AddHostedService<InitializeConfigurationHostedService>();
 
             // shared
             services.AddSingleton<IClientBackendMapper, ClientBackendMapper>();

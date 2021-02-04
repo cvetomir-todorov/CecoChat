@@ -7,6 +7,10 @@ namespace CecoChat.Data.Configuration.History
     public interface IHistoryConfigurationRepository
     {
         Task<RedisValueResult<string>> GetServerAddress();
+
+        Task<RedisValueResult<int>> GetUserMessageCount();
+
+        Task<RedisValueResult<int>> GetDialogMessageCount();
     }
 
     public sealed class HistoryConfigurationRepository : IHistoryConfigurationRepository
@@ -22,8 +26,7 @@ namespace CecoChat.Data.Configuration.History
         public async Task<RedisValueResult<string>> GetServerAddress()
         {
             IDatabase database = _redisContext.GetDatabase();
-            const string key = HistoryKeys.ServerAddress;
-            RedisValue value = await database.StringGetAsync(key);
+            RedisValue value = await database.StringGetAsync(HistoryKeys.ServerAddress);
 
             if (value.IsNullOrEmpty)
             {
@@ -31,6 +34,34 @@ namespace CecoChat.Data.Configuration.History
             }
 
             return RedisValueResult<string>.Success(value);
+        }
+
+        public async Task<RedisValueResult<int>> GetUserMessageCount()
+        {
+            IDatabase database = _redisContext.GetDatabase();
+            RedisValue value = await database.StringGetAsync(HistoryKeys.UserMessageCount);
+
+            if (value.IsNullOrEmpty ||
+                !value.TryParse(out int userMessageCount))
+            {
+                return RedisValueResult<int>.Failure();
+            }
+
+            return RedisValueResult<int>.Success(userMessageCount);
+        }
+
+        public async Task<RedisValueResult<int>> GetDialogMessageCount()
+        {
+            IDatabase database = _redisContext.GetDatabase();
+            RedisValue value = await database.StringGetAsync(HistoryKeys.DialogMessageCount);
+
+            if (value.IsNullOrEmpty ||
+                !value.TryParse(out int dialogMessageCount))
+            {
+                return RedisValueResult<int>.Failure();
+            }
+
+            return RedisValueResult<int>.Success(dialogMessageCount);
         }
     }
 }

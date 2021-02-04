@@ -2,29 +2,29 @@
 using System.Threading.Tasks;
 using CecoChat.Contracts.Backend;
 using CecoChat.Contracts.Client;
+using CecoChat.Data.Configuration.History;
 using CecoChat.Data.Messaging;
 using CecoChat.Server;
 using Grpc.Core;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace CecoChat.History.Server.Clients
 {
     public sealed class GrpcHistoryService : Contracts.Client.History.HistoryBase
     {
         private readonly ILogger _logger;
-        private readonly IClientOptions _clientOptions;
+        private readonly IHistoryConfiguration _historyConfiguration;
         private readonly IHistoryRepository _historyRepository;
         private readonly IClientBackendMapper _clientBackendMapper;
 
         public GrpcHistoryService(
             ILogger<GrpcHistoryService> logger,
-            IOptions<ClientOptions> clientOptions,
+            IHistoryConfiguration historyConfiguration,
             IHistoryRepository historyRepository,
             IClientBackendMapper clientBackendMapper)
         {
             _logger = logger;
-            _clientOptions = clientOptions.Value;
+            _historyConfiguration = historyConfiguration;
             _historyRepository = historyRepository;
             _clientBackendMapper = clientBackendMapper;
         }
@@ -34,7 +34,7 @@ namespace CecoChat.History.Server.Clients
             // TODO: use user ID from auth token
             long userID = request.UserId;
             IReadOnlyCollection<BackendMessage> backendMessages = await _historyRepository
-                .GetUserHistory(userID, request.OlderThan.ToDateTime(), _clientOptions.MessageHistoryCountLimit);
+                .GetUserHistory(userID, request.OlderThan.ToDateTime(), _historyConfiguration.UserMessageCount);
 
             GetUserHistoryResponse response = new();
             foreach (BackendMessage backendMessage in backendMessages)
@@ -54,7 +54,7 @@ namespace CecoChat.History.Server.Clients
             long otherUserID = request.OtherUserId;
 
             IReadOnlyCollection<BackendMessage> backendMessages = await _historyRepository
-                .GetDialogHistory(userID, otherUserID, request.OlderThan.ToDateTime(), _clientOptions.MessageHistoryCountLimit);
+                .GetDialogHistory(userID, otherUserID, request.OlderThan.ToDateTime(), _historyConfiguration.DialogMessageCount);
 
             GetDialogHistoryResponse response = new();
             foreach (BackendMessage backendMessage in backendMessages)
