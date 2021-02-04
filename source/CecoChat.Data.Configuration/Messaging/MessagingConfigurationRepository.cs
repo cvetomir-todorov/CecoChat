@@ -7,11 +7,11 @@ namespace CecoChat.Data.Configuration.Messaging
 {
     public interface IMessagingConfigurationRepository
     {
-        Task<int> GetPartitionCount();
+        Task<RedisValueResult<int>> GetPartitionCount();
 
-        IAsyncEnumerable<KeyValuePair<string, PartitionRange>> GetServerPartitions();
+        IAsyncEnumerable<RedisValueResult<KeyValuePair<string, PartitionRange>>> GetServerPartitions();
 
-        IAsyncEnumerable<KeyValuePair<string, string>> GetServerAddresses();
+        IAsyncEnumerable<RedisValueResult<KeyValuePair<string, string>>> GetServerAddresses();
     }
 
     public sealed class MessagingConfigurationRepository : IMessagingConfigurationRepository
@@ -24,7 +24,7 @@ namespace CecoChat.Data.Configuration.Messaging
             _redisContext = redisContext;
         }
 
-        public async Task<int> GetPartitionCount()
+        public async Task<RedisValueResult<int>> GetPartitionCount()
         {
             IDatabase database = _redisContext.GetDatabase();
             const string key = MessagingKeys.PartitionCount;
@@ -32,17 +32,17 @@ namespace CecoChat.Data.Configuration.Messaging
 
             if (value.IsNullOrEmpty)
             {
-                throw new ConfigurationException(key);
+                return RedisValueResult<int>.Failure();
             }
             if (!value.TryParse(out int partitionCount))
             {
-                throw new ConfigurationException(key, value);
+                return RedisValueResult<int>.Failure();
             }
 
-            return partitionCount;
+            return RedisValueResult<int>.Success(partitionCount);
         }
 
-        public async IAsyncEnumerable<KeyValuePair<string, PartitionRange>> GetServerPartitions()
+        public async IAsyncEnumerable<RedisValueResult<KeyValuePair<string, PartitionRange>>> GetServerPartitions()
         {
             IDatabase database = _redisContext.GetDatabase();
             const string key = MessagingKeys.ServerPartitions;
@@ -54,18 +54,21 @@ namespace CecoChat.Data.Configuration.Messaging
 
                 if (hashEntry.Value.IsNullOrEmpty)
                 {
-                    throw new ConfigurationException(key);
+                    yield return RedisValueResult<KeyValuePair<string, PartitionRange>>.Failure();
                 }
-                if (!PartitionRange.TryParse(hashEntry.Value.ToString(), separator: '-', out PartitionRange partitions))
+                else if (!PartitionRange.TryParse(hashEntry.Value, separator: '-', out PartitionRange partitions))
                 {
-                    throw new ConfigurationException(key, hashEntry.Value);
+                    yield return RedisValueResult<KeyValuePair<string, PartitionRange>>.Failure();
                 }
-
-                yield return new KeyValuePair<string, PartitionRange>(server, partitions);
+                else
+                {
+                    KeyValuePair<string, PartitionRange> serverPartitions = new(server, partitions);
+                    yield return RedisValueResult<KeyValuePair<string, PartitionRange>>.Success(serverPartitions);
+                }
             }
         }
 
-        public async IAsyncEnumerable<KeyValuePair<string, string>> GetServerAddresses()
+        public async IAsyncEnumerable<RedisValueResult<KeyValuePair<string, string>>> GetServerAddresses()
         {
             IDatabase database = _redisContext.GetDatabase();
             const string key = MessagingKeys.ServerAddresses;
@@ -77,12 +80,13 @@ namespace CecoChat.Data.Configuration.Messaging
 
                 if (hashEntry.Value.IsNullOrEmpty)
                 {
-                    throw new ConfigurationException(key);
+                    yield return RedisValueResult<KeyValuePair<string, string>>.Failure();
                 }
-
-                string address = hashEntry.Value.ToString();
-
-                yield return new KeyValuePair<string, string>(server, address);
+                else
+                {
+                    KeyValuePair<string, string> serverAddress = new(server, hashEntry.Value);
+                    yield return RedisValueResult<KeyValuePair<string, string>>.Success(serverAddress);
+                }
             }
         }
     }

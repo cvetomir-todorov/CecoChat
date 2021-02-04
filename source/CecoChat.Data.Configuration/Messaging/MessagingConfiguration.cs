@@ -158,52 +158,78 @@ namespace CecoChat.Data.Configuration.Messaging
 
         private async Task SetPartitionCount()
         {
-            int partitionCount = await _repository.GetPartitionCount();
-            PartitionCount = partitionCount;
-            _logger.LogInformation("Partition count set to {1}.", partitionCount);
+            RedisValueResult<int> partitionCountResult = await _repository.GetPartitionCount();
+            if (partitionCountResult.IsSuccess)
+            {
+                PartitionCount = partitionCountResult.Value;
+                _logger.LogInformation("Partition count set to {0}.", partitionCountResult.Value);
+            }
+            else
+            {
+                _logger.LogError("Partition count is invalid.");
+            }
         }
 
         private async Task SetServerPartitions(bool strictlyAdd)
         {
-            await foreach (KeyValuePair<string, PartitionRange> serverPartitions in _repository.GetServerPartitions())
+            await foreach (RedisValueResult<KeyValuePair<string, PartitionRange>> serverPartitionsResult in _repository.GetServerPartitions())
             {
-                int successfullySet = strictlyAdd ? 0 : serverPartitions.Value.Length;
-
-                for (int partition = serverPartitions.Value.Lower; partition <= serverPartitions.Value.Upper; ++partition)
+                if (serverPartitionsResult.IsSuccess)
                 {
-                    if (strictlyAdd)
+                    string server = serverPartitionsResult.Value.Key;
+                    PartitionRange partitions = serverPartitionsResult.Value.Value;
+                    int successfullySet = strictlyAdd ? 0 : partitions.Length;
+
+                    for (int partition = partitions.Lower; partition <= partitions.Upper; ++partition)
                     {
-                        if (_partitionServerMap.TryAdd(partition, serverPartitions.Key))
+                        if (strictlyAdd)
                         {
-                            successfullySet++;
+                            if (_partitionServerMap.TryAdd(partition, server))
+                            {
+                                successfullySet++;
+                            }
+                        }
+                        else
+                        {
+                            _partitionServerMap.AddOrUpdate(partition, server, (_, _) => server);
                         }
                     }
-                    else
-                    {
-                        _partitionServerMap.AddOrUpdate(partition, serverPartitions.Key, (_, _) => serverPartitions.Key);
-                    }
-                }
 
-                _logger.LogInformation("Partitions {0} ({1} out of {2}) assigned to server {3}.",
-                    serverPartitions.Value, successfullySet, serverPartitions.Value.Length, serverPartitions.Key);
+                    _logger.LogInformation("Partitions {0} ({1} out of {2}) assigned to server {3}.",
+                        partitions, successfullySet, partitions.Length, server);
+                }
+                else
+                {
+                    _logger.LogError("Server partitions is invalid.");
+                }
             }
         }
 
         private async Task SetServerAddresses(bool strictlyAdd)
         {
-            await foreach (KeyValuePair<string, string> serverAddress in _repository.GetServerAddresses())
+            await foreach (RedisValueResult<KeyValuePair<string, string>> serverAddressResult in _repository.GetServerAddresses())
             {
-                if (strictlyAdd)
+                if (serverAddressResult.IsSuccess)
                 {
-                    if (_serverAddressMap.TryAdd(serverAddress.Key, serverAddress.Value))
+                    string server = serverAddressResult.Value.Key;
+                    string address = serverAddressResult.Value.Value;
+
+                    if (strictlyAdd)
                     {
-                        _logger.LogInformation("Server {0} assigned address {1}.", serverAddress.Key, serverAddress.Value);
+                        if (_serverAddressMap.TryAdd(server, address))
+                        {
+                            _logger.LogInformation("Server {0} assigned address {1}.", server, address);
+                        }
+                    }
+                    else
+                    {
+                        _serverAddressMap.AddOrUpdate(server, address, (_, _) => address);
+                        _logger.LogInformation("Server {0} assigned address {1}.", server, address);
                     }
                 }
                 else
                 {
-                    _serverAddressMap.AddOrUpdate(serverAddress.Key, serverAddress.Value, (_, _) => serverAddress.Value);
-                    _logger.LogInformation("Server {0} assigned address {1}.", serverAddress.Key, serverAddress.Value);
+                    _logger.LogError("Server address is invalid.");
                 }
             }
         }

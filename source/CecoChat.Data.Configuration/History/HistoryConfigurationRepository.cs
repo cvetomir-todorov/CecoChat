@@ -6,7 +6,7 @@ namespace CecoChat.Data.Configuration.History
 {
     public interface IHistoryConfigurationRepository
     {
-        Task<string> GetServerAddress();
+        Task<RedisValueResult<string>> GetServerAddress();
     }
 
     public sealed class HistoryConfigurationRepository : IHistoryConfigurationRepository
@@ -19,7 +19,7 @@ namespace CecoChat.Data.Configuration.History
             _redisContext = redisContext;
         }
 
-        public async Task<string> GetServerAddress()
+        public async Task<RedisValueResult<string>> GetServerAddress()
         {
             IDatabase database = _redisContext.GetDatabase();
             const string key = HistoryKeys.ServerAddress;
@@ -27,10 +27,10 @@ namespace CecoChat.Data.Configuration.History
 
             if (value.IsNullOrEmpty)
             {
-                throw new ConfigurationException(key);
+                return RedisValueResult<string>.Failure();
             }
 
-            return value;
+            return RedisValueResult<string>.Success(value);
         }
     }
 }

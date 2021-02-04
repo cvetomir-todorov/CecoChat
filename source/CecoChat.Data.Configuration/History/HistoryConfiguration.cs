@@ -86,9 +86,16 @@ namespace CecoChat.Data.Configuration.History
 
         private async Task SetServerAddress()
         {
-            string serverAddress = await _repository.GetServerAddress();
-            ServerAddress = serverAddress;
-            _logger.LogInformation("Server address set to {1}.", serverAddress);
+            RedisValueResult<string> serverAddressResult = await _repository.GetServerAddress();
+            if (serverAddressResult.IsSuccess)
+            {
+                ServerAddress = serverAddressResult.Value;
+                _logger.LogInformation("Server address set to {0}.", serverAddressResult.Value);
+            }
+            else
+            {
+                _logger.LogError("Server address is invalid.");
+            }
         }
     }
 }
