@@ -48,7 +48,7 @@ namespace CecoChat.Connect.Server
             services.AddSingleton<IHistoryConfiguration, HistoryConfiguration>();
             services.AddSingleton<IHistoryConfigurationRepository, HistoryConfigurationRepository>();
             services.AddSingleton<IConfigurationUtility, ConfigurationUtility>();
-            services.AddRedis(Configuration.GetSection("Redis"));
+            services.AddRedis(Configuration.GetSection("Data.Configuration"));
 
             // shared
             services.AddSingleton<IPartitionUtility, PartitionUtility>();
