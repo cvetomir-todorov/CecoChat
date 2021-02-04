@@ -1,5 +1,6 @@
 ﻿using System;
 using CecoChat.Contracts.Backend;
+using CecoChat.Data.Configuration.Messaging;
 using CecoChat.Kafka;
 using CecoChat.Server.Backend;
 using Confluent.Kafka;
@@ -13,6 +14,7 @@ namespace CecoChat.Messaging.Server.Backend
     {
         private readonly ILogger _logger;
         private readonly IBackendOptions _backendOptions;
+        private readonly IMessagingConfiguration _messagingConfiguration;
         private readonly IPartitionUtility _partitionUtility;
         private readonly ITopicPartitionFlyweight _partitionFlyweight;
         private readonly IProducer<Null, BackendMessage> _producer;
@@ -20,12 +22,14 @@ namespace CecoChat.Messaging.Server.Backend
         public MessagesToBackendProducer(
             ILogger<MessagesToBackendProducer> logger,
             IOptions<BackendOptions> backendOptions,
+            IMessagingConfiguration messagingConfiguration,
             IHostApplicationLifetime applicationLifetime,
             IPartitionUtility partitionUtility,
             ITopicPartitionFlyweight partitionFlyweight)
         {
             _logger = logger;
             _backendOptions = backendOptions.Value;
+            _messagingConfiguration = messagingConfiguration;
             _partitionUtility = partitionUtility;
             _partitionFlyweight = partitionFlyweight;
 
@@ -69,7 +73,7 @@ namespace CecoChat.Messaging.Server.Backend
 
         public void ProduceMessage(BackendMessage message)
         {
-            int partition = _partitionUtility.ChoosePartition(message.ReceiverId, _backendOptions.MessagesTopicPartitionCount);
+            int partition = _partitionUtility.ChoosePartition(message.ReceiverId, _messagingConfiguration.PartitionCount);
             TopicPartition topicPartition = _partitionFlyweight.GetTopicPartition(_backendOptions.MessagesTopicName, partition);
             Message<Null, BackendMessage> kafkaMessage = new()
             {

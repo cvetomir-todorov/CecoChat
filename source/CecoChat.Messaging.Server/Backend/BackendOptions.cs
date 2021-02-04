@@ -7,8 +7,6 @@ namespace CecoChat.Messaging.Server.Backend
         public IKafkaOptions Kafka { get; }
 
         public string MessagesTopicName { get; }
-
-        public int MessagesTopicPartitionCount { get; }
     }
 
     public sealed class BackendOptions : IBackendOptions
@@ -18,7 +16,5 @@ namespace CecoChat.Messaging.Server.Backend
         IKafkaOptions IBackendOptions.Kafka => Kafka;
 
         public string MessagesTopicName { get; set; }
-
-        public int MessagesTopicPartitionCount { get; set; }
     }
 }

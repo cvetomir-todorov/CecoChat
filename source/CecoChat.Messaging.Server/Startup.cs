@@ -1,9 +1,13 @@
 using CecoChat.Contracts.Backend;
 using CecoChat.Contracts.Client;
+using CecoChat.Data.Configuration;
+using CecoChat.Data.Configuration.Messaging;
 using CecoChat.DependencyInjection;
 using CecoChat.Kafka;
 using CecoChat.Messaging.Server.Backend;
 using CecoChat.Messaging.Server.Clients;
+using CecoChat.Messaging.Server.Initialization;
+using CecoChat.Redis;
 using CecoChat.Server;
 using CecoChat.Server.Backend;
 using Confluent.Kafka;
@@ -26,6 +30,10 @@ namespace CecoChat.Messaging.Server
 
         public void ConfigureServices(IServiceCollection services)
         {
+            // ordered hosted services
+            services.AddHostedService<ConfigurationHostedService>();
+            services.AddHostedService<MessagesToReceiversHostedService>();
+
             // clients
             services.AddGrpc();
             services.AddSingleton<IClientContainer, ClientContainer>();
@@ -38,8 +46,13 @@ namespace CecoChat.Messaging.Server
             services.AddSingleton<IBackendProducer, MessagesToBackendProducer>();
             services.AddSingleton<IBackendConsumer, MessagesToReceiversConsumer>();
             services.AddFactory<IKafkaConsumer<Null, BackendMessage>, KafkaConsumer<Null, BackendMessage>>();
-            services.AddHostedService<MessagesToReceiversHostedService>();
             services.Configure<BackendOptions>(Configuration.GetSection("Backend"));
+
+            // configuration
+            services.AddRedis(Configuration.GetSection("Data.Configuration"));
+            services.AddSingleton<IMessagingConfiguration, MessagingConfiguration>();
+            services.AddSingleton<IMessagingConfigurationRepository, MessagingConfigurationRepository>();
+            services.AddSingleton<IConfigurationUtility, ConfigurationUtility>();
 
             // shared
             services.AddSingleton<IClock, MonotonicClock>();

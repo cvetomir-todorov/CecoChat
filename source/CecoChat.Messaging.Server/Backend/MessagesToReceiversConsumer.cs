@@ -2,6 +2,7 @@
 using System.Threading;
 using CecoChat.Contracts.Backend;
 using CecoChat.Contracts.Client;
+using CecoChat.Data.Configuration.Messaging;
 using CecoChat.DependencyInjection;
 using CecoChat.Kafka;
 using CecoChat.Messaging.Server.Clients;
@@ -17,6 +18,7 @@ namespace CecoChat.Messaging.Server.Backend
     {
         private readonly ILogger _logger;
         private readonly IBackendOptions _backendOptions;
+        private readonly IMessagingConfiguration _messagingConfiguration;
         private readonly ITopicPartitionFlyweight _partitionFlyweight;
         private readonly IKafkaConsumer<Null, BackendMessage> _consumer;
         private readonly IClientContainer _clientContainer;
@@ -25,6 +27,7 @@ namespace CecoChat.Messaging.Server.Backend
         public MessagesToReceiversConsumer(
             ILogger<MessagesToReceiversConsumer> logger,
             IOptions<BackendOptions> backendOptions,
+            IMessagingConfiguration messagingConfiguration,
             ITopicPartitionFlyweight partitionFlyweight,
             IFactory<IKafkaConsumer<Null, BackendMessage>> consumerFactory,
             IClientContainer clientContainer,
@@ -32,6 +35,7 @@ namespace CecoChat.Messaging.Server.Backend
         {
             _logger = logger;
             _backendOptions = backendOptions.Value;
+            _messagingConfiguration = messagingConfiguration;
             _partitionFlyweight = partitionFlyweight;
             _consumer = consumerFactory.Create();
             _clientContainer = clientContainer;
@@ -49,7 +53,7 @@ namespace CecoChat.Messaging.Server.Backend
             _consumer.Assign(
                 _backendOptions.MessagesTopicName,
                 minPartition: 0,
-                maxPartition: _backendOptions.MessagesTopicPartitionCount - 1,
+                maxPartition: _messagingConfiguration.PartitionCount - 1,
                 _partitionFlyweight);
         }
 
