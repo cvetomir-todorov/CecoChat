@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading;
-using System.Threading.Tasks;
 using CecoChat.Contracts.Backend;
 using CecoChat.Contracts.Client;
-using CecoChat.Data.Configuration.Messaging;
 using CecoChat.DependencyInjection;
-using CecoChat.Events;
 using CecoChat.Kafka;
 using CecoChat.Messaging.Server.Clients;
 using CecoChat.Server;
@@ -17,24 +13,20 @@ using Microsoft.Extensions.Options;
 
 namespace CecoChat.Messaging.Server.Backend
 {
-    public sealed class MessagesToReceiversConsumer : IBackendConsumer, ISubscriber<PartitionsChangedEventData>
+    public sealed class MessagesToReceiversConsumer : IBackendConsumer
     {
         private readonly ILogger _logger;
         private readonly IBackendOptions _backendOptions;
-        private readonly IMessagingConfiguration _messagingConfiguration;
-        private readonly IEvent<PartitionsChangedEventData> _partitionsChanged;
         private readonly ITopicPartitionFlyweight _partitionFlyweight;
         private readonly IKafkaConsumer<Null, BackendMessage> _consumer;
         private readonly IClientContainer _clientContainer;
         private readonly IClientBackendMapper _mapper;
-
-        private readonly Guid _partitionsChangedToken;
+        private bool _isInitialized;
+        private readonly object _initializationLock;
 
         public MessagesToReceiversConsumer(
             ILogger<MessagesToReceiversConsumer> logger,
             IOptions<BackendOptions> backendOptions,
-            IMessagingConfiguration messagingConfiguration,
-            IEvent<PartitionsChangedEventData> partitionsChanged,
             ITopicPartitionFlyweight partitionFlyweight,
             IFactory<IKafkaConsumer<Null, BackendMessage>> consumerFactory,
             IClientContainer clientContainer,
@@ -42,26 +34,30 @@ namespace CecoChat.Messaging.Server.Backend
         {
             _logger = logger;
             _backendOptions = backendOptions.Value;
-            _messagingConfiguration = messagingConfiguration;
-            _partitionsChanged = partitionsChanged;
             _partitionFlyweight = partitionFlyweight;
             _consumer = consumerFactory.Create();
             _clientContainer = clientContainer;
             _mapper = mapper;
 
-            _partitionsChangedToken = _partitionsChanged.Subscribe(this);
+            _initializationLock = new object();
         }
 
         public void Dispose()
         {
-            _partitionsChanged.Unsubscribe(_partitionsChangedToken);
             _consumer.Dispose();
         }
 
-        public void Prepare()
+        public void Prepare(PartitionRange partitions)
         {
-            _consumer.Initialize(_backendOptions.Kafka, new BackendMessageDeserializer());
-            PartitionRange partitions = _messagingConfiguration.GetServerPartitions(_backendOptions.ServerID);
+            lock (_initializationLock)
+            {
+                if (!_isInitialized)
+                {
+                    _consumer.Initialize(_backendOptions.Kafka, new BackendMessageDeserializer());
+                    _isInitialized = true;
+                }
+            }
+
             _consumer.Assign(_backendOptions.MessagesTopicName, partitions, _partitionFlyweight);
         }
 
@@ -113,14 +109,6 @@ namespace CecoChat.Messaging.Server.Backend
             {
                 _logger.LogTrace("Connected recipients (all {0}) were sent message {1}.", successCount, backendMessage);
             }
-        }
-
-        public ValueTask Handle(PartitionsChangedEventData eventData)
-        {
-            PartitionRange partitions = _messagingConfiguration.GetServerPartitions(_backendOptions.ServerID);
-            // TODO: send a message to the clients connected to the server who should move to other server
-            _consumer.Assign(_backendOptions.MessagesTopicName, partitions, _partitionFlyweight);
-            return ValueTask.CompletedTask;
         }
     }
 }

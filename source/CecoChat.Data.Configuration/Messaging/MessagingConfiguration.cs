@@ -86,6 +86,8 @@ namespace CecoChat.Data.Configuration.Messaging
                 if (usage.UsePartitionCount)
                 {
                     // TODO: switch to custom pub/sub instead of keyspace notifications which don't work in a cluster
+                    // TODO: merge the partition change events and include the data inside the event data class
+
                     ChannelMessageQueue partitionCountMQ = await subscriber.SubscribeAsync($"__keyspace*__:{MessagingKeys.PartitionCount}");
                     partitionCountMQ.OnMessage(channelMessage => _configurationUtility.HandleChange(channelMessage, HandlePartitionCount));
                     _logger.LogInformation("Subscribed for changes about {0}.", MessagingKeys.PartitionCount);

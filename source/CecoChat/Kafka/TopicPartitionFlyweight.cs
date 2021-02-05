@@ -12,6 +12,8 @@ namespace CecoChat.Kafka
         void AddOrUpdate(string topic, int partitionCount);
 
         TopicPartition GetTopicPartition(string topic, int partition);
+
+        int GetTopicPartitionCount(string topic);
     }
 
     public sealed class TopicPartitionFlyweight : ITopicPartitionFlyweight
@@ -82,6 +84,19 @@ namespace CecoChat.Kafka
                 throw new InvalidOperationException($"Partition {partition} for topic {topic} should be within [0, {topicPartitions.Length - 1}].");
 
             return topicPartitions[partition];
+        }
+
+        public int GetTopicPartitionCount(string topic)
+        {
+            if (string.IsNullOrWhiteSpace(topic))
+                throw new ArgumentException($"{nameof(topic)} should be a non-empty non-whitespace string.");
+
+            if (!_topicPartitionsMap.TryGetValue(topic, out TopicPartition[] topicPartitions))
+            {
+                return 0;
+            }
+
+            return topicPartitions.Length;
         }
     }
 }
