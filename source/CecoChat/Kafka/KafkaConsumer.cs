@@ -19,16 +19,23 @@ namespace CecoChat.Kafka
         void Commit(ConsumeResult<TKey, TValue> consumeResult, CancellationToken ct);
     }
 
-    // TODO: do not use consumer ID from Kafka since it returns empty string
+    internal class KafkaConsumerID
+    {
+        private static int _nextIDCounter;
+        public static int GetNextID() => Interlocked.Increment(ref _nextIDCounter);
+    }
+
     public sealed class KafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey, TValue>
     {
         private readonly ILogger _logger;
+        private readonly int _id;
         private PartitionRange _assignedPartitions;
         private IConsumer<TKey, TValue> _consumer;
 
         public KafkaConsumer(ILogger<KafkaConsumer<TKey, TValue>> logger)
         {
             _logger = logger;
+            _id = KafkaConsumerID.GetNextID();
             _assignedPartitions = PartitionRange.Empty;
         }
 
@@ -61,7 +68,7 @@ namespace CecoChat.Kafka
         {
             EnsureInitialized();
             _consumer.Subscribe(topic);
-            _logger.LogDebug("Consumer {0} subscribed to topic {1}.", _consumer.MemberId, topic);
+            _logger.LogDebug("Consumer {0} subscribed to topic {1}.", _id, topic);
         }
 
         public void Assign(string topic, PartitionRange partitions, ITopicPartitionFlyweight partitionFlyweight)
@@ -70,7 +77,7 @@ namespace CecoChat.Kafka
 
             if (_assignedPartitions.Equals(partitions))
             {
-                _logger.LogDebug("Consumer {0} already assigned partitions {1}.", _consumer.MemberId, _assignedPartitions);
+                _logger.LogDebug("Consumer {0} already assigned partitions {1}.", _id, _assignedPartitions);
                 return;
             }
 
@@ -83,7 +90,7 @@ namespace CecoChat.Kafka
 
             _consumer.Assign(topicPartitions);
             _assignedPartitions = partitions;
-            _logger.LogDebug("Consumer {0} assigned partitions {1}.", _consumer.MemberId, partitions);
+            _logger.LogDebug("Consumer {0} assigned partitions {1}.", _id, partitions);
         }
 
         public bool TryConsume(CancellationToken ct, out ConsumeResult<TKey, TValue> consumeResult)
@@ -109,7 +116,7 @@ namespace CecoChat.Kafka
             if (!success)
             {
                 _logger.LogError("Consumer {0} failed to commit topic {1} partition {2} offset {3}.",
-                    _consumer.MemberId, consumeResult.Topic, consumeResult.Partition, consumeResult.Offset);
+                    _id, consumeResult.Topic, consumeResult.Partition, consumeResult.Offset);
             }
         }
 
@@ -135,7 +142,7 @@ namespace CecoChat.Kafka
             }
             catch (Exception exception)
             {
-                _logger.LogError(exception, "Consumer {0} error.", _consumer.MemberId);
+                _logger.LogError(exception, "Consumer {0} error.", _id);
             }
 
             return default;
@@ -145,7 +152,7 @@ namespace CecoChat.Kafka
         {
             if (!ct.IsCancellationRequested)
             {
-                _logger.LogError(exception, "Consumer {0} was disposed without cancellation being requested.", _consumer.MemberId);
+                _logger.LogError(exception, "Consumer {0} was disposed without cancellation being requested.", _id);
             }
         }
     }
