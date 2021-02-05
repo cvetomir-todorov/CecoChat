@@ -54,7 +54,7 @@ namespace CecoChat.Connect.Server
 
             // shared
             services.AddSingleton<IPartitionUtility, PartitionUtility>();
-            services.AddSingleton<INonCryptoHash, FnvHash>();
+            services.AddSingleton<INonCryptoHash, XXHash>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

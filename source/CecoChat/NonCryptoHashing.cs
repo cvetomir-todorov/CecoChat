@@ -1,6 +1,7 @@
-﻿namespace CecoChat
+﻿using System;
+
+namespace CecoChat
 {
-    // TODO: consider implementing via HashCode.Combine() https://github.com/Cyan4973/xxHash
     public interface INonCryptoHash
     {
         int Compute(long value);
@@ -26,6 +27,20 @@
                 hash = hash * prime ^ value3;
             }
 
+            return hash;
+        }
+    }
+
+    public sealed class XXHash : INonCryptoHash
+    {
+        public int Compute(long value)
+        {
+            short value0 = (short)(value >> 48);
+            short value1 = (short)(value >> 32);
+            short value2 = (short)(value >> 16);
+            short value3 = (short)value;
+
+            int hash = HashCode.Combine(value0, value1, value2, value3);
             return hash;
         }
     }

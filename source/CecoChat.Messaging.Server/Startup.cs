@@ -58,7 +58,7 @@ namespace CecoChat.Messaging.Server
 
             // shared
             services.AddSingleton<IClock, MonotonicClock>();
-            services.AddSingleton<INonCryptoHash, FnvHash>();
+            services.AddSingleton<INonCryptoHash, XXHash>();
             services.AddSingleton<IClientBackendMapper, ClientBackendMapper>();
         }
 
