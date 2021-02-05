@@ -23,7 +23,7 @@ namespace CecoChat.Connect.Server.Initialization
         {
             await _messagingConfiguration.Initialize(new MessagingConfigurationUsage
             {
-                UsePartitionCount = true,
+                UsePartitions = true,
                 UseServerAddressByPartition = true
             });
             await _historyConfiguration.Initialize(new HistoryConfigurationUsage

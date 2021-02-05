@@ -17,6 +17,8 @@ namespace CecoChat.Data.Configuration.Messaging
             _serverPartitionsMap = new();
         }
 
+        public int PartitionCount { get; set; }
+
         public string GetServerAddress(int partition)
         {
             if (!_partitionServerMap.TryGetValue(partition, out string server))

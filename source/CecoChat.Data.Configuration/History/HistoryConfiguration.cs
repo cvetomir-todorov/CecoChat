@@ -59,21 +59,24 @@ namespace CecoChat.Data.Configuration.History
 
                 if (usage.UseServerAddress)
                 {
-                    ChannelMessageQueue serverAddressMQ = await subscriber.SubscribeAsync($"__keyspace*__:{HistoryKeys.ServerAddress}");
+                    ChannelMessageQueue serverAddressMQ = await subscriber.SubscribeAsync($"notify:{HistoryKeys.ServerAddress}");
                     serverAddressMQ.OnMessage(channelMessage => _configurationUtility.HandleChange(channelMessage, HandleServerAddress));
-                    _logger.LogInformation("Subscribed for changes about {0}.", HistoryKeys.ServerAddress);
+                    _logger.LogInformation("Subscribed for changes about {0} from channel {1}.",
+                        HistoryKeys.ServerAddress, serverAddressMQ.Channel);
                 }
                 if (usage.UseUserMessageCount)
                 {
-                    ChannelMessageQueue userMessageCountMQ = await subscriber.SubscribeAsync($"__keyspace*__:{HistoryKeys.UserMessageCount}");
+                    ChannelMessageQueue userMessageCountMQ = await subscriber.SubscribeAsync($"notify:{HistoryKeys.UserMessageCount}");
                     userMessageCountMQ.OnMessage(channelMessage => _configurationUtility.HandleChange(channelMessage, HandleUserMessageCount));
-                    _logger.LogInformation("Subscribed for changes about {0}.", HistoryKeys.UserMessageCount);
+                    _logger.LogInformation("Subscribed for changes about {0} from channel {1}.",
+                        HistoryKeys.UserMessageCount, userMessageCountMQ.Channel);
                 }
                 if (usage.UseDialogMessageCount)
                 {
-                    ChannelMessageQueue dialogMessageCountMQ = await subscriber.SubscribeAsync($"__keyspace*__:{HistoryKeys.DialogMessageCount}");
+                    ChannelMessageQueue dialogMessageCountMQ = await subscriber.SubscribeAsync($"notify:{HistoryKeys.DialogMessageCount}");
                     dialogMessageCountMQ.OnMessage(channelMessage => _configurationUtility.HandleChange(channelMessage, HandleDialogMessageCount));
-                    _logger.LogInformation("Subscribed for changes about {0}.", HistoryKeys.DialogMessageCount);
+                    _logger.LogInformation("Subscribed for changes about {0} from channel {1}.",
+                        HistoryKeys.DialogMessageCount, dialogMessageCountMQ.Channel);
                 }
 
                 await LoadValues(usage);
@@ -106,38 +109,17 @@ namespace CecoChat.Data.Configuration.History
 
         private async Task HandleServerAddress(ChannelMessage channelMessage)
         {
-            if (_configurationUtility.ChannelMessageIs(channelMessage, "set"))
-            {
-                await SetServerAddress();
-            }
-            else if (_configurationUtility.ChannelMessageIs(channelMessage, "del"))
-            {
-                _logger.LogError("Key {0} was deleted.", HistoryKeys.ServerAddress);
-            }
+            await SetServerAddress();
         }
 
         private async Task HandleUserMessageCount(ChannelMessage channelMessage)
         {
-            if (_configurationUtility.ChannelMessageIs(channelMessage, "set"))
-            {
-                await SetUserMessageCount();
-            }
-            else if (_configurationUtility.ChannelMessageIs(channelMessage, "del"))
-            {
-                _logger.LogError("Key {0} was deleted.", HistoryKeys.UserMessageCount);
-            }
+            await SetUserMessageCount();
         }
 
         private async Task HandleDialogMessageCount(ChannelMessage channelMessage)
         {
-            if (_configurationUtility.ChannelMessageIs(channelMessage, "set"))
-            {
-                await SetDialogMessageCount();
-            }
-            else if (_configurationUtility.ChannelMessageIs(channelMessage, "del"))
-            {
-                _logger.LogError("Key {0} was deleted.", HistoryKeys.DialogMessageCount);
-            }
+            await SetDialogMessageCount();
         }
 
         private async Task SetServerAddress()

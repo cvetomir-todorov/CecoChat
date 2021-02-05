@@ -46,28 +46,26 @@ namespace CecoChat.Messaging.Server.Initialization
         {
             int partitionCount = _messagingConfiguration.PartitionCount;
             PartitionRange partitions = _messagingConfiguration.GetServerPartitions(_backendOptions.ServerID);
-            if (!ValidatePartitionConfiguration(partitionCount, partitions))
-            {
-                return Task.CompletedTask;
-            }
 
-            ConfigureBackend(partitionCount, partitions);
-            StartBackendConsumer(ct);
+            if (ValidatePartitionConfiguration(partitionCount, partitions))
+            {
+                ConfigureBackend(partitionCount, partitions);
+                StartBackendConsumer(ct);
+            }
 
             return Task.CompletedTask;
         }
 
         public ValueTask Handle(PartitionsChangedEventData eventData)
         {
-            int partitionCount = _messagingConfiguration.PartitionCount;
-            PartitionRange partitions = _messagingConfiguration.GetServerPartitions(_backendOptions.ServerID);
-            if (!ValidatePartitionConfiguration(partitionCount, partitions))
-            {
-                return ValueTask.CompletedTask;
-            }
+            int partitionCount = eventData.PartitionCount;
+            PartitionRange partitions = eventData.Partitions;
 
-            DisconnectClients(partitions);
-            ConfigureBackend(partitionCount, partitions);
+            if (ValidatePartitionConfiguration(partitionCount, partitions))
+            {
+                DisconnectClients(partitions);
+                ConfigureBackend(partitionCount, partitions);
+            }
 
             return ValueTask.CompletedTask;
         }
