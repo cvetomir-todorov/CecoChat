@@ -4,7 +4,7 @@ namespace CecoChat.Server.Backend
 {
     public interface IPartitionUtility
     {
-        int ChoosePartition(long receiverID, int partitionCount);
+        int ChoosePartition(long userID, int partitionCount);
     }
 
     public sealed class PartitionUtility : IPartitionUtility
@@ -17,9 +17,9 @@ namespace CecoChat.Server.Backend
             _hash = hash;
         }
 
-        public int ChoosePartition(long receiverID, int partitionCount)
+        public int ChoosePartition(long userID, int partitionCount)
         {
-            int hash = _hash.Compute(receiverID);
+            int hash = _hash.Compute(userID);
             int partition = Math.Abs(hash) % partitionCount;
             return partition;
         }

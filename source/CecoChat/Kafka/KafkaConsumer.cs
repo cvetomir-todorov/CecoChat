@@ -12,21 +12,24 @@ namespace CecoChat.Kafka
 
         void Subscribe(string topic);
 
-        void Assign(string topic, int minPartition, int maxPartition, ITopicPartitionFlyweight partitionFlyweight);
+        void Assign(string topic, PartitionRange partitions, ITopicPartitionFlyweight partitionFlyweight);
 
         bool TryConsume(CancellationToken ct, out ConsumeResult<TKey, TValue> consumeResult);
 
         void Commit(ConsumeResult<TKey, TValue> consumeResult, CancellationToken ct);
     }
 
+    // TODO: do not use consumer ID from Kafka since it returns empty string
     public sealed class KafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey, TValue>
     {
         private readonly ILogger _logger;
+        private PartitionRange _assignedPartitions;
         private IConsumer<TKey, TValue> _consumer;
 
         public KafkaConsumer(ILogger<KafkaConsumer<TKey, TValue>> logger)
         {
             _logger = logger;
+            _assignedPartitions = PartitionRange.Empty;
         }
 
         public void Dispose()
@@ -61,20 +64,26 @@ namespace CecoChat.Kafka
             _logger.LogDebug("Consumer {0} subscribed to topic {1}.", _consumer.MemberId, topic);
         }
 
-        public void Assign(string topic, int minPartition, int maxPartition, ITopicPartitionFlyweight partitionFlyweight)
+        public void Assign(string topic, PartitionRange partitions, ITopicPartitionFlyweight partitionFlyweight)
         {
             EnsureInitialized();
 
-            int count = maxPartition - minPartition + 1;
-            List<TopicPartition> topicPartitions = new(capacity: count);
-            for (int partition = minPartition; partition <= maxPartition; ++partition)
+            if (_assignedPartitions.Equals(partitions))
+            {
+                _logger.LogDebug("Consumer {0} already assigned partitions {1}.", _consumer.MemberId, _assignedPartitions);
+                return;
+            }
+
+            List<TopicPartition> topicPartitions = new(capacity: partitions.Length);
+            for (int partition = partitions.Lower; partition <= partitions.Upper; ++partition)
             {
                 TopicPartition topicPartition = partitionFlyweight.GetTopicPartition(topic, partition);
                 topicPartitions.Add(topicPartition);
             }
 
             _consumer.Assign(topicPartitions);
-            _logger.LogDebug("Consumer {0} assigned partitions [{1}, {2}].", _consumer.MemberId, minPartition, maxPartition);
+            _assignedPartitions = partitions;
+            _logger.LogDebug("Consumer {0} assigned partitions {1}.", _consumer.MemberId, partitions);
         }
 
         public bool TryConsume(CancellationToken ct, out ConsumeResult<TKey, TValue> consumeResult)

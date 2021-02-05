@@ -3,6 +3,7 @@ using CecoChat.Contracts.Client;
 using CecoChat.Data.Configuration;
 using CecoChat.Data.Configuration.Messaging;
 using CecoChat.DependencyInjection;
+using CecoChat.Events;
 using CecoChat.Kafka;
 using CecoChat.Messaging.Server.Backend;
 using CecoChat.Messaging.Server.Clients;
@@ -53,6 +54,7 @@ namespace CecoChat.Messaging.Server
             services.AddSingleton<IMessagingConfiguration, MessagingConfiguration>();
             services.AddSingleton<IMessagingConfigurationRepository, MessagingConfigurationRepository>();
             services.AddSingleton<IConfigurationUtility, ConfigurationUtility>();
+            services.AddEvent<EventSource<PartitionsChangedEventData>, PartitionsChangedEventData>();
 
             // shared
             services.AddSingleton<IClock, MonotonicClock>();

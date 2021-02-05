@@ -1,7 +1,8 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using CecoChat.Events;
+using CecoChat.Kafka;
 using CecoChat.Redis;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
@@ -10,9 +11,11 @@ namespace CecoChat.Data.Configuration.Messaging
 {
     public sealed class MessagingConfigurationUsage
     {
-        public bool UsePartitionCount { get; set; } = true;
+        public bool UsePartitionCount { get; set; }
 
-        public bool UseServerAddressByPartition { get; set; } = true;
+        public bool UseServerAddressByPartition { get; set; }
+
+        public bool UseServerPartitions { get; set; }
     }
 
     public interface IMessagingConfiguration : IDisposable
@@ -22,7 +25,12 @@ namespace CecoChat.Data.Configuration.Messaging
         int PartitionCount { get; }
 
         string GetServerAddress(int partition);
+
+        PartitionRange GetServerPartitions(string server);
     }
+
+    public sealed class PartitionsChangedEventData
+    {}
 
     public sealed class MessagingConfiguration : IMessagingConfiguration
     {
@@ -30,23 +38,25 @@ namespace CecoChat.Data.Configuration.Messaging
         private readonly IRedisContext _redisContext;
         private readonly IMessagingConfigurationRepository _repository;
         private readonly IConfigurationUtility _configurationUtility;
+        private readonly IEventSource<PartitionsChangedEventData> _partitionsChanged;
 
-        private readonly ConcurrentDictionary<int, string> _partitionServerMap;
-        private readonly ConcurrentDictionary<string, string> _serverAddressMap;
+        private readonly MessagingConfigurationState _state;
+        private MessagingConfigurationUsage _usage;
 
         public MessagingConfiguration(
             ILogger<MessagingConfiguration> logger,
             IRedisContext redisContext,
             IMessagingConfigurationRepository repository,
-            IConfigurationUtility configurationUtility)
+            IConfigurationUtility configurationUtility,
+            IEventSource<PartitionsChangedEventData> partitionsChanged)
         {
             _logger = logger;
             _redisContext = redisContext;
             _repository = repository;
             _configurationUtility = configurationUtility;
+            _partitionsChanged = partitionsChanged;
 
-            _partitionServerMap = new();
-            _serverAddressMap = new();
+            _state = new MessagingConfigurationState();
         }
 
         public void Dispose()
@@ -58,37 +68,36 @@ namespace CecoChat.Data.Configuration.Messaging
 
         public string GetServerAddress(int partition)
         {
-            if (!_partitionServerMap.TryGetValue(partition, out string server))
-            {
-                throw new InvalidOperationException($"No server configured for partition {partition}.");
-            }
-            if (!_serverAddressMap.TryGetValue(server, out string serverAddress))
-            {
-                throw new InvalidOperationException($"No server address configured for server {server}.");
-            }
+            return _state.GetServerAddress(partition);
+        }
 
-            return serverAddress;
+        public PartitionRange GetServerPartitions(string server)
+        {
+            return _state.GetPartitionsForServer(server);
         }
 
         public async Task Initialize(MessagingConfigurationUsage usage)
         {
             try
             {
+                _usage = usage;
                 ISubscriber subscriber = _redisContext.GetSubscriber();
 
                 if (usage.UsePartitionCount)
                 {
+                    // TODO: switch to custom pub/sub instead of keyspace notifications which don't work in a cluster
                     ChannelMessageQueue partitionCountMQ = await subscriber.SubscribeAsync($"__keyspace*__:{MessagingKeys.PartitionCount}");
                     partitionCountMQ.OnMessage(channelMessage => _configurationUtility.HandleChange(channelMessage, HandlePartitionCount));
                     _logger.LogInformation("Subscribed for changes about {0}.", MessagingKeys.PartitionCount);
                 }
-
-                if (usage.UseServerAddressByPartition)
+                if (usage.UseServerAddressByPartition || usage.UseServerPartitions)
                 {
                     ChannelMessageQueue serverPartitionsMQ = await subscriber.SubscribeAsync($"__keyspace*__:{MessagingKeys.ServerPartitions}");
                     serverPartitionsMQ.OnMessage(channelMessage => _configurationUtility.HandleChange(channelMessage, HandleServerPartitions));
                     _logger.LogInformation("Subscribed for changes about {0}.", MessagingKeys.ServerPartitions);
-
+                }
+                if (usage.UseServerAddressByPartition)
+                {
                     ChannelMessageQueue serverAddressesMQ = await subscriber.SubscribeAsync($"__keyspace*__:{MessagingKeys.ServerAddresses}");
                     serverAddressesMQ.OnMessage(channelMessage => _configurationUtility.HandleChange(channelMessage, HandleServerAddresses));
                     _logger.LogInformation("Subscribed for changes about {0}.", MessagingKeys.ServerAddresses);
@@ -110,10 +119,12 @@ namespace CecoChat.Data.Configuration.Messaging
             {
                 await SetPartitionCount();
             }
-
-            if (usage.UseServerAddressByPartition)
+            if (usage.UseServerAddressByPartition || usage.UseServerPartitions)
             {
                 await SetServerPartitions(strictlyAdd: true);
+            }
+            if (usage.UseServerAddressByPartition)
+            {
                 await SetServerAddresses(strictlyAdd: true);
             }
 
@@ -126,10 +137,12 @@ namespace CecoChat.Data.Configuration.Messaging
             {
                 await SetPartitionCount();
             }
-            if (_configurationUtility.ChannelMessageIs(channelMessage, "del"))
+            else if (_configurationUtility.ChannelMessageIs(channelMessage, "del"))
             {
                 _logger.LogError("Key {0} was deleted.", MessagingKeys.PartitionCount);
             }
+
+            _partitionsChanged.Publish(new());
         }
 
         private async Task HandleServerPartitions(ChannelMessage channelMessage)
@@ -138,10 +151,12 @@ namespace CecoChat.Data.Configuration.Messaging
             {
                 await SetServerPartitions(strictlyAdd: false);
             }
-            if (_configurationUtility.ChannelMessageIs(channelMessage, "del"))
+            else if (_configurationUtility.ChannelMessageIs(channelMessage, "del"))
             {
                 _logger.LogError("Key {0} was deleted.", MessagingKeys.ServerPartitions);
             }
+
+            _partitionsChanged.Publish(new());
         }
 
         private async Task HandleServerAddresses(ChannelMessage channelMessage)
@@ -150,7 +165,7 @@ namespace CecoChat.Data.Configuration.Messaging
             {
                 await SetServerAddresses(strictlyAdd: false);
             }
-            if (_configurationUtility.ChannelMessageIs(channelMessage, "del"))
+            else if (_configurationUtility.ChannelMessageIs(channelMessage, "del"))
             {
                 _logger.LogError("Key {0} was deleted.", MessagingKeys.ServerAddresses);
             }
@@ -158,11 +173,11 @@ namespace CecoChat.Data.Configuration.Messaging
 
         private async Task SetPartitionCount()
         {
-            RedisValueResult<int> partitionCountResult = await _repository.GetPartitionCount();
-            if (partitionCountResult.IsSuccess)
+            RedisValueResult<int> result = await _repository.GetPartitionCount();
+            if (result.IsSuccess)
             {
-                PartitionCount = partitionCountResult.Value;
-                _logger.LogInformation("Partition count set to {0}.", partitionCountResult.Value);
+                PartitionCount = result.Value;
+                _logger.LogInformation("Partition count set to {0}.", result.Value);
             }
             else
             {
@@ -172,58 +187,45 @@ namespace CecoChat.Data.Configuration.Messaging
 
         private async Task SetServerPartitions(bool strictlyAdd)
         {
-            await foreach (RedisValueResult<KeyValuePair<string, PartitionRange>> serverPartitionsResult in _repository.GetServerPartitions())
+            await foreach (RedisValueResult<KeyValuePair<string, PartitionRange>> result in _repository.GetServerPartitions())
             {
-                if (serverPartitionsResult.IsSuccess)
+                if (result.IsSuccess)
                 {
-                    string server = serverPartitionsResult.Value.Key;
-                    PartitionRange partitions = serverPartitionsResult.Value.Value;
-                    int successfullySet = strictlyAdd ? 0 : partitions.Length;
+                    string server = result.Value.Key;
+                    PartitionRange partitions = result.Value.Value;
 
-                    for (int partition = partitions.Lower; partition <= partitions.Upper; ++partition)
+                    if (_usage.UseServerAddressByPartition)
                     {
-                        if (strictlyAdd)
+                        int partitionsSet = _state.SetServerForPartitions(server, partitions, strictlyAdd);
+                        _logger.LogInformation("Server {0} is assigned to partitions {1} ({2} out of {3}).",
+                            server, partitions, partitionsSet, partitions.Length);
+                    }
+                    if (_usage.UseServerPartitions)
+                    {
+                        if (_state.SetPartitionsForServer(server, partitions, strictlyAdd))
                         {
-                            if (_partitionServerMap.TryAdd(partition, server))
-                            {
-                                successfullySet++;
-                            }
-                        }
-                        else
-                        {
-                            _partitionServerMap.AddOrUpdate(partition, server, (_, _) => server);
+                            _logger.LogInformation("Server {0} assigned partitions {1}.", server, partitions);
                         }
                     }
-
-                    _logger.LogInformation("Partitions {0} ({1} out of {2}) assigned to server {3}.",
-                        partitions, successfullySet, partitions.Length, server);
                 }
                 else
                 {
-                    _logger.LogError("Server partitions is invalid.");
+                    _logger.LogError("Server partitions are invalid.");
                 }
             }
         }
 
         private async Task SetServerAddresses(bool strictlyAdd)
         {
-            await foreach (RedisValueResult<KeyValuePair<string, string>> serverAddressResult in _repository.GetServerAddresses())
+            await foreach (RedisValueResult<KeyValuePair<string, string>> result in _repository.GetServerAddresses())
             {
-                if (serverAddressResult.IsSuccess)
+                if (result.IsSuccess)
                 {
-                    string server = serverAddressResult.Value.Key;
-                    string address = serverAddressResult.Value.Value;
+                    string server = result.Value.Key;
+                    string address = result.Value.Value;
 
-                    if (strictlyAdd)
+                    if (_state.SetServerAddress(server, address, strictlyAdd))
                     {
-                        if (_serverAddressMap.TryAdd(server, address))
-                        {
-                            _logger.LogInformation("Server {0} assigned address {1}.", server, address);
-                        }
-                    }
-                    else
-                    {
-                        _serverAddressMap.AddOrUpdate(server, address, (_, _) => address);
                         _logger.LogInformation("Server {0} assigned address {1}.", server, address);
                     }
                 }

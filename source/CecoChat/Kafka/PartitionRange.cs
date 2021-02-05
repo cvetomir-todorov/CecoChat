@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace CecoChat.Data.Configuration.Messaging
+namespace CecoChat.Kafka
 {
-    public readonly struct PartitionRange
+    public readonly struct PartitionRange : IEquatable<PartitionRange>
     {
         public PartitionRange(ushort lower, ushort upper)
         {
@@ -11,10 +11,19 @@ namespace CecoChat.Data.Configuration.Messaging
 
             Lower = lower;
             Upper = upper;
+            IsNotEmpty = true;
+        }
+
+        private PartitionRange(ushort lower, ushort upper, bool isNotEmpty)
+        {
+            Lower = lower;
+            Upper = upper;
+            IsNotEmpty = isNotEmpty;
         }
 
         public ushort Lower { get; }
         public ushort Upper { get; }
+        public bool IsNotEmpty { get; }
 
         public ushort Length
         {
@@ -27,16 +36,38 @@ namespace CecoChat.Data.Configuration.Messaging
             }
         }
 
-        public override string ToString() => $"[{Lower}, {Upper}]";
+        public override string ToString()
+        {
+            return IsNotEmpty ? $"[{Lower}, {Upper}]" : "[,]";
+        }
 
-        public static readonly PartitionRange Zero = new(0, 0);
+        public bool Equals(PartitionRange other)
+        {
+            return 
+                Lower == other.Lower && 
+                Upper == other.Upper && 
+                IsNotEmpty == other.IsNotEmpty;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is PartitionRange other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            int hashCode = HashCode.Combine(Lower, Upper);
+            return hashCode;
+        }
+
+        public static readonly PartitionRange Empty = new(0, 0, isNotEmpty: false);
 
         public static bool TryParse(string value, char separator, out PartitionRange partitionRange)
         {
             int separatorIndex = value.IndexOf(separator);
             if (separatorIndex <= 0 || separatorIndex == value.Length - 1)
             {
-                partitionRange = Zero;
+                partitionRange = Empty;
                 return false;
             }
 
@@ -46,7 +77,7 @@ namespace CecoChat.Data.Configuration.Messaging
             if (!ushort.TryParse(lowerString, out ushort lower) ||
                 !ushort.TryParse(upperString, out ushort upper))
             {
-                partitionRange = Zero;
+                partitionRange = Empty;
                 return false;
             }
 

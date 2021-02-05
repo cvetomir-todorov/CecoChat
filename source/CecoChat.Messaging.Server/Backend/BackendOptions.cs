@@ -6,6 +6,8 @@ namespace CecoChat.Messaging.Server.Backend
     {
         public IKafkaOptions Kafka { get; }
 
+        public string ServerID { get; }
+
         public string MessagesTopicName { get; }
     }
 
@@ -14,6 +16,8 @@ namespace CecoChat.Messaging.Server.Backend
         public KafkaOptions Kafka { get; set; }
 
         IKafkaOptions IBackendOptions.Kafka => Kafka;
+
+        public string ServerID { get; set; }
 
         public string MessagesTopicName { get; set; }
     }

@@ -1,5 +1,6 @@
 ﻿namespace CecoChat
 {
+    // TODO: consider implementing via HashCode.Combine() https://github.com/Cyan4973/xxHash
     public interface INonCryptoHash
     {
         int Compute(long value);

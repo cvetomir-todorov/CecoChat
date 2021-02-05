@@ -9,6 +9,8 @@ namespace CecoChat.Kafka
     {
         void Add(string topic, int partitionCount);
 
+        void AddOrUpdate(string topic, int partitionCount);
+
         TopicPartition GetTopicPartition(string topic, int partition);
     }
 
@@ -31,6 +33,21 @@ namespace CecoChat.Kafka
             if (partitionCount <= 0)
                 throw new ArgumentException($"{nameof(partitionCount)} should be greater than zero.");
 
+            Set(topic, partitionCount, strictlyAdd: true);
+        }
+
+        public void AddOrUpdate(string topic, int partitionCount)
+        {
+            if (string.IsNullOrWhiteSpace(topic))
+                throw new ArgumentException($"{nameof(topic)} should be a non-empty non-whitespace string.");
+            if (partitionCount <= 0)
+                throw new ArgumentException($"{nameof(partitionCount)} should be greater than zero.");
+
+            Set(topic, partitionCount, strictlyAdd: false);
+        }
+
+        private void Set(string topic, int partitionCount, bool strictlyAdd)
+        {
             TopicPartition[] topicPartitions = new TopicPartition[partitionCount];
 
             for (int partition = 0; partition < partitionCount; ++partition)
@@ -38,12 +55,19 @@ namespace CecoChat.Kafka
                 topicPartitions[partition] = new TopicPartition(topic, partition);
             }
 
-            if (!_topicPartitionsMap.TryAdd(topic, topicPartitions))
+            if (strictlyAdd)
             {
-                throw new InvalidOperationException($"Topic {topic} is already added.");
+                if (!_topicPartitionsMap.TryAdd(topic, topicPartitions))
+                {
+                    throw new InvalidOperationException($"Topic {topic} is already added.");
+                }
+            }
+            else
+            {
+                _topicPartitionsMap.AddOrUpdate(topic, topicPartitions, (_, _) => topicPartitions);
             }
 
-            _logger.LogInformation("Initialized {0} topic {1} partitions flyweight.", topic, partitionCount);
+            _logger.LogInformation("Set {0} topic {1} partitions flyweight.", topic, partitionCount);
         }
 
         public TopicPartition GetTopicPartition(string topic, int partition)

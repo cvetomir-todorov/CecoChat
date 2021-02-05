@@ -2,6 +2,7 @@ using CecoChat.Connect.Server.Initialization;
 using CecoChat.Data.Configuration;
 using CecoChat.Data.Configuration.History;
 using CecoChat.Data.Configuration.Messaging;
+using CecoChat.Events;
 using CecoChat.Redis;
 using CecoChat.Server.Backend;
 using CecoChat.Swagger;
@@ -48,6 +49,7 @@ namespace CecoChat.Connect.Server
             services.AddSingleton<IHistoryConfiguration, HistoryConfiguration>();
             services.AddSingleton<IHistoryConfigurationRepository, HistoryConfigurationRepository>();
             services.AddSingleton<IConfigurationUtility, ConfigurationUtility>();
+            services.AddEvent<EventSource<PartitionsChangedEventData>, PartitionsChangedEventData>();
             services.AddRedis(Configuration.GetSection("Data.Configuration"));
 
             // shared
