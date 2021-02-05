@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using CecoChat.Materialize.Server.Backend;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace CecoChat.Materialize.Server.Backend
+namespace CecoChat.Materialize.Server.Initialization
 {
     public class MaterializeMessagesHostedService : IHostedService
     {

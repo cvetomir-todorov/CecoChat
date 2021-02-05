@@ -25,6 +25,10 @@ namespace CecoChat.Materialize.Server
 
         public void ConfigureServices(IServiceCollection services)
         {
+            // ordered hosted services
+            services.AddHostedService<InitializeDbHostedService>();
+            services.AddHostedService<MaterializeMessagesHostedService>();
+
             // database
             services.AddCassandra<ICecoChatDbContext, CecoChatDbContext>(Configuration.GetSection("Data.Messaging"));
             services.AddSingleton<ICecoChatDbInitializer, CecoChatDbInitializer>();
@@ -35,9 +39,7 @@ namespace CecoChat.Materialize.Server
             // backend
             services.AddSingleton<IBackendConsumer, MaterializeMessagesConsumer>();
             services.AddFactory<IKafkaConsumer<Null, BackendMessage>, KafkaConsumer<Null, BackendMessage>>();
-            services.AddHostedService<MaterializeMessagesHostedService>();
             services.Configure<BackendOptions>(Configuration.GetSection("Backend"));
-            services.AddHostedService<InitializeDbHostedService>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
