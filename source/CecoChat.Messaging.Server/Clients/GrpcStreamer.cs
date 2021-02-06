@@ -22,6 +22,7 @@ namespace CecoChat.Messaging.Server.Clients
         private readonly BlockingCollection<TMessage> _messageQueue;
         private readonly SemaphoreSlim _signalProcessing;
 
+        private Func<TMessage, bool> _finalMessagePredicate;
         private IServerStreamWriter<TMessage> _streamWriter;
         private string _clientID;
 
@@ -34,6 +35,7 @@ namespace CecoChat.Messaging.Server.Clients
                 collection: new ConcurrentQueue<TMessage>(),
                 boundedCapacity: options.Value.SendMessagesHighWatermark);
             _signalProcessing = new SemaphoreSlim(initialCount: 0, maxCount: 1);
+            _finalMessagePredicate = _ => false;
         }
 
         public void Initialize(IServerStreamWriter<TMessage> streamWriter, ServerCallContext context)
@@ -57,6 +59,10 @@ namespace CecoChat.Messaging.Server.Clients
             {
                 _signalProcessing.Release();
             }
+            else
+            {
+                _logger.LogTrace("Dropped message {0} since queue is full.", message);
+            }
 
             return isAdded;
         }
@@ -75,17 +81,25 @@ namespace CecoChat.Messaging.Server.Clients
             }
         }
 
+        public void SetFinalMessagePredicate(Func<TMessage, bool> finalMessagePredicate)
+        {
+            _finalMessagePredicate = finalMessagePredicate;
+        }
+
         private struct EmptyQueueResult
         {
             public bool Stop { get; init; }
         }
-
+ 
         private async Task<EmptyQueueResult> EmptyQueue(CancellationToken ct)
         {
+            bool processedFinalMessage = false;
+
             while (!ct.IsCancellationRequested && _messageQueue.TryTake(out TMessage message))
             {
                 try
                 {
+                    processedFinalMessage = _finalMessagePredicate(message);
                     await _streamWriter.WriteAsync(message);
                     _logger.LogTrace("Sent {0} message {1}", _clientID, message);
                 }
@@ -103,7 +117,7 @@ namespace CecoChat.Messaging.Server.Clients
                 }
             }
 
-            return new EmptyQueueResult {Stop = false};
+            return new EmptyQueueResult {Stop = processedFinalMessage};
         }
     }
 }

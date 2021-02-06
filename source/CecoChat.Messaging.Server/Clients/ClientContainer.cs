@@ -13,6 +13,8 @@ namespace CecoChat.Messaging.Server.Clients
         void RemoveClient(in long userID, IStreamer<ListenResponse> streamer);
 
         IEnumerable<IStreamer<ListenResponse>> GetClients(in long userID);
+
+        IEnumerable<KeyValuePair<long, IEnumerable<IStreamer<ListenResponse>>>> EnumerateUsers();
     }
 
     public sealed class ClientContainer : IClientContainer
@@ -55,6 +57,17 @@ namespace CecoChat.Messaging.Server.Clients
             else
             {
                 return _emptyStreamerList;
+            }
+        }
+
+        public IEnumerable<KeyValuePair<long, IEnumerable<IStreamer<ListenResponse>>>> EnumerateUsers()
+        {
+            foreach (KeyValuePair<long, UserData> pair in _userMap)
+            {
+                long userID = pair.Key;
+                IEnumerable<IStreamer<ListenResponse>> streamers = pair.Value.Streamers;
+
+                yield return new KeyValuePair<long, IEnumerable<IStreamer<ListenResponse>>>(userID, streamers);
             }
         }
 

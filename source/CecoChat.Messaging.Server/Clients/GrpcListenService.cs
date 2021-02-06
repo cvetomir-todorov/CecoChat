@@ -30,6 +30,7 @@ namespace CecoChat.Messaging.Server.Clients
             _logger.LogTrace("Client {0} connected.", clientID);
 
             IGrpcStreamer<ListenResponse> streamer = _streamerFactory.Create();
+            streamer.SetFinalMessagePredicate(IsFinalMessage);
             streamer.Initialize(responseStream, context);
 
             try
@@ -37,16 +38,30 @@ namespace CecoChat.Messaging.Server.Clients
                 // TODO: use user ID from auth token
                 _clientContainer.AddClient(request.UserId, streamer);
                 await streamer.ProcessMessages(context.CancellationToken);
+
+                // TODO: use user ID from auth token
+                RemoveClient(request.UserId, clientID, streamer);
             }
             catch (OperationCanceledException)
             {
-                _clientContainer.RemoveClient(request.UserId, streamer);
-                _logger.LogTrace("Client {0} disconnected.", clientID);
+                // TODO: use user ID from auth token
+                RemoveClient(request.UserId, clientID, streamer);
             }
             finally
             {
                 streamer.Dispose();
             }
+        }
+
+        private void RemoveClient(long userID, string clientID, IGrpcStreamer<ListenResponse> streamer)
+        {
+            _clientContainer.RemoveClient(userID, streamer);
+            _logger.LogTrace("Client {0} disconnected.", clientID);
+        }
+
+        private bool IsFinalMessage(ListenResponse response)
+        {
+            return response.Message.Type == ClientMessageType.Disconnect;
         }
     }
 }

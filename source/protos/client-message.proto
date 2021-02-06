@@ -18,7 +18,8 @@ message ClientMessage {
 enum ClientMessageType {
   UNKNOWN = 0;
   PLAIN_TEXT = 1;
-  ACK = 2;
+  DISCONNECT = 2;
+  ACK = 3;
 }
 
 message PlainTextData {

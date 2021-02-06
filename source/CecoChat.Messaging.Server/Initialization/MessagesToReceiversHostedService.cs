@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using CecoChat.Contracts.Client;
 using CecoChat.Data.Configuration.Messaging;
 using CecoChat.Events;
 using CecoChat.Kafka;
 using CecoChat.Messaging.Server.Backend;
+using CecoChat.Messaging.Server.Clients;
+using CecoChat.Server.Backend;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -17,8 +20,10 @@ namespace CecoChat.Messaging.Server.Initialization
         private readonly IBackendOptions _backendOptions;
         private readonly IMessagingConfiguration _messagingConfiguration;
         private readonly ITopicPartitionFlyweight _topicPartitionFlyweight;
+        private readonly IPartitionUtility _partitionUtility;
         private readonly IBackendProducer _backendProducer;
         private readonly IBackendConsumer _backendConsumer;
+        private readonly IClientContainer _clientContainer;
         private readonly IEvent<PartitionsChangedEventData> _partitionsChanged;
         private readonly Guid _partitionsChangedToken;
 
@@ -27,16 +32,20 @@ namespace CecoChat.Messaging.Server.Initialization
             IOptions<BackendOptions> backendOptions,
             IMessagingConfiguration messagingConfiguration,
             ITopicPartitionFlyweight topicPartitionFlyweight,
+            IPartitionUtility partitionUtility,
             IBackendProducer backendProducer,
             IBackendConsumer backendConsumer,
+            IClientContainer clientContainer,
             IEvent<PartitionsChangedEventData> partitionsChanged)
         {
             _logger = logger;
             _backendOptions = backendOptions.Value;
             _messagingConfiguration = messagingConfiguration;
             _topicPartitionFlyweight = topicPartitionFlyweight;
+            _partitionUtility = partitionUtility;
             _backendProducer = backendProducer;
             _backendConsumer = backendConsumer;
+            _clientContainer = clientContainer;
             _partitionsChanged = partitionsChanged;
 
             _partitionsChangedToken = _partitionsChanged.Subscribe(this);
@@ -63,7 +72,7 @@ namespace CecoChat.Messaging.Server.Initialization
 
             if (ValidatePartitionConfiguration(partitionCount, partitions))
             {
-                DisconnectClients(partitions);
+                DisconnectClients(partitionCount, partitions);
                 ConfigureBackend(partitionCount, partitions);
             }
 
@@ -111,9 +120,24 @@ namespace CecoChat.Messaging.Server.Initialization
             _logger.LogInformation("Started send messages to receivers hosted service.");
         }
 
-        private void DisconnectClients(PartitionRange partitions)
+        private void DisconnectClients(int partitionCount, PartitionRange partitions)
         {
-            // TODO: send a message to the clients connected to the server who should move to other server
+            foreach (var pair in _clientContainer.EnumerateUsers())
+            {
+                long userID = pair.Key;
+                var clients = pair.Value;
+
+                int userPartition = _partitionUtility.ChoosePartition(userID, partitionCount);
+                if (!partitions.Contains(userPartition))
+                {
+                    foreach (IStreamer<ListenResponse> client in clients)
+                    {
+                        ClientMessage disconnectMessage = new() {Type = ClientMessageType.Disconnect};
+                        ListenResponse response = new() {Message = disconnectMessage};
+                        client.AddMessage(response);
+                    }
+                }
+            }
         }
 
         public Task StopAsync(CancellationToken ct)

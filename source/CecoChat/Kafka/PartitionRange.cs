@@ -36,6 +36,12 @@ namespace CecoChat.Kafka
             }
         }
 
+        public bool Contains(int partition)
+        {
+            bool contains = IsNotEmpty && partition >= Lower && partition <= Upper;
+            return contains;
+        }
+
         public override string ToString()
         {
             return IsNotEmpty ? $"[{Lower}, {Upper}]" : "[,]";
