@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace CecoChat.Server.Backend
 {
@@ -22,6 +23,16 @@ namespace CecoChat.Server.Backend
             int hash = _hash.Compute(userID);
             int partition = Math.Abs(hash) % partitionCount;
             return partition;
+        }
+    }
+
+    public static class PartitionUtilityRegistrations
+    {
+        public static IServiceCollection AddPartitionUtility(this IServiceCollection services)
+        {
+            return services
+                .AddSingleton<IPartitionUtility, PartitionUtility>()
+                .AddSingleton<INonCryptoHash, FnvHash>();
         }
     }
 }

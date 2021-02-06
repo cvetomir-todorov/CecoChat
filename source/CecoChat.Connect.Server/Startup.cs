@@ -52,9 +52,8 @@ namespace CecoChat.Connect.Server
             services.AddEvent<EventSource<PartitionsChangedEventData>, PartitionsChangedEventData>();
             services.AddRedis(Configuration.GetSection("Data.Configuration"));
 
-            // shared
-            services.AddSingleton<IPartitionUtility, PartitionUtility>();
-            services.AddSingleton<INonCryptoHash, XXHash>();
+            // backend
+            services.AddPartitionUtility();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

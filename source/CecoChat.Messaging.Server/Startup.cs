@@ -42,7 +42,7 @@ namespace CecoChat.Messaging.Server
             services.Configure<ClientOptions>(Configuration.GetSection("Clients"));
 
             // backend
-            services.AddSingleton<IPartitionUtility, PartitionUtility>();
+            services.AddPartitionUtility();
             services.AddSingleton<ITopicPartitionFlyweight, TopicPartitionFlyweight>();
             services.AddSingleton<IBackendProducer, MessagesToBackendProducer>();
             services.AddSingleton<IBackendConsumer, MessagesToReceiversConsumer>();
@@ -58,7 +58,6 @@ namespace CecoChat.Messaging.Server
 
             // shared
             services.AddSingleton<IClock, MonotonicClock>();
-            services.AddSingleton<INonCryptoHash, XXHash>();
             services.AddSingleton<IClientBackendMapper, ClientBackendMapper>();
         }
 
