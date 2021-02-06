@@ -8,18 +8,18 @@ namespace CecoChat.Client.ViewModels
         protected MessagingClient MessagingClient { get; }
         protected MessageStorage MessageStorage { get; }
         protected IDispatcher UIThreadDispatcher { get; }
-        protected IErrorService ErrorService { get; }
+        protected IFeedbackService FeedbackService { get; }
 
         protected BaseViewModel(
             MessagingClient messagingClient,
             MessageStorage messageStorage,
             IDispatcher uiThreadDispatcher,
-            IErrorService errorService)
+            IFeedbackService feedbackService)
         {
             MessagingClient = messagingClient;
             MessageStorage = messageStorage;
             UIThreadDispatcher = uiThreadDispatcher;
-            ErrorService = errorService;
+            FeedbackService = feedbackService;
         }
     }
 }

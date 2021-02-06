@@ -12,12 +12,13 @@ namespace CecoChat.Client.ViewModels
             MessagingClient messagingClient,
             MessageStorage messageStorage,
             IDispatcher uiThreadDispatcher,
-            IErrorService errorService,
+            IFeedbackService feedbackService,
             ConnectViewModel connectVM,
             AllChatsViewModel allChatsVM)
-            : base(messagingClient, messageStorage, uiThreadDispatcher, errorService)
+            : base(messagingClient, messageStorage, uiThreadDispatcher, feedbackService)
         {
             MessagingClient.ExceptionOccurred += MessagingClientOnExceptionOccurred;
+            MessagingClient.Disconnected += MessagingClientOnDisconnected;
 
             ConnectVM = connectVM;
             ConnectVM.CanOperate = true;
@@ -33,7 +34,16 @@ namespace CecoChat.Client.ViewModels
 
         private void MessagingClientOnExceptionOccurred(object sender, Exception exception)
         {
-            ErrorService.ShowError(exception);
+            FeedbackService.ShowError(exception);
+            AllChatsVM.CanOperate = false;
+            ConnectVM.CanOperate = true;
+        }
+
+        private void MessagingClientOnDisconnected(object sender, EventArgs e)
+        {
+            FeedbackService.ShowWarning("Disconnected.");
+            AllChatsVM.CanOperate = false;
+            ConnectVM.CanOperate = true;
         }
 
         private void ConnectViewModelOnConnected(object sender, EventArgs e)

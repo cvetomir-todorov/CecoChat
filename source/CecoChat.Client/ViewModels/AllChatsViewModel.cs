@@ -20,9 +20,9 @@ namespace CecoChat.Client.ViewModels
             MessagingClient messagingClient,
             MessageStorage messageStorage,
             IDispatcher uiThreadDispatcher,
-            IErrorService errorService,
+            IFeedbackService feedbackService,
             SingleChatViewModel singleChatVM)
-            : base(messagingClient, messageStorage, uiThreadDispatcher, errorService)
+            : base(messagingClient, messageStorage, uiThreadDispatcher, feedbackService)
         {
             _chatsMap = new Dictionary<long, AllChatsItemViewModel>();
 
@@ -70,7 +70,7 @@ namespace CecoChat.Client.ViewModels
         {
             if (!long.TryParse(StartChatUserID, out long otherUserID))
             {
-                ErrorService.ShowError($"User ID should be a long, not '{StartChatUserID}'.");
+                FeedbackService.ShowError($"User ID should be a long, not '{StartChatUserID}'.");
                 return;
             }
             if (_chatsMap.TryGetValue(otherUserID, out AllChatsItemViewModel existingChatVM))
@@ -115,7 +115,7 @@ namespace CecoChat.Client.ViewModels
             }
             catch (Exception exception)
             {
-                ErrorService.ShowError(exception);
+                FeedbackService.ShowError(exception);
             }
         }
 
@@ -142,7 +142,7 @@ namespace CecoChat.Client.ViewModels
             }
             else
             {
-                ErrorService.ShowError($"Message '{message}' is from current user {MessagingClient.UserID} to himself.");
+                FeedbackService.ShowError($"Message '{message}' is from current user {MessagingClient.UserID} to himself.");
                 otherUserID = -1;
                 return false;
             }

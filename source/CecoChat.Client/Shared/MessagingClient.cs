@@ -18,8 +18,6 @@ namespace CecoChat.Client.Shared
         private readonly MessageIDGenerator _messageIDGenerator;
         private readonly HttpClient _httpClient;
         private long _userID;
-        private string _messagingServer;
-        private string _historyServer;
         private GrpcChannel _messagingChannel;
         private GrpcChannel _historyChannel;
         private Listen.ListenClient _listenClient;
@@ -51,11 +49,10 @@ namespace CecoChat.Client.Shared
             CreateSessionRequest request = new() {UserID = userID};
             CreateSessionResponse response = await CreateSession(request, connectServer);
 
-            _messagingServer = response.MessagingServerAddress;
-            _historyServer = response.HistoryServerAddress;
-
-            _messagingChannel = GrpcChannel.ForAddress(_messagingServer);
-            _historyChannel = GrpcChannel.ForAddress(_historyServer);
+            _messagingChannel?.Dispose();
+            _messagingChannel = GrpcChannel.ForAddress(response.MessagingServerAddress);
+            _historyChannel?.Dispose();
+            _historyChannel = GrpcChannel.ForAddress(response.HistoryServerAddress);
 
             _listenClient = new Listen.ListenClient(_messagingChannel);
             _sendClient = new Send.SendClient(_messagingChannel);
@@ -97,7 +94,14 @@ namespace CecoChat.Client.Shared
                 while (!ct.IsCancellationRequested && await serverStream.ResponseStream.MoveNext())
                 {
                     ClientMessage message = serverStream.ResponseStream.Current.Message;
-                    MessageReceived?.Invoke(this, message);
+                    if (message.Type == ClientMessageType.Disconnect)
+                    {
+                        Disconnected?.Invoke(this, EventArgs.Empty);
+                    }
+                    else
+                    {
+                        MessageReceived?.Invoke(this, message);
+                    }
                 }
             }
             catch (Exception exception)
@@ -107,6 +111,8 @@ namespace CecoChat.Client.Shared
         }
 
         public event EventHandler<ClientMessage> MessageReceived;
+
+        public event EventHandler Disconnected;
 
         public event EventHandler<Exception> ExceptionOccurred;
 

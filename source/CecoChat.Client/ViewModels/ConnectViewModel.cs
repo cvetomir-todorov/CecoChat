@@ -16,8 +16,8 @@ namespace CecoChat.Client.ViewModels
             MessagingClient messagingClient,
             MessageStorage messageStorage,
             IDispatcher uiThreadDispatcher,
-            IErrorService errorService)
-            : base(messagingClient, messageStorage, uiThreadDispatcher, errorService)
+            IFeedbackService feedbackService)
+            : base(messagingClient, messageStorage, uiThreadDispatcher, feedbackService)
         {
             CanOperate = true;
             UserID = "1";
@@ -46,7 +46,7 @@ namespace CecoChat.Client.ViewModels
             }
             catch (Exception exception)
             {
-                ErrorService.ShowError(exception);
+                FeedbackService.ShowError(exception);
             }
         }
     }

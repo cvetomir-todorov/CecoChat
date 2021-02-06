@@ -25,7 +25,7 @@ namespace CecoChat.Client.Wpf
             ServiceCollection services = new();
 
             services.AddSingleton<IDispatcher, WpfUIThreadDispatcher>();
-            services.AddSingleton<IErrorService, WpfErrorService>();
+            services.AddSingleton<IFeedbackService, WpfFeedbackService>();
             services.AddClientSharedServices();
 
             return services.BuildServiceProvider();
