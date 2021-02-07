@@ -50,7 +50,7 @@ namespace CecoChat.Messaging.Server
             services.Configure<BackendOptions>(Configuration.GetSection("Backend"));
 
             // configuration
-            services.AddRedis(Configuration.GetSection("Data.Configuration"));
+            services.AddRedis(Configuration.GetSection("ConfigurationDB"));
             services.AddSingleton<IMessagingConfiguration, MessagingConfiguration>();
             services.AddSingleton<IMessagingConfigurationRepository, MessagingConfigurationRepository>();
             services.AddSingleton<IConfigurationUtility, ConfigurationUtility>();

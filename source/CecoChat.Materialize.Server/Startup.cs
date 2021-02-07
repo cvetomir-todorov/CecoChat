@@ -29,8 +29,8 @@ namespace CecoChat.Materialize.Server
             services.AddHostedService<InitializeDbHostedService>();
             services.AddHostedService<MaterializeMessagesHostedService>();
 
-            // database
-            services.AddCassandra<ICecoChatDbContext, CecoChatDbContext>(Configuration.GetSection("Data.Messaging"));
+            // history
+            services.AddCassandra<ICecoChatDbContext, CecoChatDbContext>(Configuration.GetSection("HistoryDB"));
             services.AddSingleton<ICecoChatDbInitializer, CecoChatDbInitializer>();
             services.AddSingleton<INewMessageRepository, NewMessageRepository>();
             services.AddSingleton<IDataUtility, DataUtility>();

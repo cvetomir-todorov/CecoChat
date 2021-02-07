@@ -50,7 +50,7 @@ namespace CecoChat.Connect.Server
             services.AddSingleton<IHistoryConfigurationRepository, HistoryConfigurationRepository>();
             services.AddSingleton<IConfigurationUtility, ConfigurationUtility>();
             services.AddEvent<EventSource<PartitionsChangedEventData>, PartitionsChangedEventData>();
-            services.AddRedis(Configuration.GetSection("Data.Configuration"));
+            services.AddRedis(Configuration.GetSection("ConfigurationDB"));
 
             // backend
             services.AddPartitionUtility();

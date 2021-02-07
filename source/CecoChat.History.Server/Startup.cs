@@ -29,14 +29,14 @@ namespace CecoChat.History.Server
             services.AddGrpc();
             services.Configure<ClientOptions>(Configuration.GetSection("Clients"));
 
-            // database
-            services.AddCassandra<ICecoChatDbContext, CecoChatDbContext>(Configuration.GetSection("Data.Messaging"));
+            // history
+            services.AddCassandra<ICecoChatDbContext, CecoChatDbContext>(Configuration.GetSection("HistoryDB"));
             services.AddSingleton<IHistoryRepository, HistoryRepository>();
             services.AddSingleton<IDataUtility, DataUtility>();
             services.AddSingleton<IBackendDbMapper, BackendDbMapper>();
 
             // configuration
-            services.AddRedis(Configuration.GetSection("Data.Configuration"));
+            services.AddRedis(Configuration.GetSection("ConfigurationDB"));
             services.AddSingleton<IHistoryConfiguration, HistoryConfiguration>();
             services.AddSingleton<IHistoryConfigurationRepository, HistoryConfigurationRepository>();
             services.AddSingleton<IConfigurationUtility, ConfigurationUtility>();
