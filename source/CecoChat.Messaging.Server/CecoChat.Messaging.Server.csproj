@@ -5,6 +5,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="..\cecochat-dev.pfx" Link="cecochat-dev.pfx">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="ConcurrentHashSet" Version="1.1.0" />
     <PackageReference Include="Confluent.Kafka" Version="1.5.3" />
     <PackageReference Include="Grpc.AspNetCore" Version="2.34.0" />
