@@ -2,6 +2,7 @@ using System;
 using System.Reflection;
 using CecoChat.Serilog;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 
@@ -35,6 +36,10 @@ namespace CecoChat.Messaging.Server
             return Host
                 .CreateDefaultBuilder(args)
                 .UseSerilog()
+                .ConfigureAppConfiguration(configurationBuilder =>
+                {
+                    configurationBuilder.AddEnvironmentVariables(prefix: "CECOCHAT_");
+                })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
