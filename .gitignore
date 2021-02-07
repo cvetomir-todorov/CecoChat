@@ -3,6 +3,12 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+# Cecochat
+containerize/Connect
+containerize/Messaging
+containerize/History
+containerize/Materialize
+
 # User-specific files
 *.rsuser
 *.suo
