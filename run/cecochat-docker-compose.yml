@@ -1,0 +1,93 @@
+version: '3'
+networks:
+  cecochat:
+services:
+  cecochat-connect:
+    image: ceco.com/cecochat/connect:0.1
+    container_name: cecochat-connect
+    hostname: connect
+    networks: &networks
+      - cecochat
+    ports:
+      - "31000:443"
+    mem_limit: 512M
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: https://+
+      ASPNETCORE_HTTPS_PORT: 443
+      ASPNETCORE_Kestrel__Certificates__Default__Path: "/app/cecochat-dev.pfx"
+      ASPNETCORE_Kestrel__Certificates__Default__Password: "cecochat"
+      CECOCHAT_ConfigurationDB__Endpoints__0: "redis1:6379"
+  cecochat-messaging1:
+    image: ceco.com/cecochat/messaging:0.1
+    container_name: cecochat-messaging1
+    hostname: messaging1
+    networks: *networks
+    ports:
+      - "31001:443"
+    mem_limit: 512M
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: https://+
+      ASPNETCORE_HTTPS_PORT: 443
+      ASPNETCORE_Kestrel__Certificates__Default__Path: "/app/cecochat-dev.pfx"
+      ASPNETCORE_Kestrel__Certificates__Default__Password: "cecochat"
+      CECOCHAT_ConfigurationDB__Endpoints__0: "redis1:6379"
+      CECOCHAT_Backend__ServerID: s1
+      CECOCHAT_Backend__Kafka__BootstrapServers__0: kafka1:19091
+      CECOCHAT_Backend__Kafka__BootstrapServers__1: kafka2:19092
+  cecochat-messaging2:
+    image: ceco.com/cecochat/messaging:0.1
+    container_name: cecochat-messaging2
+    hostname: messaging2
+    networks: *networks
+    ports:
+      - "31011:443"
+    mem_limit: 512M
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: https://+
+      ASPNETCORE_HTTPS_PORT: 443
+      ASPNETCORE_Kestrel__Certificates__Default__Path: "/app/cecochat-dev.pfx"
+      ASPNETCORE_Kestrel__Certificates__Default__Password: "cecochat"
+      CECOCHAT_ConfigurationDB__Endpoints__0: "redis1:6379"
+      CECOCHAT_Backend__ServerID: s2
+      CECOCHAT_Backend__Kafka__BootstrapServers__0: kafka1:19091
+      CECOCHAT_Backend__Kafka__BootstrapServers__1: kafka2:19092
+  cecochat-history:
+    image: ceco.com/cecochat/history:0.1
+    container_name: cecochat-history
+    hostname: history
+    networks: *networks
+    ports:
+      - "31003:443"
+    mem_limit: 512M
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: https://+
+      ASPNETCORE_HTTPS_PORT: 443
+      ASPNETCORE_Kestrel__Certificates__Default__Path: "/app/cecochat-dev.pfx"
+      ASPNETCORE_Kestrel__Certificates__Default__Password: "cecochat"
+      CECOCHAT_ConfigurationDB__Endpoints__0: "redis1:6379"
+      CECOCHAT_HistoryDB__ContactPoints__0: cass1
+      CECOCHAT_HistoryDB__ContactPoints__1: cass2
+      CECOCHAT_HistoryDB__ContactPoints__2: cass3
+  cecochat-materialize:
+    image: ceco.com/cecochat/materialize:0.1
+    container_name: cecochat-materialize
+    hostname: materialize
+    networks: *networks
+    ports:
+      - "31002:443"
+    mem_limit: 512M
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: https://+
+      ASPNETCORE_HTTPS_PORT: 443
+      ASPNETCORE_Kestrel__Certificates__Default__Path: "/app/cecochat-dev.pfx"
+      ASPNETCORE_Kestrel__Certificates__Default__Password: "cecochat"
+      CECOCHAT_Backend__Kafka__BootstrapServers__0: kafka1:19091
+      CECOCHAT_Backend__Kafka__BootstrapServers__1: kafka2:19092
+      CECOCHAT_HistoryDB__ContactPoints__0: cass1
+      CECOCHAT_HistoryDB__ContactPoints__1: cass2
+      CECOCHAT_HistoryDB__ContactPoints__2: cass3
