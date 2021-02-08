@@ -1,4 +1,6 @@
+using CecoChat.Jwt;
 using CecoChat.Swagger;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -25,8 +27,20 @@ namespace CecoChat.Server.Profile
         public void ConfigureServices(IServiceCollection services)
         {
             // web
-            services.AddControllers();
+            services
+                .AddControllers()
+                .AddFluentValidation(fluentValidation =>
+                {
+                    fluentValidation.RunDefaultMvcValidationAfterFluentValidationExecutes = false;
+                    fluentValidation.RegisterValidatorsFromAssemblyContaining<Startup>();
+                });
             services.AddSwaggerServices(_swaggerOptions);
+
+            // session
+            services.Configure<JwtOptions>(Configuration.GetSection("Jwt"));
+
+            // shared
+            services.AddSingleton<IClock, MonotonicClock>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
