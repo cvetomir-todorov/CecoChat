@@ -2,3 +2,4 @@
 .\BuildImageForHistory.ps1
 .\BuildImageForMaterialize.ps1
 .\BuildImageForMessaging.ps1
+.\BuildImageForProfile.ps1

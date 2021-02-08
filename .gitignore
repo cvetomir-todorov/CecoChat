@@ -8,6 +8,7 @@ containerize/Connect
 containerize/Messaging
 containerize/History
 containerize/Materialize
+containerize/Profile
 
 # User-specific files
 *.rsuser

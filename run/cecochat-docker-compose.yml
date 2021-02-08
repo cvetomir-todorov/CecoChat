@@ -91,3 +91,17 @@ services:
       CECOCHAT_HistoryDB__ContactPoints__0: cass1
       CECOCHAT_HistoryDB__ContactPoints__1: cass2
       CECOCHAT_HistoryDB__ContactPoints__2: cass3
+  cecochat-profile:
+    image: ceco.com/cecochat/profile:0.1
+    container_name: cecochat-profile
+    hostname: profile
+    networks: *networks
+    ports:
+      - "31005:443"
+    mem_limit: 512M
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: https://+
+      ASPNETCORE_HTTPS_PORT: 443
+      ASPNETCORE_Kestrel__Certificates__Default__Path: "/app/cecochat-dev.pfx"
+      ASPNETCORE_Kestrel__Certificates__Default__Password: "cecochat"
