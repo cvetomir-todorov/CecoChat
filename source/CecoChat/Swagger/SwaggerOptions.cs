@@ -10,6 +10,8 @@ namespace CecoChat.Swagger
 
         string Url { get; }
 
+        bool AddAuthorizationHeader { get; }
+
         OpenApiInfo OpenApiInfo { get; }
     }
 
@@ -20,6 +22,8 @@ namespace CecoChat.Swagger
         public bool UseSwaggerUI { get; set; }
 
         public string Url { get; set; }
+
+        public bool AddAuthorizationHeader { get; set; }
 
         public OpenApiInfo OpenApiInfo { get; set; }
     }

@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Filters;
 
 namespace CecoChat.Swagger
 {
@@ -11,6 +13,19 @@ namespace CecoChat.Swagger
             {
                 services.AddSwaggerGen(config =>
                 {
+                    if (options.AddAuthorizationHeader)
+                    {
+                        config.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+                        {
+                            Type = SecuritySchemeType.ApiKey,
+                            In = ParameterLocation.Header,
+                            Name = "Authorization",
+                            Description = "Standard Authorization header using the Bearer scheme. Example: \"bearer {token}\""
+                        });
+
+                        config.OperationFilter<SecurityRequirementsOperationFilter>();
+                    }
+
                     config.SwaggerDoc(options.OpenApiInfo.Version, options.OpenApiInfo);
                 });
                 services.ConfigureSwaggerGen(config =>
