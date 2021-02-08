@@ -2,10 +2,17 @@
 {
     public sealed class CreateSessionRequest
     {
-        public long UserID { get; set; }
+        public string Username { get; set; }
+
+        public string Password { get; set; }
     }
 
     public sealed class CreateSessionResponse
+    {
+        public string AccessToken { get; set; }
+    }
+
+    public sealed class ConnectResponse
     {
         public string MessagingServerAddress { get; set; }
 

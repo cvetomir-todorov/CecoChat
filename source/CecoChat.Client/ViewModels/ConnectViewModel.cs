@@ -20,14 +20,20 @@ namespace CecoChat.Client.ViewModels
             : base(messagingClient, messageStorage, uiThreadDispatcher, feedbackService)
         {
             CanOperate = true;
-            UserID = "1";
+            Username = "ceco";
+            Password = "secret";
+            ProfileServer = "https://localhost:31005";
             ConnectServer = "https://localhost:31000";
             Connect = new AsyncRelayCommand(ConnectExecuted);
         }
 
         public bool CanOperate { get; set; }
 
-        public string UserID { get; set; }
+        public string Username { get; set; }
+
+        public string Password { get; set; }
+
+        public string ProfileServer { get; set; }
 
         public string ConnectServer { get; set; }
 
@@ -39,7 +45,7 @@ namespace CecoChat.Client.ViewModels
         {
             try
             {
-                await MessagingClient.Initialize(long.Parse(UserID), ConnectServer);
+                await MessagingClient.Initialize(Username, Password, ProfileServer, ConnectServer);
                 MessagingClient.ListenForMessages(CancellationToken.None);
 
                 Connected?.Invoke(this, EventArgs.Empty);

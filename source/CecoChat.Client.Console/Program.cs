@@ -9,13 +9,16 @@ namespace CecoChat.Client.Console
 {
     public static class Program
     {
-        public static async Task Main(string[] args)
+        public static async Task Main()
         {
-            System.Console.Write("Your ID: ");
-            long userID = long.Parse(System.Console.ReadLine() ?? string.Empty);
+            System.Console.Write("Username: ");
+            string username = System.Console.ReadLine() ?? string.Empty;
+
+            System.Console.Write("Password: ");
+            string password = System.Console.ReadLine() ?? string.Empty;
 
             MessagingClient client = new(new MessageIDGenerator());
-            await client.Initialize(userID, connectServer: "https://localhost:31000");
+            await client.Initialize(username, password, profileServer: "https://localhost:31005", connectServer: "https://localhost:31000");
             client.MessageReceived += (_, message) => DisplayMessage(message);
             client.ExceptionOccurred += (_, exception) => System.Console.WriteLine(exception);
 

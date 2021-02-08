@@ -12,6 +12,8 @@
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto"/>
       <RowDefinition Height="Auto"/>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="Auto"/>
       <RowDefinition Height="*"/>
       <RowDefinition Height="Auto"/>
     </Grid.RowDefinitions>
@@ -20,22 +22,38 @@
       <ColumnDefinition Width="*"/>
     </Grid.ColumnDefinitions>
     <TextBlock Grid.Row="0" Grid.Column="0"
-               Text="User ID"
+               Text="Username"
                VerticalAlignment="Center"
                Style="{StaticResource CommonElementStyle}"/>
     <TextBox Grid.Row="0" Grid.Column="1"
              MinWidth="100"
-             Text="{Binding Path=UserID}"
+             Text="{Binding Path=Username}"
              Style="{StaticResource CommonControlStyle}"/>
     <TextBlock Grid.Row="1" Grid.Column="0"
-               Text="Server"
+               Text="Password"
                VerticalAlignment="Center"
                Style="{StaticResource CommonElementStyle}"/>
     <TextBox Grid.Row="1" Grid.Column="1"
              MinWidth="100"
+             Text="{Binding Path=Password}"
+             Style="{StaticResource CommonControlStyle}"/>
+    <TextBlock Grid.Row="2" Grid.Column="0"
+               Text="Profile server"
+               VerticalAlignment="Center"
+               Style="{StaticResource CommonElementStyle}"/>
+    <TextBox Grid.Row="2" Grid.Column="1"
+             MinWidth="100"
+             Text="{Binding Path=ProfileServer}"
+             Style="{StaticResource CommonControlStyle}"/>
+    <TextBlock Grid.Row="3" Grid.Column="0"
+               Text="Connect server"
+               VerticalAlignment="Center"
+               Style="{StaticResource CommonElementStyle}"/>
+    <TextBox Grid.Row="3" Grid.Column="1"
+             MinWidth="100"
              Text="{Binding Path=ConnectServer}"
              Style="{StaticResource CommonControlStyle}"/>
-    <Button Grid.Row="3" Grid.Column="1"
+    <Button Grid.Row="5" Grid.Column="1"
             Content="Connect"
             Command="{Binding Path=Connect}"
             HorizontalAlignment="Right"

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -18,6 +19,7 @@ namespace CecoChat.Client.Shared
         private readonly MessageIDGenerator _messageIDGenerator;
         private readonly HttpClient _httpClient;
         private long _userID;
+        private string _accessToken;
         private GrpcChannel _messagingChannel;
         private GrpcChannel _historyChannel;
         private Listen.ListenClient _listenClient;
@@ -43,26 +45,32 @@ namespace CecoChat.Client.Shared
 
         public long UserID => _userID;
 
-        public async Task Initialize(long userID, string connectServer)
+        public async Task Initialize(string username, string password, string profileServer, string connectServer)
         {
-            _userID = userID;
-            CreateSessionRequest request = new() {UserID = userID};
-            CreateSessionResponse response = await CreateSession(request, connectServer);
+            CreateSessionRequest createSessionRequest = new()
+            {
+                Username = username,
+                Password = password
+            };
+            CreateSessionResponse createSessionResponse = await CreateSession(createSessionRequest, profileServer);
+            ConnectResponse connectResponse = await GetConnectInfo(createSessionResponse.AccessToken, connectServer);
+            ProcessAccessToken(createSessionResponse.AccessToken);
 
             _messagingChannel?.Dispose();
-            _messagingChannel = GrpcChannel.ForAddress(response.MessagingServerAddress);
+            _messagingChannel = GrpcChannel.ForAddress(connectResponse.MessagingServerAddress);
             _historyChannel?.Dispose();
-            _historyChannel = GrpcChannel.ForAddress(response.HistoryServerAddress);
+            _historyChannel = GrpcChannel.ForAddress(connectResponse.HistoryServerAddress);
 
             _listenClient = new Listen.ListenClient(_messagingChannel);
             _sendClient = new Send.SendClient(_messagingChannel);
             _historyClient = new History.HistoryClient(_historyChannel);
         }
 
-        private async Task<CreateSessionResponse> CreateSession(CreateSessionRequest request, string connectServer)
+        private async Task<CreateSessionResponse> CreateSession(CreateSessionRequest request, string profileServer)
         {
-            UriBuilder builder = new(uri: connectServer);
+            UriBuilder builder = new(uri: profileServer);
             builder.Path = "api/session";
+
             HttpRequestMessage requestMessage = new(HttpMethod.Post, builder.Uri);
             requestMessage.Version = HttpVersion.Version20;
             string requestString = JsonSerializer.Serialize(request);
@@ -77,6 +85,32 @@ namespace CecoChat.Client.Shared
             CreateSessionResponse response = JsonSerializer.Deserialize<CreateSessionResponse>(responseString,
                 new JsonSerializerOptions {PropertyNamingPolicy = JsonNamingPolicy.CamelCase});
             return response;
+        }
+
+        private async Task<ConnectResponse> GetConnectInfo(string accessToken, string connectServer)
+        {
+            UriBuilder builder = new(uri: connectServer);
+            builder.Path = "api/connect";
+
+            HttpRequestMessage requestMessage = new(HttpMethod.Get, builder.Uri);
+            requestMessage.Version = HttpVersion.Version20;
+            requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
+            HttpResponseMessage responseMessage = await _httpClient.SendAsync(requestMessage);
+            responseMessage.EnsureSuccessStatusCode();
+
+            string responseString = await responseMessage.Content.ReadAsStringAsync();
+            ConnectResponse response = JsonSerializer.Deserialize<ConnectResponse>(responseString,
+                new JsonSerializerOptions {PropertyNamingPolicy = JsonNamingPolicy.CamelCase});
+            return response;
+        }
+
+        private void ProcessAccessToken(string accessToken)
+        {
+            _accessToken = accessToken;
+            JwtSecurityToken jwt = new(accessToken);
+            _userID = long.Parse(jwt.Subject);
         }
 
         public void ListenForMessages(CancellationToken ct)
