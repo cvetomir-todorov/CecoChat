@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
-namespace CecoChat.Server.Profile.Security
+namespace CecoChat.Profile.Server.Security
 {
     [ApiController]
     [Route("api/session")]

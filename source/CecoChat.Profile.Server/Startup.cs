@@ -7,7 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace CecoChat.Server.Profile
+namespace CecoChat.Profile.Server
 {
     public class Startup
     {

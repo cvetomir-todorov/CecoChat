@@ -6,7 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 
-namespace CecoChat.Server.Profile
+namespace CecoChat.Profile.Server
 {
     public static class Program
     {
