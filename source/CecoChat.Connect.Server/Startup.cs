@@ -1,6 +1,3 @@
-using System;
-using System.IdentityModel.Tokens.Jwt;
-using System.Text;
 using CecoChat.Connect.Server.Initialization;
 using CecoChat.Data.Configuration;
 using CecoChat.Data.Configuration.History;
@@ -9,15 +6,14 @@ using CecoChat.Events;
 using CecoChat.Jwt;
 using CecoChat.Redis;
 using CecoChat.Server.Backend;
+using CecoChat.Server.Identity;
 using CecoChat.Swagger;
 using FluentValidation.AspNetCore;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.IdentityModel.Tokens;
 
 namespace CecoChat.Connect.Server
 {
@@ -54,29 +50,7 @@ namespace CecoChat.Connect.Server
             services.AddSwaggerServices(_swaggerOptions);
 
             // security
-            services
-                .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(jwt =>
-                {
-                    JwtSecurityTokenHandler jwtHandler = new() {MapInboundClaims = false};
-                    jwt.SecurityTokenValidators.Clear();
-                    jwt.SecurityTokenValidators.Add(jwtHandler);
-
-                    byte[] issuerSigningKey = Encoding.UTF8.GetBytes(_jwtOptions.Secret);
-
-                    jwt.RequireHttpsMetadata = true;
-                    jwt.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuer = true,
-                        ValidIssuer = _jwtOptions.Issuer,
-                        ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(issuerSigningKey),
-                        ValidateAudience = true,
-                        ValidAudience = _jwtOptions.Audience,
-                        ValidateLifetime = true,
-                        ClockSkew = TimeSpan.FromSeconds(5)
-                    };
-                });
+            services.AddJwtAuthentication(_jwtOptions);
 
             // configuration
             services.AddHostedService<ConfigurationHostedService>();
