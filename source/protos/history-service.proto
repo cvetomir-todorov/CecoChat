@@ -10,8 +10,7 @@ service History {
 }
 
 message GetUserHistoryRequest {
-  int64 user_id = 1;
-  google.protobuf.Timestamp older_than = 2;
+  google.protobuf.Timestamp older_than = 1;
 }
 
 message GetUserHistoryResponse {
@@ -19,9 +18,8 @@ message GetUserHistoryResponse {
 }
 
 message GetDialogHistoryRequest {
-  int64 user_id = 1;
-  int64 other_user_id = 2;
-  google.protobuf.Timestamp older_than = 3;
+  int64 other_user_id = 1;
+  google.protobuf.Timestamp older_than = 2;
 }
 
 message GetDialogHistoryResponse {

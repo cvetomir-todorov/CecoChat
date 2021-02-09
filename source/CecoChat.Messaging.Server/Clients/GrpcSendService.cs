@@ -6,6 +6,7 @@ using CecoChat.Messaging.Server.Backend;
 using CecoChat.Server;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
 
 namespace CecoChat.Messaging.Server.Clients
@@ -32,6 +33,7 @@ namespace CecoChat.Messaging.Server.Clients
             _clientContainer = clientContainer;
         }
 
+        [Authorize(Roles = "user")]
         public override Task<SendMessageResponse> SendMessage(SendMessageRequest request, ServerCallContext context)
         {
             ClientMessage clientMessage = request.Message;

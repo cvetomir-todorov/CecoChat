@@ -19,7 +19,7 @@ namespace CecoChat.Client.Shared
         private readonly MessageIDGenerator _messageIDGenerator;
         private readonly HttpClient _httpClient;
         private long _userID;
-        private string _accessToken;
+        private Metadata _grpcMetadata;
         private GrpcChannel _messagingChannel;
         private GrpcChannel _historyChannel;
         private Listen.ListenClient _listenClient;
@@ -108,14 +108,16 @@ namespace CecoChat.Client.Shared
 
         private void ProcessAccessToken(string accessToken)
         {
-            _accessToken = accessToken;
+            _grpcMetadata = new();
+            _grpcMetadata.Add("Authorization", $"Bearer {accessToken}");
+
             JwtSecurityToken jwt = new(accessToken);
             _userID = long.Parse(jwt.Subject);
         }
 
         public void ListenForMessages(CancellationToken ct)
         {
-            AsyncServerStreamingCall<ListenResponse> serverStream = _listenClient.Listen(new ListenRequest {UserId = _userID});
+            AsyncServerStreamingCall<ListenResponse> serverStream = _listenClient.Listen(new ListenRequest(), _grpcMetadata);
             Task.Factory.StartNew(
                 async () => await ListenForNewMessages(serverStream, ct),
                 TaskCreationOptions.LongRunning);
@@ -154,10 +156,9 @@ namespace CecoChat.Client.Shared
         {
             GetUserHistoryRequest request = new()
             {
-                UserId = _userID,
                 OlderThan = Timestamp.FromDateTime(olderThan)
             };
-            GetUserHistoryResponse response = await _historyClient.GetUserHistoryAsync(request);
+            GetUserHistoryResponse response = await _historyClient.GetUserHistoryAsync(request, _grpcMetadata);
             return response.Messages;
         }
 
@@ -165,11 +166,10 @@ namespace CecoChat.Client.Shared
         {
             GetDialogHistoryRequest request = new()
             {
-                UserId = _userID,
                 OtherUserId = otherUserID,
                 OlderThan = Timestamp.FromDateTime(olderThan)
             };
-            GetDialogHistoryResponse response = await _historyClient.GetDialogHistoryAsync(request);
+            GetDialogHistoryResponse response = await _historyClient.GetDialogHistoryAsync(request, _grpcMetadata);
             return response.Messages;
         }
 
@@ -188,7 +188,11 @@ namespace CecoChat.Client.Shared
                 }
             };
 
-            SendMessageResponse response = await _sendClient.SendMessageAsync(new SendMessageRequest {Message = message});
+            SendMessageRequest request = new()
+            {
+                Message = message
+            };
+            SendMessageResponse response = await _sendClient.SendMessageAsync(request, _grpcMetadata);
             message.Timestamp = response.MessageTimestamp;
             return message;
         }

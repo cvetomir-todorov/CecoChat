@@ -8,7 +8,6 @@ service Listen {
 }
 
 message ListenRequest {
-  int64 user_id = 1;
 }
 
 message ListenResponse {

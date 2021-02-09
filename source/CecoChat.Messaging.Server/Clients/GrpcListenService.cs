@@ -2,7 +2,9 @@
 using System.Threading.Tasks;
 using CecoChat.Contracts.Client;
 using CecoChat.DependencyInjection;
+using CecoChat.Server.Identity;
 using Grpc.Core;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
 
 namespace CecoChat.Messaging.Server.Clients
@@ -23,8 +25,15 @@ namespace CecoChat.Messaging.Server.Clients
             _streamerFactory = streamerFactory;
         }
 
+        [Authorize(Roles = "user")]
         public override async Task Listen(ListenRequest request, IServerStreamWriter<ListenResponse> responseStream, ServerCallContext context)
         {
+            if (!context.GetHttpContext().User.TryGetUserID(out long userID))
+            {
+                _logger.LogError("Client from {0} was authorized but has no parseable access token.", context.Peer);
+                return;
+            }
+
             // TODO: use client ID from metadata or auth token
             string clientID = context.Peer;
             _logger.LogTrace("Client {0} connected.", clientID);
@@ -35,17 +44,14 @@ namespace CecoChat.Messaging.Server.Clients
 
             try
             {
-                // TODO: use user ID from auth token
-                _clientContainer.AddClient(request.UserId, streamer);
+                _clientContainer.AddClient(userID, streamer);
                 await streamer.ProcessMessages(context.CancellationToken);
 
-                // TODO: use user ID from auth token
-                RemoveClient(request.UserId, clientID, streamer);
+                RemoveClient(userID, clientID, streamer);
             }
             catch (OperationCanceledException)
             {
-                // TODO: use user ID from auth token
-                RemoveClient(request.UserId, clientID, streamer);
+                RemoveClient(userID, clientID, streamer);
             }
             finally
             {

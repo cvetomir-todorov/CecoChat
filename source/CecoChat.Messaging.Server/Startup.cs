@@ -4,6 +4,7 @@ using CecoChat.Data.Configuration;
 using CecoChat.Data.Configuration.Messaging;
 using CecoChat.DependencyInjection;
 using CecoChat.Events;
+using CecoChat.Jwt;
 using CecoChat.Kafka;
 using CecoChat.Messaging.Server.Backend;
 using CecoChat.Messaging.Server.Clients;
@@ -11,6 +12,7 @@ using CecoChat.Messaging.Server.Initialization;
 using CecoChat.Redis;
 using CecoChat.Server;
 using CecoChat.Server.Backend;
+using CecoChat.Server.Identity;
 using Confluent.Kafka;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -22,9 +24,15 @@ namespace CecoChat.Messaging.Server
 {
     public class Startup
     {
+        private readonly IJwtOptions _jwtOptions;
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+
+            JwtOptions jwtOptions = new();
+            Configuration.GetSection("Jwt").Bind(jwtOptions);
+            _jwtOptions = jwtOptions;
         }
 
         public IConfiguration Configuration { get; }
@@ -40,6 +48,10 @@ namespace CecoChat.Messaging.Server
             services.AddSingleton<IClientContainer, ClientContainer>();
             services.AddFactory<IGrpcStreamer<ListenResponse>, GrpcStreamer<ListenResponse>>();
             services.Configure<ClientOptions>(Configuration.GetSection("Clients"));
+
+            // security
+            services.AddJwtAuthentication(_jwtOptions);
+            services.AddAuthorization();
 
             // backend
             services.AddPartitionUtility();
@@ -70,6 +82,8 @@ namespace CecoChat.Messaging.Server
 
             app.UseHttpsRedirection();
             app.UseRouting();
+            app.UseAuthentication();
+            app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapGrpcService<GrpcListenService>();

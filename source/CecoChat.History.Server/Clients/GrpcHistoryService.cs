@@ -5,7 +5,9 @@ using CecoChat.Contracts.Client;
 using CecoChat.Data.Configuration.History;
 using CecoChat.Data.Messaging;
 using CecoChat.Server;
+using CecoChat.Server.Identity;
 using Grpc.Core;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
 
 namespace CecoChat.History.Server.Clients
@@ -29,10 +31,15 @@ namespace CecoChat.History.Server.Clients
             _clientBackendMapper = clientBackendMapper;
         }
 
+        [Authorize(Roles = "user")]
         public override async Task<GetUserHistoryResponse> GetUserHistory(GetUserHistoryRequest request, ServerCallContext context)
         {
-            // TODO: use user ID from auth token
-            long userID = request.UserId;
+            if (!context.GetHttpContext().User.TryGetUserID(out long userID))
+            {
+                _logger.LogError("Client from {0} was authorized but has no parseable access token.", context.Peer);
+                return new GetUserHistoryResponse();
+            }
+
             IReadOnlyCollection<BackendMessage> backendMessages = await _historyRepository
                 .GetUserHistory(userID, request.OlderThan.ToDateTime(), _historyConfiguration.UserMessageCount);
 
@@ -47,10 +54,15 @@ namespace CecoChat.History.Server.Clients
             return response;
         }
 
+        [Authorize(Roles = "user")]
         public override async Task<GetDialogHistoryResponse> GetDialogHistory(GetDialogHistoryRequest request, ServerCallContext context)
         {
-            // TODO: use user ID from auth token
-            long userID = request.UserId;
+            if (!context.GetHttpContext().User.TryGetUserID(out long userID))
+            {
+                _logger.LogError("Client from {0} was authorized but has no parseable access token.", context.Peer);
+                return new GetDialogHistoryResponse();
+            }
+
             long otherUserID = request.OtherUserId;
 
             IReadOnlyCollection<BackendMessage> backendMessages = await _historyRepository
