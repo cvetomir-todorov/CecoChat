@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -37,11 +38,21 @@ namespace CecoChat.Profile.Server.Security
             _jwtTokenHandler.OutboundClaimTypeMap.Clear();
         }
 
+        private readonly Dictionary<string, long> _userIDMap = new()
+        {
+            {"bob", 1},
+            {"alice", 2},
+            {"peter", 1200}
+        };
+
         [AllowAnonymous]
         [HttpPost]
         public IActionResult CreateSession([FromBody] CreateSessionRequest request)
         {
-            long userID = 1;
+            if (!_userIDMap.TryGetValue(request.Username, out long userID))
+            {
+                return Unauthorized();
+            }
             Guid clientID = Guid.NewGuid();
 
             Claim[] claims =

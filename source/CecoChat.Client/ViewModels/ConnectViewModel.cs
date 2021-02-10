@@ -20,7 +20,7 @@ namespace CecoChat.Client.ViewModels
             : base(messagingClient, messageStorage, uiThreadDispatcher, feedbackService)
         {
             CanOperate = true;
-            Username = "ceco";
+            Username = "bob";
             Password = "secret";
             ProfileServer = "https://localhost:31005";
             ConnectServer = "https://localhost:31000";
