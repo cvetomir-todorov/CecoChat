@@ -21,10 +21,10 @@ namespace CecoChat
 
             unchecked // overflow is fine
             {
-                hash = hash * prime ^ value0;
-                hash = hash * prime ^ value1;
-                hash = hash * prime ^ value2;
-                hash = hash * prime ^ value3;
+                hash = (hash * prime) ^ value0;
+                hash = (hash * prime) ^ value1;
+                hash = (hash * prime) ^ value2;
+                hash = (hash * prime) ^ value3;
             }
 
             return hash;
