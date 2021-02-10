@@ -1,14 +1,14 @@
 # Cell limits
 
 * Infrastructure
-  - 10 000 connections per front-facing server (FFS)
-  - 10 000 FFS instances 
+  - 50 000 connections per messaging server
+  - 2 000 messaging servers
 * Time
-  - 1 day = 24*60*60 seconds = 86 400 seconds
-  - 1 hour = 60*60 seconds = 3 600 seconds
+  - 1 hour = 60 minutes * 60 seconds = 3 600 seconds
+  - 1 day = 24 hours * 60 minutes * 60 seconds = 86 400 seconds
 * Other
   - 100 000 000 max users at the same time
-  - 128 bytes per message
+  - 256 bytes per message
   - 4 years of message storage
 
 ## Daily
@@ -26,8 +26,9 @@
 
 ### Throughput
 
-* 5 242 880 000 000 bytes = 5 120 000 000 KB = 5 000 000 MB daily
-* 5 000 000 MB daily / 86 400 seconds  = ~58 MB/s daily
+* 10 485 760 000 000 bytes = 10 240 000 000 KB = 10 000 000 MB daily
+* 10 000 000 MB daily / 86 400 seconds  = ~116 MB/s daily
+* 116 MB/s / 2000 messaging servers = 0.06 MB/s per messaging server daily
 
 ## Peak
 
@@ -46,8 +47,9 @@
 
 ### Throughput
 
-* 327 680 000 000 bytes = 320 000 000 KB = 312 500 MB peak
-* 312 500 MB peak / 3 600 seconds = ~87 MB/s peak
+* 655 360 000 000 bytes = 640 000 000 KB = 625 000 MB peak
+* 625 000 MB peak / 3 600 seconds = ~174 MB/s peak
+* 174 MB/s / 2000 messagin servers = 0.09 MB/s per messaging server peak
 
 ## Storage
 
