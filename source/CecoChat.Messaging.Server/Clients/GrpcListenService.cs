@@ -36,33 +36,46 @@ namespace CecoChat.Messaging.Server.Clients
 
             long userID = userClaims.UserID;
             Guid clientID = userClaims.ClientID;
-            _logger.LogTrace("{0} connected.", userClaims);
+            string address = context.Peer;
+            _logger.LogTrace("{0} from {1} connected.", userClaims, address);
 
             IGrpcStreamer<ListenResponse> streamer = _streamerFactory.Create();
             streamer.SetFinalMessagePredicate(IsFinalMessage);
             streamer.Initialize(clientID, responseStream);
+            bool isClientAdded = false;
 
             try
             {
-                _clientContainer.AddClient(userID, streamer);
-                await streamer.ProcessMessages(context.CancellationToken);
-
-                RemoveClient(userClaims, streamer);
+                isClientAdded = _clientContainer.AddClient(userID, streamer);
+                if (isClientAdded)
+                {
+                    await streamer.ProcessMessages(context.CancellationToken);
+                }
+                else
+                {
+                    _logger.LogError("Failed to add {0} from {1}.", userClaims, address);
+                }
             }
             catch (OperationCanceledException)
+            {}
+            catch (Exception exception)
             {
-                RemoveClient(userClaims, streamer);
+                _logger.LogError(exception, "Listen for {0} from {1} failed.", userClaims, address);
             }
             finally
             {
+                if (isClientAdded)
+                {
+                    RemoveClient(userClaims, address, streamer);
+                }
                 streamer.Dispose();
             }
         }
 
-        private void RemoveClient(UserClaims userClaims, IGrpcStreamer<ListenResponse> streamer)
+        private void RemoveClient(UserClaims userClaims, string address, IGrpcStreamer<ListenResponse> streamer)
         {
             _clientContainer.RemoveClient(userClaims.UserID, streamer);
-            _logger.LogTrace("{0} disconnected.", userClaims);
+            _logger.LogTrace("{0} from {1} disconnected.", userClaims, address);
         }
 
         private bool IsFinalMessage(ListenResponse response)

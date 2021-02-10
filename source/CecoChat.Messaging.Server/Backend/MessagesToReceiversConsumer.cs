@@ -79,7 +79,7 @@ namespace CecoChat.Messaging.Server.Backend
 
         private void ProcessMessage(BackendMessage backendMessage)
         {
-            IEnumerable<IStreamer<ListenResponse>> clients = _clientContainer.GetClients(backendMessage.ReceiverId);
+            IEnumerable<IStreamer<ListenResponse>> clients = _clientContainer.EnumerateClients(backendMessage.ReceiverId);
 
             ClientMessage clientMessage = _mapper.MapBackendToClientMessage(backendMessage);
             ListenResponse response = new ListenResponse

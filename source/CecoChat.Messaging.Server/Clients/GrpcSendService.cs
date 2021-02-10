@@ -57,7 +57,7 @@ namespace CecoChat.Messaging.Server.Clients
 
         private void SendToClientsFromSameSender(ClientMessage clientMessage, UserClaims currentUserClaims)
         {
-            IEnumerable<IStreamer<ListenResponse>> clients = _clientContainer.GetClients(clientMessage.SenderId);
+            IEnumerable<IStreamer<ListenResponse>> clients = _clientContainer.EnumerateClients(clientMessage.SenderId);
             ListenResponse response = new()
             {
                 Message = clientMessage

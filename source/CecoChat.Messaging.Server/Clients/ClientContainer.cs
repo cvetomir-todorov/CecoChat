@@ -1,81 +1,96 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using CecoChat.Contracts.Client;
-using ConcurrentCollections;
 
 namespace CecoChat.Messaging.Server.Clients
 {
     public interface IClientContainer
     {
-        void AddClient(in long userID, IStreamer<ListenResponse> streamer);
+        bool AddClient(in long userID, IStreamer<ListenResponse> client);
 
-        void RemoveClient(in long userID, IStreamer<ListenResponse> streamer);
+        void RemoveClient(in long userID, IStreamer<ListenResponse> client);
 
-        IEnumerable<IStreamer<ListenResponse>> GetClients(in long userID);
+        IEnumerable<IStreamer<ListenResponse>> EnumerateClients(in long userID);
 
-        IEnumerable<KeyValuePair<long, IEnumerable<IStreamer<ListenResponse>>>> EnumerateUsers();
+        IEnumerable<KeyValuePair<long, IEnumerable<IStreamer<ListenResponse>>>> EnumerateAllClients();
     }
 
     public sealed class ClientContainer : IClientContainer
     {
         // ReSharper disable once CollectionNeverUpdated.Local
-        private static readonly List<IStreamer<ListenResponse>> _emptyStreamerList = new(capacity: 0);
-        private readonly ConcurrentDictionary<long, UserData> _userMap;
+        private static readonly List<IStreamer<ListenResponse>> _emptyClientList = new(capacity: 0);
+        private readonly ConcurrentDictionary<long, UserClients> _userMap;
 
         public ClientContainer()
         {
-            _userMap = new ConcurrentDictionary<long, UserData>();
+            _userMap = new ConcurrentDictionary<long, UserClients>();
         }
 
-        public void AddClient(in long userID, IStreamer<ListenResponse> streamer)
+        public bool AddClient(in long userID, IStreamer<ListenResponse> client)
         {
-            UserData userData = _userMap.GetOrAdd(userID, _ => new UserData());
-            if (!userData.Streamers.Add(streamer))
-            {
-                throw new InvalidOperationException($"Client for user {userID} has already been added.");
-            }
+            UserClients userClients = _userMap.GetOrAdd(userID, _ => new UserClients());
+            bool isAdded = userClients.Clients.TryAdd(client.ClientID, client);
+            return isAdded;
         }
 
-        public void RemoveClient(in long userID, IStreamer<ListenResponse> streamer)
+        public void RemoveClient(in long userID, IStreamer<ListenResponse> client)
         {
-            if (_userMap.TryGetValue(userID, out UserData userData))
+            if (_userMap.TryGetValue(userID, out UserClients userClients))
             {
-                if (!userData.Streamers.TryRemove(streamer))
+                if (!userClients.Clients.TryRemove(client.ClientID, out _))
                 {
-                    throw new InvalidOperationException($"Client for user {userID} has already been removed.");
+                    throw new InvalidOperationException($"Client {client.ClientID} for user {userID} has already been removed.");
                 }
             }
         }
 
-        public IEnumerable<IStreamer<ListenResponse>> GetClients(in long userID)
+        public IEnumerable<IStreamer<ListenResponse>> EnumerateClients(in long userID)
         {
-            if (_userMap.TryGetValue(userID, out UserData userData))
+            if (_userMap.TryGetValue(userID, out UserClients userClients))
             {
-                return userData.Streamers;
+                return userClients;
             }
             else
             {
-                return _emptyStreamerList;
+                return _emptyClientList;
             }
         }
 
-        public IEnumerable<KeyValuePair<long, IEnumerable<IStreamer<ListenResponse>>>> EnumerateUsers()
+        public IEnumerable<KeyValuePair<long, IEnumerable<IStreamer<ListenResponse>>>> EnumerateAllClients()
         {
-            foreach (KeyValuePair<long, UserData> pair in _userMap)
+            foreach (KeyValuePair<long, UserClients> pair in _userMap)
             {
                 long userID = pair.Key;
-                IEnumerable<IStreamer<ListenResponse>> streamers = pair.Value.Streamers;
+                IEnumerable<IStreamer<ListenResponse>> clients = pair.Value;
 
-                yield return new KeyValuePair<long, IEnumerable<IStreamer<ListenResponse>>>(userID, streamers);
+                yield return new KeyValuePair<long, IEnumerable<IStreamer<ListenResponse>>>(userID, clients);
             }
         }
 
-        private sealed class UserData
+        private sealed class UserClients : IEnumerable<IStreamer<ListenResponse>>
         {
-            public ConcurrentHashSet<IStreamer<ListenResponse>> Streamers { get; }
+            public ConcurrentDictionary<Guid, IStreamer<ListenResponse>> Clients { get; }
+
+            public UserClients()
+            {
                 // we don't usually expect the connected clients to be > 1
-                = new(concurrencyLevel: Environment.ProcessorCount, capacity: 2);
+                Clients = new(concurrencyLevel: Environment.ProcessorCount, capacity: 2);
+            }
+
+            public IEnumerator<IStreamer<ListenResponse>> GetEnumerator()
+            {
+                foreach (var pair in Clients)
+                {
+                    yield return pair.Value;
+                }
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return GetEnumerator();
+            }
         }
     }
 }

@@ -122,7 +122,7 @@ namespace CecoChat.Messaging.Server.Initialization
 
         private void DisconnectClients(int partitionCount, PartitionRange partitions)
         {
-            foreach (var pair in _clientContainer.EnumerateUsers())
+            foreach (var pair in _clientContainer.EnumerateAllClients())
             {
                 long userID = pair.Key;
                 var clients = pair.Value;
