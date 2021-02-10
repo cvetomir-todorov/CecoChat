@@ -41,13 +41,17 @@ namespace CecoChat.Profile.Server.Security
         [HttpPost]
         public IActionResult CreateSession([FromBody] CreateSessionRequest request)
         {
+            long userID = 1;
+            Guid clientID = Guid.NewGuid();
+
             Claim[] claims =
             {
-                new(JwtRegisteredClaimNames.Sub, "1", ClaimValueTypes.Integer64),
+                new(JwtRegisteredClaimNames.Sub, userID.ToString(), ClaimValueTypes.Integer64),
+                new(ClaimTypes.Actor, clientID.ToString()),
                 new(ClaimTypes.Role, "user")
             };
             string accessToken = CreateAccessToken(claims);
-            _logger.LogInformation("User {0} authenticated and assigned user ID 1.", request.Username);
+            _logger.LogInformation("User {0} authenticated and assigned user ID {1} and client ID {2}.", request.Username, userID, clientID);
 
             CreateSessionResponse response = new() {AccessToken = accessToken};
             return Ok(response);

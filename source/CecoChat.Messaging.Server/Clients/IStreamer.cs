@@ -6,7 +6,7 @@ namespace CecoChat.Messaging.Server.Clients
 {
     public interface IStreamer<TMessage> : IDisposable
     {
-        string ClientID { get; }
+        Guid ClientID { get; }
 
         bool AddMessage(TMessage message);
 

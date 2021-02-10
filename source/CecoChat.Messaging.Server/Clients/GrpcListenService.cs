@@ -28,30 +28,30 @@ namespace CecoChat.Messaging.Server.Clients
         [Authorize(Roles = "user")]
         public override async Task Listen(ListenRequest request, IServerStreamWriter<ListenResponse> responseStream, ServerCallContext context)
         {
-            if (!context.GetHttpContext().User.TryGetUserID(out long userID))
+            if (!context.GetHttpContext().User.TryGetUserClaims(out UserClaims userClaims))
             {
                 _logger.LogError("Client from {0} was authorized but has no parseable access token.", context.Peer);
                 return;
             }
 
-            // TODO: use client ID from metadata or auth token
-            string clientID = context.Peer;
-            _logger.LogTrace("Client {0} connected.", clientID);
+            long userID = userClaims.UserID;
+            Guid clientID = userClaims.ClientID;
+            _logger.LogTrace("{0} connected.", userClaims);
 
             IGrpcStreamer<ListenResponse> streamer = _streamerFactory.Create();
             streamer.SetFinalMessagePredicate(IsFinalMessage);
-            streamer.Initialize(responseStream, context);
+            streamer.Initialize(clientID, responseStream);
 
             try
             {
                 _clientContainer.AddClient(userID, streamer);
                 await streamer.ProcessMessages(context.CancellationToken);
 
-                RemoveClient(userID, clientID, streamer);
+                RemoveClient(userClaims, streamer);
             }
             catch (OperationCanceledException)
             {
-                RemoveClient(userID, clientID, streamer);
+                RemoveClient(userClaims, streamer);
             }
             finally
             {
@@ -59,10 +59,10 @@ namespace CecoChat.Messaging.Server.Clients
             }
         }
 
-        private void RemoveClient(long userID, string clientID, IGrpcStreamer<ListenResponse> streamer)
+        private void RemoveClient(UserClaims userClaims, IGrpcStreamer<ListenResponse> streamer)
         {
-            _clientContainer.RemoveClient(userID, streamer);
-            _logger.LogTrace("Client {0} disconnected.", clientID);
+            _clientContainer.RemoveClient(userClaims.UserID, streamer);
+            _logger.LogTrace("{0} disconnected.", userClaims);
         }
 
         private bool IsFinalMessage(ListenResponse response)

@@ -117,7 +117,8 @@ namespace CecoChat.Client.Shared
 
         public void ListenForMessages(CancellationToken ct)
         {
-            AsyncServerStreamingCall<ListenResponse> serverStream = _listenClient.Listen(new ListenRequest(), _grpcMetadata);
+            ListenRequest request = new();
+            AsyncServerStreamingCall<ListenResponse> serverStream = _listenClient.Listen(request, _grpcMetadata);
             Task.Factory.StartNew(
                 async () => await ListenForNewMessages(serverStream, ct),
                 TaskCreationOptions.LongRunning);

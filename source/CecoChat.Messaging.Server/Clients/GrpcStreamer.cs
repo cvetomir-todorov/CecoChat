@@ -10,7 +10,7 @@ namespace CecoChat.Messaging.Server.Clients
 {
     public interface IGrpcStreamer<TMessage> : IStreamer<TMessage>
     {
-        void Initialize(IServerStreamWriter<TMessage> streamWriter, ServerCallContext context);
+        void Initialize(Guid clientID, IServerStreamWriter<TMessage> streamWriter);
     }
 
     /// <summary>
@@ -24,7 +24,7 @@ namespace CecoChat.Messaging.Server.Clients
 
         private Func<TMessage, bool> _finalMessagePredicate;
         private IServerStreamWriter<TMessage> _streamWriter;
-        private string _clientID;
+        private Guid _clientID;
 
         public GrpcStreamer(
             ILogger<GrpcStreamer<TMessage>> logger,
@@ -38,11 +38,10 @@ namespace CecoChat.Messaging.Server.Clients
             _finalMessagePredicate = _ => false;
         }
 
-        public void Initialize(IServerStreamWriter<TMessage> streamWriter, ServerCallContext context)
+        public void Initialize(Guid clientID, IServerStreamWriter<TMessage> streamWriter)
         {
+            _clientID = clientID;
             _streamWriter = streamWriter;
-            // TODO: use client ID from metadata or auth token
-            _clientID = context.Peer;
         }
 
         public void Dispose()
@@ -50,7 +49,7 @@ namespace CecoChat.Messaging.Server.Clients
             _signalProcessing.Dispose();
         }
 
-        public string ClientID => _clientID;
+        public Guid ClientID => _clientID;
 
         public bool AddMessage(TMessage message)
         {
