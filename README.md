@@ -6,14 +6,14 @@ System design and implementation of a chat for millions active users based on Ka
 
 I decided to take on the challenge to design a globally-scalable chat like WhatsApp and Facebook Messenger. Based on [statistics](https://www.statista.com/statistics/258749/most-popular-global-mobile-messenger-apps/) the montly active users are 2.0 bln for WhatsApp and 1.3 bln for Facebook Messenger. At that scale I decided to start a bit smaller. A good first step was to design a system that would be able to handle a smaller number of active users which are directly connected to it. I call it a cell. After that I would need to design how multiple cells placed in different geographic locations would communicate with each other. I certainly don't have the infrastructure to validate the design and the implementation. But I used the challenge to think at a large scale and to learn a few new technologies and approaches along the way.
 
-# Design
+# Overall design
 
 ## Back of the envelope calculations
 
 <details>
 <summary>Show/hide</summary>
 
-The ![docs](docs/) folder contains the detailed calculations. A messaging server is the server to which users directly connect to. A key limit I impose is `50K connections per messaging server`. A simple calculation tells that `2K messaging servers` are needed in order to support `100 mln active users`.
+The [docs](docs/) folder contains the detailed calculations. A messaging server is the server to which users directly connect to. A key limit I impose is `50K connections per messaging server`. A simple calculation tells that `2K messaging servers` are needed in order to support `100 mln active users`.
 
 Throughput-wise a limit of `256 bytes per message` with `640 mln users` spread throughout the day each of which sends `64 messages per day` gives us `116 MB/s for the cell` or `0.06 MB/s per messaging server`.
 
@@ -23,16 +23,16 @@ These numbers do not take into account the security and transport data overhead.
 
 </details>
 
-## Overall design
+## Main diagram
 
-![Overall design](docs/images/cecochat-01-overall.png)
+![Main diagram](docs/images/cecochat-01-overall.png)
 
 <details>
 <summary>Show/hide</summary>
 
 Clients connect to messaging servers in order to chat. Messaging servers communicate with each other indirectly using a PUB/SUB backplane. The PUB/SUB backplane also acts like an event log. Materialize servers transform messages from the event log into a history database which is the source of truth. The history is available for querying by the clients via history servers. Clients obtain the addresses for the messaging and history server from a connect server. The messaging, history, connect servers use dynamic configuration which is updated centrally. All of this is powered by a deployment infrastructure which takes care of failover, growth and shrinking of the different server sets based on load.
 
-All the diagrams are in the ![docs](docs/) folder and you need [draw.io](https://app.diagrams.net/) in order to view them. From the `Help` item in the menu you can get a desktop tool. Currently this is the [link with the releases](https://github.com/jgraph/drawio-desktop/releases).
+All the diagrams are in the [docs](docs/) folder and [draw.io](https://app.diagrams.net/) is needed in order to view them. From the `Help` item in the menu a desktop tool could be downloaded, if preferred. Currently this is the [link with the releases](https://github.com/jgraph/drawio-desktop/releases).
 
 </details>
 
@@ -77,7 +77,7 @@ Drawbacks are not small:
 * Each messaging server needs to know which other messaging server the recepient of the message is connected to
   - One option is each messaging server to keep an in-memory data structure for the up to 100 mln clients which isn't something easy to implement, especially if we take into account the fact that this data structure needs to be thread-safe. A hashtable, b-trees or some variant of trie are possible options.
   - Another option is to offload the storage of this knowledge to a configuration database cluster. This would increase the latency of course.
-* Messaging servers need to keep open connections between each other, which considering their number and the fact that one of the key limits in the system is the number of connections to a messaging server, is not something I favor.
+* Messaging servers need to keep open connections between each other. This does not play well with one of the key limits in the system which is the number of connections to a messaging server.
 * Messaging servers need to know when one of them fails and re-establish the connection to its replacement.
 * Consistency of the data would be harder since the two logical operations required for message processing would be separate instead of an atomic single one.
   - Sending the message to its recipient(s) by calling one (or multiple for group chats) messaging servers
@@ -101,7 +101,7 @@ The benefits are:
 The drawbacks, just like the benefits, are the opposite from the previous approach
 
 * Higher latency because of the indirect communication, especially if we persist the message in Kafka to not just the leader but to at least 1 more in-sync replica.
-* Load-balancing becomes non-trivial, since balanced distribution of topic partitions between all messaging servers now become crucial.
+* Load-balancing becomes non-trivial, since balanced distribution of topic partitions between all messaging servers now become crucial. Manually assigning topic partitions in Kafka is considered a custom approach, compared to the built-in auto-balancing.
 * The messaging servers become stateful since they are now bound to 2 things.
   - Each messaging server needs to listen to a specific set of topic partitions. This can be solved via centraized configuration but there are tricky details.
   - Each messaging server is the only one responsible to the set of clients which use the mentioned topic partitions. The deployment infrastructure can keep idle messaging servers ready to replace ones declared dead.
@@ -112,12 +112,34 @@ I decided to try out the alternative approach using a PUB/SUB backplane and lear
 
 ## Send
 
+<details>
+<summary>Show/hide</summary>
+
 ![Send messages](docs/images/cecochat-02-message-send.png)
+
+Sending messages relies on a formula in order to calculate which topic partition the recipient is assigned to.
+
+```
+Recipient Kafka partition = Hash(Recipient ID) % Partition count
+```
+
+As hinted, typically Kafka uses auto-partitioning when sending messages, so doing it manually is not the standard way. But in our case it is required since each messaging server consumer is stateful - the clients connected to it are assigned to specific partitions. Fortunately the .NET clients API has these capabilities.
+
+The hash function needs to be stable because it would be run on multiple different servers. It needs to provide an excellent distribution since we don't want hot partitions. And since this is the same function which is used to decide which messaging server each client connects to - we don't want to hit our messaging server connection number limit. The performance requirements are not key, it just doesn't need to be slow. I used [FNV](https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function) which satisfied the requirements. I [checked](check/) how it behaves and its total distribution deviation and max one are small enough.
+
+</details>
 
 ## Receive
 
-![Send messages](docs/images/cecochat-02-message-receive.png)
+<details>
+<summary>Show/hide</summary>
+
+![Receive messages](docs/images/cecochat-03-message-receive.png)
+
+Each messaging server is stateful. It is manually assigned a number of Kafka partitions and consumes messages only from them. Additionally only clients whose user ID is assigned to one of those same partitions connect to that messaging server.
+
+</details>
 
 # Conclusion
 
-# What next?
+# What next
