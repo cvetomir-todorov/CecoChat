@@ -14,15 +14,14 @@
 ## Daily
 
 * Users come and go throughout the day
-
-### Users
-
 * 640 000 000 active users daily
+* 64 messages per user daily
 
 ### Messages
 
-* 64 messages per user daily
 * 640 000 000 users x 64 messages = 40 960 000 000 messages daily
+* 40 960 000 000 daily / 86 400 seconds = ~475 000 messages/s daily
+* 475 000 messages/s / 2000 messaging servers = ~237 messages/s per messaging server daily
 
 ### Throughput
 
@@ -32,24 +31,21 @@
 
 ## Peak
 
-* 1 hour
-* 80% of cell is busy
-* 50% of user daily messages are sent
-
-### Users
-
-* 80 000 000 active users
+* 1 hour peak
+* 80% of cell is busy = 80 000 000 active users
+* 50% of user daily messages are sent = 32 messages for each user peak
 
 ### Messages
 
-* 32 messages for each user peak
 * 80 000 000 users * 32 messages = 2 560 000 000 messages peak
+* 2 560 000 000 peak / 3600 seconds = ~712 000 messages/s peak
+* 712 000 messages/s / 2000 messaging servers ~356 messages/s per messaging server daily
 
 ### Throughput
 
 * 655 360 000 000 bytes = 640 000 000 KB = 625 000 MB peak
 * 625 000 MB peak / 3 600 seconds = ~174 MB/s peak
-* 174 MB/s / 2000 messagin servers = 0.09 MB/s per messaging server peak
+* 174 MB/s / 2000 messaging servers = 0.09 MB/s per messaging server peak
 
 ## Storage
 
