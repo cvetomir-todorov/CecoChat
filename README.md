@@ -167,23 +167,78 @@ A client's way of being consistent with the latest messages is to start listenin
 
 </details>
 
-# Configuration and failover
-
-## Configuration
+# Configuration
 
 <details>
 <summary>Show/hide</summary>
+
+![Configuration](docs/images/cecochat-05-configuration.png)
+
+The most important information stored in the configuration database is related to server partition assignment. Each messaging server is assigned a server ID. The configuration database stores the address and partitions for each server ID. It is used by:
+
+* Connect server:
+  - Get the user partition by the user ID
+  - Get the server address for that partition
+* Messaging server:
+  - Assign the partitions to the Kafka consumer in order to consume messages
+
+Redis conveniently supports simple keys for plain data such as partition count and history settings. Redis hashes (which could probably be called maps) are used to store key-value pairs like the (server ID -> partitions) and (server ID -> address). After the configurator server applies configuration changes the Redis PUB/SUB is used to publish a notification to subscribers using the respective channels. Each interested server listens to the changes for it:
+
+* Connect server - partitions, server partitions, server addresses
+* Messaging server - partitions, server partitions
+* History server - history settings
 
 </details>
 
-## Failover
+# Failover
 
 <details>
 <summary>Show/hide</summary>
+
+![Failover](docs/images/cecochat-06-failover.png)
+
+Each Kafka partition is consumed by exactly one messaging server. Once this server is declared dead it should be replaced by a new one. To speed things up the deployment infrastructure should keep idle messaging servers waiting. Idle ones also have server IDs as described in the configuration section. Replacing a dead server then costs:
+
+* Handling the notification from the deployment infrastructure
+* Updating the server partitions configuration
+* Publishing the configuration change notification
 
 </details>
 
 # How to run
+
+<details>
+<summary>Show/hide</summary>
+
+Despite there is quite a bit of code written it is more of a proof-of-concept. In order to validate the implementation a lot of physical infrastructure is required which is quite expensive unfortunately. Despite that it is functioning and with a machine powerful enough everything could be powered up. I've used `docker-compose` in order to run the required servers and the solution itself since it is also containerized. I've limited the memory for most of the containers to `512 MB`.
+
+## Run infrastructure
+
+Before and after running the containers there are some scripts for preparing each type of server. Most of them simply create the `docker` volumes.
+
+* Kafka has 4 containers:
+  - 2 Kafka brokers
+  - Zookeeper
+  - Kafdrop web interface
+* Cassandra has 4 containers:
+  - 3 Cassandra instances
+  - Cassandra web interface
+* Redis has 2 containers:
+  - 1 Redis instance
+  - Redis commander
+
+## Containerize and run CecoChat
+
+In order to containerize CecoChat you need to build it using .NET 5. I've used Visual Studio since I am also developing it, but I guess the SDK is enough to simply build. The [containerize](containerize/) folder contains the Docker files and scripts for building the images. Internally the scripts do `dotnet publish` and use `Debug` configuration with `Trace`/`Verbose` level of logging. Changes to the type of scripts `ps1` -> `sh` or to the configuration `Debug` -> `Release` is easy. The docker-compose files creates containers for:
+
+* 1 connect server
+* 2 messaging servers
+* 1 materialize server
+* 1 history server
+
+TODO: Add Redis scripts to create the initial state which is currently hardcoded locally.
+
+</details>
 
 # Conclusion
 
