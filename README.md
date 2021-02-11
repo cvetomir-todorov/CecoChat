@@ -4,7 +4,7 @@ System design and implementation of a chat for millions active users based on Ka
 
 # Why
 
-I decided to take on the challenge to design a globally-scalable chat like WhatsApp and Facebook Messenger. Based on [statistics](https://www.statista.com/statistics/258749/most-popular-global-mobile-messenger-apps/) the montly active users are 2.0 bln for WhatsApp and 1.3 bln for Facebook Messenger. At that scale I decided to start a bit smaller. A good first step was to design a system that would be able to handle a smaller number of active users which are directly connected to it. I call it a cell. After that I would need to design how multiple cells placed in different geographic locations would communicate with each other. I certainly don't have the infrastructure to validate the design and the implementation. But I used the challenge to think at a large scale and to learn a few new technologies and approaches along the way.
+I decided to take on the challenge to design a globally-scalable chat like WhatsApp and Facebook Messenger. Based on [statistics](https://www.statista.com/statistics/258749/most-popular-global-mobile-messenger-apps/) the montly active users are 2.0 bln for WhatsApp and 1.3 bln for Facebook Messenger. At that scale I decided to start a bit smaller. A good first step was to design a system that would be able to handle a smaller number of active users which are directly connected to it. Let's call it a cell. After that I would need to design how multiple cells placed in different geographic locations would communicate with each other. I certainly don't have the infrastructure to validate the design and the implementation. But I used the challenge to think at a large scale and to learn a few new technologies and approaches along the way.
 
 # Overall design
 
@@ -79,7 +79,7 @@ Drawbacks are not small:
   - Another option is to offload the storage of this knowledge to a configuration database cluster. This would increase the latency of course.
 * Messaging servers need to keep open connections between each other. This does not play well with one of the key limits in the system which is the number of connections to a messaging server.
 * Messaging servers need to know when one of them fails and re-establish the connection to its replacement.
-* Consistency of the data would be harder since the two logical operations required for message processing would be separate instead of an atomic single one.
+* Consistency of the data would be harder since the two logical operations required for message processing would be separate instead of a single one.
   - Sending the message to its recipient(s) by calling one (or multiple for group chats) messaging servers
   - Persisting the message into the history database
 
@@ -101,14 +101,14 @@ The benefits are:
 The drawbacks, just like the benefits, are the opposite from the previous approach
 
 * Higher latency because of the indirect communication, especially if we persist the message in Kafka to not just the leader but to at least 1 more in-sync replica.
-* Load-balancing becomes non-trivial, since balanced distribution of topic partitions between all messaging servers now become crucial. Manually assigning topic partitions in Kafka is considered a custom approach, compared to the built-in auto-balancing.
+* Client load-balancing becomes non-trivial, since balanced distribution of topic partitions between all messaging servers now is crucial. Manually assigning topic partitions in Kafka is considered a custom approach, compared to the built-in auto-balancing.
 * The messaging servers become stateful since they are now bound to 2 things.
-  - Each messaging server needs to listen to a specific set of topic partitions. This can be solved via centraized configuration but there are tricky details.
-  - Each messaging server is the only one responsible to the set of clients which use the mentioned topic partitions. The deployment infrastructure can keep idle messaging servers ready to replace ones declared dead.
+  - Each messaging server needs to listen to a specific set of topic partitions. This can be solved via centraized configuration.
+  - Each messaging server is the only one responsible to the set of clients which use the mentioned topic partitions. To solve this issue the deployment infrastructure can keep idle messaging servers ready to replace ones declared dead.
 
 </details>
 
-I decided to try out the alternative approach using a PUB/SUB backplane and learning a bit more about Kafka.
+I decided to try out the alternative approach using a PUB/SUB backplane.
 
 ## Send
 
@@ -123,7 +123,7 @@ Sending messages relies on a formula in order to calculate which topic partition
 Recipient Kafka partition = Hash(Recipient ID) % Partition count
 ```
 
-As hinted, typically Kafka uses auto-partitioning when sending messages, so doing it manually is not the standard way. But in our case it is required since each messaging server consumer is stateful - the clients connected to it are assigned to specific partitions. Fortunately the .NET clients API has these capabilities.
+Typically Kafka uses auto-partitioning when sending messages, so doing it manually is not the standard way. But in our case it is required since each messaging server consumer is stateful - the clients connected to it are assigned to specific partitions. Fortunately the Kafka .NET client API has these capabilities.
 
 The hash function needs to be stable because it would be run on multiple different servers. It needs to provide an excellent distribution since we don't want hot partitions. And since this is the same function which is used to decide which messaging server each client connects to - we don't want to hit our messaging server connection number limit. The performance requirements are not key, it just doesn't need to be slow. I used [FNV](https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function) which satisfied the requirements. I [checked](check/) how it behaves and its total distribution deviation and max one are small enough.
 
@@ -136,9 +136,54 @@ The hash function needs to be stable because it would be run on multiple differe
 
 ![Receive messages](docs/images/cecochat-03-message-receive.png)
 
-Each messaging server is stateful. It is manually assigned a number of Kafka partitions and consumes messages only from them. Additionally only clients whose user ID is assigned to one of those same partitions connect to that messaging server.
+Each messaging server is stateful. It contains a Kafka consumer which has manually assigned Kafka partitions and consumes messages only from them. Additionally only clients whose user ID is assigned to one of those same partitions connect to that messaging server.
 
 </details>
+
+# History and clients
+
+## Materialize
+
+<details>
+<summary>Show/hide</summary>
+
+Materialize servers use a standard Kafka consumger group with automatic partition assignment and balancing. Their role is to create the history data in the Cassandra database. Currently 2 types of queries are supported which reflects the data that is being entered.
+
+* `Get user history` - returns a predefined max number of messages sent to the user with the specified user ID which are older than a specified date. In order to support this query for both sender and receiver the message is entered in the database twice. The table has a `user ID` column which is the partition key. It is separate from the `sender ID` and `receiver ID`.
+* `Get dialog history` - returns a predefined max number of messages between 2 users with the specified user IDs which are older than a specified date. The partition key here is a string of `userID1-userID2`. To avoid ambiguity `userID1` is always the smaller.
+
+</details>
+
+## Clients
+
+<details>
+<summary>Show/hide</summary>
+
+![Clients](docs/images/cecochat-04-clients.png)
+
+Because of the messaging servers state each client needs to be connected to the precise messaging server. This could be solved via a load balancer which extracts the user ID from the client's access token. This is an operation which would require an additional decryption and application-level-based load-balancing which happens for every message. I decided to approach things in a different way. The connnect server finds out which the messaging server is only once and the clients use that address to connect directly to their messaging server. There are operational issues with this approach but the addition decryption is avoided. To make things consistent the connect server returns the history server address as well, but here it could be the HTTP-level based load-balancer address.
+
+A client's way of being consistent with the latest messages is to start listening for new ones from the messaging server first. After than the client can query for the user history using the current date until it decides it has caught up by checking the date of the oldest returned message. Additionally, each client can explore a dialog with a certain user in the same manner using the second query supported by the history database. In order to handle duplicate messages which could be already present in the client's local database each message has a unique ID used for deduplication.
+
+</details>
+
+# Configuration and failover
+
+## Configuration
+
+<details>
+<summary>Show/hide</summary>
+
+</details>
+
+## Failover
+
+<details>
+<summary>Show/hide</summary>
+
+</details>
+
+# How to run
 
 # Conclusion
 
