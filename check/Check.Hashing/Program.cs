@@ -34,8 +34,10 @@ namespace Check.Hashing
 
         private static void PrintResult(string hashName, EvaluateHashParams evaluateParams, EvaluateHashResult result)
         {
-            Console.WriteLine("{0} for user IDs in [{1}, {2}] and partition count = {3} calculated for {4:0.00} ms.",
-                hashName, evaluateParams.MinUserID, evaluateParams.MaxUserID, evaluateParams.PartitionCount, result.Time.TotalMilliseconds);
+            Console.WriteLine("{0} for user IDs in [{1}, {2}] and partition count = {3}.", hashName,
+                evaluateParams.MinUserID, evaluateParams.MaxUserID, evaluateParams.PartitionCount);
+            Console.WriteLine("All {0} hashes calculated for {1:0.##} ms, 1000 hashes calculated for {2:0.####} ms.",
+                evaluateParams.UserCount, result.TotalTime.TotalMilliseconds, result.AverageTimePer1000Hashes.TotalMilliseconds);
             Console.WriteLine("Total distribution deviation = {0}", result.TotalDistributionDeviation);
             Console.WriteLine("Max distribution deviation = {0}", result.MaxDistributionDeviation);
         }
@@ -45,13 +47,15 @@ namespace Check.Hashing
             public int PartitionCount { get; init; }
             public long MinUserID { get; init; }
             public long MaxUserID { get; init; }
+            public long UserCount => MaxUserID - MinUserID + 1;
         }
 
         private record EvaluateHashResult
         {
             public int TotalDistributionDeviation { get; init; }
             public int MaxDistributionDeviation { get; init; }
-            public TimeSpan Time { get; init; }
+            public TimeSpan TotalTime { get; init; }
+            public TimeSpan AverageTimePer1000Hashes { get; init; }
         }
 
         private static EvaluateHashResult EvaluateHash(INonCryptoHash hash, EvaluateHashParams evaluateParams)
@@ -67,7 +71,7 @@ namespace Check.Hashing
 
             stopwatch.Stop();
 
-            int average = (int) Math.Round((evaluateParams.MaxUserID - evaluateParams.MinUserID + 1) / (double) evaluateParams.PartitionCount);
+            int average = (int) Math.Round(evaluateParams.UserCount / (double) evaluateParams.PartitionCount);
             int totalDeviation = 0;
             int maxDeviation = 0;
 
@@ -78,11 +82,15 @@ namespace Check.Hashing
                 maxDeviation = Math.Max(maxDeviation, deviation);
             }
 
+            // ReSharper disable once PossibleLossOfFraction
+            TimeSpan averageTime = stopwatch.Elapsed / (evaluateParams.UserCount / 1000);
+
             return new EvaluateHashResult
             {
                 TotalDistributionDeviation = totalDeviation,
                 MaxDistributionDeviation = maxDeviation,
-                Time = stopwatch.Elapsed
+                TotalTime = stopwatch.Elapsed,
+                AverageTimePer1000Hashes = averageTime
             };
         }
     }
