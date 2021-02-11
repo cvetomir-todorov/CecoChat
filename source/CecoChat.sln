@@ -39,10 +39,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CecoChat.Data.Configuration
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CecoChat.Profile.Server", "CecoChat.Profile.Server\CecoChat.Profile.Server.csproj", "{E887FD54-B681-44DF-9566-182DF3327B6B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CecoChat.Check", "CecoChat.Check\CecoChat.Check.csproj", "{9988B350-355D-4FFA-83B6-98447F3564D8}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ZOthers", "ZOthers", "{E5F02457-38F1-4D3C-907F-19EB56AFA6A0}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -105,8 +101,6 @@ Global
 		{E887FD54-B681-44DF-9566-182DF3327B6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E887FD54-B681-44DF-9566-182DF3327B6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E887FD54-B681-44DF-9566-182DF3327B6B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9988B350-355D-4FFA-83B6-98447F3564D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9988B350-355D-4FFA-83B6-98447F3564D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -126,7 +120,6 @@ Global
 		{4A2BBA46-E004-4353-97B4-DEB23502AA83} = {8A833F6F-10A3-4A3B-9B83-90F03DF415E4}
 		{F5322D17-1D82-4929-A461-F9CB24371ED4} = {AFB9809C-E9BA-4CB1-93B5-2C95EA5A391C}
 		{E887FD54-B681-44DF-9566-182DF3327B6B} = {8A833F6F-10A3-4A3B-9B83-90F03DF415E4}
-		{9988B350-355D-4FFA-83B6-98447F3564D8} = {E5F02457-38F1-4D3C-907F-19EB56AFA6A0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B5EAA668-8419-44F5-8BE5-9175A9B20BF8}

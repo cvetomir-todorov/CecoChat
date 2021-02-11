@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
+using CecoChat;
 
-namespace CecoChat.Check
+namespace Check.Hashing
 {
     public static class Program
     {
@@ -17,6 +18,13 @@ namespace CecoChat.Check
             INonCryptoHash fnv = new FnvHash();
             INonCryptoHash xxHash = new XXHash();
 
+            // warm-up
+            fnv.Compute(evaluateParams.MinUserID);
+            fnv.Compute(evaluateParams.MaxUserID);
+            xxHash.Compute(evaluateParams.MinUserID);
+            xxHash.Compute(evaluateParams.MaxUserID);
+
+            // actual
             EvaluateHashResult fnvResult = EvaluateHash(fnv, evaluateParams);
             EvaluateHashResult xxHashResult = EvaluateHash(xxHash, evaluateParams);
 
@@ -26,10 +34,10 @@ namespace CecoChat.Check
 
         private static void PrintResult(string hashName, EvaluateHashParams evaluateParams, EvaluateHashResult result)
         {
-            Console.WriteLine(
-                "{0} for user IDs in [{1}, {2}] and partition count = {3} calculated for {4:0.00} ms with distribution deviation = {5}.",
-                hashName, evaluateParams.MinUserID, evaluateParams.MaxUserID, evaluateParams.PartitionCount,
-                result.Time.TotalMilliseconds, result.DistributionDeviation);
+            Console.WriteLine("{0} for user IDs in [{1}, {2}] and partition count = {3} calculated for {4:0.00} ms.",
+                hashName, evaluateParams.MinUserID, evaluateParams.MaxUserID, evaluateParams.PartitionCount, result.Time.TotalMilliseconds);
+            Console.WriteLine("Total distribution deviation = {0}", result.TotalDistributionDeviation);
+            Console.WriteLine("Max distribution deviation = {0}", result.MaxDistributionDeviation);
         }
 
         private record EvaluateHashParams
@@ -41,7 +49,8 @@ namespace CecoChat.Check
 
         private record EvaluateHashResult
         {
-            public int DistributionDeviation { get; init; }
+            public int TotalDistributionDeviation { get; init; }
+            public int MaxDistributionDeviation { get; init; }
             public TimeSpan Time { get; init; }
         }
 
@@ -60,16 +69,19 @@ namespace CecoChat.Check
 
             int average = (int) Math.Round((evaluateParams.MaxUserID - evaluateParams.MinUserID + 1) / (double) evaluateParams.PartitionCount);
             int totalDeviation = 0;
+            int maxDeviation = 0;
 
             foreach (int partition in partitions)
             {
                 int deviation = Math.Abs(partition - average);
                 totalDeviation += deviation;
+                maxDeviation = Math.Max(maxDeviation, deviation);
             }
 
             return new EvaluateHashResult
             {
-                DistributionDeviation = totalDeviation,
+                TotalDistributionDeviation = totalDeviation,
+                MaxDistributionDeviation = maxDeviation,
                 Time = stopwatch.Elapsed
             };
         }

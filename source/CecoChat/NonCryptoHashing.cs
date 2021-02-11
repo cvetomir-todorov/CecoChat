@@ -7,6 +7,9 @@ namespace CecoChat
         int Compute(long value);
     }
 
+    /// <summary>
+    /// A stable hashing using FNV algorithm.
+    /// </summary>
     public sealed class FnvHash : INonCryptoHash
     {
         public int Compute(long value)
@@ -31,6 +34,9 @@ namespace CecoChat
         }
     }
 
+    /// <summary>
+    /// A non-stable .NET hashing function using xxHash algorithm.
+    /// </summary>
     public sealed class XXHash : INonCryptoHash
     {
         public int Compute(long value)

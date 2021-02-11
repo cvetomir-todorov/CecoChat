@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CecoChat\CecoChat.csproj" />
+    <ProjectReference Include="..\..\source\CecoChat\CecoChat.csproj" />
   </ItemGroup>
 
 </Project>
