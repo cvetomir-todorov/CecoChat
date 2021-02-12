@@ -9,6 +9,8 @@ namespace CecoChat.Data.Messaging
 {
     public interface IHistoryRepository
     {
+        void Prepare();
+
         Task<IReadOnlyCollection<BackendMessage>> GetUserHistory(long userID, DateTime olderThan, int countLimit);
 
         Task<IReadOnlyCollection<BackendMessage>> GetDialogHistory(long userID, long otherUserID, DateTime olderThan, int countLimit);
@@ -38,6 +40,13 @@ namespace CecoChat.Data.Messaging
         const string SelectMessagesForDialog =
             "SELECT message_id, sender_id, receiver_id, when, message_type, data " +
             "FROM messages_for_dialog WHERE dialog_id = ? AND when < ? ORDER BY when DESC LIMIT ?";
+
+        public void Prepare()
+        {
+            // preparing the queries beforehand is optional and is implemented using the lazy pattern
+            var _ = _userHistoryQuery.Value;
+            var __ = _dialogHistoryQuery.Value;
+        }
 
         public async Task<IReadOnlyCollection<BackendMessage>> GetUserHistory(long userID, DateTime olderThan, int countLimit)
         {

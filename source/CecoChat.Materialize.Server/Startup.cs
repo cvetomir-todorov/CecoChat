@@ -27,6 +27,7 @@ namespace CecoChat.Materialize.Server
         {
             // ordered hosted services
             services.AddHostedService<InitializeDbHostedService>();
+            services.AddHostedService<PrepareQueriesHostedService>();
             services.AddHostedService<MaterializeMessagesHostedService>();
 
             // history

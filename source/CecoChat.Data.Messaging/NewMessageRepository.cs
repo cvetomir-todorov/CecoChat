@@ -8,6 +8,8 @@ namespace CecoChat.Data.Messaging
 {
     public interface INewMessageRepository
     {
+        void Prepare();
+
         void AddNewDialogMessage(BackendMessage message);
     }
 
@@ -43,6 +45,13 @@ namespace CecoChat.Data.Messaging
             "INSERT INTO messages_for_dialog " +
             "(dialog_id, message_id, sender_id, receiver_id, when, message_type, data) " +
             "VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+        public void Prepare()
+        {
+            // preparing the queries beforehand is optional and is implemented using the lazy pattern
+            var _ = _messagesForUserQuery.Value;
+            var __ = _messagesForDialogQuery.Value;
+        }
 
         public void AddNewDialogMessage(BackendMessage message)
         {

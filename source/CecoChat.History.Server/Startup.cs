@@ -35,6 +35,7 @@ namespace CecoChat.History.Server
         {
             // ordered hosted services
             services.AddHostedService<ConfigurationHostedService>();
+            services.AddHostedService<PrepareQueriesHostedService>();
 
             // clients
             services.AddGrpc();
