@@ -21,7 +21,7 @@ namespace CecoChat.Messaging.Server.Clients
         private readonly IClientContainer _clientContainer;
 
         public GrpcSendService(
-            ILogger<GrpcListenService> logger,
+            ILogger<GrpcSendService> logger,
             IClock clock,
             IBackendProducer backendProducer,
             IClientBackendMapper mapper,
