@@ -1,12 +1,34 @@
 # CecoChat
 
-System design and implementation of a chat for millions active users based on Kafka, Cassandra, Redis, gRPC, Docker, ASP.NET, .NET 5. The solution is named after my short name.
+System design and sample implementation of a chat for millions active users based on Kafka, Cassandra, Redis, gRPC, Docker, ASP.NET, .NET 5. The solution is named after my short name.
 
 # Why
 
 I decided to take on the challenge to design a globally-scalable chat like WhatsApp and Facebook Messenger. Based on [statistics](https://www.statista.com/statistics/258749/most-popular-global-mobile-messenger-apps/) the montly active users are 2.0 bln for WhatsApp and 1.3 bln for Facebook Messenger. At that scale I decided to start a bit smaller. A good first step was to design a system that would be able to handle a smaller number of active users which are directly connected to it. Let's call it a cell. After that I would need to design how multiple cells placed in different geographic locations would communicate with each other. I certainly don't have the infrastructure to validate the design and the implementation. But I used the challenge to think at a large scale and to learn a few new technologies and approaches along the way.
 
 Feel free to comment using the `Discussions` tab on the Git repo.
+
+# Capabilities
+
+<details>
+<summary>Show/hide</summary>
+
+## Functional capabilities
+
+* User can send messages to and receive messages from other users
+* User is shown at log-in the missed messages while being offline
+* User can review chat history between him and another user
+* Same user can use multiple clients
+
+Currently no user profile and friendship are implemented so clients rely on user IDs.
+
+## Non-functional capabilities
+
+* Designed for 10-100 mln of active users
+  - Expensive to validate as mentioned already
+  - Numbers from the calculation show that the solution is possible
+
+</details>
 
 # Overall design
 
@@ -248,21 +270,31 @@ I've written a very basic console client. There is also a WPF desktop client for
 
 # What next
 
-* The architecturally most important thing is to design the communication between cells. It is also the most challenging.
-* Adding different types of messages is also interesting:
-  - Ack that CecoChat has received the message
-  - Ack that receiver has received the message
-  - Ack that receiver has seen the message
-  - Image message
-  - Video message
-  - Group message
-  - Status update message: online, offline, away, busy etc.
-* Infrastructurally some things could be worked on:
-  - Generating message IDs on the server
-  - Benchmarking a real connection limit
-  - Configure Kafka and benchmark behavior
-  - Revisit Cassandra design and client usage, e.g. consider bulk loading data
-* To make the implementation complete:
-  - Add user authentication and authorization
-  - Add profile service (database will be required) for storing the user data
-  - Handle user friendship
+<details>
+<summary>Show/hide</summary>
+
+* The architecturally most important thing is to design the communication between cells which is also the most challenging
+* Add missing operability elements
+  - Tracing
+  - Monitoring
+  - Health status
+  - Deployment
+* Internal things could be worked on
+  - Generate message IDs on the server
+  - Benchmark messaging server connection limit
+  - Configure better and benchmark Kafka
+  - Revisit Cassandra design and consider client usage to employ bulk-loading data
+* Add different types of messages:
+  - Group messages
+  - Media messages - image/video
+  - Status update messages: online, offline, away, busy etc.
+  - Acks:
+    - CecoChat has received the message
+    - Recipient has received the message
+    - Recipient has seen the message
+* Add user and profile related features
+  - User authentication and authorization
+  - Store user profile data
+  - Handle friendship between users
+
+</details>
