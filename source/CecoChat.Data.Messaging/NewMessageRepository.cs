@@ -63,6 +63,7 @@ namespace CecoChat.Data.Messaging
                 .Add(insertForReceiver)
                 .Add(insertForDialog);
             insertBatch.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
+            insertBatch.SetIdempotence(false);
 
             ISession session = _dbContext.Messaging;
             session.Execute(insertBatch);

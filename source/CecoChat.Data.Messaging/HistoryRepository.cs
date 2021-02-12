@@ -43,6 +43,7 @@ namespace CecoChat.Data.Messaging
         {
             BoundStatement query = _userHistoryQuery.Value.Bind(userID, olderThan, countLimit);
             query.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
+            query.SetIdempotence(true);
             List<BackendMessage> messages = await _dataUtility.GetMessages(query, countLimit);
 
             _logger.LogTrace("Returned {0} messages for user {1} older than {2}.", messages.Count, userID, olderThan);
@@ -53,6 +54,7 @@ namespace CecoChat.Data.Messaging
         {
             string dialogID = _dataUtility.CreateDialogID(userID, otherUserID);
             BoundStatement query = _dialogHistoryQuery.Value.Bind(dialogID, olderThan, countLimit);
+            query.SetIdempotence(true);
             query.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
             List<BackendMessage> messages = await _dataUtility.GetMessages(query, countLimit);
 
