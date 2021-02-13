@@ -2,7 +2,9 @@
 
 System design and partial implementation of a chat for 10-100 millions active users based on Kafka, Cassandra, gRPC, Redis, Docker, ASP.NET, .NET 5.
 
-I would appreciate any comments using the `Discussions` tab on the Git repo. The solution is named after my short name.
+I would appreciate any comments so feel free to use the `Discussions` tab on the Git repo.
+
+P.S. The solution is named after my short name.
 
 # Introduction
 
@@ -90,16 +92,21 @@ All the diagrams are in the [docs](docs/) folder and [draw.io](https://app.diagr
 
 ## Concurrent connections benchmark
 
-I decided to check what could be the number of connections per messaging server. The code is in the [check](check/) folder. I ran the server application on a weaker machine and the clients on a moderately powerful one which are connected via 100Mbps router. Both were run on .NET 5 using Release configuration. Details are as follow:
+<details>
+<summary>Show/hide</summary>
+
+I decided to benchmark the number of connections per messaging server. The code is in the [check](check/) folder. I ran the server application on a weaker machine and the clients on a moderately powerful one which are connected via 100Mbps router. Both were run on .NET 5 using Release configuration. Details are as follow:
 
 | Application | CPU         | Frequency | Cores | RAM  | OS                      |
 | :---------- | :---------  | :-------- | :---- | :--- | :---------------------- |
 | Server      | Core 2 Duo  | 2133MHz   | 2     | 4GB  | Ubuntu Server 20.04 LTS |
 | Clients     | QuadCore i5 | 3533MHz   | 4     | 16GB | Windows 10              |
 
-On the server I use ASP.NET Core gRPC services utilizing async-await instead of hardcoded number of workers. The clients connect in an interval of 0.5ms and send 20 messages at a rate of 1 per second. The server was able to handle 10k concurrent connections for about 35-40 seconds utilizing about 40% of RAM and 150% CPU (out of 200% max). The simple gRPC service logic and not using TLS makes things easier. Once there are more complex logic, Kafka communication, TLS encryption, monitoring etc. the things would be harder. But let's not forget that not all connected clients send/receive a message each second.
+On the server I use ASP.NET Core gRPC services utilizing async-await and TPL. The clients connect in an interval of 0.5ms and send 20 messages at a rate of 1 per second. The server was able to handle 10k concurrent connections for about 35-40 seconds utilizing about 40% of RAM and 150% CPU (out of 200% max). The simple gRPC service logic and not using TLS makes things easier. Once there are more complex logic, Kafka communication, TLS encryption, monitoring etc. it would be harder. But let's not forget that not all connected clients send/receive a message each second.
 
-After that I decided to check 20k connections and the server was not able to handle more than 16k of them. It was dropping them on connect despite that Kestrel by default doesn't have those limits set. The memory was 50% but the CPU was 200%. So if 50k connections are an issue with a more powerful server there needs to be another solution. Options include using even more lightweight and lower latency communication framework like ZeroMQ. This would allow a more precise control of the number of background workers and synchronous code. The client-server communication will be full-duplex and asynchronous instead of using the request-response interaction style as is now in gRPC.
+I decided to create 20k connections but the server was not able to handle more than 16k of them. It was dropping them on connect even though Kestrel by default doesn't have a concurrent connection limit set. The memory was 50% but the CPU was 200%. So if 50k connections are an issue with a more powerful server there needs to be another solution. One option is to drop using ASP.NET gRPC integration and rely on pure gRPC server code. Another option is to use a different lightweight and low latency communication framework like ZeroMQ. Ideally we should have a precise control over the number of background workers and we should use synchronous code instead of async-await and TPL. The client-server communication will be full-duplex and asynchronous instead of using the request-response interaction style.
+
+</details>
 
 ## Send and receive messages
 
