@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Check.Connections.Client": {
+      "commandName": "Project",
+      "commandLineArgs": "-a http://192.168.0.100:5000 -c 20000 -m 20"
+    }
+  }
+}
