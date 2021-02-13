@@ -1,19 +1,26 @@
 # CecoChat
 
-System design and sample implementation of a chat for millions active users based on Kafka, Cassandra, Redis, gRPC, Docker, ASP.NET, .NET 5. The solution is named after my short name.
+System design and partial implementation of a chat for 10-100 millions active users based on Kafka, Cassandra, gRPC, Redis, Docker, ASP.NET, .NET 5.
 
-# Why
+I would appreciate any comments using the `Discussions` tab on the Git repo. The solution is named after my short name.
 
-I decided to take on the challenge to design a globally-scalable chat like WhatsApp and Facebook Messenger. Based on [statistics](https://www.statista.com/statistics/258749/most-popular-global-mobile-messenger-apps/) the montly active users are 2.0 bln for WhatsApp and 1.3 bln for Facebook Messenger. At that scale I decided to start a bit smaller. A good first step was to design a system that would be able to handle a smaller number of active users which are directly connected to it. Let's call it a cell. After that I would need to design how multiple cells placed in different geographic locations would communicate with each other. I certainly don't have the infrastructure to validate the design and the implementation. But I used the challenge to think at a large scale and to learn a few new technologies and approaches along the way.
+# Introduction
 
-Feel free to comment using the `Discussions` tab on the Git repo.
-
-# Capabilities
+## Why
 
 <details>
 <summary>Show/hide</summary>
 
-## Functional capabilities
+I decided to take on the challenge to design a globally-scalable chat like WhatsApp and Facebook Messenger. Based on [statistics](https://www.statista.com/statistics/258749/most-popular-global-mobile-messenger-apps/) the montly active users are 2.0 bln for WhatsApp and 1.3 bln for Facebook Messenger. At that scale I decided to start a bit smaller. A good first step was to design a system that would be able to handle a smaller number of active users which are directly connected to it. Let's call it a cell. After that I would need to design how multiple cells placed in different geographic locations would communicate with each other. I certainly don't have the infrastructure to validate the design and the implementation. But I used the challenge to think at a large scale and to learn a few new technologies and approaches along the way.
+
+</details>
+
+## Capabilities
+
+<details>
+<summary>Show/hide</summary>
+
+### Functional
 
 * User can send messages to and receive messages from other users
 * User is shown at log-in the missed messages while being offline
@@ -22,15 +29,15 @@ Feel free to comment using the `Discussions` tab on the Git repo.
 
 Currently no user profile and friendship are implemented so clients rely on user IDs.
 
-## Non-functional capabilities
+### Non-functional
 
 * Designed for 10-100 mln of active users
-  - Expensive to validate as mentioned already
+  - Expensive to validate for real
   - Numbers from the calculation show that the solution is possible
+  - The concurrent connection benchmark is promising
+* A balanced aproach between latency, consistency and fault tolerance
 
 </details>
-
-# Overall design
 
 ## Back of the envelope calculations
 
@@ -47,9 +54,9 @@ These numbers do not take into account the security and transport data overhead.
 
 </details>
 
-## Main diagram
+## Overall design
 
-![Main diagram](docs/images/cecochat-01-overall.png)
+![Overall design](docs/images/cecochat-01-overall.png)
 
 <details>
 <summary>Show/hide</summary>
@@ -65,7 +72,7 @@ All the diagrams are in the [docs](docs/) folder and [draw.io](https://app.diagr
 <details>
 <summary>Show/hide</summary>
 
-* Clients use HTTP when they need to find out where to connect. After that gRPC is utilized in order to obtain history and exchange messages. gRPC is language-agnostic, which is important for the variety of front-end technologies. It is lightweight and performant. It is based on HTTP/2 which allows for both inter-operability and optimizations from the protocol. gRPC uses full-duplex communication. Unfortunately support for some of the languages isn't perfect and things like error handling could be improved.
+* Clients use HTTP when they need to find out where to connect. After that gRPC is utilized in order to obtain history and exchange messages. gRPC is language-agnostic, which is important for the variety of front-end technologies. It is lightweight and has a decent performance. It is based on HTTP/2 which allows for both inter-operability and optimizations from the protocol. gRPC uses full-duplex communication. Unfortunately support for some of the languages isn't perfect and things like error handling could be improved.
 
 * PUB/SUB backplane uses Kafka. It is a scalable message broker enabling superb throughput due to its balanced distribution of topic-partition leadership throughout the cluster. It is fault-tolerant and persists messages. Kafka allows different consumer groups each of which can process messages independently from each other. The pull model allows consumers to process messages at their own rate. Kafka can be tuned for either low latency, high-throughput or something in-between. It is a good solution for an event log, especially when processing a single message is fast.
 
@@ -79,11 +86,26 @@ All the diagrams are in the [docs](docs/) folder and [draw.io](https://app.diagr
 
 </details>
 
-# Send and receive messages
+# Design
+
+## Concurrent connections benchmark
+
+I decided to check what could be the number of connections per messaging server. The code is in the [check](check/) folder. I ran the server application on a weaker machine and the clients on a moderately powerful one which are connected via 100Mbps router. Both were run on .NET 5 using Release configuration. Details are as follow:
+
+| Application | CPU         | Frequency | Cores | RAM  | OS                      |
+| :---------- | :---------  | :-------- | :---- | :--- | :---------------------- |
+| Server      | Core 2 Duo  | 2133MHz   | 2     | 4GB  | Ubuntu Server 20.04 LTS |
+| Clients     | QuadCore i5 | 3533MHz   | 4     | 16GB | Windows 10              |
+
+On the server I use ASP.NET Core gRPC services utilizing async-await instead of hardcoded number of workers. The clients connect in an interval of 0.5ms and send 20 messages at a rate of 1 per second. The server was able to handle 10k concurrent connections for about 35-40 seconds utilizing about 40% of RAM and 150% CPU (out of 200% max). The simple gRPC service logic and not using TLS makes things easier. Once there are more complex logic, Kafka communication, TLS encryption, monitoring etc. the things would be harder. But let's not forget that not all connected clients send/receive a message each second.
+
+After that I decided to check 20k connections and the server was not able to handle more than 16k of them. It was dropping them on connect despite that Kestrel by default doesn't have those limits set. The memory was 50% but the CPU was 200%. So if 50k connections are an issue with a more powerful server there needs to be another solution. Options include using even more lightweight and lower latency communication framework like ZeroMQ. This would allow a more precise control of the number of background workers and synchronous code. The client-server communication will be full-duplex and asynchronous instead of using the request-response interaction style as is now in gRPC.
+
+## Send and receive messages
 
 We have a limit of how many clients can connect to a messaging server. A key design element is how to distribute the messages between the messaging servers. Which is what two clients connected to different messaging servers would need in order to exchange messages.
 
-## Standard approach
+### Standard approach
 
 <details>
 <summary>Show/hide</summary>
@@ -109,7 +131,7 @@ Drawbacks are not small:
 
 </details>
 
-## Alternative approach
+### Alternative approach
 
 <details>
 <summary>Show/hide</summary>
@@ -134,7 +156,7 @@ The drawbacks, just like the benefits, are the opposite from the previous approa
 
 I decided to try out the alternative approach using a PUB/SUB backplane.
 
-## Send
+### Send
 
 <details>
 <summary>Show/hide</summary>
@@ -153,7 +175,7 @@ The hash function needs to be stable because it would be run on multiple differe
 
 </details>
 
-## Receive
+### Receive
 
 <details>
 <summary>Show/hide</summary>
@@ -164,9 +186,7 @@ Each messaging server is stateful. It contains a Kafka consumer which has manual
 
 </details>
 
-# History and clients
-
-## Materialize
+## History
 
 <details>
 <summary>Show/hide</summary>
@@ -191,7 +211,7 @@ A client's way of being consistent with the latest messages is to start listenin
 
 </details>
 
-# Configuration
+## Configuration
 
 <details>
 <summary>Show/hide</summary>
@@ -214,7 +234,7 @@ Redis conveniently supports simple keys for plain data such as partition count a
 
 </details>
 
-# Failover
+## Failover
 
 <details>
 <summary>Show/hide</summary>
