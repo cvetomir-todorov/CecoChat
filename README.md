@@ -41,12 +41,37 @@ Currently no user profile and friendship are implemented so clients rely on user
 
 </details>
 
+## Concurrent connections benchmark
+
+<details>
+<summary>Show/hide</summary>
+
+I decided to benchmark the number of connections per messaging server. The code is in the [check](check/) folder. I used two machines connected via 100Mbps router. Details are as follow:
+
+| Machine     | CPU         | Frequency | Cores | RAM  | OS                      |
+| :---------- | :---------  | :-------- | :---- | :--- | :---------------------- |
+| Weaker      | Core 2 Duo  | 2133MHz   | 2     | 4GB  | Ubuntu Server 20.04 LTS |
+| Moderate    | QuadCore i5 | 3533MHz   | 4     | 16GB | Windows 10 20H2         |
+
+On the server I am using ASP.NET Core gRPC services utilizing async-await and TPL. The clients connect first and then simultaneously start sending 20 messages at a rate of 1 per second again utilizing async-await and TPL. Below are the results specifying which machine ran the client and what are the server process resources allocated.
+
+| Client machine | Clients succeeded | Client time | Server machine | Server CPU | Server threads | Server RAM |
+| :------------- | :---------------- | :---------- | :------------- | :--------- | :------------- | :--------- |
+| Moderate       | 15869             | 21 seconds  | Weaker         | 150%-200%  | ?              | 1.3GB      |
+| Weaker         | 28232             | 147 seconds | Moderate       | 5-10%      | 67             | 3.55GB     |
+
+The clients succeeded on both machines are a result of port exhaustion limits hit on both OS-es. The Windows error was `An operation on a socket could not be performed because the system lacked sufficient buffer space or because a queue was full` and the Ubuntu Server one: `Cannot assign requested address`. Additionally when clients were on the weaker machine the client time required in order to complete the requests is considerably higher while it was obvious that the server was not under serious load. One of these could be the issue: Windows 10 has some limits which prohibit it from handling a high number of concurrent clients, the weaker machine is really weak, there is a concurrency issue with .NET 5 at least on Ubuntu Server, I've messed something in the client or server code.
+
+Based on these numbers I think that 50k concurrent connections shouldn't be an issue and would be a useful limit in our calculations.
+
+</details>
+
 ## Back of the envelope calculations
 
 <details>
 <summary>Show/hide</summary>
 
-The [docs](docs/) folder contains the detailed calculations. A messaging server is the server to which users directly connect to. A key limit I impose is `50K connections per messaging server`. A simple calculation tells that `2K messaging servers` are needed in order to support `100 mln active users`.
+The [back-of-the-envelope](docs/back-of-the-envelope.md) file contains the detailed calculations. A messaging server is the server to which users directly connect to. A key limit is `50K connections per messaging server`. A simple calculation tells that `2K messaging servers` are needed in order to support `100 mln active users`.
 
 Throughput-wise a limit of `256 bytes per message` with `640 mln users` spread throughout the day each of which sends `64 messages per day` gives us `116 MB/s for the cell` or `0.06 MB/s per messaging server`.
 
@@ -89,24 +114,6 @@ All the diagrams are in the [docs](docs/) folder and [draw.io](https://app.diagr
 </details>
 
 # Design
-
-## Concurrent connections benchmark
-
-<details>
-<summary>Show/hide</summary>
-
-I decided to benchmark the number of connections per messaging server. The code is in the [check](check/) folder. I ran the server application on a weaker machine and the clients on a moderately powerful one which are connected via 100Mbps router. Both were run on .NET 5 using Release configuration. Details are as follow:
-
-| Application | CPU         | Frequency | Cores | RAM  | OS                      |
-| :---------- | :---------  | :-------- | :---- | :--- | :---------------------- |
-| Server      | Core 2 Duo  | 2133MHz   | 2     | 4GB  | Ubuntu Server 20.04 LTS |
-| Clients     | QuadCore i5 | 3533MHz   | 4     | 16GB | Windows 10              |
-
-On the server I use ASP.NET Core gRPC services utilizing async-await and TPL. The clients connect in an interval of 0.5ms and send 20 messages at a rate of 1 per second. The server was able to handle 10k concurrent connections for about 35-40 seconds utilizing about 40% of RAM and 150% CPU (out of 200% max). The simple gRPC service logic and not using TLS makes things easier. Once there are more complex logic, Kafka communication, TLS encryption, monitoring etc. it would be harder. But let's not forget that not all connected clients send/receive a message each second.
-
-I decided to create 20k connections but the server was not able to handle more than 16k of them. It was dropping them on connect even though Kestrel by default doesn't have a concurrent connection limit set. The memory was 50% but the CPU was 200%. So if 50k connections are an issue with a more powerful server there needs to be another solution. One option is to drop using ASP.NET gRPC integration and rely on pure gRPC server code. Another option is to use a different lightweight and low latency communication framework like ZeroMQ. Ideally we should have a precise control over the number of background workers and we should use synchronous code instead of async-await and TPL. The client-server communication will be full-duplex and asynchronous instead of using the request-response interaction style.
-
-</details>
 
 ## Send and receive messages
 

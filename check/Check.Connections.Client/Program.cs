@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Net;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using CecoChat.Contracts.Client;
@@ -12,6 +14,7 @@ namespace Check.Connections.Client
     public static class Program
     {
         private static int _successCount;
+        private static SemaphoreSlim _clientsConnected;
 
         public static void Main(string[] args)
         {
@@ -24,23 +27,27 @@ namespace Check.Connections.Client
         {
             List<ClientData> clients = CreateClients(commandLine);
 
-            Console.WriteLine("Start {0} clients with {1} messages each and server {2}.",
+            Console.WriteLine("Create {0} clients with {1} messages each and server {2}.",
                 commandLine.ClientCount, commandLine.MessageCount, commandLine.ServerAddress);
+
+            _clientsConnected = new SemaphoreSlim(initialCount: 0, maxCount: commandLine.ClientCount);
 
             Stopwatch stopwatch = Stopwatch.StartNew();
             Task[] tasks = new Task[commandLine.ClientCount];
-
             for (int i = 0; i < commandLine.ClientCount; ++i)
             {
-                // do not connect all clients immediately
-                Thread.Sleep(TimeSpan.FromMilliseconds(0.5));
                 tasks[i] = RunSingleClient(clients[i], commandLine);
             }
-            Console.WriteLine("Clients connected.");
-
-            Task.WaitAll(tasks);
             stopwatch.Stop();
-            Console.WriteLine("Completed {0} out of {1} for {2:0.####} ms.",
+            Console.WriteLine("Clients connected for {0:0.####} ms.", stopwatch.Elapsed.TotalMilliseconds);
+
+            stopwatch.Restart();
+            _clientsConnected.Release(commandLine.ClientCount);
+            Console.WriteLine("Start sending messages.");
+            Task.WaitAll(tasks);
+
+            stopwatch.Stop();
+            Console.WriteLine("Completed {0} out of {1} clients for {2:0.####} ms.",
                 _successCount, commandLine.ClientCount, stopwatch.Elapsed.TotalMilliseconds);
         }
 
@@ -50,12 +57,24 @@ namespace Check.Connections.Client
 
             for (int i = 0; i < commandLine.ClientCount; ++i)
             {
-                GrpcChannel channel = GrpcChannel.ForAddress(commandLine.ServerAddress);
+                Uri address = new Uri(commandLine.ServerAddress);
+                EndPoint endPoint = new DnsEndPoint(address.Host, address.Port);
+                PreConnectedHttpHandler preConnectedHttpHandler = new(endPoint);
+                SocketsHttpHandler socketsHttpHandler = new()
+                {
+                    ConnectCallback = preConnectedHttpHandler.GetConnectedStream
+                };
+
+                GrpcChannel channel = GrpcChannel.ForAddress(commandLine.ServerAddress, new GrpcChannelOptions
+                {
+                    HttpHandler = socketsHttpHandler
+                });
                 Send.SendClient sendClient = new Send.SendClient(channel);
 
                 ClientData client = new()
                 {
                     ID = i,
+                    HttpHandler = preConnectedHttpHandler,
                     Channel = channel,
                     SendClient = sendClient
                 };
@@ -70,6 +89,9 @@ namespace Check.Connections.Client
         {
             try
             {
+                await client.HttpHandler.PreConnect();
+                await _clientsConnected.WaitAsync();
+
                 for (int i = 0; i < commandLine.MessageCount; ++i)
                 {
                     ClientMessage message = new()
@@ -106,6 +128,7 @@ namespace Check.Connections.Client
         private sealed class ClientData
         {
             public int ID { get; init; }
+            public PreConnectedHttpHandler HttpHandler { get; init; }
             public GrpcChannel Channel { get; init; }
             public Send.SendClient SendClient { get; init; }
         }
