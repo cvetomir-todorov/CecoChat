@@ -46,7 +46,7 @@ Currently no user profile and friendship are implemented so clients rely on user
 <details>
 <summary>Show/hide</summary>
 
-I decided to benchmark the number of connections per messaging server. The code is in the [check](check/) folder. I used two machines connected via 100Mbps router. Details are as follow:
+This is a benchmark for the number of concurrent connections per messaging server. The code is in the [check](check/) folder. I used two machines connected via 100Mbps router. Details are as follow:
 
 | Machine     | CPU         | Frequency | Cores | RAM  | OS                      |
 | :---------- | :---------  | :-------- | :---- | :--- | :---------------------- |
@@ -60,9 +60,9 @@ On the server I am using ASP.NET Core gRPC services utilizing async-await and TP
 | Moderate       | 15869             | 21 seconds  | Weaker         | 150%-200%  | ?              | 1.3GB      |
 | Weaker         | 28232             | 147 seconds | Moderate       | 5-10%      | 67             | 3.55GB     |
 
-The clients succeeded on both machines are a result of port exhaustion limits hit on both OS-es. The Windows error was `An operation on a socket could not be performed because the system lacked sufficient buffer space or because a queue was full` and the Ubuntu Server one: `Cannot assign requested address`. Additionally when clients were on the weaker machine the client time required in order to complete the requests is considerably higher while it was obvious that the server was not under serious load. One of these could be the issue: Windows 10 has some limits which prohibit it from handling a high number of concurrent clients, the weaker machine is really weak, there is a concurrency issue with .NET 5 at least on Ubuntu Server, I've messed something in the client or server code.
+The clients succeeded on both machines are a result of port exhaustion limits hit on both OS-es which ran the clients. The Windows error was `An operation on a socket could not be performed because the system lacked sufficient buffer space or because a queue was full` and the Ubuntu Server one was `Cannot assign requested address`. Additionally when clients were on the weaker machine the client time required in order to complete the requests is considerably higher while it was obvious that the server was not under serious load. One of these could be the issue: Windows 10 has some limits which prohibit it from handling a high number of concurrent clients, the weaker machine is really weak, there is a concurrency issue with .NET 5 at least on Ubuntu Server, I've messed something in the client or server code.
 
-Based on these numbers I think that 50k concurrent connections shouldn't be an issue and would be a useful limit in our calculations.
+Based on these numbers I think that 50k concurrent connections could be a realistic number for a messaging server and would be a useful limit in our calculations.
 
 </details>
 
