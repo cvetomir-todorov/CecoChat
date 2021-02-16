@@ -16,7 +16,6 @@ namespace CecoChat.Client.Shared
 {
     public sealed class MessagingClient : IDisposable
     {
-        private readonly MessageIDGenerator _messageIDGenerator;
         private readonly HttpClient _httpClient;
         private long _userID;
         private Metadata _grpcMetadata;
@@ -26,9 +25,8 @@ namespace CecoChat.Client.Shared
         private Send.SendClient _sendClient;
         private History.HistoryClient _historyClient;
 
-        public MessagingClient(MessageIDGenerator messageIDGenerator)
+        public MessagingClient()
         {
-            _messageIDGenerator = messageIDGenerator;
             _httpClient = new HttpClient();
         }
 
@@ -176,10 +174,8 @@ namespace CecoChat.Client.Shared
 
         public async Task<ClientMessage> SendPlainTextMessage(long receiverID, string text)
         {
-            string messageID = _messageIDGenerator.GenerateMessageID();
             ClientMessage message = new()
             {
-                MessageId = messageID,
                 SenderId = _userID,
                 ReceiverId = receiverID,
                 Type = ClientMessageType.PlainText,
@@ -191,6 +187,8 @@ namespace CecoChat.Client.Shared
                 Message = message
             };
             SendMessageResponse response = await _sendClient.SendMessageAsync(request, _grpcMetadata);
+
+            message.MessageId = response.MessageId;
             message.Timestamp = response.MessageTimestamp;
             return message;
         }

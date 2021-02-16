@@ -1,7 +1,7 @@
 ﻿CREATE TABLE messaging.messages_for_dialog
 (
   dialog_id text,
-  message_id text,
+  message_id uuid,
   sender_id bigint,
   receiver_id bigint,
   when timestamp,

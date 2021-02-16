@@ -13,6 +13,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CecoChat.Contracts\CecoChat.Contracts.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Protobuf Include="..\protos\backend-message.proto">
       <Link>backend-message.proto</Link>
     </Protobuf>

@@ -1,6 +1,6 @@
 syntax = "proto3";
 option csharp_namespace = "CecoChat.Contracts.Client";
-package CecoChat;
+package CecoChat.Contracts.Client;
 import "client-message.proto";
 
 service Listen {

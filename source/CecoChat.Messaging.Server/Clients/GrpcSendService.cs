@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using CecoChat.Contracts;
 using CecoChat.Contracts.Backend;
 using CecoChat.Contracts.Client;
 using CecoChat.Messaging.Server.Backend;
@@ -44,15 +46,21 @@ namespace CecoChat.Messaging.Server.Clients
             }
 
             ClientMessage clientMessage = request.Message;
+            clientMessage.MessageId = Guid.NewGuid().ToUuid();
             clientMessage.Timestamp = Timestamp.FromDateTime(_clock.GetNowUtc());
-            _logger.LogTrace("Timestamped for {0} message {1}.", userClaims, clientMessage);
+            _logger.LogTrace("Message for {0} assigned ID and timestamp {1}.", userClaims, clientMessage);
 
             BackendMessage backendMessage = _mapper.MapClientToBackendMessage(clientMessage);
             _backendProducer.ProduceMessage(backendMessage);
 
             SendToClientsFromSameSender(clientMessage, userClaims);
 
-            return Task.FromResult(new SendMessageResponse{MessageTimestamp = clientMessage.Timestamp});
+            SendMessageResponse response = new()
+            {
+                MessageId = clientMessage.MessageId,
+                MessageTimestamp = clientMessage.Timestamp
+            };
+            return Task.FromResult(response);
         }
 
         private void SendToClientsFromSameSender(ClientMessage clientMessage, UserClaims currentUserClaims)

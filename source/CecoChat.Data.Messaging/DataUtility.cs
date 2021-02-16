@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Cassandra;
+using CecoChat.Contracts;
 using CecoChat.Contracts.Backend;
 using Google.Protobuf.WellKnownTypes;
 using Microsoft.Extensions.Logging;
@@ -49,7 +50,8 @@ namespace CecoChat.Data.Messaging
             {
                 BackendMessage message = new();
 
-                message.MessageId = row.GetValue<string>("message_id");
+                Guid messageID = row.GetValue<Guid>("message_id");
+                message.MessageId = messageID.ToUuid();
                 message.SenderId = row.GetValue<long>("sender_id");
                 message.ReceiverId = row.GetValue<long>("receiver_id");
                 message.Timestamp = Timestamp.FromDateTimeOffset(row.GetValue<DateTimeOffset>("when"));

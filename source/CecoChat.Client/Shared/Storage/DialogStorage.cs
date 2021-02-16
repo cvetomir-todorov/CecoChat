@@ -1,12 +1,14 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using CecoChat.Contracts;
 using CecoChat.Contracts.Client;
 
 namespace CecoChat.Client.Shared.Storage
 {
     public sealed class DialogStorage
     {
-        private readonly ConcurrentDictionary<string, ClientMessage> _messageMap;
+        private readonly ConcurrentDictionary<Guid, ClientMessage> _messageMap;
 
         public DialogStorage()
         {
@@ -15,12 +17,12 @@ namespace CecoChat.Client.Shared.Storage
 
         public void AddMessage(ClientMessage message)
         {
-            _messageMap.TryAdd(message.MessageId, message);
+            _messageMap.TryAdd(message.MessageId.ToGuid(), message);
         }
 
         public IEnumerable<ClientMessage> GetMessages()
         {
-            foreach (KeyValuePair<string, ClientMessage> pair in _messageMap)
+            foreach (KeyValuePair<Guid, ClientMessage> pair in _messageMap)
             {
                 yield return pair.Value;
             }

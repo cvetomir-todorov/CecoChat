@@ -17,7 +17,7 @@ namespace CecoChat.Client.Console
             System.Console.Write("Password: ");
             string password = System.Console.ReadLine() ?? string.Empty;
 
-            MessagingClient client = new(new MessageIDGenerator());
+            MessagingClient client = new();
             await client.Initialize(username, password, profileServer: "https://localhost:31005", connectServer: "https://localhost:31000");
             client.MessageReceived += (_, message) => DisplayMessage(message);
             client.ExceptionOccurred += (_, exception) => System.Console.WriteLine(exception);

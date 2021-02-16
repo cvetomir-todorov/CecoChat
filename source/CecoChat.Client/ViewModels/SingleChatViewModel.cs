@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using CecoChat.Client.Shared;
 using CecoChat.Client.Shared.Storage;
+using CecoChat.Contracts;
 using CecoChat.Contracts.Client;
 using Microsoft.Toolkit.Mvvm.Input;
 using PropertyChanged;
@@ -15,7 +16,7 @@ namespace CecoChat.Client.ViewModels
     [AddINotifyPropertyChangedInterface]
     public sealed class SingleChatViewModel : BaseViewModel
     {
-        private readonly HashSet<string> _messageIDs;
+        private readonly HashSet<Guid> _messageIDs;
 
         public SingleChatViewModel(
             MessagingClient messagingClient,
@@ -24,7 +25,7 @@ namespace CecoChat.Client.ViewModels
             IFeedbackService feedbackService)
             : base(messagingClient, messageStorage, uiThreadDispatcher, feedbackService)
         {
-            _messageIDs = new HashSet<string>();
+            _messageIDs = new();
 
             MessagingClient.MessageReceived += MessagingClientOnMessageReceived;
             Messages = new ObservableCollection<SingleChatMessageViewModel>();
@@ -90,7 +91,8 @@ namespace CecoChat.Client.ViewModels
 
         private void InsertMessage(ClientMessage message)
         {
-            if (_messageIDs.Contains(message.MessageId))
+            Guid messageID = message.MessageId.ToGuid();
+            if (_messageIDs.Contains(messageID))
                 return;
 
             int insertionIndex = 0;
@@ -120,7 +122,7 @@ namespace CecoChat.Client.ViewModels
                 UIThreadDispatcher.Invoke(() => Messages.Insert(insertionIndex, messageVM));
             }
 
-            _messageIDs.Add(message.MessageId);
+            _messageIDs.Add(messageID);
         }
     }
 }

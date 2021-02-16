@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Cassandra;
+using CecoChat.Contracts;
 using CecoChat.Contracts.Backend;
 using Microsoft.Extensions.Logging;
 
@@ -55,17 +56,18 @@ namespace CecoChat.Data.Messaging
 
         public void AddNewDialogMessage(BackendMessage message)
         {
+            Guid messageID = message.MessageId.ToGuid();
             DateTime messageTimestamp = message.Timestamp.ToDateTime();
             sbyte dbMessageType = _mapper.MapBackendToDbMessageType(message.Type);
             IDictionary<string, string> data = _mapper.MapBackendToDbData(message);
             string dialogID = _dataUtility.CreateDialogID(message.SenderId, message.ReceiverId);
 
             BoundStatement insertForSender = _messagesForUserQuery.Value.Bind(
-                message.SenderId, message.MessageId, message.SenderId, message.ReceiverId, messageTimestamp, dbMessageType, data);
+                message.SenderId, messageID, message.SenderId, message.ReceiverId, messageTimestamp, dbMessageType, data);
             BoundStatement insertForReceiver = _messagesForUserQuery.Value.Bind(
-                message.ReceiverId, message.MessageId, message.SenderId, message.ReceiverId, messageTimestamp, dbMessageType, data);
+                message.ReceiverId, messageID, message.SenderId, message.ReceiverId, messageTimestamp, dbMessageType, data);
             BoundStatement insertForDialog = _messagesForDialogQuery.Value.Bind(
-                dialogID, message.MessageId, message.SenderId, message.ReceiverId, messageTimestamp, dbMessageType, data);
+                dialogID, messageID, message.SenderId, message.ReceiverId, messageTimestamp, dbMessageType, data);
 
             BatchStatement insertBatch = new BatchStatement()
                 .Add(insertForSender)

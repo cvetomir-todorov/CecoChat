@@ -10,7 +10,6 @@ namespace CecoChat.Client
         public static IServiceCollection AddClientSharedServices(this IServiceCollection services)
         {
             services.AddSingleton<MessagingClient>();
-            services.AddSingleton<MessageIDGenerator>();
             services.AddSingleton<MessageStorage>();
 
             services.AddSingleton<MainViewModel>();
