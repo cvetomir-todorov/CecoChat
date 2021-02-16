@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using CecoChat.Contracts.Backend;
 using CecoChat.Contracts.Client;
 using CecoChat.Data.Configuration.History;
-using CecoChat.Data.Messaging;
+using CecoChat.Data.History;
 using CecoChat.Server;
 using CecoChat.Server.Identity;
 using Grpc.Core;

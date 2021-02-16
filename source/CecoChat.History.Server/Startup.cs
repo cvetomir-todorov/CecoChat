@@ -1,7 +1,7 @@
 using CecoChat.Cassandra;
 using CecoChat.Data.Configuration;
 using CecoChat.Data.Configuration.History;
-using CecoChat.Data.Messaging;
+using CecoChat.Data.History;
 using CecoChat.History.Server.Clients;
 using CecoChat.History.Server.Initialization;
 using CecoChat.Jwt;

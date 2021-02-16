@@ -2,7 +2,7 @@
 using CecoChat.Cassandra;
 using Microsoft.Extensions.Options;
 
-namespace CecoChat.Data.Messaging
+namespace CecoChat.Data.History
 {
     public interface ICecoChatDbContext : ICassandraDbContext
     {

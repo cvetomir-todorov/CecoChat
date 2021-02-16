@@ -5,7 +5,7 @@ using Cassandra;
 using CecoChat.Contracts.Backend;
 using Microsoft.Extensions.Logging;
 
-namespace CecoChat.Data.Messaging
+namespace CecoChat.Data.History
 {
     public interface IHistoryRepository
     {

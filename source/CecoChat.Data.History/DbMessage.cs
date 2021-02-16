@@ -1,4 +1,4 @@
-﻿namespace CecoChat.Data.Messaging
+﻿namespace CecoChat.Data.History
 {
     public enum DbMessageType : sbyte
     {

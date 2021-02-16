@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using CecoChat.Contracts.Backend;
 
-namespace CecoChat.Data.Messaging
+namespace CecoChat.Data.History
 {
     public interface IBackendDbMapper
     {

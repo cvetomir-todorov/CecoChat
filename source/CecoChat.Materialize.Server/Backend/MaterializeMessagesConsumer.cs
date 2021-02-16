@@ -1,6 +1,6 @@
 ﻿using System.Threading;
 using CecoChat.Contracts.Backend;
-using CecoChat.Data.Messaging;
+using CecoChat.Data.History;
 using CecoChat.DependencyInjection;
 using CecoChat.Kafka;
 using CecoChat.Server.Backend;

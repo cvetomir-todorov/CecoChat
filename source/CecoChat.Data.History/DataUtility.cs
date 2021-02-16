@@ -7,7 +7,7 @@ using CecoChat.Contracts.Backend;
 using Google.Protobuf.WellKnownTypes;
 using Microsoft.Extensions.Logging;
 
-namespace CecoChat.Data.Messaging
+namespace CecoChat.Data.History
 {
     public interface IDataUtility
     {

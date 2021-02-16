@@ -1,6 +1,6 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using CecoChat.Data.Messaging;
+using CecoChat.Data.History;
 using Microsoft.Extensions.Hosting;
 
 namespace CecoChat.History.Server.Initialization
