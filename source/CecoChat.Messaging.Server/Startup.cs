@@ -1,7 +1,7 @@
 using CecoChat.Contracts.Backend;
 using CecoChat.Contracts.Client;
 using CecoChat.Data.Configuration;
-using CecoChat.Data.Configuration.Messaging;
+using CecoChat.Data.Configuration.Partitioning;
 using CecoChat.DependencyInjection;
 using CecoChat.Events;
 using CecoChat.Jwt;
@@ -63,8 +63,8 @@ namespace CecoChat.Messaging.Server
 
             // configuration
             services.AddRedis(Configuration.GetSection("ConfigurationDB"));
-            services.AddSingleton<IMessagingConfiguration, MessagingConfiguration>();
-            services.AddSingleton<IMessagingConfigurationRepository, MessagingConfigurationRepository>();
+            services.AddSingleton<IPartitioningConfiguration, PartitioningConfiguration>();
+            services.AddSingleton<IPartitioningConfigurationRepository, PartitioningConfigurationRepository>();
             services.AddSingleton<IConfigurationUtility, ConfigurationUtility>();
             services.AddEvent<EventSource<PartitionsChangedEventData>, PartitionsChangedEventData>();
 

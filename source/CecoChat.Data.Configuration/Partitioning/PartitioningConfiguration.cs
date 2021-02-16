@@ -7,9 +7,9 @@ using CecoChat.Redis;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 
-namespace CecoChat.Data.Configuration.Messaging
+namespace CecoChat.Data.Configuration.Partitioning
 {
-    public sealed class MessagingConfigurationUsage
+    public sealed class PartitioningConfigurationUsage
     {
         public bool UsePartitions { get; set; }
 
@@ -18,9 +18,9 @@ namespace CecoChat.Data.Configuration.Messaging
         public bool UseServerAddressByPartition { get; set; }
     }
 
-    public interface IMessagingConfiguration : IDisposable
+    public interface IPartitioningConfiguration : IDisposable
     {
-        Task Initialize(MessagingConfigurationUsage usage);
+        Task Initialize(PartitioningConfigurationUsage usage);
 
         int PartitionCount { get; }
 
@@ -36,21 +36,21 @@ namespace CecoChat.Data.Configuration.Messaging
         public PartitionRange Partitions { get; init; }
     }
 
-    public sealed class MessagingConfiguration : IMessagingConfiguration
+    public sealed class PartitioningConfiguration : IPartitioningConfiguration
     {
         private readonly ILogger _logger;
         private readonly IRedisContext _redisContext;
-        private readonly IMessagingConfigurationRepository _repository;
+        private readonly IPartitioningConfigurationRepository _repository;
         private readonly IConfigurationUtility _configurationUtility;
         private readonly IEventSource<PartitionsChangedEventData> _partitionsChanged;
 
-        private readonly MessagingConfigurationState _state;
-        private MessagingConfigurationUsage _usage;
+        private readonly PartitioningConfigurationState _state;
+        private PartitioningConfigurationUsage _usage;
 
-        public MessagingConfiguration(
-            ILogger<MessagingConfiguration> logger,
+        public PartitioningConfiguration(
+            ILogger<PartitioningConfiguration> logger,
             IRedisContext redisContext,
-            IMessagingConfigurationRepository repository,
+            IPartitioningConfigurationRepository repository,
             IConfigurationUtility configurationUtility,
             IEventSource<PartitionsChangedEventData> partitionsChanged)
         {
@@ -60,7 +60,7 @@ namespace CecoChat.Data.Configuration.Messaging
             _configurationUtility = configurationUtility;
             _partitionsChanged = partitionsChanged;
 
-            _state = new MessagingConfigurationState();
+            _state = new PartitioningConfigurationState();
         }
 
         public void Dispose()
@@ -80,7 +80,7 @@ namespace CecoChat.Data.Configuration.Messaging
             return _state.GetServerAddress(partition);
         }
 
-        public async Task Initialize(MessagingConfigurationUsage usage)
+        public async Task Initialize(PartitioningConfigurationUsage usage)
         {
             try
             {
@@ -89,17 +89,17 @@ namespace CecoChat.Data.Configuration.Messaging
 
                 if (usage.UsePartitions || usage.UseServerAddressByPartition)
                 {
-                    ChannelMessageQueue partitionsMQ = await subscriber.SubscribeAsync($"notify:{MessagingKeys.Partitions}");
+                    ChannelMessageQueue partitionsMQ = await subscriber.SubscribeAsync($"notify:{PartitioningKeys.Partitions}");
                     partitionsMQ.OnMessage(channelMessage => _configurationUtility.HandleChange(channelMessage, HandlePartitions));
                     _logger.LogInformation("Subscribed for changes about {0}, {1} from channel {2}.",
-                        MessagingKeys.PartitionCount, MessagingKeys.ServerPartitions, partitionsMQ.Channel);
+                        PartitioningKeys.PartitionCount, PartitioningKeys.ServerPartitions, partitionsMQ.Channel);
                 }
                 if (usage.UseServerAddressByPartition)
                 {
-                    ChannelMessageQueue serverAddressesMQ = await subscriber.SubscribeAsync($"notify:{MessagingKeys.ServerAddresses}");
+                    ChannelMessageQueue serverAddressesMQ = await subscriber.SubscribeAsync($"notify:{PartitioningKeys.ServerAddresses}");
                     serverAddressesMQ.OnMessage(channelMessage => _configurationUtility.HandleChange(channelMessage, HandleServerAddresses));
                     _logger.LogInformation("Subscribed for changes about {0} from channel {1}.",
-                        MessagingKeys.ServerAddresses, serverAddressesMQ.Channel);
+                        PartitioningKeys.ServerAddresses, serverAddressesMQ.Channel);
                 }
 
                 await LoadValues(usage);
@@ -110,7 +110,7 @@ namespace CecoChat.Data.Configuration.Messaging
             }
         }
 
-        private async Task LoadValues(MessagingConfigurationUsage usage)
+        private async Task LoadValues(PartitioningConfigurationUsage usage)
         {
             _logger.LogInformation("Loading messaging configuration...");
 

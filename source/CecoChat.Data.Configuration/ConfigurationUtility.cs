@@ -8,8 +8,6 @@ namespace CecoChat.Data.Configuration
     public interface IConfigurationUtility
     {
         Task HandleChange(ChannelMessage channelMessage, Func<ChannelMessage, Task> handleAction);
-
-        bool ChannelMessageIs(ChannelMessage channelMessage, params string[] expectedMessages);
     }
 
     public sealed class ConfigurationUtility : IConfigurationUtility
@@ -33,19 +31,6 @@ namespace CecoChat.Data.Configuration
             {
                 _logger.LogError(exception, "Error occurred while processing change {0}.", channelMessage);
             }
-        }
-
-        public bool ChannelMessageIs(ChannelMessage channelMessage, params string[] expectedMessages)
-        {
-            foreach (string expectedMessage in expectedMessages)
-            {
-                if (string.Equals(channelMessage.Message, expectedMessage, StringComparison.InvariantCultureIgnoreCase))
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
     }
 }

@@ -1,5 +1,5 @@
 ﻿using CecoChat.Data.Configuration.History;
-using CecoChat.Data.Configuration.Messaging;
+using CecoChat.Data.Configuration.Partitioning;
 using CecoChat.Server.Backend;
 using CecoChat.Server.Identity;
 using Microsoft.AspNetCore.Authorization;
@@ -14,18 +14,18 @@ namespace CecoChat.Connect.Server.Controllers
     {
         private readonly ILogger _logger;
         private readonly IPartitionUtility _partitionUtility;
-        private readonly IMessagingConfiguration _messagingConfiguration;
+        private readonly IPartitioningConfiguration _partitioningConfiguration;
         private readonly IHistoryConfiguration _historyConfiguration;
 
         public ConnectController(
             ILogger<ConnectController> logger,
             IPartitionUtility partitionUtility,
-            IMessagingConfiguration messagingConfiguration,
+            IPartitioningConfiguration partitioningConfiguration,
             IHistoryConfiguration historyConfiguration)
         {
             _logger = logger;
             _partitionUtility = partitionUtility;
-            _messagingConfiguration = messagingConfiguration;
+            _partitioningConfiguration = partitioningConfiguration;
             _historyConfiguration = historyConfiguration;
         }
 
@@ -38,12 +38,12 @@ namespace CecoChat.Connect.Server.Controllers
                 return Unauthorized();
             }
 
-            int partitionCount = _messagingConfiguration.PartitionCount;
+            int partitionCount = _partitioningConfiguration.PartitionCount;
             int partition = _partitionUtility.ChoosePartition(userID, partitionCount);
 
             ConnectResponse response = new()
             {
-                MessagingServerAddress = _messagingConfiguration.GetServerAddress(partition),
+                MessagingServerAddress = _partitioningConfiguration.GetServerAddress(partition),
                 HistoryServerAddress = _historyConfiguration.ServerAddress
             };
 

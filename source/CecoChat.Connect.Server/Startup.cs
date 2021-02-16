@@ -1,7 +1,7 @@
 using CecoChat.Connect.Server.Initialization;
 using CecoChat.Data.Configuration;
 using CecoChat.Data.Configuration.History;
-using CecoChat.Data.Configuration.Messaging;
+using CecoChat.Data.Configuration.Partitioning;
 using CecoChat.Events;
 using CecoChat.Jwt;
 using CecoChat.Redis;
@@ -54,8 +54,8 @@ namespace CecoChat.Connect.Server
 
             // configuration
             services.AddHostedService<ConfigurationHostedService>();
-            services.AddSingleton<IMessagingConfiguration, MessagingConfiguration>();
-            services.AddSingleton<IMessagingConfigurationRepository, MessagingConfigurationRepository>();
+            services.AddSingleton<IPartitioningConfiguration, PartitioningConfiguration>();
+            services.AddSingleton<IPartitioningConfigurationRepository, PartitioningConfigurationRepository>();
             services.AddSingleton<IHistoryConfiguration, HistoryConfiguration>();
             services.AddSingleton<IHistoryConfigurationRepository, HistoryConfigurationRepository>();
             services.AddSingleton<IConfigurationUtility, ConfigurationUtility>();

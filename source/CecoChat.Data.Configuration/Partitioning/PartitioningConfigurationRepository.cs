@@ -4,9 +4,9 @@ using CecoChat.Kafka;
 using CecoChat.Redis;
 using StackExchange.Redis;
 
-namespace CecoChat.Data.Configuration.Messaging
+namespace CecoChat.Data.Configuration.Partitioning
 {
-    public interface IMessagingConfigurationRepository
+    public interface IPartitioningConfigurationRepository
     {
         Task<RedisValueResult<int>> GetPartitionCount();
 
@@ -15,11 +15,11 @@ namespace CecoChat.Data.Configuration.Messaging
         IAsyncEnumerable<RedisValueResult<KeyValuePair<string, string>>> GetServerAddresses();
     }
 
-    public sealed class MessagingConfigurationRepository : IMessagingConfigurationRepository
+    public sealed class PartitioningConfigurationRepository : IPartitioningConfigurationRepository
     {
         private readonly IRedisContext _redisContext;
 
-        public MessagingConfigurationRepository(
+        public PartitioningConfigurationRepository(
             IRedisContext redisContext)
         {
             _redisContext = redisContext;
@@ -28,7 +28,7 @@ namespace CecoChat.Data.Configuration.Messaging
         public async Task<RedisValueResult<int>> GetPartitionCount()
         {
             IDatabase database = _redisContext.GetDatabase();
-            RedisValue value = await database.StringGetAsync(MessagingKeys.PartitionCount);
+            RedisValue value = await database.StringGetAsync(PartitioningKeys.PartitionCount);
 
             if (value.IsNullOrEmpty ||
                 !value.TryParse(out int partitionCount))
@@ -42,7 +42,7 @@ namespace CecoChat.Data.Configuration.Messaging
         public async IAsyncEnumerable<RedisValueResult<KeyValuePair<string, PartitionRange>>> GetServerPartitions()
         {
             IDatabase database = _redisContext.GetDatabase();
-            HashEntry[] values = await database.HashGetAllAsync(MessagingKeys.ServerPartitions);
+            HashEntry[] values = await database.HashGetAllAsync(PartitioningKeys.ServerPartitions);
 
             foreach (HashEntry hashEntry in values)
             {
@@ -64,7 +64,7 @@ namespace CecoChat.Data.Configuration.Messaging
         public async IAsyncEnumerable<RedisValueResult<KeyValuePair<string, string>>> GetServerAddresses()
         {
             IDatabase database = _redisContext.GetDatabase();
-            HashEntry[] values = await database.HashGetAllAsync(MessagingKeys.ServerAddresses);
+            HashEntry[] values = await database.HashGetAllAsync(PartitioningKeys.ServerAddresses);
 
             foreach (HashEntry hashEntry in values)
             {

@@ -2,15 +2,15 @@
 using System.Collections.Concurrent;
 using CecoChat.Kafka;
 
-namespace CecoChat.Data.Configuration.Messaging
+namespace CecoChat.Data.Configuration.Partitioning
 {
-    internal sealed class MessagingConfigurationState
+    internal sealed class PartitioningConfigurationState
     {
         private readonly ConcurrentDictionary<int, string> _partitionServerMap;
         private readonly ConcurrentDictionary<string, string> _serverAddressMap;
         private readonly ConcurrentDictionary<string, PartitionRange> _serverPartitionsMap;
 
-        public MessagingConfigurationState()
+        public PartitioningConfigurationState()
         {
             _partitionServerMap = new();
             _serverAddressMap = new();

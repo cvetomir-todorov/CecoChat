@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using CecoChat.Contracts.Client;
-using CecoChat.Data.Configuration.Messaging;
+using CecoChat.Data.Configuration.Partitioning;
 using CecoChat.Events;
 using CecoChat.Kafka;
 using CecoChat.Messaging.Server.Backend;
@@ -18,7 +18,7 @@ namespace CecoChat.Messaging.Server.Initialization
     {
         private readonly ILogger _logger;
         private readonly IBackendOptions _backendOptions;
-        private readonly IMessagingConfiguration _messagingConfiguration;
+        private readonly IPartitioningConfiguration _partitioningConfiguration;
         private readonly ITopicPartitionFlyweight _topicPartitionFlyweight;
         private readonly IPartitionUtility _partitionUtility;
         private readonly IBackendProducer _backendProducer;
@@ -30,7 +30,7 @@ namespace CecoChat.Messaging.Server.Initialization
         public MessagesToReceiversHostedService(
             ILogger<MessagesToReceiversHostedService> logger,
             IOptions<BackendOptions> backendOptions,
-            IMessagingConfiguration messagingConfiguration,
+            IPartitioningConfiguration partitioningConfiguration,
             ITopicPartitionFlyweight topicPartitionFlyweight,
             IPartitionUtility partitionUtility,
             IBackendProducer backendProducer,
@@ -40,7 +40,7 @@ namespace CecoChat.Messaging.Server.Initialization
         {
             _logger = logger;
             _backendOptions = backendOptions.Value;
-            _messagingConfiguration = messagingConfiguration;
+            _partitioningConfiguration = partitioningConfiguration;
             _topicPartitionFlyweight = topicPartitionFlyweight;
             _partitionUtility = partitionUtility;
             _backendProducer = backendProducer;
@@ -53,8 +53,8 @@ namespace CecoChat.Messaging.Server.Initialization
 
         public Task StartAsync(CancellationToken ct)
         {
-            int partitionCount = _messagingConfiguration.PartitionCount;
-            PartitionRange partitions = _messagingConfiguration.GetServerPartitions(_backendOptions.ServerID);
+            int partitionCount = _partitioningConfiguration.PartitionCount;
+            PartitionRange partitions = _partitioningConfiguration.GetServerPartitions(_backendOptions.ServerID);
 
             if (ValidatePartitionConfiguration(partitionCount, partitions))
             {

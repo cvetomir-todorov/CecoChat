@@ -1,27 +1,27 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using CecoChat.Data.Configuration.History;
-using CecoChat.Data.Configuration.Messaging;
+using CecoChat.Data.Configuration.Partitioning;
 using Microsoft.Extensions.Hosting;
 
 namespace CecoChat.Connect.Server.Initialization
 {
     public sealed class ConfigurationHostedService : IHostedService
     {
-        private readonly IMessagingConfiguration _messagingConfiguration;
+        private readonly IPartitioningConfiguration _partitioningConfiguration;
         private readonly IHistoryConfiguration _historyConfiguration;
 
         public ConfigurationHostedService(
-            IMessagingConfiguration messagingConfiguration,
+            IPartitioningConfiguration partitioningConfiguration,
             IHistoryConfiguration historyConfiguration)
         {
-            _messagingConfiguration = messagingConfiguration;
+            _partitioningConfiguration = partitioningConfiguration;
             _historyConfiguration = historyConfiguration;
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            await _messagingConfiguration.Initialize(new MessagingConfigurationUsage
+            await _partitioningConfiguration.Initialize(new PartitioningConfigurationUsage
             {
                 UsePartitions = true,
                 UseServerAddressByPartition = true
