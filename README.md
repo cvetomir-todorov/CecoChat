@@ -314,10 +314,8 @@ I've written a very basic console client. There is also a WPF desktop client for
   - Health status
   - Deployment
 * Internal things could be worked on
-  - Generate message IDs on the server
-  - Benchmark messaging server connection limit
-  - Configure better and benchmark Kafka
-  - Revisit Cassandra design and consider client usage to employ bulk-loading data
+  - Benchmark Kafka and configure it accordingly
+  - Compare Materialize servers immediate message write to bulk-loading data
 * Add different types of messages:
   - Group messages
   - Media messages - image/video
