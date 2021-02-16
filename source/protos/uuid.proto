@@ -1,0 +1,12 @@
+syntax = "proto3";
+option csharp_namespace = "CecoChat.Contracts";
+package CecoChat.Contracts;
+
+message Uuid {
+  // The high 64 bits of the UUID
+  // MSB -> LSB: time_low (32 bits) | time_mid (16 bits) | time_hi_and_version (16 bits)
+  fixed64 high64 = 1;
+  // The low 64 bits of the UUID
+  // MSB -> LSB: clock_seq_hi_and_reserved (8 bits) | clock_seq_low (8 bits) | node (48 bits)
+  fixed64 low64 = 2;
+}
