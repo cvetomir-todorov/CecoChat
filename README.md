@@ -294,8 +294,6 @@ In order to containerize CecoChat you need to build it using .NET 5. I've used V
 * 1 materialize server
 * 1 history server
 
-TODO: Add Redis scripts to create the initial state which is currently hardcoded but can be entered by watching the server logs which report all keys.
-
 ## Clients
 
 I've written a very basic console client. There is also a WPF desktop client for Windows which has some decent UI. A browser client would be ideal though.
