@@ -35,6 +35,7 @@ namespace CecoChat.History.Server
         {
             // ordered hosted services
             services.AddHostedService<ConfigurationHostedService>();
+            services.AddHostedService<InitializeDbHostedService>();
             services.AddHostedService<PrepareQueriesHostedService>();
 
             // clients
@@ -47,6 +48,7 @@ namespace CecoChat.History.Server
 
             // history
             services.AddCassandra<ICecoChatDbContext, CecoChatDbContext>(Configuration.GetSection("HistoryDB"));
+            services.AddSingleton<ICecoChatDbInitializer, CecoChatDbInitializer>();
             services.AddSingleton<IHistoryRepository, HistoryRepository>();
             services.AddSingleton<IDataUtility, DataUtility>();
             services.AddSingleton<IBackendDbMapper, BackendDbMapper>();

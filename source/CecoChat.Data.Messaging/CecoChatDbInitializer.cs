@@ -91,8 +91,15 @@ namespace CecoChat.Data.Messaging
 
         private void ExecuteCqlScript(ISession session, CqlScript cql)
         {
-            session.Execute(cql.Content, ConsistencyLevel.All);
-            _logger.LogDebug("Executed {0} CQL script: {1}{2}", cql.Name, Environment.NewLine, cql.Content);
+            try
+            {
+                session.Execute(cql.Content, ConsistencyLevel.All);
+                _logger.LogDebug("Executed {0} CQL script: {1}{2}", cql.Name, Environment.NewLine, cql.Content);
+            }
+            catch (AlreadyExistsException alreadyExistsException)
+            {
+                _logger.LogWarning(alreadyExistsException.Message);
+            }
         }
     }
 }
