@@ -10,20 +10,11 @@ message BackendMessage {
   google.protobuf.Timestamp timestamp = 4;
   BackendMessageType type = 5;
   oneof data {
-    PlainTextData plain_text_data = 6;
-    AckData ack_data = 7;
+    string text = 6;
   }
 }
 
 enum BackendMessageType {
   UNKNOWN = 0;
   PLAIN_TEXT = 1;
-  ACK = 2;
-}
-
-message PlainTextData {
-  string text = 1;
-}
-
-message AckData {
 }

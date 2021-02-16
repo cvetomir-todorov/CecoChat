@@ -27,10 +27,7 @@ namespace CecoChat.Server
             {
                 case ClientMessageType.PlainText:
                     backendMessage.Type = BackendMessageType.PlainText;
-                    backendMessage.PlainTextData = new Contracts.Backend.PlainTextData
-                    {
-                        Text = clientMessage.PlainTextData.Text
-                    };
+                    backendMessage.Text = clientMessage.Text;
                     break;
                 default:
                     throw new NotSupportedException($"{typeof(ClientMessageType).FullName} value {clientMessage.Type} is not supported.");
@@ -53,10 +50,7 @@ namespace CecoChat.Server
             {
                 case BackendMessageType.PlainText:
                     clientMessage.Type = ClientMessageType.PlainText;
-                    clientMessage.PlainTextData = new Contracts.Client.PlainTextData
-                    {
-                        Text = backendMessage.PlainTextData.Text
-                    };
+                    clientMessage.Text = backendMessage.Text;
                     break;
                 default:
                     throw new NotSupportedException($"{typeof(BackendMessageType).FullName} value {backendMessage.Type} is not supported.");

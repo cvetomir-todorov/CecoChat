@@ -69,7 +69,7 @@ namespace CecoChat.Client.Console
 
         private static void DisplayMessage(ClientMessage message)
         {
-            System.Console.WriteLine($"[{message.Timestamp.ToDateTime():F}] {message.SenderId}->{message.ReceiverId}: {message.PlainTextData.Text}");
+            System.Console.WriteLine($"[{message.Timestamp.ToDateTime():F}] {message.SenderId}->{message.ReceiverId}: {message.Text}");
         }
     }
 }

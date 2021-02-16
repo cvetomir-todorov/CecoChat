@@ -183,10 +183,7 @@ namespace CecoChat.Client.Shared
                 SenderId = _userID,
                 ReceiverId = receiverID,
                 Type = ClientMessageType.PlainText,
-                PlainTextData = new PlainTextData
-                {
-                    Text = text
-                }
+                Text = text
             };
 
             SendMessageRequest request = new()

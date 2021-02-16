@@ -108,7 +108,7 @@ namespace CecoChat.Client.ViewModels
             {
                 IsSenderCurrentUser = message.SenderId == MessagingClient.UserID,
                 Timestamp = message.Timestamp.ToDateTime(),
-                FormattedMessage = $"[{message.Timestamp.ToDateTime()}] {message.SenderId}: {message.PlainTextData.Text}"
+                FormattedMessage = $"[{message.Timestamp.ToDateTime()}] {message.SenderId}: {message.Text}"
             };
 
             if (insertionIndex >= Messages.Count)

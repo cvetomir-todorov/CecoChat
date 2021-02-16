@@ -157,7 +157,7 @@ namespace CecoChat.Client.ViewModels
                 {
                     UIThreadDispatcher.Invoke(() =>
                     {
-                        chatVM.LastMessage = message.PlainTextData.Text;
+                        chatVM.LastMessage = message.Text;
                         chatVM.Timestamp = messageTimestamp;
                     });
                 }
@@ -167,7 +167,7 @@ namespace CecoChat.Client.ViewModels
                 chatVM = new AllChatsItemViewModel
                 {
                     UserID = otherUsedID,
-                    LastMessage = message.PlainTextData.Text,
+                    LastMessage = message.Text,
                     Timestamp = messageTimestamp
                 };
 

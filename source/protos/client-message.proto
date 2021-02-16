@@ -10,8 +10,7 @@ message ClientMessage {
   google.protobuf.Timestamp timestamp = 4;
   ClientMessageType type = 5;
   oneof data {
-    PlainTextData plain_text_data = 6;
-    AckData ack_data = 7;
+	  string text = 6;
   }
 }
 
@@ -19,12 +18,4 @@ enum ClientMessageType {
   UNKNOWN = 0;
   PLAIN_TEXT = 1;
   DISCONNECT = 2;
-  ACK = 3;
-}
-
-message PlainTextData {
-  string text = 1;
-}
-
-message AckData {
 }

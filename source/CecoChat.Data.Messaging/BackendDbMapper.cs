@@ -24,7 +24,6 @@ namespace CecoChat.Data.Messaging
             switch (backendMessageType)
             {
                 case BackendMessageType.PlainText: return (sbyte) DbMessageType.PlainText;
-                case BackendMessageType.Ack: return (sbyte) DbMessageType.Ack;
                 default:
                     throw new NotSupportedException($"{typeof(BackendMessageType).FullName} value {backendMessageType} is not supported.");
             }
@@ -36,9 +35,8 @@ namespace CecoChat.Data.Messaging
             {
                 case BackendMessageType.PlainText: return new SortedDictionary<string, string>
                 {
-                    {PlainTextKey, backendMessage.PlainTextData.Text}
+                    {PlainTextKey, backendMessage.Text}
                 };
-                case BackendMessageType.Ack: return new SortedDictionary<string, string>();
                 default:
                     throw new NotSupportedException($"{typeof(BackendMessageType).FullName} value {backendMessage.Type} is not supported.");
             }
@@ -51,7 +49,6 @@ namespace CecoChat.Data.Messaging
             switch (dbMessageTypeAsEnum)
             {
                 case DbMessageType.PlainText: return BackendMessageType.PlainText;
-                case DbMessageType.Ack: return BackendMessageType.Ack;
                 default:
                     throw new NotSupportedException($"{typeof(DbMessageType).FullName} value {dbMessageTypeAsEnum} is not supported.");
             }
@@ -63,13 +60,9 @@ namespace CecoChat.Data.Messaging
             {
                 case BackendMessageType.PlainText:
                 {
-                    backendMessage.PlainTextData = new PlainTextData
-                    {
-                        Text = data[PlainTextKey]
-                    };
+                    backendMessage.Text = data[PlainTextKey];
                     break;
                 }
-                case BackendMessageType.Ack: break;
                 default:
                     throw new NotSupportedException($"{typeof(BackendMessageType).FullName} value {backendMessage.Type} is not supported.");
             }
