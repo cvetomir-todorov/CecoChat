@@ -7,6 +7,7 @@ using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using CecoChat.Contracts;
 using CecoChat.Contracts.Client;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
@@ -176,6 +177,7 @@ namespace CecoChat.Client.Shared
         {
             ClientMessage message = new()
             {
+                MessageId = Guid.NewGuid().ToUuid(),
                 SenderId = _userID,
                 ReceiverId = receiverID,
                 Type = ClientMessageType.PlainText,
@@ -188,7 +190,6 @@ namespace CecoChat.Client.Shared
             };
             SendMessageResponse response = await _sendClient.SendMessageAsync(request, _grpcMetadata);
 
-            message.MessageId = response.MessageId;
             message.Timestamp = response.MessageTimestamp;
             return message;
         }
