@@ -1,6 +1,6 @@
 # CecoChat
 
-System design and partial implementation of a chat for 10-100 millions active users based on Kafka, Cassandra, gRPC, Redis, Docker, ASP.NET, .NET 5.
+System design and partial implementation of a chat for 10-100 millions active users based on Kafka, Cassandra, gRPC, Redis, Docker, .NET 5, ASP.NET.
 
 I would appreciate any comments so feel free to use the `Discussions` tab on the Git repo.
 
@@ -58,9 +58,9 @@ On the server I am using ASP.NET Core gRPC services utilizing async-await and TP
 | Client machine | Clients succeeded | Client time | Server machine | Server CPU | Server threads | Server RAM |
 | :------------- | :---------------- | :---------- | :------------- | :--------- | :------------- | :--------- |
 | Moderate       | 15869             | 21 seconds  | Weaker         | 150%-200%  | ?              | 1.3GB      |
-| Weaker         | 28232             | 147 seconds | Moderate       | 5-10%      | 67             | 3.55GB     |
+| Weaker         | 28232             | 145 seconds | Moderate       | 40-50%     | 67             | 3.55GB     |
 
-The clients succeeded on both machines are a result of port exhaustion limits hit on both OS-es which ran the clients. The Windows error was `An operation on a socket could not be performed because the system lacked sufficient buffer space or because a queue was full` and the Ubuntu Server one was `Cannot assign requested address`. Additionally when clients were on the weaker machine the client time required in order to complete the requests is considerably higher while it was obvious that the server was not under serious load. One of these could be the issue: Windows 10 has some limits which prohibit it from handling a high number of concurrent clients, the weaker machine is really weak, there is a concurrency issue with .NET 5 at least on Ubuntu Server, I've messed something in the client or server code.
+The number of clients that succeeded is the number of clients that were able to connect. That number is a result of port exhaustion limits hit on both OS-es which ran the clients. The Windows error was `An operation on a socket could not be performed because the system lacked sufficient buffer space or because a queue was full` and the Ubuntu Server one was `Cannot assign requested address`. Additionally when clients were on the weaker machine the client time required in order to complete the requests is considerably higher while it was obvious that the server could handle more load. One of these could be the issue: Windows 10 has some limits which prohibit it from handling a high number of concurrent clients, the weaker machine is really weak, there is a concurrency issue with .NET 5 at least on Ubuntu Server, the client code could be improved to better schedule the tasks instead of relying on async-await and TPL.
 
 Based on these numbers I think that 50k concurrent connections could be a realistic number for a messaging server and would be a useful limit in our calculations.
 
