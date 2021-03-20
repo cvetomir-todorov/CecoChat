@@ -19,7 +19,7 @@ jobs:
         dotnet-version: 5.0.x
 
     - name: Restore
-      run: dotnet restore
+      run: dotnet restore source/CecoChat.sln
 
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build --no-restore source/CecoChat.sln
