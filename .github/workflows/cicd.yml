@@ -39,4 +39,4 @@ jobs:
         file: containerize/Connect.Dockerfile
         context: ./source
         push: true
-        tags: ceco.com/cecochat/connect:0.1
+        tags: cecochat/connect:0.1
