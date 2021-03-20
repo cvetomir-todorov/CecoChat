@@ -1,5 +1,5 @@
-.\BuildImageForConnect.ps1
-.\BuildImageForHistory.ps1
-.\BuildImageForMaterialize.ps1
-.\BuildImageForMessaging.ps1
-.\BuildImageForProfile.ps1
+docker build -f .\Connect.Dockerfile -t ceco.com/cecochat/connect:0.1 ..\source\
+docker build -f .\History.Dockerfile -t ceco.com/cecochat/history:0.1 ..\source\
+docker build -f .\Materialize.Dockerfile -t ceco.com/cecochat/materialize:0.1 ..\source\
+docker build -f .\Messaging.Dockerfile -t ceco.com/cecochat/messaging:0.1 ..\source\
+docker build -f .\Profile.Dockerfile -t ceco.com/cecochat/profile:0.1 ..\source\
