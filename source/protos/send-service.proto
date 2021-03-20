@@ -3,7 +3,6 @@ option csharp_namespace = "CecoChat.Contracts.Client";
 package CecoChat.Contracts.Client;
 import "client-message.proto";
 import "google/protobuf/timestamp.proto";
-import "uuid.proto";
 
 service Send {
   rpc SendMessage(SendMessageRequest) returns (SendMessageResponse);
