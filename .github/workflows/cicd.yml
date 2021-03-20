@@ -35,7 +35,7 @@ jobs:
       uses: docker/setup-buildx-action@v1
 
     - name: Publish .NET projects
-      run: dotnet publish source/CecoChat.Connect.Server/CecoChat.Connect.Server.csproj -o ./connect -c Debug
+      run: dotnet publish source/CecoChat.Connect.Server/CecoChat.Connect.Server.csproj -o $GITHUB_WORKSPACE/Connect -c Debug
 
     - name: Build and push Docker images
       id: dockerbuild
