@@ -20,10 +20,14 @@ jobs:
         dotnet-version: 5.0.x
 
     - name: Restore
-      run: dotnet restore source/CecoChat.sln
+      run: |
+        dotnet restore source/CecoChat.sln
+        dotnet restore check/Check.sln
 
     - name: Build
-      run: dotnet build --no-restore source/CecoChat.sln
+      run: |
+        dotnet build --no-restore source/CecoChat.sln
+        dotnet build --no-restore check/Check.sln
 
   analyze-code-quality:
     needs: build
