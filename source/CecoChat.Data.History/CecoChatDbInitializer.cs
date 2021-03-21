@@ -52,7 +52,7 @@ namespace CecoChat.Data.History
             public string Content { get; init; }
         }
 
-        private List<CqlScript> GetCqlScripts(string keyspace)
+        private static List<CqlScript> GetCqlScripts(string keyspace)
         {
             Assembly targetAssembly = Assembly.GetExecutingAssembly();
             string messagingPrefix = keyspace + "-";
