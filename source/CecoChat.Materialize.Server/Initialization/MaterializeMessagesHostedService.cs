@@ -20,26 +20,26 @@ namespace CecoChat.Materialize.Server.Initialization
             _backendConsumer = backendConsumer;
         }
 
-        public Task StartAsync(CancellationToken ct)
+        public Task StartAsync(CancellationToken cancellationToken)
         {
             _backendConsumer.Prepare();
             Task.Factory.StartNew(() =>
             {
                 try
                 {
-                    _backendConsumer.Start(ct);
+                    _backendConsumer.Start(cancellationToken);
                 }
                 catch (Exception exception)
                 {
                     _logger.LogCritical(exception, "Failure in start materialize messages hosted service.");
                 }
-            }, ct, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+            }, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
 
             _logger.LogInformation("Started materialize messages hosted service.");
             return Task.CompletedTask;
         }
 
-        public Task StopAsync(CancellationToken ct)
+        public Task StopAsync(CancellationToken cancellationToken)
         {
             return Task.CompletedTask;
         }
