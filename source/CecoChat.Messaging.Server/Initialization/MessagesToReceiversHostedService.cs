@@ -51,7 +51,7 @@ namespace CecoChat.Messaging.Server.Initialization
             _partitionsChangedToken = _partitionsChanged.Subscribe(this);
         }
 
-        public Task StartAsync(CancellationToken ct)
+        public Task StartAsync(CancellationToken cancellationToken)
         {
             int partitionCount = _partitioningConfiguration.PartitionCount;
             PartitionRange partitions = _partitioningConfiguration.GetServerPartitions(_backendOptions.ServerID);
@@ -59,7 +59,7 @@ namespace CecoChat.Messaging.Server.Initialization
             if (ValidatePartitionConfiguration(partitionCount, partitions))
             {
                 ConfigureBackend(partitionCount, partitions);
-                StartBackendConsumer(ct);
+                StartBackendConsumer(cancellationToken);
             }
 
             return Task.CompletedTask;
@@ -140,7 +140,7 @@ namespace CecoChat.Messaging.Server.Initialization
             }
         }
 
-        public Task StopAsync(CancellationToken ct)
+        public Task StopAsync(CancellationToken cancellationToken)
         {
             _partitionsChanged.Unsubscribe(_partitionsChangedToken);
             return Task.CompletedTask;
