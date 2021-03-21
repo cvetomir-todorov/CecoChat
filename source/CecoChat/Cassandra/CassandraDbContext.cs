@@ -54,11 +54,11 @@ namespace CecoChat.Cassandra
 
         public void Dispose()
         {
-            CleanUp(isDisposing: true);
+            Dispose(isDisposing: true);
             GC.SuppressFinalize(this);
         }
 
-        protected virtual void CleanUp(bool isDisposing)
+        protected virtual void Dispose(bool isDisposing)
         {
             if (isDisposing)
             {
