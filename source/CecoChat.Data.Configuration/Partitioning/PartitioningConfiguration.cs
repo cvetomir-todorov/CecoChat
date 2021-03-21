@@ -181,12 +181,9 @@ namespace CecoChat.Data.Configuration.Partitioning
                         _logger.LogInformation("Server {0} is assigned to partitions {1} ({2} out of {3}).",
                             server, partitions, partitionsSet, partitions.Length);
                     }
-                    if (_usage.UsePartitions)
+                    if (_usage.UsePartitions && _state.SetPartitionsForServer(server, partitions, strictlyAdd))
                     {
-                        if (_state.SetPartitionsForServer(server, partitions, strictlyAdd))
-                        {
-                            _logger.LogInformation("Partitions {0} are assigned to server {1}.", partitions, server);
-                        }
+                        _logger.LogInformation("Partitions {0} are assigned to server {1}.", partitions, server);
                     }
                 }
                 else
