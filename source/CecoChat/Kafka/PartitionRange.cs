@@ -66,6 +66,16 @@ namespace CecoChat.Kafka
             return hashCode;
         }
 
+        public static bool operator ==(PartitionRange left, PartitionRange right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(PartitionRange left, PartitionRange right)
+        {
+            return !left.Equals(right);
+        }
+
         public static readonly PartitionRange Empty = new(0, 0, isNotEmpty: false);
 
         public static bool TryParse(string value, char separator, out PartitionRange partitionRange)
