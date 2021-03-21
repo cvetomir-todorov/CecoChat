@@ -56,8 +56,10 @@ namespace CecoChat.Messaging.Server.Clients
                     _logger.LogError("Failed to add {0} from {1}.", userClaims, address);
                 }
             }
-            catch (OperationCanceledException)
-            {}
+            catch (OperationCanceledException operationCanceledException) when (operationCanceledException.InnerException != null)
+            {
+                _logger.LogError(operationCanceledException.InnerException, "Listen for {0} from {1} failed.", userClaims, address);
+            }
             catch (Exception exception)
             {
                 _logger.LogError(exception, "Listen for {0} from {1} failed.", userClaims, address);
