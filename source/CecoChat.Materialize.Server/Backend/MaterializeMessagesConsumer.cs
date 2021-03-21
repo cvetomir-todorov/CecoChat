@@ -10,7 +10,7 @@ using Microsoft.Extensions.Options;
 
 namespace CecoChat.Materialize.Server.Backend
 {
-    public class MaterializeMessagesConsumer : IBackendConsumer
+    public sealed class MaterializeMessagesConsumer : IBackendConsumer
     {
         private readonly ILogger _logger;
         private readonly IBackendOptions _backendOptions;
