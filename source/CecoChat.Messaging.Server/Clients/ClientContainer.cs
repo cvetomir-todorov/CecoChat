@@ -39,7 +39,8 @@ namespace CecoChat.Messaging.Server.Clients
         {
             if (_userMap.TryGetValue(userID, out UserClients userClients))
             {
-                if (!userClients.Clients.TryRemove(client.ClientID, out _))
+                bool isRemoved = userClients.Clients.TryRemove(client.ClientID, out _);
+                if (!isRemoved)
                 {
                     throw new InvalidOperationException($"Client {client.ClientID} for user {userID} has already been removed.");
                 }
