@@ -86,7 +86,7 @@ namespace CecoChat.Cassandra
         {
             ValidateKeyspace(keyspace);
             // force connection create
-            ISession _ = GetSession();
+            GetSession();
             KeyspaceMetadata metadata = Cluster.Metadata.GetKeyspace(keyspace);
             bool exists = metadata != null;
             return exists;
