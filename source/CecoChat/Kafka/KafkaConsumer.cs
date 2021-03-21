@@ -19,12 +19,6 @@ namespace CecoChat.Kafka
         void Commit(ConsumeResult<TKey, TValue> consumeResult, CancellationToken ct);
     }
 
-    internal class KafkaConsumerID
-    {
-        private static int _nextIDCounter;
-        public static int GetNextID() => Interlocked.Increment(ref _nextIDCounter);
-    }
-
     public sealed class KafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey, TValue>
     {
         private readonly ILogger _logger;
@@ -35,7 +29,7 @@ namespace CecoChat.Kafka
         public KafkaConsumer(ILogger<KafkaConsumer<TKey, TValue>> logger)
         {
             _logger = logger;
-            _id = KafkaConsumerID.GetNextID();
+            _id = KafkaConsumerIDGenerator.GetNextID();
             _assignedPartitions = PartitionRange.Empty;
         }
 
@@ -155,5 +149,14 @@ namespace CecoChat.Kafka
                 _logger.LogError(exception, "Consumer {0} was disposed without cancellation being requested.", _id);
             }
         }
+    }
+
+    /// <summary>
+    /// Not inside the <see cref="KafkaConsumer{TKey,TValue}"/> class which uses it since it is generic.
+    /// </summary>
+    internal static class KafkaConsumerIDGenerator
+    {
+        private static int _nextIDCounter;
+        public static int GetNextID() => Interlocked.Increment(ref _nextIDCounter);
     }
 }
