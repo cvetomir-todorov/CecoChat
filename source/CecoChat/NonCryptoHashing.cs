@@ -41,12 +41,12 @@ namespace CecoChat
     {
         public int Compute(long value)
         {
-            short value0 = (short)(value >> 48);
-            short value1 = (short)(value >> 32);
-            short value2 = (short)(value >> 16);
-            short value3 = (short)value;
+            short value1 = (short)(value >> 48);
+            short value2 = (short)(value >> 32);
+            short value3 = (short)(value >> 16);
+            short value4 = (short)value;
 
-            int hash = HashCode.Combine(value0, value1, value2, value3);
+            int hash = HashCode.Combine(value1, value2, value3, value4);
             return hash;
         }
     }
