@@ -4,16 +4,12 @@ using StackExchange.Redis;
 
 namespace CecoChat.Data.Configuration.History
 {
-    public interface IHistoryConfigurationRepository
+    internal interface IHistoryConfigurationRepository
     {
-        Task<string> GetServerAddress();
-
-        Task<int> GetUserMessageCount();
-
-        Task<int> GetDialogMessageCount();
+        Task<HistoryConfigurationValues> GetValues(HistoryConfigurationUsage usage);
     }
 
-    public sealed class HistoryConfigurationRepository : IHistoryConfigurationRepository
+    internal sealed class HistoryConfigurationRepository : IHistoryConfigurationRepository
     {
         private readonly IRedisContext _redisContext;
 
@@ -21,6 +17,23 @@ namespace CecoChat.Data.Configuration.History
             IRedisContext redisContext)
         {
             _redisContext = redisContext;
+        }
+
+        public async Task<HistoryConfigurationValues> GetValues(HistoryConfigurationUsage usage)
+        {
+            HistoryConfigurationValues values = new();
+
+            if (usage.UseServerAddress)
+            {
+                values.ServerAddress = await GetServerAddress();
+            }
+            if (usage.UseMessageCount)
+            {
+                values.UserMessageCount = await GetUserMessageCount();
+                values.DialogMessageCount = await GetDialogMessageCount();
+            }
+
+            return values;
         }
 
         public async Task<string> GetServerAddress()
