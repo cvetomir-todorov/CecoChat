@@ -71,42 +71,47 @@ namespace CecoChat.Data.Configuration.Partitioning
             }
 
             HashSet<int> uniquePartitions = new();
-            List<int> overlappingPartitions = new();
-            List<int> invalidPartitions = new();
 
             foreach (KeyValuePair<string, PartitionRange> pair in serverPartitionRangeMap)
             {
                 string server = pair.Key;
                 PartitionRange partitions = pair.Value;
+                ValidateSingleServerPartitions(server, partitions, values.PartitionCount, uniquePartitions, context);
+            }
+        }
 
-                if (string.IsNullOrWhiteSpace(server))
-                {
-                    context.AddFailure($"Server for partitions {partitions} is null or whitespace.");
-                }
+        private static void ValidateSingleServerPartitions(
+            string server, PartitionRange partitions,
+            int partitionCount, HashSet<int> uniquePartitions,
+            CustomContext context)
+        {
+            List<int> overlappingPartitions = new();
+            List<int> invalidPartitions = new();
 
-                overlappingPartitions.Clear();
-                invalidPartitions.Clear();
+            if (string.IsNullOrWhiteSpace(server))
+            {
+                context.AddFailure($"Server for partitions {partitions} is null or whitespace.");
+            }
 
-                for (int partition = partitions.Lower; partition <= partitions.Upper; ++partition)
+            for (int partition = partitions.Lower; partition <= partitions.Upper; ++partition)
+            {
+                if (!uniquePartitions.Add(partition))
                 {
-                    if (!uniquePartitions.Add(partition))
-                    {
-                        overlappingPartitions.Add(partition);
-                    }
-                    if (partition < 0 || partition > values.PartitionCount - 1)
-                    {
-                        invalidPartitions.Add(partition);
-                    }
+                    overlappingPartitions.Add(partition);
                 }
+                if (partition < 0 || partition > partitionCount - 1)
+                {
+                    invalidPartitions.Add(partition);
+                }
+            }
 
-                if (overlappingPartitions.Count > 0)
-                {
-                    context.AddFailure($"Server {server} has partitions that overlap with existing ones [{string.Join(',', overlappingPartitions)}].");
-                }
-                if (invalidPartitions.Count > 0)
-                {
-                    context.AddFailure($"Server {server} has invalid partitions [{string.Join(',', invalidPartitions)}].");
-                }
+            if (overlappingPartitions.Count > 0)
+            {
+                context.AddFailure($"Server {server} has partitions that overlap with existing ones [{string.Join(',', overlappingPartitions)}].");
+            }
+            if (invalidPartitions.Count > 0)
+            {
+                context.AddFailure($"Server {server} has invalid partitions [{string.Join(',', invalidPartitions)}].");
             }
         }
 
