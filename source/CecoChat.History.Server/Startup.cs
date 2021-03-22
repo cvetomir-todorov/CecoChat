@@ -54,10 +54,7 @@ namespace CecoChat.History.Server
             services.AddSingleton<IBackendDbMapper, BackendDbMapper>();
 
             // configuration
-            services.AddRedis(Configuration.GetSection("ConfigurationDB"));
-            services.AddSingleton<IHistoryConfiguration, HistoryConfiguration>();
-            services.AddSingleton<IHistoryConfigurationRepository, HistoryConfigurationRepository>();
-            services.AddSingleton<IConfigurationUtility, ConfigurationUtility>();
+            services.AddConfiguration(Configuration.GetSection("ConfigurationDB"), addHistory: true);
 
             // shared
             services.AddSingleton<IClientBackendMapper, ClientBackendMapper>();
