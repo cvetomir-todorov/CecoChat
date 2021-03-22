@@ -1,42 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 using CecoChat.Events;
 using CecoChat.Kafka;
 using CecoChat.Redis;
+using FluentValidation.Results;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 
 namespace CecoChat.Data.Configuration.Partitioning
 {
-    public sealed class PartitioningConfigurationUsage
-    {
-        public bool UsePartitions { get; set; }
-
-        public string ServerForWhichToUsePartitions { get; set; }
-
-        public bool UseServerAddressByPartition { get; set; }
-    }
-
-    public interface IPartitioningConfiguration : IDisposable
-    {
-        Task Initialize(PartitioningConfigurationUsage usage);
-
-        int PartitionCount { get; }
-
-        PartitionRange GetServerPartitions(string server);
-
-        string GetServerAddress(int partition);
-    }
-
-    public sealed class PartitionsChangedEventData
-    {
-        public int PartitionCount { get; init; }
-
-        public PartitionRange Partitions { get; init; }
-    }
-
-    public sealed class PartitioningConfiguration : IPartitioningConfiguration
+    internal sealed class PartitioningConfiguration : IPartitioningConfiguration
     {
         private readonly ILogger _logger;
         private readonly IRedisContext _redisContext;
@@ -44,8 +19,9 @@ namespace CecoChat.Data.Configuration.Partitioning
         private readonly IConfigurationUtility _configurationUtility;
         private readonly IEventSource<PartitionsChangedEventData> _partitionsChanged;
 
-        private readonly PartitioningConfigurationState _state;
         private PartitioningConfigurationUsage _usage;
+        private PartitioningConfigurationValues _values;
+        private PartitioningConfigurationValidator _validator;
 
         public PartitioningConfiguration(
             ILogger<PartitioningConfiguration> logger,
@@ -59,8 +35,6 @@ namespace CecoChat.Data.Configuration.Partitioning
             _repository = repository;
             _configurationUtility = configurationUtility;
             _partitionsChanged = partitionsChanged;
-
-            _state = new PartitioningConfigurationState();
         }
 
         public void Dispose()
@@ -68,16 +42,30 @@ namespace CecoChat.Data.Configuration.Partitioning
             _redisContext.Dispose();
         }
 
-        public int PartitionCount => _state.PartitionCount;
+        public int PartitionCount => _values.PartitionCount;
 
         public PartitionRange GetServerPartitions(string server)
         {
-            return _state.GetPartitionsForServer(server);
+            if (!_values.ServerPartitionsMap.TryGetValue(server, out PartitionRange partitions))
+            {
+                throw new InvalidOperationException($"No partitions configured for server {server}.");
+            }
+
+            return partitions;
         }
 
         public string GetServerAddress(int partition)
         {
-            return _state.GetServerAddress(partition);
+            if (!_values.PartitionServerMap.TryGetValue(partition, out string server))
+            {
+                throw new InvalidOperationException($"No server configured for partition {partition}.");
+            }
+            if (!_values.ServerAddressMap.TryGetValue(server, out string address))
+            {
+                throw new InvalidOperationException($"No address configured for server {server}.");
+            }
+
+            return address;
         }
 
         public async Task Initialize(PartitioningConfigurationUsage usage)
@@ -85,131 +73,133 @@ namespace CecoChat.Data.Configuration.Partitioning
             try
             {
                 _usage = usage;
-                ISubscriber subscriber = _redisContext.GetSubscriber();
+                await SubscribeForChanges(usage);
 
-                if (usage.UsePartitions || usage.UseServerAddressByPartition)
-                {
-                    ChannelMessageQueue partitionsMQ = await subscriber.SubscribeAsync($"notify:{PartitioningKeys.Partitions}");
-                    partitionsMQ.OnMessage(channelMessage => _configurationUtility.HandleChange(channelMessage, HandlePartitions));
-                    _logger.LogInformation("Subscribed for changes about {0}, {1} from channel {2}.",
-                        PartitioningKeys.PartitionCount, PartitioningKeys.ServerPartitions, partitionsMQ.Channel);
-                }
-                if (usage.UseServerAddressByPartition)
-                {
-                    ChannelMessageQueue serverAddressesMQ = await subscriber.SubscribeAsync($"notify:{PartitioningKeys.ServerAddresses}");
-                    serverAddressesMQ.OnMessage(channelMessage => _configurationUtility.HandleChange(channelMessage, HandleServerAddresses));
-                    _logger.LogInformation("Subscribed for changes about {0} from channel {1}.",
-                        PartitioningKeys.ServerAddresses, serverAddressesMQ.Channel);
-                }
-
-                await LoadValues(usage);
+                _validator = new PartitioningConfigurationValidator(usage);
+                await LoadValidateValues(usage, _validator);
             }
             catch (Exception exception)
             {
-                _logger.LogError(exception, "Initializing messaging configuration failed.");
+                _logger.LogError(exception, "Initializing partitioning configuration failed.");
             }
         }
 
-        private async Task LoadValues(PartitioningConfigurationUsage usage)
+        private async Task SubscribeForChanges(PartitioningConfigurationUsage usage)
         {
-            _logger.LogInformation("Loading messaging configuration...");
+            ISubscriber subscriber = _redisContext.GetSubscriber();
 
-            if (usage.UsePartitions || usage.UseServerAddressByPartition)
+            if (usage.UseServerPartitions || usage.UseServerAddresses)
             {
-                await SetPartitionCount();
-                await SetServerPartitions(strictlyAdd: true);
+                ChannelMessageQueue partitionsMQ = await subscriber.SubscribeAsync($"notify:{PartitioningKeys.ServerPartitions}");
+                partitionsMQ.OnMessage(channelMessage => _configurationUtility.HandleChange(channelMessage, HandleServerPartitions));
+                _logger.LogInformation("Subscribed for changes about {0}, {1} from channel {2}.",
+                    PartitioningKeys.PartitionCount, PartitioningKeys.ServerPartitions, partitionsMQ.Channel);
             }
-            if (usage.UseServerAddressByPartition)
+            if (usage.UseServerAddresses)
             {
-                await SetServerAddresses(strictlyAdd: true);
+                ChannelMessageQueue serverAddressesMQ = await subscriber.SubscribeAsync($"notify:{PartitioningKeys.ServerAddresses}");
+                serverAddressesMQ.OnMessage(channelMessage => _configurationUtility.HandleChange(channelMessage, HandleServerAddresses));
+                _logger.LogInformation("Subscribed for changes about {0} from channel {1}.",
+                    PartitioningKeys.ServerAddresses, serverAddressesMQ.Channel);
             }
-
-            _logger.LogInformation("Loading messaging configuration succeeded.");
         }
 
-        private async Task HandlePartitions(ChannelMessage channelMessage)
+        private async Task HandleServerPartitions(ChannelMessage channelMessage)
         {
-            await SetPartitionCount();
-            await SetServerPartitions(strictlyAdd: false);
-
-            PartitionRange partitions = PartitionRange.Empty;
-            if (!string.IsNullOrWhiteSpace(_usage.ServerForWhichToUsePartitions))
+            if (!_usage.UseServerPartitions && !_usage.UseServerAddresses)
             {
-                partitions = _state.GetPartitionsForServer(_usage.ServerForWhichToUsePartitions);
+                return;
             }
 
-            PartitionsChangedEventData eventData = new()
+            bool areValid = await LoadValidateValues(_usage, _validator);
+            if (areValid && !string.IsNullOrWhiteSpace(_usage.ServerPartitionChangesToWatch))
             {
-                PartitionCount = _state.PartitionCount,
-                Partitions = partitions
-            };
+                PartitioningConfigurationValues values = _values;
+                if (values.ServerPartitionsMap.TryGetValue(_usage.ServerPartitionChangesToWatch, out PartitionRange partitions))
+                {
+                    PartitionsChangedEventData eventData = new()
+                    {
+                        PartitionCount = values.PartitionCount,
+                        Partitions = partitions
+                    };
 
-            _partitionsChanged.Publish(eventData);
+                    _partitionsChanged.Publish(eventData);
+                }
+                else
+                {
+                    _logger.LogError("After server partition changes there are no partitions for watched server {0}.",
+                        _usage.ServerPartitionChangesToWatch);
+                }
+            }
         }
 
         private async Task HandleServerAddresses(ChannelMessage channelMessage)
         {
-            await SetServerAddresses(strictlyAdd: false);
+            if (_usage.UseServerAddresses)
+            {
+                await LoadValidateValues(_usage, _validator);
+            }
         }
 
-        private async Task SetPartitionCount()
+        private async Task<bool> LoadValidateValues(PartitioningConfigurationUsage usage, PartitioningConfigurationValidator validator)
         {
-            RedisValueResult<int> result = await _repository.GetPartitionCount();
-            if (result.IsSuccess)
+            PartitioningConfigurationValues values = await _repository.GetValues(usage);
+            _logger.LogInformation("Loading partitioning configuration succeeded.");
+
+            bool areValid = ValidateValues(values, validator);
+            if (areValid)
             {
-                _state.PartitionCount = result.Value;
-                _logger.LogInformation("Partition count set to {0}.", result.Value);
+                _values = values;
+                PrintValues(usage, values);
+            }
+
+            return areValid;
+        }
+
+        // TODO: reuse method
+        private bool ValidateValues(PartitioningConfigurationValues values, PartitioningConfigurationValidator validator)
+        {
+            ValidationResult validationResult = validator.Validate(values);
+            if (validationResult.IsValid)
+            {
+                _logger.LogInformation("Validating partitioning configuration succeeded.");
             }
             else
             {
-                _logger.LogError("Partition count is invalid.");
+                StringBuilder errorBuilder = new();
+                errorBuilder.AppendLine("Validating partitioning configuration failed.");
+
+                foreach (ValidationFailure validationFailure in validationResult.Errors)
+                {
+                    errorBuilder.AppendLine(validationFailure.ErrorMessage);
+                }
+
+                _logger.LogError(errorBuilder.ToString());
             }
+
+            return validationResult.IsValid;
         }
 
-        private async Task SetServerPartitions(bool strictlyAdd)
+        private void PrintValues(PartitioningConfigurationUsage usage, PartitioningConfigurationValues values)
         {
-            await foreach (RedisValueResult<KeyValuePair<string, PartitionRange>> result in _repository.GetServerPartitions())
-            {
-                if (result.IsSuccess)
-                {
-                    string server = result.Value.Key;
-                    PartitionRange partitions = result.Value.Value;
+            _logger.LogInformation("Partition count set to {0}.", values.PartitionCount);
 
-                    if (_usage.UseServerAddressByPartition)
-                    {
-                        int partitionsSet = _state.SetServerForPartitions(server, partitions, strictlyAdd);
-                        _logger.LogInformation("Server {0} is assigned to partitions {1} ({2} out of {3}).",
-                            server, partitions, partitionsSet, partitions.Length);
-                    }
-                    if (_usage.UsePartitions && _state.SetPartitionsForServer(server, partitions, strictlyAdd))
-                    {
-                        _logger.LogInformation("Partitions {0} are assigned to server {1}.", partitions, server);
-                    }
-                }
-                else
+            if (usage.UseServerPartitions || usage.UseServerAddresses)
+            {
+                foreach (KeyValuePair<string, PartitionRange> pair in values.ServerPartitionsMap)
                 {
-                    _logger.LogError("Server partitions are invalid.");
+                    string server = pair.Key;
+                    PartitionRange partitions = pair.Value;
+                    _logger.LogInformation("Partitions {0} are assigned to server {1}.", partitions, server);
                 }
             }
-        }
-
-        private async Task SetServerAddresses(bool strictlyAdd)
-        {
-            await foreach (RedisValueResult<KeyValuePair<string, string>> result in _repository.GetServerAddresses())
+            if (usage.UseServerAddresses)
             {
-                if (result.IsSuccess)
+                foreach (KeyValuePair<string, string> pair in values.ServerAddressMap)
                 {
-                    string server = result.Value.Key;
-                    string address = result.Value.Value;
-
-                    if (_state.SetServerAddress(server, address, strictlyAdd))
-                    {
-                        _logger.LogInformation("Address {0} is assigned to server {1}.", address, server);
-                    }
-                }
-                else
-                {
-                    _logger.LogError("Server address is invalid.");
+                    string server = pair.Key;
+                    string address = pair.Value;
+                    _logger.LogInformation("Address {0} is assigned to server {1}.", address, server);
                 }
             }
         }

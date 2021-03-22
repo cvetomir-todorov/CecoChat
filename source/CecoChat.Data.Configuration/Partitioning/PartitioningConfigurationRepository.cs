@@ -1,21 +1,16 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using CecoChat.Kafka;
 using CecoChat.Redis;
 using StackExchange.Redis;
 
 namespace CecoChat.Data.Configuration.Partitioning
 {
-    public interface IPartitioningConfigurationRepository
+    internal interface IPartitioningConfigurationRepository
     {
-        Task<RedisValueResult<int>> GetPartitionCount();
-
-        IAsyncEnumerable<RedisValueResult<KeyValuePair<string, PartitionRange>>> GetServerPartitions();
-
-        IAsyncEnumerable<RedisValueResult<KeyValuePair<string, string>>> GetServerAddresses();
+        Task<PartitioningConfigurationValues> GetValues(PartitioningConfigurationUsage usage);
     }
 
-    public sealed class PartitioningConfigurationRepository : IPartitioningConfigurationRepository
+    internal sealed class PartitioningConfigurationRepository : IPartitioningConfigurationRepository
     {
         private readonly IRedisContext _redisContext;
 
@@ -25,60 +20,65 @@ namespace CecoChat.Data.Configuration.Partitioning
             _redisContext = redisContext;
         }
 
-        public async Task<RedisValueResult<int>> GetPartitionCount()
+        public async Task<PartitioningConfigurationValues> GetValues(PartitioningConfigurationUsage usage)
+        {
+            PartitioningConfigurationValues values = new();
+
+            values.PartitionCount = await GetPartitionCount();
+            await GetServerPartitions(usage, values);
+            await GetServerAddresses(usage, values);
+
+            return values;
+        }
+
+        private async Task<int> GetPartitionCount()
         {
             IDatabase database = _redisContext.GetDatabase();
             RedisValue value = await database.StringGetAsync(PartitioningKeys.PartitionCount);
-
-            if (value.IsNullOrEmpty ||
-                !value.TryParse(out int partitionCount))
-            {
-                return RedisValueResult<int>.Failure();
-            }
-
-            return RedisValueResult<int>.Success(partitionCount);
+            value.TryParse(out int partitionCount);
+            return partitionCount;
         }
 
-        public async IAsyncEnumerable<RedisValueResult<KeyValuePair<string, PartitionRange>>> GetServerPartitions()
+        private async Task GetServerPartitions(PartitioningConfigurationUsage usage, PartitioningConfigurationValues values)
         {
-            IDatabase database = _redisContext.GetDatabase();
-            HashEntry[] values = await database.HashGetAllAsync(PartitioningKeys.ServerPartitions);
-
-            foreach (HashEntry hashEntry in values)
+            if (!usage.UseServerPartitions && !usage.UseServerAddresses)
             {
-                string server = hashEntry.Name;
+                return;
+            }
 
-                if (hashEntry.Value.IsNullOrEmpty ||
-                    !PartitionRange.TryParse(hashEntry.Value, separator: '-', out PartitionRange partitions))
+            IDatabase database = _redisContext.GetDatabase();
+            HashEntry[] pairs = await database.HashGetAllAsync(PartitioningKeys.ServerPartitions);
+
+            foreach (HashEntry pair in pairs)
+            {
+                string server = pair.Name;
+                if (PartitionRange.TryParse(pair.Value, separator: '-', out PartitionRange partitions))
                 {
-                    yield return RedisValueResult<KeyValuePair<string, PartitionRange>>.Failure();
+                    for (int partition = partitions.Lower; partition <= partitions.Upper; ++partition)
+                    {
+                        values.PartitionServerMap[partition] = server;
+                    }
                 }
-                else
-                {
-                    KeyValuePair<string, PartitionRange> serverPartitions = new(server, partitions);
-                    yield return RedisValueResult<KeyValuePair<string, PartitionRange>>.Success(serverPartitions);
-                }
+
+                values.ServerPartitionsMap[server] = partitions;
             }
         }
 
-        public async IAsyncEnumerable<RedisValueResult<KeyValuePair<string, string>>> GetServerAddresses()
+        public async Task GetServerAddresses(PartitioningConfigurationUsage usage, PartitioningConfigurationValues values)
         {
-            IDatabase database = _redisContext.GetDatabase();
-            HashEntry[] values = await database.HashGetAllAsync(PartitioningKeys.ServerAddresses);
-
-            foreach (HashEntry hashEntry in values)
+            if (!usage.UseServerAddresses)
             {
-                string server = hashEntry.Name;
+                return;
+            }
 
-                if (hashEntry.Value.IsNullOrEmpty)
-                {
-                    yield return RedisValueResult<KeyValuePair<string, string>>.Failure();
-                }
-                else
-                {
-                    KeyValuePair<string, string> serverAddress = new(server, hashEntry.Value);
-                    yield return RedisValueResult<KeyValuePair<string, string>>.Success(serverAddress);
-                }
+            IDatabase database = _redisContext.GetDatabase();
+            HashEntry[] pairs = await database.HashGetAllAsync(PartitioningKeys.ServerAddresses);
+
+            foreach (HashEntry pair in pairs)
+            {
+                string server = pair.Name;
+                string address = pair.Value;
+                values.ServerAddressMap[server] = address;
             }
         }
     }
