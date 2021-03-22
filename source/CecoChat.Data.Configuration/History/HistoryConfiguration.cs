@@ -8,7 +8,7 @@ using StackExchange.Redis;
 
 namespace CecoChat.Data.Configuration.History
 {
-    public sealed class HistoryConfiguration : IHistoryConfiguration
+    internal sealed class HistoryConfiguration : IHistoryConfiguration
     {
         private readonly ILogger _logger;
         private readonly IRedisContext _redisContext;
@@ -73,63 +73,35 @@ namespace CecoChat.Data.Configuration.History
             }
         }
 
-        private Task HandleServerAddress(ChannelMessage channelMessage)
+        private async Task HandleServerAddress(ChannelMessage channelMessage)
         {
             if (_usage.UseServerAddress)
             {
-                return LoadValidateValues(_usage, _validator);
+                await LoadValidateValues(_usage, _validator);
             }
-
-            return Task.CompletedTask;
         }
 
-        private Task HandleMessageCount(ChannelMessage channelMessage)
+        private async Task HandleMessageCount(ChannelMessage channelMessage)
         {
             if (_usage.UseMessageCount)
             {
-                return LoadValidateValues(_usage, _validator);
+                await LoadValidateValues(_usage, _validator);
             }
-
-            return Task.CompletedTask;
         }
 
         private async Task LoadValidateValues(HistoryConfigurationUsage usage, HistoryConfigurationValidator validator)
         {
-            HistoryConfigurationValues values = await LoadValues(usage);
+            HistoryConfigurationValues values = await _repository.GetValues(usage);
+            _logger.LogInformation("Loading history configuration succeeded.");
+
             if (ValidateValues(values, validator))
             {
                 _values = values;
-
-                if (usage.UseServerAddress)
-                {
-                    _logger.LogInformation("Server address set to {0}.", values.ServerAddress);
-                }
-                if (usage.UseMessageCount)
-                {
-                    _logger.LogInformation("User message count set to {0}.", values.UserMessageCount);
-                    _logger.LogInformation("Dialog message count set to {0}.", values.DialogMessageCount);
-                }
+                PrintValues(usage, values);
             }
         }
 
-        private async Task<HistoryConfigurationValues> LoadValues(HistoryConfigurationUsage usage)
-        {
-            HistoryConfigurationValues values = new();
-
-            if (usage.UseServerAddress)
-            {
-                values.ServerAddress = await _repository.GetServerAddress();
-            }
-            if (usage.UseMessageCount)
-            {
-                values.UserMessageCount = await _repository.GetUserMessageCount();
-                values.DialogMessageCount = await _repository.GetDialogMessageCount();
-            }
-
-            _logger.LogInformation("Loading history configuration succeeded.");
-            return values;
-        }
-
+        // TODO: reuse method
         private bool ValidateValues(HistoryConfigurationValues values, HistoryConfigurationValidator validator)
         {
             ValidationResult validationResult = validator.Validate(values);
@@ -151,6 +123,19 @@ namespace CecoChat.Data.Configuration.History
             }
 
             return validationResult.IsValid;
+        }
+
+        private void PrintValues(HistoryConfigurationUsage usage, HistoryConfigurationValues values)
+        {
+            if (usage.UseServerAddress)
+            {
+                _logger.LogInformation("Server address set to {0}.", values.ServerAddress);
+            }
+            if (usage.UseMessageCount)
+            {
+                _logger.LogInformation("User message count set to {0}.", values.UserMessageCount);
+                _logger.LogInformation("Dialog message count set to {0}.", values.DialogMessageCount);
+            }
         }
     }
 }
