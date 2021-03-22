@@ -30,8 +30,8 @@ namespace CecoChat.Messaging.Server.Initialization
 
             await _partitioningConfiguration.Initialize(new PartitioningConfigurationUsage
             {
-                UsePartitions = true,
-                ServerForWhichToUsePartitions = _backendOptions.ServerID
+                UseServerPartitions = true,
+                ServerPartitionChangesToWatch = _backendOptions.ServerID
             });
         }
 

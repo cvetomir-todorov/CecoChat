@@ -23,8 +23,7 @@ namespace CecoChat.Connect.Server.Initialization
         {
             await _partitioningConfiguration.Initialize(new PartitioningConfigurationUsage
             {
-                UsePartitions = true,
-                UseServerAddressByPartition = true
+                UseServerAddresses = true
             });
             await _historyConfiguration.Initialize(new HistoryConfigurationUsage
             {
