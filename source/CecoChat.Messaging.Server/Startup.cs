@@ -62,11 +62,7 @@ namespace CecoChat.Messaging.Server
             services.Configure<BackendOptions>(Configuration.GetSection("Backend"));
 
             // configuration
-            services.AddRedis(Configuration.GetSection("ConfigurationDB"));
-            services.AddSingleton<IPartitioningConfiguration, PartitioningConfiguration>();
-            services.AddSingleton<IPartitioningConfigurationRepository, PartitioningConfigurationRepository>();
-            services.AddSingleton<IConfigurationUtility, ConfigurationUtility>();
-            services.AddEvent<EventSource<PartitionsChangedEventData>, PartitionsChangedEventData>();
+            services.AddConfiguration(Configuration.GetSection("ConfigurationDB"), addPartitioning: true);
 
             // shared
             services.AddSingleton<IClock, MonotonicClock>();

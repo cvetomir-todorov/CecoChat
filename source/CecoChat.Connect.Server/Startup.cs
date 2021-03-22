@@ -39,6 +39,9 @@ namespace CecoChat.Connect.Server
 
         public void ConfigureServices(IServiceCollection services)
         {
+            // ordered hosted services
+            services.AddHostedService<ConfigurationHostedService>();
+
             // web
             services
                 .AddControllers()
@@ -53,14 +56,7 @@ namespace CecoChat.Connect.Server
             services.AddJwtAuthentication(_jwtOptions);
 
             // configuration
-            services.AddHostedService<ConfigurationHostedService>();
-            services.AddSingleton<IPartitioningConfiguration, PartitioningConfiguration>();
-            services.AddSingleton<IPartitioningConfigurationRepository, PartitioningConfigurationRepository>();
-            services.AddSingleton<IHistoryConfiguration, HistoryConfiguration>();
-            services.AddSingleton<IHistoryConfigurationRepository, HistoryConfigurationRepository>();
-            services.AddSingleton<IConfigurationUtility, ConfigurationUtility>();
-            services.AddEvent<EventSource<PartitionsChangedEventData>, PartitionsChangedEventData>();
-            services.AddRedis(Configuration.GetSection("ConfigurationDB"));
+            services.AddConfiguration(Configuration.GetSection("ConfigurationDB"), addHistory: true, addPartitioning: true);
 
             // backend
             services.AddPartitionUtility();
