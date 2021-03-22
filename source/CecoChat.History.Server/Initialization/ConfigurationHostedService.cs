@@ -19,8 +19,7 @@ namespace CecoChat.History.Server.Initialization
         {
             await _historyConfiguration.Initialize(new HistoryConfigurationUsage
             {
-                UseUserMessageCount = true,
-                UseDialogMessageCount = true
+                UseMessageCount = true
             });
         }
 

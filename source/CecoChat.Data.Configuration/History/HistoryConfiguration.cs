@@ -1,37 +1,23 @@
 ﻿using System;
+using System.Text;
 using System.Threading.Tasks;
 using CecoChat.Redis;
+using FluentValidation.Results;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 
 namespace CecoChat.Data.Configuration.History
 {
-    public sealed class HistoryConfigurationUsage
-    {
-        public bool UseServerAddress { get; set; }
-
-        public bool UseUserMessageCount { get; set; }
-
-        public bool UseDialogMessageCount { get; set; }
-    }
-
-    public interface IHistoryConfiguration
-    {
-        Task Initialize(HistoryConfigurationUsage usage);
-
-        string ServerAddress { get; }
-
-        int UserMessageCount { get; }
-
-        int DialogMessageCount { get; }
-    }
-
     public sealed class HistoryConfiguration : IHistoryConfiguration
     {
         private readonly ILogger _logger;
         private readonly IRedisContext _redisContext;
         private readonly IHistoryConfigurationRepository _repository;
         private readonly IConfigurationUtility _configurationUtility;
+
+        private HistoryConfigurationUsage _usage;
+        private HistoryConfigurationValues _values;
+        private HistoryConfigurationValidator _validator;
 
         public HistoryConfiguration(
             ILogger<HistoryConfiguration> logger,
@@ -45,41 +31,21 @@ namespace CecoChat.Data.Configuration.History
             _configurationUtility = configurationUtility;
         }
 
-        public string ServerAddress { get; private set; }
+        public string ServerAddress => _values.ServerAddress;
 
-        public int UserMessageCount { get; private set; }
+        public int UserMessageCount => _values.UserMessageCount;
 
-        public int DialogMessageCount { get; private set; }
+        public int DialogMessageCount => _values.DialogMessageCount;
 
         public async Task Initialize(HistoryConfigurationUsage usage)
         {
             try
             {
-                ISubscriber subscriber = _redisContext.GetSubscriber();
+                _usage = usage;
+                await SubscribeForChanges(usage);
 
-                if (usage.UseServerAddress)
-                {
-                    ChannelMessageQueue serverAddressMQ = await subscriber.SubscribeAsync($"notify:{HistoryKeys.ServerAddress}");
-                    serverAddressMQ.OnMessage(channelMessage => _configurationUtility.HandleChange(channelMessage, HandleServerAddress));
-                    _logger.LogInformation("Subscribed for changes about {0} from channel {1}.",
-                        HistoryKeys.ServerAddress, serverAddressMQ.Channel);
-                }
-                if (usage.UseUserMessageCount)
-                {
-                    ChannelMessageQueue userMessageCountMQ = await subscriber.SubscribeAsync($"notify:{HistoryKeys.UserMessageCount}");
-                    userMessageCountMQ.OnMessage(channelMessage => _configurationUtility.HandleChange(channelMessage, HandleUserMessageCount));
-                    _logger.LogInformation("Subscribed for changes about {0} from channel {1}.",
-                        HistoryKeys.UserMessageCount, userMessageCountMQ.Channel);
-                }
-                if (usage.UseDialogMessageCount)
-                {
-                    ChannelMessageQueue dialogMessageCountMQ = await subscriber.SubscribeAsync($"notify:{HistoryKeys.DialogMessageCount}");
-                    dialogMessageCountMQ.OnMessage(channelMessage => _configurationUtility.HandleChange(channelMessage, HandleDialogMessageCount));
-                    _logger.LogInformation("Subscribed for changes about {0} from channel {1}.",
-                        HistoryKeys.DialogMessageCount, dialogMessageCountMQ.Channel);
-                }
-
-                await LoadValues(usage);
+                _validator = new HistoryConfigurationValidator(usage);
+                await LoadValidateValues(usage, _validator);
             }
             catch (Exception exception)
             {
@@ -87,81 +53,104 @@ namespace CecoChat.Data.Configuration.History
             }
         }
 
-        private async Task LoadValues(HistoryConfigurationUsage usage)
+        private async Task SubscribeForChanges(HistoryConfigurationUsage usage)
         {
-            _logger.LogInformation("Loading history configuration...");
+            ISubscriber subscriber = _redisContext.GetSubscriber();
 
             if (usage.UseServerAddress)
             {
-                await SetServerAddress();
+                ChannelMessageQueue serverAddressMQ = await subscriber.SubscribeAsync($"notify:{HistoryKeys.ServerAddress}");
+                serverAddressMQ.OnMessage(channelMessage => _configurationUtility.HandleChange(channelMessage, HandleServerAddress));
+                _logger.LogInformation("Subscribed for changes about {0} from channel {1}.",
+                    HistoryKeys.ServerAddress, serverAddressMQ.Channel);
             }
-            if (usage.UseUserMessageCount)
+            if (usage.UseMessageCount)
             {
-                await SetUserMessageCount();
+                ChannelMessageQueue userMessageCountMQ = await subscriber.SubscribeAsync($"notify:{HistoryKeys.MessageCount}");
+                userMessageCountMQ.OnMessage(channelMessage => _configurationUtility.HandleChange(channelMessage, HandleMessageCount));
+                _logger.LogInformation("Subscribed for changes about {0}, {1} from channel {2}.",
+                    HistoryKeys.UserMessageCount, HistoryKeys.DialogMessageCount, userMessageCountMQ.Channel);
             }
-            if (usage.UseDialogMessageCount)
+        }
+
+        private Task HandleServerAddress(ChannelMessage channelMessage)
+        {
+            if (_usage.UseServerAddress)
             {
-                await SetDialogMessageCount();
+                return LoadValidateValues(_usage, _validator);
+            }
+
+            return Task.CompletedTask;
+        }
+
+        private Task HandleMessageCount(ChannelMessage channelMessage)
+        {
+            if (_usage.UseMessageCount)
+            {
+                return LoadValidateValues(_usage, _validator);
+            }
+
+            return Task.CompletedTask;
+        }
+
+        private async Task LoadValidateValues(HistoryConfigurationUsage usage, HistoryConfigurationValidator validator)
+        {
+            HistoryConfigurationValues values = await LoadValues(usage);
+            if (ValidateValues(values, validator))
+            {
+                _values = values;
+
+                if (usage.UseServerAddress)
+                {
+                    _logger.LogInformation("Server address set to {0}.", values.ServerAddress);
+                }
+                if (usage.UseMessageCount)
+                {
+                    _logger.LogInformation("User message count set to {0}.", values.UserMessageCount);
+                    _logger.LogInformation("Dialog message count set to {0}.", values.DialogMessageCount);
+                }
+            }
+        }
+
+        private async Task<HistoryConfigurationValues> LoadValues(HistoryConfigurationUsage usage)
+        {
+            HistoryConfigurationValues values = new();
+
+            if (usage.UseServerAddress)
+            {
+                values.ServerAddress = await _repository.GetServerAddress();
+            }
+            if (usage.UseMessageCount)
+            {
+                values.UserMessageCount = await _repository.GetUserMessageCount();
+                values.DialogMessageCount = await _repository.GetDialogMessageCount();
             }
 
             _logger.LogInformation("Loading history configuration succeeded.");
+            return values;
         }
 
-        private async Task HandleServerAddress(ChannelMessage channelMessage)
+        private bool ValidateValues(HistoryConfigurationValues values, HistoryConfigurationValidator validator)
         {
-            await SetServerAddress();
-        }
-
-        private async Task HandleUserMessageCount(ChannelMessage channelMessage)
-        {
-            await SetUserMessageCount();
-        }
-
-        private async Task HandleDialogMessageCount(ChannelMessage channelMessage)
-        {
-            await SetDialogMessageCount();
-        }
-
-        private async Task SetServerAddress()
-        {
-            RedisValueResult<string> result = await _repository.GetServerAddress();
-            if (result.IsSuccess)
+            ValidationResult validationResult = validator.Validate(values);
+            if (validationResult.IsValid)
             {
-                ServerAddress = result.Value;
-                _logger.LogInformation("Server address set to {0}.", result.Value);
+                _logger.LogInformation("Validating history configuration succeeded.");
             }
             else
             {
-                _logger.LogError("Server address is invalid.");
-            }
-        }
+                StringBuilder errorBuilder = new();
+                errorBuilder.AppendLine("Validating history configuration failed.");
 
-        private async Task SetUserMessageCount()
-        {
-            RedisValueResult<int> result = await _repository.GetUserMessageCount();
-            if (result.IsSuccess)
-            {
-                UserMessageCount = result.Value;
-                _logger.LogInformation("User message count set to {0}.", result.Value);
-            }
-            else
-            {
-                _logger.LogError("User message count is invalid.");
-            }
-        }
+                foreach (ValidationFailure validationFailure in validationResult.Errors)
+                {
+                    errorBuilder.AppendLine(validationFailure.ErrorMessage);
+                }
 
-        private async Task SetDialogMessageCount()
-        {
-            RedisValueResult<int> result = await _repository.GetDialogMessageCount();
-            if (result.IsSuccess)
-            {
-                DialogMessageCount = result.Value;
-                _logger.LogInformation("Dialog message count set to {0}.", result.Value);
+                _logger.LogError(errorBuilder.ToString());
             }
-            else
-            {
-                _logger.LogError("Dialog message count is invalid.");
-            }
+
+            return validationResult.IsValid;
         }
     }
 }

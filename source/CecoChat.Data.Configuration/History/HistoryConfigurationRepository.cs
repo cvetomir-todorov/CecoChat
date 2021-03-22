@@ -6,11 +6,11 @@ namespace CecoChat.Data.Configuration.History
 {
     public interface IHistoryConfigurationRepository
     {
-        Task<RedisValueResult<string>> GetServerAddress();
+        Task<string> GetServerAddress();
 
-        Task<RedisValueResult<int>> GetUserMessageCount();
+        Task<int> GetUserMessageCount();
 
-        Task<RedisValueResult<int>> GetDialogMessageCount();
+        Task<int> GetDialogMessageCount();
     }
 
     public sealed class HistoryConfigurationRepository : IHistoryConfigurationRepository
@@ -23,45 +23,27 @@ namespace CecoChat.Data.Configuration.History
             _redisContext = redisContext;
         }
 
-        public async Task<RedisValueResult<string>> GetServerAddress()
+        public async Task<string> GetServerAddress()
         {
             IDatabase database = _redisContext.GetDatabase();
             RedisValue value = await database.StringGetAsync(HistoryKeys.ServerAddress);
-
-            if (value.IsNullOrEmpty)
-            {
-                return RedisValueResult<string>.Failure();
-            }
-
-            return RedisValueResult<string>.Success(value);
+            return value;
         }
 
-        public async Task<RedisValueResult<int>> GetUserMessageCount()
+        public async Task<int> GetUserMessageCount()
         {
             IDatabase database = _redisContext.GetDatabase();
             RedisValue value = await database.StringGetAsync(HistoryKeys.UserMessageCount);
-
-            if (value.IsNullOrEmpty ||
-                !value.TryParse(out int userMessageCount))
-            {
-                return RedisValueResult<int>.Failure();
-            }
-
-            return RedisValueResult<int>.Success(userMessageCount);
+            value.TryParse(out int userMessageCount);
+            return userMessageCount;
         }
 
-        public async Task<RedisValueResult<int>> GetDialogMessageCount()
+        public async Task<int> GetDialogMessageCount()
         {
             IDatabase database = _redisContext.GetDatabase();
             RedisValue value = await database.StringGetAsync(HistoryKeys.DialogMessageCount);
-
-            if (value.IsNullOrEmpty ||
-                !value.TryParse(out int dialogMessageCount))
-            {
-                return RedisValueResult<int>.Failure();
-            }
-
-            return RedisValueResult<int>.Success(dialogMessageCount);
+            value.TryParse(out int dialogMessageCount);
+            return dialogMessageCount;
         }
     }
 }
