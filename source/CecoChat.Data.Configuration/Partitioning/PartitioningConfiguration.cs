@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using CecoChat.Events;
 using CecoChat.Kafka;
 using CecoChat.Redis;
-using FluentValidation.Results;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 
@@ -146,7 +144,7 @@ namespace CecoChat.Data.Configuration.Partitioning
             PartitioningConfigurationValues values = await _repository.GetValues(usage);
             _logger.LogInformation("Loading partitioning configuration succeeded.");
 
-            bool areValid = ValidateValues(values, validator);
+            bool areValid = _configurationUtility.ValidateValues("partitioning", values, validator);
             if (areValid)
             {
                 _values = values;
@@ -154,30 +152,6 @@ namespace CecoChat.Data.Configuration.Partitioning
             }
 
             return areValid;
-        }
-
-        // TODO: reuse method
-        private bool ValidateValues(PartitioningConfigurationValues values, PartitioningConfigurationValidator validator)
-        {
-            ValidationResult validationResult = validator.Validate(values);
-            if (validationResult.IsValid)
-            {
-                _logger.LogInformation("Validating partitioning configuration succeeded.");
-            }
-            else
-            {
-                StringBuilder errorBuilder = new();
-                errorBuilder.AppendLine("Validating partitioning configuration failed.");
-
-                foreach (ValidationFailure validationFailure in validationResult.Errors)
-                {
-                    errorBuilder.AppendLine(validationFailure.ErrorMessage);
-                }
-
-                _logger.LogError(errorBuilder.ToString());
-            }
-
-            return validationResult.IsValid;
         }
 
         private void PrintValues(PartitioningConfigurationUsage usage, PartitioningConfigurationValues values)
