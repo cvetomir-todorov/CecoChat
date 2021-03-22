@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Text;
 using System.Threading.Tasks;
 using CecoChat.Redis;
-using FluentValidation.Results;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 
@@ -94,35 +92,11 @@ namespace CecoChat.Data.Configuration.History
             HistoryConfigurationValues values = await _repository.GetValues(usage);
             _logger.LogInformation("Loading history configuration succeeded.");
 
-            if (ValidateValues(values, validator))
+            if (_configurationUtility.ValidateValues("history", values, validator))
             {
                 _values = values;
                 PrintValues(usage, values);
             }
-        }
-
-        // TODO: reuse method
-        private bool ValidateValues(HistoryConfigurationValues values, HistoryConfigurationValidator validator)
-        {
-            ValidationResult validationResult = validator.Validate(values);
-            if (validationResult.IsValid)
-            {
-                _logger.LogInformation("Validating history configuration succeeded.");
-            }
-            else
-            {
-                StringBuilder errorBuilder = new();
-                errorBuilder.AppendLine("Validating history configuration failed.");
-
-                foreach (ValidationFailure validationFailure in validationResult.Errors)
-                {
-                    errorBuilder.AppendLine(validationFailure.ErrorMessage);
-                }
-
-                _logger.LogError(errorBuilder.ToString());
-            }
-
-            return validationResult.IsValid;
         }
 
         private void PrintValues(HistoryConfigurationUsage usage, HistoryConfigurationValues values)
