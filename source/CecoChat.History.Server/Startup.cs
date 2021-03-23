@@ -1,11 +1,9 @@
 using CecoChat.Cassandra;
 using CecoChat.Data.Configuration;
-using CecoChat.Data.Configuration.History;
 using CecoChat.Data.History;
 using CecoChat.History.Server.Clients;
 using CecoChat.History.Server.Initialization;
 using CecoChat.Jwt;
-using CecoChat.Redis;
 using CecoChat.Server;
 using CecoChat.Server.Identity;
 using Microsoft.AspNetCore.Builder;
