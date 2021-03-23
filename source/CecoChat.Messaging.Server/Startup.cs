@@ -39,6 +39,7 @@ namespace CecoChat.Messaging.Server
             // ordered hosted services
             services.AddHostedService<ConfigurationHostedService>();
             services.AddHostedService<MessagesToReceiversHostedService>();
+            services.AddHostedService<PartitionsChangedHostedService>();
 
             // clients
             services.AddGrpc();
