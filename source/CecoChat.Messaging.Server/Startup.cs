@@ -1,15 +1,12 @@
 using CecoChat.Contracts.Backend;
 using CecoChat.Contracts.Client;
 using CecoChat.Data.Configuration;
-using CecoChat.Data.Configuration.Partitioning;
 using CecoChat.DependencyInjection;
-using CecoChat.Events;
 using CecoChat.Jwt;
 using CecoChat.Kafka;
 using CecoChat.Messaging.Server.Backend;
 using CecoChat.Messaging.Server.Clients;
 using CecoChat.Messaging.Server.Initialization;
-using CecoChat.Redis;
 using CecoChat.Server;
 using CecoChat.Server.Backend;
 using CecoChat.Server.Identity;
