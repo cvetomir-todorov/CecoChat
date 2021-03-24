@@ -8,7 +8,7 @@ namespace CecoChat.Messaging.Server.Clients
     {
         Guid ClientID { get; }
 
-        bool AddMessage(TMessage message);
+        bool EnqueueMessage(TMessage message);
 
         Task ProcessMessages(CancellationToken ct);
 
