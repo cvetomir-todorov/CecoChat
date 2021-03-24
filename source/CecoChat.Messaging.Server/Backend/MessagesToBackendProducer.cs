@@ -9,7 +9,14 @@ using Microsoft.Extensions.Options;
 
 namespace CecoChat.Messaging.Server.Backend
 {
-    public sealed class MessagesToBackendProducer : IBackendProducer
+    public interface IMessagesToBackendProducer : IDisposable
+    {
+        int PartitionCount { get; set; }
+
+        void ProduceMessage(BackendMessage message);
+    }
+
+    public sealed class MessagesToBackendProducer : IMessagesToBackendProducer
     {
         private readonly ILogger _logger;
         private readonly IBackendOptions _backendOptions;
@@ -34,10 +41,10 @@ namespace CecoChat.Messaging.Server.Backend
             ProducerConfig configuration = new()
             {
                 BootstrapServers = string.Join(separator: ',', _backendOptions.Kafka.BootstrapServers),
-                Acks = Acks.All,
-                LingerMs = 1.0,
-                MessageTimeoutMs = 300000,
-                MessageSendMaxRetries = 8
+                Acks = _backendOptions.MessagesToBackendProducer.Acks,
+                LingerMs = _backendOptions.MessagesToBackendProducer.LingerMs,
+                MessageTimeoutMs = _backendOptions.MessagesToBackendProducer.MessageTimeoutMs,
+                MessageSendMaxRetries = _backendOptions.MessagesToBackendProducer.MessageSendMaxRetries
             };
 
             _producer = new ProducerBuilder<Null, BackendMessage>(configuration)
@@ -71,7 +78,7 @@ namespace CecoChat.Messaging.Server.Backend
 
         public void ProduceMessage(BackendMessage message)
         {
-            int partition = _partitionUtility.ChoosePartition(message.ReceiverId, PartitionCount);
+            int partition = _partitionUtility.ChoosePartition(message.TargetId, PartitionCount);
             TopicPartition topicPartition = _partitionFlyweight.GetTopicPartition(_backendOptions.MessagesTopicName, partition);
             Message<Null, BackendMessage> kafkaMessage = new()
             {
