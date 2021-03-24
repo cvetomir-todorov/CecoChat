@@ -10,32 +10,31 @@ namespace CecoChat.Materialize.Server.Initialization
     public class MaterializeMessagesHostedService : IHostedService
     {
         private readonly ILogger _logger;
-        private readonly IBackendConsumer _backendConsumer;
+        private readonly IMaterializeMessagesConsumer _materializeMessagesConsumer;
 
         public MaterializeMessagesHostedService(
             ILogger<MaterializeMessagesHostedService> logger,
-            IBackendConsumer backendConsumer)
+            IMaterializeMessagesConsumer materializeMessagesConsumer)
         {
             _logger = logger;
-            _backendConsumer = backendConsumer;
+            _materializeMessagesConsumer = materializeMessagesConsumer;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            _backendConsumer.Prepare();
+            _materializeMessagesConsumer.Prepare();
             Task.Factory.StartNew(() =>
             {
                 try
                 {
-                    _backendConsumer.Start(cancellationToken);
+                    _materializeMessagesConsumer.Start(cancellationToken);
                 }
                 catch (Exception exception)
                 {
-                    _logger.LogCritical(exception, "Failure in start materialize messages hosted service.");
+                    _logger.LogCritical(exception, "Failure in materialize messages consumer.");
                 }
             }, cancellationToken, TaskCreationOptions.LongRunning, TaskScheduler.Current);
 
-            _logger.LogInformation("Started materialize messages hosted service.");
             return Task.CompletedTask;
         }
 

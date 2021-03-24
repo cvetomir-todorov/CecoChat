@@ -10,29 +10,32 @@ using Microsoft.Extensions.Options;
 
 namespace CecoChat.Messaging.Server.Initialization
 {
-    public sealed class MessagesToReceiversHostedService : IHostedService
+    public sealed class BackendHostedService : IHostedService
     {
         private readonly ILogger _logger;
         private readonly IBackendOptions _backendOptions;
         private readonly IPartitioningConfiguration _partitioningConfiguration;
         private readonly ITopicPartitionFlyweight _topicPartitionFlyweight;
-        private readonly IBackendProducer _backendProducer;
-        private readonly IBackendConsumer _backendConsumer;
+        private readonly IMessagesToBackendProducer _messagesToBackendProducer;
+        private readonly IMessagesToReceiversConsumer _messagesToReceiversConsumer;
+        private readonly IMessagesToSendersConsumer _messagesToSendersConsumer;
 
-        public MessagesToReceiversHostedService(
-            ILogger<MessagesToReceiversHostedService> logger,
+        public BackendHostedService(
+            ILogger<BackendHostedService> logger,
             IOptions<BackendOptions> backendOptions,
             IPartitioningConfiguration partitioningConfiguration,
             ITopicPartitionFlyweight topicPartitionFlyweight,
-            IBackendProducer backendProducer,
-            IBackendConsumer backendConsumer)
+            IMessagesToBackendProducer messagesToBackendProducer,
+            IMessagesToReceiversConsumer messagesToReceiversConsumer,
+            IMessagesToSendersConsumer messagesToSendersConsumer)
         {
             _logger = logger;
             _backendOptions = backendOptions.Value;
             _partitioningConfiguration = partitioningConfiguration;
             _topicPartitionFlyweight = topicPartitionFlyweight;
-            _backendProducer = backendProducer;
-            _backendConsumer = backendConsumer;
+            _messagesToBackendProducer = messagesToBackendProducer;
+            _messagesToReceiversConsumer = messagesToReceiversConsumer;
+            _messagesToSendersConsumer = messagesToSendersConsumer;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -41,7 +44,8 @@ namespace CecoChat.Messaging.Server.Initialization
             PartitionRange partitions = _partitioningConfiguration.GetServerPartitions(_backendOptions.ServerID);
 
             ConfigureBackend(partitionCount, partitions);
-            StartBackendConsumer(cancellationToken);
+            StartBackendConsumer(_messagesToReceiversConsumer, "messages to receivers", cancellationToken);
+            StartBackendConsumer(_messagesToSendersConsumer, "messages to senders", cancellationToken);
 
             return Task.CompletedTask;
         }
@@ -49,25 +53,24 @@ namespace CecoChat.Messaging.Server.Initialization
         private void ConfigureBackend(int partitionCount, PartitionRange partitions)
         {
             _topicPartitionFlyweight.Add(_backendOptions.MessagesTopicName, partitionCount);
-            _backendConsumer.Prepare(partitions);
-            _backendProducer.PartitionCount = partitionCount;
+            _messagesToBackendProducer.PartitionCount = partitionCount;
+            _messagesToReceiversConsumer.Prepare(partitions);
+            _messagesToSendersConsumer.Prepare(partitions);
         }
 
-        private void StartBackendConsumer(CancellationToken ct)
+        private void StartBackendConsumer(IBackendConsumer consumer, string consumerID, CancellationToken ct)
         {
             Task.Factory.StartNew(() =>
             {
                 try
                 {
-                    _backendConsumer.Start(ct);
+                    consumer.Start(ct);
                 }
                 catch (Exception exception)
                 {
-                    _logger.LogCritical(exception, "Failure in send messages to receivers hosted service.");
+                    _logger.LogCritical(exception, "Failure in {0} consumer.", consumerID);
                 }
             }, ct, TaskCreationOptions.LongRunning, TaskScheduler.Current);
-
-            _logger.LogInformation("Started send messages to receivers hosted service.");
         }
 
         public Task StopAsync(CancellationToken cancellationToken)

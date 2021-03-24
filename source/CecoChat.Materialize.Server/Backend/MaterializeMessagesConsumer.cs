@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using CecoChat.Contracts.Backend;
 using CecoChat.Data.History;
 using CecoChat.DependencyInjection;
@@ -10,7 +11,14 @@ using Microsoft.Extensions.Options;
 
 namespace CecoChat.Materialize.Server.Backend
 {
-    public sealed class MaterializeMessagesConsumer : IBackendConsumer
+    public interface IMaterializeMessagesConsumer : IDisposable
+    {
+        void Prepare();
+
+        void Start(CancellationToken ct);
+    }
+
+    public sealed class MaterializeMessagesConsumer : IMaterializeMessagesConsumer
     {
         private readonly ILogger _logger;
         private readonly IBackendOptions _backendOptions;
@@ -36,7 +44,7 @@ namespace CecoChat.Materialize.Server.Backend
 
         public void Prepare()
         {
-            _consumer.Initialize(_backendOptions.Kafka, new BackendMessageDeserializer());
+            _consumer.Initialize(_backendOptions.Kafka, _backendOptions.MaterializeMessagesConsumer, new BackendMessageDeserializer());
             _consumer.Subscribe(_backendOptions.MessagesTopicName);
         }
 
@@ -48,7 +56,11 @@ namespace CecoChat.Materialize.Server.Backend
             {
                 if (_consumer.TryConsume(ct, out ConsumeResult<Null, BackendMessage> consumeResult))
                 {
-                    _newMessageRepository.AddNewDialogMessage(consumeResult.Message.Value);
+                    BackendMessage message = consumeResult.Message.Value;
+                    if (message.TargetId == message.ReceiverId)
+                    {
+                        _newMessageRepository.AddNewDialogMessage(message);
+                    }
                     _consumer.Commit(consumeResult, ct);
                 }
             }

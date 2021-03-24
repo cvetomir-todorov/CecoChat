@@ -13,7 +13,10 @@ using Microsoft.Extensions.Options;
 
 namespace CecoChat.Messaging.Server.Backend
 {
-    public sealed class MessagesToReceiversConsumer : IBackendConsumer
+    public interface IMessagesToReceiversConsumer : IBackendConsumer
+    {}
+
+    public sealed class MessagesToReceiversConsumer : IMessagesToReceiversConsumer
     {
         private readonly ILogger _logger;
         private readonly IBackendOptions _backendOptions;
@@ -53,7 +56,7 @@ namespace CecoChat.Messaging.Server.Backend
             {
                 if (!_isInitialized)
                 {
-                    _consumer.Initialize(_backendOptions.Kafka, new BackendMessageDeserializer());
+                    _consumer.Initialize(_backendOptions.Kafka, _backendOptions.MessagesToReceiversConsumer, new BackendMessageDeserializer());
                     _isInitialized = true;
                 }
             }
@@ -79,7 +82,7 @@ namespace CecoChat.Messaging.Server.Backend
 
         private void ProcessMessage(BackendMessage backendMessage)
         {
-            IEnumerable<IStreamer<ListenResponse>> clients = _clientContainer.EnumerateClients(backendMessage.ReceiverId);
+            IEnumerable<IStreamer<ListenResponse>> clients = _clientContainer.EnumerateClients(backendMessage.TargetId);
 
             ClientMessage clientMessage = _mapper.MapBackendToClientMessage(backendMessage);
             ListenResponse response = new ListenResponse
@@ -91,9 +94,9 @@ namespace CecoChat.Messaging.Server.Backend
             int successCount = 0;
             int allCount = 0;
 
-            foreach (IStreamer<ListenResponse> streamer in clients)
+            foreach (IStreamer<ListenResponse> client in clients)
             {
-                if (streamer.AddMessage(response))
+                if (client.AddMessage(response))
                 {
                     successCount++;
                 }
@@ -103,11 +106,13 @@ namespace CecoChat.Messaging.Server.Backend
 
             if (successCount < allCount)
             {
-                _logger.LogWarning("Connected recipients ({0} out of {1}) were sent message {2}.", successCount, allCount, backendMessage);
+                _logger.LogWarning("Connected recipients with ID {0} ({1} out of {2}) were queued message {3}.",
+                    backendMessage.TargetId, successCount, allCount, backendMessage);
             }
             else
             {
-                _logger.LogTrace("Connected recipients (all {0}) were sent message {1}.", successCount, backendMessage);
+                _logger.LogTrace("Connected recipients with ID {0} (all {1}) were queued message {2}.",
+                    backendMessage.TargetId, successCount, backendMessage);
             }
         }
     }

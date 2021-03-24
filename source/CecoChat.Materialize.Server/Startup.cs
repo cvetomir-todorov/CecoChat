@@ -38,7 +38,7 @@ namespace CecoChat.Materialize.Server
             services.AddSingleton<IBackendDbMapper, BackendDbMapper>();
 
             // backend
-            services.AddSingleton<IBackendConsumer, MaterializeMessagesConsumer>();
+            services.AddSingleton<IMaterializeMessagesConsumer, MaterializeMessagesConsumer>();
             services.AddFactory<IKafkaConsumer<Null, BackendMessage>, KafkaConsumer<Null, BackendMessage>>();
             services.Configure<BackendOptions>(Configuration.GetSection("Backend"));
         }

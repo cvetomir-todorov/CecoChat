@@ -18,8 +18,9 @@ namespace CecoChat.Messaging.Server.Initialization
         private readonly IBackendOptions _backendOptions;
         private readonly ITopicPartitionFlyweight _topicPartitionFlyweight;
         private readonly IPartitionUtility _partitionUtility;
-        private readonly IBackendProducer _backendProducer;
-        private readonly IBackendConsumer _backendConsumer;
+        private readonly IMessagesToBackendProducer _messagesToBackendProducer;
+        private readonly IMessagesToReceiversConsumer _messagesToReceiversConsumer;
+        private readonly IMessagesToSendersConsumer _messagesToSendersConsumer;
         private readonly IClientContainer _clientContainer;
         private readonly IEvent<PartitionsChangedEventData> _partitionsChanged;
         private readonly Guid _partitionsChangedToken;
@@ -28,16 +29,18 @@ namespace CecoChat.Messaging.Server.Initialization
             IOptions<BackendOptions> backendOptions,
             ITopicPartitionFlyweight topicPartitionFlyweight,
             IPartitionUtility partitionUtility,
-            IBackendProducer backendProducer,
-            IBackendConsumer backendConsumer,
+            IMessagesToBackendProducer messagesToBackendProducer,
+            IMessagesToReceiversConsumer messagesToReceiversConsumer,
+            IMessagesToSendersConsumer messagesToSendersConsumer,
             IClientContainer clientContainer,
             IEvent<PartitionsChangedEventData> partitionsChanged)
         {
             _backendOptions = backendOptions.Value;
             _topicPartitionFlyweight = topicPartitionFlyweight;
             _partitionUtility = partitionUtility;
-            _backendProducer = backendProducer;
-            _backendConsumer = backendConsumer;
+            _messagesToBackendProducer = messagesToBackendProducer;
+            _messagesToReceiversConsumer = messagesToReceiversConsumer;
+            _messagesToSendersConsumer = messagesToSendersConsumer;
             _clientContainer = clientContainer;
             _partitionsChanged = partitionsChanged;
 
@@ -94,8 +97,9 @@ namespace CecoChat.Messaging.Server.Initialization
                 _topicPartitionFlyweight.AddOrUpdate(_backendOptions.MessagesTopicName, partitionCount);
             }
 
-            _backendConsumer.Prepare(partitions);
-            _backendProducer.PartitionCount = partitionCount;
+            _messagesToBackendProducer.PartitionCount = partitionCount;
+            _messagesToReceiversConsumer.Prepare(partitions);
+            _messagesToSendersConsumer.Prepare(partitions);
         }
     }
 }

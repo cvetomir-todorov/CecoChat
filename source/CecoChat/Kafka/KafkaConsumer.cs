@@ -8,7 +8,7 @@ namespace CecoChat.Kafka
 {
     public interface IKafkaConsumer<TKey, TValue> : IDisposable
     {
-        void Initialize(IKafkaOptions options, IDeserializer<TValue> valueDeserializer);
+        void Initialize(IKafkaOptions options, IKafkaConsumerOptions consumerOptions, IDeserializer<TValue> valueDeserializer);
 
         void Subscribe(string topic);
 
@@ -38,7 +38,7 @@ namespace CecoChat.Kafka
             _consumer?.Close();
         }
 
-        public void Initialize(IKafkaOptions options, IDeserializer<TValue> valueDeserializer)
+        public void Initialize(IKafkaOptions options, IKafkaConsumerOptions consumerOptions, IDeserializer<TValue> valueDeserializer)
         {
             if (_consumer != null)
                 throw new InvalidOperationException($"'{nameof(Initialize)}' already called.");
@@ -46,11 +46,11 @@ namespace CecoChat.Kafka
             ConsumerConfig configuration = new()
             {
                 BootstrapServers = string.Join(separator: ',', options.BootstrapServers),
-                GroupId = options.ConsumerGroupID,
-                AutoOffsetReset = AutoOffsetReset.Earliest,
-                EnablePartitionEof = false,
-                AllowAutoCreateTopics = false,
-                EnableAutoCommit = false
+                GroupId = consumerOptions.ConsumerGroupID,
+                AutoOffsetReset = consumerOptions.AutoOffsetReset,
+                EnablePartitionEof = consumerOptions.EnablePartitionEof,
+                AllowAutoCreateTopics = consumerOptions.AllowAutoCreateTopics,
+                EnableAutoCommit = consumerOptions.EnableAutoCommit
             };
 
             _consumer = new ConsumerBuilder<TKey, TValue>(configuration)

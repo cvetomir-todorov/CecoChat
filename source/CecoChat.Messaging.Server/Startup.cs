@@ -38,7 +38,7 @@ namespace CecoChat.Messaging.Server
         {
             // ordered hosted services
             services.AddHostedService<ConfigurationHostedService>();
-            services.AddHostedService<MessagesToReceiversHostedService>();
+            services.AddHostedService<BackendHostedService>();
             services.AddHostedService<PartitionsChangedHostedService>();
 
             // clients
@@ -54,8 +54,9 @@ namespace CecoChat.Messaging.Server
             // backend
             services.AddPartitionUtility();
             services.AddSingleton<ITopicPartitionFlyweight, TopicPartitionFlyweight>();
-            services.AddSingleton<IBackendProducer, MessagesToBackendProducer>();
-            services.AddSingleton<IBackendConsumer, MessagesToReceiversConsumer>();
+            services.AddSingleton<IMessagesToBackendProducer, MessagesToBackendProducer>();
+            services.AddSingleton<IMessagesToReceiversConsumer, MessagesToReceiversConsumer>();
+            services.AddSingleton<IMessagesToSendersConsumer, MessagesToSendersConsumer>();
             services.AddFactory<IKafkaConsumer<Null, BackendMessage>, KafkaConsumer<Null, BackendMessage>>();
             services.Configure<BackendOptions>(Configuration.GetSection("Backend"));
 
