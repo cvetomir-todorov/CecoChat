@@ -53,6 +53,7 @@ namespace CecoChat.Messaging.Server
 
             // backend
             services.AddPartitionUtility();
+            services.AddSingleton<IBackendComponents, BackendComponents>();
             services.AddSingleton<ITopicPartitionFlyweight, TopicPartitionFlyweight>();
             services.AddSingleton<IMessagesToBackendProducer, MessagesToBackendProducer>();
             services.AddSingleton<IMessagesToReceiversConsumer, MessagesToReceiversConsumer>();

@@ -14,28 +14,19 @@ namespace CecoChat.Messaging.Server.Initialization
     {
         private readonly ILogger _logger;
         private readonly IBackendOptions _backendOptions;
+        private readonly IBackendComponents _backendComponents;
         private readonly IPartitioningConfiguration _partitioningConfiguration;
-        private readonly ITopicPartitionFlyweight _topicPartitionFlyweight;
-        private readonly IMessagesToBackendProducer _messagesToBackendProducer;
-        private readonly IMessagesToReceiversConsumer _messagesToReceiversConsumer;
-        private readonly IMessagesToSendersConsumer _messagesToSendersConsumer;
 
         public BackendHostedService(
             ILogger<BackendHostedService> logger,
             IOptions<BackendOptions> backendOptions,
-            IPartitioningConfiguration partitioningConfiguration,
-            ITopicPartitionFlyweight topicPartitionFlyweight,
-            IMessagesToBackendProducer messagesToBackendProducer,
-            IMessagesToReceiversConsumer messagesToReceiversConsumer,
-            IMessagesToSendersConsumer messagesToSendersConsumer)
+            IBackendComponents backendComponents,
+            IPartitioningConfiguration partitioningConfiguration)
         {
             _logger = logger;
             _backendOptions = backendOptions.Value;
+            _backendComponents = backendComponents;
             _partitioningConfiguration = partitioningConfiguration;
-            _topicPartitionFlyweight = topicPartitionFlyweight;
-            _messagesToBackendProducer = messagesToBackendProducer;
-            _messagesToReceiversConsumer = messagesToReceiversConsumer;
-            _messagesToSendersConsumer = messagesToSendersConsumer;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -43,19 +34,11 @@ namespace CecoChat.Messaging.Server.Initialization
             int partitionCount = _partitioningConfiguration.PartitionCount;
             PartitionRange partitions = _partitioningConfiguration.GetServerPartitions(_backendOptions.ServerID);
 
-            ConfigureBackend(partitionCount, partitions);
-            StartBackendConsumer(_messagesToReceiversConsumer, "messages to receivers", cancellationToken);
-            StartBackendConsumer(_messagesToSendersConsumer, "messages to senders", cancellationToken);
+            _backendComponents.ConfigurePartitioning(partitionCount, partitions);
+            StartBackendConsumer(_backendComponents.MessagesToReceiversConsumer, "messages to receivers", cancellationToken);
+            StartBackendConsumer(_backendComponents.MessagesToSendersConsumer, "messages to senders", cancellationToken);
 
             return Task.CompletedTask;
-        }
-
-        private void ConfigureBackend(int partitionCount, PartitionRange partitions)
-        {
-            _topicPartitionFlyweight.Add(_backendOptions.MessagesTopicName, partitionCount);
-            _messagesToBackendProducer.PartitionCount = partitionCount;
-            _messagesToReceiversConsumer.Prepare(partitions);
-            _messagesToSendersConsumer.Prepare(partitions);
         }
 
         private void StartBackendConsumer(IBackendConsumer consumer, string consumerID, CancellationToken ct)
