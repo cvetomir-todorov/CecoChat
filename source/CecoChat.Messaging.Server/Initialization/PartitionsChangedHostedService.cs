@@ -10,38 +10,25 @@ using CecoChat.Messaging.Server.Backend;
 using CecoChat.Messaging.Server.Clients;
 using CecoChat.Server.Backend;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
 
 namespace CecoChat.Messaging.Server.Initialization
 {
     public sealed class PartitionsChangedHostedService : IHostedService, ISubscriber<PartitionsChangedEventData>
     {
-        private readonly IBackendOptions _backendOptions;
-        private readonly ITopicPartitionFlyweight _topicPartitionFlyweight;
+        private readonly IBackendComponents _backendComponents;
         private readonly IPartitionUtility _partitionUtility;
-        private readonly IMessagesToBackendProducer _messagesToBackendProducer;
-        private readonly IMessagesToReceiversConsumer _messagesToReceiversConsumer;
-        private readonly IMessagesToSendersConsumer _messagesToSendersConsumer;
         private readonly IClientContainer _clientContainer;
         private readonly IEvent<PartitionsChangedEventData> _partitionsChanged;
         private readonly Guid _partitionsChangedToken;
 
         public PartitionsChangedHostedService(
-            IOptions<BackendOptions> backendOptions,
-            ITopicPartitionFlyweight topicPartitionFlyweight,
+            IBackendComponents backendComponents,
             IPartitionUtility partitionUtility,
-            IMessagesToBackendProducer messagesToBackendProducer,
-            IMessagesToReceiversConsumer messagesToReceiversConsumer,
-            IMessagesToSendersConsumer messagesToSendersConsumer,
             IClientContainer clientContainer,
             IEvent<PartitionsChangedEventData> partitionsChanged)
         {
-            _backendOptions = backendOptions.Value;
-            _topicPartitionFlyweight = topicPartitionFlyweight;
+            _backendComponents = backendComponents;
             _partitionUtility = partitionUtility;
-            _messagesToBackendProducer = messagesToBackendProducer;
-            _messagesToReceiversConsumer = messagesToReceiversConsumer;
-            _messagesToSendersConsumer = messagesToSendersConsumer;
             _clientContainer = clientContainer;
             _partitionsChanged = partitionsChanged;
 
@@ -65,7 +52,7 @@ namespace CecoChat.Messaging.Server.Initialization
             PartitionRange partitions = eventData.Partitions;
 
             DisconnectClients(partitionCount, partitions);
-            ConfigureBackend(partitionCount, partitions);
+            _backendComponents.ConfigurePartitioning(partitionCount, partitions);
 
             return ValueTask.CompletedTask;
         }
@@ -89,19 +76,6 @@ namespace CecoChat.Messaging.Server.Initialization
                     }
                 }
             }
-        }
-
-        private void ConfigureBackend(int partitionCount, PartitionRange partitions)
-        {
-            int currentPartitionCount = _topicPartitionFlyweight.GetTopicPartitionCount(_backendOptions.MessagesTopicName);
-            if (currentPartitionCount < partitionCount)
-            {
-                _topicPartitionFlyweight.AddOrUpdate(_backendOptions.MessagesTopicName, partitionCount);
-            }
-
-            _messagesToBackendProducer.PartitionCount = partitionCount;
-            _messagesToReceiversConsumer.Prepare(partitions);
-            _messagesToSendersConsumer.Prepare(partitions);
         }
     }
 }
