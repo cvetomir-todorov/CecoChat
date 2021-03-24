@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
+using CecoChat.Contracts;
 using CecoChat.Contracts.Backend;
 using CecoChat.Contracts.Client;
 using CecoChat.DependencyInjection;
@@ -82,6 +84,7 @@ namespace CecoChat.Messaging.Server.Backend
 
         private void ProcessMessage(BackendMessage backendMessage)
         {
+            Guid senderClientID = backendMessage.ClientId.ToGuid();
             IEnumerable<IStreamer<ListenResponse>> clients = _clientContainer.EnumerateClients(backendMessage.TargetId);
 
             ClientMessage clientMessage = _mapper.MapBackendToClientMessage(backendMessage);
@@ -90,20 +93,34 @@ namespace CecoChat.Messaging.Server.Backend
                 Message = clientMessage
             };
 
+            EnqueueMessage(senderClientID, response, clients, out int successCount, out int allCount);
+            LogResults(backendMessage, successCount, allCount);
+        }
+
+        private static void EnqueueMessage(
+            Guid senderClientID, ListenResponse response, IEnumerable<IStreamer<ListenResponse>> clients,
+            out int successCount, out int allCount)
+        {
             // do not call clients.Count since it is expensive and uses locks
-            int successCount = 0;
-            int allCount = 0;
+            successCount = 0;
+            allCount = 0;
 
             foreach (IStreamer<ListenResponse> client in clients)
             {
-                if (client.AddMessage(response))
+                if (client.ClientID != senderClientID)
                 {
-                    successCount++;
+                    if (client.EnqueueMessage(response))
+                    {
+                        successCount++;
+                    }
+
+                    allCount++;
                 }
-
-                allCount++;
             }
+        }
 
+        private void LogResults(BackendMessage backendMessage, int successCount, int allCount)
+        {
             if (successCount < allCount)
             {
                 _logger.LogWarning("Connected recipients with ID {0} ({1} out of {2}) were queued message {3}.",

@@ -51,7 +51,7 @@ namespace CecoChat.Messaging.Server.Clients
 
         public Guid ClientID => _clientID;
 
-        public bool AddMessage(TMessage message)
+        public bool EnqueueMessage(TMessage message)
         {
             bool isAdded = _messageQueue.TryAdd(message);
             if (isAdded)

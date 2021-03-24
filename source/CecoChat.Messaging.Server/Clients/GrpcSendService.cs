@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using CecoChat.Contracts;
 using CecoChat.Contracts.Backend;
 using CecoChat.Contracts.Client;
 using CecoChat.Messaging.Server.Backend;
@@ -45,6 +46,7 @@ namespace CecoChat.Messaging.Server.Clients
 
             BackendMessage backendMessage = _mapper.MapClientToBackendMessage(clientMessage);
             backendMessage.TargetId = backendMessage.ReceiverId;
+            backendMessage.ClientId = userClaims.ClientID.ToUuid();
             _messagesToBackendProducer.ProduceMessage(backendMessage);
 
             SendMessageResponse response = new()

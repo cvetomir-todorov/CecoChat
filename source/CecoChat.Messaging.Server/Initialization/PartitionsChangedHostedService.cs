@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using CecoChat.Contracts.Client;
@@ -71,19 +72,20 @@ namespace CecoChat.Messaging.Server.Initialization
 
         private void DisconnectClients(int partitionCount, PartitionRange partitions)
         {
+            ClientMessage disconnectMessage = new() {Type = ClientMessageType.Disconnect};
+            ListenResponse response = new() {Message = disconnectMessage};
+
             foreach (var pair in _clientContainer.EnumerateAllClients())
             {
                 long userID = pair.Key;
-                var clients = pair.Value;
+                IEnumerable<IStreamer<ListenResponse>> clients = pair.Value;
 
                 int userPartition = _partitionUtility.ChoosePartition(userID, partitionCount);
                 if (!partitions.Contains(userPartition))
                 {
                     foreach (IStreamer<ListenResponse> client in clients)
                     {
-                        ClientMessage disconnectMessage = new() { Type = ClientMessageType.Disconnect };
-                        ListenResponse response = new() { Message = disconnectMessage };
-                        client.AddMessage(response);
+                        client.EnqueueMessage(response);
                     }
                 }
             }
