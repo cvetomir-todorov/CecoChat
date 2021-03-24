@@ -22,14 +22,13 @@ namespace CecoChat.Kafka
     public sealed class KafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey, TValue>
     {
         private readonly ILogger _logger;
-        private readonly int _id;
         private PartitionRange _assignedPartitions;
         private IConsumer<TKey, TValue> _consumer;
+        private string _id;
 
         public KafkaConsumer(ILogger<KafkaConsumer<TKey, TValue>> logger)
         {
             _logger = logger;
-            _id = KafkaConsumerIDGenerator.GetNextID();
             _assignedPartitions = PartitionRange.Empty;
         }
 
@@ -56,6 +55,7 @@ namespace CecoChat.Kafka
             _consumer = new ConsumerBuilder<TKey, TValue>(configuration)
                 .SetValueDeserializer(valueDeserializer)
                 .Build();
+            _id = $"{KafkaConsumerIDGenerator.GetNextID()}@{consumerOptions.ConsumerGroupID}";
         }
 
         public void Subscribe(string topic)
@@ -84,7 +84,7 @@ namespace CecoChat.Kafka
 
             _consumer.Assign(topicPartitions);
             _assignedPartitions = partitions;
-            _logger.LogDebug("Consumer {0} assigned partitions {1}.", _id, partitions);
+            _logger.LogDebug("Consumer {0} assigned partitions {1} from topic {2}.", _id, partitions, topic);
         }
 
         public bool TryConsume(CancellationToken ct, out ConsumeResult<TKey, TValue> consumeResult)
