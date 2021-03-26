@@ -40,7 +40,9 @@ namespace CecoChat.Kafka
         public void Initialize(IKafkaOptions options, IKafkaConsumerOptions consumerOptions, IDeserializer<TValue> valueDeserializer)
         {
             if (_consumer != null)
+            {
                 throw new InvalidOperationException($"'{nameof(Initialize)}' already called.");
+            }
 
             ConsumerConfig configuration = new()
             {
@@ -117,7 +119,9 @@ namespace CecoChat.Kafka
         private void EnsureInitialized()
         {
             if (_consumer == null)
+            {
                 throw new InvalidOperationException($"'{nameof(Initialize)}' needs to be called first.");
+            }
         }
 
         private TResult Execute<TResult>(Func<TResult> operation, CancellationToken ct)
