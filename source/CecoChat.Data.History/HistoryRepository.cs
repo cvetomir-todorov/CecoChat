@@ -34,10 +34,10 @@ namespace CecoChat.Data.History
             _dialogHistoryQuery = new Lazy<PreparedStatement>(() => _dataUtility.PrepareQuery(SelectMessagesForDialog));
         }
 
-        const string SelectMessagesForUser =
+        private const string SelectMessagesForUser =
             "SELECT message_id, sender_id, receiver_id, when, message_type, data " +
             "FROM messages_for_user WHERE user_id = ? AND when < ? ORDER BY when DESC LIMIT ?";
-        const string SelectMessagesForDialog =
+        private const string SelectMessagesForDialog =
             "SELECT message_id, sender_id, receiver_id, when, message_type, data " +
             "FROM messages_for_dialog WHERE dialog_id = ? AND when < ? ORDER BY when DESC LIMIT ?";
 

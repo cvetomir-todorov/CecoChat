@@ -38,11 +38,11 @@ namespace CecoChat.Data.History
             _messagesForDialogQuery = new Lazy<PreparedStatement>(() => _dataUtility.PrepareQuery(InsertIntoMessagesForDialog));
         }
 
-        const string InsertIntoMessagesForUser =
+        private const string InsertIntoMessagesForUser =
             "INSERT INTO messages_for_user " +
             "(user_id, message_id, sender_id, receiver_id, when, message_type, data) " +
             "VALUES (?, ?, ?, ?, ?, ?, ?)";
-        const string InsertIntoMessagesForDialog =
+        private const string InsertIntoMessagesForDialog =
             "INSERT INTO messages_for_dialog " +
             "(dialog_id, message_id, sender_id, receiver_id, when, message_type, data) " +
             "VALUES (?, ?, ?, ?, ?, ?, ?)";
