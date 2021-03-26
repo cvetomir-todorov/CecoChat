@@ -8,7 +8,7 @@ namespace CecoChat.Events
 {
     public class EventSource<TEventData> : IEventSource<TEventData>
     {
-        private static bool AlwaysTrue(TEventData _) => true;
+        private static bool AlwaysTrue(TEventData _) { return true; }
 
         private readonly ILogger _logger;
         private readonly ConcurrentDictionary<Guid, SubscriberInfo> _subscribersMap;

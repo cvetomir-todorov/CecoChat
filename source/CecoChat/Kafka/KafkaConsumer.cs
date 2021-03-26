@@ -161,6 +161,10 @@ namespace CecoChat.Kafka
     internal static class KafkaConsumerIDGenerator
     {
         private static int _nextIDCounter;
-        public static int GetNextID() => Interlocked.Increment(ref _nextIDCounter);
+
+        public static int GetNextID()
+        {
+            return Interlocked.Increment(ref _nextIDCounter);
+        }
     }
 }
