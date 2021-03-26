@@ -82,7 +82,7 @@ namespace CecoChat.Messaging.Server.Clients
 
             public IEnumerator<IStreamer<ListenResponse>> GetEnumerator()
             {
-                foreach (var pair in Clients)
+                foreach (KeyValuePair<Guid, IStreamer<ListenResponse>> pair in Clients)
                 {
                     yield return pair.Value;
                 }
