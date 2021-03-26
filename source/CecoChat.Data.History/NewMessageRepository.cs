@@ -51,7 +51,9 @@ namespace CecoChat.Data.History
         {
             // preparing the queries beforehand is optional and is implemented using the lazy pattern
             PreparedStatement _ = _messagesForUserQuery.Value;
+            #pragma warning disable IDE0059
             PreparedStatement __ = _messagesForDialogQuery.Value;
+            #pragma warning restore IDE0059
         }
 
         public void AddNewDialogMessage(BackendMessage message)
