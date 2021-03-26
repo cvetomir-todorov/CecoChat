@@ -7,7 +7,26 @@ on:
     branches: [ dev ]
 
 jobs:
+  verify-code-style:
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+
+    - name: Install dotnet-format
+      run: dotnet tool update -g dotnet-format
+
+    - name: Lint
+      run: dotnet format ./source --check --fix-style
+
   build:
+    needs: verify-code-style
     runs-on: ubuntu-latest
     steps:
 
