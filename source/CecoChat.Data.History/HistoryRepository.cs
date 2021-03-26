@@ -44,8 +44,8 @@ namespace CecoChat.Data.History
         public void Prepare()
         {
             // preparing the queries beforehand is optional and is implemented using the lazy pattern
-            var _ = _userHistoryQuery.Value;
-            var __ = _dialogHistoryQuery.Value;
+            PreparedStatement _ = _userHistoryQuery.Value;
+            PreparedStatement __ = _dialogHistoryQuery.Value;
         }
 
         public async Task<IReadOnlyCollection<BackendMessage>> GetUserHistory(long userID, DateTime olderThan, int countLimit)

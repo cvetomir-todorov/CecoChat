@@ -62,7 +62,7 @@ namespace CecoChat.Messaging.Server.Initialization
             ClientMessage disconnectMessage = new() {Type = ClientMessageType.Disconnect};
             ListenResponse response = new() {Message = disconnectMessage};
 
-            foreach (var pair in _clientContainer.EnumerateAllClients())
+            foreach (KeyValuePair<long, IEnumerable<IStreamer<ListenResponse>>> pair in _clientContainer.EnumerateAllClients())
             {
                 long userID = pair.Key;
                 IEnumerable<IStreamer<ListenResponse>> clients = pair.Value;
