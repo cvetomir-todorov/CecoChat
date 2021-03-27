@@ -2,9 +2,9 @@ name: CI/CD
 
 on:
   push:
-    branches: [ dev ]
+    branches: [dev]
   pull_request:
-    branches: [ dev ]
+    branches: [dev]
 
 jobs:
   verify-code-style:
@@ -29,7 +29,6 @@ jobs:
       run: dotnet format ./source --check --fix-style
 
   build:
-    needs: verify-code-style
     runs-on: ubuntu-latest
     steps:
 
@@ -52,7 +51,7 @@ jobs:
         dotnet build --no-restore check/Check.sln
 
   analyze-code-quality:
-    needs: build
+    needs: [verify-code-style, build]
     runs-on: windows-latest
     steps:
 
@@ -99,7 +98,7 @@ jobs:
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
 
   containerize:
-    needs: build
+    needs: [verify-code-style, build]
     runs-on: ubuntu-latest
     steps:
 
