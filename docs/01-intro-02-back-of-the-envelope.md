@@ -39,7 +39,7 @@
 
 * 80 000 000 users * 32 messages = 2 560 000 000 messages peak
 * 2 560 000 000 peak / 3600 seconds = ~712 000 messages/s peak
-* 712 000 messages/s / 2000 messaging servers = ~356 messages/s per messaging server daily
+* 712 000 messages/s / 2000 messaging servers = ~356 messages/s per messaging server peak
 
 ### Throughput
 
