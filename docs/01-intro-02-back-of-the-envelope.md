@@ -11,7 +11,7 @@
   - 256 bytes per message
   - 4 years of message storage
 
-## Daily
+# Daily
 
 * Users come and go throughout the day
 * 640 000 000 active users daily
@@ -29,7 +29,7 @@
 * 10 000 000 MB daily / 86 400 seconds  = ~116 MB/s daily
 * 116 MB/s / 2000 messaging servers = 0.06 MB/s per messaging server daily
 
-## Peak
+# Peak
 
 * 1 hour peak
 * 80% of cell is busy = 80 000 000 active users
@@ -47,7 +47,7 @@
 * 625 000 MB peak / 3 600 seconds = ~174 MB/s peak
 * 174 MB/s / 2000 messaging servers = 0.09 MB/s per messaging server peak
 
-## Storage
+# Storage
 
 * 10 000 000 MB daily
 * 3 650 000 000 MB yearly

@@ -1,3 +1,7 @@
+# Why
+
+I decided to take on the challenge to design a globally-scalable chat like WhatsApp and Facebook Messenger. Based on [statistics](https://www.statista.com/statistics/258749/most-popular-global-mobile-messenger-apps/) the montly active users are 2.0 bln for WhatsApp and 1.3 bln for Facebook Messenger. At that scale I decided to start a bit smaller. A good first step was to design a system that would be able to handle a smaller number of active users which are directly connected to it. Let's call it a cell. After that I would need to design how multiple cells placed in different geographic locations would communicate with each other. I certainly don't have the infrastructure to validate the design and the implementation. But I used the challenge to think at a large scale and to learn a few new technologies and approaches along the way.
+
 # Capabilities
 
 ## Functional
@@ -22,7 +26,7 @@ Currently no user profile and friendship are implemented so clients rely on user
 
 # Concurrent connections benchmark
 
-This is a benchmark for the number of concurrent connections per messaging server. The code is in the [check](check/) folder. I used two machines connected via 100Mbps router. Details are as follow:
+This is a benchmark for the number of concurrent connections per messaging server. The code is in the [check](../check/) folder. I used two machines connected via 100Mbps router. Details are as follow:
 
 | Machine     | CPU         | Frequency | Cores | RAM  | OS                      |
 | :---------- | :---------  | :-------- | :---- | :--- | :---------------------- |
@@ -42,7 +46,7 @@ The client-side limitation will be mitigated by the fact that each client is typ
 
 # Back of the envelope calculations
 
-The [back-of-the-envelope](01-intro-01-back-of-the-envelope.md) file contains the detailed calculations. A messaging server is the server to which users directly connect to. A key limit is `50K connections per messaging server`. A simple calculation tells that `2K messaging servers` are needed in order to support `100 mln active users`.
+The [back-of-the-envelope](01-intro-02-back-of-the-envelope.md) file contains the detailed calculations. A messaging server is the server to which users directly connect to. A key limit is `50K connections per messaging server`. A simple calculation tells that `2K messaging servers` are needed in order to support `100 mln active users`.
 
 Throughput-wise a limit of `256 bytes per message` with `640 mln users` spread throughout the day each of which sends `64 messages per day` gives us `116 MB/s for the cell` or `0.06 MB/s per messaging server`.
 

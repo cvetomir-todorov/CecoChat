@@ -19,7 +19,7 @@ Despite there is quite a bit of code written a good part of it is a proof-of-con
 
 ## Run 3rd party components
 
-Before and after running the containers there are some [scripts for preparing](run/prepare/) the servers. Most of them simply create the `docker` volumes. The `docker-compose` files for the containers are in the [run folder](run/).
+Before running the containers docker volumes need to be created using the [create volumes scripts](../run/create-volumes). Some containers have configuration which resides in the [configuration folder](../run/configuration). After running the containers they need to be [prepared](../run/prepare) using `docker exec -it` just one time (unless the volumes are deleted). The `docker-compose` files for the containers are in the [run folder](../run/).
 
 * Kafka has 4 containers:
   - 2 Kafka brokers
@@ -30,11 +30,11 @@ Before and after running the containers there are some [scripts for preparing](r
   - Cassandra web interface
 * Redis has 2 containers:
   - 1 Redis instance
-  - Redis commander
+  - Redis commander web interface
 
 ## Containerize and run CecoChat
 
-In order to containerize CecoChat you need to build it using .NET 5. I've used Visual Studio since I am also developing it, but the SDK is enough to simply build it. The [containerize](containerize/) folder contains the Docker files and scripts for building the images. Internally the dockerfiles do `dotnet publish` and use `Debug` configuration which has `Trace`/`Verbose` level of logging but it can be changed as prefered. The `docker-compose` file creates containers for:
+In order to containerize CecoChat you can use the [containerize folder](../containerize/) which contains the Docker files for building the Docker images. Internally the Docker files do `dotnet publish` and use `Debug` configuration which has `Trace`/`Verbose` level of logging but this can be changed as prefered. The `docker-compose` file creates containers for:
 
 * 1 connect server
 * 2 messaging servers
@@ -43,4 +43,4 @@ In order to containerize CecoChat you need to build it using .NET 5. I've used V
 
 ## Clients
 
-I've written a very basic console client. There is also a WPF desktop client for Windows which has some decent UI. A browser client would be ideal though.
+I've written a very basic console client. There is also a WPF desktop client for Windows which has some decent UI. A browser or WebAssembly client would be ideal in the future although that would require setting up a proxy to [enable gRPC-web](https://github.com/grpc/grpc-web).
