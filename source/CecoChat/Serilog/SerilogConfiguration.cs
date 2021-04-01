@@ -3,6 +3,7 @@ using System.IO;
 using System.Reflection;
 using Microsoft.Extensions.Configuration;
 using Serilog;
+using Serilog.Enrichers.Span;
 
 namespace CecoChat.Serilog
 {
@@ -27,6 +28,7 @@ namespace CecoChat.Serilog
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(configuration)
                 .Enrich.WithProperty("Application", entryAssembly.GetName().Name)
+                .Enrich.WithSpan()
                 .CreateLogger();
         }
     }
