@@ -1,4 +1,5 @@
 using CecoChat.Jwt;
+using CecoChat.Otel;
 using CecoChat.Swagger;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
@@ -6,16 +7,22 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using OpenTelemetry.Trace;
 
 namespace CecoChat.Profile.Server
 {
     public class Startup
     {
+        private readonly IJaegerOptions _jaegerOptions;
         private readonly ISwaggerOptions _swaggerOptions;
 
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+
+            JaegerOptions jaegerOptions = new();
+            Configuration.GetSection("Jaeger").Bind(jaegerOptions);
+            _jaegerOptions = jaegerOptions;
 
             SwaggerOptions swaggerOptions = new();
             Configuration.GetSection("Swagger").Bind(swaggerOptions);
@@ -35,6 +42,14 @@ namespace CecoChat.Profile.Server
                     fluentValidation.RegisterValidatorsFromAssemblyContaining<Startup>();
                 });
             services.AddSwaggerServices(_swaggerOptions);
+
+            // telemetry
+            services.AddOpenTelemetryTracing(otel =>
+            {
+                otel.AddServiceResource(new OtelServiceResource {Namespace = "CecoChat", Service = "Profile", Version = "0.1"});
+                otel.AddAspNetCoreInstrumentation(aspnet => aspnet.EnableGrpcAspNetCoreSupport = true);
+                otel.ConfigureJaegerExporter(_jaegerOptions);
+            });
 
             // session
             services.Configure<JwtOptions>(Configuration.GetSection("Jwt"));
