@@ -1,10 +1,7 @@
 using CecoChat.Connect.Server.Initialization;
 using CecoChat.Data.Configuration;
-using CecoChat.Data.Configuration.History;
-using CecoChat.Data.Configuration.Partitioning;
-using CecoChat.Events;
 using CecoChat.Jwt;
-using CecoChat.Redis;
+using CecoChat.Otel;
 using CecoChat.Server.Backend;
 using CecoChat.Server.Identity;
 using CecoChat.Swagger;
@@ -14,12 +11,14 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using OpenTelemetry.Trace;
 
 namespace CecoChat.Connect.Server
 {
     public class Startup
     {
         private readonly IJwtOptions _jwtOptions;
+        private readonly IJaegerOptions _jaegerOptions;
         private readonly ISwaggerOptions _swaggerOptions;
 
         public Startup(IConfiguration configuration)
@@ -29,6 +28,10 @@ namespace CecoChat.Connect.Server
             JwtOptions jwtOptions = new();
             Configuration.GetSection("Jwt").Bind(jwtOptions);
             _jwtOptions = jwtOptions;
+
+            JaegerOptions jaegerOptions = new();
+            Configuration.GetSection("Jaeger").Bind(jaegerOptions);
+            _jaegerOptions = jaegerOptions;
 
             SwaggerOptions swaggerOptions = new();
             Configuration.GetSection("Swagger").Bind(swaggerOptions);
@@ -51,6 +54,14 @@ namespace CecoChat.Connect.Server
                     fluentValidation.RegisterValidatorsFromAssemblyContaining<Startup>();
                 });
             services.AddSwaggerServices(_swaggerOptions);
+
+            // telemetry
+            services.AddOpenTelemetryTracing(otel =>
+            {
+                otel.AddServiceResource(new OtelServiceResource {Namespace = "CecoChat", Service = "Connect", Version = "0.1"});
+                otel.AddAspNetCoreInstrumentation(aspnet => aspnet.EnableGrpcAspNetCoreSupport = true);
+                otel.ConfigureJaegerExporter(_jaegerOptions);
+            });
 
             // security
             services.AddJwtAuthentication(_jwtOptions);
