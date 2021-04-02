@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using CecoChat.Contracts.Client;
 using CecoChat.DependencyInjection;
@@ -28,28 +29,31 @@ namespace CecoChat.Messaging.Server.Clients
         [Authorize(Roles = "user")]
         public override async Task Listen(ListenRequest request, IServerStreamWriter<ListenResponse> responseStream, ServerCallContext context)
         {
+            string address = context.Peer;
             if (!context.GetHttpContext().User.TryGetUserClaims(out UserClaims userClaims))
             {
-                _logger.LogError("Client from {0} was authorized but has no parseable access token.", context.Peer);
+                _logger.LogError("Client from {0} was authorized but has no parseable access token.", address);
                 return;
             }
 
-            long userID = userClaims.UserID;
-            Guid clientID = userClaims.ClientID;
-            string address = context.Peer;
             _logger.LogTrace("{0} from {1} connected.", userClaims, address);
 
             IGrpcStreamer<ListenResponse> streamer = _streamerFactory.Create();
             streamer.SetFinalMessagePredicate(IsFinalMessage);
-            streamer.Initialize(clientID, responseStream);
+            streamer.Initialize(userClaims.ClientID, responseStream);
+            await ProcessMessages(streamer, userClaims, address, context.CancellationToken);
+        }
+
+        private async Task ProcessMessages(IGrpcStreamer<ListenResponse> streamer, UserClaims userClaims, string address, CancellationToken ct)
+        {
             bool isClientAdded = false;
 
             try
             {
-                isClientAdded = _clientContainer.AddClient(userID, streamer);
+                isClientAdded = _clientContainer.AddClient(userClaims.UserID, streamer);
                 if (isClientAdded)
                 {
-                    await streamer.ProcessMessages(context.CancellationToken);
+                    await streamer.ProcessMessages(ct);
                 }
                 else
                 {
