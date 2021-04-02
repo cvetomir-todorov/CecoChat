@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -53,8 +54,9 @@ namespace CecoChat.Profile.Server.Security
             {
                 return Unauthorized();
             }
-            Guid clientID = Guid.NewGuid();
+            Activity.Current?.AddTag("user.id", userID);
 
+            Guid clientID = Guid.NewGuid();
             Claim[] claims =
             {
                 new(JwtRegisteredClaimNames.Sub, userID.ToString(), ClaimValueTypes.Integer64),

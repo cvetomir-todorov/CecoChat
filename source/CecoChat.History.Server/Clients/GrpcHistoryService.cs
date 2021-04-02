@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using CecoChat.Contracts.Backend;
 using CecoChat.Contracts.Client;
@@ -39,6 +40,7 @@ namespace CecoChat.History.Server.Clients
                 _logger.LogError("Client from {0} was authorized but has no parseable access token.", context.Peer);
                 return new GetUserHistoryResponse();
             }
+            Activity.Current?.SetTag("user.id", userID);
 
             IReadOnlyCollection<BackendMessage> backendMessages = await _historyRepository
                 .GetUserHistory(userID, request.OlderThan.ToDateTime(), _historyConfiguration.UserMessageCount);
@@ -62,6 +64,7 @@ namespace CecoChat.History.Server.Clients
                 _logger.LogError("Client from {0} was authorized but has no parseable access token.", context.Peer);
                 return new GetDialogHistoryResponse();
             }
+            Activity.Current?.SetTag("user.id", userID);
 
             long otherUserID = request.OtherUserId;
 
