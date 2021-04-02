@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Cassandra;
 using CecoChat.Contracts;
 using CecoChat.Contracts.Backend;
+using CecoChat.Tracing;
 using Google.Protobuf.WellKnownTypes;
 using Microsoft.Extensions.Logging;
 
@@ -11,28 +13,37 @@ namespace CecoChat.Data.History
 {
     public interface IDataUtility
     {
+        ISession MessagingSession { get; }
+
         PreparedStatement PrepareQuery(string cql);
 
         Task<List<BackendMessage>> GetMessages(IStatement query, int countHint);
 
         string CreateDialogID(long userID1, long userID2);
+
+        Activity StartActivity(string name, ISession session);
     }
 
     public sealed class DataUtility : IDataUtility
     {
         private readonly ILogger _logger;
+        private readonly IActivityUtility _activityUtility;
         private readonly ICecoChatDbContext _dbContext;
         private readonly IBackendDbMapper _mapper;
 
         public DataUtility(
             ILogger<DataUtility> logger,
+            IActivityUtility activityUtility,
             ICecoChatDbContext dbContext,
             IBackendDbMapper mapper)
         {
             _logger = logger;
+            _activityUtility = activityUtility;
             _dbContext = dbContext;
             _mapper = mapper;
         }
+
+        public ISession MessagingSession => _dbContext.Messaging;
 
         public PreparedStatement PrepareQuery(string cql)
         {
@@ -71,6 +82,18 @@ namespace CecoChat.Data.History
             long max = Math.Max(userID1, userID2);
 
             return $"{min}-{max}";
+        }
+
+        public Activity StartActivity(string name, ISession session)
+        {
+            Activity activity = _activityUtility.StartClient(name);
+
+            activity?.SetTag("db.system", "cassandra");
+            activity?.SetTag("db.name", session.Keyspace);
+            activity?.SetTag("db.session_name", session.SessionName);
+            activity?.SetTag("db.operation", "batch");
+
+            return activity;
         }
     }
 }

@@ -6,6 +6,7 @@ using CecoChat.Kafka;
 using CecoChat.Materialize.Server.Backend;
 using CecoChat.Materialize.Server.Initialization;
 using CecoChat.Otel;
+using CecoChat.Tracing;
 using Confluent.Kafka;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -55,6 +56,9 @@ namespace CecoChat.Materialize.Server
             services.AddSingleton<IMaterializeMessagesConsumer, MaterializeMessagesConsumer>();
             services.AddFactory<IKafkaConsumer<Null, BackendMessage>, KafkaConsumer<Null, BackendMessage>>();
             services.Configure<BackendOptions>(Configuration.GetSection("Backend"));
+
+            // shared
+            services.AddSingleton<IActivityUtility, ActivityUtility>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

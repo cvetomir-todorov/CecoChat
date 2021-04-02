@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Cassandra;
 using CecoChat.Contracts.Backend;
@@ -52,6 +53,9 @@ namespace CecoChat.Data.History
 
         public async Task<IReadOnlyCollection<BackendMessage>> GetUserHistory(long userID, DateTime olderThan, int countLimit)
         {
+            using Activity activity = _dataUtility.StartActivity("Get user history", _dataUtility.MessagingSession);
+            activity?.SetTag("user.id", userID);
+
             BoundStatement query = _userHistoryQuery.Value.Bind(userID, olderThan, countLimit);
             query.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
             query.SetIdempotence(true);
@@ -63,6 +67,9 @@ namespace CecoChat.Data.History
 
         public async Task<IReadOnlyCollection<BackendMessage>> GetDialogHistory(long userID, long otherUserID, DateTime olderThan, int countLimit)
         {
+            using Activity activity = _dataUtility.StartActivity("Get dialog history", _dataUtility.MessagingSession);
+            activity?.SetTag("user.id", userID);
+
             string dialogID = _dataUtility.CreateDialogID(userID, otherUserID);
             BoundStatement query = _dialogHistoryQuery.Value.Bind(dialogID, olderThan, countLimit);
             query.SetIdempotence(true);
