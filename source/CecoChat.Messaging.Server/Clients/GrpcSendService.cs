@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Diagnostics;
+using System.Threading.Tasks;
 using CecoChat.Contracts;
 using CecoChat.Contracts.Backend;
 using CecoChat.Contracts.Client;
@@ -39,6 +40,7 @@ namespace CecoChat.Messaging.Server.Clients
                 _logger.LogError("Client from {0} was authorized but has no parseable access token.", context.Peer);
                 return Task.FromResult(new SendMessageResponse());
             }
+            Activity.Current?.SetTag("user.id", userClaims.UserID);
 
             ClientMessage clientMessage = request.Message;
             clientMessage.Timestamp = Timestamp.FromDateTime(_clock.GetNowUtc());

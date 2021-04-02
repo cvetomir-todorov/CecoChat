@@ -1,4 +1,5 @@
-﻿using CecoChat.Data.Configuration.History;
+﻿using System.Diagnostics;
+using CecoChat.Data.Configuration.History;
 using CecoChat.Data.Configuration.Partitioning;
 using CecoChat.Server.Backend;
 using CecoChat.Server.Identity;
@@ -37,6 +38,7 @@ namespace CecoChat.Connect.Server.Controllers
             {
                 return Unauthorized();
             }
+            Activity.Current?.AddTag("user.id", userID);
 
             int partitionCount = _partitioningConfiguration.PartitionCount;
             int partition = _partitionUtility.ChoosePartition(userID, partitionCount);
