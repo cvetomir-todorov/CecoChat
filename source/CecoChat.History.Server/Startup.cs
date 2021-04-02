@@ -7,6 +7,7 @@ using CecoChat.Jwt;
 using CecoChat.Otel;
 using CecoChat.Server;
 using CecoChat.Server.Identity;
+using CecoChat.Tracing;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -70,6 +71,7 @@ namespace CecoChat.History.Server
             services.AddConfiguration(Configuration.GetSection("ConfigurationDB"), addHistory: true);
 
             // shared
+            services.AddSingleton<IActivityUtility, ActivityUtility>();
             services.AddSingleton<IClientBackendMapper, ClientBackendMapper>();
         }
 

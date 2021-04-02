@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Cassandra;
 using CecoChat.Contracts;
 using CecoChat.Contracts.Backend;
@@ -58,6 +59,17 @@ namespace CecoChat.Data.History
 
         public void AddNewDialogMessage(BackendMessage message)
         {
+            ISession session = _dbContext.Messaging;
+            using Activity activity = _dataUtility.StartActivity("New dialog message", session);
+            activity?.SetTag("message.id", message.MessageId.ToGuid());
+
+            BatchStatement insertBatch = CreateInsertStatement(message);
+            session.Execute(insertBatch);
+            _logger.LogTrace("Persisted for sender, receiver and dialog the message {0}.", message);
+        }
+
+        private BatchStatement CreateInsertStatement(BackendMessage message)
+        {
             Guid messageID = message.MessageId.ToGuid();
             DateTime messageTimestamp = message.Timestamp.ToDateTime();
             sbyte dbMessageType = _mapper.MapBackendToDbMessageType(message.Type);
@@ -77,10 +89,7 @@ namespace CecoChat.Data.History
                 .Add(insertForDialog);
             insertBatch.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
             insertBatch.SetIdempotence(false);
-
-            ISession session = _dbContext.Messaging;
-            session.Execute(insertBatch);
-            _logger.LogTrace("Persisted for sender, receiver and dialog the message {0}.", message);
+            return insertBatch;
         }
     }
 }
