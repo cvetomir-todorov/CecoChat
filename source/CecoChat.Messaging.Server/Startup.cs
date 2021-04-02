@@ -73,6 +73,7 @@ namespace CecoChat.Messaging.Server
             services.AddSingleton<IMessagesToBackendProducer, MessagesToBackendProducer>();
             services.AddSingleton<IMessagesToReceiversConsumer, MessagesToReceiversConsumer>();
             services.AddSingleton<IMessagesToSendersConsumer, MessagesToSendersConsumer>();
+            services.AddFactory<IKafkaProducer<Null, BackendMessage>, KafkaProducer<Null, BackendMessage>>();
             services.AddFactory<IKafkaConsumer<Null, BackendMessage>, KafkaConsumer<Null, BackendMessage>>();
             services.Configure<BackendOptions>(Configuration.GetSection("Backend"));
 
