@@ -10,21 +10,11 @@ services:
       - cecochat
     ports:
       - "6379:6379"
-    mem_limit: 512M
+    mem_limit: 256M
     volumes:
       - ./configuration/redis1.conf:/redis.conf
       - cecochat-redis1-data:/data
     command: [ "redis-server", "/redis.conf" ]
-  rediscommander:
-    image: rediscommander/redis-commander
-    container_name: cecochat-rediscommander
-    hostname: rediscommander
-    networks: *networks
-    ports:
-      - "8081:8081"
-    mem_limit: 512M
-    environment:
-      - REDIS_HOSTS=redis1:redis1:6379
 volumes:
   cecochat-redis1-data:
     external: true
