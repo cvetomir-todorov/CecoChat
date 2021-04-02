@@ -4,6 +4,7 @@ using CecoChat.Data.History;
 using CecoChat.History.Server.Clients;
 using CecoChat.History.Server.Initialization;
 using CecoChat.Jwt;
+using CecoChat.Otel;
 using CecoChat.Server;
 using CecoChat.Server.Identity;
 using Microsoft.AspNetCore.Builder;
@@ -11,12 +12,14 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using OpenTelemetry.Trace;
 
 namespace CecoChat.History.Server
 {
     public class Startup
     {
         private readonly IJwtOptions _jwtOptions;
+        private readonly IJaegerOptions _jaegerOptions;
 
         public Startup(IConfiguration configuration)
         {
@@ -25,6 +28,10 @@ namespace CecoChat.History.Server
             JwtOptions jwtOptions = new();
             Configuration.GetSection("Jwt").Bind(jwtOptions);
             _jwtOptions = jwtOptions;
+
+            JaegerOptions jaegerOptions = new();
+            Configuration.GetSection("Jaeger").Bind(jaegerOptions);
+            _jaegerOptions = jaegerOptions;
         }
 
         public IConfiguration Configuration { get; }
@@ -43,6 +50,14 @@ namespace CecoChat.History.Server
             // security
             services.AddJwtAuthentication(_jwtOptions);
             services.AddAuthorization();
+
+            // telemetry
+            services.AddOpenTelemetryTracing(otel =>
+            {
+                otel.AddServiceResource(new OtelServiceResource {Namespace = "CecoChat", Service = "History", Version = "0.1"});
+                otel.AddAspNetCoreInstrumentation(aspnet => aspnet.EnableGrpcAspNetCoreSupport = true);
+                otel.ConfigureJaegerExporter(_jaegerOptions);
+            });
 
             // history
             services.AddCassandra<ICecoChatDbContext, CecoChatDbContext>(Configuration.GetSection("HistoryDB"));
