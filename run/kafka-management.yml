@@ -1,0 +1,15 @@
+version: '3'
+networks:
+  cecochat:
+services:
+  kafdrop:
+    image: obsidiandynamics/kafdrop
+    container_name: cecochat-kafdrop
+    restart: "no"
+    networks:
+      - cecochat
+    ports: 
+      - "9000:9000"
+    mem_limit: 256M
+    environment: 
+      KAFKA_BROKERCONNECT: "kafka1:19091"

@@ -60,19 +60,6 @@ services:
       - cecochat-kafka2-data:/var/lib/kafka/data
     depends_on:
       - zookeeper
-  kafdrop:
-    image: obsidiandynamics/kafdrop
-    container_name: cecochat-kafdrop
-    restart: "no"
-    networks: *networks
-    ports: 
-      - "9000:9000"
-    mem_limit: 256M
-    environment: 
-      KAFKA_BROKERCONNECT: "kafka1:19091"
-    depends_on: 
-      - kafka1
-      - kafka2
 volumes:
   cecochat-zookeeper-data:
     external: true
