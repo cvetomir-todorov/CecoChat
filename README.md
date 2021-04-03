@@ -1,11 +1,22 @@
-System design and partial implementation of a chat for 10-100 millions active users based on Kafka, Cassandra, gRPC, Redis, Docker, .NET 5, ASP.NET. I would appreciate any comments so feel free to use the `Discussions` tab.
+[System design](docs/01-intro-03-overall-design-technologies.md), [partial implementation](source/), [dev environment](run/) of a chat for 10-100 millions active users based on Kafka, Cassandra, gRPC, Redis, Docker, OpenTelemetry, .NET 5, ASP.NET. I would appreciate any comments so feel free to use the `Discussions` tab.
+
+# Technologies
 
 ![Kafka](docs/tech-images/kafka.png)
 ![Cassandra](docs/tech-images/cassandra.png)
 ![gRPC](docs/tech-images/grpc.png)
 ![Redis](docs/tech-images/redis.png)
+![Protocol buffers](docs/tech-images/protocol-buffers.png)
+![Swagger](docs/tech-images/swagger.png)
+
 ![Docker](docs/tech-images/docker.png)
+![OpenTelemetry](docs/tech-images/open-telemetry.png)
+![Jaeger](docs/tech-images/jaeger.png)
+
 ![.NET](docs/tech-images/dotnet.png)
+![ASP.NET](docs/tech-images/aspnet.png)
+![Serilog](docs/tech-images/serilog.png)
+![FluentValidation](docs/tech-images/fluent-validation.png)
 
 # Code
 
@@ -20,10 +31,6 @@ System design and partial implementation of a chat for 10-100 millions active us
 [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=cvetomir-todorov_CecoChat&metric=code_smells)](https://sonarcloud.io/dashboard?id=cvetomir-todorov_CecoChat)
 [![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=cvetomir-todorov_CecoChat&metric=duplicated_lines_density)](https://sonarcloud.io/dashboard?id=cvetomir-todorov_CecoChat)
 [![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=cvetomir-todorov_CecoChat&metric=sqale_index)](https://sonarcloud.io/dashboard?id=cvetomir-todorov_CecoChat)
-
-# Design
-
-![Overall design](docs/images/cecochat-01-overall.png)
 
 # Documentation
 
