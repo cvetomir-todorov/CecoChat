@@ -16,6 +16,6 @@ services:
       - 16686:16686
       - 14268:14268
       - 9411:9411
-    mem_limit: 256M
+    mem_limit: 128M
     environment:
       COLLECTOR_ZIPKIN_HTTP_PORT: 9411

@@ -2,32 +2,32 @@ version: '3'
 networks:
   cecochat:
 services:
-  profiledb-leader:
+  mongodb1:
     image: mongo:4.4.3
-    container_name: cecochat-profiledb-leader
-    hostname: profiledb-leader
+    container_name: cecochat-mongodb1
+    hostname: mongodb1
     networks: &networks
       - cecochat
     ports:
       - "27017:27017"
-    mem_limit: 512M
+    mem_limit: 256M
     volumes:
-      - cecochat-profiledb-leader-data:/data/db
+      - cecochat-mongodb1-data:/data/db
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: secret
-  profiledb-mongoexpress:
+  mongoexpress:
     image: mongo-express
-    container_name: cecochat-profiledb-mongoexpress
-    hostname: profiledb-mongoexpress
+    container_name: cecochat-mongoexpress
+    hostname: mongoexpress
     networks: *networks
     ports:
       - 27000:8081
-    mem_limit: 512M
+    mem_limit: 128M
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: admin
       ME_CONFIG_MONGODB_ADMINPASSWORD: secret
-      ME_CONFIG_MONGODB_SERVER: profiledb-leader
+      ME_CONFIG_MONGODB_SERVER: mongodb1
 volumes:
-  cecochat-profiledb-leader-data:
+  cecochat-mongodb1-data:
     external: true
