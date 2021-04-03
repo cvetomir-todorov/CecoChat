@@ -1,1 +1,1 @@
-docker volume create cecochat-profiledb-leader-data
+docker volume create cecochat-mongodb1-data

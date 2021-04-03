@@ -10,6 +10,6 @@ services:
       - cecochat
     ports: 
       - "9000:9000"
-    mem_limit: 256M
+    mem_limit: 128M
     environment: 
       KAFKA_BROKERCONNECT: "kafka1:19091"

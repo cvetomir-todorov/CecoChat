@@ -6,7 +6,7 @@ services:
     hostname: cassweb
     ports:
     - "3000:3000"
-    mem_limit: 256M
+    mem_limit: 128M
     environment:
       CASSANDRA_HOST_IPS: 192.168.0.101
       CASSANDRA_PORT: 9042
