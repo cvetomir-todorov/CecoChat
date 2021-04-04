@@ -1,6 +1,7 @@
 using CecoChat.Cassandra;
 using CecoChat.Data.Configuration;
 using CecoChat.Data.History;
+using CecoChat.Data.History.Instrumentation;
 using CecoChat.History.Server.Clients;
 using CecoChat.History.Server.Initialization;
 using CecoChat.Jwt;
@@ -39,6 +40,15 @@ namespace CecoChat.History.Server
 
         public void ConfigureServices(IServiceCollection services)
         {
+            // telemetry
+            services.AddOpenTelemetryTracing(otel =>
+            {
+                otel.AddServiceResource(new OtelServiceResource { Namespace = "CecoChat", Service = "History", Version = "0.1" });
+                otel.AddAspNetCoreInstrumentation(aspnet => aspnet.EnableGrpcAspNetCoreSupport = true);
+                otel.AddHistoryInstrumentation();
+                otel.ConfigureJaegerExporter(_jaegerOptions);
+            });
+
             // ordered hosted services
             services.AddHostedService<ConfigurationHostedService>();
             services.AddHostedService<InitializeDbHostedService>();
@@ -51,14 +61,6 @@ namespace CecoChat.History.Server
             // security
             services.AddJwtAuthentication(_jwtOptions);
             services.AddAuthorization();
-
-            // telemetry
-            services.AddOpenTelemetryTracing(otel =>
-            {
-                otel.AddServiceResource(new OtelServiceResource {Namespace = "CecoChat", Service = "History", Version = "0.1"});
-                otel.AddAspNetCoreInstrumentation(aspnet => aspnet.EnableGrpcAspNetCoreSupport = true);
-                otel.ConfigureJaegerExporter(_jaegerOptions);
-            });
 
             // history
             services.AddCassandra<ICecoChatDbContext, CecoChatDbContext>(Configuration.GetSection("HistoryDB"));

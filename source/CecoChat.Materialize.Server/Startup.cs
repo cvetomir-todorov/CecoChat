@@ -1,7 +1,9 @@
 using CecoChat.Cassandra;
 using CecoChat.Contracts.Backend;
 using CecoChat.Data.History;
+using CecoChat.Data.History.Instrumentation;
 using CecoChat.Kafka;
+using CecoChat.Kafka.Instrumentation;
 using CecoChat.Materialize.Server.Backend;
 using CecoChat.Materialize.Server.Initialization;
 using CecoChat.Otel;
@@ -35,8 +37,9 @@ namespace CecoChat.Materialize.Server
             services.AddOpenTelemetryTracing(otel =>
             {
                 otel.AddServiceResource(new OtelServiceResource {Namespace = "CecoChat", Service = "Materialize", Version = "0.1"});
+                otel.AddKafkaInstrumentation();
+                otel.AddHistoryInstrumentation();
                 otel.ConfigureJaegerExporter(_jaegerOptions);
-                // TODO: add instrumentation for cassandra
                 // TODO: set different samplers for debug and production
             });
 
