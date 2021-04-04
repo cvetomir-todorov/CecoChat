@@ -2,7 +2,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 using CecoChat.Contracts.Client;
-using CecoChat.DependencyInjection;
 using CecoChat.Server.Identity;
 using Grpc.Core;
 using Microsoft.AspNetCore.Authorization;

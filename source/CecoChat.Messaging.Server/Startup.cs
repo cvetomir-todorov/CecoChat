@@ -1,7 +1,6 @@
 using CecoChat.Contracts.Backend;
 using CecoChat.Contracts.Client;
 using CecoChat.Data.Configuration;
-using CecoChat.DependencyInjection;
 using CecoChat.Jwt;
 using CecoChat.Kafka;
 using CecoChat.Kafka.Instrumentation;

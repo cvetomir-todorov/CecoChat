@@ -4,7 +4,6 @@ using System.Threading;
 using CecoChat.Contracts;
 using CecoChat.Contracts.Backend;
 using CecoChat.Contracts.Client;
-using CecoChat.DependencyInjection;
 using CecoChat.Kafka;
 using CecoChat.Messaging.Server.Clients;
 using CecoChat.Server;
