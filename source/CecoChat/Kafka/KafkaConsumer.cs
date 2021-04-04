@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
+using CecoChat.Kafka.Instrumentation;
+using CecoChat.Tracing;
 using Confluent.Kafka;
 using Microsoft.Extensions.Logging;
 
@@ -16,19 +19,32 @@ namespace CecoChat.Kafka
 
         bool TryConsume(CancellationToken ct, out ConsumeResult<TKey, TValue> consumeResult);
 
+        /// <summary>
+        /// Should always be called regardless of the value of <see cref="IKafkaConsumerOptions.EnableAutoCommit"/>.
+        /// </summary>
         void Commit(ConsumeResult<TKey, TValue> consumeResult, CancellationToken ct);
     }
 
     public sealed class KafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey, TValue>
     {
         private readonly ILogger _logger;
+        private readonly IActivityUtility _activityUtility;
+        private readonly IKafkaActivityUtility _kafkaActivityUtility;
         private PartitionRange _assignedPartitions;
         private IConsumer<TKey, TValue> _consumer;
+        private IKafkaConsumerOptions _consumerOptions;
+        private string _activityID;
         private string _id;
 
-        public KafkaConsumer(ILogger<KafkaConsumer<TKey, TValue>> logger)
+        public KafkaConsumer(
+            ILogger<KafkaConsumer<TKey, TValue>> logger,
+            IActivityUtility activityUtility,
+            IKafkaActivityUtility kafkaActivityUtility)
         {
             _logger = logger;
+            _activityUtility = activityUtility;
+            _kafkaActivityUtility = kafkaActivityUtility;
+
             _assignedPartitions = PartitionRange.Empty;
         }
 
@@ -57,6 +73,7 @@ namespace CecoChat.Kafka
             _consumer = new ConsumerBuilder<TKey, TValue>(configuration)
                 .SetValueDeserializer(valueDeserializer)
                 .Build();
+            _consumerOptions = consumerOptions;
             _id = $"{KafkaConsumerIDGenerator.GetNextID()}@{consumerOptions.ConsumerGroupID}";
         }
 
@@ -92,43 +109,15 @@ namespace CecoChat.Kafka
         public bool TryConsume(CancellationToken ct, out ConsumeResult<TKey, TValue> consumeResult)
         {
             EnsureInitialized();
+            bool success = false;
+            consumeResult = default;
 
-            consumeResult = Execute(() => _consumer.Consume(ct), ct);
-            bool success = consumeResult != default;
-
-            return success;
-        }
-
-        public void Commit(ConsumeResult<TKey, TValue> consumeResult, CancellationToken ct)
-        {
-            EnsureInitialized();
-
-            bool success = Execute(() =>
-            {
-                _consumer.Commit(consumeResult);
-                return true;
-            }, ct);
-
-            if (!success)
-            {
-                _logger.LogError("Consumer {0} failed to commit topic {1} partition {2} offset {3}.",
-                    _id, consumeResult.Topic, consumeResult.Partition, consumeResult.Offset);
-            }
-        }
-
-        private void EnsureInitialized()
-        {
-            if (_consumer == null)
-            {
-                throw new InvalidOperationException($"'{nameof(Initialize)}' needs to be called first.");
-            }
-        }
-
-        private TResult Execute<TResult>(Func<TResult> operation, CancellationToken ct)
-        {
             try
             {
-                return operation();
+                consumeResult = _consumer.Consume(ct);
+                // consume blocks until there is a message and it is read => start activity after that
+                StartActivity(consumeResult);
+                success = true;
             }
             catch (AccessViolationException accessViolationException)
             {
@@ -143,7 +132,74 @@ namespace CecoChat.Kafka
                 _logger.LogError(exception, "Consumer {0} error.", _id);
             }
 
-            return default;
+            return success;
+        }
+
+        public void Commit(ConsumeResult<TKey, TValue> consumeResult, CancellationToken ct)
+        {
+            EnsureInitialized();
+            bool success = false;
+
+            try
+            {
+                if (!_consumerOptions.EnableAutoCommit)
+                {
+                    _consumer.Commit(consumeResult);
+                }
+
+                success = true;
+            }
+            catch (AccessViolationException accessViolationException)
+            {
+                HandleConsumerDisposal(accessViolationException, ct);
+            }
+            catch (ObjectDisposedException objectDisposedException)
+            {
+                HandleConsumerDisposal(objectDisposedException, ct);
+            }
+            catch (Exception exception)
+            {
+                _logger.LogError(exception, "Consumer {0} error.", _id);
+            }
+            finally
+            {
+                if (!_consumerOptions.EnableAutoCommit)
+                {
+                    Activity activity = Activity.Current;
+                    if (activity != null && activity.Id == _activityID)
+                    {
+                        _activityUtility.Stop(activity, success);
+                    }
+                }
+            }
+
+            if (!success)
+            {
+                _logger.LogError("Consumer {0} failed to commit topic {1} partition {2} offset {3}.",
+                    _id, consumeResult.Topic, consumeResult.Partition, consumeResult.Offset);
+            }
+        }
+
+        private void StartActivity(ConsumeResult<TKey, TValue> consumeResult)
+        {
+            Activity activity = KafkaInstrumentation.ActivitySource.StartActivity(KafkaInstrumentation.Operations.Consumption, ActivityKind.Consumer);
+            if (activity == null)
+            {
+                return;
+            }
+
+            _activityID = activity.Id;
+            string displayName = $"{activity.OperationName}/Topic:{consumeResult.Topic} -> Consumer:{_consumerOptions.ConsumerGroupID}";
+            _kafkaActivityUtility.EnrichActivity(consumeResult.Topic, consumeResult.Partition, displayName, activity);
+            _kafkaActivityUtility.ExtractTraceData(consumeResult.Message, activity);
+        }
+
+        private void EnsureInitialized()
+        {
+            if (_consumer == null)
+            {
+                throw new InvalidOperationException($"'{nameof(Initialize)}' needs to be called first.");
+            }
         }
 
         private void HandleConsumerDisposal(Exception exception, CancellationToken ct)

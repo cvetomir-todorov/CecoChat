@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading;
+using CecoChat.Kafka.Instrumentation;
+using CecoChat.Tracing;
 using Confluent.Kafka;
 using Microsoft.Extensions.Logging;
 
@@ -19,13 +22,20 @@ namespace CecoChat.Kafka
     public sealed class KafkaProducer<TKey, TValue> : IKafkaProducer<TKey, TValue>
     {
         private readonly ILogger _logger;
+        private readonly IActivityUtility _activityUtility;
+        private readonly IKafkaActivityUtility _kafkaActivityUtility;
         private IProducer<TKey, TValue> _producer;
+        private IKafkaProducerOptions _producerOptions;
         private string _id;
 
         public KafkaProducer(
-            ILogger<KafkaProducer<TKey, TValue>> logger)
+            ILogger<KafkaProducer<TKey, TValue>> logger,
+            IActivityUtility activityUtility,
+            IKafkaActivityUtility kafkaActivityUtility)
         {
             _logger = logger;
+            _activityUtility = activityUtility;
+            _kafkaActivityUtility = kafkaActivityUtility;
         }
 
         public void Dispose()
@@ -52,18 +62,21 @@ namespace CecoChat.Kafka
             _producer = new ProducerBuilder<TKey, TValue>(configuration)
                 .SetValueSerializer(valueSerializer)
                 .Build();
+            _producerOptions = producerOptions;
             _id = $"{KafkaProducerIDGenerator.GetNextID()}@{producerOptions.IDContext}";
         }
 
         public void Produce(Message<TKey, TValue> message, TopicPartition topicPartition)
         {
-            _producer.Produce(topicPartition, message, DeliveryHandler);
+            Activity activity = StartActivity(message, topicPartition.Topic, topicPartition.Partition);
+            _producer.Produce(topicPartition, message, deliveryReport => DeliveryHandler(deliveryReport, activity));
             _logger.LogTrace("Producer {0} produced message {1} in {2}{3}.", _id, message.Value, topicPartition.Topic, topicPartition.Partition);
         }
 
         public void Produce(Message<TKey, TValue> message, string topic)
         {
-            _producer.Produce(topic, message, DeliveryHandler);
+            Activity activity = StartActivity(message, topic);
+            _producer.Produce(topic, message, deliveryReport => DeliveryHandler(deliveryReport, activity));
             _logger.LogTrace("Producer {0} produced message {1} in {2}.", _id, message.Value, topic);
         }
 
@@ -86,22 +99,53 @@ namespace CecoChat.Kafka
             }
         }
 
-        private void DeliveryHandler(DeliveryReport<TKey, TValue> report)
+        private Activity StartActivity(Message<TKey, TValue> message, string topic, int? partition = null)
         {
-            TValue value = report.Message.Value;
+            Activity activity = KafkaInstrumentation.ActivitySource.StartActivity(KafkaInstrumentation.Operations.Production, ActivityKind.Producer);
+            if (activity == null)
+            {
+                return null;
+            }
 
-            if (report.Status != PersistenceStatus.Persisted)
+            // activity will be completed in the delivery handler thread and we don't want to pollute the execution context
+            // so we set the current activity to the previous one
+            Activity.Current = activity.Parent;
+
+            string displayName = $"{activity.OperationName}/Producer:{_producerOptions.IDContext} -> Topic:{topic}";
+            _kafkaActivityUtility.EnrichActivity(topic, partition, displayName, activity);
+            _kafkaActivityUtility.InjectTraceData(activity, message);
+
+            return activity;
+        }
+
+        private void DeliveryHandler(DeliveryReport<TKey, TValue> report, Activity activity)
+        {
+            bool success = true;
+            try
             {
-                _logger.LogError("Message {0} persistence status {1}.", value, report.Status);
+                TValue value = report.Message.Value;
+
+                if (report.Status != PersistenceStatus.Persisted)
+                {
+                    _logger.LogError("Message {0} persistence status {1}.", value, report.Status);
+                    success = false;
+                }
+                if (report.Error.IsError)
+                {
+                    _logger.LogError("Message {0} error '{1}'.", value, report.Error.Reason);
+                    success = false;
+                }
+                if (report.TopicPartitionOffsetError.Error.IsError)
+                {
+                    _logger.LogError("Message {0} topic partition {1} error '{2}'.",
+                        value, report.TopicPartitionOffsetError.Partition, report.TopicPartitionOffsetError.Error.Reason);
+                    success = false;
+                }
             }
-            if (report.Error.IsError)
+            finally
             {
-                _logger.LogError("Message {0} error '{1}'.", value, report.Error.Reason);
-            }
-            if (report.TopicPartitionOffsetError.Error.IsError)
-            {
-                _logger.LogError("Message {0} topic partition {1} error '{2}'.",
-                    value, report.TopicPartitionOffsetError.Partition, report.TopicPartitionOffsetError.Error.Reason);
+                // do not change the Activity.Current
+                _activityUtility.Stop(activity, success, relyOnDefaultPolicyOfSettingCurrentActivity: false);
             }
         }
     }

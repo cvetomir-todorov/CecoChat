@@ -3,6 +3,7 @@ using CecoChat.Contracts.Backend;
 using CecoChat.Data.History;
 using CecoChat.DependencyInjection;
 using CecoChat.Kafka;
+using CecoChat.Kafka.Instrumentation;
 using CecoChat.Materialize.Server.Backend;
 using CecoChat.Materialize.Server.Initialization;
 using CecoChat.Otel;
@@ -33,17 +34,19 @@ namespace CecoChat.Materialize.Server
 
         public void ConfigureServices(IServiceCollection services)
         {
-            // ordered hosted services
-            services.AddHostedService<InitializeDbHostedService>();
-            services.AddHostedService<PrepareQueriesHostedService>();
-            services.AddHostedService<MaterializeMessagesHostedService>();
-
             // telemetry
             services.AddOpenTelemetryTracing(otel =>
             {
                 otel.AddServiceResource(new OtelServiceResource {Namespace = "CecoChat", Service = "Materialize", Version = "0.1"});
                 otel.ConfigureJaegerExporter(_jaegerOptions);
+                // TODO: add instrumentation for cassandra
+                // TODO: set different samplers for debug and production
             });
+
+            // ordered hosted services
+            services.AddHostedService<InitializeDbHostedService>();
+            services.AddHostedService<PrepareQueriesHostedService>();
+            services.AddHostedService<MaterializeMessagesHostedService>();
 
             // history
             services.AddCassandra<ICecoChatDbContext, CecoChatDbContext>(Configuration.GetSection("HistoryDB"));
@@ -55,6 +58,7 @@ namespace CecoChat.Materialize.Server
             // backend
             services.AddSingleton<IMaterializeMessagesConsumer, MaterializeMessagesConsumer>();
             services.AddFactory<IKafkaConsumer<Null, BackendMessage>, KafkaConsumer<Null, BackendMessage>>();
+            services.AddSingleton<IKafkaActivityUtility, KafkaActivityUtility>();
             services.Configure<BackendOptions>(Configuration.GetSection("Backend"));
 
             // shared
