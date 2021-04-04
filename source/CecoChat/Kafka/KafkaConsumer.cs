@@ -163,20 +163,17 @@ namespace CecoChat.Kafka
             }
             finally
             {
-                if (!_consumerOptions.EnableAutoCommit)
+                if (!success)
                 {
-                    Activity activity = Activity.Current;
-                    if (activity != null && activity.Id == _activityID)
-                    {
-                        _activityUtility.Stop(activity, success);
-                    }
+                    _logger.LogError("Consumer {0} failed to commit topic {1} partition {2} offset {3}.",
+                        _id, consumeResult.Topic, consumeResult.Partition, consumeResult.Offset);
                 }
-            }
 
-            if (!success)
-            {
-                _logger.LogError("Consumer {0} failed to commit topic {1} partition {2} offset {3}.",
-                    _id, consumeResult.Topic, consumeResult.Partition, consumeResult.Offset);
+                Activity activity = Activity.Current;
+                if (activity != null && activity.Id == _activityID)
+                {
+                    _activityUtility.Stop(activity, success);
+                }
             }
         }
 
