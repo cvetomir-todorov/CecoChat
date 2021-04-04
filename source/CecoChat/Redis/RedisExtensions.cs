@@ -5,11 +5,11 @@ namespace CecoChat.Redis
 {
     public static class RedisExtensions
     {
-        public static IServiceCollection AddRedis(this IServiceCollection services, IConfiguration redisConfigurationSection)
+        public static IServiceCollection AddRedis(this IServiceCollection services, IConfiguration redisConfiguration)
         {
             return services
                 .AddSingleton<IRedisContext, RedisContext>()
-                .Configure<RedisOptions>(redisConfigurationSection);
+                .Configure<RedisOptions>(redisConfiguration);
         }
     }
 }
