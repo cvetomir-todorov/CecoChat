@@ -103,7 +103,7 @@ namespace CecoChat.Data.History
 
         private Activity StartActivity(string name, long userID)
         {
-            using Activity activity = _dataUtility.StartActivity(name, _dataUtility.MessagingSession);
+            Activity activity = _dataUtility.StartActivity(name, _dataUtility.MessagingSession);
             if (activity != null && activity.IsAllDataRequested)
             {
                 activity.SetTag(HistoryInstrumentation.Keys.DbOperation, HistoryInstrumentation.Values.DbOperationOneRead);
