@@ -1,6 +1,5 @@
 ﻿using System;
 using CecoChat.Contracts.Backend;
-using CecoChat.DependencyInjection;
 using CecoChat.Kafka;
 using CecoChat.Server.Backend;
 using Confluent.Kafka;

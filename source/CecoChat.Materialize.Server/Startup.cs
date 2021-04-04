@@ -1,7 +1,6 @@
 using CecoChat.Cassandra;
 using CecoChat.Contracts.Backend;
 using CecoChat.Data.History;
-using CecoChat.DependencyInjection;
 using CecoChat.Kafka;
 using CecoChat.Kafka.Instrumentation;
 using CecoChat.Materialize.Server.Backend;
