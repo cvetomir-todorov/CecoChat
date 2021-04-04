@@ -14,7 +14,7 @@ namespace CecoChat.Kafka.Instrumentation
         void ExtractTraceData<TKey, TValue>(Message<TKey, TValue> message, Activity activity);
     }
 
-    public sealed class KafkaActivityUtility : IKafkaActivityUtility
+    internal sealed class KafkaActivityUtility : IKafkaActivityUtility
     {
         public void EnrichActivity(string topic, int? partition, string displayName, Activity activity)
         {

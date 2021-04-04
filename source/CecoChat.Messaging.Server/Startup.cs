@@ -11,7 +11,6 @@ using CecoChat.Otel;
 using CecoChat.Server;
 using CecoChat.Server.Backend;
 using CecoChat.Server.Identity;
-using CecoChat.Tracing;
 using Confluent.Kafka;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -77,7 +76,7 @@ namespace CecoChat.Messaging.Server
             services.AddSingleton<IMessagesToSendersConsumer, MessagesToSendersConsumer>();
             services.AddFactory<IKafkaProducer<Null, BackendMessage>, KafkaProducer<Null, BackendMessage>>();
             services.AddFactory<IKafkaConsumer<Null, BackendMessage>, KafkaConsumer<Null, BackendMessage>>();
-            services.AddSingleton<IKafkaActivityUtility, KafkaActivityUtility>();
+            services.AddKafka();
             services.Configure<BackendOptions>(Configuration.GetSection("Backend"));
 
             // configuration
@@ -86,7 +85,6 @@ namespace CecoChat.Messaging.Server
             // shared
             services.AddSingleton<IClock, MonotonicClock>();
             services.AddSingleton<IClientBackendMapper, ClientBackendMapper>();
-            services.AddSingleton<IActivityUtility, ActivityUtility>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
