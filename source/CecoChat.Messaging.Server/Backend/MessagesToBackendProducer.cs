@@ -51,11 +51,7 @@ namespace CecoChat.Messaging.Server.Backend
         {
             int partition = _partitionUtility.ChoosePartition(message.TargetId, PartitionCount);
             TopicPartition topicPartition = _partitionFlyweight.GetTopicPartition(_backendOptions.MessagesTopicName, partition);
-            Message<Null, BackendMessage> kafkaMessage = new()
-            {
-                Value = message
-            };
-
+            Message<Null, BackendMessage> kafkaMessage = new() {Value = message};
             _producer.Produce(kafkaMessage, topicPartition);
         }
     }

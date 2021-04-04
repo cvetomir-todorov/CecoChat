@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using OpenTelemetry.Trace;
 
 namespace CecoChat.Tracing
 {
@@ -10,6 +11,12 @@ namespace CecoChat.Tracing
         Activity StartProducer(string name);
         Activity StartConsumer(string name);
         Activity StartInternal(string name);
+
+        /// <summary>
+        /// By default calling <see cref="Activity.Stop"/> sets the <see cref="Activity.Current"/>
+        /// to the <see cref="Activity.Parent"/> of the stopped activity which may not be desired.
+        /// </summary>
+        void Stop(Activity activity, bool success, bool relyOnDefaultPolicyOfSettingCurrentActivity = true);
     }
 
     public sealed class ActivityUtility : IActivityUtility
@@ -42,6 +49,23 @@ namespace CecoChat.Tracing
         public Activity StartInternal(string name)
         {
             return Start(name, ActivityKind.Internal);
+        }
+
+        public void Stop(Activity activity, bool success, bool relyOnDefaultPolicyOfSettingCurrentActivity = true)
+        {
+            if (activity != null)
+            {
+                Status status = success ? Status.Ok : Status.Error;
+                activity.SetStatus(status);
+
+                Activity currentActivity = Activity.Current;
+                activity.Stop();
+
+                if (!relyOnDefaultPolicyOfSettingCurrentActivity)
+                {
+                    Activity.Current = currentActivity;
+                }
+            }
         }
     }
 }

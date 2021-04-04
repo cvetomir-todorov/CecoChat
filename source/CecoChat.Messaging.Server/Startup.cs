@@ -4,6 +4,7 @@ using CecoChat.Data.Configuration;
 using CecoChat.DependencyInjection;
 using CecoChat.Jwt;
 using CecoChat.Kafka;
+using CecoChat.Kafka.Instrumentation;
 using CecoChat.Messaging.Server.Backend;
 using CecoChat.Messaging.Server.Clients;
 using CecoChat.Messaging.Server.Initialization;
@@ -11,6 +12,7 @@ using CecoChat.Otel;
 using CecoChat.Server;
 using CecoChat.Server.Backend;
 using CecoChat.Server.Identity;
+using CecoChat.Tracing;
 using Confluent.Kafka;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -43,6 +45,15 @@ namespace CecoChat.Messaging.Server
 
         public void ConfigureServices(IServiceCollection services)
         {
+            // telemetry
+            services.AddOpenTelemetryTracing(otel =>
+            {
+                otel.AddServiceResource(new OtelServiceResource { Namespace = "CecoChat", Service = "Messaging", Version = "0.1" });
+                otel.AddAspNetCoreInstrumentation(aspnet => aspnet.EnableGrpcAspNetCoreSupport = true);
+                otel.AddKafkaInstrumentation();
+                otel.ConfigureJaegerExporter(_jaegerOptions);
+            });
+
             // ordered hosted services
             services.AddHostedService<ConfigurationHostedService>();
             services.AddHostedService<BackendHostedService>();
@@ -58,14 +69,6 @@ namespace CecoChat.Messaging.Server
             services.AddJwtAuthentication(_jwtOptions);
             services.AddAuthorization();
 
-            // telemetry
-            services.AddOpenTelemetryTracing(otel =>
-            {
-                otel.AddServiceResource(new OtelServiceResource {Namespace = "CecoChat", Service = "Messaging", Version = "0.1"});
-                otel.AddAspNetCoreInstrumentation(aspnet => aspnet.EnableGrpcAspNetCoreSupport = true);
-                otel.ConfigureJaegerExporter(_jaegerOptions);
-            });
-
             // backend
             services.AddPartitionUtility();
             services.AddSingleton<IBackendComponents, BackendComponents>();
@@ -75,6 +78,7 @@ namespace CecoChat.Messaging.Server
             services.AddSingleton<IMessagesToSendersConsumer, MessagesToSendersConsumer>();
             services.AddFactory<IKafkaProducer<Null, BackendMessage>, KafkaProducer<Null, BackendMessage>>();
             services.AddFactory<IKafkaConsumer<Null, BackendMessage>, KafkaConsumer<Null, BackendMessage>>();
+            services.AddSingleton<IKafkaActivityUtility, KafkaActivityUtility>();
             services.Configure<BackendOptions>(Configuration.GetSection("Backend"));
 
             // configuration
@@ -83,6 +87,7 @@ namespace CecoChat.Messaging.Server
             // shared
             services.AddSingleton<IClock, MonotonicClock>();
             services.AddSingleton<IClientBackendMapper, ClientBackendMapper>();
+            services.AddSingleton<IActivityUtility, ActivityUtility>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

@@ -88,10 +88,7 @@ namespace CecoChat.Messaging.Server.Backend
             IEnumerable<IStreamer<ListenResponse>> clients = _clientContainer.EnumerateClients(backendMessage.TargetId);
 
             ClientMessage clientMessage = _mapper.MapBackendToClientMessage(backendMessage);
-            ListenResponse response = new ListenResponse
-            {
-                Message = clientMessage
-            };
+            ListenResponse response = new() {Message = clientMessage};
 
             EnqueueMessage(senderClientID, response, clients, out int successCount, out int allCount);
             LogResults(backendMessage, successCount, allCount);
