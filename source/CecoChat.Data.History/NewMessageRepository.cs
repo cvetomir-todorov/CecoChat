@@ -4,6 +4,8 @@ using System.Diagnostics;
 using Cassandra;
 using CecoChat.Contracts;
 using CecoChat.Contracts.Backend;
+using CecoChat.Data.History.Instrumentation;
+using CecoChat.Tracing;
 using Microsoft.Extensions.Logging;
 
 namespace CecoChat.Data.History
@@ -18,7 +20,7 @@ namespace CecoChat.Data.History
     public sealed class NewMessageRepository : INewMessageRepository
     {
         private readonly ILogger _logger;
-        private readonly ICecoChatDbContext _dbContext;
+        private readonly IActivityUtility _activityUtility;
         private readonly IDataUtility _dataUtility;
         private readonly IBackendDbMapper _mapper;
         private readonly Lazy<PreparedStatement> _messagesForUserQuery;
@@ -26,12 +28,12 @@ namespace CecoChat.Data.History
 
         public NewMessageRepository(
             ILogger<NewMessageRepository> logger,
-            ICecoChatDbContext dbContext,
+            IActivityUtility activityUtility,
             IDataUtility dataUtility,
             IBackendDbMapper mapper)
         {
             _logger = logger;
-            _dbContext = dbContext;
+            _activityUtility = activityUtility;
             _dataUtility = dataUtility;
             _mapper = mapper;
 
@@ -59,16 +61,35 @@ namespace CecoChat.Data.History
 
         public void AddNewDialogMessage(BackendMessage message)
         {
-            ISession session = _dbContext.Messaging;
-            using Activity activity = _dataUtility.StartActivity("New dialog message", session);
-            activity?.SetTag("message.id", message.MessageId.ToGuid());
+            Activity activity = StartActivity(message, _dataUtility.MessagingSession);
+            bool success = false;
 
-            BatchStatement insertBatch = CreateInsertStatement(message);
-            session.Execute(insertBatch);
-            _logger.LogTrace("Persisted for sender, receiver and dialog the message {0}.", message);
+            try
+            {
+                BatchStatement insertBatch = CreateInsertBatch(message);
+                _dataUtility.MessagingSession.Execute(insertBatch);
+                success = true;
+                _logger.LogTrace("Persisted for sender, receiver and dialog the message {0}.", message);
+            }
+            finally
+            {
+                _activityUtility.Stop(activity, success);
+            }
         }
 
-        private BatchStatement CreateInsertStatement(BackendMessage message)
+        private Activity StartActivity(BackendMessage message, ISession session)
+        {
+            Activity activity = _dataUtility.StartActivity(HistoryInstrumentation.Operations.HistoryNewDialogMessage, session);
+            if (activity != null && activity.IsAllDataRequested)
+            {
+                activity.SetTag(HistoryInstrumentation.Keys.DbOperation, HistoryInstrumentation.Values.DbOperationBatchWrite);
+                activity.SetTag("message.id", message.MessageId.ToGuid());
+            }
+
+            return activity;
+        }
+
+        private BatchStatement CreateInsertBatch(BackendMessage message)
         {
             Guid messageID = message.MessageId.ToGuid();
             DateTime messageTimestamp = message.Timestamp.ToDateTime();

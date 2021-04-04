@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Cassandra;
 using CecoChat.Contracts;
 using CecoChat.Contracts.Backend;
-using CecoChat.Tracing;
+using CecoChat.Data.History.Instrumentation;
 using Google.Protobuf.WellKnownTypes;
 using Microsoft.Extensions.Logging;
 
@@ -27,18 +27,15 @@ namespace CecoChat.Data.History
     public sealed class DataUtility : IDataUtility
     {
         private readonly ILogger _logger;
-        private readonly IActivityUtility _activityUtility;
         private readonly ICecoChatDbContext _dbContext;
         private readonly IBackendDbMapper _mapper;
 
         public DataUtility(
             ILogger<DataUtility> logger,
-            IActivityUtility activityUtility,
             ICecoChatDbContext dbContext,
             IBackendDbMapper mapper)
         {
             _logger = logger;
-            _activityUtility = activityUtility;
             _dbContext = dbContext;
             _mapper = mapper;
         }
@@ -86,12 +83,18 @@ namespace CecoChat.Data.History
 
         public Activity StartActivity(string name, ISession session)
         {
-            Activity activity = _activityUtility.StartClient(name);
+            Activity activity = HistoryInstrumentation.ActivitySource.StartActivity(name, ActivityKind.Client);
+            if (activity == null)
+            {
+                return null;
+            }
 
-            activity?.SetTag("db.system", "cassandra");
-            activity?.SetTag("db.name", session.Keyspace);
-            activity?.SetTag("db.session_name", session.SessionName);
-            activity?.SetTag("db.operation", "batch");
+            if (activity.IsAllDataRequested)
+            {
+                activity.SetTag(HistoryInstrumentation.Keys.DbSystem, HistoryInstrumentation.Values.DbSystemCassandra);
+                activity.SetTag(HistoryInstrumentation.Keys.DbName, session.Keyspace);
+                activity.SetTag(HistoryInstrumentation.Keys.DbSessionName, session.SessionName);
+            }
 
             return activity;
         }

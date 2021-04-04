@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using Cassandra;
 using CecoChat.Contracts.Backend;
+using CecoChat.Data.History.Instrumentation;
+using CecoChat.Tracing;
 using Microsoft.Extensions.Logging;
 
 namespace CecoChat.Data.History
@@ -20,15 +22,18 @@ namespace CecoChat.Data.History
     public sealed class HistoryRepository : IHistoryRepository
     {
         private readonly ILogger _logger;
+        private readonly IActivityUtility _activityUtility;
         private readonly IDataUtility _dataUtility;
         private readonly Lazy<PreparedStatement> _userHistoryQuery;
         private readonly Lazy<PreparedStatement> _dialogHistoryQuery;
 
         public HistoryRepository(
             ILogger<NewMessageRepository> logger,
+            IActivityUtility activityUtility,
             IDataUtility dataUtility)
         {
             _logger = logger;
+            _activityUtility = activityUtility;
             _dataUtility = dataUtility;
 
             _userHistoryQuery = new Lazy<PreparedStatement>(() => _dataUtility.PrepareQuery(SelectMessagesForUser));
@@ -53,31 +58,59 @@ namespace CecoChat.Data.History
 
         public async Task<IReadOnlyCollection<BackendMessage>> GetUserHistory(long userID, DateTime olderThan, int countLimit)
         {
-            using Activity activity = _dataUtility.StartActivity("Get user history", _dataUtility.MessagingSession);
-            activity?.SetTag("user.id", userID);
+            Activity activity = StartActivity(HistoryInstrumentation.Operations.HistoryGetUserHistory, userID);
+            bool success = false;
 
-            BoundStatement query = _userHistoryQuery.Value.Bind(userID, olderThan, countLimit);
-            query.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
-            query.SetIdempotence(true);
-            List<BackendMessage> messages = await _dataUtility.GetMessages(query, countLimit);
+            try
+            {
+                BoundStatement query = _userHistoryQuery.Value.Bind(userID, olderThan, countLimit);
+                query.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
+                query.SetIdempotence(true);
+                List<BackendMessage> messages = await _dataUtility.GetMessages(query, countLimit);
+                success = true;
 
-            _logger.LogTrace("Returned {0} messages for user {1} older than {2}.", messages.Count, userID, olderThan);
-            return messages;
+                _logger.LogTrace("Returned {0} messages for user {1} older than {2}.", messages.Count, userID, olderThan);
+                return messages;
+            }
+            finally
+            {
+                _activityUtility.Stop(activity, success);
+            }
         }
 
         public async Task<IReadOnlyCollection<BackendMessage>> GetDialogHistory(long userID, long otherUserID, DateTime olderThan, int countLimit)
         {
-            using Activity activity = _dataUtility.StartActivity("Get dialog history", _dataUtility.MessagingSession);
-            activity?.SetTag("user.id", userID);
+            Activity activity = StartActivity(HistoryInstrumentation.Operations.HistoryGetDialogHistory, userID);
+            bool success = false;
 
-            string dialogID = _dataUtility.CreateDialogID(userID, otherUserID);
-            BoundStatement query = _dialogHistoryQuery.Value.Bind(dialogID, olderThan, countLimit);
-            query.SetIdempotence(true);
-            query.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
-            List<BackendMessage> messages = await _dataUtility.GetMessages(query, countLimit);
+            try
+            {
+                string dialogID = _dataUtility.CreateDialogID(userID, otherUserID);
+                BoundStatement query = _dialogHistoryQuery.Value.Bind(dialogID, olderThan, countLimit);
+                query.SetIdempotence(true);
+                query.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
+                List<BackendMessage> messages = await _dataUtility.GetMessages(query, countLimit);
+                success = true;
 
-            _logger.LogTrace("Returned {0} messages between [{1} <-> {2}] older than {3}.", messages.Count, userID, otherUserID, olderThan);
-            return messages;
+                _logger.LogTrace("Returned {0} messages between [{1} <-> {2}] older than {3}.", messages.Count, userID, otherUserID, olderThan);
+                return messages;
+            }
+            finally
+            {
+                _activityUtility.Stop(activity, success);
+            }
+        }
+
+        private Activity StartActivity(string name, long userID)
+        {
+            using Activity activity = _dataUtility.StartActivity(name, _dataUtility.MessagingSession);
+            if (activity != null && activity.IsAllDataRequested)
+            {
+                activity.SetTag(HistoryInstrumentation.Keys.DbOperation, HistoryInstrumentation.Values.DbOperationOneRead);
+                activity.SetTag("user.id", userID);
+            }
+
+            return activity;
         }
     }
 }
