@@ -15,7 +15,7 @@ namespace CecoChat.Kafka.Instrumentation
 
         Activity StartConsumer<TKey, TValue>(ConsumeResult<TKey, TValue> consumeResult, string consumerID);
 
-        void StopConsumer(Activity expectedActivity, bool operationSuccess);
+        void StopConsumer(Activity activity, bool operationSuccess);
     }
 
     internal sealed class KafkaActivityUtility : IKafkaActivityUtility
@@ -79,13 +79,10 @@ namespace CecoChat.Kafka.Instrumentation
             return activity;
         }
 
-        public void StopConsumer(Activity expectedActivity, bool operationSuccess)
+        public void StopConsumer(Activity activity, bool operationSuccess)
         {
-            Activity activity = Activity.Current;
-            if (activity != null && activity == expectedActivity)
-            {
-                _activityUtility.Stop(activity, operationSuccess);
-            }
+            // do not change the Activity.Current
+            _activityUtility.Stop(activity, operationSuccess, relyOnDefaultPolicyOfSettingCurrentActivity: false);
         }
 
         private void InjectTraceData<TKey, TValue>(ActivityContext activityContext, Message<TKey, TValue> message)
