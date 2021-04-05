@@ -21,6 +21,7 @@ namespace CecoChat.History.Server
     public class Startup
     {
         private readonly IJwtOptions _jwtOptions;
+        private readonly IOtelSamplingOptions _otelSamplingOptions;
         private readonly IJaegerOptions _jaegerOptions;
 
         public Startup(IConfiguration configuration)
@@ -30,6 +31,10 @@ namespace CecoChat.History.Server
             JwtOptions jwtOptions = new();
             Configuration.GetSection("Jwt").Bind(jwtOptions);
             _jwtOptions = jwtOptions;
+
+            OtelSamplingOptions otelSamplingOptions = new();
+            Configuration.GetSection("OtelSampling").Bind(otelSamplingOptions);
+            _otelSamplingOptions = otelSamplingOptions;
 
             JaegerOptions jaegerOptions = new();
             Configuration.GetSection("Jaeger").Bind(jaegerOptions);
@@ -43,9 +48,10 @@ namespace CecoChat.History.Server
             // telemetry
             services.AddOpenTelemetryTracing(otel =>
             {
-                otel.AddServiceResource(new OtelServiceResource { Namespace = "CecoChat", Service = "History", Version = "0.1" });
+                otel.AddServiceResource(new OtelServiceResource {Namespace = "CecoChat", Name = "History", Version = "0.1"});
                 otel.AddAspNetCoreInstrumentation(aspnet => aspnet.EnableGrpcAspNetCoreSupport = true);
                 otel.AddHistoryInstrumentation();
+                otel.ConfigureSampling(_otelSamplingOptions);
                 otel.ConfigureJaegerExporter(_jaegerOptions);
             });
 

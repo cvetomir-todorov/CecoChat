@@ -25,19 +25,24 @@ namespace CecoChat.Messaging.Server
     public class Startup
     {
         private readonly IJwtOptions _jwtOptions;
+        private readonly IOtelSamplingOptions _otelSamplingOptions;
         private readonly IJaegerOptions _jaegerOptions;
 
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
 
-            JaegerOptions jaegerOptions = new();
-            Configuration.GetSection("Jaeger").Bind(jaegerOptions);
-            _jaegerOptions = jaegerOptions;
-
             JwtOptions jwtOptions = new();
             Configuration.GetSection("Jwt").Bind(jwtOptions);
             _jwtOptions = jwtOptions;
+
+            OtelSamplingOptions otelSamplingOptions = new();
+            Configuration.GetSection("OtelSampling").Bind(otelSamplingOptions);
+            _otelSamplingOptions = otelSamplingOptions;
+
+            JaegerOptions jaegerOptions = new();
+            Configuration.GetSection("Jaeger").Bind(jaegerOptions);
+            _jaegerOptions = jaegerOptions;
         }
 
         public IConfiguration Configuration { get; }
@@ -47,10 +52,11 @@ namespace CecoChat.Messaging.Server
             // telemetry
             services.AddOpenTelemetryTracing(otel =>
             {
-                otel.AddServiceResource(new OtelServiceResource { Namespace = "CecoChat", Service = "Messaging", Version = "0.1" });
+                otel.AddServiceResource(new OtelServiceResource {Namespace = "CecoChat", Name = "Messaging", Version = "0.1"});
                 otel.AddAspNetCoreInstrumentation(aspnet => aspnet.EnableGrpcAspNetCoreSupport = true);
                 otel.AddKafkaInstrumentation();
                 otel.AddGrpcInstrumentation();
+                otel.ConfigureSampling(_otelSamplingOptions);
                 otel.ConfigureJaegerExporter(_jaegerOptions);
             });
 

@@ -1,15 +1,9 @@
-﻿using OpenTelemetry.Resources;
+﻿using System;
+using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 
 namespace CecoChat.Otel
 {
-    public record OtelServiceResource
-    {
-        public string Namespace { get; init; }
-        public string Service { get; init; }
-        public string Version { get; init; }
-    }
-
     public static class OtelExtensions
     {
         public static TracerProviderBuilder AddServiceResource(this TracerProviderBuilder otel, OtelServiceResource serviceResource)
@@ -17,10 +11,31 @@ namespace CecoChat.Otel
             ResourceBuilder resourceBuilder = ResourceBuilder.CreateDefault()
                 .AddService(
                     serviceNamespace: serviceResource.Namespace,
-                    serviceName: serviceResource.Service,
+                    serviceName: serviceResource.Name,
                     serviceVersion: serviceResource.Version);
 
             return otel.SetResourceBuilder(resourceBuilder);
+        }
+
+        public static TracerProviderBuilder ConfigureSampling(this TracerProviderBuilder otel, IOtelSamplingOptions samplingOptions)
+        {
+            Sampler sampler;
+            switch (samplingOptions.Strategy)
+            {
+                case OtelSamplingStrategy.AlwaysOff:
+                    sampler = new AlwaysOffSampler();
+                    break;
+                case OtelSamplingStrategy.AlwaysOn:
+                    sampler = new AlwaysOnSampler();
+                    break;
+                case OtelSamplingStrategy.Probability:
+                    sampler = new CustomSampler(samplingOptions.Probability);
+                    break;
+                default:
+                    throw new InvalidOperationException($"{typeof(OtelSamplingStrategy)} value {samplingOptions.Strategy} is not valid.");
+            }
+
+            return otel.SetSampler(sampler);
         }
 
         public static TracerProviderBuilder ConfigureJaegerExporter(this TracerProviderBuilder otel, IJaegerOptions options)
