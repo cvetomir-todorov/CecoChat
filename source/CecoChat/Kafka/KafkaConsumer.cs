@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using CecoChat.Kafka.Instrumentation;
-using CecoChat.Tracing;
 using Confluent.Kafka;
 using Microsoft.Extensions.Logging;
 
@@ -28,21 +27,18 @@ namespace CecoChat.Kafka
     public sealed class KafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey, TValue>
     {
         private readonly ILogger _logger;
-        private readonly IActivityUtility _activityUtility;
         private readonly IKafkaActivityUtility _kafkaActivityUtility;
         private PartitionRange _assignedPartitions;
         private IConsumer<TKey, TValue> _consumer;
         private IKafkaConsumerOptions _consumerOptions;
-        private string _activityID;
+        private Activity _activity;
         private string _id;
 
         public KafkaConsumer(
             ILogger<KafkaConsumer<TKey, TValue>> logger,
-            IActivityUtility activityUtility,
             IKafkaActivityUtility kafkaActivityUtility)
         {
             _logger = logger;
-            _activityUtility = activityUtility;
             _kafkaActivityUtility = kafkaActivityUtility;
 
             _assignedPartitions = PartitionRange.Empty;
@@ -116,7 +112,7 @@ namespace CecoChat.Kafka
             {
                 consumeResult = _consumer.Consume(ct);
                 // consume blocks until there is a message and it is read => start activity after that
-                StartActivity(consumeResult);
+                _activity = _kafkaActivityUtility.StartConsumer(consumeResult, _consumerOptions.ConsumerGroupID);
                 success = true;
             }
             catch (AccessViolationException accessViolationException)
@@ -169,26 +165,8 @@ namespace CecoChat.Kafka
                         _id, consumeResult.Topic, consumeResult.Partition, consumeResult.Offset);
                 }
 
-                Activity activity = Activity.Current;
-                if (activity != null && activity.Id == _activityID)
-                {
-                    _activityUtility.Stop(activity, success);
-                }
+                _kafkaActivityUtility.StopConsumer(_activity, success);
             }
-        }
-
-        private void StartActivity(ConsumeResult<TKey, TValue> consumeResult)
-        {
-            Activity activity = KafkaInstrumentation.ActivitySource.StartActivity(KafkaInstrumentation.Operations.Consumption, ActivityKind.Consumer);
-            if (activity == null)
-            {
-                return;
-            }
-
-            _activityID = activity.Id;
-            string displayName = $"{activity.OperationName}/Topic:{consumeResult.Topic} -> Consumer:{_consumerOptions.ConsumerGroupID}";
-            _kafkaActivityUtility.EnrichActivity(consumeResult.Topic, consumeResult.Partition, displayName, activity);
-            _kafkaActivityUtility.ExtractTraceData(consumeResult.Message, activity);
         }
 
         private void EnsureInitialized()

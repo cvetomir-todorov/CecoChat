@@ -5,7 +5,6 @@ using Cassandra;
 using CecoChat.Contracts;
 using CecoChat.Contracts.Backend;
 using CecoChat.Data.History.Instrumentation;
-using CecoChat.Tracing;
 using Microsoft.Extensions.Logging;
 
 namespace CecoChat.Data.History
@@ -20,7 +19,7 @@ namespace CecoChat.Data.History
     public sealed class NewMessageRepository : INewMessageRepository
     {
         private readonly ILogger _logger;
-        private readonly IActivityUtility _activityUtility;
+        private readonly IHistoryActivityUtility _historyActivityUtility;
         private readonly IDataUtility _dataUtility;
         private readonly IBackendDbMapper _mapper;
         private readonly Lazy<PreparedStatement> _messagesForUserQuery;
@@ -28,12 +27,12 @@ namespace CecoChat.Data.History
 
         public NewMessageRepository(
             ILogger<NewMessageRepository> logger,
-            IActivityUtility activityUtility,
+            IHistoryActivityUtility historyActivityUtility,
             IDataUtility dataUtility,
             IBackendDbMapper mapper)
         {
             _logger = logger;
-            _activityUtility = activityUtility;
+            _historyActivityUtility = historyActivityUtility;
             _dataUtility = dataUtility;
             _mapper = mapper;
 
@@ -61,7 +60,7 @@ namespace CecoChat.Data.History
 
         public void AddNewDialogMessage(BackendMessage message)
         {
-            Activity activity = StartActivity(message, _dataUtility.MessagingSession);
+            Activity activity = _historyActivityUtility.StartNewDialogMessage(_dataUtility.MessagingSession, message.MessageId.ToGuid());
             bool success = false;
 
             try
@@ -73,20 +72,8 @@ namespace CecoChat.Data.History
             }
             finally
             {
-                _activityUtility.Stop(activity, success);
+                _historyActivityUtility.Stop(activity, success);
             }
-        }
-
-        private Activity StartActivity(BackendMessage message, ISession session)
-        {
-            Activity activity = _dataUtility.StartActivity(HistoryInstrumentation.Operations.HistoryNewDialogMessage, session);
-            if (activity != null && activity.IsAllDataRequested)
-            {
-                activity.SetTag(HistoryInstrumentation.Keys.DbOperation, HistoryInstrumentation.Values.DbOperationBatchWrite);
-                activity.SetTag("message.id", message.MessageId.ToGuid());
-            }
-
-            return activity;
         }
 
         private BatchStatement CreateInsertBatch(BackendMessage message)

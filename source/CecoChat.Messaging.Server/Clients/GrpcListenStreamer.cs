@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using CecoChat.Contracts.Client;
 using CecoChat.Grpc.Instrumentation;
-using CecoChat.Tracing;
 using Grpc.Core;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -25,7 +24,6 @@ namespace CecoChat.Messaging.Server.Clients
     public sealed class GrpcListenStreamer : IGrpcListenStreamer
     {
         private readonly ILogger _logger;
-        private readonly IActivityUtility _activityUtility;
         private readonly IGrpcActivityUtility _grpcActivityUtility;
         private readonly BlockingCollection<MessageContext> _messageQueue;
         private readonly SemaphoreSlim _signalProcessing;
@@ -36,12 +34,10 @@ namespace CecoChat.Messaging.Server.Clients
 
         public GrpcListenStreamer(
             ILogger<GrpcListenStreamer> logger,
-            IActivityUtility activityUtility,
             IGrpcActivityUtility grpcActivityUtility,
             IOptions<ClientOptions> options)
         {
             _logger = logger;
-            _activityUtility = activityUtility;
             _grpcActivityUtility = grpcActivityUtility;
 
             _messageQueue = new(
@@ -72,7 +68,7 @@ namespace CecoChat.Messaging.Server.Clients
 
         public bool EnqueueMessage(ListenResponse message, Activity parentActivity = null)
         {
-            bool isAdded = _messageQueue.TryAdd(new MessageContext()
+            bool isAdded = _messageQueue.TryAdd(new MessageContext
             {
                 Message = message,
                 ParentActivity = parentActivity
@@ -139,7 +135,7 @@ namespace CecoChat.Messaging.Server.Clients
                 }
                 finally
                 {
-                    _activityUtility.Stop(activity, success);
+                    _grpcActivityUtility.Stop(activity, success);
                 }
             }
 
@@ -148,15 +144,11 @@ namespace CecoChat.Messaging.Server.Clients
 
         private Activity StartActivity(Activity parentActivity)
         {
-            Activity activity = null;
-            if (parentActivity != null && _grpcActivityUtility.ActivitySource.HasListeners())
-            {
-                string name = $"{nameof(GrpcListenService)}.{nameof(GrpcListenService.Listen)}/Clients.PushMessage";
-                activity = _grpcActivityUtility.ActivitySource.StartActivity(name, ActivityKind.Producer, parentActivity.Context);
-            }
+            const string service = nameof(GrpcListenService);
+            const string method = nameof(GrpcListenService.Listen);
+            string name = $"{service}.{method}/Clients.PushMessage";
 
-            _grpcActivityUtility.EnrichActivity(nameof(GrpcListenService), nameof(GrpcListenService.Listen), activity);
-            return activity;
+            return _grpcActivityUtility.StartServiceMethod(name, service, method, parentActivity.Context);
         }
 
         private record MessageContext
