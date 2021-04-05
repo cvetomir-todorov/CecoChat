@@ -1,6 +1,8 @@
 using CecoChat.Contracts.Backend;
 using CecoChat.Contracts.Client;
 using CecoChat.Data.Configuration;
+using CecoChat.Grpc;
+using CecoChat.Grpc.Instrumentation;
 using CecoChat.Jwt;
 using CecoChat.Kafka;
 using CecoChat.Kafka.Instrumentation;
@@ -49,6 +51,7 @@ namespace CecoChat.Messaging.Server
                 otel.AddServiceResource(new OtelServiceResource { Namespace = "CecoChat", Service = "Messaging", Version = "0.1" });
                 otel.AddAspNetCoreInstrumentation(aspnet => aspnet.EnableGrpcAspNetCoreSupport = true);
                 otel.AddKafkaInstrumentation();
+                otel.AddGrpcInstrumentation();
                 otel.ConfigureJaegerExporter(_jaegerOptions);
             });
 
@@ -59,6 +62,7 @@ namespace CecoChat.Messaging.Server
 
             // clients
             services.AddGrpc();
+            services.AddGrpcCustomUtilies();
             services.AddSingleton<IClientContainer, ClientContainer>();
             services.AddFactory<IGrpcStreamer<ListenResponse>, GrpcStreamer<ListenResponse>>();
             services.Configure<ClientOptions>(Configuration.GetSection("Clients"));
