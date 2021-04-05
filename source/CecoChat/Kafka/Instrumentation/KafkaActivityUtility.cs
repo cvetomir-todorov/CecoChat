@@ -85,7 +85,7 @@ namespace CecoChat.Kafka.Instrumentation
             _activityUtility.Stop(activity, operationSuccess, relyOnDefaultPolicyOfSettingCurrentActivity: false);
         }
 
-        private void InjectTraceData<TKey, TValue>(ActivityContext activityContext, Message<TKey, TValue> message)
+        private static void InjectTraceData<TKey, TValue>(ActivityContext activityContext, Message<TKey, TValue> message)
         {
             byte[] traceIdBytes = new byte[16];
             activityContext.TraceId.CopyTo(traceIdBytes);
@@ -105,7 +105,7 @@ namespace CecoChat.Kafka.Instrumentation
             }
         }
 
-        private bool TryExtractTraceData<TKey, TValue>(ConsumeResult<TKey, TValue> consumeResult, out ActivityContext activityContext)
+        private static bool TryExtractTraceData<TKey, TValue>(ConsumeResult<TKey, TValue> consumeResult, out ActivityContext activityContext)
         {
             if (consumeResult.Message.Headers == null)
             {
@@ -137,7 +137,7 @@ namespace CecoChat.Kafka.Instrumentation
             }
         }
 
-        private void EnrichActivity(string topic, int? partition, string displayName, Activity activity)
+        private static void EnrichActivity(string topic, int? partition, string displayName, Activity activity)
         {
             if (activity.IsAllDataRequested)
             {

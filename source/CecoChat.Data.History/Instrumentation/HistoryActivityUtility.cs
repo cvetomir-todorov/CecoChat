@@ -64,7 +64,7 @@ namespace CecoChat.Data.History.Instrumentation
             _activityUtility.Stop(activity, operationSuccess);
         }
 
-        private void Enrich(ISession session, Activity activity)
+        private static void Enrich(ISession session, Activity activity)
         {
             activity.SetTag(HistoryInstrumentation.Keys.DbSystem, HistoryInstrumentation.Values.DbSystemCassandra);
             activity.SetTag(HistoryInstrumentation.Keys.DbName, session.Keyspace);
