@@ -33,6 +33,17 @@ namespace CecoChat.Profile.Server
 
         public void ConfigureServices(IServiceCollection services)
         {
+            // telemetry
+            services.AddOpenTelemetryTracing(otel =>
+            {
+                otel.AddServiceResource(new OtelServiceResource {Namespace = "CecoChat", Service = "Profile", Version = "0.1"});
+                otel.AddAspNetCoreInstrumentation(aspnet => aspnet.EnableGrpcAspNetCoreSupport = true);
+                otel.ConfigureJaegerExporter(_jaegerOptions);
+            });
+
+            // security
+            services.Configure<JwtOptions>(Configuration.GetSection("Jwt"));
+
             // web
             services
                 .AddControllers()
@@ -42,17 +53,6 @@ namespace CecoChat.Profile.Server
                     fluentValidation.RegisterValidatorsFromAssemblyContaining<Startup>();
                 });
             services.AddSwaggerServices(_swaggerOptions);
-
-            // telemetry
-            services.AddOpenTelemetryTracing(otel =>
-            {
-                otel.AddServiceResource(new OtelServiceResource {Namespace = "CecoChat", Service = "Profile", Version = "0.1"});
-                otel.AddAspNetCoreInstrumentation(aspnet => aspnet.EnableGrpcAspNetCoreSupport = true);
-                otel.ConfigureJaegerExporter(_jaegerOptions);
-            });
-
-            // session
-            services.Configure<JwtOptions>(Configuration.GetSection("Jwt"));
 
             // shared
             services.AddSingleton<IClock, MonotonicClock>();
