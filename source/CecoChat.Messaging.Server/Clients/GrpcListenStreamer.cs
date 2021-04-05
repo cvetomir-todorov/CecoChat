@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using CecoChat.Contracts.Client;
 using CecoChat.Grpc.Instrumentation;
 using CecoChat.Tracing;
 using Grpc.Core;
@@ -11,15 +12,17 @@ using Microsoft.Extensions.Options;
 
 namespace CecoChat.Messaging.Server.Clients
 {
-    public interface IGrpcStreamer<TMessage> : IStreamer<TMessage>
+    public interface IGrpcListenStreamer : IStreamer<ListenResponse>
     {
-        void Initialize(Guid clientID, IServerStreamWriter<TMessage> streamWriter);
+        void Initialize(Guid clientID, IServerStreamWriter<ListenResponse> streamWriter);
+
+        void SetFinalMessagePredicate(Func<ListenResponse, bool> finalMessagePredicate);
     }
 
     /// <summary>
-    /// Streams <typeparam name="TMessage"/> instances to a connected client.
+    /// Streams <see cref="ListenResponse"/> instances to a connected client.
     /// </summary>
-    public sealed class GrpcStreamer<TMessage> : IGrpcStreamer<TMessage>
+    public sealed class GrpcListenStreamer : IGrpcListenStreamer
     {
         private readonly ILogger _logger;
         private readonly IActivityUtility _activityUtility;
@@ -27,12 +30,12 @@ namespace CecoChat.Messaging.Server.Clients
         private readonly BlockingCollection<MessageContext> _messageQueue;
         private readonly SemaphoreSlim _signalProcessing;
 
-        private Func<TMessage, bool> _finalMessagePredicate;
-        private IServerStreamWriter<TMessage> _streamWriter;
+        private Func<ListenResponse, bool> _finalMessagePredicate;
+        private IServerStreamWriter<ListenResponse> _streamWriter;
         private Guid _clientID;
 
-        public GrpcStreamer(
-            ILogger<GrpcStreamer<TMessage>> logger,
+        public GrpcListenStreamer(
+            ILogger<GrpcListenStreamer> logger,
             IActivityUtility activityUtility,
             IGrpcActivityUtility grpcActivityUtility,
             IOptions<ClientOptions> options)
@@ -48,20 +51,26 @@ namespace CecoChat.Messaging.Server.Clients
             _finalMessagePredicate = _ => false;
         }
 
-        public void Initialize(Guid clientID, IServerStreamWriter<TMessage> streamWriter)
+        public void Dispose()
+        {
+            _signalProcessing.Dispose();
+            _messageQueue.Dispose();
+        }
+
+        public void Initialize(Guid clientID, IServerStreamWriter<ListenResponse> streamWriter)
         {
             _clientID = clientID;
             _streamWriter = streamWriter;
         }
 
-        public void Dispose()
+        public void SetFinalMessagePredicate(Func<ListenResponse, bool> finalMessagePredicate)
         {
-            _signalProcessing.Dispose();
+            _finalMessagePredicate = finalMessagePredicate;
         }
 
         public Guid ClientID => _clientID;
 
-        public bool EnqueueMessage(TMessage message, Activity parentActivity = null)
+        public bool EnqueueMessage(ListenResponse message, Activity parentActivity = null)
         {
             bool isAdded = _messageQueue.TryAdd(new MessageContext()
             {
@@ -93,11 +102,6 @@ namespace CecoChat.Messaging.Server.Clients
                     break;
                 }
             }
-        }
-
-        public void SetFinalMessagePredicate(Func<TMessage, bool> finalMessagePredicate)
-        {
-            _finalMessagePredicate = finalMessagePredicate;
         }
 
         private struct EmptyQueueResult
@@ -142,7 +146,6 @@ namespace CecoChat.Messaging.Server.Clients
             return new EmptyQueueResult {Stop = processedFinalMessage};
         }
 
-        // TODO: figure out how to make these generic or rename the class to something that reflects it
         private Activity StartActivity(Activity parentActivity)
         {
             Activity activity = null;
@@ -158,7 +161,7 @@ namespace CecoChat.Messaging.Server.Clients
 
         private record MessageContext
         {
-            public TMessage Message { get; init; }
+            public ListenResponse Message { get; init; }
 
             public Activity ParentActivity { get; init; }
         }

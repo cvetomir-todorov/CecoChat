@@ -13,12 +13,12 @@ namespace CecoChat.Messaging.Server.Clients
     {
         private readonly ILogger _logger;
         private readonly IClientContainer _clientContainer;
-        private readonly IFactory<IGrpcStreamer<ListenResponse>> _streamerFactory;
+        private readonly IFactory<IGrpcListenStreamer> _streamerFactory;
 
         public GrpcListenService(
             ILogger<GrpcListenService> logger,
             IClientContainer clientContainer,
-            IFactory<IGrpcStreamer<ListenResponse>> streamerFactory)
+            IFactory<IGrpcListenStreamer> streamerFactory)
         {
             _logger = logger;
             _clientContainer = clientContainer;
@@ -37,13 +37,13 @@ namespace CecoChat.Messaging.Server.Clients
 
             _logger.LogTrace("{0} from {1} connected.", userClaims, address);
 
-            IGrpcStreamer<ListenResponse> streamer = _streamerFactory.Create();
+            IGrpcListenStreamer streamer = _streamerFactory.Create();
             streamer.SetFinalMessagePredicate(IsFinalMessage);
             streamer.Initialize(userClaims.ClientID, responseStream);
             await ProcessMessages(streamer, userClaims, address, context.CancellationToken);
         }
 
-        private async Task ProcessMessages(IGrpcStreamer<ListenResponse> streamer, UserClaims userClaims, string address, CancellationToken ct)
+        private async Task ProcessMessages(IGrpcListenStreamer streamer, UserClaims userClaims, string address, CancellationToken ct)
         {
             bool isClientAdded = false;
 
@@ -81,7 +81,7 @@ namespace CecoChat.Messaging.Server.Clients
             }
         }
 
-        private void RemoveClient(UserClaims userClaims, string address, IGrpcStreamer<ListenResponse> streamer)
+        private void RemoveClient(UserClaims userClaims, string address, IGrpcListenStreamer streamer)
         {
             _clientContainer.RemoveClient(userClaims.UserID, streamer);
             _logger.LogTrace("{0} from {1} disconnected.", userClaims, address);

@@ -1,5 +1,4 @@
 using CecoChat.Contracts.Backend;
-using CecoChat.Contracts.Client;
 using CecoChat.Data.Configuration;
 using CecoChat.Grpc;
 using CecoChat.Grpc.Instrumentation;
@@ -64,7 +63,7 @@ namespace CecoChat.Messaging.Server
             services.AddGrpc();
             services.AddGrpcCustomUtilies();
             services.AddSingleton<IClientContainer, ClientContainer>();
-            services.AddFactory<IGrpcStreamer<ListenResponse>, GrpcStreamer<ListenResponse>>();
+            services.AddFactory<IGrpcListenStreamer, GrpcListenStreamer>();
             services.Configure<ClientOptions>(Configuration.GetSection("Clients"));
 
             // security
