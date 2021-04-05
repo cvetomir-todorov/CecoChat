@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading;
 using CecoChat.Contracts;
 using CecoChat.Contracts.Backend;
@@ -105,7 +106,7 @@ namespace CecoChat.Messaging.Server.Backend
             {
                 if (client.ClientID != senderClientID)
                 {
-                    if (client.EnqueueMessage(response))
+                    if (client.EnqueueMessage(response, parentActivity: Activity.Current))
                     {
                         successCount++;
                     }

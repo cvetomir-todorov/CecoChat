@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using CecoChat.Grpc.Instrumentation;
+using CecoChat.Tracing;
 using Grpc.Core;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -19,7 +22,9 @@ namespace CecoChat.Messaging.Server.Clients
     public sealed class GrpcStreamer<TMessage> : IGrpcStreamer<TMessage>
     {
         private readonly ILogger _logger;
-        private readonly BlockingCollection<TMessage> _messageQueue;
+        private readonly IActivityUtility _activityUtility;
+        private readonly IGrpcActivityUtility _grpcActivityUtility;
+        private readonly BlockingCollection<MessageContext> _messageQueue;
         private readonly SemaphoreSlim _signalProcessing;
 
         private Func<TMessage, bool> _finalMessagePredicate;
@@ -28,11 +33,16 @@ namespace CecoChat.Messaging.Server.Clients
 
         public GrpcStreamer(
             ILogger<GrpcStreamer<TMessage>> logger,
+            IActivityUtility activityUtility,
+            IGrpcActivityUtility grpcActivityUtility,
             IOptions<ClientOptions> options)
         {
             _logger = logger;
-            _messageQueue = new BlockingCollection<TMessage>(
-                collection: new ConcurrentQueue<TMessage>(),
+            _activityUtility = activityUtility;
+            _grpcActivityUtility = grpcActivityUtility;
+
+            _messageQueue = new(
+                collection: new ConcurrentQueue<MessageContext>(),
                 boundedCapacity: options.Value.SendMessagesHighWatermark);
             _signalProcessing = new SemaphoreSlim(initialCount: 0, maxCount: 1);
             _finalMessagePredicate = _ => false;
@@ -51,16 +61,21 @@ namespace CecoChat.Messaging.Server.Clients
 
         public Guid ClientID => _clientID;
 
-        public bool EnqueueMessage(TMessage message)
+        public bool EnqueueMessage(TMessage message, Activity parentActivity = null)
         {
-            bool isAdded = _messageQueue.TryAdd(message);
+            bool isAdded = _messageQueue.TryAdd(new MessageContext()
+            {
+                Message = message,
+                ParentActivity = parentActivity
+            });
+
             if (isAdded)
             {
                 _signalProcessing.Release();
             }
             else
             {
-                _logger.LogTrace("Dropped message {0} since queue is full.", message);
+                _logger.LogWarning("Dropped message {0} since queue for {1} is full.", message, ClientID);
             }
 
             return isAdded;
@@ -94,13 +109,17 @@ namespace CecoChat.Messaging.Server.Clients
         {
             bool processedFinalMessage = false;
 
-            while (!ct.IsCancellationRequested && _messageQueue.TryTake(out TMessage message))
+            while (!ct.IsCancellationRequested && _messageQueue.TryTake(out MessageContext messageContext))
             {
+                Activity activity = StartActivity(messageContext.ParentActivity);
+                bool success = false;
+
                 try
                 {
-                    processedFinalMessage = _finalMessagePredicate(message);
-                    await _streamWriter.WriteAsync(message);
-                    _logger.LogTrace("Sent {0} message {1}", _clientID, message);
+                    processedFinalMessage = _finalMessagePredicate(messageContext.Message);
+                    await _streamWriter.WriteAsync(messageContext.Message);
+                    success = true;
+                    _logger.LogTrace("Sent {0} message {1}", _clientID, messageContext.Message);
                 }
                 catch (InvalidOperationException invalidOperationException)
                     when (invalidOperationException.Message == "Can't write the message because the request is complete.")
@@ -111,12 +130,37 @@ namespace CecoChat.Messaging.Server.Clients
                 }
                 catch (Exception exception)
                 {
-                    _logger.LogError(exception, "Failed to send {0} message {1}", _clientID, message);
+                    _logger.LogError(exception, "Failed to send {0} message {1}", _clientID, messageContext.Message);
                     return new EmptyQueueResult {Stop = true};
+                }
+                finally
+                {
+                    _activityUtility.Stop(activity, success);
                 }
             }
 
             return new EmptyQueueResult {Stop = processedFinalMessage};
+        }
+
+        // TODO: figure out how to make these generic or rename the class to something that reflects it
+        private Activity StartActivity(Activity parentActivity)
+        {
+            Activity activity = null;
+            if (parentActivity != null && _grpcActivityUtility.ActivitySource.HasListeners())
+            {
+                string name = $"{nameof(GrpcListenService)}.{nameof(GrpcListenService.Listen)}/Clients.PushMessage";
+                activity = _grpcActivityUtility.ActivitySource.StartActivity(name, ActivityKind.Producer, parentActivity.Context);
+            }
+
+            _grpcActivityUtility.EnrichActivity(nameof(GrpcListenService), nameof(GrpcListenService.Listen), activity);
+            return activity;
+        }
+
+        private record MessageContext
+        {
+            public TMessage Message { get; init; }
+
+            public Activity ParentActivity { get; init; }
         }
     }
 }
