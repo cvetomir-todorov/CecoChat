@@ -18,11 +18,16 @@ namespace CecoChat.Materialize.Server
 {
     public class Startup
     {
+        private readonly IOtelSamplingOptions _otelSamplingOptions;
         private readonly IJaegerOptions _jaegerOptions;
 
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+
+            OtelSamplingOptions otelSamplingOptions = new();
+            Configuration.GetSection("OtelSampling").Bind(otelSamplingOptions);
+            _otelSamplingOptions = otelSamplingOptions;
 
             JaegerOptions jaegerOptions = new();
             Configuration.GetSection("Jaeger").Bind(jaegerOptions);
@@ -36,11 +41,11 @@ namespace CecoChat.Materialize.Server
             // telemetry
             services.AddOpenTelemetryTracing(otel =>
             {
-                otel.AddServiceResource(new OtelServiceResource {Namespace = "CecoChat", Service = "Materialize", Version = "0.1"});
+                otel.AddServiceResource(new OtelServiceResource {Namespace = "CecoChat", Name = "Materialize", Version = "0.1"});
                 otel.AddKafkaInstrumentation();
                 otel.AddHistoryInstrumentation();
+                otel.ConfigureSampling(_otelSamplingOptions);
                 otel.ConfigureJaegerExporter(_jaegerOptions);
-                // TODO: set different samplers for debug and production
             });
 
             // ordered hosted services
