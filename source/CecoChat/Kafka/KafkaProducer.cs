@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.Threading;
 using CecoChat.Kafka.Instrumentation;
-using CecoChat.Tracing;
 using Confluent.Kafka;
 using Microsoft.Extensions.Logging;
 
@@ -22,7 +21,6 @@ namespace CecoChat.Kafka
     public sealed class KafkaProducer<TKey, TValue> : IKafkaProducer<TKey, TValue>
     {
         private readonly ILogger _logger;
-        private readonly IActivityUtility _activityUtility;
         private readonly IKafkaActivityUtility _kafkaActivityUtility;
         private IProducer<TKey, TValue> _producer;
         private IKafkaProducerOptions _producerOptions;
@@ -30,11 +28,9 @@ namespace CecoChat.Kafka
 
         public KafkaProducer(
             ILogger<KafkaProducer<TKey, TValue>> logger,
-            IActivityUtility activityUtility,
             IKafkaActivityUtility kafkaActivityUtility)
         {
             _logger = logger;
-            _activityUtility = activityUtility;
             _kafkaActivityUtility = kafkaActivityUtility;
         }
 
@@ -68,14 +64,16 @@ namespace CecoChat.Kafka
 
         public void Produce(Message<TKey, TValue> message, TopicPartition topicPartition)
         {
-            Activity activity = StartActivity(message, topicPartition.Topic, topicPartition.Partition);
+            Activity activity = _kafkaActivityUtility.StartProducer(
+                message, _producerOptions.IDContext, topicPartition.Topic, topicPartition.Partition);
             _producer.Produce(topicPartition, message, deliveryReport => DeliveryHandler(deliveryReport, activity));
             _logger.LogTrace("Producer {0} produced message {1} in {2}{3}.", _id, message.Value, topicPartition.Topic, topicPartition.Partition);
         }
 
         public void Produce(Message<TKey, TValue> message, string topic)
         {
-            Activity activity = StartActivity(message, topic);
+            Activity activity = _kafkaActivityUtility.StartProducer(
+                message, _producerOptions.IDContext, topic);
             _producer.Produce(topic, message, deliveryReport => DeliveryHandler(deliveryReport, activity));
             _logger.LogTrace("Producer {0} produced message {1} in {2}.", _id, message.Value, topic);
         }
@@ -97,25 +95,6 @@ namespace CecoChat.Kafka
             {
                 _logger.LogError(exception, "Producer {0} flushing pending messages failed.", _id);
             }
-        }
-
-        private Activity StartActivity(Message<TKey, TValue> message, string topic, int? partition = null)
-        {
-            Activity activity = KafkaInstrumentation.ActivitySource.StartActivity(KafkaInstrumentation.Operations.Production, ActivityKind.Producer);
-            if (activity == null)
-            {
-                return null;
-            }
-
-            // activity will be completed in the delivery handler thread and we don't want to pollute the execution context
-            // so we set the current activity to the previous one
-            Activity.Current = activity.Parent;
-
-            string displayName = $"{activity.OperationName}/Producer:{_producerOptions.IDContext} -> Topic:{topic}";
-            _kafkaActivityUtility.EnrichActivity(topic, partition, displayName, activity);
-            _kafkaActivityUtility.InjectTraceData(activity, message);
-
-            return activity;
         }
 
         private void DeliveryHandler(DeliveryReport<TKey, TValue> report, Activity activity)
@@ -144,8 +123,7 @@ namespace CecoChat.Kafka
             }
             finally
             {
-                // do not change the Activity.Current
-                _activityUtility.Stop(activity, success, relyOnDefaultPolicyOfSettingCurrentActivity: false);
+                _kafkaActivityUtility.StopProducer(activity, success);
             }
         }
     }

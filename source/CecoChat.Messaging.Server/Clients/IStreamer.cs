@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace CecoChat.Messaging.Server.Clients
 {
-    public interface IStreamer<TMessage> : IDisposable
+    public interface IStreamer<in TMessage> : IDisposable
     {
         Guid ClientID { get; }
 

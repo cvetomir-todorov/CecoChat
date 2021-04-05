@@ -76,6 +76,7 @@ namespace CecoChat.History.Server
             services.AddSingleton<ICecoChatDbInitializer, CecoChatDbInitializer>();
             services.AddSingleton<IHistoryRepository, HistoryRepository>();
             services.AddSingleton<IDataUtility, DataUtility>();
+            services.AddSingleton<IHistoryActivityUtility, HistoryActivityUtility>();
             services.AddSingleton<IBackendDbMapper, BackendDbMapper>();
 
             // shared

@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Cassandra;
 using CecoChat.Contracts.Backend;
 using CecoChat.Data.History.Instrumentation;
-using CecoChat.Tracing;
 using Microsoft.Extensions.Logging;
 
 namespace CecoChat.Data.History
@@ -22,18 +21,18 @@ namespace CecoChat.Data.History
     public sealed class HistoryRepository : IHistoryRepository
     {
         private readonly ILogger _logger;
-        private readonly IActivityUtility _activityUtility;
+        private readonly IHistoryActivityUtility _historyActivityUtility;
         private readonly IDataUtility _dataUtility;
         private readonly Lazy<PreparedStatement> _userHistoryQuery;
         private readonly Lazy<PreparedStatement> _dialogHistoryQuery;
 
         public HistoryRepository(
             ILogger<NewMessageRepository> logger,
-            IActivityUtility activityUtility,
+            IHistoryActivityUtility historyActivityUtility,
             IDataUtility dataUtility)
         {
             _logger = logger;
-            _activityUtility = activityUtility;
+            _historyActivityUtility = historyActivityUtility;
             _dataUtility = dataUtility;
 
             _userHistoryQuery = new Lazy<PreparedStatement>(() => _dataUtility.PrepareQuery(SelectMessagesForUser));
@@ -58,7 +57,10 @@ namespace CecoChat.Data.History
 
         public async Task<IReadOnlyCollection<BackendMessage>> GetUserHistory(long userID, DateTime olderThan, int countLimit)
         {
-            Activity activity = StartActivity(HistoryInstrumentation.Operations.HistoryGetUserHistory, userID);
+            Activity activity = _historyActivityUtility.StartGetHistory(
+                HistoryInstrumentation.Operations.HistoryGetUserHistory,
+                _dataUtility.MessagingSession,
+                userID);
             bool success = false;
 
             try
@@ -74,13 +76,16 @@ namespace CecoChat.Data.History
             }
             finally
             {
-                _activityUtility.Stop(activity, success);
+                _historyActivityUtility.Stop(activity, success);
             }
         }
 
         public async Task<IReadOnlyCollection<BackendMessage>> GetDialogHistory(long userID, long otherUserID, DateTime olderThan, int countLimit)
         {
-            Activity activity = StartActivity(HistoryInstrumentation.Operations.HistoryGetDialogHistory, userID);
+            Activity activity = _historyActivityUtility.StartGetHistory(
+                HistoryInstrumentation.Operations.HistoryGetDialogHistory,
+                _dataUtility.MessagingSession,
+                userID);
             bool success = false;
 
             try
@@ -97,20 +102,8 @@ namespace CecoChat.Data.History
             }
             finally
             {
-                _activityUtility.Stop(activity, success);
+                _historyActivityUtility.Stop(activity, success);
             }
-        }
-
-        private Activity StartActivity(string name, long userID)
-        {
-            Activity activity = _dataUtility.StartActivity(name, _dataUtility.MessagingSession);
-            if (activity != null && activity.IsAllDataRequested)
-            {
-                activity.SetTag(HistoryInstrumentation.Keys.DbOperation, HistoryInstrumentation.Values.DbOperationOneRead);
-                activity.SetTag("user.id", userID);
-            }
-
-            return activity;
         }
     }
 }

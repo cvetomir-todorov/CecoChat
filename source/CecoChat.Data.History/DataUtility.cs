@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using Cassandra;
 using CecoChat.Contracts;
 using CecoChat.Contracts.Backend;
-using CecoChat.Data.History.Instrumentation;
 using Google.Protobuf.WellKnownTypes;
 using Microsoft.Extensions.Logging;
 
@@ -20,8 +18,6 @@ namespace CecoChat.Data.History
         Task<List<BackendMessage>> GetMessages(IStatement query, int countHint);
 
         string CreateDialogID(long userID1, long userID2);
-
-        Activity StartActivity(string name, ISession session);
     }
 
     public sealed class DataUtility : IDataUtility
@@ -79,24 +75,6 @@ namespace CecoChat.Data.History
             long max = Math.Max(userID1, userID2);
 
             return $"{min}-{max}";
-        }
-
-        public Activity StartActivity(string name, ISession session)
-        {
-            Activity activity = HistoryInstrumentation.ActivitySource.StartActivity(name, ActivityKind.Client);
-            if (activity == null)
-            {
-                return null;
-            }
-
-            if (activity.IsAllDataRequested)
-            {
-                activity.SetTag(HistoryInstrumentation.Keys.DbSystem, HistoryInstrumentation.Values.DbSystemCassandra);
-                activity.SetTag(HistoryInstrumentation.Keys.DbName, session.Keyspace);
-                activity.SetTag(HistoryInstrumentation.Keys.DbSessionName, session.SessionName);
-            }
-
-            return activity;
         }
     }
 }
