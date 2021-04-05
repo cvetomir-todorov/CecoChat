@@ -38,9 +38,9 @@ namespace CecoChat.Tracing
             return activity;
         }
 
-        private Action<Activity, ActivityKind> SetKindProperty => CreateActivityKindSetter();
+        private static Action<Activity, ActivityKind> SetKindProperty => CreateActivityKindSetter();
 
-        private Action<Activity, ActivitySource> SetSourceProperty => CreateActivitySourceSetter();
+        private static Action<Activity, ActivitySource> SetSourceProperty => CreateActivitySourceSetter();
 
         private static Action<Activity, ActivitySource> CreateActivitySourceSetter()
         {
