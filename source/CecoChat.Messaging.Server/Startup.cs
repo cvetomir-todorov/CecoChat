@@ -59,16 +59,19 @@ namespace CecoChat.Messaging.Server
             services.AddHostedService<BackendHostedService>();
             services.AddHostedService<PartitionsChangedHostedService>();
 
+            // security
+            services.AddJwtAuthentication(_jwtOptions);
+            services.AddAuthorization();
+
+            // configuration
+            services.AddConfiguration(Configuration.GetSection("ConfigurationDB"), addPartitioning: true);
+
             // clients
             services.AddGrpc();
             services.AddGrpcCustomUtilies();
             services.AddSingleton<IClientContainer, ClientContainer>();
             services.AddFactory<IGrpcListenStreamer, GrpcListenStreamer>();
             services.Configure<ClientOptions>(Configuration.GetSection("Clients"));
-
-            // security
-            services.AddJwtAuthentication(_jwtOptions);
-            services.AddAuthorization();
 
             // backend
             services.AddPartitionUtility();
@@ -81,9 +84,6 @@ namespace CecoChat.Messaging.Server
             services.AddFactory<IKafkaConsumer<Null, BackendMessage>, KafkaConsumer<Null, BackendMessage>>();
             services.AddKafka();
             services.Configure<BackendOptions>(Configuration.GetSection("Backend"));
-
-            // configuration
-            services.AddConfiguration(Configuration.GetSection("ConfigurationDB"), addPartitioning: true);
 
             // shared
             services.AddSingleton<IClock, MonotonicClock>();

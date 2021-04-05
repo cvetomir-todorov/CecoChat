@@ -42,8 +42,22 @@ namespace CecoChat.Connect.Server
 
         public void ConfigureServices(IServiceCollection services)
         {
+            // telemetry
+            services.AddOpenTelemetryTracing(otel =>
+            {
+                otel.AddServiceResource(new OtelServiceResource {Namespace = "CecoChat", Service = "Connect", Version = "0.1"});
+                otel.AddAspNetCoreInstrumentation(aspnet => aspnet.EnableGrpcAspNetCoreSupport = true);
+                otel.ConfigureJaegerExporter(_jaegerOptions);
+            });
+
             // ordered hosted services
             services.AddHostedService<ConfigurationHostedService>();
+
+            // security
+            services.AddJwtAuthentication(_jwtOptions);
+
+            // configuration
+            services.AddConfiguration(Configuration.GetSection("ConfigurationDB"), addHistory: true, addPartitioning: true);
 
             // web
             services
@@ -54,20 +68,6 @@ namespace CecoChat.Connect.Server
                     fluentValidation.RegisterValidatorsFromAssemblyContaining<Startup>();
                 });
             services.AddSwaggerServices(_swaggerOptions);
-
-            // telemetry
-            services.AddOpenTelemetryTracing(otel =>
-            {
-                otel.AddServiceResource(new OtelServiceResource {Namespace = "CecoChat", Service = "Connect", Version = "0.1"});
-                otel.AddAspNetCoreInstrumentation(aspnet => aspnet.EnableGrpcAspNetCoreSupport = true);
-                otel.ConfigureJaegerExporter(_jaegerOptions);
-            });
-
-            // security
-            services.AddJwtAuthentication(_jwtOptions);
-
-            // configuration
-            services.AddConfiguration(Configuration.GetSection("ConfigurationDB"), addHistory: true, addPartitioning: true);
 
             // backend
             services.AddPartitionUtility();

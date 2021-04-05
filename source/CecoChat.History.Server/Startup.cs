@@ -54,13 +54,16 @@ namespace CecoChat.History.Server
             services.AddHostedService<InitializeDbHostedService>();
             services.AddHostedService<PrepareQueriesHostedService>();
 
-            // clients
-            services.AddGrpc();
-            services.Configure<ClientOptions>(Configuration.GetSection("Clients"));
-
             // security
             services.AddJwtAuthentication(_jwtOptions);
             services.AddAuthorization();
+
+            // configuration
+            services.AddConfiguration(Configuration.GetSection("ConfigurationDB"), addHistory: true);
+
+            // clients
+            services.AddGrpc();
+            services.Configure<ClientOptions>(Configuration.GetSection("Clients"));
 
             // history
             services.AddCassandra<ICecoChatDbContext, CecoChatDbContext>(Configuration.GetSection("HistoryDB"));
@@ -68,9 +71,6 @@ namespace CecoChat.History.Server
             services.AddSingleton<IHistoryRepository, HistoryRepository>();
             services.AddSingleton<IDataUtility, DataUtility>();
             services.AddSingleton<IBackendDbMapper, BackendDbMapper>();
-
-            // configuration
-            services.AddConfiguration(Configuration.GetSection("ConfigurationDB"), addHistory: true);
 
             // shared
             services.AddSingleton<IActivityUtility, ActivityUtility>();
