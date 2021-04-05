@@ -12,7 +12,5 @@ namespace CecoChat.Messaging.Server.Clients
         bool EnqueueMessage(TMessage message, Activity parentActivity = null);
 
         Task ProcessMessages(CancellationToken ct);
-
-        void SetFinalMessagePredicate(Func<TMessage, bool> finalMessagePredicate);
     }
 }
