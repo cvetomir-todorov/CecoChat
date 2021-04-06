@@ -1,4 +1,4 @@
-[System design](docs/01-intro-03-overall-design-technologies.md), [partial implementation](source/), [dev environment](run/) of a chat for 10-100 millions active users based on Kafka, Cassandra, gRPC, Redis, Docker, OpenTelemetry, .NET 5, ASP.NET. I would appreciate any comments so feel free to use the `Discussions` tab.
+[System design](docs/01-intro-03-overall-design-technologies.md) and [partial implementation](source/) of a chat for 10-100 millions active users based on Kafka, Cassandra, gRPC, Redis, .NET 5, ASP.NET. The solution provides a [configurable](docs/04-production-01-main.md#Configurability) and for now [partially-observable](docs/04-production-01-main.md#Distributed-tracing) local [environment](docs/03-infrastructure-01-main.md#Run-locally) with [containerized components](containerize/) based on Docker, OpenTelemetry, Jaeger. I appreciate all comments so feel free to use the `Discussions` tab.
 
 # Technologies
 
@@ -40,11 +40,14 @@
   - [Back of the envelope calculations](docs/01-intro-01-main.md#Back-of-the-envelope-calculations)
   - [Overall design, technologies](docs/01-intro-03-overall-design-technologies.md)
 * Design
-  - [Send receive approach](docs/02-design-01-approach.md)
-  - [Send, receive, multiple clients](docs/02-design-02-send-receive.md)
+  - [Approach](docs/02-design-01-approach.md)
+  - [Send, receive, multiple clients for same user](docs/02-design-02-send-receive.md)
   - [History, clients](docs/02-design-03-history-clients.md)
   - [Configuration, failover](docs/02-design-04-configuration-failover.md)
 * Infrastructure
-  - [CI/CD](docs/03-infrastructure-01-main.md#CICD)
-  - [Run](docs/03-infrastructure-01-main.md#Run)
-* [What next](docs/04-what-next.md)
+  - [CI pipeline](docs/03-infrastructure-01-main.md#CI-pipeline)
+  - [Run locally](docs/03-infrastructure-01-main.md#Run-locally)
+* Production readiness
+  - [Configurability](docs/04-production-01-main.md#Configurability)
+  - [Distributed tracing](docs/04-production-01-main.md#Distributed-tracing)
+* [What next](docs/05-what-next.md)

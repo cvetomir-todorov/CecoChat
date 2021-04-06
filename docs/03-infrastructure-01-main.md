@@ -1,4 +1,4 @@
-# CI/CD
+# CI pipeline
 
 A Github Actions workflow is set up to:
 * Build the solution
@@ -13,9 +13,9 @@ A Github Actions workflow is set up to:
   - [Materialize](https://hub.docker.com/repository/docker/cvetomirtodorov/cecochat-materialize)
   - [Messaging](https://hub.docker.com/repository/docker/cvetomirtodorov/cecochat-messaging)
 
-# Run
+# Run locally
 
-Despite there is quite a bit of code written a good part of it is a proof-of-concept. In order to validate the implementation a lot of physical infrastructure is required which is quite expensive unfortunately. Nevertheless the system is functioning and with a machine powerful enough everything could be powered up **locally**. I've used `docker-compose` in order to run the required servers and the solution itself since it is also containerized. I've limited the memory for most of the containers to `512 MB`.
+Despite there is quite a bit of code written a good part of it is a proof-of-concept. In order to validate the implementation a lot of physical infrastructure is required which is quite expensive unfortunately. Nevertheless the system is functioning and with a machine powerful enough everything could be powered up **locally**. I've used `docker-compose` in order to run the required servers and the solution itself since it is also containerized. I've limited the memory for most of the containers to `128 MB` or `256 MB` but there are a few which require `512 MB`.
 
 ## Run 3rd party components
 
@@ -24,13 +24,15 @@ Before running the containers docker volumes need to be created using the [creat
 * Kafka has 4 containers:
   - 2 Kafka brokers
   - Zookeeper
-  - Kafdrop web interface
-* Cassandra has 4 containers:
-  - 3 Cassandra instances
-  - Cassandra web interface
+  - Kafdrop (management)
+* Cassandra has 3 containers:
+  - 2 Cassandra instances
+  - Cassandra Web (management)
 * Redis has 2 containers:
   - 1 Redis instance
-  - Redis commander web interface
+  - Redis commander (management)
+* Observability has 1 container:
+  - 1 Jaeger all-in-one instance
 
 ## Containerize and run CecoChat
 
