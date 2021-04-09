@@ -1,0 +1,1 @@
+docker-compose.exe -f .\kafka.yml -f .\cassandra.yml -f .\redis.yml -f .\observability.yml up -d
