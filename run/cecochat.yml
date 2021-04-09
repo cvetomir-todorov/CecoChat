@@ -71,7 +71,6 @@ services:
       CECOCHAT_ConfigurationDB__Endpoints__0: "redis1:6379"
       CECOCHAT_HistoryDB__ContactPoints__0: cass1
       CECOCHAT_HistoryDB__ContactPoints__1: cass2
-      CECOCHAT_HistoryDB__ContactPoints__2: cass3
   cecochat-materialize:
     image: ceco.com/cecochat/materialize:0.1
     container_name: cecochat-materialize
@@ -90,7 +89,6 @@ services:
       CECOCHAT_Backend__Kafka__BootstrapServers__1: kafka2:19092
       CECOCHAT_HistoryDB__ContactPoints__0: cass1
       CECOCHAT_HistoryDB__ContactPoints__1: cass2
-      CECOCHAT_HistoryDB__ContactPoints__2: cass3
   cecochat-profile:
     image: ceco.com/cecochat/profile:0.1
     container_name: cecochat-profile
