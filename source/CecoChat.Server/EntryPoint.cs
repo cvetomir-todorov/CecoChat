@@ -42,7 +42,8 @@ namespace CecoChat.Server
 
         public static void CreateAndRunHost(IHostBuilder hostBuilder, Type loggerContext)
         {
-            SerilogConfiguration.Setup(Assembly.GetEntryAssembly());
+            string environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            SerilogConfiguration.Setup(Assembly.GetEntryAssembly(), environment);
             ILogger logger = Log.ForContext(loggerContext);
 
             try
