@@ -5,8 +5,9 @@ using Serilog;
 using Serilog.Enrichers.Span;
 using Serilog.Events;
 using Serilog.Formatting.Elasticsearch;
+using Serilog.Sinks.Elasticsearch;
 
-namespace CecoChat.Serilog
+namespace CecoChat.Server
 {
     public static class SerilogConfiguration
     {
@@ -54,6 +55,11 @@ namespace CecoChat.Serilog
             return configuration
                 .MinimumLevel.Override("CecoChat", LogEventLevel.Verbose)
                 .WriteTo.Console()
+                .WriteTo.Elasticsearch(new ElasticsearchSinkOptions
+                {
+                    CustomFormatter = new ElasticsearchJsonFormatter(renderMessageTemplate: false),
+                    IndexFormat = "cecochat-logs"
+                })
                 .WriteTo.File(
                     path: filePath,
                     rollingInterval: RollingInterval.Day,

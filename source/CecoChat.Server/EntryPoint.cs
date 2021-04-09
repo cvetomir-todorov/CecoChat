@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Reflection;
-using CecoChat.Serilog;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
