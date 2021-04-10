@@ -2,8 +2,8 @@
   WITH REPLICATION =
   {
     'class' : 'NetworkTopologyStrategy',
-    'Europe' : 3,
-    'Asia' : 3,
-    'America' : 3
+    'Europe' : 2,
+    'Asia' : 2,
+    'America' : 2
   }
   AND DURABLE_WRITES = true;
