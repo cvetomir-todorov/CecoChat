@@ -4,7 +4,6 @@
 * Add missing operability elements
   - Observability
     - Health check API
-    - Log aggregation
     - Metrics and monitoring
     - Exception tracking
   - Deployment
@@ -50,3 +49,4 @@
   - Compare Materialize servers immediate message write to bulk-loading data
   - Benchmark Kafka and improve its configuration
   - Improve existing distributed tracing - baggage propagation, custom instrumentation implementation
+  - Improve existing log aggregation - performance of Fluentd, ElasticSearch index customizations

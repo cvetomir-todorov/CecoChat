@@ -16,6 +16,10 @@ All the diagrams are in the [diagrams](diagrams/) folder and [draw.io](https://a
 
 * Configuration database uses Redis. It is lightweight, fast and easy to use. Redis supports PUB/SUB used for notifying subscribers about configuration changes.
 
-* Docker is used for a containerization technology mainly because of its maturity and popularity.
+* The servers use ASP.NET and .NET 5. Even though they could be implemented as a background services/daemons ASP.NET allows easy support for health checks and monitoring based on HTTP. The Kestrel server is performant and has integration with gRPC. In general .NET is a very mature, widely-used, feature-rich and well supported development platform.
 
-* Most of the servers use ASP.NET and .NET 5. Even though they could be implemented as a background services/daemons ASP.NET allows easy support for health checks and monitoring based on HTTP. The Kestrel server is performant and has integration with gRPC. In general .NET is a very mature, widely-used, feature-rich and well supported development platform.
+* Containerization relies on Docker mainly because of its maturity and popularity.
+
+* Distributed tracing is built on .NET tracing API which is integrated with OpenTelemetry and Jaeger is configured for viewing traces and spans.
+
+* Log aggregation is based on the EFK stack consisting of ElasticSearch, Fluentd and Kibana.

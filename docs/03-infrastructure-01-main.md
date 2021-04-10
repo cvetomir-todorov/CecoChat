@@ -19,29 +19,34 @@ Despite there is quite a bit of code written a good part of it is a proof-of-con
 
 ## Run 3rd party components
 
-Before running the containers docker volumes need to be created using the [create volumes scripts](../run/create-volumes). Some containers have configuration which resides in the [configuration folder](../run/configuration). After running the containers they need to be [prepared](../run/prepare) using `docker exec -it` just one time (unless the volumes are deleted). The `docker-compose` files for the containers are in the [run folder](../run/).
+Before running the containers some preparation steps need to be done manually. The scripts for them are in the respective technology folder. Docker volumes need to be created. After running the containers some need to be prepared using `docker exec -it` just one time (unless the volumes are deleted). The `docker-compose` files for the containers are in the [run folder](../run/).
 
-* Kafka has 4 containers:
+* Cassandra:
+  - 2 Cassandra instances
+  - Cassandra Web (management)
+* Kafka:
   - 2 Kafka brokers
   - Zookeeper
   - Kafdrop (management)
-* Cassandra has 3 containers:
-  - 2 Cassandra instances
-  - Cassandra Web (management)
-* Redis has 2 containers:
+* Redis:
   - 1 Redis instance
   - Redis commander (management)
-* Observability has 1 container:
-  - 1 Jaeger all-in-one instance
+* Observability:
+  - 1 Jaeger instance (all-in-one)
+  - 1 ElasticSearch instance
+  - 1 Fluentd instance
+  - 1 Kibana instance (management)
 
 ## Containerize and run CecoChat
 
-In order to containerize CecoChat you can use the [containerize folder](../containerize/) which contains the Docker files for building the Docker images. Internally the Docker files do `dotnet publish` and use `Debug` configuration which has `Trace`/`Verbose` level of logging but this can be changed as prefered. The `docker-compose` file creates containers for:
+In order to containerize CecoChat you can use the folder which contains the [Docker files](../run/cecochat/) for building the Docker images. Internally the Docker files do `dotnet publish` and use `Release` configuration but this can be changed as prefered. The `docker-compose` file creates containers for:
 
 * 1 connect server
 * 2 messaging servers
 * 1 materialize server
 * 1 history server
+
+It uses `ASPNETCORE_ENVIRONMENT=Production` and overrides tracing options to persists all traces.
 
 ## Clients
 
