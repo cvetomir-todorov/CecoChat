@@ -4,13 +4,11 @@
 
 Static app configuration is stored in `appsettings.json` files as is typical for .NET applications. For some servers it is overriden for the `Development` environment via the `appsettings.ENVIRONMENT.json` approach.
 
-Static logging configuration also uses the same approach with a main file and an environment-specific one. It is in separate `logging.json` and `logging.ENVIRONMENT.json` files based on Serilog logger configuration format.
-
 The [CecoChat docker-compose file](../run/cecochat.yml) uses environment variables with specific prefixes in order to push static configuration values to the servers at start-up. [ASP.NET documentation](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-5.0#environment-variables) describes how to name the environment variables in order to override both ASP.NET and app-specific values.
 
 ## Dynamic
 
-Some parts of the configuration are designed to be changed while it is running. These parts are stored in Redis and read at start-up. The [prepare script](../run/prepare/redis-create-configuration.sh) inputs the partitioning and history configuration values which need to be present and valid at all times. The configuration can be changed manually using the `redis-cli` command after attaching to the Redis container via `docker exec -it cecochat-redis1 bash`. Each server that is using dynamic configuration outputs at start-up the key names it reads and PUB/SUB channels which it subscribes to in order to get notified about changes. After the configuration is changed a dummy message needs to be sent to one of those PUB/SUB channels. The servers validate the new configuration values and may reject the change. The validation output provides descriptive information which can be used to correct the values.
+Some parts of the configuration are designed to be changed while it is running. These parts are stored in Redis and read at start-up. The [prepare script](../run/redis/redis-create-configuration.sh) inputs the partitioning and history configuration values which need to be present and valid at all times. The configuration can be changed manually using the `redis-cli` command after attaching to the Redis container via `docker exec -it cecochat-redis1 bash`. Each server that is using dynamic configuration outputs at start-up the key names it reads and PUB/SUB channels which it subscribes to in order to get notified about changes. After the configuration is changed a dummy message needs to be sent to one of those PUB/SUB channels. The servers validate the new configuration values and may reject the change. The validation output provides descriptive information which can be used to correct the values.
 
 In the future there may be a web-based Configurator which uses a Redis client and would allow changing the configuration more easily.
 
@@ -41,3 +39,19 @@ For `Debug` all traces are sampled. For `Release` this is true for 10% of them. 
 ## Exporting
 
 Jaeger is used in order to show traces and spans since an exporter for it is provided out-of-the-box. Additionally a few other ones could be used as well. The development environment uses the all-in-one Jaeger container which stores traces only in memory and that is enough. For production though a full deployment of Jaeger and all its components would have to be implemented.
+
+# Log aggregation
+
+EFK stack is utilized to aggregate, store, view and search all logs.
+
+## Aggregation
+
+In Debug/Development mode servers are configured to write logs directly to ElasticSearch. Serilog provides a specialized formatter using the JSON fields which ElasticSearch understands.
+
+In Release/Production mode the servers simply write logs to `stdout`. The same Serilog formatter for ElasticSearch is used. Docker logging driver for Fluentd is configured in the docker-compose file. It enables sending the logs to a Fluentd container. It matches them by tag, parses them by using only the `log` JSON field and sends that data to ElasticSearch.
+
+Both modes are configured to create indexes with different names because there is a slight difference in the fields. Also it makes it easier to know where the logs came from.
+
+## Storage and view
+
+Once the logs are in the appropriate indexes in ElasticSearch Kibana can be used in order to search by whatever field is needed. Log streaming can also be configured.

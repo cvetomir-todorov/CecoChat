@@ -1,22 +1,4 @@
-[System design](docs/01-intro-03-overall-design-technologies.md) and [partial implementation](source/) of a chat for 10-100 millions active users based on Kafka, Cassandra, gRPC, Redis, .NET 5, ASP.NET. The solution provides a [configurable](docs/04-production-01-main.md#Configurability) and for now [partially-observable](docs/04-production-01-main.md#Distributed-tracing) local [environment](docs/03-infrastructure-01-main.md#Run-locally) with [containerized components](containerize/) based on Docker, OpenTelemetry, Jaeger. I appreciate all comments so feel free to use the `Discussions` tab.
-
-# Technologies
-
-![Kafka](docs/tech-images/kafka.png)
-![Cassandra](docs/tech-images/cassandra.png)
-![gRPC](docs/tech-images/grpc.png)
-![Redis](docs/tech-images/redis.png)
-![Protocol buffers](docs/tech-images/protocol-buffers.png)
-![Swagger](docs/tech-images/swagger.png)
-
-![Docker](docs/tech-images/docker.png)
-![OpenTelemetry](docs/tech-images/open-telemetry.png)
-![Jaeger](docs/tech-images/jaeger.png)
-
-![.NET](docs/tech-images/dotnet.png)
-![ASP.NET](docs/tech-images/aspnet.png)
-![Serilog](docs/tech-images/serilog.png)
-![FluentValidation](docs/tech-images/fluent-validation.png)
+[System design](docs/01-intro-03-overall-design-technologies.md) and [partial implementation](source/) of a chat for 10-100 millions active users based on Kafka, Cassandra, gRPC, Redis, .NET 5, ASP.NET. A [configurable](docs/04-production-01-main.md#Configurability) and [partially-observable](docs/04-production-01-main.md#Distributed-tracing) environment with containerized components which can be [ran locally](docs/03-infrastructure-01-main.md#Run-locally) and is based on Docker, OpenTelemetry, Fluentd, ElasticSearch, Kibana, Jaeger. I appreciate all comments so feel free to use the `Discussions` tab.
 
 # Code
 
@@ -31,6 +13,27 @@
 [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=cvetomir-todorov_CecoChat&metric=code_smells)](https://sonarcloud.io/dashboard?id=cvetomir-todorov_CecoChat)
 [![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=cvetomir-todorov_CecoChat&metric=duplicated_lines_density)](https://sonarcloud.io/dashboard?id=cvetomir-todorov_CecoChat)
 [![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=cvetomir-todorov_CecoChat&metric=sqale_index)](https://sonarcloud.io/dashboard?id=cvetomir-todorov_CecoChat)
+
+# Technologies
+
+![Kafka](docs/tech-images/kafka.png)
+![Cassandra](docs/tech-images/cassandra.png)
+![gRPC](docs/tech-images/grpc.png)
+![Redis](docs/tech-images/redis.png)
+![Protocol buffers](docs/tech-images/protocol-buffers.png)
+![Swagger](docs/tech-images/swagger.png)
+
+![Docker](docs/tech-images/docker.png)
+![OpenTelemetry](docs/tech-images/open-telemetry.png)
+![Fluentd](docs/tech-images/fluentd.png)
+![ElasticSearch](docs/tech-images/elasticsearch.png)
+![Kibana](docs/tech-images/kibana.png)
+![Jaeger](docs/tech-images/jaeger.png)
+
+![.NET](docs/tech-images/dotnet.png)
+![ASP.NET](docs/tech-images/aspnet.png)
+![Serilog](docs/tech-images/serilog.png)
+![FluentValidation](docs/tech-images/fluent-validation.png)
 
 # Documentation
 
@@ -50,4 +53,5 @@
 * Production readiness
   - [Configurability](docs/04-production-01-main.md#Configurability)
   - [Distributed tracing](docs/04-production-01-main.md#Distributed-tracing)
+  - [Log aggregation](docs/04-production-01-main.md#Log-aggregation)
 * [What next](docs/05-what-next.md)
