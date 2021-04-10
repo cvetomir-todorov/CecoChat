@@ -10,14 +10,21 @@ services:
       - cecochat
     ports:
       - "31000:443"
-    mem_limit: 512M
+    mem_limit: 128M
     environment:
-      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: https://+
       ASPNETCORE_HTTPS_PORT: 443
       ASPNETCORE_Kestrel__Certificates__Default__Path: "/app/cecochat-dev.pfx"
       ASPNETCORE_Kestrel__Certificates__Default__Password: "cecochat"
       CECOCHAT_ConfigurationDB__Endpoints__0: "redis1:6379"
+      CECOCHAT_OtelSampling__Strategy: "AlwaysOn"
+      CECOCHAT_Jaeger__AgentHost: jaeger
+    logging: &fluentd-logging
+      driver: "fluentd"
+      options:
+        fluentd-address: localhost:24224
+        tag: cecochat
   cecochat-messaging1:
     image: ceco.com/cecochat/messaging:0.1
     container_name: cecochat-messaging1
@@ -25,9 +32,9 @@ services:
     networks: *networks
     ports:
       - "31001:443"
-    mem_limit: 512M
+    mem_limit: 128M
     environment:
-      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: https://+
       ASPNETCORE_HTTPS_PORT: 443
       ASPNETCORE_Kestrel__Certificates__Default__Path: "/app/cecochat-dev.pfx"
@@ -36,6 +43,9 @@ services:
       CECOCHAT_Backend__ServerID: s1
       CECOCHAT_Backend__Kafka__BootstrapServers__0: kafka1:19091
       CECOCHAT_Backend__Kafka__BootstrapServers__1: kafka2:19092
+      CECOCHAT_OtelSampling__Strategy: "AlwaysOn"
+      CECOCHAT_Jaeger__AgentHost: jaeger
+    logging: *fluentd-logging
   cecochat-messaging2:
     image: ceco.com/cecochat/messaging:0.1
     container_name: cecochat-messaging2
@@ -43,9 +53,9 @@ services:
     networks: *networks
     ports:
       - "31011:443"
-    mem_limit: 512M
+    mem_limit: 128M
     environment:
-      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: https://+
       ASPNETCORE_HTTPS_PORT: 443
       ASPNETCORE_Kestrel__Certificates__Default__Path: "/app/cecochat-dev.pfx"
@@ -54,6 +64,9 @@ services:
       CECOCHAT_Backend__ServerID: s2
       CECOCHAT_Backend__Kafka__BootstrapServers__0: kafka1:19091
       CECOCHAT_Backend__Kafka__BootstrapServers__1: kafka2:19092
+      CECOCHAT_OtelSampling__Strategy: "AlwaysOn"
+      CECOCHAT_Jaeger__AgentHost: jaeger
+    logging: *fluentd-logging
   cecochat-history:
     image: ceco.com/cecochat/history:0.1
     container_name: cecochat-history
@@ -61,9 +74,9 @@ services:
     networks: *networks
     ports:
       - "31003:443"
-    mem_limit: 512M
+    mem_limit: 128M
     environment:
-      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: https://+
       ASPNETCORE_HTTPS_PORT: 443
       ASPNETCORE_Kestrel__Certificates__Default__Path: "/app/cecochat-dev.pfx"
@@ -71,6 +84,9 @@ services:
       CECOCHAT_ConfigurationDB__Endpoints__0: "redis1:6379"
       CECOCHAT_HistoryDB__ContactPoints__0: cass1
       CECOCHAT_HistoryDB__ContactPoints__1: cass2
+      CECOCHAT_OtelSampling__Strategy: "AlwaysOn"
+      CECOCHAT_Jaeger__AgentHost: jaeger
+    logging: *fluentd-logging
   cecochat-materialize:
     image: ceco.com/cecochat/materialize:0.1
     container_name: cecochat-materialize
@@ -78,9 +94,9 @@ services:
     networks: *networks
     ports:
       - "31002:443"
-    mem_limit: 512M
+    mem_limit: 128M
     environment:
-      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: https://+
       ASPNETCORE_HTTPS_PORT: 443
       ASPNETCORE_Kestrel__Certificates__Default__Path: "/app/cecochat-dev.pfx"
@@ -89,6 +105,9 @@ services:
       CECOCHAT_Backend__Kafka__BootstrapServers__1: kafka2:19092
       CECOCHAT_HistoryDB__ContactPoints__0: cass1
       CECOCHAT_HistoryDB__ContactPoints__1: cass2
+      CECOCHAT_OtelSampling__Strategy: "AlwaysOn"
+      CECOCHAT_Jaeger__AgentHost: jaeger
+    logging: *fluentd-logging
   cecochat-profile:
     image: ceco.com/cecochat/profile:0.1
     container_name: cecochat-profile
@@ -96,10 +115,13 @@ services:
     networks: *networks
     ports:
       - "31005:443"
-    mem_limit: 512M
+    mem_limit: 128M
     environment:
-      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: https://+
       ASPNETCORE_HTTPS_PORT: 443
       ASPNETCORE_Kestrel__Certificates__Default__Path: "/app/cecochat-dev.pfx"
       ASPNETCORE_Kestrel__Certificates__Default__Password: "cecochat"
+      CECOCHAT_OtelSampling__Strategy: "AlwaysOn"
+      CECOCHAT_Jaeger__AgentHost: jaeger
+    logging: *fluentd-logging

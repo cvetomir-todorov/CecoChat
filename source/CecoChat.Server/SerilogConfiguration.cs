@@ -58,7 +58,7 @@ namespace CecoChat.Server
                 .WriteTo.Elasticsearch(new ElasticsearchSinkOptions
                 {
                     CustomFormatter = new ElasticsearchJsonFormatter(renderMessageTemplate: false),
-                    IndexFormat = "cecochat-logs"
+                    IndexFormat = "cecochat-logs-app"
                 })
                 .WriteTo.File(
                     path: filePath,
