@@ -45,7 +45,7 @@ services:
       SERVER_NAME: kibana
       ELASTICSEARCH_HOSTS: http://es:9200
     volumes:
-      - ./configuration/kibana.yml:/usr/share/kibana/config/kibana.yml
+      - ./observe/kibana.yml:/usr/share/kibana/config/kibana.yml
     depends_on:
       - es
 volumes:
