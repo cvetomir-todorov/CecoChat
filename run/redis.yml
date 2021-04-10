@@ -12,7 +12,7 @@ services:
       - "6379:6379"
     mem_limit: 64M
     volumes:
-      - ./configuration/redis1.conf:/redis.conf
+      - ./redis/redis1.conf:/redis.conf
       - cecochat-redis1-data:/data
     command: [ "redis-server", "/redis.conf" ]
 volumes:
