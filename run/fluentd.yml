@@ -1,0 +1,15 @@
+version: '3'
+networks:
+  cecochat:
+services:
+  fluentd:
+    image: cecochat-fluentd:0.1
+    container_name: cecochat-fluentd
+    hostname: fluentd
+    networks: &networks
+      - cecochat
+    ports:
+      - 24224:24224
+    mem_limit: 128M
+    volumes:
+      - ./fluentd/fluent.conf:/fluentd/etc/fluent.conf
