@@ -1,8 +1,8 @@
-name: CI/CD
+name: CI
 
 on:
   push:
-    branches: [dev]
+    branches: [dev, main]
   pull_request:
     branches: [dev]
 
@@ -51,7 +51,6 @@ jobs:
         dotnet build --no-restore check/Check.sln
 
   analyze-code-quality:
-    needs: [verify-code-style, build]
     runs-on: windows-latest
     steps:
 
@@ -96,60 +95,3 @@ jobs:
           .\.sonar\scanner\dotnet-sonarscanner begin /k:"cvetomir-todorov_CecoChat" /o:"cvetomirtodorov-cecochat" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
           dotnet build source/CecoChat.sln
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
-
-  containerize:
-    needs: [verify-code-style, build]
-    runs-on: ubuntu-latest
-    steps:
-
-    - name: Docker Hub login
-      uses: docker/login-action@v1
-      with:
-        username: ${{ secrets.DOCKER_HUB_USERNAME }}
-        password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-
-    - name: Docker setup
-      uses: docker/setup-buildx-action@v1
-
-    - name: Checkout
-      uses: actions/checkout@v2
-
-    - name: Connect image
-      uses: docker/build-push-action@v2
-      with:
-        file: containerize/Connect.Dockerfile
-        context: ./source
-        push: true
-        tags: cvetomirtodorov/cecochat-connect:0.1
-
-    - name: History image
-      uses: docker/build-push-action@v2
-      with:
-        file: containerize/History.Dockerfile
-        context: ./source
-        push: true
-        tags: cvetomirtodorov/cecochat-history:0.1
-
-    - name: Materialize image
-      uses: docker/build-push-action@v2
-      with:
-        file: containerize/Materialize.Dockerfile
-        context: ./source
-        push: true
-        tags: cvetomirtodorov/cecochat-materialize:0.1
-
-    - name: Messaging image
-      uses: docker/build-push-action@v2
-      with:
-        file: containerize/Messaging.Dockerfile
-        context: ./source
-        push: true
-        tags: cvetomirtodorov/cecochat-messaging:0.1
-
-    - name: Profile image
-      uses: docker/build-push-action@v2
-      with:
-        file: containerize/Profile.Dockerfile
-        context: ./source
-        push: true
-        tags: cvetomirtodorov/cecochat-profile:0.1
