@@ -6,7 +6,7 @@ namespace CecoChat.Data.History.Instrumentation
 {
     internal static class HistoryInstrumentation
     {
-        private static readonly string ActivitySourceName = "OpenTelemetry.Instrumentation.CecoChatHistory";
+        private static readonly string ActivitySourceName = "OpenTelemetry.Instrumentation.CecoChatHistoryDB";
         private static readonly AssemblyName _assemblyName = typeof(HistoryInstrumentation).Assembly.GetName();
         private static readonly Version _activitySourceVersion = _assemblyName.Version;
 
@@ -14,9 +14,9 @@ namespace CecoChat.Data.History.Instrumentation
 
         public static class Operations
         {
-            public const string HistoryNewDialogMessage = "History.NewDialogMessage";
-            public const string HistoryGetUserHistory = "History.GetUserHistory";
-            public const string HistoryGetDialogHistory = "History.GetDialogHistory";
+            public const string HistoryNewDialogMessage = "HistoryDB.NewDialogMessage";
+            public const string HistoryGetUserHistory = "HistoryDB.GetUserHistory";
+            public const string HistoryGetDialogHistory = "HistoryDB.GetDialogHistory";
         }
 
         public static class Keys
