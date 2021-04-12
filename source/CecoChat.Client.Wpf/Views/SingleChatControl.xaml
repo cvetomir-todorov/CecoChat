@@ -27,6 +27,11 @@
       <i:Interaction.Behaviors>
         <infrastructure:ScrollIntoViewBehavior />
       </i:Interaction.Behaviors>
+      <ListView.ItemContainerStyle>
+        <Style TargetType="ListViewItem">
+          <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+        </Style>
+      </ListView.ItemContainerStyle>
       <ListView.ItemTemplate>
         <DataTemplate>
           <Grid Background="{Binding Path=IsSenderCurrentUser,
@@ -37,8 +42,14 @@
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
               <ColumnDefinition Width="*"/>
+              <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <TextBlock Text="{Binding Path=FormattedMessage}"
+                       Grid.Column="0"
+                       Style="{StaticResource CommonElementStyle}"/>
+            <TextBlock Text="{Binding Path=DeliveryStatus}"
+                       Grid.Column="1"
+                       Foreground="Gray"
                        Style="{StaticResource CommonElementStyle}"/>
           </Grid>
         </DataTemplate>

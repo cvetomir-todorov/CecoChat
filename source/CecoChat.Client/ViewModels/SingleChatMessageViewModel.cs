@@ -11,5 +11,7 @@ namespace CecoChat.Client.ViewModels
         public DateTime Timestamp { get; set; }
 
         public string FormattedMessage { get; set; }
+
+        public string DeliveryStatus { get; set; }
     }
 }

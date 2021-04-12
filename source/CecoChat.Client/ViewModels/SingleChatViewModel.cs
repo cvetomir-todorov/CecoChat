@@ -16,7 +16,7 @@ namespace CecoChat.Client.ViewModels
     [AddINotifyPropertyChangedInterface]
     public sealed class SingleChatViewModel : BaseViewModel
     {
-        private readonly HashSet<Guid> _messageIDs;
+        private readonly Dictionary<Guid, SingleChatMessageViewModel> _messageMap;
 
         public SingleChatViewModel(
             MessagingClient messagingClient,
@@ -25,9 +25,11 @@ namespace CecoChat.Client.ViewModels
             IFeedbackService feedbackService)
             : base(messagingClient, messageStorage, uiThreadDispatcher, feedbackService)
         {
-            _messageIDs = new();
+            _messageMap = new();
 
             MessagingClient.MessageReceived += MessagingClientOnMessageReceived;
+            MessagingClient.MessageAcknowledged += MessagingClientOnMessageAcknowledged;
+
             Messages = new ObservableCollection<SingleChatMessageViewModel>();
             SendMessage = new AsyncRelayCommand(SendMessageExecuted);
         }
@@ -54,6 +56,14 @@ namespace CecoChat.Client.ViewModels
             InsertMessage(message);
         }
 
+        private void MessagingClientOnMessageAcknowledged(object sender, ClientMessage message)
+        {
+            if (_messageMap.TryGetValue(message.MessageId.ToGuid(), out SingleChatMessageViewModel messageVM))
+            {
+                messageVM.DeliveryStatus = message.AckType.ToString();
+            }
+        }
+
         private async Task SendMessageExecuted()
         {
             try
@@ -74,7 +84,7 @@ namespace CecoChat.Client.ViewModels
         {
             OtherUserID = otherUserID;
 
-            _messageIDs.Clear();
+            _messageMap.Clear();
             Messages.Clear();
 
             IEnumerable<ClientMessage> storedMessages = MessageStorage.GetMessages(otherUserID);
@@ -92,8 +102,10 @@ namespace CecoChat.Client.ViewModels
         private void InsertMessage(ClientMessage message)
         {
             Guid messageID = message.MessageId.ToGuid();
-            if (_messageIDs.Contains(messageID))
+            if (_messageMap.ContainsKey(messageID))
+            {
                 return;
+            }
 
             int insertionIndex = 0;
 
@@ -122,7 +134,7 @@ namespace CecoChat.Client.ViewModels
                 UIThreadDispatcher.Invoke(() => Messages.Insert(insertionIndex, messageVM));
             }
 
-            _messageIDs.Add(messageID);
+            _messageMap.Add(messageID, messageVM);
         }
     }
 }
