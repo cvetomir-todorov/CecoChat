@@ -11,12 +11,14 @@ namespace CecoChat.Kafka
     {
         void Initialize(IKafkaOptions options, IKafkaProducerOptions producerOptions, ISerializer<TValue> valueSerializer);
 
-        void Produce(Message<TKey, TValue> message, TopicPartition topicPartition);
+        void Produce(Message<TKey, TValue> message, TopicPartition topicPartition, DeliveryHandler<TKey, TValue> deliveryHandler = null);
 
-        void Produce(Message<TKey, TValue> message, string topic);
+        void Produce(Message<TKey, TValue> message, string topic, DeliveryHandler<TKey, TValue> deliveryHandler = null);
 
         void FlushPendingMessages();
     }
+
+    public delegate void DeliveryHandler<TKey, TValue>(bool isDelivered, DeliveryReport<TKey, TValue> report, Activity activity);
 
     public sealed class KafkaProducer<TKey, TValue> : IKafkaProducer<TKey, TValue>
     {
@@ -62,19 +64,20 @@ namespace CecoChat.Kafka
             _id = $"{KafkaProducerIDGenerator.GetNextID()}@{producerOptions.IDContext}";
         }
 
-        public void Produce(Message<TKey, TValue> message, TopicPartition topicPartition)
+        public void Produce(Message<TKey, TValue> message, TopicPartition topicPartition, DeliveryHandler<TKey, TValue> deliveryHandler = null)
         {
-            Activity activity = _kafkaActivityUtility.StartProducer(
-                message, _producerOptions.IDContext, topicPartition.Topic, topicPartition.Partition);
-            _producer.Produce(topicPartition, message, deliveryReport => DeliveryHandler(deliveryReport, activity));
-            _logger.LogTrace("Producer {0} produced message {1} in {2}{3}.", _id, message.Value, topicPartition.Topic, topicPartition.Partition);
+            string topic = topicPartition.Topic;
+            int partition = topicPartition.Partition;
+
+            Activity activity = _kafkaActivityUtility.StartProducer(message, _producerOptions.IDContext, topic, partition);
+            _producer.Produce(topicPartition, message, deliveryReport => HandleDeliveryReport(deliveryReport, activity, deliveryHandler));
+            _logger.LogTrace("Producer {0} produced message {1} in {2}[{3}].", _id, message.Value, topic, partition);
         }
 
-        public void Produce(Message<TKey, TValue> message, string topic)
+        public void Produce(Message<TKey, TValue> message, string topic, DeliveryHandler<TKey, TValue> deliveryHandler = null)
         {
-            Activity activity = _kafkaActivityUtility.StartProducer(
-                message, _producerOptions.IDContext, topic);
-            _producer.Produce(topic, message, deliveryReport => DeliveryHandler(deliveryReport, activity));
+            Activity activity = _kafkaActivityUtility.StartProducer(message, _producerOptions.IDContext, topic);
+            _producer.Produce(topic, message, deliveryReport => HandleDeliveryReport(deliveryReport, activity, deliveryHandler));
             _logger.LogTrace("Producer {0} produced message {1} in {2}.", _id, message.Value, topic);
         }
 
@@ -97,9 +100,9 @@ namespace CecoChat.Kafka
             }
         }
 
-        private void DeliveryHandler(DeliveryReport<TKey, TValue> report, Activity activity)
+        private void HandleDeliveryReport(DeliveryReport<TKey, TValue> report, Activity activity, DeliveryHandler<TKey, TValue> deliveryHandler)
         {
-            bool success = true;
+            bool isDelivered = true;
             try
             {
                 TValue value = report.Message.Value;
@@ -107,23 +110,25 @@ namespace CecoChat.Kafka
                 if (report.Status != PersistenceStatus.Persisted)
                 {
                     _logger.LogError("Message {0} persistence status {1}.", value, report.Status);
-                    success = false;
+                    isDelivered = false;
                 }
                 if (report.Error.IsError)
                 {
-                    _logger.LogError("Message {0} error '{1}'.", value, report.Error.Reason);
-                    success = false;
+                    _logger.LogError("Message {0} error code {1} reason '{2}'.", value, report.Error.Code, report.Error.Reason);
+                    isDelivered = false;
                 }
                 if (report.TopicPartitionOffsetError.Error.IsError)
                 {
-                    _logger.LogError("Message {0} topic partition {1} error '{2}'.",
-                        value, report.TopicPartitionOffsetError.Partition, report.TopicPartitionOffsetError.Error.Reason);
-                    success = false;
+                    _logger.LogError("Message {0} topic partition {1} error code {2} reason '{3}'.",
+                        value, report.TopicPartitionOffsetError.Partition, report.Error.Code, report.TopicPartitionOffsetError.Error.Reason);
+                    isDelivered = false;
                 }
+
+                deliveryHandler?.Invoke(isDelivered, report, activity);
             }
             finally
             {
-                _kafkaActivityUtility.StopProducer(activity, success);
+                _kafkaActivityUtility.StopProducer(activity, isDelivered);
             }
         }
     }
