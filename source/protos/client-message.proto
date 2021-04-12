@@ -12,6 +12,7 @@ message ClientMessage {
   ClientMessageType type = 5;
   oneof data {
 	  string text = 6;
+	  AckType ackType = 7;
   }
 }
 
@@ -19,4 +20,11 @@ enum ClientMessageType {
   UNKNOWN = 0;
   PLAIN_TEXT = 1;
   DISCONNECT = 2;
+  ACK = 3;
+}
+
+enum AckType {
+  LOST = 0;
+  PROCESSED = 1;
+  DELIVERED = 2;
 }

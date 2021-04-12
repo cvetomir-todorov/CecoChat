@@ -68,7 +68,7 @@ namespace CecoChat.Messaging.Server.Backend
                     if (message.TargetId == message.ReceiverId)
                     {
                         message.TargetId = message.SenderId;
-                        _messagesToBackendProducer.ProduceMessage(message);
+                        _messagesToBackendProducer.ProduceMessage(message, sendAck: false);
                         _logger.LogTrace("Duplicated for sender message {0}.", message);
                     }
                     _consumer.Commit(consumeResult, ct);
