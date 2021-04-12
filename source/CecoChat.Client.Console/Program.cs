@@ -20,6 +20,7 @@ namespace CecoChat.Client.Console
             MessagingClient client = new();
             await client.Initialize(username, password, profileServer: "https://localhost:31005", connectServer: "https://localhost:31000");
             client.MessageReceived += (_, message) => DisplayMessage(message);
+            client.MessageAcknowledged += (_, message) => DisplayAck(message);
             client.ExceptionOccurred += (_, exception) => System.Console.WriteLine(exception);
 
             client.ListenForMessages(CancellationToken.None);
@@ -70,6 +71,11 @@ namespace CecoChat.Client.Console
         private static void DisplayMessage(ClientMessage message)
         {
             System.Console.WriteLine($"[{message.Timestamp.ToDateTime():F}] {message.SenderId}->{message.ReceiverId}: {message.Text}");
+        }
+
+        private static void DisplayAck(ClientMessage message)
+        {
+            System.Console.WriteLine($"[{message.Timestamp.ToDateTime():F}] {message.SenderId}->{message.ReceiverId}: {message.AckType}");
         }
     }
 }

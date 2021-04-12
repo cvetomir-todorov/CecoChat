@@ -134,6 +134,10 @@ namespace CecoChat.Client.Shared
                     {
                         Disconnected?.Invoke(this, EventArgs.Empty);
                     }
+                    else if (message.Type == ClientMessageType.Ack)
+                    {
+                        MessageAcknowledged?.Invoke(this, message);
+                    }
                     else
                     {
                         MessageReceived?.Invoke(this, message);
@@ -147,6 +151,8 @@ namespace CecoChat.Client.Shared
         }
 
         public event EventHandler<ClientMessage> MessageReceived;
+
+        public event EventHandler<ClientMessage> MessageAcknowledged;
 
         public event EventHandler Disconnected;
 
