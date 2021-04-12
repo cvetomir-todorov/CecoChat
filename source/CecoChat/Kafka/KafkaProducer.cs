@@ -61,7 +61,7 @@ namespace CecoChat.Kafka
                 .SetValueSerializer(valueSerializer)
                 .Build();
             _producerOptions = producerOptions;
-            _id = $"{KafkaProducerIDGenerator.GetNextID()}@{producerOptions.IDContext}";
+            _id = $"{KafkaProducerIDGenerator.GetNextID()}@{producerOptions.ProducerID}";
         }
 
         public void Produce(Message<TKey, TValue> message, TopicPartition topicPartition, DeliveryHandler<TKey, TValue> deliveryHandler = null)
@@ -69,14 +69,14 @@ namespace CecoChat.Kafka
             string topic = topicPartition.Topic;
             int partition = topicPartition.Partition;
 
-            Activity activity = _kafkaActivityUtility.StartProducer(message, _producerOptions.IDContext, topic, partition);
+            Activity activity = _kafkaActivityUtility.StartProducer(message, _producerOptions.ProducerID, topic, partition);
             _producer.Produce(topicPartition, message, deliveryReport => HandleDeliveryReport(deliveryReport, activity, deliveryHandler));
             _logger.LogTrace("Producer {0} produced message {1} in {2}[{3}].", _id, message.Value, topic, partition);
         }
 
         public void Produce(Message<TKey, TValue> message, string topic, DeliveryHandler<TKey, TValue> deliveryHandler = null)
         {
-            Activity activity = _kafkaActivityUtility.StartProducer(message, _producerOptions.IDContext, topic);
+            Activity activity = _kafkaActivityUtility.StartProducer(message, _producerOptions.ProducerID, topic);
             _producer.Produce(topic, message, deliveryReport => HandleDeliveryReport(deliveryReport, activity, deliveryHandler));
             _logger.LogTrace("Producer {0} produced message {1} in {2}.", _id, message.Value, topic);
         }

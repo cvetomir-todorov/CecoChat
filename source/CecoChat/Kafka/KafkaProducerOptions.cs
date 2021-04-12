@@ -4,7 +4,7 @@ namespace CecoChat.Kafka
 {
     public interface IKafkaProducerOptions
     {
-        string IDContext { get; }
+        string ProducerID { get; }
 
         Acks Acks { get; }
 
@@ -17,7 +17,7 @@ namespace CecoChat.Kafka
 
     public sealed class KafkaProducerOptions : IKafkaProducerOptions
     {
-        public string IDContext { get; set; }
+        public string ProducerID { get; set; }
 
         public Acks Acks { get; set; }
 
