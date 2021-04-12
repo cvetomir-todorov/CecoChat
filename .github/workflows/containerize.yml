@@ -27,7 +27,7 @@ jobs:
     - name: Connect image
       uses: docker/build-push-action@v2
       with:
-        file: containerize/Connect.Dockerfile
+        file: run/cecochat/Connect.Dockerfile
         context: ./source
         push: true
         tags: cvetomirtodorov/cecochat-connect:0.1
@@ -35,7 +35,7 @@ jobs:
     - name: History image
       uses: docker/build-push-action@v2
       with:
-        file: containerize/History.Dockerfile
+        file: run/cecochat/History.Dockerfile
         context: ./source
         push: true
         tags: cvetomirtodorov/cecochat-history:0.1
@@ -43,7 +43,7 @@ jobs:
     - name: Materialize image
       uses: docker/build-push-action@v2
       with:
-        file: containerize/Materialize.Dockerfile
+        file: run/cecochat/Materialize.Dockerfile
         context: ./source
         push: true
         tags: cvetomirtodorov/cecochat-materialize:0.1
@@ -51,7 +51,7 @@ jobs:
     - name: Messaging image
       uses: docker/build-push-action@v2
       with:
-        file: containerize/Messaging.Dockerfile
+        file: run/cecochat/Messaging.Dockerfile
         context: ./source
         push: true
         tags: cvetomirtodorov/cecochat-messaging:0.1
@@ -59,7 +59,7 @@ jobs:
     - name: Profile image
       uses: docker/build-push-action@v2
       with:
-        file: containerize/Profile.Dockerfile
+        file: run/cecochat/Profile.Dockerfile
         context: ./source
         push: true
         tags: cvetomirtodorov/cecochat-profile:0.1
