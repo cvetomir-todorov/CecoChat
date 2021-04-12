@@ -2,28 +2,12 @@ version: '3'
 networks:
   cecochat:
 services:
-  jaeger:
-    image: jaegertracing/all-in-one:1.22
-    container_name: cecochat-jaeger
-    hostname: jaeger
-    networks: &networks
-      - cecochat
-    ports:
-      - 5775:5775/udp
-      - 6831:6831/udp
-      - 6832:6832/udp
-      - 5778:5778
-      - 16686:16686
-      - 14268:14268
-      - 9411:9411
-    mem_limit: 128M
-    environment:
-      COLLECTOR_ZIPKIN_HTTP_PORT: 9411
   es:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.12.0
     container_name: cecochat-es
     hostname: es
-    networks: *networks
+    networks: &networks
+      - cecochat
     ports:
       - 9200:9200
     mem_limit: 512M

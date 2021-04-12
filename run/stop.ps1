@@ -1,1 +1,1 @@
-docker-compose.exe -f .\kafka.yml -f .\cassandra.yml -f .\redis.yml -f .\observe.yml stop
+docker-compose.exe -f .\kafka.yml -f .\cassandra.yml -f .\redis.yml stop
