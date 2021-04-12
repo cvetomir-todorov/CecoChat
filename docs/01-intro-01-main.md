@@ -9,6 +9,7 @@ I decided to take on the challenge to design a globally-scalable chat like Whats
 * User can send messages to and receive messages from other users
 * User is shown at log-in the missed messages while being offline
 * User can review chat history between him and another user
+* User receives an ACK when the message has been processed by the chat, but not yet delivered to recipient
 * Same user can use multiple clients
 
 Currently no user profile and friendship are implemented so clients rely on user IDs.
