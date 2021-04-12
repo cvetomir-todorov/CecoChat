@@ -25,7 +25,6 @@
     - Away
     - Busy
   - Acks
-    - CecoChat has received the message
     - Recipient has received the message
     - Recipient has seen the message
 * Add user and profile related features
