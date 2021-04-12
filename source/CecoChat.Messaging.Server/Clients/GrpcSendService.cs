@@ -49,7 +49,7 @@ namespace CecoChat.Messaging.Server.Clients
             BackendMessage backendMessage = _mapper.MapClientToBackendMessage(clientMessage);
             backendMessage.TargetId = backendMessage.ReceiverId;
             backendMessage.ClientId = userClaims.ClientID.ToUuid();
-            _messagesToBackendProducer.ProduceMessage(backendMessage);
+            _messagesToBackendProducer.ProduceMessage(backendMessage, sendAck: true);
 
             SendMessageResponse response = new()
             {
