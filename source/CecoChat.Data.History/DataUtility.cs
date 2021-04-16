@@ -23,12 +23,12 @@ namespace CecoChat.Data.History
     internal sealed class DataUtility : IDataUtility
     {
         private readonly ILogger _logger;
-        private readonly ICecoChatDbContext _dbContext;
+        private readonly IHistoryDbContext _dbContext;
         private readonly IBackendDbMapper _mapper;
 
         public DataUtility(
             ILogger<DataUtility> logger,
-            ICecoChatDbContext dbContext,
+            IHistoryDbContext dbContext,
             IBackendDbMapper mapper)
         {
             _logger = logger;
