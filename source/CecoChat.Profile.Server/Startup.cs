@@ -1,3 +1,5 @@
+using Autofac;
+using CecoChat.Autofac;
 using CecoChat.Jwt;
 using CecoChat.Otel;
 using CecoChat.Swagger;
@@ -47,9 +49,6 @@ namespace CecoChat.Profile.Server
                 otel.ConfigureJaegerExporter(_jaegerOptions);
             });
 
-            // security
-            services.Configure<JwtOptions>(Configuration.GetSection("Jwt"));
-
             // web
             services
                 .AddControllers()
@@ -60,8 +59,17 @@ namespace CecoChat.Profile.Server
                 });
             services.AddSwaggerServices(_swaggerOptions);
 
+            // required
+            services.AddOptions();
+        }
+
+        public void ConfigureContainer(ContainerBuilder builder)
+        {
+            // security
+            builder.RegisterOptions<JwtOptions>(Configuration.GetSection("Jwt"));
+
             // shared
-            services.AddSingleton<IClock, MonotonicClock>();
+            builder.RegisterType<MonotonicClock>().As<IClock>().SingleInstance();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

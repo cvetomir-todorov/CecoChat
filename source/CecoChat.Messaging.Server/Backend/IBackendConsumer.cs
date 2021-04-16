@@ -9,5 +9,7 @@ namespace CecoChat.Messaging.Server.Backend
         void Prepare(PartitionRange partitions);
 
         void Start(CancellationToken ct);
+
+        string ConsumerID { get; }
     }
 }

@@ -1,3 +1,5 @@
+using Autofac;
+using CecoChat.Autofac;
 using CecoChat.Cassandra;
 using CecoChat.Contracts.Backend;
 using CecoChat.Data.History;
@@ -7,6 +9,7 @@ using CecoChat.Kafka.Instrumentation;
 using CecoChat.Materialize.Server.Backend;
 using CecoChat.Materialize.Server.Initialization;
 using CecoChat.Otel;
+using CecoChat.Tracing;
 using Confluent.Kafka;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -48,24 +51,36 @@ namespace CecoChat.Materialize.Server
                 otel.ConfigureJaegerExporter(_jaegerOptions);
             });
 
+            // required
+            services.AddOptions();
+        }
+
+        public void ConfigureContainer(ContainerBuilder builder)
+        {
             // ordered hosted services
-            services.AddHostedService<InitializeDbHostedService>();
-            services.AddHostedService<PrepareQueriesHostedService>();
-            services.AddHostedService<MaterializeMessagesHostedService>();
+            builder.RegisterHostedService<InitializeDbHostedService>();
+            builder.RegisterHostedService<PrepareQueriesHostedService>();
+            builder.RegisterHostedService<MaterializeMessagesHostedService>();
 
             // history
-            services.AddCassandra<ICecoChatDbContext, CecoChatDbContext>(Configuration.GetSection("HistoryDB"));
-            services.AddSingleton<ICecoChatDbInitializer, CecoChatDbInitializer>();
-            services.AddSingleton<INewMessageRepository, NewMessageRepository>();
-            services.AddSingleton<IDataUtility, DataUtility>();
-            services.AddSingleton<IHistoryActivityUtility, HistoryActivityUtility>();
-            services.AddSingleton<IBackendDbMapper, BackendDbMapper>();
+            builder.RegisterModule(new CassandraModule<CecoChatDbContext, ICecoChatDbContext>
+            {
+                CassandraConfiguration = Configuration.GetSection("HistoryDB")
+            });
+            builder.RegisterType<CecoChatDbInitializer>().As<ICecoChatDbInitializer>().SingleInstance();
+            builder.RegisterType<NewMessageRepository>().As<INewMessageRepository>().SingleInstance();
+            builder.RegisterType<DataUtility>().As<IDataUtility>().SingleInstance();
+            builder.RegisterType<HistoryActivityUtility>().As<IHistoryActivityUtility>().SingleInstance();
+            builder.RegisterType<BackendDbMapper>().As<IBackendDbMapper>().SingleInstance();
 
             // backend
-            services.AddSingleton<IMaterializeMessagesConsumer, MaterializeMessagesConsumer>();
-            services.AddFactory<IKafkaConsumer<Null, BackendMessage>, KafkaConsumer<Null, BackendMessage>>();
-            services.AddKafka();
-            services.Configure<BackendOptions>(Configuration.GetSection("Backend"));
+            builder.RegisterType<MaterializeMessagesConsumer>().As<IMaterializeMessagesConsumer>().SingleInstance();
+            builder.RegisterFactory<KafkaConsumer<Null, BackendMessage>, IKafkaConsumer<Null, BackendMessage>>();
+            builder.RegisterModule(new KafkaInstrumentationModule());
+            builder.RegisterOptions<BackendOptions>(Configuration.GetSection("Backend"));
+
+            // shared
+            builder.RegisterType<ActivityUtility>().As<IActivityUtility>().SingleInstance();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

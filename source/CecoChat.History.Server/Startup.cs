@@ -1,3 +1,5 @@
+using Autofac;
+using CecoChat.Autofac;
 using CecoChat.Cassandra;
 using CecoChat.Data.Configuration;
 using CecoChat.Data.History;
@@ -55,33 +57,48 @@ namespace CecoChat.History.Server
                 otel.ConfigureJaegerExporter(_jaegerOptions);
             });
 
-            // ordered hosted services
-            services.AddHostedService<ConfigurationHostedService>();
-            services.AddHostedService<InitializeDbHostedService>();
-            services.AddHostedService<PrepareQueriesHostedService>();
-
             // security
             services.AddJwtAuthentication(_jwtOptions);
             services.AddAuthorization();
 
-            // configuration
-            services.AddConfiguration(Configuration.GetSection("ConfigurationDB"), addHistory: true);
-
             // clients
             services.AddGrpc();
-            services.Configure<ClientOptions>(Configuration.GetSection("Clients"));
+
+            // required
+            services.AddOptions();
+        }
+
+        public void ConfigureContainer(ContainerBuilder builder)
+        {
+            // ordered hosted services
+            builder.RegisterHostedService<ConfigurationHostedService>();
+            builder.RegisterHostedService<InitializeDbHostedService>();
+            builder.RegisterHostedService<PrepareQueriesHostedService>();
+
+            // configuration
+            builder.RegisterModule(new ConfigurationModule
+            {
+                RedisConfiguration = Configuration.GetSection("ConfigurationDB"),
+                AddHistory = true
+            });
+
+            // clients
+            builder.RegisterOptions<ClientOptions>(Configuration.GetSection("Clients"));
 
             // history
-            services.AddCassandra<ICecoChatDbContext, CecoChatDbContext>(Configuration.GetSection("HistoryDB"));
-            services.AddSingleton<ICecoChatDbInitializer, CecoChatDbInitializer>();
-            services.AddSingleton<IHistoryRepository, HistoryRepository>();
-            services.AddSingleton<IDataUtility, DataUtility>();
-            services.AddSingleton<IHistoryActivityUtility, HistoryActivityUtility>();
-            services.AddSingleton<IBackendDbMapper, BackendDbMapper>();
+            builder.RegisterModule(new CassandraModule<CecoChatDbContext, ICecoChatDbContext>
+            {
+                CassandraConfiguration = Configuration.GetSection("HistoryDB")
+            });
+            builder.RegisterType<CecoChatDbInitializer>().As<ICecoChatDbInitializer>().SingleInstance();
+            builder.RegisterType<HistoryRepository>().As<IHistoryRepository>().SingleInstance();
+            builder.RegisterType<DataUtility>().As<IDataUtility>().SingleInstance();
+            builder.RegisterType<HistoryActivityUtility>().As<IHistoryActivityUtility>().SingleInstance();
+            builder.RegisterType<BackendDbMapper>().As<IBackendDbMapper>().SingleInstance();
 
             // shared
-            services.AddSingleton<IActivityUtility, ActivityUtility>();
-            services.AddSingleton<IClientBackendMapper, ClientBackendMapper>();
+            builder.RegisterType<ActivityUtility>().As<IActivityUtility>().SingleInstance();
+            builder.RegisterType<ClientBackendMapper>().As<IClientBackendMapper>().SingleInstance();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

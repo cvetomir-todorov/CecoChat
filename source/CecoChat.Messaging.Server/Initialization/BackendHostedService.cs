@@ -35,13 +35,16 @@ namespace CecoChat.Messaging.Server.Initialization
             PartitionRange partitions = _partitioningConfiguration.GetServerPartitions(_backendOptions.ServerID);
 
             _backendComponents.ConfigurePartitioning(partitionCount, partitions);
-            StartBackendConsumer(_backendComponents.MessagesToReceiversConsumer, "messages to receivers", cancellationToken);
-            StartBackendConsumer(_backendComponents.MessagesToSendersConsumer, "messages to senders", cancellationToken);
+
+            foreach (IBackendConsumer backendConsumer in _backendComponents.BackendConsumers)
+            {
+                StartBackendConsumer(backendConsumer, cancellationToken);
+            }
 
             return Task.CompletedTask;
         }
 
-        private void StartBackendConsumer(IBackendConsumer consumer, string consumerID, CancellationToken ct)
+        private void StartBackendConsumer(IBackendConsumer consumer, CancellationToken ct)
         {
             Task.Factory.StartNew(() =>
             {
@@ -51,7 +54,7 @@ namespace CecoChat.Messaging.Server.Initialization
                 }
                 catch (Exception exception)
                 {
-                    _logger.LogCritical(exception, "Failure in {0} consumer.", consumerID);
+                    _logger.LogCritical(exception, "Failure in {0} consumer.", consumer.ConsumerID);
                 }
             }, ct, TaskCreationOptions.LongRunning, TaskScheduler.Current);
         }

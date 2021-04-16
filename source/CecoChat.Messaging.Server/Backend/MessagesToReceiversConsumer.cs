@@ -15,10 +15,7 @@ using Microsoft.Extensions.Options;
 
 namespace CecoChat.Messaging.Server.Backend
 {
-    public interface IMessagesToReceiversConsumer : IBackendConsumer
-    {}
-
-    public sealed class MessagesToReceiversConsumer : IMessagesToReceiversConsumer
+    public sealed class MessagesToReceiversConsumer : IBackendConsumer
     {
         private readonly ILogger _logger;
         private readonly IBackendOptions _backendOptions;
@@ -81,6 +78,8 @@ namespace CecoChat.Messaging.Server.Backend
 
             _logger.LogInformation("Stopped sending messages to receivers.");
         }
+
+        public string ConsumerID => _backendOptions.MessagesToReceiversConsumer.ConsumerGroupID;
 
         private void ProcessMessage(BackendMessage backendMessage)
         {
