@@ -7,17 +7,17 @@ using Microsoft.Extensions.Configuration;
 
 namespace CecoChat.Data.Configuration
 {
-    public sealed class ConfigurationModule : Module
+    public sealed class ConfigurationDbModule : Module
     {
         public IConfiguration RedisConfiguration { get; init; }
 
-        public bool AddHistory { get; init; } = false;
+        public bool RegisterHistory { get; init; } = false;
 
-        public bool AddPartitioning { get; init; } = false;
+        public bool RegisterPartitioning { get; init; } = false;
 
         protected override void Load(ContainerBuilder builder)
         {
-            if (AddHistory || AddPartitioning)
+            if (RegisterHistory || RegisterPartitioning)
             {
                 builder.RegisterModule(new RedisModule
                 {
@@ -25,12 +25,12 @@ namespace CecoChat.Data.Configuration
                 });
                 builder.RegisterType<ConfigurationUtility>().As<IConfigurationUtility>().SingleInstance();
             }
-            if (AddHistory)
+            if (RegisterHistory)
             {
                 builder.RegisterType<HistoryConfiguration>().As<IHistoryConfiguration>().SingleInstance();
                 builder.RegisterType<HistoryConfigurationRepository>().As<IHistoryConfigurationRepository>().SingleInstance();
             }
-            if (AddPartitioning)
+            if (RegisterPartitioning)
             {
                 builder.RegisterType<PartitioningConfiguration>().As<IPartitioningConfiguration>().SingleInstance();
                 builder.RegisterType<PartitioningConfigurationRepository>().As<IPartitioningConfigurationRepository>().SingleInstance();

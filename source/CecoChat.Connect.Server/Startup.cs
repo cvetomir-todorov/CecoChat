@@ -81,11 +81,11 @@ namespace CecoChat.Connect.Server
             builder.RegisterHostedService<ConfigurationHostedService>();
 
             // configuration
-            builder.RegisterModule(new ConfigurationModule
+            builder.RegisterModule(new ConfigurationDbModule
             {
                 RedisConfiguration = Configuration.GetSection("ConfigurationDB"),
-                AddHistory = true,
-                AddPartitioning = true
+                RegisterHistory = true,
+                RegisterPartitioning = true
             });
 
             // backend

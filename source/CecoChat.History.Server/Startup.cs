@@ -76,10 +76,10 @@ namespace CecoChat.History.Server
             builder.RegisterHostedService<PrepareQueriesHostedService>();
 
             // configuration
-            builder.RegisterModule(new ConfigurationModule
+            builder.RegisterModule(new ConfigurationDbModule
             {
                 RedisConfiguration = Configuration.GetSection("ConfigurationDB"),
-                AddHistory = true
+                RegisterHistory = true
             });
 
             // clients
