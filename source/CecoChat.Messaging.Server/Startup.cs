@@ -80,10 +80,10 @@ namespace CecoChat.Messaging.Server
             builder.RegisterHostedService<PartitionsChangedHostedService>();
 
             // configuration
-            builder.RegisterModule(new ConfigurationModule
+            builder.RegisterModule(new ConfigurationDbModule
             {
                 RedisConfiguration = Configuration.GetSection("ConfigurationDB"),
-                AddPartitioning = true
+                RegisterPartitioning = true
             });
 
             // clients
