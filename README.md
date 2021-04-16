@@ -1,4 +1,4 @@
-[System design](docs/01-intro-03-overall-design-technologies.md) and [partial implementation](source/) of a chat for 10-100 millions active users based on Kafka, Cassandra, gRPC, Redis, .NET 5, ASP.NET. A [configurable](docs/04-production-01-main.md#Configurability) and [partially-observable](docs/04-production-01-main.md#Distributed-tracing) environment with containerized components which can be [ran locally](docs/03-infrastructure-01-main.md#Run-locally) and is based on Docker, OpenTelemetry, Fluentd, ElasticSearch, Kibana, Jaeger. I appreciate all comments so feel free to use the `Discussions` tab.
+[System design](docs/01-intro-03-overall-design-technologies.md) of a chat for 10-100 millions active users. [Partial implementation](source/) based on Kafka, Cassandra, gRPC, Redis, .NET 5, ASP.NET. [Configurable](docs/04-production-01-main.md#Configurability) and [partially-observable](docs/04-production-01-main.md#Distributed-tracing) environment with containerized components which can be [ran locally](docs/03-infrastructure-01-main.md#Run-locally) based on Docker, OpenTelemetry, Fluentd, ElasticSearch, Kibana, Jaeger. I appreciate all comments so feel free to use the `Discussions` tab.
 
 # Code
 
@@ -33,6 +33,7 @@
 ![.NET](docs/tech-images/dotnet.png)
 ![ASP.NET](docs/tech-images/aspnet.png)
 ![Serilog](docs/tech-images/serilog.png)
+![Autofac](docs/tech-images/autofac.png)
 ![FluentValidation](docs/tech-images/fluent-validation.png)
 
 # Documentation
