@@ -120,6 +120,8 @@ namespace CecoChat.Kafka
                 _activity = _kafkaActivityUtility.StartConsumer(consumeResult, _consumerOptions.ConsumerGroupID);
                 success = true;
             }
+            catch (OperationCanceledException)
+            {}
             catch (AccessViolationException accessViolationException)
             {
                 HandleConsumerDisposal(accessViolationException, ct);
@@ -150,6 +152,8 @@ namespace CecoChat.Kafka
 
                 success = true;
             }
+            catch (OperationCanceledException)
+            {}
             catch (AccessViolationException accessViolationException)
             {
                 HandleConsumerDisposal(accessViolationException, ct);

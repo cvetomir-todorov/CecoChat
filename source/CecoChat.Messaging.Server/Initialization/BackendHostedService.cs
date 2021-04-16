@@ -10,15 +10,18 @@ using Microsoft.Extensions.Options;
 
 namespace CecoChat.Messaging.Server.Initialization
 {
-    public sealed class BackendHostedService : IHostedService
+    public sealed class BackendHostedService : IHostedService, IDisposable
     {
         private readonly ILogger _logger;
         private readonly IBackendOptions _backendOptions;
         private readonly IBackendComponents _backendComponents;
         private readonly IPartitioningConfiguration _partitioningConfiguration;
+        private readonly CancellationToken _appStoppingCt;
+        private CancellationTokenSource _stoppedCts;
 
         public BackendHostedService(
             ILogger<BackendHostedService> logger,
+            IHostApplicationLifetime applicationLifetime,
             IOptions<BackendOptions> backendOptions,
             IBackendComponents backendComponents,
             IPartitioningConfiguration partitioningConfiguration)
@@ -27,10 +30,19 @@ namespace CecoChat.Messaging.Server.Initialization
             _backendOptions = backendOptions.Value;
             _backendComponents = backendComponents;
             _partitioningConfiguration = partitioningConfiguration;
+
+            _appStoppingCt = applicationLifetime.ApplicationStopping;
+        }
+
+        public void Dispose()
+        {
+            _stoppedCts?.Dispose();
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
+            _stoppedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _appStoppingCt);
+
             int partitionCount = _partitioningConfiguration.PartitionCount;
             PartitionRange partitions = _partitioningConfiguration.GetServerPartitions(_backendOptions.ServerID);
 
@@ -38,7 +50,7 @@ namespace CecoChat.Messaging.Server.Initialization
 
             foreach (IBackendConsumer backendConsumer in _backendComponents.BackendConsumers)
             {
-                StartBackendConsumer(backendConsumer, cancellationToken);
+                StartBackendConsumer(backendConsumer, _stoppedCts.Token);
             }
 
             return Task.CompletedTask;
