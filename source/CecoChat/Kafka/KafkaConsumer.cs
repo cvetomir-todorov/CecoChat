@@ -33,6 +33,7 @@ namespace CecoChat.Kafka
         private IKafkaConsumerOptions _consumerOptions;
         private Activity _activity;
         private string _id;
+        private bool _isDisposed;
 
         public KafkaConsumer(
             ILogger<KafkaConsumer<TKey, TValue>> logger,
@@ -46,7 +47,11 @@ namespace CecoChat.Kafka
 
         public void Dispose()
         {
-            _consumer?.Close();
+            if (!_isDisposed)
+            {
+                _consumer?.Close();
+                _isDisposed = true;
+            }
         }
 
         public void Initialize(IKafkaOptions options, IKafkaConsumerOptions consumerOptions, IDeserializer<TValue> valueDeserializer)

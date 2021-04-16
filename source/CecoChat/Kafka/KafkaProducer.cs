@@ -27,6 +27,7 @@ namespace CecoChat.Kafka
         private IProducer<TKey, TValue> _producer;
         private IKafkaProducerOptions _producerOptions;
         private string _id;
+        private bool _isDisposed;
 
         public KafkaProducer(
             ILogger<KafkaProducer<TKey, TValue>> logger,
@@ -38,7 +39,11 @@ namespace CecoChat.Kafka
 
         public void Dispose()
         {
-            _producer?.Dispose();
+            if (!_isDisposed)
+            {
+                _producer?.Dispose();
+                _isDisposed = true;
+            }
         }
 
         public void Initialize(IKafkaOptions options, IKafkaProducerOptions producerOptions, ISerializer<TValue> valueSerializer)
