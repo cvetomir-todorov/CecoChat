@@ -4,7 +4,7 @@ using CecoChat.Contracts.Backend;
 
 namespace CecoChat.Data.History
 {
-    public interface IBackendDbMapper
+    internal interface IBackendDbMapper
     {
         sbyte MapBackendToDbMessageType(BackendMessageType backendMessageType);
 
@@ -15,7 +15,7 @@ namespace CecoChat.Data.History
         void MapDbToBackendData(IDictionary<string, string> data, BackendMessage backendMessage);
     }
 
-    public sealed class BackendDbMapper : IBackendDbMapper
+    internal sealed class BackendDbMapper : IBackendDbMapper
     {
         private const string PlainTextKey = "plain_text";
 

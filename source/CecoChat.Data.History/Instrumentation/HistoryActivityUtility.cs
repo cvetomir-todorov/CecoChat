@@ -5,7 +5,7 @@ using CecoChat.Tracing;
 
 namespace CecoChat.Data.History.Instrumentation
 {
-    public interface IHistoryActivityUtility
+    internal interface IHistoryActivityUtility
     {
         Activity StartNewDialogMessage(ISession session, Guid messageID);
 
@@ -14,7 +14,7 @@ namespace CecoChat.Data.History.Instrumentation
         void Stop(Activity activity, bool operationSuccess);
     }
 
-    public sealed class HistoryActivityUtility : IHistoryActivityUtility
+    internal sealed class HistoryActivityUtility : IHistoryActivityUtility
     {
         private readonly IActivityUtility _activityUtility;
 

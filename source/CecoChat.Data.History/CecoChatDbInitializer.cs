@@ -13,7 +13,7 @@ namespace CecoChat.Data.History
         void Initialize();
     }
 
-    public sealed class CecoChatDbInitializer : ICecoChatDbInitializer
+    internal sealed class CecoChatDbInitializer : ICecoChatDbInitializer
     {
         private readonly ILogger _logger;
         private readonly ICecoChatDbContext _dbContext;

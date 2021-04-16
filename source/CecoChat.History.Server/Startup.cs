@@ -1,6 +1,5 @@
 using Autofac;
 using CecoChat.Autofac;
-using CecoChat.Cassandra;
 using CecoChat.Data.Configuration;
 using CecoChat.Data.History;
 using CecoChat.Data.History.Instrumentation;
@@ -10,7 +9,6 @@ using CecoChat.Jwt;
 using CecoChat.Otel;
 using CecoChat.Server;
 using CecoChat.Server.Identity;
-using CecoChat.Tracing;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -86,18 +84,13 @@ namespace CecoChat.History.Server
             builder.RegisterOptions<ClientOptions>(Configuration.GetSection("Clients"));
 
             // history
-            builder.RegisterModule(new CassandraModule<CecoChatDbContext, ICecoChatDbContext>
+            builder.RegisterModule(new HistoryDbModule
             {
-                CassandraConfiguration = Configuration.GetSection("HistoryDB")
+                HistoryDbConfiguration = Configuration.GetSection("HistoryDB"),
+                RegisterHistory = true
             });
-            builder.RegisterType<CecoChatDbInitializer>().As<ICecoChatDbInitializer>().SingleInstance();
-            builder.RegisterType<HistoryRepository>().As<IHistoryRepository>().SingleInstance();
-            builder.RegisterType<DataUtility>().As<IDataUtility>().SingleInstance();
-            builder.RegisterType<HistoryActivityUtility>().As<IHistoryActivityUtility>().SingleInstance();
-            builder.RegisterType<BackendDbMapper>().As<IBackendDbMapper>().SingleInstance();
 
             // shared
-            builder.RegisterType<ActivityUtility>().As<IActivityUtility>().SingleInstance();
             builder.RegisterType<ClientBackendMapper>().As<IClientBackendMapper>().SingleInstance();
         }
 
