@@ -121,7 +121,9 @@ namespace CecoChat.Kafka
                 success = true;
             }
             catch (OperationCanceledException)
-            {}
+            {
+                // nothing more to do when the ct was canceled
+            }
             catch (AccessViolationException accessViolationException)
             {
                 HandleConsumerDisposal(accessViolationException, ct);
@@ -153,7 +155,9 @@ namespace CecoChat.Kafka
                 success = true;
             }
             catch (OperationCanceledException)
-            {}
+            {
+                // nothing more to do when the ct was canceled
+            }
             catch (AccessViolationException accessViolationException)
             {
                 HandleConsumerDisposal(accessViolationException, ct);
