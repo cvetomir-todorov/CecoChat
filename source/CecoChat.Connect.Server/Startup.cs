@@ -1,3 +1,5 @@
+using Autofac;
+using CecoChat.Autofac;
 using CecoChat.Connect.Server.Initialization;
 using CecoChat.Data.Configuration;
 using CecoChat.Jwt;
@@ -56,14 +58,8 @@ namespace CecoChat.Connect.Server
                 otel.ConfigureJaegerExporter(_jaegerOptions);
             });
 
-            // ordered hosted services
-            services.AddHostedService<ConfigurationHostedService>();
-
             // security
             services.AddJwtAuthentication(_jwtOptions);
-
-            // configuration
-            services.AddConfiguration(Configuration.GetSection("ConfigurationDB"), addHistory: true, addPartitioning: true);
 
             // web
             services
@@ -75,8 +71,25 @@ namespace CecoChat.Connect.Server
                 });
             services.AddSwaggerServices(_swaggerOptions);
 
+            // required
+            services.AddOptions();
+        }
+
+        public void ConfigureContainer(ContainerBuilder builder)
+        {
+            // ordered hosted services
+            builder.RegisterHostedService<ConfigurationHostedService>();
+
+            // configuration
+            builder.RegisterModule(new ConfigurationModule
+            {
+                RedisConfiguration = Configuration.GetSection("ConfigurationDB"),
+                AddHistory = true,
+                AddPartitioning = true
+            });
+
             // backend
-            services.AddPartitionUtility();
+            builder.RegisterModule(new PartitionUtilityModule());
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

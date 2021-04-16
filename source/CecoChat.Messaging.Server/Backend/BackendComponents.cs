@@ -1,4 +1,5 @@
-﻿using CecoChat.Kafka;
+﻿using System.Collections.Generic;
+using CecoChat.Kafka;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -6,9 +7,7 @@ namespace CecoChat.Messaging.Server.Backend
 {
     public interface IBackendComponents
     {
-        IMessagesToReceiversConsumer MessagesToReceiversConsumer { get; }
-
-        IMessagesToSendersConsumer MessagesToSendersConsumer { get; }
+        IEnumerable<IBackendConsumer> BackendConsumers { get; }
 
         void ConfigurePartitioning(int partitionCount, PartitionRange partitions);
     }
@@ -19,28 +18,23 @@ namespace CecoChat.Messaging.Server.Backend
         private readonly IBackendOptions _backendOptions;
         private readonly ITopicPartitionFlyweight _topicPartitionFlyweight;
         private readonly IMessagesToBackendProducer _messagesToBackendProducer;
-        private readonly IMessagesToReceiversConsumer _messagesToReceiversConsumer;
-        private readonly IMessagesToSendersConsumer _messagesToSendersConsumer;
+        private readonly List<IBackendConsumer> _backendConsumers;
 
         public BackendComponents(
             ILogger<BackendComponents> logger,
             IOptions<BackendOptions> backendOptions,
             ITopicPartitionFlyweight topicPartitionFlyweight,
             IMessagesToBackendProducer messagesToBackendProducer,
-            IMessagesToReceiversConsumer messagesToReceiversConsumer,
-            IMessagesToSendersConsumer messagesToSendersConsumer)
+            IEnumerable<IBackendConsumer> backendConsumers)
         {
             _logger = logger;
             _backendOptions = backendOptions.Value;
             _topicPartitionFlyweight = topicPartitionFlyweight;
             _messagesToBackendProducer = messagesToBackendProducer;
-            _messagesToReceiversConsumer = messagesToReceiversConsumer;
-            _messagesToSendersConsumer = messagesToSendersConsumer;
+            _backendConsumers = new List<IBackendConsumer>(backendConsumers);
         }
 
-        public IMessagesToReceiversConsumer MessagesToReceiversConsumer => _messagesToReceiversConsumer;
-
-        public IMessagesToSendersConsumer MessagesToSendersConsumer => _messagesToSendersConsumer;
+        public IEnumerable<IBackendConsumer> BackendConsumers => _backendConsumers;
 
         public void ConfigurePartitioning(int partitionCount, PartitionRange partitions)
         {
@@ -53,8 +47,11 @@ namespace CecoChat.Messaging.Server.Backend
             }
 
             _messagesToBackendProducer.PartitionCount = partitionCount;
-            _messagesToReceiversConsumer.Prepare(partitions);
-            _messagesToSendersConsumer.Prepare(partitions);
+            foreach (IBackendConsumer backendConsumer in _backendConsumers)
+            {
+                backendConsumer.Prepare(partitions);
+            }
+
             _logger.LogInformation("Prepared backend components for topic {0} to use partitions {1}.",
                 _backendOptions.MessagesTopicName, partitions);
         }

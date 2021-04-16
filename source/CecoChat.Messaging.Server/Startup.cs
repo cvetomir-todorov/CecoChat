@@ -1,6 +1,7 @@
+using Autofac;
+using CecoChat.Autofac;
 using CecoChat.Contracts.Backend;
 using CecoChat.Data.Configuration;
-using CecoChat.Grpc;
 using CecoChat.Grpc.Instrumentation;
 using CecoChat.Jwt;
 using CecoChat.Kafka;
@@ -60,40 +61,52 @@ namespace CecoChat.Messaging.Server
                 otel.ConfigureJaegerExporter(_jaegerOptions);
             });
 
-            // ordered hosted services
-            services.AddHostedService<ConfigurationHostedService>();
-            services.AddHostedService<BackendHostedService>();
-            services.AddHostedService<PartitionsChangedHostedService>();
-
             // security
             services.AddJwtAuthentication(_jwtOptions);
             services.AddAuthorization();
 
-            // configuration
-            services.AddConfiguration(Configuration.GetSection("ConfigurationDB"), addPartitioning: true);
-
             // clients
             services.AddGrpc();
-            services.AddGrpcCustomUtilies();
-            services.AddSingleton<IClientContainer, ClientContainer>();
-            services.AddFactory<IGrpcListenStreamer, GrpcListenStreamer>();
-            services.Configure<ClientOptions>(Configuration.GetSection("Clients"));
+
+            // required
+            services.AddOptions();
+        }
+
+        public void ConfigureContainer(ContainerBuilder builder)
+        {
+            // ordered hosted services
+            builder.RegisterHostedService<ConfigurationHostedService>();
+            builder.RegisterHostedService<BackendHostedService>();
+            builder.RegisterHostedService<PartitionsChangedHostedService>();
+
+            // configuration
+            builder.RegisterModule(new ConfigurationModule
+            {
+                RedisConfiguration = Configuration.GetSection("ConfigurationDB"),
+                AddPartitioning = true
+            });
+
+            // clients
+            builder.RegisterModule(new GrpcInstrumentationModule());
+            builder.RegisterType<ClientContainer>().As<IClientContainer>().SingleInstance();
+            builder.RegisterFactory<GrpcListenStreamer, IGrpcListenStreamer>();
+            builder.RegisterOptions<ClientOptions>(Configuration.GetSection("Clients"));
 
             // backend
-            services.AddPartitionUtility();
-            services.AddSingleton<IBackendComponents, BackendComponents>();
-            services.AddSingleton<ITopicPartitionFlyweight, TopicPartitionFlyweight>();
-            services.AddSingleton<IMessagesToBackendProducer, MessagesToBackendProducer>();
-            services.AddSingleton<IMessagesToReceiversConsumer, MessagesToReceiversConsumer>();
-            services.AddSingleton<IMessagesToSendersConsumer, MessagesToSendersConsumer>();
-            services.AddFactory<IKafkaProducer<Null, BackendMessage>, KafkaProducer<Null, BackendMessage>>();
-            services.AddFactory<IKafkaConsumer<Null, BackendMessage>, KafkaConsumer<Null, BackendMessage>>();
-            services.AddKafka();
-            services.Configure<BackendOptions>(Configuration.GetSection("Backend"));
+            builder.RegisterModule(new PartitionUtilityModule());
+            builder.RegisterType<BackendComponents>().As<IBackendComponents>().SingleInstance();
+            builder.RegisterType<TopicPartitionFlyweight>().As<ITopicPartitionFlyweight>().SingleInstance();
+            builder.RegisterType<MessagesToBackendProducer>().As<IMessagesToBackendProducer>().SingleInstance();
+            builder.RegisterType<MessagesToReceiversConsumer>().As<IBackendConsumer>().SingleInstance();
+            builder.RegisterType<MessagesToSendersConsumer>().As<IBackendConsumer>().SingleInstance();
+            builder.RegisterFactory<KafkaProducer<Null, BackendMessage>, IKafkaProducer<Null, BackendMessage>>();
+            builder.RegisterFactory<KafkaConsumer<Null, BackendMessage>, IKafkaConsumer<Null, BackendMessage>>();
+            builder.RegisterModule(new KafkaInstrumentationModule());
+            builder.RegisterOptions<BackendOptions>(Configuration.GetSection("Backend"));
 
             // shared
-            services.AddSingleton<IClock, MonotonicClock>();
-            services.AddSingleton<IClientBackendMapper, ClientBackendMapper>();
+            builder.RegisterType<MonotonicClock>().As<IClock>().SingleInstance();
+            builder.RegisterType<ClientBackendMapper>().As<IClientBackendMapper>().SingleInstance();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

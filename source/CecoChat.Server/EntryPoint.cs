@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using Autofac.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -12,11 +13,16 @@ namespace CecoChat.Server
         public static IHostBuilder CreateDefaultHostBuilder(
             string[] args,
             Type startupContext,
+            bool useAutofac = true,
             bool useSerilog = true,
             string environmentVariablesPrefix = "CECOCHAT_")
         {
             IHostBuilder hostBuilder = Host.CreateDefaultBuilder(args);
 
+            if (useAutofac)
+            {
+                hostBuilder = hostBuilder.UseServiceProviderFactory(new AutofacServiceProviderFactory());
+            }
             if (startupContext != null)
             {
                 hostBuilder = hostBuilder.ConfigureWebHostDefaults(webBuilder =>

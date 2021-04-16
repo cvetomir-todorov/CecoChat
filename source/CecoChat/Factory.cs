@@ -23,7 +23,7 @@ namespace CecoChat
         }
     }
 
-    public static class FactoryExtensions
+    public static class FactoryRegistrations
     {
         public static IServiceCollection AddFactory<TService, TImplementation>(this IServiceCollection services)
             where TService : class
