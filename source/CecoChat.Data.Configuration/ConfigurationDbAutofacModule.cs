@@ -7,7 +7,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace CecoChat.Data.Configuration
 {
-    public sealed class ConfigurationDbModule : Module
+    public sealed class ConfigurationDbAutofacModule : Module
     {
         public IConfiguration RedisConfiguration { get; init; }
 
@@ -19,7 +19,7 @@ namespace CecoChat.Data.Configuration
         {
             if (RegisterHistory || RegisterPartitioning)
             {
-                builder.RegisterModule(new RedisModule
+                builder.RegisterModule(new RedisAutofacModule
                 {
                     RedisConfiguration = RedisConfiguration
                 });

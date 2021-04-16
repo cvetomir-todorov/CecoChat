@@ -11,7 +11,7 @@ namespace CecoChat.Data.History
         ISession Messaging { get; }
     }
 
-    public sealed class CecoChatDbContext : CassandraDbContext, ICecoChatDbContext
+    internal sealed class CecoChatDbContext : CassandraDbContext, ICecoChatDbContext
     {
         public CecoChatDbContext(IOptions<CassandraOptions> options) : base(options)
         {}

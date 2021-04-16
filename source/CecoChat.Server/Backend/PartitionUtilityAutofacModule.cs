@@ -3,7 +3,7 @@ using CecoChat.Autofac;
 
 namespace CecoChat.Server.Backend
 {
-    public sealed class PartitionUtilityModule : Module
+    public sealed class PartitionUtilityAutofacModule : Module
     {
         protected override void Load(ContainerBuilder builder)
         {

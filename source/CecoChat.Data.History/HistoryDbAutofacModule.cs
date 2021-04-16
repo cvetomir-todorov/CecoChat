@@ -7,7 +7,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace CecoChat.Data.History
 {
-    public sealed class HistoryDbModule : Module
+    public sealed class HistoryDbAutofacModule : Module
     {
         public IConfiguration HistoryDbConfiguration { get; init; }
 
@@ -22,7 +22,7 @@ namespace CecoChat.Data.History
                 return;
             }
 
-            builder.RegisterModule(new CassandraModule<CecoChatDbContext, ICecoChatDbContext>
+            builder.RegisterModule(new CassandraAutofacModule<CecoChatDbContext, ICecoChatDbContext>
             {
                 CassandraConfiguration = HistoryDbConfiguration
             });

@@ -74,7 +74,7 @@ namespace CecoChat.History.Server
             builder.RegisterHostedService<PrepareQueriesHostedService>();
 
             // configuration
-            builder.RegisterModule(new ConfigurationDbModule
+            builder.RegisterModule(new ConfigurationDbAutofacModule
             {
                 RedisConfiguration = Configuration.GetSection("ConfigurationDB"),
                 RegisterHistory = true
@@ -84,7 +84,7 @@ namespace CecoChat.History.Server
             builder.RegisterOptions<ClientOptions>(Configuration.GetSection("Clients"));
 
             // history
-            builder.RegisterModule(new HistoryDbModule
+            builder.RegisterModule(new HistoryDbAutofacModule
             {
                 HistoryDbConfiguration = Configuration.GetSection("HistoryDB"),
                 RegisterHistory = true

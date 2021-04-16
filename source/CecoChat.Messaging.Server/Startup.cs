@@ -80,20 +80,20 @@ namespace CecoChat.Messaging.Server
             builder.RegisterHostedService<PartitionsChangedHostedService>();
 
             // configuration
-            builder.RegisterModule(new ConfigurationDbModule
+            builder.RegisterModule(new ConfigurationDbAutofacModule
             {
                 RedisConfiguration = Configuration.GetSection("ConfigurationDB"),
                 RegisterPartitioning = true
             });
 
             // clients
-            builder.RegisterModule(new GrpcInstrumentationModule());
+            builder.RegisterModule(new GrpcInstrumentationAutofacModule());
             builder.RegisterType<ClientContainer>().As<IClientContainer>().SingleInstance();
             builder.RegisterFactory<GrpcListenStreamer, IGrpcListenStreamer>();
             builder.RegisterOptions<ClientOptions>(Configuration.GetSection("Clients"));
 
             // backend
-            builder.RegisterModule(new PartitionUtilityModule());
+            builder.RegisterModule(new PartitionUtilityAutofacModule());
             builder.RegisterType<BackendComponents>().As<IBackendComponents>().SingleInstance();
             builder.RegisterType<TopicPartitionFlyweight>().As<ITopicPartitionFlyweight>().SingleInstance();
             builder.RegisterType<MessagesToBackendProducer>().As<IMessagesToBackendProducer>().SingleInstance();
@@ -101,7 +101,7 @@ namespace CecoChat.Messaging.Server
             builder.RegisterType<MessagesToSendersConsumer>().As<IBackendConsumer>().SingleInstance();
             builder.RegisterFactory<KafkaProducer<Null, BackendMessage>, IKafkaProducer<Null, BackendMessage>>();
             builder.RegisterFactory<KafkaConsumer<Null, BackendMessage>, IKafkaConsumer<Null, BackendMessage>>();
-            builder.RegisterModule(new KafkaInstrumentationModule());
+            builder.RegisterModule(new KafkaInstrumentationAutofacModule());
             builder.RegisterOptions<BackendOptions>(Configuration.GetSection("Backend"));
 
             // shared

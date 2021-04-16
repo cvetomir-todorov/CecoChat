@@ -5,7 +5,7 @@ using Swashbuckle.AspNetCore.Filters;
 
 namespace CecoChat.Swagger
 {
-    public static class SwaggerExtensions
+    public static class SwaggerRegistrations
     {
         public static void AddSwaggerServices(this IServiceCollection services, ISwaggerOptions options)
         {

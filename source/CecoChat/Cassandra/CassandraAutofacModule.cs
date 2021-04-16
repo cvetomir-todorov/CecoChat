@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace CecoChat.Cassandra
 {
-    public class CassandraModule<TDbContextImplementation, TDbContext> : Module
+    public class CassandraAutofacModule<TDbContextImplementation, TDbContext> : Module
         where TDbContext : class, ICassandraDbContext
         where TDbContextImplementation : CassandraDbContext, TDbContext
     {

@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace CecoChat.Redis
 {
-    public sealed class RedisModule : Module
+    public sealed class RedisAutofacModule : Module
     {
         public IConfiguration RedisConfiguration { get; init; }
 

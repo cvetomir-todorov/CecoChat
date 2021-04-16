@@ -2,7 +2,7 @@
 
 namespace CecoChat.Grpc.Instrumentation
 {
-    public static class GrpcInstrumentationExtensions
+    public static class GrpcInstrumentationRegistrations
     {
         public static TracerProviderBuilder AddGrpcInstrumentation(this TracerProviderBuilder builder)
         {

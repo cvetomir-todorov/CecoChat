@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace CecoChat.Client
 {
-    public static class RegistrationExtensions
+    public static class Registrations
     {
         public static IServiceCollection AddClientSharedServices(this IServiceCollection services)
         {

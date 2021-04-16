@@ -4,7 +4,7 @@ using OpenTelemetry.Trace;
 
 namespace CecoChat.Otel
 {
-    public static class OtelExtensions
+    public static class OtelRegistrations
     {
         public static TracerProviderBuilder AddServiceResource(this TracerProviderBuilder otel, OtelServiceResource serviceResource)
         {
