@@ -2,15 +2,15 @@
 using CecoChat.Autofac;
 using CecoChat.Tracing;
 
-namespace CecoChat.Kafka.Instrumentation
+namespace CecoChat.Grpc.Instrumentation
 {
-    public sealed class KafkaInstrumentationModule : Module
+    public sealed class GrpcInstrumentationAutofacModule : Module
     {
         protected override void Load(ContainerBuilder builder)
         {
-            string utilityName = $"{nameof(KafkaActivityUtility)}.{nameof(IActivityUtility)}";
+            string utilityName = $"{nameof(GrpcActivityUtility)}.{nameof(IActivityUtility)}";
 
-            builder.RegisterType<KafkaActivityUtility>().As<IKafkaActivityUtility>()
+            builder.RegisterType<GrpcActivityUtility>().As<IGrpcActivityUtility>()
                 .WithNamedParameter(typeof(IActivityUtility), utilityName)
                 .SingleInstance();
             builder.RegisterType<ActivityUtility>().Named<IActivityUtility>(utilityName).SingleInstance();

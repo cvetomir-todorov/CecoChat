@@ -2,7 +2,7 @@
 
 namespace CecoChat.Data.History.Instrumentation
 {
-    public static class HistoryInstrumentationExtensions
+    public static class HistoryInstrumentationRegistrations
     {
         public static TracerProviderBuilder AddHistoryInstrumentation(this TracerProviderBuilder builder)
         {

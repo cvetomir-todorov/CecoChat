@@ -63,7 +63,7 @@ namespace CecoChat.Materialize.Server
             builder.RegisterHostedService<MaterializeMessagesHostedService>();
 
             // history
-            builder.RegisterModule(new HistoryDbModule
+            builder.RegisterModule(new HistoryDbAutofacModule
             {
                 HistoryDbConfiguration = Configuration.GetSection("HistoryDB"),
                 RegisterNewMessage = true
@@ -72,7 +72,7 @@ namespace CecoChat.Materialize.Server
             // backend
             builder.RegisterType<MaterializeMessagesConsumer>().As<IMaterializeMessagesConsumer>().SingleInstance();
             builder.RegisterFactory<KafkaConsumer<Null, BackendMessage>, IKafkaConsumer<Null, BackendMessage>>();
-            builder.RegisterModule(new KafkaInstrumentationModule());
+            builder.RegisterModule(new KafkaInstrumentationAutofacModule());
             builder.RegisterOptions<BackendOptions>(Configuration.GetSection("Backend"));
         }
 

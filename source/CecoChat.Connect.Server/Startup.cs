@@ -81,7 +81,7 @@ namespace CecoChat.Connect.Server
             builder.RegisterHostedService<ConfigurationHostedService>();
 
             // configuration
-            builder.RegisterModule(new ConfigurationDbModule
+            builder.RegisterModule(new ConfigurationDbAutofacModule
             {
                 RedisConfiguration = Configuration.GetSection("ConfigurationDB"),
                 RegisterHistory = true,
@@ -89,7 +89,7 @@ namespace CecoChat.Connect.Server
             });
 
             // backend
-            builder.RegisterModule(new PartitionUtilityModule());
+            builder.RegisterModule(new PartitionUtilityAutofacModule());
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
