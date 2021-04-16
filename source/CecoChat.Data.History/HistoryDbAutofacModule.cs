@@ -22,11 +22,11 @@ namespace CecoChat.Data.History
                 return;
             }
 
-            builder.RegisterModule(new CassandraAutofacModule<CecoChatDbContext, ICecoChatDbContext>
+            builder.RegisterModule(new CassandraAutofacModule<HistoryDbContext, IHistoryDbContext>
             {
                 CassandraConfiguration = HistoryDbConfiguration
             });
-            builder.RegisterType<CecoChatDbInitializer>().As<ICecoChatDbInitializer>().SingleInstance();
+            builder.RegisterType<HistoryDbInitializer>().As<IHistoryDbInitializer>().SingleInstance();
             builder.RegisterType<DataUtility>().As<IDataUtility>().SingleInstance();
             builder.RegisterType<BackendDbMapper>().As<IBackendDbMapper>().SingleInstance();
 

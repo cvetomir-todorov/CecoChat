@@ -4,16 +4,16 @@ using Microsoft.Extensions.Options;
 
 namespace CecoChat.Data.History
 {
-    public interface ICecoChatDbContext : ICassandraDbContext
+    public interface IHistoryDbContext : ICassandraDbContext
     {
         string MessagingKeyspace { get; }
 
         ISession Messaging { get; }
     }
 
-    internal sealed class CecoChatDbContext : CassandraDbContext, ICecoChatDbContext
+    internal sealed class HistoryDbContext : CassandraDbContext, IHistoryDbContext
     {
-        public CecoChatDbContext(IOptions<CassandraOptions> options) : base(options)
+        public HistoryDbContext(IOptions<CassandraOptions> options) : base(options)
         {}
 
         public string MessagingKeyspace => "messaging";

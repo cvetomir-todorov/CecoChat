@@ -8,19 +8,19 @@ using Microsoft.Extensions.Logging;
 
 namespace CecoChat.Data.History
 {
-    public interface ICecoChatDbInitializer
+    public interface IHistoryDbInitializer
     {
         void Initialize();
     }
 
-    internal sealed class CecoChatDbInitializer : ICecoChatDbInitializer
+    internal sealed class HistoryDbInitializer : IHistoryDbInitializer
     {
         private readonly ILogger _logger;
-        private readonly ICecoChatDbContext _dbContext;
+        private readonly IHistoryDbContext _dbContext;
 
-        public CecoChatDbInitializer(
-            ILogger<CecoChatDbInitializer> logger,
-            ICecoChatDbContext dbContext)
+        public HistoryDbInitializer(
+            ILogger<HistoryDbInitializer> logger,
+            IHistoryDbContext dbContext)
         {
             _logger = logger;
             _dbContext = dbContext;

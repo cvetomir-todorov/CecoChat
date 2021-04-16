@@ -7,10 +7,10 @@ namespace CecoChat.History.Server.Initialization
 {
     public sealed class InitializeDbHostedService : IHostedService
     {
-        private readonly ICecoChatDbInitializer _dbInitializer;
+        private readonly IHistoryDbInitializer _dbInitializer;
 
         public InitializeDbHostedService(
-            ICecoChatDbInitializer dbInitializer)
+            IHistoryDbInitializer dbInitializer)
         {
             _dbInitializer = dbInitializer;
         }
