@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace CecoChat.Materialize.Server.Initialization
 {
-    public class MaterializeMessagesHostedService : IHostedService, IDisposable
+    public sealed class MaterializeMessagesHostedService : IHostedService, IDisposable
     {
         private readonly ILogger _logger;
         private readonly IMaterializeMessagesConsumer _materializeMessagesConsumer;
