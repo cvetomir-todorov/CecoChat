@@ -18,7 +18,7 @@ namespace CecoChat.Data.History
         Task<IReadOnlyCollection<BackendMessage>> GetDialogHistory(long userID, long otherUserID, DateTime olderThan, int countLimit);
     }
 
-    public sealed class HistoryRepository : IHistoryRepository
+    internal sealed class HistoryRepository : IHistoryRepository
     {
         private readonly ILogger _logger;
         private readonly IHistoryActivityUtility _historyActivityUtility;

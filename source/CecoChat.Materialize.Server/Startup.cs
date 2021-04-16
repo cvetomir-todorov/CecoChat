@@ -63,24 +63,17 @@ namespace CecoChat.Materialize.Server
             builder.RegisterHostedService<MaterializeMessagesHostedService>();
 
             // history
-            builder.RegisterModule(new CassandraModule<CecoChatDbContext, ICecoChatDbContext>
+            builder.RegisterModule(new HistoryDbModule
             {
-                CassandraConfiguration = Configuration.GetSection("HistoryDB")
+                HistoryDbConfiguration = Configuration.GetSection("HistoryDB"),
+                RegisterNewMessage = true
             });
-            builder.RegisterType<CecoChatDbInitializer>().As<ICecoChatDbInitializer>().SingleInstance();
-            builder.RegisterType<NewMessageRepository>().As<INewMessageRepository>().SingleInstance();
-            builder.RegisterType<DataUtility>().As<IDataUtility>().SingleInstance();
-            builder.RegisterType<HistoryActivityUtility>().As<IHistoryActivityUtility>().SingleInstance();
-            builder.RegisterType<BackendDbMapper>().As<IBackendDbMapper>().SingleInstance();
 
             // backend
             builder.RegisterType<MaterializeMessagesConsumer>().As<IMaterializeMessagesConsumer>().SingleInstance();
             builder.RegisterFactory<KafkaConsumer<Null, BackendMessage>, IKafkaConsumer<Null, BackendMessage>>();
             builder.RegisterModule(new KafkaInstrumentationModule());
             builder.RegisterOptions<BackendOptions>(Configuration.GetSection("Backend"));
-
-            // shared
-            builder.RegisterType<ActivityUtility>().As<IActivityUtility>().SingleInstance();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

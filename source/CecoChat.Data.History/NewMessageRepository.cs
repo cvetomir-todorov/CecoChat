@@ -16,7 +16,7 @@ namespace CecoChat.Data.History
         void AddNewDialogMessage(BackendMessage message);
     }
 
-    public sealed class NewMessageRepository : INewMessageRepository
+    internal sealed class NewMessageRepository : INewMessageRepository
     {
         private readonly ILogger _logger;
         private readonly IHistoryActivityUtility _historyActivityUtility;

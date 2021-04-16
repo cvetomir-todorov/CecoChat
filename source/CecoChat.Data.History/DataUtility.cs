@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace CecoChat.Data.History
 {
-    public interface IDataUtility
+    internal interface IDataUtility
     {
         ISession MessagingSession { get; }
 
@@ -20,7 +20,7 @@ namespace CecoChat.Data.History
         string CreateDialogID(long userID1, long userID2);
     }
 
-    public sealed class DataUtility : IDataUtility
+    internal sealed class DataUtility : IDataUtility
     {
         private readonly ILogger _logger;
         private readonly ICecoChatDbContext _dbContext;
