@@ -131,13 +131,10 @@ namespace CecoChat.Messaging.Server.Backend
                 _logger.LogWarning("Connected recipients with ID {0} ({1} out of {2}) were queued message {3}.",
                     backendMessage.ReceiverId, successCount, allCount, backendMessage.MessageId);
             }
-            else
+            else if (allCount > 0)
             {
-                if (allCount > 0)
-                {
-                    _logger.LogTrace("Connected recipients with ID {0} (all {1}) were queued message {2}.",
-                        backendMessage.ReceiverId, successCount, backendMessage.MessageId);
-                }
+                _logger.LogTrace("Connected recipients with ID {0} (all {1}) were queued message {2}.",
+                    backendMessage.ReceiverId, successCount, backendMessage.MessageId);
             }
         }
     }

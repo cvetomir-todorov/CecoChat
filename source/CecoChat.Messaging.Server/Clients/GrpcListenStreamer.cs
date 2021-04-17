@@ -13,9 +13,14 @@ namespace CecoChat.Messaging.Server.Clients
 {
     public interface IGrpcListenStreamer : IStreamer<ListenResponse>
     {
-        void Initialize(Guid clientID, IServerStreamWriter<ListenResponse> streamWriter);
+        void Initialize(Guid clientID, IServerStreamWriter<ListenResponse> streamWriter, IStreamingStrategy streamingStrategy);
+    }
 
-        void SetFinalMessagePredicate(Func<ListenResponse, bool> finalMessagePredicate);
+    public interface IStreamingStrategy
+    {
+        bool IsFinal(ListenResponse response);
+
+        bool AffectsSequencing(ListenResponse response);
     }
 
     /// <summary>
@@ -28,9 +33,10 @@ namespace CecoChat.Messaging.Server.Clients
         private readonly BlockingCollection<MessageContext> _messageQueue;
         private readonly SemaphoreSlim _signalProcessing;
 
-        private Func<ListenResponse, bool> _finalMessagePredicate;
         private IServerStreamWriter<ListenResponse> _streamWriter;
+        private IStreamingStrategy _streamingStrategy;
         private Guid _clientID;
+        private int _sequenceNumber;
 
         public GrpcListenStreamer(
             ILogger<GrpcListenStreamer> logger,
@@ -44,7 +50,7 @@ namespace CecoChat.Messaging.Server.Clients
                 collection: new ConcurrentQueue<MessageContext>(),
                 boundedCapacity: options.Value.SendMessagesHighWatermark);
             _signalProcessing = new SemaphoreSlim(initialCount: 0, maxCount: 1);
-            _finalMessagePredicate = _ => false;
+            _streamingStrategy = DefaultStreamingStrategy.Instance;
         }
 
         public void Dispose()
@@ -53,21 +59,22 @@ namespace CecoChat.Messaging.Server.Clients
             _messageQueue.Dispose();
         }
 
-        public void Initialize(Guid clientID, IServerStreamWriter<ListenResponse> streamWriter)
+        public void Initialize(Guid clientID, IServerStreamWriter<ListenResponse> streamWriter, IStreamingStrategy streamingStrategy)
         {
             _clientID = clientID;
             _streamWriter = streamWriter;
-        }
-
-        public void SetFinalMessagePredicate(Func<ListenResponse, bool> finalMessagePredicate)
-        {
-            _finalMessagePredicate = finalMessagePredicate;
+            _streamingStrategy = streamingStrategy;
         }
 
         public Guid ClientID => _clientID;
 
         public bool EnqueueMessage(ListenResponse message, Activity parentActivity = null)
         {
+            if (_streamingStrategy.AffectsSequencing(message))
+            {
+                _sequenceNumber++;
+            }
+
             bool isAdded = _messageQueue.TryAdd(new MessageContext
             {
                 Message = message,
@@ -111,12 +118,13 @@ namespace CecoChat.Messaging.Server.Clients
 
             while (!ct.IsCancellationRequested && _messageQueue.TryTake(out MessageContext messageContext))
             {
-                Activity activity = StartActivity(messageContext.ParentActivity);
+                Activity activity = StartActivity(messageContext.Message, messageContext.ParentActivity);
                 bool success = false;
 
                 try
                 {
-                    processedFinalMessage = _finalMessagePredicate(messageContext.Message);
+                    processedFinalMessage = _streamingStrategy.IsFinal(messageContext.Message);
+                    messageContext.Message.SequenceNumber = _sequenceNumber;
                     await _streamWriter.WriteAsync(messageContext.Message);
                     success = true;
                     _logger.LogTrace("Sent {0} message {1}", _clientID, messageContext.Message);
@@ -142,11 +150,11 @@ namespace CecoChat.Messaging.Server.Clients
             return new EmptyQueueResult {Stop = processedFinalMessage};
         }
 
-        private Activity StartActivity(Activity parentActivity)
+        private Activity StartActivity(ListenResponse message, Activity parentActivity)
         {
             const string service = nameof(GrpcListenService);
             const string method = nameof(GrpcListenService.Listen);
-            string name = $"{service}.{method}/Clients.PushMessage";
+            string name = $"{service}.{method}/StreamMessage.{message.Message.Type}";
 
             return _grpcActivityUtility.StartServiceMethod(name, service, method, parentActivity.Context);
         }
@@ -156,6 +164,24 @@ namespace CecoChat.Messaging.Server.Clients
             public ListenResponse Message { get; init; }
 
             public Activity ParentActivity { get; init; }
+        }
+
+        private sealed class DefaultStreamingStrategy : IStreamingStrategy
+        {
+            public static readonly DefaultStreamingStrategy Instance = new();
+
+            private DefaultStreamingStrategy()
+            {}
+
+            public bool IsFinal(ListenResponse response)
+            {
+                return false;
+            }
+
+            public bool AffectsSequencing(ListenResponse response)
+            {
+                return true;
+            }
         }
     }
 }

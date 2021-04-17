@@ -12,4 +12,5 @@ message ListenRequest {
 
 message ListenResponse {
   ClientMessage message = 1;
+  int32 sequence_number = 2;
 }
