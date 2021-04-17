@@ -1,23 +1,41 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using CecoChat.Data.History;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace CecoChat.History.Server.Initialization
 {
     public sealed class PrepareQueriesHostedService : IHostedService
     {
+        private readonly ILogger _logger;
         private readonly IHistoryRepository _historyRepository;
 
         public PrepareQueriesHostedService(
+            ILogger<PrepareQueriesHostedService> logger,
             IHistoryRepository historyRepository)
         {
+            _logger = logger;
             _historyRepository = historyRepository;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            _historyRepository.Prepare();
+            Task.Run(() =>
+            {
+                try
+                {
+                    _logger.LogInformation("Start preparing queries...");
+                    _historyRepository.Prepare();
+                    _logger.LogInformation("Completed preparing queries.");
+                }
+                catch (Exception exception)
+                {
+                    _logger.LogCritical(exception, "Failed to prepare queries.");
+                }
+            }, cancellationToken);
+
             return Task.CompletedTask;
         }
 
