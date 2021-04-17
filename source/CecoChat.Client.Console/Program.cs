@@ -19,8 +19,8 @@ namespace CecoChat.Client.Console
 
             MessagingClient client = new();
             await client.Initialize(username, password, profileServer: "https://localhost:31005", connectServer: "https://localhost:31000");
-            client.MessageReceived += (_, message) => DisplayMessage(message);
-            client.MessageAcknowledged += (_, message) => DisplayAck(message);
+            client.MessageReceived += (_, response) => DisplayMessage(response.Message, response.SequenceNumber);
+            client.MessageAcknowledged += (_, response) => DisplayAck(response);
             client.ExceptionOccurred += (_, exception) => System.Console.WriteLine(exception);
 
             client.ListenForMessages(CancellationToken.None);
@@ -68,14 +68,18 @@ namespace CecoChat.Client.Console
             }
         }
 
-        private static void DisplayMessage(ClientMessage message)
+        private static void DisplayMessage(ClientMessage message, int? sequenceNumber = null)
         {
-            System.Console.WriteLine($"[{message.Timestamp.ToDateTime():F}] {message.SenderId}->{message.ReceiverId}: {message.Text}");
+            string sequenceString = sequenceNumber.HasValue ? $"[{sequenceNumber}]" : string.Empty;
+            System.Console.WriteLine("{0}[{1:F}] {2}->{3}: {4}",
+                sequenceString, message.Timestamp.ToDateTime(), message.SenderId, message.ReceiverId, message.Text);
         }
 
-        private static void DisplayAck(ClientMessage message)
+        private static void DisplayAck(ListenResponse response)
         {
-            System.Console.WriteLine($"[{message.Timestamp.ToDateTime():F}] {message.SenderId}->{message.ReceiverId}: {message.AckType}");
+            ClientMessage message = response.Message;
+            System.Console.WriteLine("[{0}][{1:F}] {2}->{3}: {4}",
+                response.SequenceNumber, message.Timestamp.ToDateTime(), message.SenderId, message.ReceiverId, message.AckType);
         }
     }
 }

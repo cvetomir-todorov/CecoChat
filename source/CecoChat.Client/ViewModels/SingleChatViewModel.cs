@@ -46,21 +46,22 @@ namespace CecoChat.Client.ViewModels
 
         public event EventHandler<ClientMessage> MessageSent;
 
-        private void MessagingClientOnMessageReceived(object sender, ClientMessage message)
+        private void MessagingClientOnMessageReceived(object sender, ListenResponse response)
         {
-            if (message.SenderId != OtherUserID && message.ReceiverId != OtherUserID)
+            if (response.Message.SenderId != OtherUserID && response.Message.ReceiverId != OtherUserID)
             {
                 return;
             }
 
-            InsertMessage(message);
+            InsertMessage(response.Message, response.SequenceNumber);
         }
 
-        private void MessagingClientOnMessageAcknowledged(object sender, ClientMessage message)
+        private void MessagingClientOnMessageAcknowledged(object sender, ListenResponse response)
         {
-            if (_messageMap.TryGetValue(message.MessageId.ToGuid(), out SingleChatMessageViewModel messageVM))
+            if (_messageMap.TryGetValue(response.Message.MessageId.ToGuid(), out SingleChatMessageViewModel messageVM))
             {
-                messageVM.DeliveryStatus = message.AckType.ToString();
+                messageVM.SequenceNumber = response.SequenceNumber.ToString();
+                messageVM.DeliveryStatus = response.Message.AckType.ToString();
             }
         }
 
@@ -99,7 +100,7 @@ namespace CecoChat.Client.ViewModels
             CanSend = true;
         }
 
-        private void InsertMessage(ClientMessage message)
+        private void InsertMessage(ClientMessage message, int? sequenceNumber = null)
         {
             Guid messageID = message.MessageId.ToGuid();
             if (_messageMap.ContainsKey(messageID))
@@ -122,7 +123,8 @@ namespace CecoChat.Client.ViewModels
             {
                 IsSenderCurrentUser = message.SenderId == MessagingClient.UserID,
                 Timestamp = message.Timestamp.ToDateTime(),
-                FormattedMessage = $"[{message.Timestamp.ToDateTime()}] {message.SenderId}: {message.Text}"
+                FormattedMessage = $"[{message.Timestamp.ToDateTime()}] {message.SenderId}: {message.Text}",
+                SequenceNumber = sequenceNumber?.ToString()
             };
 
             if (insertionIndex >= Messages.Count)
