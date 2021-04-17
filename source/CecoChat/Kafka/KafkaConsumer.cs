@@ -16,12 +16,7 @@ namespace CecoChat.Kafka
 
         void Assign(string topic, PartitionRange partitions, ITopicPartitionFlyweight partitionFlyweight);
 
-        bool TryConsume(CancellationToken ct, out ConsumeResult<TKey, TValue> consumeResult);
-
-        /// <summary>
-        /// Should always be called regardless of the value of <see cref="IKafkaConsumerOptions.EnableAutoCommit"/>.
-        /// </summary>
-        void Commit(ConsumeResult<TKey, TValue> consumeResult, CancellationToken ct);
+        void Consume(Action<ConsumeResult<TKey, TValue>> messageHandler, CancellationToken ct);
     }
 
     public sealed class KafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey, TValue>
@@ -31,7 +26,6 @@ namespace CecoChat.Kafka
         private PartitionRange _assignedPartitions;
         private IConsumer<TKey, TValue> _consumer;
         private IKafkaConsumerOptions _consumerOptions;
-        private Activity _activity;
         private string _id;
         private bool _isDisposed;
 
@@ -107,52 +101,24 @@ namespace CecoChat.Kafka
             _logger.LogDebug("Consumer {0} assigned partitions {1} from topic {2}.", _id, partitions, topic);
         }
 
-        public bool TryConsume(CancellationToken ct, out ConsumeResult<TKey, TValue> consumeResult)
+        private enum ConsumeStage
         {
-            EnsureInitialized();
-            bool success = false;
-            consumeResult = default;
-
-            try
-            {
-                consumeResult = _consumer.Consume(ct);
-                // consume blocks until there is a message and it is read => start activity after that
-                _activity = _kafkaActivityUtility.StartConsumer(consumeResult, _consumerOptions.ConsumerGroupID);
-                success = true;
-            }
-            catch (OperationCanceledException)
-            {
-                // nothing more to do when the ct was canceled
-            }
-            catch (AccessViolationException accessViolationException)
-            {
-                HandleConsumerDisposal(accessViolationException, ct);
-            }
-            catch (ObjectDisposedException objectDisposedException)
-            {
-                HandleConsumerDisposal(objectDisposedException, ct);
-            }
-            catch (Exception exception)
-            {
-                _logger.LogError(exception, "Consumer {0} error.", _id);
-            }
-
-            return success;
+            Initial, AfterConsume, AfterMessageHandle, AfterCommit
         }
 
-        public void Commit(ConsumeResult<TKey, TValue> consumeResult, CancellationToken ct)
+        public void Consume(Action<ConsumeResult<TKey, TValue>> messageHandler, CancellationToken ct)
         {
             EnsureInitialized();
-            bool success = false;
+            ConsumeStage stage = ConsumeStage.Initial;
+            ConsumeResult<TKey, TValue> consumeResult = default;
+            Activity activity = default;
 
             try
             {
-                if (!_consumerOptions.EnableAutoCommit)
+                if (!DoConsume(messageHandler, out Exception messageHandlerException, out stage, out consumeResult, out activity, ct))
                 {
-                    _consumer.Commit(consumeResult);
+                    throw new InvalidOperationException("Message handler threw an exception.", messageHandlerException);
                 }
-
-                success = true;
             }
             catch (OperationCanceledException)
             {
@@ -172,13 +138,8 @@ namespace CecoChat.Kafka
             }
             finally
             {
-                if (!success)
-                {
-                    _logger.LogError("Consumer {0} failed to commit topic {1} partition {2} offset {3}.",
-                        _id, consumeResult.Topic, consumeResult.Partition, consumeResult.Offset);
-                }
-
-                _kafkaActivityUtility.StopConsumer(_activity, success);
+                bool success = InspectStage(stage, consumeResult);
+                _kafkaActivityUtility.StopConsumer(activity, success);
             }
         }
 
@@ -196,6 +157,71 @@ namespace CecoChat.Kafka
             {
                 _logger.LogError(exception, "Consumer {0} was disposed without cancellation being requested.", _id);
             }
+        }
+
+#pragma warning disable IDE0059 // Unnecessary assignment of a value
+        private bool DoConsume(
+            Action<ConsumeResult<TKey, TValue>> messageHandler,
+            out Exception messageHandlerException,
+            out ConsumeStage stage,
+            out ConsumeResult<TKey, TValue> consumeResult,
+            out Activity activity,
+            CancellationToken ct)
+        {
+            messageHandlerException = default;
+            consumeResult = _consumer.Consume(ct);
+            // consume blocks until there is a message and it is read => start activity after that
+            activity = _kafkaActivityUtility.StartConsumer(consumeResult, _consumerOptions.ConsumerGroupID);
+            stage = ConsumeStage.AfterConsume;
+
+            try
+            {
+                messageHandler(consumeResult);
+                stage = ConsumeStage.AfterMessageHandle;
+            }
+            catch (Exception e)
+            {
+                messageHandlerException = e;
+            }
+
+            if (messageHandlerException != default)
+            {
+                return false;
+            }
+
+            if (!_consumerOptions.EnableAutoCommit)
+            {
+                _consumer.Commit(consumeResult);
+            }
+            stage = ConsumeStage.AfterCommit;
+            return true;
+        }
+#pragma warning restore IDE0059 // Unnecessary assignment of a value
+
+        private bool InspectStage(ConsumeStage stage, ConsumeResult<TKey, TValue> consumeResult)
+        {
+            bool success = false;
+
+            switch (stage)
+            {
+                case ConsumeStage.Initial:
+                    _logger.LogError("Consumer {0} failed to consume a message.", _id);
+                    break;
+                case ConsumeStage.AfterConsume:
+                    _logger.LogError("Consumer {0} encountered a failing message handler.", _id);
+                    break;
+                case ConsumeStage.AfterMessageHandle:
+                    _logger.LogError("Consumer {0} failed to commit to topic {1} partition {2} offset {3}.",
+                        _id, consumeResult.Topic, consumeResult.Partition.Value, consumeResult.Offset.Value);
+                    break;
+                case ConsumeStage.AfterCommit:
+                    success = true;
+                    break;
+                default:
+                    throw new InvalidOperationException($"{typeof(ConsumeStage).FullName} value {stage} is not supported.");
+            }
+
+            return success;
         }
     }
 

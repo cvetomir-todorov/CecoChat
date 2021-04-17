@@ -78,11 +78,10 @@ namespace CecoChat.Messaging.Server.Backend
 
             while (!ct.IsCancellationRequested)
             {
-                if (_consumer.TryConsume(ct, out ConsumeResult<Null, BackendMessage> consumeResult))
+                _consumer.Consume(consumeResult =>
                 {
                     ProcessMessage(consumeResult.Message.Value);
-                    _consumer.Commit(consumeResult, ct);
-                }
+                }, ct);
             }
 
             _logger.LogInformation("Stopped sending messages to receivers.");
