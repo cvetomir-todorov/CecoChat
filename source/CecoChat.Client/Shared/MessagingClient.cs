@@ -129,18 +129,18 @@ namespace CecoChat.Client.Shared
             {
                 while (!ct.IsCancellationRequested && await serverStream.ResponseStream.MoveNext())
                 {
-                    ClientMessage message = serverStream.ResponseStream.Current.Message;
-                    if (message.Type == ClientMessageType.Disconnect)
+                    ListenResponse response = serverStream.ResponseStream.Current;
+                    if (response.Message.Type == ClientMessageType.Disconnect)
                     {
                         Disconnected?.Invoke(this, EventArgs.Empty);
                     }
-                    else if (message.Type == ClientMessageType.Ack)
+                    else if (response.Message.Type == ClientMessageType.Ack)
                     {
-                        MessageAcknowledged?.Invoke(this, message);
+                        MessageAcknowledged?.Invoke(this, response);
                     }
                     else
                     {
-                        MessageReceived?.Invoke(this, message);
+                        MessageReceived?.Invoke(this, response);
                     }
                 }
             }
@@ -150,9 +150,9 @@ namespace CecoChat.Client.Shared
             }
         }
 
-        public event EventHandler<ClientMessage> MessageReceived;
+        public event EventHandler<ListenResponse> MessageReceived;
 
-        public event EventHandler<ClientMessage> MessageAcknowledged;
+        public event EventHandler<ListenResponse> MessageAcknowledged;
 
         public event EventHandler Disconnected;
 

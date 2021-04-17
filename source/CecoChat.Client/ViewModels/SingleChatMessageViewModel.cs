@@ -12,6 +12,8 @@ namespace CecoChat.Client.ViewModels
 
         public string FormattedMessage { get; set; }
 
+        public string SequenceNumber { get; set; }
+
         public string DeliveryStatus { get; set; }
     }
 }

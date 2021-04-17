@@ -51,14 +51,14 @@ namespace CecoChat.Client.ViewModels
 
         public SingleChatViewModel SingleChatVM { get; }
 
-        private void MessagingClientOnMessageReceived(object sender, ClientMessage message)
+        private void MessagingClientOnMessageReceived(object sender, ListenResponse response)
         {
-            if (!TryGetOtherUserID(message, out long otherUserID))
+            if (!TryGetOtherUserID(response.Message, out long otherUserID))
             {
                 return;
             }
-            MessageStorage.AddMessage(otherUserID, message);
-            ShowLastMessageFromUser(message, otherUserID);
+            MessageStorage.AddMessage(otherUserID, response.Message);
+            ShowLastMessageFromUser(response.Message, otherUserID);
         }
 
         private Task SelectionChangedOnExecute()
