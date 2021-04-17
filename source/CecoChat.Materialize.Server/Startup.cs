@@ -70,7 +70,7 @@ namespace CecoChat.Materialize.Server
             });
 
             // backend
-            builder.RegisterType<MaterializeMessagesConsumer>().As<IMaterializeMessagesConsumer>().SingleInstance();
+            builder.RegisterType<MaterializeConsumer>().As<IMaterializeConsumer>().SingleInstance();
             builder.RegisterFactory<KafkaConsumer<Null, BackendMessage>, IKafkaConsumer<Null, BackendMessage>>();
             builder.RegisterModule(new KafkaInstrumentationAutofacModule());
             builder.RegisterOptions<BackendOptions>(Configuration.GetSection("Backend"));

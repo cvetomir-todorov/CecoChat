@@ -10,22 +10,22 @@ using Microsoft.Extensions.Options;
 
 namespace CecoChat.Materialize.Server.Backend
 {
-    public interface IMaterializeMessagesConsumer : IDisposable
+    public interface IMaterializeConsumer : IDisposable
     {
         void Prepare();
 
         void Start(CancellationToken ct);
     }
 
-    public sealed class MaterializeMessagesConsumer : IMaterializeMessagesConsumer
+    public sealed class MaterializeConsumer : IMaterializeConsumer
     {
         private readonly ILogger _logger;
         private readonly IBackendOptions _backendOptions;
         private readonly IKafkaConsumer<Null, BackendMessage> _consumer;
         private readonly INewMessageRepository _newMessageRepository;
 
-        public MaterializeMessagesConsumer(
-            ILogger<MaterializeMessagesConsumer> logger,
+        public MaterializeConsumer(
+            ILogger<MaterializeConsumer> logger,
             IOptions<BackendOptions> backendOptions,
             IFactory<IKafkaConsumer<Null, BackendMessage>> consumerFactory,
             INewMessageRepository newMessageRepository)
@@ -43,7 +43,7 @@ namespace CecoChat.Materialize.Server.Backend
 
         public void Prepare()
         {
-            _consumer.Initialize(_backendOptions.Kafka, _backendOptions.MaterializeMessagesConsumer, new BackendMessageDeserializer());
+            _consumer.Initialize(_backendOptions.Kafka, _backendOptions.MaterializeConsumer, new BackendMessageDeserializer());
             _consumer.Subscribe(_backendOptions.MessagesTopicName);
         }
 

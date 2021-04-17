@@ -16,14 +16,14 @@ using Microsoft.Extensions.Options;
 
 namespace CecoChat.Messaging.Server.Backend
 {
-    public interface IMessagesToBackendProducer : IDisposable
+    public interface ISendProducer : IDisposable
     {
         int PartitionCount { get; set; }
 
         void ProduceMessage(BackendMessage message, bool sendAck);
     }
 
-    public sealed class MessagesToBackendProducer : IMessagesToBackendProducer
+    public sealed class SendProducer : ISendProducer
     {
         private readonly ILogger _logger;
         private readonly IClock _clock;
@@ -33,8 +33,8 @@ namespace CecoChat.Messaging.Server.Backend
         private readonly IKafkaProducer<Null, BackendMessage> _producer;
         private readonly IClientContainer _clientContainer;
 
-        public MessagesToBackendProducer(
-            ILogger<MessagesToBackendProducer> logger,
+        public SendProducer(
+            ILogger<SendProducer> logger,
             IClock clock,
             IOptions<BackendOptions> backendOptions,
             IHostApplicationLifetime applicationLifetime,
@@ -51,7 +51,7 @@ namespace CecoChat.Messaging.Server.Backend
             _producer = producerFactory.Create();
             _clientContainer = clientContainer;
 
-            _producer.Initialize(_backendOptions.Kafka, _backendOptions.MessagesToBackendProducer, new BackendMessageSerializer());
+            _producer.Initialize(_backendOptions.Kafka, _backendOptions.SendProducer, new BackendMessageSerializer());
             applicationLifetime.ApplicationStopping.Register(_producer.FlushPendingMessages);
         }
 

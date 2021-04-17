@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 using CecoChat.Kafka;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -7,9 +9,9 @@ namespace CecoChat.Messaging.Server.Backend
 {
     public interface IBackendComponents
     {
-        IEnumerable<IBackendConsumer> BackendConsumers { get; }
-
         void ConfigurePartitioning(int partitionCount, PartitionRange partitions);
+
+        void StartConsumption(CancellationToken ct);
     }
 
     public sealed class BackendComponents : IBackendComponents
@@ -17,24 +19,22 @@ namespace CecoChat.Messaging.Server.Backend
         private readonly ILogger _logger;
         private readonly IBackendOptions _backendOptions;
         private readonly ITopicPartitionFlyweight _topicPartitionFlyweight;
-        private readonly IMessagesToBackendProducer _messagesToBackendProducer;
-        private readonly List<IBackendConsumer> _backendConsumers;
+        private readonly ISendProducer _sendProducer;
+        private readonly IReceiversConsumer _receiversConsumer;
 
         public BackendComponents(
             ILogger<BackendComponents> logger,
             IOptions<BackendOptions> backendOptions,
             ITopicPartitionFlyweight topicPartitionFlyweight,
-            IMessagesToBackendProducer messagesToBackendProducer,
-            IEnumerable<IBackendConsumer> backendConsumers)
+            ISendProducer sendProducer,
+            IReceiversConsumer receiversConsumer)
         {
             _logger = logger;
             _backendOptions = backendOptions.Value;
             _topicPartitionFlyweight = topicPartitionFlyweight;
-            _messagesToBackendProducer = messagesToBackendProducer;
-            _backendConsumers = new List<IBackendConsumer>(backendConsumers);
+            _sendProducer = sendProducer;
+            _receiversConsumer = receiversConsumer;
         }
-
-        public IEnumerable<IBackendConsumer> BackendConsumers => _backendConsumers;
 
         public void ConfigurePartitioning(int partitionCount, PartitionRange partitions)
         {
@@ -46,14 +46,26 @@ namespace CecoChat.Messaging.Server.Backend
                     _backendOptions.MessagesTopicName, currentPartitionCount, partitionCount);
             }
 
-            _messagesToBackendProducer.PartitionCount = partitionCount;
-            foreach (IBackendConsumer backendConsumer in _backendConsumers)
-            {
-                backendConsumer.Prepare(partitions);
-            }
+            _sendProducer.PartitionCount = partitionCount;
+            _receiversConsumer.Prepare(partitions);
 
             _logger.LogInformation("Prepared backend components for topic {0} to use partitions {1}.",
                 _backendOptions.MessagesTopicName, partitions);
+        }
+
+        public void StartConsumption(CancellationToken ct)
+        {
+            Task.Factory.StartNew(() =>
+            {
+                try
+                {
+                    _receiversConsumer.Start(ct);
+                }
+                catch (Exception exception)
+                {
+                    _logger.LogCritical(exception, "Failure in {0} consumer.", _receiversConsumer.ConsumerID);
+                }
+            }, ct, TaskCreationOptions.LongRunning, TaskScheduler.Current);
         }
     }
 }

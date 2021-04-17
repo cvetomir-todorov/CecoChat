@@ -15,7 +15,16 @@ using Microsoft.Extensions.Options;
 
 namespace CecoChat.Messaging.Server.Backend
 {
-    public sealed class MessagesToReceiversConsumer : IBackendConsumer
+    public interface IReceiversConsumer : IDisposable
+    {
+        void Prepare(PartitionRange partitions);
+
+        void Start(CancellationToken ct);
+
+        string ConsumerID { get; }
+    }
+
+    public sealed class ReceiversConsumer : IReceiversConsumer
     {
         private readonly ILogger _logger;
         private readonly IBackendOptions _backendOptions;
@@ -26,8 +35,8 @@ namespace CecoChat.Messaging.Server.Backend
         private bool _isInitialized;
         private readonly object _initializationLock;
 
-        public MessagesToReceiversConsumer(
-            ILogger<MessagesToReceiversConsumer> logger,
+        public ReceiversConsumer(
+            ILogger<ReceiversConsumer> logger,
             IOptions<BackendOptions> backendOptions,
             ITopicPartitionFlyweight partitionFlyweight,
             IFactory<IKafkaConsumer<Null, BackendMessage>> consumerFactory,
@@ -55,7 +64,7 @@ namespace CecoChat.Messaging.Server.Backend
             {
                 if (!_isInitialized)
                 {
-                    _consumer.Initialize(_backendOptions.Kafka, _backendOptions.MessagesToReceiversConsumer, new BackendMessageDeserializer());
+                    _consumer.Initialize(_backendOptions.Kafka, _backendOptions.ReceiversConsumers, new BackendMessageDeserializer());
                     _isInitialized = true;
                 }
             }
@@ -79,7 +88,7 @@ namespace CecoChat.Messaging.Server.Backend
             _logger.LogInformation("Stopped sending messages to receivers.");
         }
 
-        public string ConsumerID => _backendOptions.MessagesToReceiversConsumer.ConsumerGroupID;
+        public string ConsumerID => _backendOptions.ReceiversConsumers.ConsumerGroupID;
 
         private void ProcessMessage(BackendMessage backendMessage)
         {

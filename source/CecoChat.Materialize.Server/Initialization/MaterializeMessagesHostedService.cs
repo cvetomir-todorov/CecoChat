@@ -10,17 +10,17 @@ namespace CecoChat.Materialize.Server.Initialization
     public sealed class MaterializeMessagesHostedService : IHostedService, IDisposable
     {
         private readonly ILogger _logger;
-        private readonly IMaterializeMessagesConsumer _materializeMessagesConsumer;
+        private readonly IMaterializeConsumer _materializeConsumer;
         private readonly CancellationToken _appStoppingCt;
         private CancellationTokenSource _stoppedCts;
 
         public MaterializeMessagesHostedService(
             ILogger<MaterializeMessagesHostedService> logger,
             IHostApplicationLifetime applicationLifetime,
-            IMaterializeMessagesConsumer materializeMessagesConsumer)
+            IMaterializeConsumer materializeConsumer)
         {
             _logger = logger;
-            _materializeMessagesConsumer = materializeMessagesConsumer;
+            _materializeConsumer = materializeConsumer;
 
             _appStoppingCt = applicationLifetime.ApplicationStopping;
         }
@@ -34,12 +34,12 @@ namespace CecoChat.Materialize.Server.Initialization
         {
             _stoppedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _appStoppingCt);
 
-            _materializeMessagesConsumer.Prepare();
+            _materializeConsumer.Prepare();
             Task.Factory.StartNew(() =>
             {
                 try
                 {
-                    _materializeMessagesConsumer.Start(_stoppedCts.Token);
+                    _materializeConsumer.Start(_stoppedCts.Token);
                 }
                 catch (Exception exception)
                 {
