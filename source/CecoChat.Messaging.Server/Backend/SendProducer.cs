@@ -20,7 +20,7 @@ namespace CecoChat.Messaging.Server.Backend
     {
         int PartitionCount { get; set; }
 
-        void ProduceMessage(BackendMessage message, bool sendAck);
+        void ProduceMessage(BackendMessage message);
     }
 
     public sealed class SendProducer : ISendProducer
@@ -62,14 +62,13 @@ namespace CecoChat.Messaging.Server.Backend
 
         public int PartitionCount { get; set; }
 
-        public void ProduceMessage(BackendMessage message, bool sendAck)
+        public void ProduceMessage(BackendMessage message)
         {
             int partition = _partitionUtility.ChoosePartition(message.ReceiverId, PartitionCount);
             TopicPartition topicPartition = _partitionFlyweight.GetTopicPartition(_backendOptions.MessagesTopicName, partition);
             Message<Null, BackendMessage> kafkaMessage = new() {Value = message};
 
-            DeliveryHandler<Null, BackendMessage> deliveryHandler = sendAck ? DeliveryHandler : null;
-            _producer.Produce(kafkaMessage, topicPartition, deliveryHandler);
+            _producer.Produce(kafkaMessage, topicPartition, DeliveryHandler);
         }
 
         private void DeliveryHandler(bool isDelivered, DeliveryReport<Null, BackendMessage> report, Activity activity)

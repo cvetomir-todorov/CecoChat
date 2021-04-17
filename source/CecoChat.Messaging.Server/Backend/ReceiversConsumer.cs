@@ -93,28 +93,28 @@ namespace CecoChat.Messaging.Server.Backend
         private void ProcessMessage(BackendMessage backendMessage)
         {
             Guid senderClientID = backendMessage.ClientId.ToGuid();
-            IEnumerable<IStreamer<ListenResponse>> clients = _clientContainer.EnumerateClients(backendMessage.ReceiverId);
+            IEnumerable<IStreamer<ListenResponse>> receiverClients = _clientContainer.EnumerateClients(backendMessage.ReceiverId);
 
             ClientMessage clientMessage = _mapper.MapBackendToClientMessage(backendMessage);
             ListenResponse response = new() {Message = clientMessage};
 
-            EnqueueMessage(senderClientID, response, clients, out int successCount, out int allCount);
+            EnqueueMessage(senderClientID, response, receiverClients, out int successCount, out int allCount);
             LogResults(backendMessage, successCount, allCount);
         }
 
         private static void EnqueueMessage(
-            Guid senderClientID, ListenResponse response, IEnumerable<IStreamer<ListenResponse>> clients,
+            Guid senderClientID, ListenResponse response, IEnumerable<IStreamer<ListenResponse>> receiverClients,
             out int successCount, out int allCount)
         {
             // do not call clients.Count since it is expensive and uses locks
             successCount = 0;
             allCount = 0;
 
-            foreach (IStreamer<ListenResponse> client in clients)
+            foreach (IStreamer<ListenResponse> receiverClient in receiverClients)
             {
-                if (client.ClientID != senderClientID)
+                if (receiverClient.ClientID != senderClientID)
                 {
-                    if (client.EnqueueMessage(response, parentActivity: Activity.Current))
+                    if (receiverClient.EnqueueMessage(response, parentActivity: Activity.Current))
                     {
                         successCount++;
                     }
@@ -129,12 +129,15 @@ namespace CecoChat.Messaging.Server.Backend
             if (successCount < allCount)
             {
                 _logger.LogWarning("Connected recipients with ID {0} ({1} out of {2}) were queued message {3}.",
-                    backendMessage.ReceiverId, successCount, allCount, backendMessage);
+                    backendMessage.ReceiverId, successCount, allCount, backendMessage.MessageId);
             }
             else
             {
-                _logger.LogTrace("Connected recipients with ID {0} (all {1}) were queued message {2}.",
-                    backendMessage.ReceiverId, successCount, backendMessage);
+                if (allCount > 0)
+                {
+                    _logger.LogTrace("Connected recipients with ID {0} (all {1}) were queued message {2}.",
+                        backendMessage.ReceiverId, successCount, backendMessage.MessageId);
+                }
             }
         }
     }
