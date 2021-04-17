@@ -64,7 +64,7 @@ namespace CecoChat.Messaging.Server.Backend
 
         public void ProduceMessage(BackendMessage message, bool sendAck)
         {
-            int partition = _partitionUtility.ChoosePartition(message.TargetId, PartitionCount);
+            int partition = _partitionUtility.ChoosePartition(message.ReceiverId, PartitionCount);
             TopicPartition topicPartition = _partitionFlyweight.GetTopicPartition(_backendOptions.MessagesTopicName, partition);
             Message<Null, BackendMessage> kafkaMessage = new() {Value = message};
 

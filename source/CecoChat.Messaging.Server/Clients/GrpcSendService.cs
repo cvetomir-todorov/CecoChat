@@ -47,7 +47,6 @@ namespace CecoChat.Messaging.Server.Clients
             _logger.LogTrace("Message for {0} processed {1}.", userClaims, clientMessage);
 
             BackendMessage backendMessage = _mapper.MapClientToBackendMessage(clientMessage);
-            backendMessage.TargetId = backendMessage.ReceiverId;
             backendMessage.ClientId = userClaims.ClientID.ToUuid();
             _messagesToBackendProducer.ProduceMessage(backendMessage, sendAck: true);
 

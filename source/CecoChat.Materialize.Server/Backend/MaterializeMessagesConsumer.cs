@@ -56,10 +56,7 @@ namespace CecoChat.Materialize.Server.Backend
                 if (_consumer.TryConsume(ct, out ConsumeResult<Null, BackendMessage> consumeResult))
                 {
                     BackendMessage message = consumeResult.Message.Value;
-                    if (message.TargetId == message.ReceiverId)
-                    {
-                        _newMessageRepository.AddNewDialogMessage(message);
-                    }
+                    _newMessageRepository.AddNewDialogMessage(message);
                     _consumer.Commit(consumeResult, ct);
                 }
             }
