@@ -64,7 +64,7 @@ namespace CecoChat.Messaging.Server.Backend
             {
                 if (!_isInitialized)
                 {
-                    _consumer.Initialize(_backendOptions.Kafka, _backendOptions.ReceiversConsumers, new BackendMessageDeserializer());
+                    _consumer.Initialize(_backendOptions.Kafka, _backendOptions.ReceiversConsumer, new BackendMessageDeserializer());
                     _isInitialized = true;
                 }
             }
@@ -87,7 +87,7 @@ namespace CecoChat.Messaging.Server.Backend
             _logger.LogInformation("Stopped sending messages to receivers.");
         }
 
-        public string ConsumerID => _backendOptions.ReceiversConsumers.ConsumerGroupID;
+        public string ConsumerID => _backendOptions.ReceiversConsumer.ConsumerGroupID;
 
         private void ProcessMessage(BackendMessage backendMessage)
         {

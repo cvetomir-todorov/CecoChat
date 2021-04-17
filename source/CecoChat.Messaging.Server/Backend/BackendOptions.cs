@@ -8,7 +8,7 @@ namespace CecoChat.Messaging.Server.Backend
 
         public IKafkaProducerOptions SendProducer { get; }
 
-        public IKafkaConsumerOptions ReceiversConsumers { get; }
+        public IKafkaConsumerOptions ReceiversConsumer { get; }
 
         public string ServerID { get; }
 
@@ -21,13 +21,13 @@ namespace CecoChat.Messaging.Server.Backend
 
         public KafkaProducerOptions SendProducer { get; set; }
 
-        public KafkaConsumerOptions ReceiversConsumers { get; set; }
+        public KafkaConsumerOptions ReceiversConsumer { get; set; }
 
         IKafkaOptions IBackendOptions.Kafka => Kafka;
 
         IKafkaProducerOptions IBackendOptions.SendProducer => SendProducer;
 
-        IKafkaConsumerOptions IBackendOptions.ReceiversConsumers => ReceiversConsumers;
+        IKafkaConsumerOptions IBackendOptions.ReceiversConsumer => ReceiversConsumer;
 
         public string ServerID { get; set; }
 
