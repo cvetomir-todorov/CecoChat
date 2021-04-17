@@ -84,7 +84,7 @@ namespace CecoChat.Messaging.Server.Backend
         private void ProcessMessage(BackendMessage backendMessage)
         {
             Guid senderClientID = backendMessage.ClientId.ToGuid();
-            IEnumerable<IStreamer<ListenResponse>> clients = _clientContainer.EnumerateClients(backendMessage.TargetId);
+            IEnumerable<IStreamer<ListenResponse>> clients = _clientContainer.EnumerateClients(backendMessage.ReceiverId);
 
             ClientMessage clientMessage = _mapper.MapBackendToClientMessage(backendMessage);
             ListenResponse response = new() {Message = clientMessage};
@@ -120,12 +120,12 @@ namespace CecoChat.Messaging.Server.Backend
             if (successCount < allCount)
             {
                 _logger.LogWarning("Connected recipients with ID {0} ({1} out of {2}) were queued message {3}.",
-                    backendMessage.TargetId, successCount, allCount, backendMessage);
+                    backendMessage.ReceiverId, successCount, allCount, backendMessage);
             }
             else
             {
                 _logger.LogTrace("Connected recipients with ID {0} (all {1}) were queued message {2}.",
-                    backendMessage.TargetId, successCount, backendMessage);
+                    backendMessage.ReceiverId, successCount, backendMessage);
             }
         }
     }

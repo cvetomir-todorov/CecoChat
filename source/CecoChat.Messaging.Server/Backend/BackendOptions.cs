@@ -10,8 +10,6 @@ namespace CecoChat.Messaging.Server.Backend
 
         public IKafkaConsumerOptions MessagesToReceiversConsumer { get; }
 
-        public IKafkaConsumerOptions MessagesToSendersConsumer { get; }
-
         public string ServerID { get; }
 
         public string MessagesTopicName { get; }
@@ -25,15 +23,11 @@ namespace CecoChat.Messaging.Server.Backend
 
         public KafkaConsumerOptions MessagesToReceiversConsumer { get; set; }
 
-        public KafkaConsumerOptions MessagesToSendersConsumer { get; set; }
-
         IKafkaOptions IBackendOptions.Kafka => Kafka;
 
         IKafkaProducerOptions IBackendOptions.MessagesToBackendProducer => MessagesToBackendProducer;
 
         IKafkaConsumerOptions IBackendOptions.MessagesToReceiversConsumer => MessagesToReceiversConsumer;
-
-        IKafkaConsumerOptions IBackendOptions.MessagesToSendersConsumer => MessagesToSendersConsumer;
 
         public string ServerID { get; set; }
 

@@ -7,13 +7,12 @@ import "uuid.proto";
 message BackendMessage {
   CecoChat.Contracts.Uuid message_id = 1;
   CecoChat.Contracts.Uuid client_id = 2;
-  int64 target_id = 3;
-  int64 sender_id = 4;
-  int64 receiver_id = 5;
-  google.protobuf.Timestamp timestamp = 6;
-  BackendMessageType type = 7;
+  int64 sender_id = 3;
+  int64 receiver_id = 4;
+  google.protobuf.Timestamp timestamp = 5;
+  BackendMessageType type = 6;
   oneof data {
-    string text = 8;
+    string text = 7;
   }
 }
 
