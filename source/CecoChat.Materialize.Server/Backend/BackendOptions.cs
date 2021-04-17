@@ -6,7 +6,7 @@ namespace CecoChat.Materialize.Server.Backend
     {
         public IKafkaOptions Kafka { get; }
 
-        public IKafkaConsumerOptions MaterializeMessagesConsumer { get; }
+        public IKafkaConsumerOptions MaterializeConsumer { get; }
 
         public string MessagesTopicName { get; }
     }
@@ -15,11 +15,11 @@ namespace CecoChat.Materialize.Server.Backend
     {
         public KafkaOptions Kafka { get; set; }
 
-        public KafkaConsumerOptions MaterializeMessagesConsumer { get; set; }
+        public KafkaConsumerOptions MaterializeConsumer { get; set; }
 
         IKafkaOptions IBackendOptions.Kafka => Kafka;
 
-        IKafkaConsumerOptions IBackendOptions.MaterializeMessagesConsumer => MaterializeMessagesConsumer;
+        IKafkaConsumerOptions IBackendOptions.MaterializeConsumer => MaterializeConsumer;
 
         public string MessagesTopicName { get; set; }
     }

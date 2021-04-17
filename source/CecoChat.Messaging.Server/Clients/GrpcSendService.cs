@@ -17,18 +17,18 @@ namespace CecoChat.Messaging.Server.Clients
     {
         private readonly ILogger _logger;
         private readonly IClock _clock;
-        private readonly IMessagesToBackendProducer _messagesToBackendProducer;
+        private readonly ISendProducer _sendProducer;
         private readonly IClientBackendMapper _mapper;
 
         public GrpcSendService(
             ILogger<GrpcSendService> logger,
             IClock clock,
-            IMessagesToBackendProducer messagesToBackendProducer,
+            ISendProducer sendProducer,
             IClientBackendMapper mapper)
         {
             _logger = logger;
             _clock = clock;
-            _messagesToBackendProducer = messagesToBackendProducer;
+            _sendProducer = sendProducer;
             _mapper = mapper;
         }
 
@@ -48,7 +48,7 @@ namespace CecoChat.Messaging.Server.Clients
 
             BackendMessage backendMessage = _mapper.MapClientToBackendMessage(clientMessage);
             backendMessage.ClientId = userClaims.ClientID.ToUuid();
-            _messagesToBackendProducer.ProduceMessage(backendMessage, sendAck: true);
+            _sendProducer.ProduceMessage(backendMessage, sendAck: true);
 
             SendMessageResponse response = new()
             {
