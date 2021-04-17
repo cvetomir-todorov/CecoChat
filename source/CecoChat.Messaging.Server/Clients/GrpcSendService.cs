@@ -89,15 +89,12 @@ namespace CecoChat.Messaging.Server.Clients
             if (successCount < allCount)
             {
                 _logger.LogWarning("Connected senders with ID {0} ({1} out of {2}) were queued message {3}.",
-                    clientMessage.ReceiverId, successCount, allCount, clientMessage.MessageId);
+                    clientMessage.SenderId, successCount, allCount, clientMessage.MessageId);
             }
-            else
+            else if (allCount > 0)
             {
-                if (allCount > 0)
-                {
-                    _logger.LogTrace("Connected senders with ID {0} (all {1}) were queued message {2}.",
-                        clientMessage.ReceiverId, successCount, clientMessage.MessageId);
-                }
+                _logger.LogTrace("Connected senders with ID {0} (all {1}) were queued message {2}.",
+                    clientMessage.SenderId, successCount, clientMessage.MessageId);
             }
         }
     }

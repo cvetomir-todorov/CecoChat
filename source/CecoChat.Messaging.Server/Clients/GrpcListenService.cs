@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using CecoChat.Contracts.Client;
@@ -38,8 +39,7 @@ namespace CecoChat.Messaging.Server.Clients
             _logger.LogTrace("{0} from {1} connected.", userClaims, address);
 
             IGrpcListenStreamer streamer = _streamerFactory.Create();
-            streamer.SetFinalMessagePredicate(IsFinalMessage);
-            streamer.Initialize(userClaims.ClientID, responseStream);
+            streamer.Initialize(userClaims.ClientID, responseStream, StaticStreamingStrategy.Instance);
             await ProcessMessages(streamer, userClaims, address, context.CancellationToken);
         }
 
@@ -75,21 +75,34 @@ namespace CecoChat.Messaging.Server.Clients
             {
                 if (isClientAdded)
                 {
-                    RemoveClient(userClaims, address, streamer);
+                    _clientContainer.RemoveClient(userClaims.UserID, streamer);
+                    _logger.LogTrace("{0} from {1} disconnected.", userClaims, address);
                 }
                 streamer.Dispose();
             }
         }
 
-        private void RemoveClient(UserClaims userClaims, string address, IGrpcListenStreamer streamer)
+        private sealed class StaticStreamingStrategy : IStreamingStrategy
         {
-            _clientContainer.RemoveClient(userClaims.UserID, streamer);
-            _logger.LogTrace("{0} from {1} disconnected.", userClaims, address);
-        }
+            public static readonly StaticStreamingStrategy Instance = new();
 
-        private bool IsFinalMessage(ListenResponse response)
-        {
-            return response.Message.Type == ClientMessageType.Disconnect;
+            private static readonly HashSet<ClientMessageType> _blacklistedTypes = new()
+            {
+                ClientMessageType.Disconnect, ClientMessageType.Unknown
+            };
+
+            private StaticStreamingStrategy()
+            {}
+
+            public bool IsFinal(ListenResponse response)
+            {
+                return response.Message.Type == ClientMessageType.Disconnect;
+            }
+
+            public bool AffectsSequencing(ListenResponse response)
+            {
+                return !_blacklistedTypes.Contains(response.Message.Type);
+            }
         }
     }
 }
