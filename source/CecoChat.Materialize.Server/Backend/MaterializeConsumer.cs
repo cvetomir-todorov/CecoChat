@@ -53,12 +53,10 @@ namespace CecoChat.Materialize.Server.Backend
 
             while (!ct.IsCancellationRequested)
             {
-                if (_consumer.TryConsume(ct, out ConsumeResult<Null, BackendMessage> consumeResult))
+                _consumer.Consume(consumeResult =>
                 {
-                    BackendMessage message = consumeResult.Message.Value;
-                    _newMessageRepository.AddNewDialogMessage(message);
-                    _consumer.Commit(consumeResult, ct);
-                }
+                    _newMessageRepository.AddNewDialogMessage(consumeResult.Message.Value);
+                }, ct);
             }
 
             _logger.LogInformation("Stopped materializing messages.");
