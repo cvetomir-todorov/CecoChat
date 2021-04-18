@@ -18,6 +18,7 @@ namespace CecoChat.Server
             BackendMessage backendMessage = new()
             {
                 MessageId = clientMessage.MessageId,
+                MessageIdSnowflake = clientMessage.MessageIdSnowflake,
                 SenderId = clientMessage.SenderId,
                 ReceiverId = clientMessage.ReceiverId,
                 Timestamp = clientMessage.Timestamp
@@ -41,6 +42,7 @@ namespace CecoChat.Server
             ClientMessage clientMessage = new()
             {
                 MessageId = backendMessage.MessageId,
+                MessageIdSnowflake = backendMessage.MessageIdSnowflake,
                 SenderId = backendMessage.SenderId,
                 ReceiverId = backendMessage.ReceiverId,
                 Timestamp = backendMessage.Timestamp

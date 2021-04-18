@@ -87,6 +87,7 @@ namespace CecoChat.Messaging.Server.Backend
                     AckType = ackType,
                     Timestamp = _clock.GetNowUtc().ToTimestamp(),
                     MessageId = backendMessage.MessageId,
+                    MessageIdSnowflake = backendMessage.MessageIdSnowflake,
                     SenderId = backendMessage.SenderId,
                     ReceiverId = backendMessage.ReceiverId
                 };
