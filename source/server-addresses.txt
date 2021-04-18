@@ -1,0 +1,7 @@
+https://localhost:31005 profile
+https://localhost:31000 connect
+https://localhost:31002 materialize
+https://localhost:31001 messaging1
+https://localhost:31011 messaging2
+https://localhost:31003 history
+https://localhost:31004 identity

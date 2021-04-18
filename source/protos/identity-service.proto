@@ -1,0 +1,15 @@
+syntax = "proto3";
+option csharp_namespace = "CecoChat.Contracts.Identity";
+package CecoChat.Contracts.Identity;
+
+service Identity {
+  rpc GenerateIdentity(GenerateIdentityRequest) returns (GenerateIdentityResponse);
+}
+
+message GenerateIdentityRequest {
+  int64 originator_id = 1;
+}
+
+message GenerateIdentityResponse {
+  int64 id = 1;
+}
