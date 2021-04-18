@@ -2,6 +2,7 @@
 (
   user_id bigint,
   message_id uuid,
+  message_id_snowflake bigint,
   sender_id bigint,
   receiver_id bigint,
   when timestamp,

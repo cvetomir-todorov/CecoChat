@@ -8,6 +8,7 @@ using CecoChat.Kafka;
 using CecoChat.Kafka.Instrumentation;
 using CecoChat.Messaging.Server.Backend;
 using CecoChat.Messaging.Server.Clients;
+using CecoChat.Messaging.Server.Identity;
 using CecoChat.Messaging.Server.Initialization;
 using CecoChat.Otel;
 using CecoChat.Server;
@@ -91,6 +92,10 @@ namespace CecoChat.Messaging.Server
             builder.RegisterType<ClientContainer>().As<IClientContainer>().SingleInstance();
             builder.RegisterFactory<GrpcListenStreamer, IGrpcListenStreamer>();
             builder.RegisterOptions<ClientOptions>(Configuration.GetSection("Clients"));
+
+            // identity
+            builder.RegisterType<IdentityClient>().As<IIdentityClient>().SingleInstance();
+            builder.RegisterOptions<IdentityOptions>(Configuration.GetSection("Identity"));
 
             // backend
             builder.RegisterModule(new PartitionUtilityAutofacModule());

@@ -5,7 +5,8 @@ import "google/protobuf/timestamp.proto";
 import "uuid.proto";
 
 message BackendMessage {
-  CecoChat.Contracts.Uuid message_id = 1;
+  CecoChat.Contracts.Uuid message_id = 1;//TODO: remove UUID message ID
+  int64 message_id_snowflake = 11;
   CecoChat.Contracts.Uuid client_id = 2;
   int64 sender_id = 3;
   int64 receiver_id = 4;

@@ -42,12 +42,12 @@ namespace CecoChat.Data.History
 
         private const string InsertIntoMessagesForUser =
             "INSERT INTO messages_for_user " +
-            "(user_id, message_id, sender_id, receiver_id, when, message_type, data) " +
-            "VALUES (?, ?, ?, ?, ?, ?, ?)";
+            "(user_id, message_id, message_id_snowflake, sender_id, receiver_id, when, message_type, data) " +
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         private const string InsertIntoMessagesForDialog =
             "INSERT INTO messages_for_dialog " +
-            "(dialog_id, message_id, sender_id, receiver_id, when, message_type, data) " +
-            "VALUES (?, ?, ?, ?, ?, ?, ?)";
+            "(dialog_id, message_id, message_id_snowflake, sender_id, receiver_id, when, message_type, data) " +
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
         public void Prepare()
         {
@@ -79,17 +79,18 @@ namespace CecoChat.Data.History
         private BatchStatement CreateInsertBatch(BackendMessage message)
         {
             Guid messageID = message.MessageId.ToGuid();
+            long messageIDSnowflake = message.MessageIdSnowflake;
             DateTime messageTimestamp = message.Timestamp.ToDateTime();
             sbyte dbMessageType = _mapper.MapBackendToDbMessageType(message.Type);
             IDictionary<string, string> data = _mapper.MapBackendToDbData(message);
             string dialogID = _dataUtility.CreateDialogID(message.SenderId, message.ReceiverId);
 
             BoundStatement insertForSender = _messagesForUserQuery.Value.Bind(
-                message.SenderId, messageID, message.SenderId, message.ReceiverId, messageTimestamp, dbMessageType, data);
+                message.SenderId, messageID, messageIDSnowflake, message.SenderId, message.ReceiverId, messageTimestamp, dbMessageType, data);
             BoundStatement insertForReceiver = _messagesForUserQuery.Value.Bind(
-                message.ReceiverId, messageID, message.SenderId, message.ReceiverId, messageTimestamp, dbMessageType, data);
+                message.ReceiverId, messageID, messageIDSnowflake, message.SenderId, message.ReceiverId, messageTimestamp, dbMessageType, data);
             BoundStatement insertForDialog = _messagesForDialogQuery.Value.Bind(
-                dialogID, messageID, message.SenderId, message.ReceiverId, messageTimestamp, dbMessageType, data);
+                dialogID, messageID, messageIDSnowflake, message.SenderId, message.ReceiverId, messageTimestamp, dbMessageType, data);
 
             BatchStatement insertBatch = new BatchStatement()
                 .Add(insertForSender)
