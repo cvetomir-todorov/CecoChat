@@ -9,7 +9,6 @@ using CecoChat.Kafka;
 using CecoChat.Messaging.Server.Clients;
 using CecoChat.Server.Backend;
 using Confluent.Kafka;
-using Google.Protobuf.WellKnownTypes;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -26,7 +25,6 @@ namespace CecoChat.Messaging.Server.Backend
     public sealed class SendProducer : ISendProducer
     {
         private readonly ILogger _logger;
-        private readonly IClock _clock;
         private readonly IBackendOptions _backendOptions;
         private readonly IPartitionUtility _partitionUtility;
         private readonly ITopicPartitionFlyweight _partitionFlyweight;
@@ -35,7 +33,6 @@ namespace CecoChat.Messaging.Server.Backend
 
         public SendProducer(
             ILogger<SendProducer> logger,
-            IClock clock,
             IOptions<BackendOptions> backendOptions,
             IHostApplicationLifetime applicationLifetime,
             IPartitionUtility partitionUtility,
@@ -44,7 +41,6 @@ namespace CecoChat.Messaging.Server.Backend
             IClientContainer clientContainer)
         {
             _logger = logger;
-            _clock = clock;
             _backendOptions = backendOptions.Value;
             _partitionUtility = partitionUtility;
             _partitionFlyweight = partitionFlyweight;
@@ -85,9 +81,7 @@ namespace CecoChat.Messaging.Server.Backend
                 {
                     Type = ClientMessageType.Ack,
                     AckType = ackType,
-                    Timestamp = _clock.GetNowUtc().ToTimestamp(),
                     MessageId = backendMessage.MessageId,
-                    MessageIdSnowflake = backendMessage.MessageIdSnowflake,
                     SenderId = backendMessage.SenderId,
                     ReceiverId = backendMessage.ReceiverId
                 };

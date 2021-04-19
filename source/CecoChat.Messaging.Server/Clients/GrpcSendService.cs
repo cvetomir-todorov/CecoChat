@@ -9,7 +9,6 @@ using CecoChat.Messaging.Server.Backend;
 using CecoChat.Messaging.Server.Identity;
 using CecoChat.Server;
 using CecoChat.Server.Identity;
-using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
@@ -19,7 +18,6 @@ namespace CecoChat.Messaging.Server.Clients
     public sealed class GrpcSendService : Send.SendBase
     {
         private readonly ILogger _logger;
-        private readonly IClock _clock;
         private readonly IIdentityClient _identityClient;
         private readonly ISendProducer _sendProducer;
         private readonly IClientContainer _clientContainer;
@@ -27,14 +25,12 @@ namespace CecoChat.Messaging.Server.Clients
 
         public GrpcSendService(
             ILogger<GrpcSendService> logger,
-            IClock clock,
             IIdentityClient identityClient,
             ISendProducer sendProducer,
             IClientContainer clientContainer,
             IClientBackendMapper mapper)
         {
             _logger = logger;
-            _clock = clock;
             _identityClient = identityClient;
             _sendProducer = sendProducer;
             _clientContainer = clientContainer;
@@ -52,8 +48,7 @@ namespace CecoChat.Messaging.Server.Clients
             Activity.Current?.SetTag("user.id", userClaims.UserID);
 
             ClientMessage clientMessage = request.Message;
-            clientMessage.MessageIdSnowflake = await _identityClient.GenerateIdentity(userClaims.UserID);
-            clientMessage.Timestamp = Timestamp.FromDateTime(_clock.GetNowUtc());
+            clientMessage.MessageId = await _identityClient.GenerateIdentity(userClaims.UserID);
             _logger.LogTrace("Message for {0} processed {1}.", userClaims, clientMessage);
 
             BackendMessage backendMessage = _mapper.MapClientToBackendMessage(clientMessage);
@@ -63,7 +58,7 @@ namespace CecoChat.Messaging.Server.Clients
             EnqueueMessagesForSenders(clientMessage, userClaims.ClientID, out int successCount, out int allCount);
             LogResults(clientMessage, successCount, allCount);
 
-            SendMessageResponse response = new() {MessageTimestamp = clientMessage.Timestamp};
+            SendMessageResponse response = new() {MessageId = clientMessage.MessageId};
             return response;
         }
 
