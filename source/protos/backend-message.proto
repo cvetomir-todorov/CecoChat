@@ -1,19 +1,16 @@
 syntax = "proto3";
 option csharp_namespace = "CecoChat.Contracts.Backend";
 package CecoChat.Contracts.Backend;
-import "google/protobuf/timestamp.proto";
 import "uuid.proto";
 
 message BackendMessage {
-  CecoChat.Contracts.Uuid message_id = 1;//TODO: remove UUID message ID
-  int64 message_id_snowflake = 11;
+  int64 message_id = 1;
   CecoChat.Contracts.Uuid client_id = 2;
   int64 sender_id = 3;
   int64 receiver_id = 4;
-  google.protobuf.Timestamp timestamp = 5;
-  BackendMessageType type = 6;
+  BackendMessageType type = 5;
   oneof data {
-    string text = 7;
+    string text = 6;
   }
 }
 
