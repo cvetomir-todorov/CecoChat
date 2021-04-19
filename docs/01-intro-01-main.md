@@ -24,6 +24,7 @@ Currently no user profile and friendship are implemented so clients rely on user
   - Latency
   - Consistency
   - Fault tolerance
+* TODO: list the actual non-functional capabilities
 
 # Concurrent connections benchmark
 
@@ -43,14 +44,16 @@ On the server I am using ASP.NET Core gRPC services utilizing async-await and TP
 
 The number of clients that succeeded is the number of clients that were able to connect. That number is a result of port exhaustion limits hit on both OS-es which ran the clients. The Windows error was `An operation on a socket could not be performed because the system lacked sufficient buffer space or because a queue was full` and the Ubuntu Server one was `Cannot assign requested address`. Additionally when clients were on the weaker machine the client time required in order to complete the requests is considerably higher while it was obvious that the server could handle more load. One of these could be the issue: Windows 10 has some limits which prohibit it from handling a high number of concurrent clients, the weaker machine is really weak, there is a concurrency issue with .NET 5 at least on Ubuntu Server, the client code could be improved to better schedule the tasks instead of relying on async-await and TPL.
 
-The client-side limitation will be mitigated by the fact that each client is typically on a separate device. Therefore the server-side limitations remaining are the resources allocated for each connected client. Based on these numbers I think that 50k concurrent connections could be a realistic number for a messaging server and would be a useful limit in our calculations.
+The client-side limitation will be mitigated by the fact that each client is typically on a separate device. Therefore the server-side limitations remaining are the resources allocated for each connected client. Based on these numbers I think that **64 k concurrent connections** could be a realistic number for a messaging server and would be a useful limit in our calculations. It is a round number close to the **65535 max number of ports** for the current OS-es.
 
 # Back of the envelope calculations
 
-The [back-of-the-envelope](01-intro-02-back-of-the-envelope.md) file contains the detailed calculations. A messaging server is the server to which users directly connect to. A key limit is `50K connections per messaging server`. A simple calculation tells that `2K messaging servers` are needed in order to support `100 mln active users`.
+The [back-of-the-envelope](01-intro-02-back-of-the-envelope.md) file contains the detailed calculations. A messaging server is the server to which users directly connect to. A key limit is **64 k connections per messaging server**. A simple calculation tells that **1.6 k messaging servers** are needed in order to support **100 mln active users**. We would consider **256 bytes message size**.
 
-Throughput-wise a limit of `256 bytes per message` with `640 mln users` spread throughout the day each of which sends `64 messages per day` gives us `116 MB/s for the cell` or `0.06 MB/s per messaging server`.
+Calculating the daily usage with **640 mln users** spread throughout the day each of which sends **128 messages per day** gives us **950 000 messages/s for the cell** and **232 MB/s for the cell** with **0.15 MB/s per messaging server**.
 
-Calculating a peak usage for `1 hour` daily where 80% of the maximum users - `80 mln active users` send 50% of their daily messages - `32 messages` we get `174 MB/s for the cell` or `0.09 MB/s per messaging server`.
+Calculating a peak usage for **1 hour** daily where **80%** of the maximum users - **80 mln active users** send **50%** of their daily messages - **64 messages** we get **1 423 000 messages/s for the cell** and **348 MB/s for the cell** with **0.22 MB/s per messaging server**.
 
-These numbers do not take into account the security and transport data overhead. Numbers are not small when we look at the cell as a whole. But for a single messaging server the throughput is tiny. Note that this traffic would be multiplied. For example sending a message would require that data to be passed between different layers, possibly to multiple recipients and stored multiple times in order to enable faster querying.
+These numbers do not take into account the security and transport data overhead. Additionally, this traffic would be multiplied. For example sending a message would require that data to be passed between different layers, possibly to multiple recipients and stored multiple times in order to enable faster querying.
+
+Numbers are not small when we look at the cell as a whole. But for a single messaging server the throughput is tiny. Using linearly scalable technologies would allow us to achieve the desired throughput.
