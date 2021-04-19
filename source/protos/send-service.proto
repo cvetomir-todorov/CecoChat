@@ -2,7 +2,6 @@ syntax = "proto3";
 option csharp_namespace = "CecoChat.Contracts.Client";
 package CecoChat.Contracts.Client;
 import "client-message.proto";
-import "google/protobuf/timestamp.proto";
 
 service Send {
   rpc SendMessage(SendMessageRequest) returns (SendMessageResponse);
@@ -13,5 +12,5 @@ message SendMessageRequest {
 }
 
 message SendMessageResponse {
-  google.protobuf.Timestamp message_timestamp = 1;
+  int64 message_id = 1;
 }

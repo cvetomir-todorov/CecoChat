@@ -1,19 +1,15 @@
 syntax = "proto3";
 option csharp_namespace = "CecoChat.Contracts.Client";
 package CecoChat.Contracts.Client;
-import "google/protobuf/timestamp.proto";
-import "uuid.proto";
 
 message ClientMessage {
-  CecoChat.Contracts.Uuid message_id = 1;//TODO: remove UUID message ID
-  int64 message_id_snowflake = 11;
+  int64 message_id = 1;
   int64 sender_id = 2;
   int64 receiver_id = 3;
-  google.protobuf.Timestamp timestamp = 4;
-  ClientMessageType type = 5;
+  ClientMessageType type = 4;
   oneof data {
-	  string text = 6;
-	  AckType ackType = 7;
+	  string text = 5;
+	  AckType ackType = 6;
   }
 }
 
