@@ -150,7 +150,7 @@ namespace CecoChat.Client.ViewModels
 
         private void ShowLastMessageFromUser(ClientMessage message, long otherUsedID)
         {
-            DateTime messageTimestamp = message.Timestamp.ToDateTime();
+            DateTime messageTimestamp = message.MessageId.ToTimestamp();
             if (_chatsMap.TryGetValue(otherUsedID, out AllChatsItemViewModel chatVM))
             {
                 if (chatVM.Timestamp < messageTimestamp)

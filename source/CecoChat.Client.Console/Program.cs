@@ -72,14 +72,14 @@ namespace CecoChat.Client.Console
         {
             string sequenceString = sequenceNumber.HasValue ? $"[{sequenceNumber}]" : string.Empty;
             System.Console.WriteLine("{0}[{1:F}] {2}->{3}: {4}",
-                sequenceString, message.Timestamp.ToDateTime(), message.SenderId, message.ReceiverId, message.Text);
+                sequenceString, message.MessageId.ToTimestamp(), message.SenderId, message.ReceiverId, message.Text);
         }
 
         private static void DisplayAck(ListenResponse response)
         {
             ClientMessage message = response.Message;
             System.Console.WriteLine("[{0}][{1:F}] {2}->{3}: {4}",
-                response.SequenceNumber, message.Timestamp.ToDateTime(), message.SenderId, message.ReceiverId, message.AckType);
+                response.SequenceNumber, message.MessageId.ToTimestamp(), message.SenderId, message.ReceiverId, message.AckType);
         }
     }
 }
