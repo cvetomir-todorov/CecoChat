@@ -159,7 +159,6 @@ namespace CecoChat.Kafka
             }
         }
 
-#pragma warning disable IDE0059 // Unnecessary assignment of a value
         private bool DoConsume(
             Action<ConsumeResult<TKey, TValue>> messageHandler,
             out Exception messageHandlerException,
@@ -196,7 +195,6 @@ namespace CecoChat.Kafka
             stage = ConsumeStage.AfterCommit;
             return true;
         }
-#pragma warning restore IDE0059 // Unnecessary assignment of a value
 
         private bool InspectStage(ConsumeStage stage, ConsumeResult<TKey, TValue> consumeResult)
         {
