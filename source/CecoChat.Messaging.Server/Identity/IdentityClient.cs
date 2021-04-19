@@ -11,8 +11,6 @@ namespace CecoChat.Messaging.Server.Identity
         Task<long> GenerateIdentity(long userID);
     }
 
-    // TODO: add tracing
-
     public sealed class IdentityClient : IIdentityClient
     {
         private readonly GrpcChannel _channel;
