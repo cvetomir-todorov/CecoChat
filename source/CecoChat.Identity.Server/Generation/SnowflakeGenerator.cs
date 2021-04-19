@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using IdGen;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -23,9 +22,10 @@ namespace CecoChat.Identity.Server.Generation
             _logger = logger;
             ISnowflakeOptions snowflakeOptions = options.Value;
 
-            IdStructure idStructure = new(timestampBits: 41, generatorIdBits: 8, sequenceBits: 14);// IdGen doesn't use the sign bit
-            DateTime epoch = snowflakeOptions.Epoch.ToUniversalTime();
-            ITimeSource timeSource = new DefaultTimeSource(epoch);
+            // IdGen doesn't use the sign bit so the sum of bits is 63
+            IdStructure idStructure = new(timestampBits: 41, generatorIdBits: 8, sequenceBits: 14);
+            // TODO: use a custom time source using current monotonic clock
+            ITimeSource timeSource = new DefaultTimeSource(Snowflake.Epoch);
             IdGeneratorOptions idGenOptions = new(idStructure, timeSource, SequenceOverflowStrategy.SpinWait);
 
             _generators = new List<IdGenerator>();
