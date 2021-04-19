@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using CecoChat.Client.Shared;
 using CecoChat.Client.Shared.Storage;
-using CecoChat.Contracts;
 using CecoChat.Contracts.Client;
 using Microsoft.Toolkit.Mvvm.Input;
 using PropertyChanged;
@@ -16,7 +15,7 @@ namespace CecoChat.Client.ViewModels
     [AddINotifyPropertyChangedInterface]
     public sealed class SingleChatViewModel : BaseViewModel
     {
-        private readonly Dictionary<Guid, SingleChatMessageViewModel> _messageMap;
+        private readonly Dictionary<long, SingleChatMessageViewModel> _messageMap;
 
         public SingleChatViewModel(
             MessagingClient messagingClient,
@@ -58,7 +57,7 @@ namespace CecoChat.Client.ViewModels
 
         private void MessagingClientOnMessageAcknowledged(object sender, ListenResponse response)
         {
-            if (_messageMap.TryGetValue(response.Message.MessageId.ToGuid(), out SingleChatMessageViewModel messageVM))
+            if (_messageMap.TryGetValue(response.Message.MessageId, out SingleChatMessageViewModel messageVM))
             {
                 messageVM.SequenceNumber = response.SequenceNumber.ToString();
                 messageVM.DeliveryStatus = response.Message.AckType.ToString();
@@ -102,7 +101,9 @@ namespace CecoChat.Client.ViewModels
 
         private void InsertMessage(ClientMessage message, int? sequenceNumber = null)
         {
-            Guid messageID = message.MessageId.ToGuid();
+            long messageID = message.MessageId;
+            DateTime messageTimestamp = message.MessageId.ToTimestamp();
+
             if (_messageMap.ContainsKey(messageID))
             {
                 return;
@@ -112,7 +113,7 @@ namespace CecoChat.Client.ViewModels
 
             for (int i = Messages.Count - 1; i >= 0; i--)
             {
-                if (message.Timestamp.ToDateTime() > Messages[i].Timestamp)
+                if (messageTimestamp > Messages[i].Timestamp)
                 {
                     insertionIndex = i + 1;
                     break;
@@ -122,8 +123,8 @@ namespace CecoChat.Client.ViewModels
             SingleChatMessageViewModel messageVM = new()
             {
                 IsSenderCurrentUser = message.SenderId == MessagingClient.UserID,
-                Timestamp = message.Timestamp.ToDateTime(),
-                FormattedMessage = $"[{message.Timestamp.ToDateTime()}] {message.SenderId}: {message.Text}",
+                Timestamp = messageTimestamp,
+                FormattedMessage = $"[{messageTimestamp}] {message.SenderId}: {message.Text}",
                 SequenceNumber = sequenceNumber?.ToString()
             };
 

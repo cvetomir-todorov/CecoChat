@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CecoChat.Contracts.Client\CecoChat.Contracts.Client.csproj" />
+    <ProjectReference Include="..\CecoChat\CecoChat.csproj" />
   </ItemGroup>
 
 </Project>
