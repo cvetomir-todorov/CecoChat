@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using Cassandra;
 using CecoChat.Tracing;
 
@@ -7,7 +6,7 @@ namespace CecoChat.Data.History.Instrumentation
 {
     internal interface IHistoryActivityUtility
     {
-        Activity StartNewDialogMessage(ISession session, Guid messageID);
+        Activity StartNewDialogMessage(ISession session, long messageID);
 
         Activity StartGetHistory(string name, ISession session, long userID);
 
@@ -23,7 +22,7 @@ namespace CecoChat.Data.History.Instrumentation
             _activityUtility = activityUtility;
         }
 
-        public Activity StartNewDialogMessage(ISession session, Guid messageID)
+        public Activity StartNewDialogMessage(ISession session, long messageID)
         {
             Activity activity = _activityUtility.Start(
                 HistoryInstrumentation.Operations.HistoryNewDialogMessage,

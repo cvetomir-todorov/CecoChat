@@ -1,13 +1,11 @@
 ﻿CREATE TABLE messaging.messages_for_dialog
 (
   dialog_id text,
-  message_id uuid,
-  message_id_snowflake bigint,
+  message_id bigint,
   sender_id bigint,
   receiver_id bigint,
-  when timestamp,
   message_type tinyint,
   data map<text,text>,
-  PRIMARY KEY (dialog_id, when)
+  PRIMARY KEY (dialog_id, message_id)
 )
-WITH CLUSTERING ORDER BY (when DESC);
+WITH CLUSTERING ORDER BY (message_id DESC);
