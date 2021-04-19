@@ -5,7 +5,6 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using CecoChat.Contracts;
 using CecoChat.Contracts.Client;
 using CommandLine;
 using Grpc.Net.Client;
@@ -48,7 +47,7 @@ namespace Check.Connections.Client
 
             for (int i = 0; i < commandLine.ClientCount; ++i)
             {
-                Uri address = new Uri(commandLine.ServerAddress);
+                Uri address = new(commandLine.ServerAddress);
                 EndPoint endPoint = new DnsEndPoint(address.Host, address.Port);
                 PreConnectedHttpHandler preConnectedHttpHandler = new(endPoint);
                 SocketsHttpHandler socketsHttpHandler = new()
@@ -60,7 +59,7 @@ namespace Check.Connections.Client
                 {
                     HttpHandler = socketsHttpHandler
                 });
-                Send.SendClient sendClient = new Send.SendClient(channel);
+                Send.SendClient sendClient = new(channel);
 
                 ClientData client = new()
                 {
@@ -107,7 +106,6 @@ namespace Check.Connections.Client
                 {
                     ClientMessage message = new()
                     {
-                        MessageId = Guid.NewGuid().ToUuid(),
                         SenderId = 1,
                         ReceiverId = 2,
                         Type = ClientMessageType.PlainText,
@@ -119,7 +117,7 @@ namespace Check.Connections.Client
                     };
 
                     SendMessageResponse response = await client.SendClient.SendMessageAsync(request);
-                    message.Timestamp = response.MessageTimestamp;
+                    message.MessageId = response.MessageId;
 
                     await Task.Delay(TimeSpan.FromSeconds(1));
                 }
