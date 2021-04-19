@@ -47,8 +47,14 @@ namespace CecoChat.Messaging.Server.Clients
             }
             Activity.Current?.SetTag("user.id", userClaims.UserID);
 
+            GenerateIdentityResult result = await _identityClient.GenerateIdentity(userClaims.UserID);
+            if (!result.Success)
+            {
+                throw new RpcException(new Status(StatusCode.Internal, null));
+            }
+
             ClientMessage clientMessage = request.Message;
-            clientMessage.MessageId = await _identityClient.GenerateIdentity(userClaims.UserID);
+            clientMessage.MessageId = result.ID;
             _logger.LogTrace("Message for {0} processed {1}.", userClaims, clientMessage);
 
             BackendMessage backendMessage = _mapper.MapClientToBackendMessage(clientMessage);
