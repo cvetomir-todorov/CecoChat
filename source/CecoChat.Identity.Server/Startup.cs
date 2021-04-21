@@ -11,17 +11,20 @@ namespace CecoChat.Identity.Server
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
             Configuration = configuration;
+            Environment = environment;
         }
 
         public IConfiguration Configuration { get; }
 
+        public IWebHostEnvironment Environment { get; }
+
         public void ConfigureServices(IServiceCollection services)
         {
             // clients
-            services.AddGrpc();
+            services.AddGrpc(rpc => rpc.EnableDetailedErrors = Environment.IsDevelopment());
 
             // required
             services.AddOptions();
