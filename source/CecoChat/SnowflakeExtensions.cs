@@ -54,14 +54,16 @@ namespace CecoChat
             switch (rounding)
             {
                 case Rounding.Round:
-                    long remainder = snowflakeTicks % TimeSpan.TicksPerMillisecond;
-                    if (remainder >= HalfTicksPerMillisecond)
+                    if (snowflakeTicks % TimeSpan.TicksPerMillisecond >= HalfTicksPerMillisecond)
                     {
                         snowflakeMs++;
                     }
                     break;
                 case Rounding.Ceiling:
-                    snowflakeMs++;
+                    if (snowflakeTicks % TimeSpan.TicksPerMillisecond > 0)
+                    {
+                        snowflakeMs++;
+                    }
                     break;
                 case Rounding.Floor:
                     break;
