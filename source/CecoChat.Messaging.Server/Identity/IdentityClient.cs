@@ -1,17 +1,13 @@
 ﻿using System;
-using System.Net.Http;
-using System.Threading;
 using System.Threading.Tasks;
 using CecoChat.Contracts.Identity;
 using Grpc.Core;
-using Grpc.Net.Client;
-using Grpc.Net.Client.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace CecoChat.Messaging.Server.Identity
 {
-    public interface IIdentityClient : IDisposable
+    public interface IIdentityClient
     {
         Task<GenerateIdentityResult> GenerateIdentity(long userID);
     }
@@ -26,56 +22,16 @@ namespace CecoChat.Messaging.Server.Identity
     {
         private readonly ILogger _logger;
         private readonly IIdentityClientOptions _options;
-        private readonly GrpcChannel _channel;
         private readonly Contracts.Identity.Identity.IdentityClient _client;
 
         public IdentityClient(
             ILogger<IdentityClient> logger,
-            IOptions<IdentityClientOptions> options)
+            IOptions<IdentityClientOptions> options,
+            Contracts.Identity.Identity.IdentityClient client)
         {
             _logger = logger;
             _options = options.Value;
-            _channel = CreateChannel(_options);
-            _client = new(_channel);
-        }
-
-        private static GrpcChannel CreateChannel(IIdentityClientOptions options)
-        {
-            MethodConfig defaultMethodConfig = new()
-            {
-                Names = {MethodName.Default},
-                RetryPolicy = new RetryPolicy
-                {
-                    MaxAttempts = options.RetryTimes,
-                    InitialBackoff = options.InitialBackOff,
-                    MaxBackoff = options.MaxBackOff,
-                    BackoffMultiplier = options.BackOffMultiplier,
-                    RetryableStatusCodes = {StatusCode.Unavailable, StatusCode.DeadlineExceeded}
-                }
-            };
-            ServiceConfig serviceConfig = new()
-            {
-                MethodConfigs = {defaultMethodConfig}
-            };
-            SocketsHttpHandler httpHandler = new()
-            {
-                PooledConnectionIdleTimeout = Timeout.InfiniteTimeSpan,
-                KeepAlivePingDelay = TimeSpan.FromSeconds(60),
-                KeepAlivePingTimeout = TimeSpan.FromSeconds(30),
-                EnableMultipleHttp2Connections = true
-            };
-
-            return GrpcChannel.ForAddress(options.Address, new GrpcChannelOptions
-            {
-                ServiceConfig = serviceConfig,
-                HttpHandler = httpHandler
-            });
-        }
-
-        public void Dispose()
-        {
-            _channel.ShutdownAsync().Wait();
-            _channel.Dispose();
+            _client = client;
         }
 
         public async Task<GenerateIdentityResult> GenerateIdentity(long userID)
