@@ -24,7 +24,6 @@ namespace CecoChat.Identity.Server.Generation
 
             // IdGen doesn't use the sign bit so the sum of bits is 63
             IdStructure idStructure = new(timestampBits: 41, generatorIdBits: 8, sequenceBits: 14);
-            // TODO: use a custom time source using current monotonic clock
             ITimeSource timeSource = new DefaultTimeSource(Snowflake.Epoch);
             IdGeneratorOptions idGenOptions = new(idStructure, timeSource, SequenceOverflowStrategy.SpinWait);
 
