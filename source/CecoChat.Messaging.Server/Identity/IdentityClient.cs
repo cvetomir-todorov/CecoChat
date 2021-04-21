@@ -25,22 +25,21 @@ namespace CecoChat.Messaging.Server.Identity
     public sealed class IdentityClient : IIdentityClient
     {
         private readonly ILogger _logger;
-        private readonly IIdentityOptions _options;
+        private readonly IIdentityClientOptions _options;
         private readonly GrpcChannel _channel;
         private readonly Contracts.Identity.Identity.IdentityClient _client;
 
         public IdentityClient(
             ILogger<IdentityClient> logger,
-            ILoggerFactory loggerFactory,
-            IOptions<IdentityOptions> options)
+            IOptions<IdentityClientOptions> options)
         {
             _logger = logger;
             _options = options.Value;
-            _channel = CreateChannel(loggerFactory, _options);
+            _channel = CreateChannel(_options);
             _client = new(_channel);
         }
 
-        private static GrpcChannel CreateChannel(ILoggerFactory loggerFactory, IIdentityOptions options)
+        private static GrpcChannel CreateChannel(IIdentityClientOptions options)
         {
             MethodConfig defaultMethodConfig = new()
             {
@@ -68,7 +67,6 @@ namespace CecoChat.Messaging.Server.Identity
 
             return GrpcChannel.ForAddress(options.Address, new GrpcChannelOptions
             {
-                LoggerFactory = loggerFactory,
                 ServiceConfig = serviceConfig,
                 HttpHandler = httpHandler
             });
@@ -96,7 +94,7 @@ namespace CecoChat.Messaging.Server.Identity
             }
             catch (RpcException rpcException)
             {
-                _logger.LogError(rpcException, "Failed to generate ID for user {0}.", userID);
+                _logger.LogError(rpcException, "Failed to generate ID for user {0} due to error {1}.", userID, rpcException.Status);
                 return new GenerateIdentityResult();
             }
         }

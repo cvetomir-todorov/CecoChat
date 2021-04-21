@@ -96,7 +96,7 @@ namespace CecoChat.Messaging.Server
 
             // identity
             builder.RegisterType<IdentityClient>().As<IIdentityClient>().SingleInstance();
-            builder.RegisterOptions<IdentityOptions>(Configuration.GetSection("Identity"));
+            builder.RegisterOptions<IdentityClientOptions>(Configuration.GetSection("IdentityClient"));
 
             // backend
             builder.RegisterModule(new PartitionUtilityAutofacModule());
