@@ -40,22 +40,12 @@ namespace CecoChat.Messaging.Server.Clients
         [Authorize(Roles = "user")]
         public override async Task<SendMessageResponse> SendMessage(SendMessageRequest request, ServerCallContext context)
         {
-            if (!context.GetHttpContext().User.TryGetUserClaims(out UserClaims userClaims))
-            {
-                _logger.LogError("Client from {0} was authorized but has no parseable access token.", context.Peer);
-                return new SendMessageResponse();
-            }
-            Activity.Current?.SetTag("user.id", userClaims.UserID);
-
-            GenerateIdentityResult result = await _identityClient.GenerateIdentity(userClaims.UserID);
-            if (!result.Success)
-            {
-                throw new RpcException(new Status(StatusCode.Internal, null));
-            }
+            UserClaims userClaims = GetUserClaims(context);
+            long messageID = await GenerateMessageID(userClaims.UserID);
 
             ClientMessage clientMessage = request.Message;
-            clientMessage.MessageId = result.ID;
-            _logger.LogTrace("Message for {0} processed {1}.", userClaims, clientMessage);
+            clientMessage.MessageId = messageID;
+            _logger.LogTrace("Message for {0} received {1}.", userClaims, clientMessage);
 
             BackendMessage backendMessage = _mapper.MapClientToBackendMessage(clientMessage);
             backendMessage.ClientId = userClaims.ClientID.ToUuid();
@@ -66,6 +56,31 @@ namespace CecoChat.Messaging.Server.Clients
 
             SendMessageResponse response = new() {MessageId = clientMessage.MessageId};
             return response;
+        }
+
+        private UserClaims GetUserClaims(ServerCallContext context)
+        {
+            if (!context.GetHttpContext().User.TryGetUserClaims(out UserClaims userClaims))
+            {
+                _logger.LogError("Client from {0} was authorized but has no parseable access token.", context.Peer);
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "Access token could not be parsed."));
+            }
+
+            Activity.Current?.SetTag("user.id", userClaims.UserID);
+            return userClaims;
+        }
+
+        private async Task<long> GenerateMessageID(long userID)
+        {
+            GenerateIdentityResult result = await _identityClient.GenerateIdentity(userID);
+            if (!result.Success)
+            {
+                Metadata metadata = new();
+                metadata.Add("UserID", userID.ToString());
+                throw new RpcException(new Status(StatusCode.Unavailable, "Failed to generate message ID."), metadata);
+            }
+
+            return result.ID;
         }
 
         private void EnqueueMessagesForSenders(ClientMessage clientMessage, Guid senderID, out int successCount, out int allCount)

@@ -36,6 +36,7 @@ namespace CecoChat.Server
                 .MinimumLevel.Is(LogEventLevel.Information)
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                 .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Information)
+                .MinimumLevel.Override("Grpc", LogEventLevel.Warning)
                 .Enrich.WithMachineName()
                 .Enrich.WithProperty("Application", entryAssembly.GetName().Name)
                 .Enrich.WithSpan()

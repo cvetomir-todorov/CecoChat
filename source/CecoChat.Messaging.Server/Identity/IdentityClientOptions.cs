@@ -2,7 +2,7 @@
 
 namespace CecoChat.Messaging.Server.Identity
 {
-    public interface IIdentityOptions
+    public interface IIdentityClientOptions
     {
         Uri Address { get; }
 
@@ -12,12 +12,12 @@ namespace CecoChat.Messaging.Server.Identity
 
         TimeSpan InitialBackOff { get; }
 
-        int BackOffMultiplier {get;}
+        double BackOffMultiplier {get;}
 
         TimeSpan MaxBackOff { get; }
     }
 
-    public sealed class IdentityOptions : IIdentityOptions
+    public sealed class IdentityClientOptions : IIdentityClientOptions
     {
         public Uri Address { get; set; }
 
@@ -27,7 +27,7 @@ namespace CecoChat.Messaging.Server.Identity
 
         public TimeSpan InitialBackOff { get; set; }
 
-        public int BackOffMultiplier { get; set; }
+        public double BackOffMultiplier { get; set; }
 
         public TimeSpan MaxBackOff { get; set; }
     }
