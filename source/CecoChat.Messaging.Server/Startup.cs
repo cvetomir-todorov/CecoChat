@@ -29,6 +29,7 @@ namespace CecoChat.Messaging.Server
         private readonly IJwtOptions _jwtOptions;
         private readonly IOtelSamplingOptions _otelSamplingOptions;
         private readonly IJaegerOptions _jaegerOptions;
+        private readonly IIdentityClientOptions _identityClientOptions;
 
         public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
@@ -46,6 +47,10 @@ namespace CecoChat.Messaging.Server
             JaegerOptions jaegerOptions = new();
             Configuration.GetSection("Jaeger").Bind(jaegerOptions);
             _jaegerOptions = jaegerOptions;
+
+            IdentityClientOptions identityClientOptions = new();
+            Configuration.GetSection("IdentityClient").Bind(identityClientOptions);
+            _identityClientOptions = identityClientOptions;
         }
 
         public IConfiguration Configuration { get; }
@@ -69,6 +74,9 @@ namespace CecoChat.Messaging.Server
             // security
             services.AddJwtAuthentication(_jwtOptions);
             services.AddAuthorization();
+
+            // identity client
+            services.AddIdentityClient(_identityClientOptions);
 
             // clients
             services.AddGrpc(rpc => rpc.EnableDetailedErrors = Environment.IsDevelopment());
