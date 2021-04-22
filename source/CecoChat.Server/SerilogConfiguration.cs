@@ -34,6 +34,7 @@ namespace CecoChat.Server
         {
             return new LoggerConfiguration()
                 .MinimumLevel.Is(LogEventLevel.Information)
+                .MinimumLevel.Override("System.Net.Http.HttpClient", LogEventLevel.Warning)
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                 .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Information)
                 .MinimumLevel.Override("Grpc", LogEventLevel.Warning)
