@@ -16,13 +16,16 @@ namespace CecoChat.Identity.Server.Generation
     public sealed class SnowflakeGenerator : IIdentityGenerator
     {
         private readonly ILogger _logger;
+        private readonly INonCryptoHash _hashFunction;
         private readonly List<IdGenerator> _generators;
 
         public SnowflakeGenerator(
             ILogger<SnowflakeGenerator> logger,
-            IOptions<SnowflakeOptions> options)
+            IOptions<SnowflakeOptions> options,
+            INonCryptoHash hashFunction)
         {
             _logger = logger;
+            _hashFunction = hashFunction;
             ISnowflakeOptions snowflakeOptions = options.Value;
 
             // IdGen doesn't use the sign bit so the sum of bits is 63
@@ -37,22 +40,25 @@ namespace CecoChat.Identity.Server.Generation
             }
         }
 
-        // TODO: use hash function to choose generator
-
         public long GenerateOne(long originatorID)
         {
-            int generatorIndex = (int) (originatorID % _generators.Count);
-            long id = _generators[generatorIndex].CreateId();
+            long id = ChooseGenerator(originatorID, out int generatorIndex).CreateId();
             _logger.LogTrace("Generated ID {0} for originator {1} using generator {2}.", id, originatorID, generatorIndex);
             return id;
         }
 
         public IEnumerable<long> GenerateMany(long originatorID, int count)
         {
-            int generatorIndex = (int) (originatorID % _generators.Count);
-            IEnumerable<long> ids = _generators[generatorIndex].Take(count);
+            IEnumerable<long> ids = ChooseGenerator(originatorID, out int generatorIndex).Take(count);
             _logger.LogTrace("Generated {0} IDs for originator {1} using generator {2}.", count, originatorID, generatorIndex);
             return ids;
+        }
+
+        private IdGenerator ChooseGenerator(long originatorID, out int generatorIndex)
+        {
+            int hash = _hashFunction.Compute(originatorID);
+            generatorIndex = hash % _generators.Count;
+            return _generators[generatorIndex];
         }
     }
 }
