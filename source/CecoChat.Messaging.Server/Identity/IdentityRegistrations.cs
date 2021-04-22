@@ -11,31 +11,31 @@ using Polly;
 
 namespace CecoChat.Messaging.Server.Identity
 {
-    public static class IdentityClientRegistrations
+    public static class IdentityRegistrations
     {
-        public static void AddIdentityClient(this IServiceCollection services, IIdentityClientOptions options)
+        public static void AddIdentityClient(this IServiceCollection services, IIdentityOptions options)
         {
             services
                 .AddGrpcClient<Contracts.Identity.Identity.IdentityClient>(grpc =>
                 {
-                    grpc.Address = options.Address;
+                    grpc.Address = options.Communication.Address;
                 })
                 .ConfigurePrimaryHttpMessageHandler(() => CreateMessageHandler(options))
                 .AddPolicyHandler(_ => HandleFailure(options));
         }
 
-        private static HttpMessageHandler CreateMessageHandler(IIdentityClientOptions options)
+        private static HttpMessageHandler CreateMessageHandler(IIdentityOptions options)
         {
             return new SocketsHttpHandler
             {
                 PooledConnectionIdleTimeout = Timeout.InfiniteTimeSpan,
-                KeepAlivePingDelay = options.KeepAlivePingDelay,
-                KeepAlivePingTimeout = options.KeepAlivePingTimeout,
+                KeepAlivePingDelay = options.Communication.KeepAlivePingDelay,
+                KeepAlivePingTimeout = options.Communication.KeepAlivePingTimeout,
                 EnableMultipleHttp2Connections = true
             };
         }
 
-        private static IAsyncPolicy<HttpResponseMessage> HandleFailure(IIdentityClientOptions options)
+        private static IAsyncPolicy<HttpResponseMessage> HandleFailure(IIdentityOptions options)
         {
             Random jitterGenerator = new();
 
@@ -51,7 +51,7 @@ namespace CecoChat.Messaging.Server.Identity
                     return !isHttpError && !isGrpcError;
                 })
                 .WaitAndRetryAsync(
-                    options.RetryCount,
+                    options.Retry.RetryCount,
                     retryAttempt => SleepDurationProvider(retryAttempt, jitterGenerator, options),
                     onRetry: (_, _, _, _) =>
                     {
@@ -76,24 +76,24 @@ namespace CecoChat.Messaging.Server.Identity
             return null;
         }
 
-        private static TimeSpan SleepDurationProvider(int retryAttempt, Random jitterGenerator, IIdentityClientOptions options)
+        private static TimeSpan SleepDurationProvider(int retryAttempt, Random jitterGenerator, IIdentityOptions options)
         {
             TimeSpan sleepDuration;
             if (retryAttempt == 1)
             {
-                sleepDuration = options.InitialBackOff;
+                sleepDuration = options.Retry.InitialBackOff;
             }
             else
             {
                 // exponential delay
-                sleepDuration = TimeSpan.FromSeconds(Math.Pow(options.BackOffMultiplier, retryAttempt));
-                if (sleepDuration > options.MaxBackOff)
+                sleepDuration = TimeSpan.FromSeconds(Math.Pow(options.Retry.BackOffMultiplier, retryAttempt));
+                if (sleepDuration > options.Retry.MaxBackOff)
                 {
-                    sleepDuration = options.MaxBackOff;
+                    sleepDuration = options.Retry.MaxBackOff;
                 }
             }
 
-            TimeSpan jitter = TimeSpan.FromMilliseconds(jitterGenerator.Next(0, options.MaxJitterMs));
+            TimeSpan jitter = TimeSpan.FromMilliseconds(jitterGenerator.Next(0, options.Retry.MaxJitterMs));
             sleepDuration += jitter;
 
             return sleepDuration;

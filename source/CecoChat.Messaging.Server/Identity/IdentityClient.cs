@@ -24,7 +24,7 @@ namespace CecoChat.Messaging.Server.Identity
     public sealed class IdentityClient : IIdentityClient
     {
         private readonly ILogger _logger;
-        private readonly IIdentityClientOptions _options;
+        private readonly IIdentityOptions _options;
         private readonly Contracts.Identity.Identity.IdentityClient _client;
         private readonly ConcurrentBag<long> _idBuffer;
         private readonly SemaphoreSlim _generatedNewIDs;
@@ -35,17 +35,20 @@ namespace CecoChat.Messaging.Server.Identity
 
         public IdentityClient(
             ILogger<IdentityClient> logger,
-            IOptions<IdentityClientOptions> identityClientOptions,
+            IOptions<IdentityOptions> identityOptions,
             IOptions<ClientOptions> clientOptions,
             Contracts.Identity.Identity.IdentityClient client)
         {
             _logger = logger;
-            _options = identityClientOptions.Value;
+            _options = identityOptions.Value;
             _client = client;
 
             _idBuffer = new();
             _generatedNewIDs = new(initialCount: 0, maxCount: clientOptions.Value.MaxClients);
-            _invalidateIDsTimer = new(InvalidateIDs, state: null, dueTime: _options.InvalidateIDsInterval, period: _options.InvalidateIDsInterval);
+            _invalidateIDsTimer = new(
+                callback: InvalidateIDs, state: null,
+                dueTime: _options.Generation.InvalidateIDsInterval,
+                period: _options.Generation.InvalidateIDsInterval);
         }
 
         public void Dispose()
@@ -61,8 +64,8 @@ namespace CecoChat.Messaging.Server.Identity
                 return new GetIdentityResult {ID = id};
             }
 
-            TriggerNewIDGeneration(userID, _options.RefreshIDsCount);
-            if (false == await _generatedNewIDs.WaitAsync(_options.GetIDWaitInterval, ct))
+            TriggerNewIDGeneration(userID, _options.Generation.RefreshIDsCount);
+            if (false == await _generatedNewIDs.WaitAsync(_options.Generation.GetIDWaitInterval, ct))
             {
                 _logger.LogWarning("Timed-out while waiting for new IDs to be generated.");
                 return new GetIdentityResult();
@@ -97,7 +100,7 @@ namespace CecoChat.Messaging.Server.Identity
                     OriginatorId = originatorID,
                     Count = count
                 };
-                DateTime deadline = DateTime.UtcNow.Add(_options.CallTimeout);
+                DateTime deadline = DateTime.UtcNow.Add(_options.Communication.CallTimeout);
 
                 GenerateManyResponse response = await _client.GenerateManyAsync(request, deadline: deadline);
                 foreach (long id in response.Ids)
