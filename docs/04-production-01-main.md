@@ -42,7 +42,7 @@ Jaeger is used in order to show traces and spans since an exporter for it is pro
 
 # Log aggregation
 
-EFK stack is utilized to aggregate, store, view and search all logs.
+EFK stack is utilized to aggregate, store, view, search all logs and setup alerts.
 
 ## Aggregation
 
@@ -52,6 +52,6 @@ In Release/Production mode the servers simply write logs to `stdout`. The same S
 
 Both modes are configured to create indexes with different names because there is a slight difference in the fields. Also it makes it easier to know where the logs came from.
 
-## Storage and view
+## Storage, view, alerts
 
-Once the logs are in the appropriate indexes in ElasticSearch Kibana can be used in order to search by whatever field is needed. Log streaming can also be configured.
+Once the logs are in the appropriate indexes in ElasticSearch Kibana can be used in order to search by whatever field is needed. Log streaming and alerts can also be used.
