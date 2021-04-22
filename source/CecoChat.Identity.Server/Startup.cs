@@ -34,6 +34,7 @@ namespace CecoChat.Identity.Server
         {
             // snowflake
             builder.RegisterType<SnowflakeGenerator>().As<IIdentityGenerator>().SingleInstance();
+            builder.RegisterType<FnvHash>().As<INonCryptoHash>().SingleInstance();
             builder.RegisterOptions<SnowflakeOptions>(Configuration.GetSection("Snowflake"));
         }
 
