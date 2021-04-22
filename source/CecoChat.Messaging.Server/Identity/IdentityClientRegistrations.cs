@@ -39,22 +39,24 @@ namespace CecoChat.Messaging.Server.Identity
         {
             Random jitterGenerator = new();
 
-            return Policy.HandleResult<HttpResponseMessage>(response =>
-            {
-                StatusCode? grpcStatus = GetGrpcStatusCode(response);
-
-                bool isHttpError = grpcStatus == null && !response.IsSuccessStatusCode;
-                bool isGrpcError = response.IsSuccessStatusCode && grpcStatus == StatusCode.OK;
-
-                return !isHttpError && !isGrpcError;
-            })
-            .WaitAndRetryAsync(
-                options.RetryCount,
-                retryAttempt => SleepDurationProvider(retryAttempt, jitterGenerator, options),
-                onRetry: (_, _, _, _) =>
+            return Policy
+                .Handle<HttpRequestException>()
+                .OrResult<HttpResponseMessage>(response =>
                 {
-                    // if needed we can obtain new tokens and do other per-call stuff here
-                });
+                    StatusCode? grpcStatus = GetGrpcStatusCode(response);
+
+                    bool isHttpError = grpcStatus == null && !response.IsSuccessStatusCode;
+                    bool isGrpcError = response.IsSuccessStatusCode && grpcStatus == StatusCode.OK;
+
+                    return !isHttpError && !isGrpcError;
+                })
+                .WaitAndRetryAsync(
+                    options.RetryCount,
+                    retryAttempt => SleepDurationProvider(retryAttempt, jitterGenerator, options),
+                    onRetry: (_, _, _, _) =>
+                    {
+                        // if needed we can obtain new tokens and do other per-call stuff here
+                    });
         }
 
         private static StatusCode? GetGrpcStatusCode(HttpResponseMessage response)
