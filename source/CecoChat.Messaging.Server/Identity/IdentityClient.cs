@@ -65,7 +65,7 @@ namespace CecoChat.Messaging.Server.Identity
             }
 
             TriggerNewIDGeneration(userID, _options.Generation.RefreshIDsCount);
-            if (false == await _generatedNewIDs.WaitAsync(_options.Generation.GetIDWaitInterval, ct))
+            if (!await _generatedNewIDs.WaitAsync(_options.Generation.GetIDWaitInterval, ct))
             {
                 _logger.LogWarning("Timed-out while waiting for new IDs to be generated.");
                 return new GetIdentityResult();
