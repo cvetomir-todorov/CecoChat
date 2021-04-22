@@ -46,9 +46,10 @@ namespace CecoChat.Messaging.Server.Clients
             _logger = logger;
             _grpcActivityUtility = grpcActivityUtility;
 
+            IClientOptions clientOptions = options.Value;
             _messageQueue = new(
                 collection: new ConcurrentQueue<MessageContext>(),
-                boundedCapacity: options.Value.SendMessagesHighWatermark);
+                boundedCapacity: clientOptions.SendMessagesHighWatermark);
             _signalProcessing = new SemaphoreSlim(initialCount: 0, maxCount: 1);
             _streamingStrategy = DefaultStreamingStrategy.Instance;
         }

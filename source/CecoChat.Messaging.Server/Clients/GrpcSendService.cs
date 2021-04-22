@@ -41,7 +41,7 @@ namespace CecoChat.Messaging.Server.Clients
         public override async Task<SendMessageResponse> SendMessage(SendMessageRequest request, ServerCallContext context)
         {
             UserClaims userClaims = GetUserClaims(context);
-            long messageID = await GenerateMessageID(userClaims.UserID);
+            long messageID = await GetMessageID(userClaims, context);
 
             ClientMessage clientMessage = request.Message;
             clientMessage.MessageId = messageID;
@@ -70,14 +70,14 @@ namespace CecoChat.Messaging.Server.Clients
             return userClaims;
         }
 
-        private async Task<long> GenerateMessageID(long userID)
+        private async Task<long> GetMessageID(UserClaims userClaims, ServerCallContext context)
         {
-            GenerateIdentityResult result = await _identityClient.GenerateIdentity(userID);
+            GetIdentityResult result = await _identityClient.GetIdentity(userClaims.UserID, context.CancellationToken);
             if (!result.Success)
             {
                 Metadata metadata = new();
-                metadata.Add("UserID", userID.ToString());
-                throw new RpcException(new Status(StatusCode.Unavailable, "Failed to generate message ID."), metadata);
+                metadata.Add("UserID", userClaims.UserID.ToString());
+                throw new RpcException(new Status(StatusCode.Unavailable, "Failed to get a message ID."), metadata);
             }
 
             return result.ID;

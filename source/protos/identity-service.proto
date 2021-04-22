@@ -3,13 +3,23 @@ option csharp_namespace = "CecoChat.Contracts.Identity";
 package CecoChat.Contracts.Identity;
 
 service Identity {
-  rpc GenerateIdentity(GenerateIdentityRequest) returns (GenerateIdentityResponse);
+  rpc GenerateOne(GenerateOneRequest) returns (GenerateOneResponse);
+  rpc GenerateMany(GenerateManyRequest) returns (GenerateManyResponse);
 }
 
-message GenerateIdentityRequest {
+message GenerateOneRequest {
   int64 originator_id = 1;
 }
 
-message GenerateIdentityResponse {
+message GenerateOneResponse {
   int64 id = 1;
+}
+
+message GenerateManyRequest {
+  int64 originator_id = 1;
+  int32 count = 2;
+}
+
+message GenerateManyResponse {
+  repeated int64 ids = 1;
 }
