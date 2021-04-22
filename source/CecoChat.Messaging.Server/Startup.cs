@@ -29,7 +29,7 @@ namespace CecoChat.Messaging.Server
         private readonly IJwtOptions _jwtOptions;
         private readonly IOtelSamplingOptions _otelSamplingOptions;
         private readonly IJaegerOptions _jaegerOptions;
-        private readonly IIdentityClientOptions _identityClientOptions;
+        private readonly IIdentityOptions _identityOptions;
 
         public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
@@ -48,9 +48,9 @@ namespace CecoChat.Messaging.Server
             Configuration.GetSection("Jaeger").Bind(jaegerOptions);
             _jaegerOptions = jaegerOptions;
 
-            IdentityClientOptions identityClientOptions = new();
-            Configuration.GetSection("IdentityClient").Bind(identityClientOptions);
-            _identityClientOptions = identityClientOptions;
+            IdentityOptions identityOptions = new();
+            Configuration.GetSection("Identity").Bind(identityOptions);
+            _identityOptions = identityOptions;
         }
 
         public IConfiguration Configuration { get; }
@@ -76,7 +76,7 @@ namespace CecoChat.Messaging.Server
             services.AddAuthorization();
 
             // identity client
-            services.AddIdentityClient(_identityClientOptions);
+            services.AddIdentityClient(_identityOptions);
 
             // clients
             services.AddGrpc(rpc => rpc.EnableDetailedErrors = Environment.IsDevelopment());
@@ -107,7 +107,7 @@ namespace CecoChat.Messaging.Server
 
             // identity
             builder.RegisterType<IdentityClient>().As<IIdentityClient>().SingleInstance();
-            builder.RegisterOptions<IdentityClientOptions>(Configuration.GetSection("IdentityClient"));
+            builder.RegisterOptions<IdentityOptions>(Configuration.GetSection("Identity"));
 
             // backend
             builder.RegisterModule(new PartitionUtilityAutofacModule());
