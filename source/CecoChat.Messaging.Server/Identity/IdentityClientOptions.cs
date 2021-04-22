@@ -4,6 +4,12 @@ namespace CecoChat.Messaging.Server.Identity
 {
     public interface IIdentityClientOptions
     {
+        int RefreshIDsCount { get; }
+
+        TimeSpan GetIDWaitInterval { get; }
+
+        TimeSpan InvalidateIDsInterval {get;}
+
         Uri Address { get; }
 
         TimeSpan KeepAlivePingDelay { get; }
@@ -25,6 +31,12 @@ namespace CecoChat.Messaging.Server.Identity
 
     public sealed class IdentityClientOptions : IIdentityClientOptions
     {
+        public int RefreshIDsCount { get; set; }
+
+        public TimeSpan GetIDWaitInterval { get; set; }
+
+        public TimeSpan InvalidateIDsInterval { get; set; }
+
         public Uri Address { get; set; }
 
         public TimeSpan KeepAlivePingDelay { get; set; }
