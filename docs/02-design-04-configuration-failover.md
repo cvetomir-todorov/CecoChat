@@ -10,7 +10,7 @@ The configuration database stores information related to server partition assign
 * Messaging server to:
   - Assign the partitions to the Kafka consumer in order to consume messages
 
-Redis conveniently supports simple keys for plain data such as partition count and history settings. Redis hashes (which could probably be called maps) are used to store key-value pairs like the (server ID -> partitions) and (server ID -> address). After the configurator server applies configuration changes the Redis PUB/SUB is used to publish a notification to subscribers using the respective channels. Each interested server listens to changes for:
+Redis conveniently supports simple keys for plain data such as partition count and history settings. Redis hashes (hash maps) are used to store key-value pairs like the `(server ID -> partitions)` and `(server ID -> address)`. After the configurator server applies configuration changes the Redis PUB/SUB is used to publish a notification to subscribers using the respective channels. Each interested server listens to changes for:
 
 * Connect server - partition count, server partitions, server addresses
 * Messaging server - partition count, server partitions
@@ -25,3 +25,5 @@ Each Kafka partition is consumed by exactly one messaging server. Once this serv
 * Handling the notification from the deployment infrastructure
 * Updating the server partitions configuration
 * Publishing the configuration change notification
+  - This doesn't affect currently alive messaging servers since their configuration doesn't change
+  - Only the new messaging server is affected when it starts consuming messages

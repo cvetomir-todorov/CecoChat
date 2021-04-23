@@ -45,7 +45,7 @@
   - [Back of the envelope calculations](docs/01-intro-01-main.md#Back-of-the-envelope-calculations)
   - [Overall design, technologies](docs/01-intro-03-overall-design-technologies.md)
 * Design
-  - [Approach](docs/02-design-01-approach.md)
+  - [Approach, main problems](docs/02-design-01-approach.md)
   - [Send, receive, multiple clients for same user](docs/02-design-02-send-receive.md)
   - [History, clients](docs/02-design-03-history-clients.md)
   - [Configuration, failover](docs/02-design-04-configuration-failover.md)
