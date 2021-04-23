@@ -21,12 +21,25 @@ Despite there is quite a bit of code written a good part of it is a proof-of-con
 
 Before running the containers some preparation steps need to be done manually. The scripts for them are in the respective technology folder. Docker volumes need to be created. After running the containers some need to be prepared using `docker exec -it` just one time (unless the volumes are deleted). The `docker-compose` files for the containers are in the [run folder](../run/).
 
-* Cassandra:
+### Preparations
+* Cassandra
+  - Create Docker volumes
+* Kafka
+  - Create Docker volumes
+  - Create Kafka topics
+* Redis
+  - Create Docker volumes
+  - Create initial configuration
+* Observability
+  - FluentD - build container
+
+### Containers
+* Cassandra
   - 2 Cassandra instances
   - Cassandra Web (management)
-* Kafka:
+* Kafka
   - 2 Kafka brokers
-  - Zookeeper
+  - ZooKeeper
   - Kafdrop (management)
 * Redis:
   - 1 Redis instance
