@@ -1,36 +1,28 @@
-# Send
+# Traffic partitioning
 
-![Send messages](images/cecochat-02-message-send.png)
-
-Sending messages relies on a formula in order to calculate which topic partition the recipient is assigned to.
-
+Each messaging server is uniquely assigned part of the messages from the PUB/SUB backplane. We cannot afford **every** messaging server to process **all** messages. Since we're using Kafka that means we split the messages into partitions. Messages for a given user are always in the same partition. The formula is:
 ```
 Recipient Kafka partition = Hash(Recipient ID) % Partition count
 ```
 
-Typically Kafka uses auto-partitioning when sending messages, so doing it manually is not the standard way. But in our case it is required since each messaging server consumer is stateful - the clients connected to it are assigned to specific partitions. Fortunately the Kafka .NET client API has these capabilities.
+The hash function from the formula needs to be stable because it would be run on different servers. It needs to provide an excellent distribution since we don't want hot partitions. And since this is the same function which is used to decide which messaging server each client connects to - we don't want to hit our messaging server connection number limit. The performance requirements are not key, it just doesn't need to be slow. I used [FNV](https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function) which satisfied the requirements. I [checked](../check/) how it behaves and its total distribution deviation and max one are small enough.
 
-The hash function needs to be stable because it would be run on multiple different servers. It needs to provide an excellent distribution since we don't want hot partitions. And since this is the same function which is used to decide which messaging server each client connects to - we don't want to hit our messaging server connection number limit. The performance requirements are not key, it just doesn't need to be slow. I used [FNV](https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function) which satisfied the requirements. I [checked](../check/) how it behaves and its total distribution deviation and max one are small enough.
+# Send
+
+![Send messages](images/cecochat-02-message-send.png)
+
+The Kafka producer doesn't use the default auto-partitioning when sending messages. Instead it is doing it manually. It is required since each messaging server is stateful - the clients connected to it are assigned to specific partitions. Fortunately the Kafka .NET client API has these capabilities.
+
+Additionally we use the Kafka delivery handler in order to send the client a positive or negative ACK. It is used by the client to know whether the message has been processed.
 
 # Receive
 
 ![Receive messages](images/cecochat-03-message-receive.png)
 
-Each messaging server is stateful. It contains a Kafka consumer which has manually assigned Kafka partitions and consumes messages only from them. Additionally only clients whose user ID is assigned to one of those same partitions connect to that messaging server.
+Each messaging server contains a Kafka consumer which is manually assigned Kafka partitions and consumes messages only from them. Only clients whose user ID matches the assigned partitions according to the formula connects to that messaging server.
+
+Messages for a client are enqueued in a bounded message queue. That helps limit the memory for each client. If the client is a slow receiver though there is a possibility for the messages to fill the queue up. Which means that some messages would get dropped. Using counters sent along with each message the client can track for gaps and use the history servers in order to get missing messages.
 
 # Multiple clients
 
-Sometimes a user has multiple clients with the same user ID. Each client should be able to receive messages sent from one of the other clients. There are two ways to achieve this:
-
-* Since all clients are connected to the same messaging server, simply send the message to the other clients. This has pros and cons:
-  - Low latency
-  - No additional transfer of data between messaging servers and PUB/SUB backplane
-  - Violation of the alternative approach taken earlier since now each send has two operations which may lead to inconsistency:
-    - Sending the message to the receiver using its topic-partition
-    - Sending the message to the other clients connected to the same messaging server
-* In order to preserve the earlier decision to follow the alternative approach, each messaging server has a separate Kafka consumer group for duplicating messages to other clients with the same user ID. This second consumer group simply reads the message, changes the recipient ID from receiver ID to sender ID and sends it back to the appropriate topic partition. This has the following pros and cons:
-  - Higher latency - now the message for the other clients with the same user ID goes additionally through
-    - Receiver messaging server
-    - Sender messaging server
-  - Additional transfer of data between messaging servers and PUB/SUB backplane
-  - Alignment with the alternative approach decision - each send has only one operation which guarantees consistency
+Sometimes a user has multiple clients with the same user ID. Each client should be able to receive messages sent from one of the other clients. From the formula we know that clients for the same user ID are using the same Kafka partition. Therefore they are all connected to the same messaging server. Which means we can asynchronously enqueue the message from the sending client to the other clients.
