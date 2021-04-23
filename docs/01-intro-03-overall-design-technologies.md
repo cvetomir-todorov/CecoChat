@@ -2,24 +2,70 @@
 
 ![Overall design](images/cecochat-01-overall.png)
 
-Clients connect to messaging servers in order to chat. Messaging servers communicate with each other indirectly using a PUB/SUB backplane. The PUB/SUB backplane also acts like an event log. Materialize servers transform messages from the event log into a history database which is the source of truth. The history is available for querying by the clients via history servers. Clients obtain the addresses for the messaging and history server from a connect server. The messaging, history, connect servers use dynamic configuration which is updated centrally. All of this is powered by a deployment infrastructure which takes care of failover, growth and shrinking of the different server sets based on load.
+Clients connect to messaging servers in order to chat. Messaging servers communicate with each other indirectly using a PUB/SUB backplane. The PUB/SUB backplane also acts like an event log. Materialize servers transform messages from the event log into a history database which is the source of truth. The history is available for querying by the clients via history servers. Clients obtain the addresses for the messaging and history servers from a connect server. Identity servers are used to generate message IDs in a distributed and scalable way. The messaging, history, connect servers use dynamic configuration which is updated centrally. Splitting the different responsibilities between separate servers allows for independent scaling. A deployment infrastructure takes care of failover, growth/shrinkage of the different server sets based on load and predictive analytics.
 
 All the diagrams are in the [diagrams](diagrams/) folder and [draw.io](https://app.diagrams.net/) is needed in order to view them. From the `Help` item in the menu a desktop tool could be downloaded, if preferred. Currently this is the [link with the releases](https://github.com/jgraph/drawio-desktop/releases).
 
 # Technologies
 
-* Clients use HTTP when they need to find out where to connect. After that gRPC is utilized in order to obtain history and exchange messages. gRPC is language-agnostic, which is important for the variety of clients. It is lightweight and has a decent performance. It is based on HTTP/2 which allows for both inter-operability and optimizations from the protocol. gRPC uses full-duplex communication which is possible in mobile and desktop clients. Unfortunately gRPC's usage of HTTP/2 doesn't allow it to be used easily in the browser but [gRPC-web](https://github.com/grpc/grpc-web) uses an [Envoy proxy](https://www.envoyproxy.io/) which supports server-side streaming.
+## Client communication
 
-* PUB/SUB backplane uses Kafka. It is a scalable message broker enabling superb throughput due to its balanced distribution of topic-partition leadership throughout the cluster. It is fault-tolerant and persists messages. Kafka allows different consumer groups each of which can process messages independently from each other. The pull model allows consumers to process messages at their own rate. Kafka can be tuned for either low latency, high-throughput or something in-between. It is a good solution for an event log, especially when processing a single message is fast.
+Clients use HTTP when they need to find out where to connect. After that gRPC is utilized in order to obtain history and exchange messages:
+* open-source software backed by Google
+* supports multiple languages, which is important for the variety of clients
+* lightweight and has good performance
+* based on HTTP/2 which allows for both inter-operability and optimizations from the protocol
+* uses full-duplex communication which is possible in mobile and desktop clients
+* usage of HTTP/2 doesn't allow it to be used easily in the browser but [gRPC-web](https://github.com/grpc/grpc-web) uses an [Envoy proxy](https://www.envoyproxy.io/) which supports server-side streaming.
 
-* History database uses Cassandra. It is suitable for small fast writes and range queries both of which are good for our use-case. Cassandra has built-in partitioning and supports multi data-center replication. It allows precise control over the consistency used for writes and reads.
+## PUB/SUB backplane
 
-* Configuration database uses Redis. It is lightweight, fast and easy to use. Redis supports PUB/SUB used for notifying subscribers about configuration changes.
+PUB/SUB backplane is based on Apache Kafka:
+* open-source software backed by Confluent
+* a linearly scalable message broker
+* enables a superb throughput due to its balanced distribution of partition leadership throughout the cluster
+* fault-tolerant and persists messages with customizable durability
+* can be tuned for either low latency, high-throughput or something in-between
+* allows different consumer groups each of which can process messages independently from each other
+* has a pull model which allows consumers to process messages at their own rate
+* a good solution for an event log, especially when processing a single message is fast
+* has some known operability issues with partition redistribution among a consumer group
+* relies on ZooKeeper as an additional element in the infrastructure
 
-* The servers use ASP.NET and .NET 5. Even though they could be implemented as a background services/daemons ASP.NET allows easy support for health checks and monitoring based on HTTP. The Kestrel server is performant and has integration with gRPC. In general .NET is a very mature, widely-used, feature-rich and well supported development platform.
+## History DB
 
-* Containerization relies on Docker mainly because of its maturity and popularity.
+History is based on Apache Cassandra:
+* open-source software backed by DataStax
+* linearly scalable
+* distributed with auto-partitioning and auto-replication
+* supports multi data-center auto-replication
+* suitable for random small fast writes and reads
+* suitable for random range queries
+* suitable for time series
+* eliminates the need of caching
+* allows precise control over the consistency used for writes and reads
+* ensures data consistency via hinted hand-offs and read repairs
+* needs regular anti-entropy repairs which are CPU-bound
 
-* Distributed tracing is built on .NET tracing API which is integrated with OpenTelemetry and Jaeger is configured for viewing traces and spans.
+## Configuration DB
 
-* Log aggregation is based on the EFK stack consisting of ElasticSearch, Fluentd and Kibana.
+Configuration is based on Redis:
+* open-source software
+* lightweight and performant
+* easy to use and manage
+* has a built-in PUB/SUB mechanism
+
+## Application servers
+
+The application servers use ASP.NET and .NET 5 which are the heirs of ASP.NET Core and .NET Core:
+* open-source software backed by Microsoft
+* very mature, feature-rich, lots of tools
+* widely-used with a big community
+* well supported
+
+## Operations
+
+* Containerization relies on Docker for its maturity, popularity, tooling and integration
+* Distributed tracing is based on OpenTelemetry and Jaeger is configured for viewing traces and spans
+* Log aggregation is based on the EFK stack consisting of ElasticSearch, Fluentd and Kibana
+* Deployment infrastructure - TBD
