@@ -7,4 +7,9 @@ RUN dotnet publish CecoChat.Connect.Server/CecoChat.Connect.Server.csproj -c Rel
 FROM mcr.microsoft.com/dotnet/aspnet:5.0 AS runtime
 WORKDIR /app
 COPY --from=build /app/out .
+
+ADD certificates/ceco-com.crt /usr/local/share/ca-certificates/ceco-com.crt
+RUN chmod 644 /usr/local/share/ca-certificates/ceco-com.crt
+RUN update-ca-certificates
+
 ENTRYPOINT ["dotnet", "CecoChat.Connect.Server.dll"]
