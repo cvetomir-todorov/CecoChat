@@ -75,7 +75,7 @@ namespace CecoChat.Messaging.Server
             services.AddJwtAuthentication(_jwtOptions);
             services.AddAuthorization();
 
-            // identity client
+            // identity
             services.AddIdentityClient(_identityOptions);
 
             // clients

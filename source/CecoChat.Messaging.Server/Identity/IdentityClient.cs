@@ -43,6 +43,7 @@ namespace CecoChat.Messaging.Server.Identity
             _options = identityOptions.Value;
             _client = client;
 
+            _logger.LogInformation("Identity address set to {0}.", _options.Communication.Address);
             _idBuffer = new();
             _generatedNewIDs = new(initialCount: 0, maxCount: clientOptions.Value.MaxClients);
             _invalidateIDsTimer = new(

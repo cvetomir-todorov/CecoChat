@@ -36,7 +36,7 @@ namespace CecoChat.Messaging.Server.Clients
                 return;
             }
 
-            _logger.LogTrace("{0} from {1} connected.", userClaims, address);
+            _logger.LogInformation("{0} from {1} connected.", userClaims, address);
 
             IGrpcListenStreamer streamer = _streamerFactory.Create();
             streamer.Initialize(userClaims.ClientID, responseStream, StaticStreamingStrategy.Instance);
@@ -76,7 +76,7 @@ namespace CecoChat.Messaging.Server.Clients
                 if (isClientAdded)
                 {
                     _clientContainer.RemoveClient(userClaims.UserID, streamer);
-                    _logger.LogTrace("{0} from {1} disconnected.", userClaims, address);
+                    _logger.LogInformation("{0} from {1} disconnected.", userClaims, address);
                 }
                 streamer.Dispose();
             }
