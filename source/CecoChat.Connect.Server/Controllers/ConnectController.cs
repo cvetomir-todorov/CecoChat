@@ -49,7 +49,7 @@ namespace CecoChat.Connect.Server.Controllers
                 HistoryServerAddress = _historyConfiguration.ServerAddress
             };
 
-            _logger.LogTrace("User {0} in partition {1} uses messaging server {2} and history server {3}.",
+            _logger.LogInformation("User {0} in partition {1} uses messaging server {2} and history server {3}.",
                 userID, partition, response.MessagingServerAddress, response.HistoryServerAddress);
             return Ok(response);
         }
