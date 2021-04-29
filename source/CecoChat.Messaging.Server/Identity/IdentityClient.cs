@@ -26,7 +26,7 @@ namespace CecoChat.Messaging.Server.Identity
         private readonly ILogger _logger;
         private readonly IIdentityOptions _options;
         private readonly Contracts.Identity.Identity.IdentityClient _client;
-        private readonly ConcurrentBag<long> _idBuffer;
+        private readonly ConcurrentQueue<long> _idBuffer;
         private readonly SemaphoreSlim _generatedNewIDs;
         private readonly Timer _invalidateIDsTimer;
         private int _isGeneratingNewIDs;
@@ -60,7 +60,7 @@ namespace CecoChat.Messaging.Server.Identity
 
         public async ValueTask<GetIdentityResult> GetIdentity(long userID, CancellationToken ct)
         {
-            if (_idBuffer.TryTake(out long id))
+            if (_idBuffer.TryDequeue(out long id))
             {
                 return new GetIdentityResult {ID = id};
             }
@@ -72,7 +72,7 @@ namespace CecoChat.Messaging.Server.Identity
                 return new GetIdentityResult();
             }
 
-            if (!_idBuffer.TryTake(out id))
+            if (!_idBuffer.TryDequeue(out id))
             {
                 _logger.LogWarning("No ID available after ensuring generating new IDs is triggered.");
                 return new GetIdentityResult();
@@ -106,7 +106,7 @@ namespace CecoChat.Messaging.Server.Identity
                 GenerateManyResponse response = await _client.GenerateManyAsync(request, deadline: deadline);
                 foreach (long id in response.Ids)
                 {
-                    _idBuffer.Add(id);
+                    _idBuffer.Enqueue(id);
                 }
             }
             catch (RpcException rpcException)
