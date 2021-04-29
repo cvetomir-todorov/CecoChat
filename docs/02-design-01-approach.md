@@ -48,7 +48,7 @@ Pros
 
 Cons
 * Higher latency because of the indirect communication, especially if we persist the message in the PUB/SUB backplane.
-* There needs to be balanced distribution of messaging traffic between all messaging servers. We cannot afford **every** messaging server to subscribe to **all** messages. Each messaging server would need to receive only a part of the messages which would be dedicated only to specific users. Which would mean those specific users need to connect to a specific messaging server. As a result client load-balancing during initial connect becomes a challenge.
+* There needs to be balanced distribution of messaging traffic between all messaging servers. We cannot afford **every** messaging server to process **all** messages. Each messaging server would need to receive only a part of the messages which would be dedicated only to specific users. Which would mean those specific users need to connect to a specific messaging server. As a result client load-balancing during initial connect becomes a challenge.
 * Each messaging server needs to listen to a specific part of the messages. The addition of new messaging servers would add complexity to the deployment infrastructure. A centralized configuration could be used to push changes to working messaging servers.
 * Each messaging server is the only one responsible for specific clients. The deployment infrastructure can keep idle messaging servers ready to replace ones declared dead.
 * As a result the messaging servers become stateful and unique, but at least still easily replaced.

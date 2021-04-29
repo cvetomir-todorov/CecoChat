@@ -21,34 +21,37 @@ Despite there is quite a bit of code written a good part of it is a proof-of-con
 
 Before running the containers some preparation steps need to be done manually. The scripts for them are in the respective technology folder. Docker volumes need to be created. After running the containers some need to be prepared using `docker exec -it` just one time (unless the volumes are deleted). The `docker-compose` files for the containers are in the [run folder](../run/).
 
-### Preparations
-* Cassandra
-  - Create Docker volumes
-* Kafka
-  - Create Docker volumes
-  - Create Kafka topics
-* Redis
-  - Create Docker volumes
-  - Create initial configuration
-* Observability
-  - FluentD - build container
+### Container groups
 
-### Containers
 * Cassandra
-  - 2 Cassandra instances
-  - Cassandra Web (management)
+  - Containers
+    - 2 Cassandra instances
+    - Cassandra Web (management)
+  - Preparation
+    - Create Docker volumes
 * Kafka
-  - 2 Kafka brokers
-  - ZooKeeper
-  - Kafdrop (management)
-* Redis:
-  - 1 Redis instance
-  - Redis commander (management)
-* Observability:
-  - 1 Jaeger instance (all-in-one)
-  - 1 ElasticSearch instance
-  - 1 Fluentd instance
-  - 1 Kibana instance (management)
+  - Containers
+    - 2 Kafka brokers
+    - ZooKeeper
+    - Kafdrop (management)
+  - Preparation
+    - Create Docker volumes
+    - Create Kafka topics
+* Redis
+  - Containers
+    - 1 Redis instance
+    - Redis commander (management)
+  - Preparation
+    - Create Docker volumes
+    - Input initial configuration
+* Observability
+  - Containers
+    - 1 Jaeger instance (all-in-one)
+    - 1 ElasticSearch instance
+    - 1 Fluentd instance
+    - 1 Kibana instance (management)
+  - Preparation
+    - FluentD - build container
 
 ## Containerize and run CecoChat
 
@@ -58,6 +61,7 @@ In order to containerize CecoChat you can use the folder which contains the [Doc
 * 2 messaging servers
 * 1 materialize server
 * 1 history server
+* 1 identity server
 
 It uses `ASPNETCORE_ENVIRONMENT=Production` and overrides tracing options to persists all traces.
 
