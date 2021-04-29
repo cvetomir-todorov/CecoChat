@@ -40,6 +40,14 @@ jobs:
         push: true
         tags: cvetomirtodorov/cecochat-history:0.1
 
+    - name: Identity image
+      uses: docker/build-push-action@v2
+      with:
+        file: run/cecochat/Identity.Dockerfile
+        context: ./source
+        push: true
+        tags: cvetomirtodorov/cecochat-identity:0.1
+
     - name: Materialize image
       uses: docker/build-push-action@v2
       with:
