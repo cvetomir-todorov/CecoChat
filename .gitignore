@@ -17,6 +17,9 @@ containerize/Profile
 *.userosscache
 *.sln.docstates
 
+# User-specific files (Rider)
+*.idea 
+
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
