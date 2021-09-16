@@ -69,3 +69,5 @@ It uses `ASPNETCORE_ENVIRONMENT=Production` and overrides tracing options to per
 ## Clients
 
 I've written a very basic console client. There is also a WPF desktop client for Windows which has some decent UI. A browser or WebAssembly client would be ideal in the future although that would require setting up a proxy to [enable gRPC-web](https://github.com/grpc/grpc-web).
+
+The machine running the clients needs to trust the [self-signed certificates](../source/certificates/).
