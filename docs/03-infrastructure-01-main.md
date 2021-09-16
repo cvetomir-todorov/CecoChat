@@ -51,6 +51,7 @@ Before running the containers some preparation steps need to be done manually. T
     - 1 Fluentd instance
     - 1 Kibana instance (management)
   - Preparation
+    - ElasticSearch - create Docker volumes
     - FluentD - build container
 
 ## Containerize and run CecoChat
