@@ -1,0 +1,1 @@
+docker volume create cecochat-es1-data
