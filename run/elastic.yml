@@ -10,7 +10,10 @@ services:
       - cecochat
     ports:
       - 9200:9200
-    mem_limit: 512M
+    deploy:
+      resources:
+        limits:
+          memory: 512M
     environment:
       - network.host=0.0.0.0
       - discovery.type=single-node
@@ -24,7 +27,10 @@ services:
     networks: *networks
     ports:
       - 5601:5601
-    mem_limit: 128M
+    deploy:
+      resources:
+        limits:
+          memory: 128M
     environment:
       SERVER_NAME: kibana
       ELASTICSEARCH_HOSTS: http://es:9200

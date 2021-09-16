@@ -10,7 +10,10 @@ services:
       - cecochat
     ports:
       - "6379:6379"
-    mem_limit: 64M
+    deploy:
+      resources:
+        limits:
+          memory: 64M
     volumes:
       - ./redis/redis1.conf:/redis.conf
       - cecochat-redis1-data:/data

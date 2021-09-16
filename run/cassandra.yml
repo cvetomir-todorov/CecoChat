@@ -15,7 +15,10 @@ services:
       - cecochat
     ports:
       - "9042:9042"
-    mem_limit: 512M
+    deploy:
+      resources:
+        limits:
+          memory: 512M
     environment:
       CASSANDRA_SEEDS: "cass1,cass2"
       CASSANDRA_CLUSTER_NAME: cecochat
@@ -36,7 +39,10 @@ services:
     networks: *networks
     ports:
       - "9043:9042"
-    mem_limit: 512M
+    deploy:
+      resources:
+        limits:
+          memory: 512M
     environment:
       CASSANDRA_SEEDS: "cass1,cass2"
       CASSANDRA_CLUSTER_NAME: cecochat
