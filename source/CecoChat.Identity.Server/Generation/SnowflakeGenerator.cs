@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using IdGen;
 using Microsoft.Extensions.Logging;
@@ -57,7 +58,7 @@ namespace CecoChat.Identity.Server.Generation
         private IdGenerator ChooseGenerator(long originatorID, out int generatorIndex)
         {
             int hash = _hashFunction.Compute(originatorID);
-            generatorIndex = hash % _generators.Count;
+            generatorIndex = Math.Abs(hash) % _generators.Count;
             return _generators[generatorIndex];
         }
     }
