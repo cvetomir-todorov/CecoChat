@@ -12,6 +12,7 @@ namespace CecoChat.Client.Console.Interaction
         public long UserID { get; set; }
     }
 
+    // ReSharper disable once ArrangeModifiersOrder
     public abstract class State
     {
         protected MessagingClient Client { get; }
@@ -43,6 +44,7 @@ namespace CecoChat.Client.Console.Interaction
             }
         }
 
+        // ReSharper disable once ArrangeModifiersOrder
         public abstract Task<State> Execute(StateContext context);
     }
 }
