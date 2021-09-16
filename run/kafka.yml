@@ -10,7 +10,10 @@ services:
       - cecochat
     ports:
       - "2181:2181"
-    mem_limit: 128M
+    deploy:
+      resources:
+        limits:
+          memory: 128M
     environment:
       ZOO_MY_ID: 1
       ZOO_PORT: 2181
@@ -25,7 +28,10 @@ services:
     networks: *networks
     ports:
       - "9091:9091"
-    mem_limit: 256M
+    deploy:
+      resources:
+        limits:
+          memory: 256M
     environment: 
       KAFKA_ADVERTISED_LISTENERS: LISTENER_DOCKER_INTERNAL://kafka1:19091,LISTENER_DOCKER_EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9091
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_DOCKER_INTERNAL:PLAINTEXT,LISTENER_DOCKER_EXTERNAL:PLAINTEXT
@@ -47,7 +53,10 @@ services:
     networks: *networks
     ports:
       - "9092:9092"
-    mem_limit: 256M
+    deploy:
+      resources:
+        limits:
+          memory: 256M
     environment:
       KAFKA_ADVERTISED_LISTENERS: LISTENER_DOCKER_INTERNAL://kafka2:19092,LISTENER_DOCKER_EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_DOCKER_INTERNAL:PLAINTEXT,LISTENER_DOCKER_EXTERNAL:PLAINTEXT

@@ -10,7 +10,10 @@ services:
       - cecochat
     ports:
       - "31000:443"
-    mem_limit: 128M
+    deploy:
+      resources:
+        limits:
+          memory: 128M
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: https://+
@@ -32,7 +35,10 @@ services:
     networks: *networks
     ports:
       - "31001:443"
-    mem_limit: 128M
+    deploy:
+      resources:
+        limits:
+          memory: 128M
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: https://+
@@ -54,7 +60,10 @@ services:
     networks: *networks
     ports:
       - "31011:443"
-    mem_limit: 128M
+    deploy:
+      resources:
+        limits:
+          memory: 128M
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: https://+
@@ -76,7 +85,10 @@ services:
     networks: *networks
     ports:
       - "31003:443"
-    mem_limit: 128M
+    deploy:
+      resources:
+        limits:
+          memory: 128M
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: https://+
@@ -96,7 +108,10 @@ services:
     networks: *networks
     ports:
       - "31004:443"
-    mem_limit: 128M
+    deploy:
+      resources:
+        limits:
+          memory: 128M
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: https://+
@@ -113,7 +128,10 @@ services:
     networks: *networks
     ports:
       - "31002:443"
-    mem_limit: 128M
+    deploy:
+      resources:
+        limits:
+          memory: 128M
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: https://+
@@ -134,7 +152,10 @@ services:
     networks: *networks
     ports:
       - "31005:443"
-    mem_limit: 128M
+    deploy:
+      resources:
+        limits:
+          memory: 128M
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: https://+
