@@ -39,7 +39,7 @@ namespace CecoChat.Client.Console.Interaction
 
         public override Task<State> Execute()
         {
-            return null;
+            return Task.FromResult<State>(null);
         }
     }
 }
