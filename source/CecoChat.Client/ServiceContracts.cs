@@ -1,4 +1,4 @@
-﻿namespace CecoChat.Client.Shared
+﻿namespace CecoChat.Client
 {
     internal sealed class CreateSessionRequest
     {
