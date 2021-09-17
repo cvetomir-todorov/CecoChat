@@ -1,6 +1,6 @@
 ﻿using CecoChat.Client.Shared;
-using CecoChat.Client.Shared.Storage;
 using CecoChat.Client.Wpf.Infrastructure;
+using CecoChat.Client.Wpf.Storage;
 
 namespace CecoChat.Client.Wpf.ViewModels
 {
