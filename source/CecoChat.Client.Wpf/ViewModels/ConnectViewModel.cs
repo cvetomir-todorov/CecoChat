@@ -2,7 +2,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using CecoChat.Client.Shared;
 using CecoChat.Client.Wpf.Infrastructure;
 using CecoChat.Client.Wpf.Storage;
 using Microsoft.Toolkit.Mvvm.Input;

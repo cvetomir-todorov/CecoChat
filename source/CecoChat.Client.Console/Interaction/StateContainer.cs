@@ -1,5 +1,4 @@
 using System.Threading.Tasks;
-using CecoChat.Client.Shared;
 
 namespace CecoChat.Client.Console.Interaction
 {
