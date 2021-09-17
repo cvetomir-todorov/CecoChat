@@ -41,12 +41,12 @@ namespace CecoChat.Client.Console
         private static async Task RunStateMachine(MessagingClient client, MessageStorage storage)
         {
             StateContainer states = new(client, storage);
+            states.Context.ReloadData = true;
             State currentState = states.Users;
-            StateContext context = new() {ReloadData = true};
 
             while (currentState != states.Final)
             {
-                currentState = await currentState.Execute(context);
+                currentState = await currentState.Execute();
             }
         }
     }
