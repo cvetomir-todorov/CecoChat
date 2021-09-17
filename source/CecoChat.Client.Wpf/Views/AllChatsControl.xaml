@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:views="clr-namespace:CecoChat.Client.Wpf.Views"
-             xmlns:viewModels="clr-namespace:CecoChat.Client.ViewModels;assembly=CecoChat.Client"
+             xmlns:viewModels="clr-namespace:CecoChat.Client.Wpf.ViewModels"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance Type=viewModels:AllChatsViewModel, IsDesignTimeCreatable=False}"
              Visibility="{Binding Path=CanOperate,Converter={StaticResource BoolToVisibilityConverter}}"

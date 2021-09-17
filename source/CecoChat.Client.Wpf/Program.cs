@@ -1,7 +1,8 @@
 ﻿using System;
 using CecoChat.Client.Shared;
-using CecoChat.Client.ViewModels;
+using CecoChat.Client.Shared.Storage;
 using CecoChat.Client.Wpf.Infrastructure;
+using CecoChat.Client.Wpf.ViewModels;
 using CecoChat.Client.Wpf.Views;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -26,7 +27,14 @@ namespace CecoChat.Client.Wpf
 
             services.AddSingleton<IDispatcher, WpfUIThreadDispatcher>();
             services.AddSingleton<IFeedbackService, WpfFeedbackService>();
-            services.AddClientSharedServices();
+
+            services.AddSingleton<MessagingClient>();
+            services.AddSingleton<MessageStorage>();
+
+            services.AddSingleton<MainViewModel>();
+            services.AddSingleton<ConnectViewModel>();
+            services.AddSingleton<AllChatsViewModel>();
+            services.AddSingleton<SingleChatViewModel>();
 
             return services.BuildServiceProvider();
         }

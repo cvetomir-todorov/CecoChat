@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Windows;
-using CecoChat.Client.Shared;
 
 namespace CecoChat.Client.Wpf.Infrastructure
 {
+    public interface IDispatcher
+    {
+        void Invoke(Action action);
+    }
+
     public sealed class WpfUIThreadDispatcher : IDispatcher
     {
         public void Invoke(Action action)

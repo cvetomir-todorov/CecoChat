@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:views="clr-namespace:CecoChat.Client.Wpf.Views"
-        xmlns:viewModels="clr-namespace:CecoChat.Client.ViewModels;assembly=CecoChat.Client"
+        xmlns:viewModels="clr-namespace:CecoChat.Client.Wpf.ViewModels"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=viewModels:MainViewModel,IsDesignTimeCreatable=False}"
         Title="{Binding Path=ConnectVM.Username, Converter={StaticResource FormattingTextConverter}, ConverterParameter=CecoChat User {0}}"

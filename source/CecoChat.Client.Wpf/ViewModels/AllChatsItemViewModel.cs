@@ -1,7 +1,7 @@
 ﻿using System;
 using PropertyChanged;
 
-namespace CecoChat.Client.ViewModels
+namespace CecoChat.Client.Wpf.ViewModels
 {
     [AddINotifyPropertyChangedInterface]
     public sealed class AllChatsItemViewModel

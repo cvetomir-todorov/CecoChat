@@ -6,11 +6,12 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using CecoChat.Client.Shared;
 using CecoChat.Client.Shared.Storage;
+using CecoChat.Client.Wpf.Infrastructure;
 using CecoChat.Contracts.Client;
 using Microsoft.Toolkit.Mvvm.Input;
 using PropertyChanged;
 
-namespace CecoChat.Client.ViewModels
+namespace CecoChat.Client.Wpf.ViewModels
 {
     [AddINotifyPropertyChangedInterface]
     public sealed class SingleChatViewModel : BaseViewModel

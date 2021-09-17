@@ -1,9 +1,19 @@
 ﻿using System;
 using System.Windows;
-using CecoChat.Client.Shared;
 
 namespace CecoChat.Client.Wpf.Infrastructure
 {
+    public interface IFeedbackService
+    {
+        void ShowInfo(string info);
+
+        void ShowWarning(string warning);
+
+        void ShowError(Exception exception);
+
+        void ShowError(string error);
+    }
+
     public sealed class WpfFeedbackService : IFeedbackService
     {
         private readonly IDispatcher _dispatcher;
