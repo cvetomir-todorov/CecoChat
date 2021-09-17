@@ -1,7 +1,8 @@
 ﻿using CecoChat.Client.Shared;
 using CecoChat.Client.Shared.Storage;
+using CecoChat.Client.Wpf.Infrastructure;
 
-namespace CecoChat.Client.ViewModels
+namespace CecoChat.Client.Wpf.ViewModels
 {
     // ReSharper disable once ArrangeModifiersOrder
     public abstract class BaseViewModel

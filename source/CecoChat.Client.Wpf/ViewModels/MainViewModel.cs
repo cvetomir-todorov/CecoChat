@@ -1,9 +1,10 @@
 ﻿using System;
 using CecoChat.Client.Shared;
 using CecoChat.Client.Shared.Storage;
+using CecoChat.Client.Wpf.Infrastructure;
 using PropertyChanged;
 
-namespace CecoChat.Client.ViewModels
+namespace CecoChat.Client.Wpf.ViewModels
 {
     [AddINotifyPropertyChangedInterface]
     public sealed class MainViewModel : BaseViewModel

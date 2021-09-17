@@ -3,9 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:viewModels="clr-namespace:CecoChat.Client.ViewModels;assembly=CecoChat.Client"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:infrastructure="clr-namespace:CecoChat.Client.Wpf.Infrastructure"
+             xmlns:viewModels="clr-namespace:CecoChat.Client.Wpf.ViewModels"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance Type=viewModels:SingleChatViewModel, IsDesignTimeCreatable=False}">
   <Grid>
