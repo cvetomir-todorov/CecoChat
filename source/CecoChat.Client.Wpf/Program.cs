@@ -1,7 +1,7 @@
 ﻿using System;
 using CecoChat.Client.Shared;
-using CecoChat.Client.Shared.Storage;
 using CecoChat.Client.Wpf.Infrastructure;
+using CecoChat.Client.Wpf.Storage;
 using CecoChat.Client.Wpf.ViewModels;
 using CecoChat.Client.Wpf.Views;
 using Microsoft.Extensions.DependencyInjection;
