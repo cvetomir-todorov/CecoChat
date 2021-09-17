@@ -1,23 +1,22 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using CecoChat.Client.Shared;
 
 namespace CecoChat.Client.Console.Interaction
 {
     public sealed class DialogState : State
     {
-        public DialogState(StateContainer states, MessagingClient client, MessageStorage storage) : base(states, client, storage)
+        public DialogState(StateContainer states) : base(states)
         {}
 
-        public override async Task<State> Execute(StateContext context)
+        public override async Task<State> Execute()
         {
-            if (context.ReloadData)
+            if (States.Context.ReloadData)
             {
-                await GetDialogHistory(context.UserID);
+                await GetDialogHistory(States.Context.UserID);
             }
             
-            List<Message> messages = Storage.GetDialogMessages(context.UserID);
+            List<Message> messages = States.Storage.GetDialogMessages(States.Context.UserID);
             messages.Sort((left, right) => left.Data.MessageId.CompareTo(right.Data.MessageId));
 
             System.Console.Clear();
@@ -30,27 +29,29 @@ namespace CecoChat.Client.Console.Interaction
             ConsoleKeyInfo keyInfo = System.Console.ReadKey(intercept: true);
             if (keyInfo.KeyChar == 'w' || keyInfo.KeyChar == 'W')
             {
+                States.Context.ReloadData = false;
                 return States.SendMessage;
             }
             else if (keyInfo.KeyChar == 'r' || keyInfo.KeyChar == 'R')
             {
-                context.ReloadData = true;
+                States.Context.ReloadData = true;
                 return States.Dialog;
             }
             else if (keyInfo.KeyChar == 'x' || keyInfo.KeyChar == 'X')
             {
-                context.ReloadData = true;
+                States.Context.ReloadData = true;
                 return States.Users;
             }
             else
             {
+                States.Context.ReloadData = false;
                 return States.Dialog;
             }
         }
 
         private void DisplayMessage(Message message)
         {
-            string sender = message.Data.SenderId == Client.UserID ? "You" : message.Data.SenderId.ToString();
+            string sender = message.Data.SenderId == States.Client.UserID ? "You" : message.Data.SenderId.ToString();
             string ackStatus = string.IsNullOrWhiteSpace(message.AckStatus) ? string.Empty : $" {message.AckStatus}";
 
             System.Console.WriteLine("[{0:F} #{3}{4}] {1}: {2}",

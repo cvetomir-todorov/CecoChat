@@ -1,25 +1,24 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using CecoChat.Client.Shared;
 
 namespace CecoChat.Client.Console.Interaction
 {
     public sealed class UsersState : State
     {
-        public UsersState(StateContainer states, MessagingClient client, MessageStorage storage) : base(states, client, storage)
+        public UsersState(StateContainer states) : base(states)
         {}
 
-        public override async Task<State> Execute(StateContext context)
+        public override async Task<State> Execute()
         {
-            if (context.ReloadData)
+            if (States.Context.ReloadData)
             {
                 await GetUserHistory();
             }
 
             System.Console.Clear();
             System.Console.WriteLine("Choose user to chat (press '0'...'9') | Refresh (press 'r') | Exit (press 'x'):");
-            List<long> userIDs = Storage.GetUsers();
+            List<long> userIDs = States.Storage.GetUsers();
             int key = 0;
             foreach (long userID in userIDs)
             {
@@ -29,11 +28,11 @@ namespace CecoChat.Client.Console.Interaction
             ConsoleKeyInfo keyInfo = System.Console.ReadKey(intercept: true);
             if (char.IsNumber(keyInfo.KeyChar))
             {
-                return ProcessNumberKey(keyInfo, userIDs, context);
+                return ProcessNumberKey(keyInfo, userIDs);
             }
             else if (keyInfo.KeyChar == 'r' || keyInfo.KeyChar == 'R')
             {
-                context.ReloadData = true;
+                States.Context.ReloadData = true;
                 return States.Users;
             }
             else if (keyInfo.KeyChar == 'x' || keyInfo.KeyChar == 'X')
@@ -42,22 +41,23 @@ namespace CecoChat.Client.Console.Interaction
             }
             else
             {
+                States.Context.ReloadData = false;
                 return States.Users;
             }
         }
 
-        private State ProcessNumberKey(ConsoleKeyInfo keyInfo, List<long> userIDs, StateContext context)
+        private State ProcessNumberKey(ConsoleKeyInfo keyInfo, List<long> userIDs)
         {
             int index = keyInfo.KeyChar - '0';
             if (index < 0 || index >= userIDs.Count)
             {
-                context.ReloadData = false;
+                States.Context.ReloadData = false;
                 return States.Users;
             }
             else
             {
-                context.UserID = userIDs[index];
-                context.ReloadData = true;
+                States.Context.UserID = userIDs[index];
+                States.Context.ReloadData = true;
                 return States.Dialog;
             }
         }
