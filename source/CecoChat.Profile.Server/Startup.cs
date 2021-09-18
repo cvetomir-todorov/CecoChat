@@ -54,7 +54,7 @@ namespace CecoChat.Profile.Server
                 .AddControllers()
                 .AddFluentValidation(fluentValidation =>
                 {
-                    fluentValidation.RunDefaultMvcValidationAfterFluentValidationExecutes = false;
+                    fluentValidation.DisableDataAnnotationsValidation = true;
                     fluentValidation.RegisterValidatorsFromAssemblyContaining<Startup>();
                 });
             services.AddSwaggerServices(_swaggerOptions);
