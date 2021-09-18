@@ -5,7 +5,6 @@ using CecoChat.Contracts.Client;
 
 namespace CecoChat.Client.Console.Interaction
 {
-    // ReSharper disable once ArrangeModifiersOrder
     public abstract class State
     {
         protected StateContainer States { get; }
@@ -33,7 +32,6 @@ namespace CecoChat.Client.Console.Interaction
             }
         }
 
-        // ReSharper disable once ArrangeModifiersOrder
         public abstract Task<State> Execute();
     }
 }
