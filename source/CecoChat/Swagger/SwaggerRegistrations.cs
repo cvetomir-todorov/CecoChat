@@ -49,6 +49,5 @@ namespace CecoChat.Swagger
                     name: $"{options.OpenApiInfo.Title} {options.OpenApiInfo.Version}"));
             }
         }
-
-	}
+    }
 }
