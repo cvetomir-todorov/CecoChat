@@ -64,7 +64,7 @@ namespace CecoChat.Data.Configuration.Partitioning
             }
         }
 
-        public async Task GetServerAddresses(PartitioningConfigurationUsage usage, PartitioningConfigurationValues values)
+        private async Task GetServerAddresses(PartitioningConfigurationUsage usage, PartitioningConfigurationValues values)
         {
             if (!usage.UseServerAddresses)
             {
