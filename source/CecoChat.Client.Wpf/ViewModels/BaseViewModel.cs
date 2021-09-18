@@ -3,7 +3,6 @@ using CecoChat.Client.Wpf.Storage;
 
 namespace CecoChat.Client.Wpf.ViewModels
 {
-    // ReSharper disable once ArrangeModifiersOrder
     public abstract class BaseViewModel
     {
         protected MessagingClient MessagingClient { get; }
