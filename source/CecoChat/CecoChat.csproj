@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Autofac" Version="6.1.0" />
+    <PackageReference Include="Autofac" Version="6.2.0" />
     <PackageReference Include="CassandraCSharpDriver" Version="3.16.2" />
     <PackageReference Include="Confluent.Kafka" Version="1.5.3" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="5.0.0" />
