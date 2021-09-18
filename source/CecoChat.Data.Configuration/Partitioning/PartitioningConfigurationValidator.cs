@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using CecoChat.Kafka;
 using FluentValidation;
-using FluentValidation.Validators;
 
 namespace CecoChat.Data.Configuration.Partitioning
 {
@@ -26,9 +25,9 @@ namespace CecoChat.Data.Configuration.Partitioning
             }
         }
 
-        private static void ValidatePartitionServerMap(IDictionary<int, string> partitionServerMap, CustomContext context)
+        private static void ValidatePartitionServerMap(IDictionary<int, string> partitionServerMap, ValidationContext<PartitioningConfigurationValues> context)
         {
-            PartitioningConfigurationValues values = (PartitioningConfigurationValues) context.InstanceToValidate;
+            PartitioningConfigurationValues values = context.InstanceToValidate;
             if (!IsPartitionCountValid(values.PartitionCount))
             {
                 return;
@@ -62,9 +61,9 @@ namespace CecoChat.Data.Configuration.Partitioning
             }
         }
 
-        private static void ValidateServerPartitionsMap(IDictionary<string, PartitionRange> serverPartitionRangeMap, CustomContext context)
+        private static void ValidateServerPartitionsMap(IDictionary<string, PartitionRange> serverPartitionRangeMap, ValidationContext<PartitioningConfigurationValues> context)
         {
-            PartitioningConfigurationValues values = (PartitioningConfigurationValues)context.InstanceToValidate;
+            PartitioningConfigurationValues values = context.InstanceToValidate;
             if (!IsPartitionCountValid(values.PartitionCount))
             {
                 return;
@@ -83,7 +82,7 @@ namespace CecoChat.Data.Configuration.Partitioning
         private static void ValidateSingleServerPartitions(
             string server, PartitionRange partitions,
             int partitionCount, HashSet<int> uniquePartitions,
-            CustomContext context)
+            ValidationContext<PartitioningConfigurationValues> context)
         {
             List<int> overlappingPartitions = new();
             List<int> invalidPartitions = new();
@@ -115,9 +114,9 @@ namespace CecoChat.Data.Configuration.Partitioning
             }
         }
 
-        private static void ValidateServerAddressMap(IDictionary<string, string> serverAddressMap, CustomContext context)
+        private static void ValidateServerAddressMap(IDictionary<string, string> serverAddressMap, ValidationContext<PartitioningConfigurationValues> context)
         {
-            PartitioningConfigurationValues values = (PartitioningConfigurationValues)context.InstanceToValidate;
+            PartitioningConfigurationValues values = context.InstanceToValidate;
             if (!IsPartitionCountValid(values.PartitionCount))
             {
                 return;
