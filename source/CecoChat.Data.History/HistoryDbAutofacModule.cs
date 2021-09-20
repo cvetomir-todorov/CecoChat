@@ -28,7 +28,7 @@ namespace CecoChat.Data.History
             });
             builder.RegisterType<HistoryDbInitializer>().As<IHistoryDbInitializer>().SingleInstance();
             builder.RegisterType<DataUtility>().As<IDataUtility>().SingleInstance();
-            builder.RegisterType<BackendDbMapper>().As<IBackendDbMapper>().SingleInstance();
+            builder.RegisterType<MessageMapper>().As<IMessageMapper>().SingleInstance();
 
             if (RegisterHistory)
             {

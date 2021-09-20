@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using Cassandra;
-using CecoChat.Contracts.Backplane;
 using CecoChat.Data.History.Instrumentation;
 using Microsoft.Extensions.Logging;
 
@@ -12,7 +11,7 @@ namespace CecoChat.Data.History
     {
         void Prepare();
 
-        void AddNewDialogMessage(BackplaneMessage message);
+        void AddNewDialogMessage(HistoryMessage message);
     }
 
     internal sealed class NewMessageRepository : INewMessageRepository
@@ -20,7 +19,7 @@ namespace CecoChat.Data.History
         private readonly ILogger _logger;
         private readonly IHistoryActivityUtility _historyActivityUtility;
         private readonly IDataUtility _dataUtility;
-        private readonly IBackendDbMapper _mapper;
+        private readonly IMessageMapper _mapper;
         private readonly Lazy<PreparedStatement> _messagesForUserQuery;
         private readonly Lazy<PreparedStatement> _messagesForDialogQuery;
 
@@ -28,7 +27,7 @@ namespace CecoChat.Data.History
             ILogger<NewMessageRepository> logger,
             IHistoryActivityUtility historyActivityUtility,
             IDataUtility dataUtility,
-            IBackendDbMapper mapper)
+            IMessageMapper mapper)
         {
             _logger = logger;
             _historyActivityUtility = historyActivityUtility;
@@ -57,9 +56,9 @@ namespace CecoChat.Data.History
             #pragma warning restore IDE0059
         }
 
-        public void AddNewDialogMessage(BackplaneMessage message)
+        public void AddNewDialogMessage(HistoryMessage message)
         {
-            Activity activity = _historyActivityUtility.StartNewDialogMessage(_dataUtility.MessagingSession, message.MessageId);
+            Activity activity = _historyActivityUtility.StartNewDialogMessage(_dataUtility.MessagingSession, message.MessageID);
             bool success = false;
 
             try
@@ -75,20 +74,20 @@ namespace CecoChat.Data.History
             }
         }
 
-        private BatchStatement CreateInsertBatch(BackplaneMessage message)
+        private BatchStatement CreateInsertBatch(HistoryMessage message)
         {
-            long senderID = message.SenderId;
-            long receiverID = message.ReceiverId;
-            sbyte dbMessageType = _mapper.MapBackplaneToDbMessageType(message.Type);
-            IDictionary<string, string> data = _mapper.MapBackplaneToDbData(message);
+            long senderID = message.SenderID;
+            long receiverID = message.ReceiverID;
+            sbyte dbMessageType = _mapper.MapHistoryToDbMessageType(message.Type);
+            IDictionary<string, string> data = _mapper.MapHistoryToDbData(message);
             string dialogID = _dataUtility.CreateDialogID(senderID, receiverID);
 
             BoundStatement insertForSender = _messagesForUserQuery.Value.Bind(
-                senderID, message.MessageId, senderID, receiverID, dbMessageType, data);
+                senderID, message.MessageID, senderID, receiverID, dbMessageType, data);
             BoundStatement insertForReceiver = _messagesForUserQuery.Value.Bind(
-                receiverID, message.MessageId, senderID, receiverID, dbMessageType, data);
+                receiverID, message.MessageID, senderID, receiverID, dbMessageType, data);
             BoundStatement insertForDialog = _messagesForDialogQuery.Value.Bind(
-                dialogID, message.MessageId, senderID, receiverID, dbMessageType, data);
+                dialogID, message.MessageID, senderID, receiverID, dbMessageType, data);
 
             BatchStatement insertBatch = new BatchStatement()
                 .Add(insertForSender)

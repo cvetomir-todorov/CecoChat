@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using CecoChat.Contracts.Backplane;
 using CecoChat.Contracts.Client;
 using CecoChat.Data.Config.History;
 using CecoChat.Data.History;
@@ -18,18 +17,18 @@ namespace CecoChat.History.Server.Clients
         private readonly ILogger _logger;
         private readonly IHistoryConfig _historyConfig;
         private readonly IHistoryRepository _historyRepository;
-        private readonly IClientBackendMapper _clientBackendMapper;
+        private readonly IMessageMapper _messageMapper;
 
         public GrpcHistoryService(
             ILogger<GrpcHistoryService> logger,
             IHistoryConfig historyConfig,
             IHistoryRepository historyRepository,
-            IClientBackendMapper clientBackendMapper)
+            IMessageMapper messageMapper)
         {
             _logger = logger;
             _historyConfig = historyConfig;
             _historyRepository = historyRepository;
-            _clientBackendMapper = clientBackendMapper;
+            _messageMapper = messageMapper;
         }
 
         [Authorize(Roles = "user")]
@@ -42,13 +41,13 @@ namespace CecoChat.History.Server.Clients
             }
             Activity.Current?.SetTag("user.id", userID);
 
-            IReadOnlyCollection<BackplaneMessage> backplaneMessages = await _historyRepository
+            IReadOnlyCollection<HistoryMessage> historyMessages = await _historyRepository
                 .GetUserHistory(userID, request.OlderThan.ToDateTime(), _historyConfig.UserMessageCount);
 
             GetUserHistoryResponse response = new();
-            foreach (BackplaneMessage backplaneMessage in backplaneMessages)
+            foreach (HistoryMessage historyMessage in historyMessages)
             {
-                ClientMessage clientMessage = _clientBackendMapper.MapBackplaneToClientMessage(backplaneMessage);
+                ClientMessage clientMessage = _messageMapper.MapHistoryToClientMessage(historyMessage);
                 response.Messages.Add(clientMessage);
             }
 
@@ -68,13 +67,13 @@ namespace CecoChat.History.Server.Clients
 
             long otherUserID = request.OtherUserId;
 
-            IReadOnlyCollection<BackplaneMessage> backplaneMessages = await _historyRepository
+            IReadOnlyCollection<HistoryMessage> historyMessages = await _historyRepository
                 .GetDialogHistory(userID, otherUserID, request.OlderThan.ToDateTime(), _historyConfig.DialogMessageCount);
 
             GetDialogHistoryResponse response = new();
-            foreach (BackplaneMessage backplaneMessage in backplaneMessages)
+            foreach (HistoryMessage historyMessage in historyMessages)
             {
-                ClientMessage clientMessage = _clientBackendMapper.MapBackplaneToClientMessage(backplaneMessage);
+                ClientMessage clientMessage = _messageMapper.MapHistoryToClientMessage(historyMessage);
                 response.Messages.Add(clientMessage);
             }
 

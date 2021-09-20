@@ -94,7 +94,7 @@ namespace CecoChat.History.Server
             });
 
             // shared
-            builder.RegisterType<ClientBackendMapper>().As<IClientBackendMapper>().SingleInstance();
+            builder.RegisterType<MessageMapper>().As<IMessageMapper>().SingleInstance();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
