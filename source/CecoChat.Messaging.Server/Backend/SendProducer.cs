@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using CecoChat.Contracts;
-using CecoChat.Contracts.Backend;
+using CecoChat.Contracts.Backplane;
 using CecoChat.Contracts.Client;
 using CecoChat.Kafka;
 using CecoChat.Messaging.Server.Clients;
@@ -19,7 +19,7 @@ namespace CecoChat.Messaging.Server.Backend
     {
         int PartitionCount { get; set; }
 
-        void ProduceMessage(BackendMessage message);
+        void ProduceMessage(BackplaneMessage message);
     }
 
     public sealed class SendProducer : ISendProducer
@@ -28,7 +28,7 @@ namespace CecoChat.Messaging.Server.Backend
         private readonly IBackendOptions _backendOptions;
         private readonly IPartitionUtility _partitionUtility;
         private readonly ITopicPartitionFlyweight _partitionFlyweight;
-        private readonly IKafkaProducer<Null, BackendMessage> _producer;
+        private readonly IKafkaProducer<Null, BackplaneMessage> _producer;
         private readonly IClientContainer _clientContainer;
 
         public SendProducer(
@@ -37,7 +37,7 @@ namespace CecoChat.Messaging.Server.Backend
             IHostApplicationLifetime applicationLifetime,
             IPartitionUtility partitionUtility,
             ITopicPartitionFlyweight partitionFlyweight,
-            IFactory<IKafkaProducer<Null, BackendMessage>> producerFactory,
+            IFactory<IKafkaProducer<Null, BackplaneMessage>> producerFactory,
             IClientContainer clientContainer)
         {
             _logger = logger;
@@ -58,20 +58,20 @@ namespace CecoChat.Messaging.Server.Backend
 
         public int PartitionCount { get; set; }
 
-        public void ProduceMessage(BackendMessage message)
+        public void ProduceMessage(BackplaneMessage message)
         {
             int partition = _partitionUtility.ChoosePartition(message.ReceiverId, PartitionCount);
             TopicPartition topicPartition = _partitionFlyweight.GetTopicPartition(_backendOptions.MessagesTopicName, partition);
-            Message<Null, BackendMessage> kafkaMessage = new() {Value = message};
+            Message<Null, BackplaneMessage> kafkaMessage = new() {Value = message};
 
             _producer.Produce(kafkaMessage, topicPartition, DeliveryHandler);
         }
 
-        private void DeliveryHandler(bool isDelivered, DeliveryReport<Null, BackendMessage> report, Activity activity)
+        private void DeliveryHandler(bool isDelivered, DeliveryReport<Null, BackplaneMessage> report, Activity activity)
         {
-            BackendMessage backendMessage = report.Message.Value;
-            IEnumerable<IStreamer<ListenResponse>> clients = _clientContainer.EnumerateClients(backendMessage.SenderId);
-            Guid clientID = backendMessage.ClientId.ToGuid();
+            BackplaneMessage backplaneMessage = report.Message.Value;
+            IEnumerable<IStreamer<ListenResponse>> clients = _clientContainer.EnumerateClients(backplaneMessage.SenderId);
+            Guid clientID = backplaneMessage.ClientId.ToGuid();
             IStreamer<ListenResponse> client = clients.FirstOrDefault(c => c.ClientID == clientID);
 
             if (client != null)
@@ -81,9 +81,9 @@ namespace CecoChat.Messaging.Server.Backend
                 {
                     Type = ClientMessageType.Ack,
                     AckType = ackType,
-                    MessageId = backendMessage.MessageId,
-                    SenderId = backendMessage.SenderId,
-                    ReceiverId = backendMessage.ReceiverId
+                    MessageId = backplaneMessage.MessageId,
+                    SenderId = backplaneMessage.SenderId,
+                    ReceiverId = backplaneMessage.ReceiverId
                 };
 
                 ListenResponse response = new() {Message = ackMessage};

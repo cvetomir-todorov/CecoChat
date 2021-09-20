@@ -1,7 +1,6 @@
 using Autofac;
 using CecoChat.Autofac;
-using CecoChat.Cassandra;
-using CecoChat.Contracts.Backend;
+using CecoChat.Contracts.Backplane;
 using CecoChat.Data.History;
 using CecoChat.Data.History.Instrumentation;
 using CecoChat.Kafka;
@@ -9,7 +8,6 @@ using CecoChat.Kafka.Instrumentation;
 using CecoChat.Materialize.Server.Backend;
 using CecoChat.Materialize.Server.Initialization;
 using CecoChat.Otel;
-using CecoChat.Tracing;
 using Confluent.Kafka;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -71,7 +69,7 @@ namespace CecoChat.Materialize.Server
 
             // backend
             builder.RegisterType<MaterializeConsumer>().As<IMaterializeConsumer>().SingleInstance();
-            builder.RegisterFactory<KafkaConsumer<Null, BackendMessage>, IKafkaConsumer<Null, BackendMessage>>();
+            builder.RegisterFactory<KafkaConsumer<Null, BackplaneMessage>, IKafkaConsumer<Null, BackplaneMessage>>();
             builder.RegisterModule(new KafkaInstrumentationAutofacModule());
             builder.RegisterOptions<BackendOptions>(Configuration.GetSection("Backend"));
         }

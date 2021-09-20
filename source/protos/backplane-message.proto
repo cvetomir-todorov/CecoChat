@@ -1,20 +1,20 @@
 syntax = "proto3";
-option csharp_namespace = "CecoChat.Contracts.Backend";
+option csharp_namespace = "CecoChat.Contracts.Backplane";
 package CecoChat.Contracts.Backend;
 import "uuid.proto";
 
-message BackendMessage {
+message BackplaneMessage {
   int64 message_id = 1;
   CecoChat.Contracts.Uuid client_id = 2;
   int64 sender_id = 3;
   int64 receiver_id = 4;
-  BackendMessageType type = 5;
+  BackplaneMessageType type = 5;
   oneof data {
     string text = 6;
   }
 }
 
-enum BackendMessageType {
+enum BackplaneMessageType {
   UNKNOWN = 0;
   PLAIN_TEXT = 1;
 }

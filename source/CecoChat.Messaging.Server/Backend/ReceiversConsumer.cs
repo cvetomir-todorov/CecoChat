@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using CecoChat.Contracts;
-using CecoChat.Contracts.Backend;
+using CecoChat.Contracts.Backplane;
 using CecoChat.Contracts.Client;
 using CecoChat.Kafka;
 using CecoChat.Messaging.Server.Clients;
@@ -29,7 +29,7 @@ namespace CecoChat.Messaging.Server.Backend
         private readonly ILogger _logger;
         private readonly IBackendOptions _backendOptions;
         private readonly ITopicPartitionFlyweight _partitionFlyweight;
-        private readonly IKafkaConsumer<Null, BackendMessage> _consumer;
+        private readonly IKafkaConsumer<Null, BackplaneMessage> _consumer;
         private readonly IClientContainer _clientContainer;
         private readonly IClientBackendMapper _mapper;
         private bool _isInitialized;
@@ -39,7 +39,7 @@ namespace CecoChat.Messaging.Server.Backend
             ILogger<ReceiversConsumer> logger,
             IOptions<BackendOptions> backendOptions,
             ITopicPartitionFlyweight partitionFlyweight,
-            IFactory<IKafkaConsumer<Null, BackendMessage>> consumerFactory,
+            IFactory<IKafkaConsumer<Null, BackplaneMessage>> consumerFactory,
             IClientContainer clientContainer,
             IClientBackendMapper mapper)
         {
@@ -89,16 +89,16 @@ namespace CecoChat.Messaging.Server.Backend
 
         public string ConsumerID => _backendOptions.ReceiversConsumer.ConsumerGroupID;
 
-        private void ProcessMessage(BackendMessage backendMessage)
+        private void ProcessMessage(BackplaneMessage backplaneMessage)
         {
-            Guid senderClientID = backendMessage.ClientId.ToGuid();
-            IEnumerable<IStreamer<ListenResponse>> receiverClients = _clientContainer.EnumerateClients(backendMessage.ReceiverId);
+            Guid senderClientID = backplaneMessage.ClientId.ToGuid();
+            IEnumerable<IStreamer<ListenResponse>> receiverClients = _clientContainer.EnumerateClients(backplaneMessage.ReceiverId);
 
-            ClientMessage clientMessage = _mapper.MapBackendToClientMessage(backendMessage);
+            ClientMessage clientMessage = _mapper.MapBackplaneToClientMessage(backplaneMessage);
             ListenResponse response = new() {Message = clientMessage};
 
             EnqueueMessage(senderClientID, response, receiverClients, out int successCount, out int allCount);
-            LogResults(backendMessage, successCount, allCount);
+            LogResults(backplaneMessage, successCount, allCount);
         }
 
         private static void EnqueueMessage(
@@ -123,17 +123,17 @@ namespace CecoChat.Messaging.Server.Backend
             }
         }
 
-        private void LogResults(BackendMessage backendMessage, int successCount, int allCount)
+        private void LogResults(BackplaneMessage backplaneMessage, int successCount, int allCount)
         {
             if (successCount < allCount)
             {
                 _logger.LogWarning("Connected recipients with ID {0} ({1} out of {2}) were queued message {3}.",
-                    backendMessage.ReceiverId, successCount, allCount, backendMessage.MessageId);
+                    backplaneMessage.ReceiverId, successCount, allCount, backplaneMessage.MessageId);
             }
             else if (allCount > 0)
             {
                 _logger.LogTrace("Connected recipients with ID {0} (all {1}) were queued message {2}.",
-                    backendMessage.ReceiverId, successCount, backendMessage.MessageId);
+                    backplaneMessage.ReceiverId, successCount, backplaneMessage.MessageId);
             }
         }
     }
