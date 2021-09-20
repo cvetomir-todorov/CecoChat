@@ -116,9 +116,9 @@ namespace CecoChat.Data.History
             {
                 HistoryMessage message = new();
 
-                message.MessageID = row.GetValue<long>("message_id");
-                message.SenderID = row.GetValue<long>("sender_id");
-                message.ReceiverID = row.GetValue<long>("receiver_id");
+                message.MessageId = row.GetValue<long>("message_id");
+                message.SenderId = row.GetValue<long>("sender_id");
+                message.ReceiverId = row.GetValue<long>("receiver_id");
                 sbyte messageType = row.GetValue<sbyte>("message_type");
                 message.Type = _mapper.MapDbToHistoryMessageType(messageType);
                 IDictionary<string, string> data = row.GetValue<IDictionary<string, string>>("data");
