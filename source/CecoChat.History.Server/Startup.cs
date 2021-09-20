@@ -79,7 +79,7 @@ namespace CecoChat.History.Server
             // configuration
             builder.RegisterModule(new ConfigDbAutofacModule
             {
-                RedisConfiguration = Configuration.GetSection("ConfigurationDB"),
+                RedisConfiguration = Configuration.GetSection("ConfigDB"),
                 RegisterHistory = true
             });
 
