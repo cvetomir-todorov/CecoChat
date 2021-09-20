@@ -17,8 +17,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Protobuf Include="..\protos\backend-message.proto">
-      <Link>backend-message.proto</Link>
+    <Protobuf Include="..\protos\backplane-message.proto">
+      <Link>backplane-message.proto</Link>
     </Protobuf>
   </ItemGroup>
 
