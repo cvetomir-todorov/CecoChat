@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using CecoChat.Contracts.History;
 
 namespace CecoChat.Data.History
 {

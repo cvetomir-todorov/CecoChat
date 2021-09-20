@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using CecoChat.Contracts.Backplane;
+using CecoChat.Contracts.History;
 using CecoChat.Data.History;
 using CecoChat.Kafka;
 using CecoChat.Server;

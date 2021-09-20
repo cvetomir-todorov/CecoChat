@@ -20,9 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CecoChat.Contracts.Backplane\CecoChat.Contracts.Backplane.csproj" />
-    <ProjectReference Include="..\CecoChat.Contracts.Client\CecoChat.Contracts.Client.csproj" />
-    <ProjectReference Include="..\CecoChat.Data.History\CecoChat.Data.History.csproj" />
+    <ProjectReference Include="..\CecoChat.Contracts\CecoChat.Contracts.csproj" />
     <ProjectReference Include="..\CecoChat\CecoChat.csproj" />
   </ItemGroup>
 

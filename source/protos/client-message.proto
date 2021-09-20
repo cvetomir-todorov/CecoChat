@@ -8,8 +8,8 @@ message ClientMessage {
   int64 receiver_id = 3;
   ClientMessageType type = 4;
   oneof data {
-	  string text = 5;
-	  AckType ackType = 6;
+      string text = 5;
+      AckType ackType = 6;
   }
 }
 

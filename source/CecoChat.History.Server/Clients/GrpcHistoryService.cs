@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Threading.Tasks;
 using CecoChat.Contracts.Client;
+using CecoChat.Contracts.History;
 using CecoChat.Data.Config.History;
 using CecoChat.Data.History;
 using CecoChat.Server;
