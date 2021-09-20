@@ -88,12 +88,12 @@ namespace CecoChat.Messaging.Server
         public void ConfigureContainer(ContainerBuilder builder)
         {
             // ordered hosted services
-            builder.RegisterHostedService<ConfigurationHostedService>();
+            builder.RegisterHostedService<ConfigHostedService>();
             builder.RegisterHostedService<BackendHostedService>();
             builder.RegisterHostedService<PartitionsChangedHostedService>();
 
             // configuration
-            builder.RegisterModule(new ConfigurationDbAutofacModule
+            builder.RegisterModule(new ConfigDbAutofacModule
             {
                 RedisConfiguration = Configuration.GetSection("ConfigurationDB"),
                 RegisterPartitioning = true

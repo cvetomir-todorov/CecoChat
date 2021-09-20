@@ -5,19 +5,19 @@ using Microsoft.Extensions.Hosting;
 
 namespace CecoChat.History.Server.Initialization
 {
-    public sealed class ConfigurationHostedService : IHostedService
+    public sealed class ConfigHostedService : IHostedService
     {
-        private readonly IHistoryConfiguration _historyConfiguration;
+        private readonly IHistoryConfig _historyConfig;
 
-        public ConfigurationHostedService(
-            IHistoryConfiguration historyConfiguration)
+        public ConfigHostedService(
+            IHistoryConfig historyConfig)
         {
-            _historyConfiguration = historyConfiguration;
+            _historyConfig = historyConfig;
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            await _historyConfiguration.Initialize(new HistoryConfigurationUsage
+            await _historyConfig.Initialize(new HistoryConfigUsage
             {
                 UseMessageCount = true
             });

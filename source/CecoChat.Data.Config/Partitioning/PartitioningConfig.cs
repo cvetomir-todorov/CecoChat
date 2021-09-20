@@ -9,29 +9,29 @@ using StackExchange.Redis;
 
 namespace CecoChat.Data.Config.Partitioning
 {
-    internal sealed class PartitioningConfiguration : IPartitioningConfiguration
+    internal sealed class PartitioningConfig : IPartitioningConfig
     {
         private readonly ILogger _logger;
         private readonly IRedisContext _redisContext;
-        private readonly IPartitioningConfigurationRepository _repository;
-        private readonly IConfigurationUtility _configurationUtility;
+        private readonly IPartitioningConfigRepository _repository;
+        private readonly IConfigUtility _configUtility;
         private readonly IEventSource<PartitionsChangedEventData> _partitionsChanged;
 
-        private PartitioningConfigurationUsage _usage;
-        private PartitioningConfigurationValues _values;
-        private PartitioningConfigurationValidator _validator;
+        private PartitioningConfigUsage _usage;
+        private PartitioningConfigValues _values;
+        private PartitioningConfigValidator _validator;
 
-        public PartitioningConfiguration(
-            ILogger<PartitioningConfiguration> logger,
+        public PartitioningConfig(
+            ILogger<PartitioningConfig> logger,
             IRedisContext redisContext,
-            IPartitioningConfigurationRepository repository,
-            IConfigurationUtility configurationUtility,
+            IPartitioningConfigRepository repository,
+            IConfigUtility configUtility,
             IEventSource<PartitionsChangedEventData> partitionsChanged)
         {
             _logger = logger;
             _redisContext = redisContext;
             _repository = repository;
-            _configurationUtility = configurationUtility;
+            _configUtility = configUtility;
             _partitionsChanged = partitionsChanged;
         }
 
@@ -66,14 +66,14 @@ namespace CecoChat.Data.Config.Partitioning
             return address;
         }
 
-        public async Task Initialize(PartitioningConfigurationUsage usage)
+        public async Task Initialize(PartitioningConfigUsage usage)
         {
             try
             {
                 _usage = usage;
                 await SubscribeForChanges(usage);
 
-                _validator = new PartitioningConfigurationValidator(usage);
+                _validator = new PartitioningConfigValidator(usage);
                 await LoadValidateValues(usage, _validator);
             }
             catch (Exception exception)
@@ -82,21 +82,21 @@ namespace CecoChat.Data.Config.Partitioning
             }
         }
 
-        private async Task SubscribeForChanges(PartitioningConfigurationUsage usage)
+        private async Task SubscribeForChanges(PartitioningConfigUsage usage)
         {
             ISubscriber subscriber = _redisContext.GetSubscriber();
 
             if (usage.UseServerPartitions || usage.UseServerAddresses)
             {
                 ChannelMessageQueue partitionsMQ = await subscriber.SubscribeAsync($"notify:{PartitioningKeys.ServerPartitions}");
-                partitionsMQ.OnMessage(channelMessage => _configurationUtility.HandleChange(channelMessage, HandleServerPartitions));
+                partitionsMQ.OnMessage(channelMessage => _configUtility.HandleChange(channelMessage, HandleServerPartitions));
                 _logger.LogInformation("Subscribed for changes about {0}, {1} from channel {2}.",
                     PartitioningKeys.PartitionCount, PartitioningKeys.ServerPartitions, partitionsMQ.Channel);
             }
             if (usage.UseServerAddresses)
             {
                 ChannelMessageQueue serverAddressesMQ = await subscriber.SubscribeAsync($"notify:{PartitioningKeys.ServerAddresses}");
-                serverAddressesMQ.OnMessage(channelMessage => _configurationUtility.HandleChange(channelMessage, HandleServerAddresses));
+                serverAddressesMQ.OnMessage(channelMessage => _configUtility.HandleChange(channelMessage, HandleServerAddresses));
                 _logger.LogInformation("Subscribed for changes about {0} from channel {1}.",
                     PartitioningKeys.ServerAddresses, serverAddressesMQ.Channel);
             }
@@ -112,7 +112,7 @@ namespace CecoChat.Data.Config.Partitioning
             bool areValid = await LoadValidateValues(_usage, _validator);
             if (areValid && !string.IsNullOrWhiteSpace(_usage.ServerPartitionChangesToWatch))
             {
-                PartitioningConfigurationValues values = _values;
+                PartitioningConfigValues values = _values;
                 if (values.ServerPartitionsMap.TryGetValue(_usage.ServerPartitionChangesToWatch, out PartitionRange partitions))
                 {
                     PartitionsChangedEventData eventData = new()
@@ -139,12 +139,12 @@ namespace CecoChat.Data.Config.Partitioning
             }
         }
 
-        private async Task<bool> LoadValidateValues(PartitioningConfigurationUsage usage, PartitioningConfigurationValidator validator)
+        private async Task<bool> LoadValidateValues(PartitioningConfigUsage usage, PartitioningConfigValidator validator)
         {
-            PartitioningConfigurationValues values = await _repository.GetValues(usage);
+            PartitioningConfigValues values = await _repository.GetValues(usage);
             _logger.LogInformation("Loading partitioning configuration succeeded.");
 
-            bool areValid = _configurationUtility.ValidateValues("partitioning", values, validator);
+            bool areValid = _configUtility.ValidateValues("partitioning", values, validator);
             if (areValid)
             {
                 _values = values;
@@ -154,7 +154,7 @@ namespace CecoChat.Data.Config.Partitioning
             return areValid;
         }
 
-        private void PrintValues(PartitioningConfigurationUsage usage, PartitioningConfigurationValues values)
+        private void PrintValues(PartitioningConfigUsage usage, PartitioningConfigValues values)
         {
             _logger.LogInformation("Partition count set to {0}.", values.PartitionCount);
 

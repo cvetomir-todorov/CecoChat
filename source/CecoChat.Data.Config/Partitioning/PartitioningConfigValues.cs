@@ -3,9 +3,9 @@ using CecoChat.Kafka;
 
 namespace CecoChat.Data.Config.Partitioning
 {
-    internal sealed class PartitioningConfigurationValues
+    internal sealed class PartitioningConfigValues
     {
-        public PartitioningConfigurationValues()
+        public PartitioningConfigValues()
         {
             PartitionServerMap = new Dictionary<int, string>();
             ServerPartitionsMap = new Dictionary<string, PartitionRange>();

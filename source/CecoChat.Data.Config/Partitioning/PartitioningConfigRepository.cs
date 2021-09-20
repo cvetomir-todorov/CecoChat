@@ -5,24 +5,24 @@ using StackExchange.Redis;
 
 namespace CecoChat.Data.Config.Partitioning
 {
-    internal interface IPartitioningConfigurationRepository
+    internal interface IPartitioningConfigRepository
     {
-        Task<PartitioningConfigurationValues> GetValues(PartitioningConfigurationUsage usage);
+        Task<PartitioningConfigValues> GetValues(PartitioningConfigUsage usage);
     }
 
-    internal sealed class PartitioningConfigurationRepository : IPartitioningConfigurationRepository
+    internal sealed class PartitioningConfigRepository : IPartitioningConfigRepository
     {
         private readonly IRedisContext _redisContext;
 
-        public PartitioningConfigurationRepository(
+        public PartitioningConfigRepository(
             IRedisContext redisContext)
         {
             _redisContext = redisContext;
         }
 
-        public async Task<PartitioningConfigurationValues> GetValues(PartitioningConfigurationUsage usage)
+        public async Task<PartitioningConfigValues> GetValues(PartitioningConfigUsage usage)
         {
-            PartitioningConfigurationValues values = new();
+            PartitioningConfigValues values = new();
 
             values.PartitionCount = await GetPartitionCount();
             await GetServerPartitions(usage, values);
@@ -39,7 +39,7 @@ namespace CecoChat.Data.Config.Partitioning
             return partitionCount;
         }
 
-        private async Task GetServerPartitions(PartitioningConfigurationUsage usage, PartitioningConfigurationValues values)
+        private async Task GetServerPartitions(PartitioningConfigUsage usage, PartitioningConfigValues values)
         {
             if (!usage.UseServerPartitions && !usage.UseServerAddresses)
             {
@@ -64,7 +64,7 @@ namespace CecoChat.Data.Config.Partitioning
             }
         }
 
-        private async Task GetServerAddresses(PartitioningConfigurationUsage usage, PartitioningConfigurationValues values)
+        private async Task GetServerAddresses(PartitioningConfigUsage usage, PartitioningConfigValues values)
         {
             if (!usage.UseServerAddresses)
             {

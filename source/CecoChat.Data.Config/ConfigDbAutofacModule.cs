@@ -7,7 +7,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace CecoChat.Data.Config
 {
-    public sealed class ConfigurationDbAutofacModule : Module
+    public sealed class ConfigDbAutofacModule : Module
     {
         public IConfiguration RedisConfiguration { get; init; }
 
@@ -23,17 +23,17 @@ namespace CecoChat.Data.Config
                 {
                     RedisConfiguration = RedisConfiguration
                 });
-                builder.RegisterType<ConfigurationUtility>().As<IConfigurationUtility>().SingleInstance();
+                builder.RegisterType<ConfigUtility>().As<IConfigUtility>().SingleInstance();
             }
             if (RegisterHistory)
             {
-                builder.RegisterType<HistoryConfiguration>().As<IHistoryConfiguration>().SingleInstance();
-                builder.RegisterType<HistoryConfigurationRepository>().As<IHistoryConfigurationRepository>().SingleInstance();
+                builder.RegisterType<HistoryConfig>().As<IHistoryConfig>().SingleInstance();
+                builder.RegisterType<HistoryConfigRepository>().As<IHistoryConfigRepository>().SingleInstance();
             }
             if (RegisterPartitioning)
             {
-                builder.RegisterType<PartitioningConfiguration>().As<IPartitioningConfiguration>().SingleInstance();
-                builder.RegisterType<PartitioningConfigurationRepository>().As<IPartitioningConfigurationRepository>().SingleInstance();
+                builder.RegisterType<PartitioningConfig>().As<IPartitioningConfig>().SingleInstance();
+                builder.RegisterType<PartitioningConfigRepository>().As<IPartitioningConfigRepository>().SingleInstance();
                 builder.RegisterSingletonEvent<EventSource<PartitionsChangedEventData>, PartitionsChangedEventData>();
             }
         }

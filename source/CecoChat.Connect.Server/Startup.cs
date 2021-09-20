@@ -78,10 +78,10 @@ namespace CecoChat.Connect.Server
         public void ConfigureContainer(ContainerBuilder builder)
         {
             // ordered hosted services
-            builder.RegisterHostedService<ConfigurationHostedService>();
+            builder.RegisterHostedService<ConfigHostedService>();
 
             // configuration
-            builder.RegisterModule(new ConfigurationDbAutofacModule
+            builder.RegisterModule(new ConfigDbAutofacModule
             {
                 RedisConfiguration = Configuration.GetSection("ConfigurationDB"),
                 RegisterHistory = true,
