@@ -25,7 +25,7 @@
     <ProjectReference Include="..\CecoChat.Contracts.Backend\CecoChat.Contracts.Backend.csproj" />
     <ProjectReference Include="..\CecoChat.Contracts.Client\CecoChat.Contracts.Client.csproj" />
     <ProjectReference Include="..\CecoChat.Contracts.Identity\CecoChat.Contracts.Identity.csproj" />
-    <ProjectReference Include="..\CecoChat.Data.Configuration\CecoChat.Data.Configuration.csproj" />
+    <ProjectReference Include="..\CecoChat.Data.Config\CecoChat.Data.Config.csproj" />
     <ProjectReference Include="..\CecoChat.Server\CecoChat.Server.csproj" />
     <ProjectReference Include="..\CecoChat\CecoChat.csproj" />
   </ItemGroup>
