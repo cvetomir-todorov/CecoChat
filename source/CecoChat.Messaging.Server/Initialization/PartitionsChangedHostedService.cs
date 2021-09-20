@@ -6,7 +6,7 @@ using CecoChat.Contracts.Client;
 using CecoChat.Data.Config.Partitioning;
 using CecoChat.Events;
 using CecoChat.Kafka;
-using CecoChat.Messaging.Server.Backend;
+using CecoChat.Messaging.Server.Backplane;
 using CecoChat.Messaging.Server.Clients;
 using CecoChat.Server.Backplane;
 using Microsoft.Extensions.Hosting;
@@ -15,19 +15,19 @@ namespace CecoChat.Messaging.Server.Initialization
 {
     public sealed class PartitionsChangedHostedService : IHostedService, ISubscriber<PartitionsChangedEventData>
     {
-        private readonly IBackendComponents _backendComponents;
+        private readonly IBackplaneComponents _backplaneComponents;
         private readonly IPartitionUtility _partitionUtility;
         private readonly IClientContainer _clientContainer;
         private readonly IEvent<PartitionsChangedEventData> _partitionsChanged;
         private readonly Guid _partitionsChangedToken;
 
         public PartitionsChangedHostedService(
-            IBackendComponents backendComponents,
+            IBackplaneComponents backplaneComponents,
             IPartitionUtility partitionUtility,
             IClientContainer clientContainer,
             IEvent<PartitionsChangedEventData> partitionsChanged)
         {
-            _backendComponents = backendComponents;
+            _backplaneComponents = backplaneComponents;
             _partitionUtility = partitionUtility;
             _clientContainer = clientContainer;
             _partitionsChanged = partitionsChanged;
@@ -52,7 +52,7 @@ namespace CecoChat.Messaging.Server.Initialization
             PartitionRange partitions = eventData.Partitions;
 
             DisconnectClients(partitionCount, partitions);
-            _backendComponents.ConfigurePartitioning(partitionCount, partitions);
+            _backplaneComponents.ConfigurePartitioning(partitionCount, partitions);
 
             return ValueTask.CompletedTask;
         }

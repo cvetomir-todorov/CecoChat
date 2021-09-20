@@ -5,32 +5,32 @@ using CecoChat.Kafka;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace CecoChat.Messaging.Server.Backend
+namespace CecoChat.Messaging.Server.Backplane
 {
-    public interface IBackendComponents
+    public interface IBackplaneComponents
     {
         void ConfigurePartitioning(int partitionCount, PartitionRange partitions);
 
         void StartConsumption(CancellationToken ct);
     }
 
-    public sealed class BackendComponents : IBackendComponents
+    public sealed class BackplaneComponents : IBackplaneComponents
     {
         private readonly ILogger _logger;
-        private readonly IBackendOptions _backendOptions;
+        private readonly IBackplaneOptions _backplaneOptions;
         private readonly ITopicPartitionFlyweight _topicPartitionFlyweight;
         private readonly ISendProducer _sendProducer;
         private readonly IReceiversConsumer _receiversConsumer;
 
-        public BackendComponents(
-            ILogger<BackendComponents> logger,
-            IOptions<BackendOptions> backendOptions,
+        public BackplaneComponents(
+            ILogger<BackplaneComponents> logger,
+            IOptions<BackplaneOptions> backplaneOptions,
             ITopicPartitionFlyweight topicPartitionFlyweight,
             ISendProducer sendProducer,
             IReceiversConsumer receiversConsumer)
         {
             _logger = logger;
-            _backendOptions = backendOptions.Value;
+            _backplaneOptions = backplaneOptions.Value;
             _topicPartitionFlyweight = topicPartitionFlyweight;
             _sendProducer = sendProducer;
             _receiversConsumer = receiversConsumer;
@@ -38,19 +38,19 @@ namespace CecoChat.Messaging.Server.Backend
 
         public void ConfigurePartitioning(int partitionCount, PartitionRange partitions)
         {
-            int currentPartitionCount = _topicPartitionFlyweight.GetTopicPartitionCount(_backendOptions.MessagesTopicName);
+            int currentPartitionCount = _topicPartitionFlyweight.GetTopicPartitionCount(_backplaneOptions.MessagesTopicName);
             if (currentPartitionCount < partitionCount)
             {
-                _topicPartitionFlyweight.AddOrUpdate(_backendOptions.MessagesTopicName, partitionCount);
+                _topicPartitionFlyweight.AddOrUpdate(_backplaneOptions.MessagesTopicName, partitionCount);
                 _logger.LogInformation("Increase cached partitions for topic {0} from {1} to {2}.",
-                    _backendOptions.MessagesTopicName, currentPartitionCount, partitionCount);
+                    _backplaneOptions.MessagesTopicName, currentPartitionCount, partitionCount);
             }
 
             _sendProducer.PartitionCount = partitionCount;
             _receiversConsumer.Prepare(partitions);
 
-            _logger.LogInformation("Prepared backend components for topic {0} to use partitions {1}.",
-                _backendOptions.MessagesTopicName, partitions);
+            _logger.LogInformation("Prepared backplane components for topic {0} to use partitions {1}.",
+                _backplaneOptions.MessagesTopicName, partitions);
         }
 
         public void StartConsumption(CancellationToken ct)

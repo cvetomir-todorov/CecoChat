@@ -13,7 +13,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace CecoChat.Messaging.Server.Backend
+namespace CecoChat.Messaging.Server.Backplane
 {
     public interface ISendProducer : IDisposable
     {
@@ -25,7 +25,7 @@ namespace CecoChat.Messaging.Server.Backend
     public sealed class SendProducer : ISendProducer
     {
         private readonly ILogger _logger;
-        private readonly IBackendOptions _backendOptions;
+        private readonly IBackplaneOptions _backplaneOptions;
         private readonly IPartitionUtility _partitionUtility;
         private readonly ITopicPartitionFlyweight _partitionFlyweight;
         private readonly IKafkaProducer<Null, BackplaneMessage> _producer;
@@ -33,7 +33,7 @@ namespace CecoChat.Messaging.Server.Backend
 
         public SendProducer(
             ILogger<SendProducer> logger,
-            IOptions<BackendOptions> backendOptions,
+            IOptions<BackplaneOptions> backplaneOptions,
             IHostApplicationLifetime applicationLifetime,
             IPartitionUtility partitionUtility,
             ITopicPartitionFlyweight partitionFlyweight,
@@ -41,13 +41,13 @@ namespace CecoChat.Messaging.Server.Backend
             IClientContainer clientContainer)
         {
             _logger = logger;
-            _backendOptions = backendOptions.Value;
+            _backplaneOptions = backplaneOptions.Value;
             _partitionUtility = partitionUtility;
             _partitionFlyweight = partitionFlyweight;
             _producer = producerFactory.Create();
             _clientContainer = clientContainer;
 
-            _producer.Initialize(_backendOptions.Kafka, _backendOptions.SendProducer, new BackplaneMessageSerializer());
+            _producer.Initialize(_backplaneOptions.Kafka, _backplaneOptions.SendProducer, new BackplaneMessageSerializer());
             applicationLifetime.ApplicationStopping.Register(_producer.FlushPendingMessages);
         }
 
@@ -61,7 +61,7 @@ namespace CecoChat.Messaging.Server.Backend
         public void ProduceMessage(BackplaneMessage message)
         {
             int partition = _partitionUtility.ChoosePartition(message.ReceiverId, PartitionCount);
-            TopicPartition topicPartition = _partitionFlyweight.GetTopicPartition(_backendOptions.MessagesTopicName, partition);
+            TopicPartition topicPartition = _partitionFlyweight.GetTopicPartition(_backplaneOptions.MessagesTopicName, partition);
             Message<Null, BackplaneMessage> kafkaMessage = new() {Value = message};
 
             _producer.Produce(kafkaMessage, topicPartition, DeliveryHandler);

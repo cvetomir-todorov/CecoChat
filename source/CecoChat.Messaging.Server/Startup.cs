@@ -6,7 +6,7 @@ using CecoChat.Grpc.Instrumentation;
 using CecoChat.Jwt;
 using CecoChat.Kafka;
 using CecoChat.Kafka.Instrumentation;
-using CecoChat.Messaging.Server.Backend;
+using CecoChat.Messaging.Server.Backplane;
 using CecoChat.Messaging.Server.Clients;
 using CecoChat.Messaging.Server.Identity;
 using CecoChat.Messaging.Server.Initialization;
@@ -89,7 +89,7 @@ namespace CecoChat.Messaging.Server
         {
             // ordered hosted services
             builder.RegisterHostedService<ConfigHostedService>();
-            builder.RegisterHostedService<BackendHostedService>();
+            builder.RegisterHostedService<BackplaneHostedService>();
             builder.RegisterHostedService<PartitionsChangedHostedService>();
 
             // configuration
@@ -109,16 +109,16 @@ namespace CecoChat.Messaging.Server
             builder.RegisterType<IdentityClient>().As<IIdentityClient>().SingleInstance();
             builder.RegisterOptions<IdentityOptions>(Configuration.GetSection("Identity"));
 
-            // backend
+            // backplane
             builder.RegisterModule(new PartitionUtilityAutofacModule());
-            builder.RegisterType<BackendComponents>().As<IBackendComponents>().SingleInstance();
+            builder.RegisterType<BackplaneComponents>().As<IBackplaneComponents>().SingleInstance();
             builder.RegisterType<TopicPartitionFlyweight>().As<ITopicPartitionFlyweight>().SingleInstance();
             builder.RegisterType<SendProducer>().As<ISendProducer>().SingleInstance();
             builder.RegisterType<ReceiversConsumer>().As<IReceiversConsumer>().SingleInstance();
             builder.RegisterFactory<KafkaProducer<Null, BackplaneMessage>, IKafkaProducer<Null, BackplaneMessage>>();
             builder.RegisterFactory<KafkaConsumer<Null, BackplaneMessage>, IKafkaConsumer<Null, BackplaneMessage>>();
             builder.RegisterModule(new KafkaInstrumentationAutofacModule());
-            builder.RegisterOptions<BackendOptions>(Configuration.GetSection("Backend"));
+            builder.RegisterOptions<BackplaneOptions>(Configuration.GetSection("Backplane"));
 
             // shared
             builder.RegisterType<MonotonicClock>().As<IClock>().SingleInstance();

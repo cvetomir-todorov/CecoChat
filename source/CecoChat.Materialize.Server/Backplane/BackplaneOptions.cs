@@ -1,8 +1,8 @@
 ﻿using CecoChat.Kafka;
 
-namespace CecoChat.Materialize.Server.Backend
+namespace CecoChat.Materialize.Server.Backplane
 {
-    public interface IBackendOptions
+    public interface IBackplaneOptions
     {
         public IKafkaOptions Kafka { get; }
 
@@ -11,15 +11,15 @@ namespace CecoChat.Materialize.Server.Backend
         public string MessagesTopicName { get; }
     }
 
-    public sealed class BackendOptions : IBackendOptions
+    public sealed class BackplaneOptions : IBackplaneOptions
     {
         public KafkaOptions Kafka { get; set; }
 
         public KafkaConsumerOptions MaterializeConsumer { get; set; }
 
-        IKafkaOptions IBackendOptions.Kafka => Kafka;
+        IKafkaOptions IBackplaneOptions.Kafka => Kafka;
 
-        IKafkaConsumerOptions IBackendOptions.MaterializeConsumer => MaterializeConsumer;
+        IKafkaConsumerOptions IBackplaneOptions.MaterializeConsumer => MaterializeConsumer;
 
         public string MessagesTopicName { get; set; }
     }

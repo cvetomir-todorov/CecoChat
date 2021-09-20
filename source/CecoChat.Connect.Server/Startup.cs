@@ -88,7 +88,7 @@ namespace CecoChat.Connect.Server
                 RegisterPartitioning = true
             });
 
-            // backend
+            // backplane
             builder.RegisterModule(new PartitionUtilityAutofacModule());
         }
 

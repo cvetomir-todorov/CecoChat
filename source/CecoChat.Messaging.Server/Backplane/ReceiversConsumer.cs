@@ -13,7 +13,7 @@ using Confluent.Kafka;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace CecoChat.Messaging.Server.Backend
+namespace CecoChat.Messaging.Server.Backplane
 {
     public interface IReceiversConsumer : IDisposable
     {
@@ -27,7 +27,7 @@ namespace CecoChat.Messaging.Server.Backend
     public sealed class ReceiversConsumer : IReceiversConsumer
     {
         private readonly ILogger _logger;
-        private readonly IBackendOptions _backendOptions;
+        private readonly IBackplaneOptions _backplaneOptions;
         private readonly ITopicPartitionFlyweight _partitionFlyweight;
         private readonly IKafkaConsumer<Null, BackplaneMessage> _consumer;
         private readonly IClientContainer _clientContainer;
@@ -37,14 +37,14 @@ namespace CecoChat.Messaging.Server.Backend
 
         public ReceiversConsumer(
             ILogger<ReceiversConsumer> logger,
-            IOptions<BackendOptions> backendOptions,
+            IOptions<BackplaneOptions> backplaneOptions,
             ITopicPartitionFlyweight partitionFlyweight,
             IFactory<IKafkaConsumer<Null, BackplaneMessage>> consumerFactory,
             IClientContainer clientContainer,
             IMessageMapper mapper)
         {
             _logger = logger;
-            _backendOptions = backendOptions.Value;
+            _backplaneOptions = backplaneOptions.Value;
             _partitionFlyweight = partitionFlyweight;
             _consumer = consumerFactory.Create();
             _clientContainer = clientContainer;
@@ -64,12 +64,12 @@ namespace CecoChat.Messaging.Server.Backend
             {
                 if (!_isInitialized)
                 {
-                    _consumer.Initialize(_backendOptions.Kafka, _backendOptions.ReceiversConsumer, new BackplaneMessageDeserializer());
+                    _consumer.Initialize(_backplaneOptions.Kafka, _backplaneOptions.ReceiversConsumer, new BackplaneMessageDeserializer());
                     _isInitialized = true;
                 }
             }
 
-            _consumer.Assign(_backendOptions.MessagesTopicName, partitions, _partitionFlyweight);
+            _consumer.Assign(_backplaneOptions.MessagesTopicName, partitions, _partitionFlyweight);
         }
 
         public void Start(CancellationToken ct)
@@ -87,7 +87,7 @@ namespace CecoChat.Messaging.Server.Backend
             _logger.LogInformation("Stopped sending messages to receivers.");
         }
 
-        public string ConsumerID => _backendOptions.ReceiversConsumer.ConsumerGroupID;
+        public string ConsumerID => _backplaneOptions.ReceiversConsumer.ConsumerGroupID;
 
         private void ProcessMessage(BackplaneMessage backplaneMessage)
         {
