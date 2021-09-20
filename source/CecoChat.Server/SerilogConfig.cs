@@ -9,7 +9,7 @@ using Serilog.Sinks.Elasticsearch;
 
 namespace CecoChat.Server
 {
-    public static class SerilogConfiguration
+    public static class SerilogConfig
     {
         public static void Setup(Assembly entryAssembly, string environment)
         {
