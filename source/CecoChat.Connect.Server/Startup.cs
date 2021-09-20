@@ -4,7 +4,7 @@ using CecoChat.Connect.Server.Initialization;
 using CecoChat.Data.Config;
 using CecoChat.Jwt;
 using CecoChat.Otel;
-using CecoChat.Server.Backend;
+using CecoChat.Server.Backplane;
 using CecoChat.Server.Identity;
 using CecoChat.Swagger;
 using FluentValidation.AspNetCore;

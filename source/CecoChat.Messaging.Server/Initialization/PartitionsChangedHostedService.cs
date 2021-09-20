@@ -8,7 +8,7 @@ using CecoChat.Events;
 using CecoChat.Kafka;
 using CecoChat.Messaging.Server.Backend;
 using CecoChat.Messaging.Server.Clients;
-using CecoChat.Server.Backend;
+using CecoChat.Server.Backplane;
 using Microsoft.Extensions.Hosting;
 
 namespace CecoChat.Messaging.Server.Initialization

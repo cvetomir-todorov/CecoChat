@@ -4,7 +4,7 @@ using CecoChat.Contracts.Backplane;
 using CecoChat.Data.History;
 using CecoChat.Kafka;
 using CecoChat.Server;
-using CecoChat.Server.Backend;
+using CecoChat.Server.Backplane;
 using Confluent.Kafka;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -47,7 +47,7 @@ namespace CecoChat.Materialize.Server.Backend
 
         public void Prepare()
         {
-            _consumer.Initialize(_backendOptions.Kafka, _backendOptions.MaterializeConsumer, new BackendMessageDeserializer());
+            _consumer.Initialize(_backendOptions.Kafka, _backendOptions.MaterializeConsumer, new BackplaneMessageDeserializer());
             _consumer.Subscribe(_backendOptions.MessagesTopicName);
         }
 

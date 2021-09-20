@@ -4,9 +4,9 @@ using Confluent.Kafka;
 using Google.Protobuf;
 using SerializationContext = Confluent.Kafka.SerializationContext;
 
-namespace CecoChat.Server.Backend
+namespace CecoChat.Server.Backplane
 {
-    public sealed class BackendMessageDeserializer : IDeserializer<BackplaneMessage>
+    public sealed class BackplaneMessageDeserializer : IDeserializer<BackplaneMessage>
     {
         public BackplaneMessage Deserialize(ReadOnlySpan<byte> data, bool isNull, SerializationContext context)
         {
