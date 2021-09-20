@@ -43,7 +43,7 @@ Before running the containers some preparation steps need to be done manually. T
     - Redis commander (management)
   - Preparation
     - Create Docker volumes
-    - Input initial configuration
+    - Create initial configuration
 * Observability
   - Containers
     - 1 Jaeger instance (all-in-one)
