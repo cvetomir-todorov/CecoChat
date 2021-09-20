@@ -1,8 +1,8 @@
 ﻿using CecoChat.Kafka;
 
-namespace CecoChat.Messaging.Server.Backend
+namespace CecoChat.Messaging.Server.Backplane
 {
-    public interface IBackendOptions
+    public interface IBackplaneOptions
     {
         public IKafkaOptions Kafka { get; }
 
@@ -15,7 +15,7 @@ namespace CecoChat.Messaging.Server.Backend
         public string MessagesTopicName { get; }
     }
 
-    public sealed class BackendOptions : IBackendOptions
+    public sealed class BackplaneOptions : IBackplaneOptions
     {
         public KafkaOptions Kafka { get; set; }
 
@@ -23,11 +23,11 @@ namespace CecoChat.Messaging.Server.Backend
 
         public KafkaConsumerOptions ReceiversConsumer { get; set; }
 
-        IKafkaOptions IBackendOptions.Kafka => Kafka;
+        IKafkaOptions IBackplaneOptions.Kafka => Kafka;
 
-        IKafkaProducerOptions IBackendOptions.SendProducer => SendProducer;
+        IKafkaProducerOptions IBackplaneOptions.SendProducer => SendProducer;
 
-        IKafkaConsumerOptions IBackendOptions.ReceiversConsumer => ReceiversConsumer;
+        IKafkaConsumerOptions IBackplaneOptions.ReceiversConsumer => ReceiversConsumer;
 
         public string ServerID { get; set; }
 

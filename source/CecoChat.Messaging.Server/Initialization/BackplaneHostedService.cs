@@ -3,28 +3,28 @@ using System.Threading;
 using System.Threading.Tasks;
 using CecoChat.Data.Config.Partitioning;
 using CecoChat.Kafka;
-using CecoChat.Messaging.Server.Backend;
+using CecoChat.Messaging.Server.Backplane;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 
 namespace CecoChat.Messaging.Server.Initialization
 {
-    public sealed class BackendHostedService : IHostedService, IDisposable
+    public sealed class BackplaneHostedService : IHostedService, IDisposable
     {
-        private readonly IBackendOptions _backendOptions;
-        private readonly IBackendComponents _backendComponents;
+        private readonly IBackplaneOptions _backplaneOptions;
+        private readonly IBackplaneComponents _backplaneComponents;
         private readonly IPartitioningConfig _partitioningConfig;
         private readonly CancellationToken _appStoppingCt;
         private CancellationTokenSource _stoppedCts;
 
-        public BackendHostedService(
+        public BackplaneHostedService(
             IHostApplicationLifetime applicationLifetime,
-            IOptions<BackendOptions> backendOptions,
-            IBackendComponents backendComponents,
+            IOptions<BackplaneOptions> backplaneOptions,
+            IBackplaneComponents backplaneComponents,
             IPartitioningConfig partitioningConfig)
         {
-            _backendOptions = backendOptions.Value;
-            _backendComponents = backendComponents;
+            _backplaneOptions = backplaneOptions.Value;
+            _backplaneComponents = backplaneComponents;
             _partitioningConfig = partitioningConfig;
 
             _appStoppingCt = applicationLifetime.ApplicationStopping;
@@ -40,10 +40,10 @@ namespace CecoChat.Messaging.Server.Initialization
             _stoppedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _appStoppingCt);
 
             int partitionCount = _partitioningConfig.PartitionCount;
-            PartitionRange partitions = _partitioningConfig.GetServerPartitions(_backendOptions.ServerID);
+            PartitionRange partitions = _partitioningConfig.GetServerPartitions(_backplaneOptions.ServerID);
 
-            _backendComponents.ConfigurePartitioning(partitionCount, partitions);
-            _backendComponents.StartConsumption(_stoppedCts.Token);
+            _backplaneComponents.ConfigurePartitioning(partitionCount, partitions);
+            _backplaneComponents.StartConsumption(_stoppedCts.Token);
 
             return Task.CompletedTask;
         }

@@ -9,7 +9,7 @@ using Confluent.Kafka;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace CecoChat.Materialize.Server.Backend
+namespace CecoChat.Materialize.Server.Backplane
 {
     public interface IMaterializeConsumer : IDisposable
     {
@@ -21,20 +21,20 @@ namespace CecoChat.Materialize.Server.Backend
     public sealed class MaterializeConsumer : IMaterializeConsumer
     {
         private readonly ILogger _logger;
-        private readonly IBackendOptions _backendOptions;
+        private readonly IBackplaneOptions _backplaneOptions;
         private readonly IKafkaConsumer<Null, BackplaneMessage> _consumer;
         private readonly IMessageMapper _mapper;
         private readonly INewMessageRepository _newMessageRepository;
 
         public MaterializeConsumer(
             ILogger<MaterializeConsumer> logger,
-            IOptions<BackendOptions> backendOptions,
+            IOptions<BackplaneOptions> backplaneOptions,
             IFactory<IKafkaConsumer<Null, BackplaneMessage>> consumerFactory,
             IMessageMapper mapper,
             INewMessageRepository newMessageRepository)
         {
             _logger = logger;
-            _backendOptions = backendOptions.Value;
+            _backplaneOptions = backplaneOptions.Value;
             _consumer = consumerFactory.Create();
             _mapper = mapper;
             _newMessageRepository = newMessageRepository;
@@ -47,8 +47,8 @@ namespace CecoChat.Materialize.Server.Backend
 
         public void Prepare()
         {
-            _consumer.Initialize(_backendOptions.Kafka, _backendOptions.MaterializeConsumer, new BackplaneMessageDeserializer());
-            _consumer.Subscribe(_backendOptions.MessagesTopicName);
+            _consumer.Initialize(_backplaneOptions.Kafka, _backplaneOptions.MaterializeConsumer, new BackplaneMessageDeserializer());
+            _consumer.Subscribe(_backplaneOptions.MessagesTopicName);
         }
 
         public void Start(CancellationToken ct)

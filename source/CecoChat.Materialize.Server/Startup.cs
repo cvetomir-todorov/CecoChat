@@ -5,7 +5,7 @@ using CecoChat.Data.History;
 using CecoChat.Data.History.Instrumentation;
 using CecoChat.Kafka;
 using CecoChat.Kafka.Instrumentation;
-using CecoChat.Materialize.Server.Backend;
+using CecoChat.Materialize.Server.Backplane;
 using CecoChat.Materialize.Server.Initialization;
 using CecoChat.Otel;
 using CecoChat.Server;
@@ -68,11 +68,11 @@ namespace CecoChat.Materialize.Server
                 RegisterNewMessage = true
             });
 
-            // backend
+            // backplane
             builder.RegisterType<MaterializeConsumer>().As<IMaterializeConsumer>().SingleInstance();
             builder.RegisterFactory<KafkaConsumer<Null, BackplaneMessage>, IKafkaConsumer<Null, BackplaneMessage>>();
             builder.RegisterModule(new KafkaInstrumentationAutofacModule());
-            builder.RegisterOptions<BackendOptions>(Configuration.GetSection("Backend"));
+            builder.RegisterOptions<BackplaneOptions>(Configuration.GetSection("Backplane"));
 
             // shared
             builder.RegisterType<MessageMapper>().As<IMessageMapper>().SingleInstance();
