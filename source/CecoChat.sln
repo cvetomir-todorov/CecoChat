@@ -33,7 +33,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CecoChat.Connect.Server", "
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{AFB9809C-E9BA-4CB1-93B5-2C95EA5A391C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CecoChat.Data.Configuration", "CecoChat.Data.Configuration\CecoChat.Data.Configuration.csproj", "{F5322D17-1D82-4929-A461-F9CB24371ED4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CecoChat.Data.Config", "CecoChat.Data.Config\CecoChat.Data.Config.csproj", "{F5322D17-1D82-4929-A461-F9CB24371ED4}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CecoChat.Profile.Server", "CecoChat.Profile.Server\CecoChat.Profile.Server.csproj", "{E887FD54-B681-44DF-9566-182DF3327B6B}"
 EndProject
