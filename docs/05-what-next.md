@@ -1,6 +1,8 @@
 # What next
 
-* The architecturally most important thing is to design the communication between cells which is also the most challenging
+* Architecture
+  - Design communication between cells
+  - Consider creating a backend for frontend
 * Add missing operability elements
   - Observability
     - Metrics for system resources, communication/db, app-specific
@@ -9,7 +11,8 @@
     - Exception tracking
   - Deployment
     - Failover
-    - Elasticity based on load
+    - Load balancing
+    - Auto-scaling
 * Security
   - Use secure transports and protocols on communication level
   - Add end-to-end encryption for messages
@@ -29,14 +32,13 @@
   - Acks
     - Recipient has received the message
     - Recipient has seen the message
-* Add user and profile related features
+* Add user/profile features
   - User authentication and authorization
   - Store user profile data
   - Handle friendship between users
 * Add clients
   - Web-based
   - Mobile
-  - Consider adding a separate API gateway for each type of client
 * Setup automated testing
   - Setup infrastructure for test running
   - Add system tests
