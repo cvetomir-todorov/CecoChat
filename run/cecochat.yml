@@ -46,9 +46,9 @@ services:
       ASPNETCORE_Kestrel__Certificates__Default__Path: "/app/cecochat-dev.pfx"
       ASPNETCORE_Kestrel__Certificates__Default__Password: "cecochat"
       CECOCHAT_ConfigDB__Endpoints__0: "redis1:6379"
-      CECOCHAT_Backend__ServerID: s1
-      CECOCHAT_Backend__Kafka__BootstrapServers__0: kafka1:19091
-      CECOCHAT_Backend__Kafka__BootstrapServers__1: kafka2:19092
+      CECOCHAT_Backplane__ServerID: s1
+      CECOCHAT_Backplane__Kafka__BootstrapServers__0: kafka1:19091
+      CECOCHAT_Backplane__Kafka__BootstrapServers__1: kafka2:19092
       CECOCHAT_Identity__Communication__Address: "https://identity"
       CECOCHAT_OtelSampling__Strategy: "AlwaysOn"
       CECOCHAT_Jaeger__AgentHost: jaeger
@@ -71,9 +71,9 @@ services:
       ASPNETCORE_Kestrel__Certificates__Default__Path: "/app/cecochat-dev.pfx"
       ASPNETCORE_Kestrel__Certificates__Default__Password: "cecochat"
       CECOCHAT_ConfigDB__Endpoints__0: "redis1:6379"
-      CECOCHAT_Backend__ServerID: s2
-      CECOCHAT_Backend__Kafka__BootstrapServers__0: kafka1:19091
-      CECOCHAT_Backend__Kafka__BootstrapServers__1: kafka2:19092
+      CECOCHAT_Backplane__ServerID: s2
+      CECOCHAT_Backplane__Kafka__BootstrapServers__0: kafka1:19091
+      CECOCHAT_Backplane__Kafka__BootstrapServers__1: kafka2:19092
       CECOCHAT_Identity__Communication__Address: "https://identity"
       CECOCHAT_OtelSampling__Strategy: "AlwaysOn"
       CECOCHAT_Jaeger__AgentHost: jaeger
@@ -138,8 +138,8 @@ services:
       ASPNETCORE_HTTPS_PORT: 443
       ASPNETCORE_Kestrel__Certificates__Default__Path: "/app/cecochat-dev.pfx"
       ASPNETCORE_Kestrel__Certificates__Default__Password: "cecochat"
-      CECOCHAT_Backend__Kafka__BootstrapServers__0: kafka1:19091
-      CECOCHAT_Backend__Kafka__BootstrapServers__1: kafka2:19092
+      CECOCHAT_Backplane__Kafka__BootstrapServers__0: kafka1:19091
+      CECOCHAT_Backplane__Kafka__BootstrapServers__1: kafka2:19092
       CECOCHAT_HistoryDB__ContactPoints__0: cass1
       CECOCHAT_HistoryDB__ContactPoints__1: cass2
       CECOCHAT_OtelSampling__Strategy: "AlwaysOn"
