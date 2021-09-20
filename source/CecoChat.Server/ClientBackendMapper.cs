@@ -1,21 +1,21 @@
 ﻿using System;
-using CecoChat.Contracts.Backend;
+using CecoChat.Contracts.Backplane;
 using CecoChat.Contracts.Client;
 
 namespace CecoChat.Server
 {
     public interface IClientBackendMapper
     {
-        BackendMessage MapClientToBackendMessage(ClientMessage clientMessage);
+        BackplaneMessage MapClientToBackplaneMessage(ClientMessage clientMessage);
 
-        ClientMessage MapBackendToClientMessage(BackendMessage backendMessage);
+        ClientMessage MapBackplaneToClientMessage(BackplaneMessage backplaneMessage);
     }
 
     public sealed class ClientBackendMapper : IClientBackendMapper
     {
-        public BackendMessage MapClientToBackendMessage(ClientMessage clientMessage)
+        public BackplaneMessage MapClientToBackplaneMessage(ClientMessage clientMessage)
         {
-            BackendMessage backendMessage = new()
+            BackplaneMessage backplaneMessage = new()
             {
                 MessageId = clientMessage.MessageId,
                 SenderId = clientMessage.SenderId,
@@ -25,33 +25,33 @@ namespace CecoChat.Server
             switch (clientMessage.Type)
             {
                 case ClientMessageType.PlainText:
-                    backendMessage.Type = BackendMessageType.PlainText;
-                    backendMessage.Text = clientMessage.Text;
+                    backplaneMessage.Type = BackplaneMessageType.PlainText;
+                    backplaneMessage.Text = clientMessage.Text;
                     break;
                 default:
                     throw new NotSupportedException($"{typeof(ClientMessageType).FullName} value {clientMessage.Type} is not supported.");
             }
 
-            return backendMessage;
+            return backplaneMessage;
         }
 
-        public ClientMessage MapBackendToClientMessage(BackendMessage backendMessage)
+        public ClientMessage MapBackplaneToClientMessage(BackplaneMessage backplaneMessage)
         {
             ClientMessage clientMessage = new()
             {
-                MessageId = backendMessage.MessageId,
-                SenderId = backendMessage.SenderId,
-                ReceiverId = backendMessage.ReceiverId,
+                MessageId = backplaneMessage.MessageId,
+                SenderId = backplaneMessage.SenderId,
+                ReceiverId = backplaneMessage.ReceiverId,
             };
 
-            switch (backendMessage.Type)
+            switch (backplaneMessage.Type)
             {
-                case BackendMessageType.PlainText:
+                case BackplaneMessageType.PlainText:
                     clientMessage.Type = ClientMessageType.PlainText;
-                    clientMessage.Text = backendMessage.Text;
+                    clientMessage.Text = backplaneMessage.Text;
                     break;
                 default:
-                    throw new NotSupportedException($"{typeof(BackendMessageType).FullName} value {backendMessage.Type} is not supported.");
+                    throw new NotSupportedException($"{typeof(BackplaneMessageType).FullName} value {backplaneMessage.Type} is not supported.");
             }
 
             return clientMessage;

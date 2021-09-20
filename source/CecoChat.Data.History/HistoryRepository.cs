@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using Cassandra;
 using CecoChat.Contracts;
-using CecoChat.Contracts.Backend;
+using CecoChat.Contracts.Backplane;
 using CecoChat.Data.History.Instrumentation;
 using Microsoft.Extensions.Logging;
 
@@ -14,9 +14,9 @@ namespace CecoChat.Data.History
     {
         void Prepare();
 
-        Task<IReadOnlyCollection<BackendMessage>> GetUserHistory(long userID, DateTime olderThan, int countLimit);
+        Task<IReadOnlyCollection<BackplaneMessage>> GetUserHistory(long userID, DateTime olderThan, int countLimit);
 
-        Task<IReadOnlyCollection<BackendMessage>> GetDialogHistory(long userID, long otherUserID, DateTime olderThan, int countLimit);
+        Task<IReadOnlyCollection<BackplaneMessage>> GetDialogHistory(long userID, long otherUserID, DateTime olderThan, int countLimit);
     }
 
     internal sealed class HistoryRepository : IHistoryRepository
@@ -59,7 +59,7 @@ namespace CecoChat.Data.History
             #pragma warning restore IDE0059
         }
 
-        public async Task<IReadOnlyCollection<BackendMessage>> GetUserHistory(long userID, DateTime olderThan, int countLimit)
+        public async Task<IReadOnlyCollection<BackplaneMessage>> GetUserHistory(long userID, DateTime olderThan, int countLimit)
         {
             Activity activity = _historyActivityUtility.StartGetHistory(
                 HistoryInstrumentation.Operations.HistoryGetUserHistory, _dataUtility.MessagingSession, userID);
@@ -71,7 +71,7 @@ namespace CecoChat.Data.History
                 BoundStatement query = _userHistoryQuery.Value.Bind(userID, olderThanSnowflake, countLimit);
                 query.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
                 query.SetIdempotence(true);
-                List<BackendMessage> messages = await GetMessages(query, countLimit);
+                List<BackplaneMessage> messages = await GetMessages(query, countLimit);
                 success = true;
 
                 _logger.LogTrace("Returned {0} messages for user {1} older than {2}.", messages.Count, userID, olderThan);
@@ -83,7 +83,7 @@ namespace CecoChat.Data.History
             }
         }
 
-        public async Task<IReadOnlyCollection<BackendMessage>> GetDialogHistory(long userID, long otherUserID, DateTime olderThan, int countLimit)
+        public async Task<IReadOnlyCollection<BackplaneMessage>> GetDialogHistory(long userID, long otherUserID, DateTime olderThan, int countLimit)
         {
             Activity activity = _historyActivityUtility.StartGetHistory(
                 HistoryInstrumentation.Operations.HistoryGetDialogHistory, _dataUtility.MessagingSession, userID);
@@ -96,7 +96,7 @@ namespace CecoChat.Data.History
                 BoundStatement query = _dialogHistoryQuery.Value.Bind(dialogID, olderThanSnowflake, countLimit);
                 query.SetIdempotence(true);
                 query.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
-                List<BackendMessage> messages = await GetMessages(query, countLimit);
+                List<BackplaneMessage> messages = await GetMessages(query, countLimit);
                 success = true;
 
                 _logger.LogTrace("Returned {0} messages between [{1} <-> {2}] older than {3}.", messages.Count, userID, otherUserID, olderThan);
@@ -108,23 +108,23 @@ namespace CecoChat.Data.History
             }
         }
 
-        public async Task<List<BackendMessage>> GetMessages(IStatement query, int countHint)
+        private async Task<List<BackplaneMessage>> GetMessages(IStatement query, int countHint)
         {
             RowSet rows = await _dataUtility.MessagingSession.ExecuteAsync(query);
-            List<BackendMessage> messages = new(capacity: countHint);
+            List<BackplaneMessage> messages = new(capacity: countHint);
 
             foreach (Row row in rows)
             {
-                BackendMessage message = new();
+                BackplaneMessage message = new();
                 message.ClientId = new Uuid();
 
                 message.MessageId = row.GetValue<long>("message_id");
                 message.SenderId = row.GetValue<long>("sender_id");
                 message.ReceiverId = row.GetValue<long>("receiver_id");
                 sbyte messageType = row.GetValue<sbyte>("message_type");
-                message.Type = _mapper.MapDbToBackendMessageType(messageType);
+                message.Type = _mapper.MapDbToBackplaneMessageType(messageType);
                 IDictionary<string, string> data = row.GetValue<IDictionary<string, string>>("data");
-                _mapper.MapDbToBackendData(data, message);
+                _mapper.MapDbToBackplaneData(data, message);
 
                 messages.Add(message);
             }

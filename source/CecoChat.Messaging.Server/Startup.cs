@@ -1,6 +1,6 @@
 using Autofac;
 using CecoChat.Autofac;
-using CecoChat.Contracts.Backend;
+using CecoChat.Contracts.Backplane;
 using CecoChat.Data.Config;
 using CecoChat.Grpc.Instrumentation;
 using CecoChat.Jwt;
@@ -115,8 +115,8 @@ namespace CecoChat.Messaging.Server
             builder.RegisterType<TopicPartitionFlyweight>().As<ITopicPartitionFlyweight>().SingleInstance();
             builder.RegisterType<SendProducer>().As<ISendProducer>().SingleInstance();
             builder.RegisterType<ReceiversConsumer>().As<IReceiversConsumer>().SingleInstance();
-            builder.RegisterFactory<KafkaProducer<Null, BackendMessage>, IKafkaProducer<Null, BackendMessage>>();
-            builder.RegisterFactory<KafkaConsumer<Null, BackendMessage>, IKafkaConsumer<Null, BackendMessage>>();
+            builder.RegisterFactory<KafkaProducer<Null, BackplaneMessage>, IKafkaProducer<Null, BackplaneMessage>>();
+            builder.RegisterFactory<KafkaConsumer<Null, BackplaneMessage>, IKafkaConsumer<Null, BackplaneMessage>>();
             builder.RegisterModule(new KafkaInstrumentationAutofacModule());
             builder.RegisterOptions<BackendOptions>(Configuration.GetSection("Backend"));
 

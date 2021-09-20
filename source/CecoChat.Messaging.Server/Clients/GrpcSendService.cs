@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using CecoChat.Contracts;
-using CecoChat.Contracts.Backend;
+using CecoChat.Contracts.Backplane;
 using CecoChat.Contracts.Client;
 using CecoChat.Messaging.Server.Backend;
 using CecoChat.Messaging.Server.Identity;
@@ -47,9 +47,9 @@ namespace CecoChat.Messaging.Server.Clients
             clientMessage.MessageId = messageID;
             _logger.LogTrace("Message for {0} received {1}.", userClaims, clientMessage);
 
-            BackendMessage backendMessage = _mapper.MapClientToBackendMessage(clientMessage);
-            backendMessage.ClientId = userClaims.ClientID.ToUuid();
-            _sendProducer.ProduceMessage(backendMessage);
+            BackplaneMessage backplaneMessage = _mapper.MapClientToBackplaneMessage(clientMessage);
+            backplaneMessage.ClientId = userClaims.ClientID.ToUuid();
+            _sendProducer.ProduceMessage(backplaneMessage);
 
             EnqueueMessagesForSenders(clientMessage, userClaims.ClientID, out int successCount, out int allCount);
             LogResults(clientMessage, successCount, allCount);

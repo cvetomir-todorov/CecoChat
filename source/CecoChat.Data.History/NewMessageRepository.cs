@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using Cassandra;
-using CecoChat.Contracts.Backend;
+using CecoChat.Contracts.Backplane;
 using CecoChat.Data.History.Instrumentation;
 using Microsoft.Extensions.Logging;
 
@@ -12,7 +12,7 @@ namespace CecoChat.Data.History
     {
         void Prepare();
 
-        void AddNewDialogMessage(BackendMessage message);
+        void AddNewDialogMessage(BackplaneMessage message);
     }
 
     internal sealed class NewMessageRepository : INewMessageRepository
@@ -57,7 +57,7 @@ namespace CecoChat.Data.History
             #pragma warning restore IDE0059
         }
 
-        public void AddNewDialogMessage(BackendMessage message)
+        public void AddNewDialogMessage(BackplaneMessage message)
         {
             Activity activity = _historyActivityUtility.StartNewDialogMessage(_dataUtility.MessagingSession, message.MessageId);
             bool success = false;
@@ -75,12 +75,12 @@ namespace CecoChat.Data.History
             }
         }
 
-        private BatchStatement CreateInsertBatch(BackendMessage message)
+        private BatchStatement CreateInsertBatch(BackplaneMessage message)
         {
             long senderID = message.SenderId;
             long receiverID = message.ReceiverId;
-            sbyte dbMessageType = _mapper.MapBackendToDbMessageType(message.Type);
-            IDictionary<string, string> data = _mapper.MapBackendToDbData(message);
+            sbyte dbMessageType = _mapper.MapBackplaneToDbMessageType(message.Type);
+            IDictionary<string, string> data = _mapper.MapBackplaneToDbData(message);
             string dialogID = _dataUtility.CreateDialogID(senderID, receiverID);
 
             BoundStatement insertForSender = _messagesForUserQuery.Value.Bind(

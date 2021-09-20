@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using CecoChat.Contracts.Backend;
+using CecoChat.Contracts.Backplane;
 using CecoChat.Contracts.Client;
 using CecoChat.Data.Config.History;
 using CecoChat.Data.History;
@@ -42,13 +42,13 @@ namespace CecoChat.History.Server.Clients
             }
             Activity.Current?.SetTag("user.id", userID);
 
-            IReadOnlyCollection<BackendMessage> backendMessages = await _historyRepository
+            IReadOnlyCollection<BackplaneMessage> backplaneMessages = await _historyRepository
                 .GetUserHistory(userID, request.OlderThan.ToDateTime(), _historyConfig.UserMessageCount);
 
             GetUserHistoryResponse response = new();
-            foreach (BackendMessage backendMessage in backendMessages)
+            foreach (BackplaneMessage backplaneMessage in backplaneMessages)
             {
-                ClientMessage clientMessage = _clientBackendMapper.MapBackendToClientMessage(backendMessage);
+                ClientMessage clientMessage = _clientBackendMapper.MapBackplaneToClientMessage(backplaneMessage);
                 response.Messages.Add(clientMessage);
             }
 
@@ -68,13 +68,13 @@ namespace CecoChat.History.Server.Clients
 
             long otherUserID = request.OtherUserId;
 
-            IReadOnlyCollection<BackendMessage> backendMessages = await _historyRepository
+            IReadOnlyCollection<BackplaneMessage> backplaneMessages = await _historyRepository
                 .GetDialogHistory(userID, otherUserID, request.OlderThan.ToDateTime(), _historyConfig.DialogMessageCount);
 
             GetDialogHistoryResponse response = new();
-            foreach (BackendMessage backendMessage in backendMessages)
+            foreach (BackplaneMessage backplaneMessage in backplaneMessages)
             {
-                ClientMessage clientMessage = _clientBackendMapper.MapBackendToClientMessage(backendMessage);
+                ClientMessage clientMessage = _clientBackendMapper.MapBackplaneToClientMessage(backplaneMessage);
                 response.Messages.Add(clientMessage);
             }
 

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading;
-using CecoChat.Contracts.Backend;
+using CecoChat.Contracts.Backplane;
 using CecoChat.Data.History;
 using CecoChat.Kafka;
 using CecoChat.Server.Backend;
@@ -21,13 +21,13 @@ namespace CecoChat.Materialize.Server.Backend
     {
         private readonly ILogger _logger;
         private readonly IBackendOptions _backendOptions;
-        private readonly IKafkaConsumer<Null, BackendMessage> _consumer;
+        private readonly IKafkaConsumer<Null, BackplaneMessage> _consumer;
         private readonly INewMessageRepository _newMessageRepository;
 
         public MaterializeConsumer(
             ILogger<MaterializeConsumer> logger,
             IOptions<BackendOptions> backendOptions,
-            IFactory<IKafkaConsumer<Null, BackendMessage>> consumerFactory,
+            IFactory<IKafkaConsumer<Null, BackplaneMessage>> consumerFactory,
             INewMessageRepository newMessageRepository)
         {
             _logger = logger;

@@ -1,70 +1,70 @@
 ﻿using System;
 using System.Collections.Generic;
-using CecoChat.Contracts.Backend;
+using CecoChat.Contracts.Backplane;
 
 namespace CecoChat.Data.History
 {
     internal interface IBackendDbMapper
     {
-        sbyte MapBackendToDbMessageType(BackendMessageType backendMessageType);
+        sbyte MapBackplaneToDbMessageType(BackplaneMessageType backplaneMessageType);
 
-        IDictionary<string, string> MapBackendToDbData(BackendMessage backendMessage);
+        IDictionary<string, string> MapBackplaneToDbData(BackplaneMessage backplaneMessage);
 
-        BackendMessageType MapDbToBackendMessageType(sbyte dbMessageType);
+        BackplaneMessageType MapDbToBackplaneMessageType(sbyte dbMessageType);
 
-        void MapDbToBackendData(IDictionary<string, string> data, BackendMessage backendMessage);
+        void MapDbToBackplaneData(IDictionary<string, string> data, BackplaneMessage backplaneMessage);
     }
 
     internal sealed class BackendDbMapper : IBackendDbMapper
     {
         private const string PlainTextKey = "plain_text";
 
-        public sbyte MapBackendToDbMessageType(BackendMessageType backendMessageType)
+        public sbyte MapBackplaneToDbMessageType(BackplaneMessageType backplaneMessageType)
         {
-            switch (backendMessageType)
+            switch (backplaneMessageType)
             {
-                case BackendMessageType.PlainText: return (sbyte) DbMessageType.PlainText;
+                case BackplaneMessageType.PlainText: return (sbyte) DbMessageType.PlainText;
                 default:
-                    throw new NotSupportedException($"{typeof(BackendMessageType).FullName} value {backendMessageType} is not supported.");
+                    throw new NotSupportedException($"{typeof(BackplaneMessageType).FullName} value {backplaneMessageType} is not supported.");
             }
         }
 
-        public IDictionary<string, string> MapBackendToDbData(BackendMessage backendMessage)
+        public IDictionary<string, string> MapBackplaneToDbData(BackplaneMessage backplaneMessage)
         {
-            switch (backendMessage.Type)
+            switch (backplaneMessage.Type)
             {
-                case BackendMessageType.PlainText: return new SortedDictionary<string, string>
+                case BackplaneMessageType.PlainText: return new SortedDictionary<string, string>
                 {
-                    {PlainTextKey, backendMessage.Text}
+                    {PlainTextKey, backplaneMessage.Text}
                 };
                 default:
-                    throw new NotSupportedException($"{typeof(BackendMessageType).FullName} value {backendMessage.Type} is not supported.");
+                    throw new NotSupportedException($"{typeof(BackplaneMessageType).FullName} value {backplaneMessage.Type} is not supported.");
             }
         }
 
-        public BackendMessageType MapDbToBackendMessageType(sbyte dbMessageType)
+        public BackplaneMessageType MapDbToBackplaneMessageType(sbyte dbMessageType)
         {
             DbMessageType dbMessageTypeAsEnum = (DbMessageType) dbMessageType;
 
             switch (dbMessageTypeAsEnum)
             {
-                case DbMessageType.PlainText: return BackendMessageType.PlainText;
+                case DbMessageType.PlainText: return BackplaneMessageType.PlainText;
                 default:
                     throw new NotSupportedException($"{typeof(DbMessageType).FullName} value {dbMessageTypeAsEnum} is not supported.");
             }
         }
 
-        public void MapDbToBackendData(IDictionary<string, string> data, BackendMessage backendMessage)
+        public void MapDbToBackplaneData(IDictionary<string, string> data, BackplaneMessage backplaneMessage)
         {
-            switch (backendMessage.Type)
+            switch (backplaneMessage.Type)
             {
-                case BackendMessageType.PlainText:
+                case BackplaneMessageType.PlainText:
                 {
-                    backendMessage.Text = data[PlainTextKey];
+                    backplaneMessage.Text = data[PlainTextKey];
                     break;
                 }
                 default:
-                    throw new NotSupportedException($"{typeof(BackendMessageType).FullName} value {backendMessage.Type} is not supported.");
+                    throw new NotSupportedException($"{typeof(BackplaneMessageType).FullName} value {backplaneMessage.Type} is not supported.");
             }
         }
     }
