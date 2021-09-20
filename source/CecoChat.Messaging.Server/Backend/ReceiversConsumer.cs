@@ -31,7 +31,7 @@ namespace CecoChat.Messaging.Server.Backend
         private readonly ITopicPartitionFlyweight _partitionFlyweight;
         private readonly IKafkaConsumer<Null, BackplaneMessage> _consumer;
         private readonly IClientContainer _clientContainer;
-        private readonly IClientBackendMapper _mapper;
+        private readonly IMessageMapper _mapper;
         private bool _isInitialized;
         private readonly object _initializationLock;
 
@@ -41,7 +41,7 @@ namespace CecoChat.Messaging.Server.Backend
             ITopicPartitionFlyweight partitionFlyweight,
             IFactory<IKafkaConsumer<Null, BackplaneMessage>> consumerFactory,
             IClientContainer clientContainer,
-            IClientBackendMapper mapper)
+            IMessageMapper mapper)
         {
             _logger = logger;
             _backendOptions = backendOptions.Value;

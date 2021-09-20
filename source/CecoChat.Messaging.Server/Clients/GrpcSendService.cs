@@ -21,14 +21,14 @@ namespace CecoChat.Messaging.Server.Clients
         private readonly IIdentityClient _identityClient;
         private readonly ISendProducer _sendProducer;
         private readonly IClientContainer _clientContainer;
-        private readonly IClientBackendMapper _mapper;
+        private readonly IMessageMapper _mapper;
 
         public GrpcSendService(
             ILogger<GrpcSendService> logger,
             IIdentityClient identityClient,
             ISendProducer sendProducer,
             IClientContainer clientContainer,
-            IClientBackendMapper mapper)
+            IMessageMapper mapper)
         {
             _logger = logger;
             _identityClient = identityClient;
