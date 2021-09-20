@@ -59,7 +59,7 @@ namespace CecoChat.Data.History
 
         public void AddNewDialogMessage(HistoryMessage message)
         {
-            Activity activity = _historyActivityUtility.StartNewDialogMessage(_dataUtility.MessagingSession, message.MessageID);
+            Activity activity = _historyActivityUtility.StartNewDialogMessage(_dataUtility.MessagingSession, message.MessageId);
             bool success = false;
 
             try
@@ -77,18 +77,18 @@ namespace CecoChat.Data.History
 
         private BatchStatement CreateInsertBatch(HistoryMessage message)
         {
-            long senderID = message.SenderID;
-            long receiverID = message.ReceiverID;
+            long senderID = message.SenderId;
+            long receiverID = message.ReceiverId;
             sbyte dbMessageType = _mapper.MapHistoryToDbMessageType(message.Type);
             IDictionary<string, string> data = _mapper.MapHistoryToDbData(message);
             string dialogID = _dataUtility.CreateDialogID(senderID, receiverID);
 
             BoundStatement insertForSender = _messagesForUserQuery.Value.Bind(
-                senderID, message.MessageID, senderID, receiverID, dbMessageType, data);
+                senderID, message.MessageId, senderID, receiverID, dbMessageType, data);
             BoundStatement insertForReceiver = _messagesForUserQuery.Value.Bind(
-                receiverID, message.MessageID, senderID, receiverID, dbMessageType, data);
+                receiverID, message.MessageId, senderID, receiverID, dbMessageType, data);
             BoundStatement insertForDialog = _messagesForDialogQuery.Value.Bind(
-                dialogID, message.MessageID, senderID, receiverID, dbMessageType, data);
+                dialogID, message.MessageId, senderID, receiverID, dbMessageType, data);
 
             BatchStatement insertBatch = new BatchStatement()
                 .Add(insertForSender)

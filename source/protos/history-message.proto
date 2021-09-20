@@ -1,0 +1,19 @@
+syntax = "proto3";
+option csharp_namespace = "CecoChat.Contracts.History";
+package CecoChat.Contracts.History;
+
+message HistoryMessage {
+  int64 message_id = 1;
+  int64 sender_id = 2;
+  int64 receiver_id = 3;
+  HistoryMessageType type = 4;
+  oneof data {
+    string text = 5;
+  }
+}
+
+enum HistoryMessageType {
+  UNKNOWN = 0;
+  PLAIN_TEXT = 1;
+  ACK = 2;
+}

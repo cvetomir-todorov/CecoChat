@@ -44,9 +44,9 @@ namespace CecoChat.Server
         {
             HistoryMessage historyMessage = new()
             {
-                MessageID = backplaneMessage.MessageId,
-                SenderID = backplaneMessage.SenderId,
-                ReceiverID = backplaneMessage.ReceiverId
+                MessageId = backplaneMessage.MessageId,
+                SenderId = backplaneMessage.SenderId,
+                ReceiverId = backplaneMessage.ReceiverId
             };
 
             switch (backplaneMessage.Type)
@@ -88,9 +88,9 @@ namespace CecoChat.Server
         {
             ClientMessage clientMessage = new()
             {
-                MessageId = historyMessage.MessageID,
-                SenderId = historyMessage.SenderID,
-                ReceiverId = historyMessage.ReceiverID,
+                MessageId = historyMessage.MessageId,
+                SenderId = historyMessage.SenderId,
+                ReceiverId = historyMessage.ReceiverId
             };
 
             switch (historyMessage.Type)

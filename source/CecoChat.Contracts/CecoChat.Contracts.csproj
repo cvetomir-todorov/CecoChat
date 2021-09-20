@@ -20,7 +20,7 @@
     <Protobuf Include="..\protos\backplane-message.proto">
       <Link>Backplane\backplane-message.proto</Link>
     </Protobuf>
-    <Protobuf Include="..\protos\client-message.proto" GrpcServices="All">
+    <Protobuf Include="..\protos\client-message.proto">
       <Link>Client\client-message.proto</Link>
     </Protobuf>
     <Protobuf Include="..\protos\history-service.proto" GrpcServices="All">
@@ -31,6 +31,9 @@
     </Protobuf>
     <Protobuf Include="..\protos\send-service.proto" GrpcServices="All">
       <Link>Client\send-service.proto</Link>
+    </Protobuf>
+    <Protobuf Include="..\protos\history-message.proto">
+      <Link>History\history-message.proto</Link>
     </Protobuf>
     <Protobuf Include="..\protos\identity-service.proto" GrpcServices="All">
       <Link>Identity\identity-service.proto</Link>
