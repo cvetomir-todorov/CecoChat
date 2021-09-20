@@ -1,6 +1,6 @@
 using Autofac;
 using CecoChat.Autofac;
-using CecoChat.Data.Configuration;
+using CecoChat.Data.Config;
 using CecoChat.Data.History;
 using CecoChat.Data.History.Instrumentation;
 using CecoChat.History.Server.Clients;

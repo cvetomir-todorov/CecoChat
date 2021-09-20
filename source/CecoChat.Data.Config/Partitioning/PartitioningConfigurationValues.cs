@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using CecoChat.Kafka;
 
-namespace CecoChat.Data.Configuration.Partitioning
+namespace CecoChat.Data.Config.Partitioning
 {
     internal sealed class PartitioningConfigurationValues
     {

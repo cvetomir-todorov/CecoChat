@@ -1,4 +1,4 @@
-﻿namespace CecoChat.Data.Configuration.History
+﻿namespace CecoChat.Data.Config.History
 {
     internal sealed class HistoryConfigurationValues
     {

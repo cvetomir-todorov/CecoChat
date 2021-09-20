@@ -6,7 +6,7 @@ using FluentValidation.Results;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 
-namespace CecoChat.Data.Configuration
+namespace CecoChat.Data.Config
 {
     internal interface IConfigurationUtility
     {

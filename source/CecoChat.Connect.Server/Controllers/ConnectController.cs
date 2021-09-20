@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
-using CecoChat.Data.Configuration.History;
-using CecoChat.Data.Configuration.Partitioning;
+using CecoChat.Data.Config.History;
+using CecoChat.Data.Config.Partitioning;
 using CecoChat.Server.Backend;
 using CecoChat.Server.Identity;
 using Microsoft.AspNetCore.Authorization;

@@ -4,7 +4,7 @@ using CecoChat.Redis;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 
-namespace CecoChat.Data.Configuration.History
+namespace CecoChat.Data.Config.History
 {
     internal sealed class HistoryConfiguration : IHistoryConfiguration
     {

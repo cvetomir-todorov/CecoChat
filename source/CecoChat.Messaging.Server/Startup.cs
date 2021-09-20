@@ -1,7 +1,7 @@
 using Autofac;
 using CecoChat.Autofac;
 using CecoChat.Contracts.Backend;
-using CecoChat.Data.Configuration;
+using CecoChat.Data.Config;
 using CecoChat.Grpc.Instrumentation;
 using CecoChat.Jwt;
 using CecoChat.Kafka;

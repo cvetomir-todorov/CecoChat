@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using CecoChat.Kafka;
 
-namespace CecoChat.Data.Configuration.Partitioning
+namespace CecoChat.Data.Config.Partitioning
 {
     public sealed class PartitioningConfigurationUsage
     {

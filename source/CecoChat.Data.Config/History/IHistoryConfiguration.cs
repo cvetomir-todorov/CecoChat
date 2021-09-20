@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace CecoChat.Data.Configuration.History
+namespace CecoChat.Data.Config.History
 {
     public sealed class HistoryConfigurationUsage
     {

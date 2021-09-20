@@ -1,7 +1,7 @@
 using Autofac;
 using CecoChat.Autofac;
 using CecoChat.Connect.Server.Initialization;
-using CecoChat.Data.Configuration;
+using CecoChat.Data.Config;
 using CecoChat.Jwt;
 using CecoChat.Otel;
 using CecoChat.Server.Backend;

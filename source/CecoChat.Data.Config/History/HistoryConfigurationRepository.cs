@@ -2,7 +2,7 @@
 using CecoChat.Redis;
 using StackExchange.Redis;
 
-namespace CecoChat.Data.Configuration.History
+namespace CecoChat.Data.Config.History
 {
     internal interface IHistoryConfigurationRepository
     {

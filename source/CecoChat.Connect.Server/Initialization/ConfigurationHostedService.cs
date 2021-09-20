@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using CecoChat.Data.Configuration.History;
-using CecoChat.Data.Configuration.Partitioning;
+using CecoChat.Data.Config.History;
+using CecoChat.Data.Config.Partitioning;
 using Microsoft.Extensions.Hosting;
 
 namespace CecoChat.Connect.Server.Initialization
