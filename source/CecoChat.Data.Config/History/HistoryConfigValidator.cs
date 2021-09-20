@@ -3,9 +3,9 @@ using FluentValidation;
 
 namespace CecoChat.Data.Config.History
 {
-    internal sealed class HistoryConfigurationValidator : AbstractValidator<HistoryConfigurationValues>
+    internal sealed class HistoryConfigValidator : AbstractValidator<HistoryConfigValues>
     {
-        public HistoryConfigurationValidator(HistoryConfigurationUsage usage)
+        public HistoryConfigValidator(HistoryConfigUsage usage)
         {
             if (usage.UseServerAddress)
             {

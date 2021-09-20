@@ -8,19 +8,19 @@ using StackExchange.Redis;
 
 namespace CecoChat.Data.Config
 {
-    internal interface IConfigurationUtility
+    internal interface IConfigUtility
     {
         Task HandleChange(ChannelMessage channelMessage, Func<ChannelMessage, Task> handleAction);
 
         bool ValidateValues<TValues>(string configurationContext, TValues values, IValidator<TValues> validator);
     }
 
-    internal sealed class ConfigurationUtility : IConfigurationUtility
+    internal sealed class ConfigUtility : IConfigUtility
     {
         private readonly ILogger _logger;
 
-        public ConfigurationUtility(
-            ILogger<ConfigurationUtility> logger)
+        public ConfigUtility(
+            ILogger<ConfigUtility> logger)
         {
             _logger = logger;
         }

@@ -13,7 +13,7 @@ namespace CecoChat.Messaging.Server.Initialization
     {
         private readonly IBackendOptions _backendOptions;
         private readonly IBackendComponents _backendComponents;
-        private readonly IPartitioningConfiguration _partitioningConfiguration;
+        private readonly IPartitioningConfig _partitioningConfig;
         private readonly CancellationToken _appStoppingCt;
         private CancellationTokenSource _stoppedCts;
 
@@ -21,11 +21,11 @@ namespace CecoChat.Messaging.Server.Initialization
             IHostApplicationLifetime applicationLifetime,
             IOptions<BackendOptions> backendOptions,
             IBackendComponents backendComponents,
-            IPartitioningConfiguration partitioningConfiguration)
+            IPartitioningConfig partitioningConfig)
         {
             _backendOptions = backendOptions.Value;
             _backendComponents = backendComponents;
-            _partitioningConfiguration = partitioningConfiguration;
+            _partitioningConfig = partitioningConfig;
 
             _appStoppingCt = applicationLifetime.ApplicationStopping;
         }
@@ -39,8 +39,8 @@ namespace CecoChat.Messaging.Server.Initialization
         {
             _stoppedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _appStoppingCt);
 
-            int partitionCount = _partitioningConfiguration.PartitionCount;
-            PartitionRange partitions = _partitioningConfiguration.GetServerPartitions(_backendOptions.ServerID);
+            int partitionCount = _partitioningConfig.PartitionCount;
+            PartitionRange partitions = _partitioningConfig.GetServerPartitions(_backendOptions.ServerID);
 
             _backendComponents.ConfigurePartitioning(partitionCount, partitions);
             _backendComponents.StartConsumption(_stoppedCts.Token);

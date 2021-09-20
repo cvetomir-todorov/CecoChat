@@ -15,19 +15,19 @@ namespace CecoChat.Connect.Server.Controllers
     {
         private readonly ILogger _logger;
         private readonly IPartitionUtility _partitionUtility;
-        private readonly IPartitioningConfiguration _partitioningConfiguration;
-        private readonly IHistoryConfiguration _historyConfiguration;
+        private readonly IPartitioningConfig _partitioningConfig;
+        private readonly IHistoryConfig _historyConfig;
 
         public ConnectController(
             ILogger<ConnectController> logger,
             IPartitionUtility partitionUtility,
-            IPartitioningConfiguration partitioningConfiguration,
-            IHistoryConfiguration historyConfiguration)
+            IPartitioningConfig partitioningConfig,
+            IHistoryConfig historyConfig)
         {
             _logger = logger;
             _partitionUtility = partitionUtility;
-            _partitioningConfiguration = partitioningConfiguration;
-            _historyConfiguration = historyConfiguration;
+            _partitioningConfig = partitioningConfig;
+            _historyConfig = historyConfig;
         }
 
         [Authorize(Roles = "user")]
@@ -40,13 +40,13 @@ namespace CecoChat.Connect.Server.Controllers
             }
             Activity.Current?.AddTag("user.id", userID);
 
-            int partitionCount = _partitioningConfiguration.PartitionCount;
+            int partitionCount = _partitioningConfig.PartitionCount;
             int partition = _partitionUtility.ChoosePartition(userID, partitionCount);
 
             ConnectResponse response = new()
             {
-                MessagingServerAddress = _partitioningConfiguration.GetServerAddress(partition),
-                HistoryServerAddress = _historyConfiguration.ServerAddress
+                MessagingServerAddress = _partitioningConfig.GetServerAddress(partition),
+                HistoryServerAddress = _historyConfig.ServerAddress
             };
 
             _logger.LogInformation("User {0} in partition {1} uses messaging server {2} and history server {3}.",

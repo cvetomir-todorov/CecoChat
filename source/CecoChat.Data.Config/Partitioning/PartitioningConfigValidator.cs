@@ -5,12 +5,12 @@ using FluentValidation;
 
 namespace CecoChat.Data.Config.Partitioning
 {
-    internal sealed class PartitioningConfigurationValidator : AbstractValidator<PartitioningConfigurationValues>
+    internal sealed class PartitioningConfigValidator : AbstractValidator<PartitioningConfigValues>
     {
         private const int PartitionCountMin = 2;
         private const int PartitionCountMax = 10000;
 
-        public PartitioningConfigurationValidator(PartitioningConfigurationUsage usage)
+        public PartitioningConfigValidator(PartitioningConfigUsage usage)
         {
             RuleFor(x => x.PartitionCount).InclusiveBetween(from: PartitionCountMin, to: PartitionCountMax);
             RuleFor(x => x.PartitionServerMap).Custom(ValidatePartitionServerMap);
@@ -25,9 +25,9 @@ namespace CecoChat.Data.Config.Partitioning
             }
         }
 
-        private static void ValidatePartitionServerMap(IDictionary<int, string> partitionServerMap, ValidationContext<PartitioningConfigurationValues> context)
+        private static void ValidatePartitionServerMap(IDictionary<int, string> partitionServerMap, ValidationContext<PartitioningConfigValues> context)
         {
-            PartitioningConfigurationValues values = context.InstanceToValidate;
+            PartitioningConfigValues values = context.InstanceToValidate;
             if (!IsPartitionCountValid(values.PartitionCount))
             {
                 return;
@@ -61,9 +61,9 @@ namespace CecoChat.Data.Config.Partitioning
             }
         }
 
-        private static void ValidateServerPartitionsMap(IDictionary<string, PartitionRange> serverPartitionRangeMap, ValidationContext<PartitioningConfigurationValues> context)
+        private static void ValidateServerPartitionsMap(IDictionary<string, PartitionRange> serverPartitionRangeMap, ValidationContext<PartitioningConfigValues> context)
         {
-            PartitioningConfigurationValues values = context.InstanceToValidate;
+            PartitioningConfigValues values = context.InstanceToValidate;
             if (!IsPartitionCountValid(values.PartitionCount))
             {
                 return;
@@ -82,7 +82,7 @@ namespace CecoChat.Data.Config.Partitioning
         private static void ValidateSingleServerPartitions(
             string server, PartitionRange partitions,
             int partitionCount, HashSet<int> uniquePartitions,
-            ValidationContext<PartitioningConfigurationValues> context)
+            ValidationContext<PartitioningConfigValues> context)
         {
             List<int> overlappingPartitions = new();
             List<int> invalidPartitions = new();
@@ -114,9 +114,9 @@ namespace CecoChat.Data.Config.Partitioning
             }
         }
 
-        private static void ValidateServerAddressMap(IDictionary<string, string> serverAddressMap, ValidationContext<PartitioningConfigurationValues> context)
+        private static void ValidateServerAddressMap(IDictionary<string, string> serverAddressMap, ValidationContext<PartitioningConfigValues> context)
         {
-            PartitioningConfigurationValues values = context.InstanceToValidate;
+            PartitioningConfigValues values = context.InstanceToValidate;
             if (!IsPartitionCountValid(values.PartitionCount))
             {
                 return;

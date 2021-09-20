@@ -8,27 +8,27 @@ using Microsoft.Extensions.Options;
 
 namespace CecoChat.Messaging.Server.Initialization
 {
-    public sealed class ConfigurationHostedService : IHostedService
+    public sealed class ConfigHostedService : IHostedService
     {
         private readonly ILogger _logger;
         private readonly IBackendOptions _backendOptions;
-        private readonly IPartitioningConfiguration _partitioningConfiguration;
+        private readonly IPartitioningConfig _partitioningConfig;
 
-        public ConfigurationHostedService(
-            ILogger<ConfigurationHostedService> logger,
+        public ConfigHostedService(
+            ILogger<ConfigHostedService> logger,
             IOptions<BackendOptions> backendOptions,
-            IPartitioningConfiguration partitioningConfiguration)
+            IPartitioningConfig partitioningConfig)
         {
             _logger = logger;
             _backendOptions = backendOptions.Value;
-            _partitioningConfiguration = partitioningConfiguration;
+            _partitioningConfig = partitioningConfig;
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
             _logger.LogInformation("Configured server ID is '{0}'.", _backendOptions.ServerID);
 
-            await _partitioningConfiguration.Initialize(new PartitioningConfigurationUsage
+            await _partitioningConfig.Initialize(new PartitioningConfigUsage
             {
                 UseServerPartitions = true,
                 ServerPartitionChangesToWatch = _backendOptions.ServerID

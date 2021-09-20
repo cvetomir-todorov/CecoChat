@@ -6,27 +6,27 @@ using StackExchange.Redis;
 
 namespace CecoChat.Data.Config.History
 {
-    internal sealed class HistoryConfiguration : IHistoryConfiguration
+    internal sealed class HistoryConfig : IHistoryConfig
     {
         private readonly ILogger _logger;
         private readonly IRedisContext _redisContext;
-        private readonly IHistoryConfigurationRepository _repository;
-        private readonly IConfigurationUtility _configurationUtility;
+        private readonly IHistoryConfigRepository _repository;
+        private readonly IConfigUtility _configUtility;
 
-        private HistoryConfigurationUsage _usage;
-        private HistoryConfigurationValues _values;
-        private HistoryConfigurationValidator _validator;
+        private HistoryConfigUsage _usage;
+        private HistoryConfigValues _values;
+        private HistoryConfigValidator _validator;
 
-        public HistoryConfiguration(
-            ILogger<HistoryConfiguration> logger,
+        public HistoryConfig(
+            ILogger<HistoryConfig> logger,
             IRedisContext redisContext,
-            IHistoryConfigurationRepository repository,
-            IConfigurationUtility configurationUtility)
+            IHistoryConfigRepository repository,
+            IConfigUtility configUtility)
         {
             _logger = logger;
             _redisContext = redisContext;
             _repository = repository;
-            _configurationUtility = configurationUtility;
+            _configUtility = configUtility;
         }
 
         public string ServerAddress => _values.ServerAddress;
@@ -35,14 +35,14 @@ namespace CecoChat.Data.Config.History
 
         public int DialogMessageCount => _values.DialogMessageCount;
 
-        public async Task Initialize(HistoryConfigurationUsage usage)
+        public async Task Initialize(HistoryConfigUsage usage)
         {
             try
             {
                 _usage = usage;
                 await SubscribeForChanges(usage);
 
-                _validator = new HistoryConfigurationValidator(usage);
+                _validator = new HistoryConfigValidator(usage);
                 await LoadValidateValues(usage, _validator);
             }
             catch (Exception exception)
@@ -51,21 +51,21 @@ namespace CecoChat.Data.Config.History
             }
         }
 
-        private async Task SubscribeForChanges(HistoryConfigurationUsage usage)
+        private async Task SubscribeForChanges(HistoryConfigUsage usage)
         {
             ISubscriber subscriber = _redisContext.GetSubscriber();
 
             if (usage.UseServerAddress)
             {
                 ChannelMessageQueue serverAddressMQ = await subscriber.SubscribeAsync($"notify:{HistoryKeys.ServerAddress}");
-                serverAddressMQ.OnMessage(channelMessage => _configurationUtility.HandleChange(channelMessage, HandleServerAddress));
+                serverAddressMQ.OnMessage(channelMessage => _configUtility.HandleChange(channelMessage, HandleServerAddress));
                 _logger.LogInformation("Subscribed for changes about {0} from channel {1}.",
                     HistoryKeys.ServerAddress, serverAddressMQ.Channel);
             }
             if (usage.UseMessageCount)
             {
                 ChannelMessageQueue userMessageCountMQ = await subscriber.SubscribeAsync($"notify:{HistoryKeys.MessageCount}");
-                userMessageCountMQ.OnMessage(channelMessage => _configurationUtility.HandleChange(channelMessage, HandleMessageCount));
+                userMessageCountMQ.OnMessage(channelMessage => _configUtility.HandleChange(channelMessage, HandleMessageCount));
                 _logger.LogInformation("Subscribed for changes about {0}, {1} from channel {2}.",
                     HistoryKeys.UserMessageCount, HistoryKeys.DialogMessageCount, userMessageCountMQ.Channel);
             }
@@ -87,19 +87,19 @@ namespace CecoChat.Data.Config.History
             }
         }
 
-        private async Task LoadValidateValues(HistoryConfigurationUsage usage, HistoryConfigurationValidator validator)
+        private async Task LoadValidateValues(HistoryConfigUsage usage, HistoryConfigValidator validator)
         {
-            HistoryConfigurationValues values = await _repository.GetValues(usage);
+            HistoryConfigValues values = await _repository.GetValues(usage);
             _logger.LogInformation("Loading history configuration succeeded.");
 
-            if (_configurationUtility.ValidateValues("history", values, validator))
+            if (_configUtility.ValidateValues("history", values, validator))
             {
                 _values = values;
                 PrintValues(usage, values);
             }
         }
 
-        private void PrintValues(HistoryConfigurationUsage usage, HistoryConfigurationValues values)
+        private void PrintValues(HistoryConfigUsage usage, HistoryConfigValues values)
         {
             if (usage.UseServerAddress)
             {

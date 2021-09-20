@@ -4,7 +4,7 @@ using CecoChat.Kafka;
 
 namespace CecoChat.Data.Config.Partitioning
 {
-    public sealed class PartitioningConfigurationUsage
+    public sealed class PartitioningConfigUsage
     {
         public bool UseServerPartitions { get; set; }
 
@@ -13,9 +13,9 @@ namespace CecoChat.Data.Config.Partitioning
         public bool UseServerAddresses { get; set; }
     }
 
-    public interface IPartitioningConfiguration : IDisposable
+    public interface IPartitioningConfig : IDisposable
     {
-        Task Initialize(PartitioningConfigurationUsage usage);
+        Task Initialize(PartitioningConfigUsage usage);
 
         int PartitionCount { get; }
 

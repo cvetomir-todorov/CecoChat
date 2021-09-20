@@ -1,6 +1,6 @@
 ﻿namespace CecoChat.Data.Config.History
 {
-    internal sealed class HistoryConfigurationValues
+    internal sealed class HistoryConfigValues
     {
         public string ServerAddress { get; set; }
 

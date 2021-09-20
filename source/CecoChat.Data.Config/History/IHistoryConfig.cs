@@ -2,16 +2,16 @@
 
 namespace CecoChat.Data.Config.History
 {
-    public sealed class HistoryConfigurationUsage
+    public sealed class HistoryConfigUsage
     {
         public bool UseServerAddress { get; init; }
 
         public bool UseMessageCount { get; init; }
     }
 
-    public interface IHistoryConfiguration
+    public interface IHistoryConfig
     {
-        Task Initialize(HistoryConfigurationUsage usage);
+        Task Initialize(HistoryConfigUsage usage);
 
         string ServerAddress { get; }
 
