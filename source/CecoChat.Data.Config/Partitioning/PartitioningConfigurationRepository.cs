@@ -3,7 +3,7 @@ using CecoChat.Kafka;
 using CecoChat.Redis;
 using StackExchange.Redis;
 
-namespace CecoChat.Data.Configuration.Partitioning
+namespace CecoChat.Data.Config.Partitioning
 {
     internal interface IPartitioningConfigurationRepository
     {

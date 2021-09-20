@@ -1,11 +1,11 @@
 ﻿using Autofac;
-using CecoChat.Data.Configuration.History;
-using CecoChat.Data.Configuration.Partitioning;
+using CecoChat.Data.Config.History;
+using CecoChat.Data.Config.Partitioning;
 using CecoChat.Events;
 using CecoChat.Redis;
 using Microsoft.Extensions.Configuration;
 
-namespace CecoChat.Data.Configuration
+namespace CecoChat.Data.Config
 {
     public sealed class ConfigurationDbAutofacModule : Module
     {

@@ -7,7 +7,7 @@ using CecoChat.Redis;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 
-namespace CecoChat.Data.Configuration.Partitioning
+namespace CecoChat.Data.Config.Partitioning
 {
     internal sealed class PartitioningConfiguration : IPartitioningConfiguration
     {

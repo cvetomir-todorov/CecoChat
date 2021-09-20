@@ -1,4 +1,4 @@
-﻿namespace CecoChat.Data.Configuration.Partitioning
+﻿namespace CecoChat.Data.Config.Partitioning
 {
     internal static class PartitioningKeys
     {

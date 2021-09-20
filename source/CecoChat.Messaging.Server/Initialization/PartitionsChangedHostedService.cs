@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using CecoChat.Contracts.Client;
-using CecoChat.Data.Configuration.Partitioning;
+using CecoChat.Data.Config.Partitioning;
 using CecoChat.Events;
 using CecoChat.Kafka;
 using CecoChat.Messaging.Server.Backend;
