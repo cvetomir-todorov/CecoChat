@@ -8,7 +8,7 @@ using CecoChat.Contracts.Client;
 using CecoChat.Kafka;
 using CecoChat.Messaging.Server.Clients;
 using CecoChat.Server;
-using CecoChat.Server.Backend;
+using CecoChat.Server.Backplane;
 using Confluent.Kafka;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -64,7 +64,7 @@ namespace CecoChat.Messaging.Server.Backend
             {
                 if (!_isInitialized)
                 {
-                    _consumer.Initialize(_backendOptions.Kafka, _backendOptions.ReceiversConsumer, new BackendMessageDeserializer());
+                    _consumer.Initialize(_backendOptions.Kafka, _backendOptions.ReceiversConsumer, new BackplaneMessageDeserializer());
                     _isInitialized = true;
                 }
             }

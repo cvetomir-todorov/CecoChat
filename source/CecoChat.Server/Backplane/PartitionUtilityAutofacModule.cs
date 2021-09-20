@@ -1,7 +1,7 @@
 ﻿using Autofac;
 using CecoChat.Autofac;
 
-namespace CecoChat.Server.Backend
+namespace CecoChat.Server.Backplane
 {
     public sealed class PartitionUtilityAutofacModule : Module
     {

@@ -12,7 +12,7 @@ using CecoChat.Messaging.Server.Identity;
 using CecoChat.Messaging.Server.Initialization;
 using CecoChat.Otel;
 using CecoChat.Server;
-using CecoChat.Server.Backend;
+using CecoChat.Server.Backplane;
 using CecoChat.Server.Identity;
 using Confluent.Kafka;
 using Microsoft.AspNetCore.Builder;

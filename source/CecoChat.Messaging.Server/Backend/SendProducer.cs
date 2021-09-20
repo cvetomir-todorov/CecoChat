@@ -7,7 +7,7 @@ using CecoChat.Contracts.Backplane;
 using CecoChat.Contracts.Client;
 using CecoChat.Kafka;
 using CecoChat.Messaging.Server.Clients;
-using CecoChat.Server.Backend;
+using CecoChat.Server.Backplane;
 using Confluent.Kafka;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -47,7 +47,7 @@ namespace CecoChat.Messaging.Server.Backend
             _producer = producerFactory.Create();
             _clientContainer = clientContainer;
 
-            _producer.Initialize(_backendOptions.Kafka, _backendOptions.SendProducer, new BackendMessageSerializer());
+            _producer.Initialize(_backendOptions.Kafka, _backendOptions.SendProducer, new BackplaneMessageSerializer());
             applicationLifetime.ApplicationStopping.Register(_producer.FlushPendingMessages);
         }
 

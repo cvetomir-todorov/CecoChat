@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CecoChat.Server.Backend
+namespace CecoChat.Server.Backplane
 {
     public interface IPartitionUtility
     {
