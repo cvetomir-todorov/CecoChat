@@ -22,9 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CecoChat.Contracts.Backplane\CecoChat.Contracts.Backplane.csproj" />
-    <ProjectReference Include="..\CecoChat.Contracts.Client\CecoChat.Contracts.Client.csproj" />
-    <ProjectReference Include="..\CecoChat.Contracts.Identity\CecoChat.Contracts.Identity.csproj" />
     <ProjectReference Include="..\CecoChat.Data.Config\CecoChat.Data.Config.csproj" />
     <ProjectReference Include="..\CecoChat.Server\CecoChat.Server.csproj" />
     <ProjectReference Include="..\CecoChat\CecoChat.csproj" />

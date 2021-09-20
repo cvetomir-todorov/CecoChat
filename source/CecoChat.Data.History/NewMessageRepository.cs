@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using Cassandra;
+using CecoChat.Contracts.History;
 using CecoChat.Data.History.Instrumentation;
 using Microsoft.Extensions.Logging;
 

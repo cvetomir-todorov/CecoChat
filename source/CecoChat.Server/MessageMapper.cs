@@ -1,7 +1,7 @@
 ﻿using System;
 using CecoChat.Contracts.Backplane;
 using CecoChat.Contracts.Client;
-using CecoChat.Data.History;
+using CecoChat.Contracts.History;
 
 namespace CecoChat.Server
 {
