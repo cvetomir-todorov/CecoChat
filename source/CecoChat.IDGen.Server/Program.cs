@@ -1,7 +1,7 @@
 using CecoChat.Server;
 using Microsoft.Extensions.Hosting;
 
-namespace CecoChat.Identity.Server
+namespace CecoChat.IDGen.Server
 {
     public static class Program
     {
