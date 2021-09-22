@@ -40,13 +40,13 @@ jobs:
         push: true
         tags: cvetomirtodorov/cecochat-history:0.1
 
-    - name: Identity image
+    - name: IDGen image
       uses: docker/build-push-action@v2
       with:
-        file: run/cecochat/Identity.Dockerfile
+        file: run/cecochat/IDGen.Dockerfile
         context: ./source
         push: true
-        tags: cvetomirtodorov/cecochat-identity:0.1
+        tags: cvetomirtodorov/cecochat-idgen:0.1
 
     - name: Materialize image
       uses: docker/build-push-action@v2
