@@ -10,6 +10,7 @@ A Github Actions workflow is set up to:
 * Build and push CecoChat containers to Docker Hub
   - [Connect](https://hub.docker.com/repository/docker/cvetomirtodorov/cecochat-connect)
   - [History](https://hub.docker.com/repository/docker/cvetomirtodorov/cecochat-history)
+  - [ID Gen](https://hub.docker.com/repository/docker/cvetomirtodorov/cecochat-idgen)
   - [Materialize](https://hub.docker.com/repository/docker/cvetomirtodorov/cecochat-materialize)
   - [Messaging](https://hub.docker.com/repository/docker/cvetomirtodorov/cecochat-messaging)
 
@@ -58,11 +59,11 @@ Before running the containers some preparation steps need to be done manually. T
 
 In order to containerize CecoChat you can use the folder which contains the [Docker files](../run/cecochat/) for building the Docker images. Internally the Docker files do `dotnet publish` and use `Release` configuration but this can be changed as prefered. The `docker-compose` file creates containers for:
 
-* 1 connect server
-* 2 messaging servers
-* 1 materialize server
-* 1 history server
-* 1 identity server
+* 1 Connect server
+* 2 Messaging servers
+* 1 Materialize server
+* 1 History server
+* 1 ID Gen server
 
 It uses `ASPNETCORE_ENVIRONMENT=Production` and overrides tracing options to persists all traces.
 
