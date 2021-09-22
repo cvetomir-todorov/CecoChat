@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CecoChat.Messaging.Server.Identity
+namespace CecoChat.Data.IDGen
 {
     public interface IIdentityOptions
     {
@@ -23,6 +23,7 @@ namespace CecoChat.Messaging.Server.Identity
     public interface IIdentityGenerationOptions
     {
         int RefreshIDsCount { get; }
+        int MaxConcurrentRequests { get; } 
         TimeSpan GetIDWaitInterval { get; }
         TimeSpan InvalidateIDsInterval {get;}
     }
@@ -30,6 +31,7 @@ namespace CecoChat.Messaging.Server.Identity
     public sealed class IdentityGenerationOptions : IIdentityGenerationOptions
     {
         public int RefreshIDsCount { get; set; }
+        public int MaxConcurrentRequests { get; set; }
         public TimeSpan GetIDWaitInterval { get; set; }
         public TimeSpan InvalidateIDsInterval { get; set; }
     }
