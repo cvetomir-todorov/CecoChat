@@ -2,13 +2,13 @@ using Autofac;
 using CecoChat.Autofac;
 using CecoChat.Contracts.Backplane;
 using CecoChat.Data.Config;
+using CecoChat.Data.IDGen;
 using CecoChat.Grpc.Instrumentation;
 using CecoChat.Jwt;
 using CecoChat.Kafka;
 using CecoChat.Kafka.Instrumentation;
 using CecoChat.Messaging.Server.Backplane;
 using CecoChat.Messaging.Server.Clients;
-using CecoChat.Messaging.Server.Identity;
 using CecoChat.Messaging.Server.Initialization;
 using CecoChat.Otel;
 using CecoChat.Server;
@@ -75,7 +75,7 @@ namespace CecoChat.Messaging.Server
             services.AddJwtAuthentication(_jwtOptions);
             services.AddAuthorization();
 
-            // identity
+            // idgen
             services.AddIdentityClient(_identityOptions);
 
             // clients

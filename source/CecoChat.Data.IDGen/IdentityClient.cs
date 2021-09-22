@@ -3,12 +3,11 @@ using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 using CecoChat.Contracts.IDGen;
-using CecoChat.Messaging.Server.Clients;
 using Grpc.Core;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace CecoChat.Messaging.Server.Identity
+namespace CecoChat.Data.IDGen
 {
     public interface IIdentityClient : IDisposable
     {
@@ -36,7 +35,6 @@ namespace CecoChat.Messaging.Server.Identity
         public IdentityClient(
             ILogger<IdentityClient> logger,
             IOptions<IdentityOptions> identityOptions,
-            IOptions<ClientOptions> clientOptions,
             Contracts.IDGen.IDGen.IDGenClient client)
         {
             _logger = logger;
@@ -45,7 +43,7 @@ namespace CecoChat.Messaging.Server.Identity
 
             _logger.LogInformation("Identity address set to {0}.", _options.Communication.Address);
             _idBuffer = new();
-            _generatedNewIDs = new(initialCount: 0, maxCount: clientOptions.Value.MaxClients);
+            _generatedNewIDs = new(initialCount: 0, maxCount: _options.Generation.MaxConcurrentRequests);
             _invalidateIDsTimer = new(
                 callback: InvalidateIDs, state: null,
                 dueTime: _options.Generation.InvalidateIDsInterval,

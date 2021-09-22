@@ -9,7 +9,7 @@ using Grpc.Core;
 using Microsoft.Extensions.DependencyInjection;
 using Polly;
 
-namespace CecoChat.Messaging.Server.Identity
+namespace CecoChat.Data.IDGen
 {
     public static class IdentityRegistrations
     {
