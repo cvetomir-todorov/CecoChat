@@ -49,7 +49,7 @@ services:
       CECOCHAT_Backplane__ServerID: s1
       CECOCHAT_Backplane__Kafka__BootstrapServers__0: kafka1:19091
       CECOCHAT_Backplane__Kafka__BootstrapServers__1: kafka2:19092
-      CECOCHAT_Identity__Communication__Address: "https://identity"
+      CECOCHAT_IDGen__Communication__Address: "https://idgen"
       CECOCHAT_OtelSampling__Strategy: "AlwaysOn"
       CECOCHAT_Jaeger__AgentHost: jaeger
     logging: *fluentd-logging
@@ -74,7 +74,7 @@ services:
       CECOCHAT_Backplane__ServerID: s2
       CECOCHAT_Backplane__Kafka__BootstrapServers__0: kafka1:19091
       CECOCHAT_Backplane__Kafka__BootstrapServers__1: kafka2:19092
-      CECOCHAT_Identity__Communication__Address: "https://identity"
+      CECOCHAT_IDGen__Communication__Address: "https://idgen"
       CECOCHAT_OtelSampling__Strategy: "AlwaysOn"
       CECOCHAT_Jaeger__AgentHost: jaeger
     logging: *fluentd-logging
@@ -101,10 +101,10 @@ services:
       CECOCHAT_OtelSampling__Strategy: "AlwaysOn"
       CECOCHAT_Jaeger__AgentHost: jaeger
     logging: *fluentd-logging
-  cecochat-identity:
-    image: ceco.com/cecochat/identity:0.1
-    container_name: cecochat-identity
-    hostname: identity
+  cecochat-idgen:
+    image: ceco.com/cecochat/idgen:0.1
+    container_name: cecochat-idgen
+    hostname: idgen
     networks: *networks
     ports:
       - "31004:443"
