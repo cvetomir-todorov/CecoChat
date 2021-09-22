@@ -1,15 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using CecoChat.Contracts.Identity;
+using CecoChat.Contracts.IDGen;
 using Grpc.Core;
 
 namespace CecoChat.IDGen.Server.Generation
 {
-    public sealed class GrpcGenerationService : Contracts.Identity.Identity.IdentityBase
+    public sealed class GrpcIDGenService : Contracts.IDGen.IDGen.IDGenBase
     {
         private readonly IIdentityGenerator _generator;
 
-        public GrpcGenerationService(
+        public GrpcIDGenService(
             IIdentityGenerator generator)
         {
             _generator = generator;
