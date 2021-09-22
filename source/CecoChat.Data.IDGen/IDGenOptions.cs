@@ -2,25 +2,25 @@
 
 namespace CecoChat.Data.IDGen
 {
-    public interface IIdentityOptions
+    public interface IIDGenOptions
     {
-        IIdentityGenerationOptions Generation { get; }
-        IIdentityCommunicationOptions Communication { get; }
-        IIdentityRetryOptions Retry { get; }
+        IIDGenGenerationOptions Generation { get; }
+        IIDGenCommunicationOptions Communication { get; }
+        IIDGenRetryOptions Retry { get; }
     }
 
-    public sealed class IdentityOptions : IIdentityOptions
+    public sealed class IDGenOptions : IIDGenOptions
     {
-        IIdentityGenerationOptions IIdentityOptions.Generation => Generation;
-        IIdentityCommunicationOptions IIdentityOptions.Communication => Communication;
-        IIdentityRetryOptions IIdentityOptions.Retry => Retry;
+        IIDGenGenerationOptions IIDGenOptions.Generation => Generation;
+        IIDGenCommunicationOptions IIDGenOptions.Communication => Communication;
+        IIDGenRetryOptions IIDGenOptions.Retry => Retry;
 
-        public IdentityGenerationOptions Generation { get; set; }
-        public IdentityCommunicationOptions Communication { get; set; }
-        public IdentityRetryOptions Retry { get; set; }
+        public IDGenGenerationOptions Generation { get; set; }
+        public IDGenCommunicationOptions Communication { get; set; }
+        public IDGenRetryOptions Retry { get; set; }
     }
 
-    public interface IIdentityGenerationOptions
+    public interface IIDGenGenerationOptions
     {
         int RefreshIDsCount { get; }
         int MaxConcurrentRequests { get; } 
@@ -28,7 +28,7 @@ namespace CecoChat.Data.IDGen
         TimeSpan InvalidateIDsInterval {get;}
     }
 
-    public sealed class IdentityGenerationOptions : IIdentityGenerationOptions
+    public sealed class IDGenGenerationOptions : IIDGenGenerationOptions
     {
         public int RefreshIDsCount { get; set; }
         public int MaxConcurrentRequests { get; set; }
@@ -36,7 +36,7 @@ namespace CecoChat.Data.IDGen
         public TimeSpan InvalidateIDsInterval { get; set; }
     }
 
-    public interface IIdentityCommunicationOptions
+    public interface IIDGenCommunicationOptions
     {
         Uri Address { get; }
         TimeSpan KeepAlivePingDelay { get; }
@@ -44,7 +44,7 @@ namespace CecoChat.Data.IDGen
         TimeSpan CallTimeout { get; }
     }
 
-    public sealed class IdentityCommunicationOptions : IIdentityCommunicationOptions
+    public sealed class IDGenCommunicationOptions : IIDGenCommunicationOptions
     {
         public Uri Address { get; set; }
         public TimeSpan KeepAlivePingDelay { get; set; }
@@ -52,7 +52,7 @@ namespace CecoChat.Data.IDGen
         public TimeSpan CallTimeout { get; set; }
     }
 
-    public interface IIdentityRetryOptions
+    public interface IIDGenRetryOptions
     {
         int RetryCount { get; }
         TimeSpan InitialBackOff { get; }
@@ -61,7 +61,7 @@ namespace CecoChat.Data.IDGen
         int MaxJitterMs { get; }
     }
 
-    public sealed class IdentityRetryOptions : IIdentityRetryOptions
+    public sealed class IDGenRetryOptions : IIDGenRetryOptions
     {
         public int RetryCount { get; set; }
         public TimeSpan InitialBackOff { get; set; }

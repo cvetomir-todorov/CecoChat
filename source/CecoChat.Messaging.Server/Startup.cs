@@ -29,7 +29,7 @@ namespace CecoChat.Messaging.Server
         private readonly IJwtOptions _jwtOptions;
         private readonly IOtelSamplingOptions _otelSamplingOptions;
         private readonly IJaegerOptions _jaegerOptions;
-        private readonly IIdentityOptions _identityOptions;
+        private readonly IIDGenOptions _idGenOptions;
 
         public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
@@ -48,9 +48,9 @@ namespace CecoChat.Messaging.Server
             Configuration.GetSection("Jaeger").Bind(jaegerOptions);
             _jaegerOptions = jaegerOptions;
 
-            IdentityOptions identityOptions = new();
-            Configuration.GetSection("Identity").Bind(identityOptions);
-            _identityOptions = identityOptions;
+            IDGenOptions idGenOptions = new();
+            Configuration.GetSection("IDGen").Bind(idGenOptions);
+            _idGenOptions = idGenOptions;
         }
 
         public IConfiguration Configuration { get; }
@@ -76,7 +76,7 @@ namespace CecoChat.Messaging.Server
             services.AddAuthorization();
 
             // idgen
-            services.AddIdentityClient(_identityOptions);
+            services.AddIDGenClient(_idGenOptions);
 
             // clients
             services.AddGrpc(rpc => rpc.EnableDetailedErrors = Environment.IsDevelopment());
@@ -105,9 +105,9 @@ namespace CecoChat.Messaging.Server
             builder.RegisterFactory<GrpcListenStreamer, IGrpcListenStreamer>();
             builder.RegisterOptions<ClientOptions>(Configuration.GetSection("Clients"));
 
-            // identity
-            builder.RegisterType<IdentityClient>().As<IIdentityClient>().SingleInstance();
-            builder.RegisterOptions<IdentityOptions>(Configuration.GetSection("Identity"));
+            // idgen
+            builder.RegisterType<IDGenClient>().As<IIDGenClient>().SingleInstance();
+            builder.RegisterOptions<IDGenOptions>(Configuration.GetSection("IDGen"));
 
             // backplane
             builder.RegisterModule(new PartitionUtilityAutofacModule());

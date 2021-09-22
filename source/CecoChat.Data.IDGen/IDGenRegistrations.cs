@@ -11,9 +11,9 @@ using Polly;
 
 namespace CecoChat.Data.IDGen
 {
-    public static class IdentityRegistrations
+    public static class IDGenRegistrations
     {
-        public static void AddIdentityClient(this IServiceCollection services, IIdentityOptions options)
+        public static void AddIDGenClient(this IServiceCollection services, IIDGenOptions options)
         {
             services
                 .AddGrpcClient<Contracts.IDGen.IDGen.IDGenClient>(grpc =>
@@ -24,7 +24,7 @@ namespace CecoChat.Data.IDGen
                 .AddPolicyHandler(_ => HandleFailure(options));
         }
 
-        private static HttpMessageHandler CreateMessageHandler(IIdentityOptions options)
+        private static HttpMessageHandler CreateMessageHandler(IIDGenOptions options)
         {
             return new SocketsHttpHandler
             {
@@ -35,7 +35,7 @@ namespace CecoChat.Data.IDGen
             };
         }
 
-        private static IAsyncPolicy<HttpResponseMessage> HandleFailure(IIdentityOptions options)
+        private static IAsyncPolicy<HttpResponseMessage> HandleFailure(IIDGenOptions options)
         {
             Random jitterGenerator = new();
 
@@ -76,7 +76,7 @@ namespace CecoChat.Data.IDGen
             return null;
         }
 
-        private static TimeSpan SleepDurationProvider(int retryAttempt, Random jitterGenerator, IIdentityOptions options)
+        private static TimeSpan SleepDurationProvider(int retryAttempt, Random jitterGenerator, IIDGenOptions options)
         {
             TimeSpan sleepDuration;
             if (retryAttempt == 1)

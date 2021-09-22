@@ -9,21 +9,21 @@ using Microsoft.Extensions.Options;
 
 namespace CecoChat.Data.IDGen
 {
-    public interface IIdentityClient : IDisposable
+    public interface IIDGenClient : IDisposable
     {
-        ValueTask<GetIdentityResult> GetIdentity(long userID, CancellationToken ct);
+        ValueTask<GetIDResult> GetID(long userID, CancellationToken ct);
     }
 
-    public struct GetIdentityResult
+    public struct GetIDResult
     {
         public bool Success => ID > 0;
         public long ID { get; set; }
     }
 
-    public sealed class IdentityClient : IIdentityClient
+    public sealed class IDGenClient : IIDGenClient
     {
         private readonly ILogger _logger;
-        private readonly IIdentityOptions _options;
+        private readonly IIDGenOptions _options;
         private readonly Contracts.IDGen.IDGen.IDGenClient _client;
         private readonly ConcurrentQueue<long> _idBuffer;
         private readonly SemaphoreSlim _generatedNewIDs;
@@ -32,16 +32,16 @@ namespace CecoChat.Data.IDGen
         private const int True = 1;
         private const int False = 0;
 
-        public IdentityClient(
-            ILogger<IdentityClient> logger,
-            IOptions<IdentityOptions> identityOptions,
+        public IDGenClient(
+            ILogger<IDGenClient> logger,
+            IOptions<IDGenOptions> options,
             Contracts.IDGen.IDGen.IDGenClient client)
         {
             _logger = logger;
-            _options = identityOptions.Value;
+            _options = options.Value;
             _client = client;
 
-            _logger.LogInformation("Identity address set to {0}.", _options.Communication.Address);
+            _logger.LogInformation("IDGen address set to {0}.", _options.Communication.Address);
             _idBuffer = new();
             _generatedNewIDs = new(initialCount: 0, maxCount: _options.Generation.MaxConcurrentRequests);
             _invalidateIDsTimer = new(
@@ -56,27 +56,27 @@ namespace CecoChat.Data.IDGen
             _invalidateIDsTimer.Dispose();
         }
 
-        public async ValueTask<GetIdentityResult> GetIdentity(long userID, CancellationToken ct)
+        public async ValueTask<GetIDResult> GetID(long userID, CancellationToken ct)
         {
             if (_idBuffer.TryDequeue(out long id))
             {
-                return new GetIdentityResult {ID = id};
+                return new GetIDResult {ID = id};
             }
 
             TriggerNewIDGeneration(userID, _options.Generation.RefreshIDsCount);
             if (!await _generatedNewIDs.WaitAsync(_options.Generation.GetIDWaitInterval, ct))
             {
                 _logger.LogWarning("Timed-out while waiting for new IDs to be generated.");
-                return new GetIdentityResult();
+                return new GetIDResult();
             }
 
             if (!_idBuffer.TryDequeue(out id))
             {
                 _logger.LogWarning("No ID available after ensuring generating new IDs is triggered.");
-                return new GetIdentityResult();
+                return new GetIDResult();
             }
 
-            return new GetIdentityResult {ID = id};
+            return new GetIDResult {ID = id};
         }
 
         private void TriggerNewIDGeneration(long originatorID, int count)
