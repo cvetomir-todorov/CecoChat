@@ -5,7 +5,7 @@ using IdGen;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace CecoChat.Identity.Server.Generation
+namespace CecoChat.IDGen.Server.Generation
 {
     public interface IIdentityGenerator
     {

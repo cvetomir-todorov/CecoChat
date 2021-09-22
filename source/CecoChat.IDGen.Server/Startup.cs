@@ -1,13 +1,13 @@
 using Autofac;
 using CecoChat.Autofac;
-using CecoChat.Identity.Server.Generation;
+using CecoChat.IDGen.Server.Generation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace CecoChat.Identity.Server
+namespace CecoChat.IDGen.Server
 {
     public class Startup
     {
@@ -49,7 +49,7 @@ namespace CecoChat.Identity.Server
             app.UseRouting();
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGrpcService<GrpcIdentityGenerationService>();
+                endpoints.MapGrpcService<GrpcGenerationService>();
             });
         }
     }

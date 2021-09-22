@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace CecoChat.Identity.Server.Generation
+namespace CecoChat.IDGen.Server.Generation
 {
     public interface ISnowflakeOptions
     {

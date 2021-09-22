@@ -3,13 +3,13 @@ using System.Threading.Tasks;
 using CecoChat.Contracts.Identity;
 using Grpc.Core;
 
-namespace CecoChat.Identity.Server.Generation
+namespace CecoChat.IDGen.Server.Generation
 {
-    public sealed class GrpcIdentityGenerationService : Contracts.Identity.Identity.IdentityBase
+    public sealed class GrpcGenerationService : Contracts.Identity.Identity.IdentityBase
     {
         private readonly IIdentityGenerator _generator;
 
-        public GrpcIdentityGenerationService(
+        public GrpcGenerationService(
             IIdentityGenerator generator)
         {
             _generator = generator;
