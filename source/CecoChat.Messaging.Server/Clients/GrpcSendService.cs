@@ -18,20 +18,20 @@ namespace CecoChat.Messaging.Server.Clients
     public sealed class GrpcSendService : Send.SendBase
     {
         private readonly ILogger _logger;
-        private readonly IIdentityClient _identityClient;
+        private readonly IIDGenClient _idGenClient;
         private readonly ISendProducer _sendProducer;
         private readonly IClientContainer _clientContainer;
         private readonly IMessageMapper _mapper;
 
         public GrpcSendService(
             ILogger<GrpcSendService> logger,
-            IIdentityClient identityClient,
+            IIDGenClient idGenClient,
             ISendProducer sendProducer,
             IClientContainer clientContainer,
             IMessageMapper mapper)
         {
             _logger = logger;
-            _identityClient = identityClient;
+            _idGenClient = idGenClient;
             _sendProducer = sendProducer;
             _clientContainer = clientContainer;
             _mapper = mapper;
@@ -72,7 +72,7 @@ namespace CecoChat.Messaging.Server.Clients
 
         private async Task<long> GetMessageID(UserClaims userClaims, ServerCallContext context)
         {
-            GetIdentityResult result = await _identityClient.GetIdentity(userClaims.UserID, context.CancellationToken);
+            GetIDResult result = await _idGenClient.GetID(userClaims.UserID, context.CancellationToken);
             if (!result.Success)
             {
                 Metadata metadata = new();
