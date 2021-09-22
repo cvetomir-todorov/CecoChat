@@ -16,7 +16,7 @@ namespace CecoChat.Messaging.Server.Identity
         public static void AddIdentityClient(this IServiceCollection services, IIdentityOptions options)
         {
             services
-                .AddGrpcClient<Contracts.Identity.Identity.IdentityClient>(grpc =>
+                .AddGrpcClient<Contracts.IDGen.IDGen.IDGenClient>(grpc =>
                 {
                     grpc.Address = options.Communication.Address;
                 })

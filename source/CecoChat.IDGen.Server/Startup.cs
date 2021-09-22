@@ -49,7 +49,7 @@ namespace CecoChat.IDGen.Server
             app.UseRouting();
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGrpcService<GrpcGenerationService>();
+                endpoints.MapGrpcService<GrpcIDGenService>();
             });
         }
     }

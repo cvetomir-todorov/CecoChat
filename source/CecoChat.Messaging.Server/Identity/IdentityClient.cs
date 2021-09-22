@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
-using CecoChat.Contracts.Identity;
+using CecoChat.Contracts.IDGen;
 using CecoChat.Messaging.Server.Clients;
 using Grpc.Core;
 using Microsoft.Extensions.Logging;
@@ -25,7 +25,7 @@ namespace CecoChat.Messaging.Server.Identity
     {
         private readonly ILogger _logger;
         private readonly IIdentityOptions _options;
-        private readonly Contracts.Identity.Identity.IdentityClient _client;
+        private readonly Contracts.IDGen.IDGen.IDGenClient _client;
         private readonly ConcurrentQueue<long> _idBuffer;
         private readonly SemaphoreSlim _generatedNewIDs;
         private readonly Timer _invalidateIDsTimer;
@@ -37,7 +37,7 @@ namespace CecoChat.Messaging.Server.Identity
             ILogger<IdentityClient> logger,
             IOptions<IdentityOptions> identityOptions,
             IOptions<ClientOptions> clientOptions,
-            Contracts.Identity.Identity.IdentityClient client)
+            Contracts.IDGen.IDGen.IDGenClient client)
         {
             _logger = logger;
             _options = identityOptions.Value;
