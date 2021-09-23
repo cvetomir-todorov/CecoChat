@@ -5,14 +5,7 @@
         AlwaysOff, AlwaysOn, Probability
     }
 
-    public interface IOtelSamplingOptions
-    {
-        OtelSamplingStrategy Strategy { get; }
-
-        double Probability { get; }
-    }
-
-    public sealed class OtelSamplingOptions : IOtelSamplingOptions
+    public sealed class OtelSamplingOptions
     {
         public OtelSamplingStrategy Strategy { get; set; }
 

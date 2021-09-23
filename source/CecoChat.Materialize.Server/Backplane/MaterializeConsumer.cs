@@ -22,7 +22,7 @@ namespace CecoChat.Materialize.Server.Backplane
     public sealed class MaterializeConsumer : IMaterializeConsumer
     {
         private readonly ILogger _logger;
-        private readonly IBackplaneOptions _backplaneOptions;
+        private readonly BackplaneOptions _backplaneOptions;
         private readonly IKafkaConsumer<Null, BackplaneMessage> _consumer;
         private readonly IMessageMapper _mapper;
         private readonly INewMessageRepository _newMessageRepository;

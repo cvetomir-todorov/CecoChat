@@ -10,7 +10,7 @@ namespace CecoChat.Kafka
 {
     public interface IKafkaConsumer<TKey, TValue> : IDisposable
     {
-        void Initialize(IKafkaOptions options, IKafkaConsumerOptions consumerOptions, IDeserializer<TValue> valueDeserializer);
+        void Initialize(KafkaOptions options, KafkaConsumerOptions consumerOptions, IDeserializer<TValue> valueDeserializer);
 
         void Subscribe(string topic);
 
@@ -25,7 +25,7 @@ namespace CecoChat.Kafka
         private readonly IKafkaActivityUtility _kafkaActivityUtility;
         private PartitionRange _assignedPartitions;
         private IConsumer<TKey, TValue> _consumer;
-        private IKafkaConsumerOptions _consumerOptions;
+        private KafkaConsumerOptions _consumerOptions;
         private string _id;
         private bool _isDisposed;
 
@@ -48,7 +48,7 @@ namespace CecoChat.Kafka
             }
         }
 
-        public void Initialize(IKafkaOptions options, IKafkaConsumerOptions consumerOptions, IDeserializer<TValue> valueDeserializer)
+        public void Initialize(KafkaOptions options, KafkaConsumerOptions consumerOptions, IDeserializer<TValue> valueDeserializer)
         {
             if (_consumer != null)
             {

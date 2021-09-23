@@ -7,7 +7,7 @@ namespace CecoChat.Swagger
 {
     public static class SwaggerRegistrations
     {
-        public static void AddSwaggerServices(this IServiceCollection services, ISwaggerOptions options)
+        public static void AddSwaggerServices(this IServiceCollection services, SwaggerOptions options)
         {
             if (options.UseSwagger)
             {
@@ -35,7 +35,7 @@ namespace CecoChat.Swagger
             }
         }
 
-        public static void UseSwaggerMiddlewares(this IApplicationBuilder app, ISwaggerOptions options)
+        public static void UseSwaggerMiddlewares(this IApplicationBuilder app, SwaggerOptions options)
         {
             if (options.UseSwagger)
             {

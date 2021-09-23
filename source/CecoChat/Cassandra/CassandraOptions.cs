@@ -3,22 +3,7 @@ using System.Collections.Generic;
 
 namespace CecoChat.Cassandra
 {
-    public interface ICassandraOptions
-    {
-        List<string> ContactPoints { get; }
-
-        string LocalDC { get; }
-
-        TimeSpan SocketConnectTimeout { get; }
-
-        bool ExponentialReconnectPolicy { get; }
-
-        TimeSpan ExponentialReconnectPolicyBaseDelay { get; }
-
-        TimeSpan ExponentialReconnectPolicyMaxDelay { get; }
-    }
-
-    public sealed class CassandraOptions : ICassandraOptions
+    public sealed class CassandraOptions
     {
         public List<string> ContactPoints { get; set; }
 

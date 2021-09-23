@@ -46,7 +46,7 @@ namespace CecoChat.Messaging.Server.Clients
             _logger = logger;
             _grpcActivityUtility = grpcActivityUtility;
 
-            IClientOptions clientOptions = options.Value;
+            ClientOptions clientOptions = options.Value;
             _messageQueue = new(
                 collection: new ConcurrentQueue<MessageContext>(),
                 boundedCapacity: clientOptions.SendMessagesHighWatermark);

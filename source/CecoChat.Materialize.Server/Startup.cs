@@ -20,20 +20,18 @@ namespace CecoChat.Materialize.Server
 {
     public class Startup
     {
-        private readonly IOtelSamplingOptions _otelSamplingOptions;
-        private readonly IJaegerOptions _jaegerOptions;
+        private readonly OtelSamplingOptions _otelSamplingOptions;
+        private readonly JaegerOptions _jaegerOptions;
 
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
 
-            OtelSamplingOptions otelSamplingOptions = new();
-            Configuration.GetSection("OtelSampling").Bind(otelSamplingOptions);
-            _otelSamplingOptions = otelSamplingOptions;
+            _otelSamplingOptions = new();
+            Configuration.GetSection("OtelSampling").Bind(_otelSamplingOptions);
 
-            JaegerOptions jaegerOptions = new();
-            Configuration.GetSection("Jaeger").Bind(jaegerOptions);
-            _jaegerOptions = jaegerOptions;
+            _jaegerOptions = new();
+            Configuration.GetSection("Jaeger").Bind(_jaegerOptions);
         }
 
         public IConfiguration Configuration { get; }

@@ -18,7 +18,7 @@ namespace CecoChat.Profile.Server.Controllers
     public sealed class SessionController : ControllerBase
     {
         private readonly ILogger _logger;
-        private readonly IJwtOptions _jwtOptions;
+        private readonly JwtOptions _jwtOptions;
         private readonly IClock _clock;
 
         private readonly SigningCredentials _signingCredentials;

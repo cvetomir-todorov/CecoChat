@@ -18,7 +18,7 @@ namespace CecoChat.Redis
     public sealed class RedisContext : IRedisContext
     {
         private readonly ILogger _logger;
-        private readonly IRedisOptions _redisOptions;
+        private readonly RedisOptions _redisOptions;
         private readonly Lazy<ConnectionMultiplexer> _connection;
 
         public RedisContext(

@@ -16,7 +16,7 @@ namespace CecoChat.Cassandra
 
     public class CassandraDbContext : ICassandraDbContext
     {
-        private readonly ICassandraOptions _options;
+        private readonly CassandraOptions _options;
         private readonly Lazy<Cluster> _cluster;
         private readonly ConcurrentDictionary<string, ISession> _sessions;
 

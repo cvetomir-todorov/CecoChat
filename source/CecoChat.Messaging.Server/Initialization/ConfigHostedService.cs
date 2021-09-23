@@ -11,7 +11,7 @@ namespace CecoChat.Messaging.Server.Initialization
     public sealed class ConfigHostedService : IHostedService
     {
         private readonly ILogger _logger;
-        private readonly IBackplaneOptions _backplaneOptions;
+        private readonly BackplaneOptions _backplaneOptions;
         private readonly IPartitioningConfig _partitioningConfig;
 
         public ConfigHostedService(

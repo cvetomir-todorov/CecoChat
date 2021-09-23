@@ -20,26 +20,23 @@ namespace CecoChat.History.Server
 {
     public class Startup
     {
-        private readonly IJwtOptions _jwtOptions;
-        private readonly IOtelSamplingOptions _otelSamplingOptions;
-        private readonly IJaegerOptions _jaegerOptions;
+        private readonly JwtOptions _jwtOptions;
+        private readonly OtelSamplingOptions _otelSamplingOptions;
+        private readonly JaegerOptions _jaegerOptions;
 
         public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
             Configuration = configuration;
             Environment = environment;
 
-            JwtOptions jwtOptions = new();
-            Configuration.GetSection("Jwt").Bind(jwtOptions);
-            _jwtOptions = jwtOptions;
+            _jwtOptions = new();
+            Configuration.GetSection("Jwt").Bind(_jwtOptions);
 
-            OtelSamplingOptions otelSamplingOptions = new();
-            Configuration.GetSection("OtelSampling").Bind(otelSamplingOptions);
-            _otelSamplingOptions = otelSamplingOptions;
+            _otelSamplingOptions = new();
+            Configuration.GetSection("OtelSampling").Bind(_otelSamplingOptions);
 
-            JaegerOptions jaegerOptions = new();
-            Configuration.GetSection("Jaeger").Bind(jaegerOptions);
-            _jaegerOptions = jaegerOptions;
+            _jaegerOptions = new();
+            Configuration.GetSection("Jaeger").Bind(_jaegerOptions);
         }
 
         public IConfiguration Configuration { get; }
@@ -82,9 +79,6 @@ namespace CecoChat.History.Server
                 RedisConfiguration = Configuration.GetSection("ConfigDB"),
                 RegisterHistory = true
             });
-
-            // clients
-            builder.RegisterOptions<ClientOptions>(Configuration.GetSection("Clients"));
 
             // history
             builder.RegisterModule(new HistoryDbAutofacModule

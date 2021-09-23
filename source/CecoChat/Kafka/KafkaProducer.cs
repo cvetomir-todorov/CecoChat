@@ -9,7 +9,7 @@ namespace CecoChat.Kafka
 {
     public interface IKafkaProducer<TKey, TValue> : IDisposable
     {
-        void Initialize(IKafkaOptions options, IKafkaProducerOptions producerOptions, ISerializer<TValue> valueSerializer);
+        void Initialize(KafkaOptions options, KafkaProducerOptions producerOptions, ISerializer<TValue> valueSerializer);
 
         void Produce(Message<TKey, TValue> message, TopicPartition topicPartition, DeliveryHandler<TKey, TValue> deliveryHandler = null);
 
@@ -25,7 +25,7 @@ namespace CecoChat.Kafka
         private readonly ILogger _logger;
         private readonly IKafkaActivityUtility _kafkaActivityUtility;
         private IProducer<TKey, TValue> _producer;
-        private IKafkaProducerOptions _producerOptions;
+        private KafkaProducerOptions _producerOptions;
         private string _id;
         private bool _isDisposed;
 
@@ -46,7 +46,7 @@ namespace CecoChat.Kafka
             }
         }
 
-        public void Initialize(IKafkaOptions options, IKafkaProducerOptions producerOptions, ISerializer<TValue> valueSerializer)
+        public void Initialize(KafkaOptions options, KafkaProducerOptions producerOptions, ISerializer<TValue> valueSerializer)
         {
             if (_producer != null)
             {

@@ -2,18 +2,7 @@
 
 namespace CecoChat.Redis
 {
-    public interface IRedisOptions
-    {
-        List<string> Endpoints { get; }
-
-        int ConnectRetry { get; }
-
-        int ConnectTimeout { get; }
-
-        int KeepAlive { get; }
-    }
-
-    public sealed class RedisOptions : IRedisOptions
+    public sealed class RedisOptions
     {
         public List<string> Endpoints { get; set; }
 

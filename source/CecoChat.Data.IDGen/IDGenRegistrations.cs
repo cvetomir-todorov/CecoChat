@@ -13,7 +13,7 @@ namespace CecoChat.Data.IDGen
 {
     public static class IDGenRegistrations
     {
-        public static void AddIDGenClient(this IServiceCollection services, IIDGenOptions options)
+        public static void AddIDGenClient(this IServiceCollection services, IDGenOptions options)
         {
             services
                 .AddGrpcClient<Contracts.IDGen.IDGen.IDGenClient>(grpc =>
@@ -24,7 +24,7 @@ namespace CecoChat.Data.IDGen
                 .AddPolicyHandler(_ => HandleFailure(options));
         }
 
-        private static HttpMessageHandler CreateMessageHandler(IIDGenOptions options)
+        private static HttpMessageHandler CreateMessageHandler(IDGenOptions options)
         {
             return new SocketsHttpHandler
             {
@@ -35,7 +35,7 @@ namespace CecoChat.Data.IDGen
             };
         }
 
-        private static IAsyncPolicy<HttpResponseMessage> HandleFailure(IIDGenOptions options)
+        private static IAsyncPolicy<HttpResponseMessage> HandleFailure(IDGenOptions options)
         {
             Random jitterGenerator = new();
 
@@ -76,7 +76,7 @@ namespace CecoChat.Data.IDGen
             return null;
         }
 
-        private static TimeSpan SleepDurationProvider(int retryAttempt, Random jitterGenerator, IIDGenOptions options)
+        private static TimeSpan SleepDurationProvider(int retryAttempt, Random jitterGenerator, IDGenOptions options)
         {
             TimeSpan sleepDuration;
             if (retryAttempt == 1)

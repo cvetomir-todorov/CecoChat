@@ -27,7 +27,7 @@ namespace CecoChat.IDGen.Server.Generation
         {
             _logger = logger;
             _hashFunction = hashFunction;
-            ISnowflakeOptions snowflakeOptions = options.Value;
+            SnowflakeOptions snowflakeOptions = options.Value;
 
             // IdGen doesn't use the sign bit so the sum of bits is 63
             IdStructure idStructure = new(timestampBits: 41, generatorIdBits: 8, sequenceBits: 14);

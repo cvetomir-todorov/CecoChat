@@ -17,7 +17,7 @@ namespace CecoChat.Otel
             return otel.SetResourceBuilder(resourceBuilder);
         }
 
-        public static TracerProviderBuilder ConfigureSampling(this TracerProviderBuilder otel, IOtelSamplingOptions samplingOptions)
+        public static TracerProviderBuilder ConfigureSampling(this TracerProviderBuilder otel, OtelSamplingOptions samplingOptions)
         {
             Sampler sampler;
             switch (samplingOptions.Strategy)
@@ -38,7 +38,7 @@ namespace CecoChat.Otel
             return otel.SetSampler(sampler);
         }
 
-        public static TracerProviderBuilder ConfigureJaegerExporter(this TracerProviderBuilder otel, IJaegerOptions options)
+        public static TracerProviderBuilder ConfigureJaegerExporter(this TracerProviderBuilder otel, JaegerOptions options)
         {
             return otel
                 .AddJaegerExporter(config =>
