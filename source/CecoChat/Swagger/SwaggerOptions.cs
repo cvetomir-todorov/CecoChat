@@ -2,20 +2,7 @@
 
 namespace CecoChat.Swagger
 {
-    public interface ISwaggerOptions
-    {
-        bool UseSwagger { get; }
-
-        bool UseSwaggerUI { get; }
-
-        string Url { get; }
-
-        bool AddAuthorizationHeader { get; }
-
-        OpenApiInfo OpenApiInfo { get; }
-    }
-
-    public sealed class SwaggerOptions : ISwaggerOptions
+    public sealed class SwaggerOptions
     {
         public bool UseSwagger { get; set; }
 

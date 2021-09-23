@@ -25,7 +25,7 @@ namespace CecoChat.Messaging.Server.Backplane
     public sealed class SendProducer : ISendProducer
     {
         private readonly ILogger _logger;
-        private readonly IBackplaneOptions _backplaneOptions;
+        private readonly BackplaneOptions _backplaneOptions;
         private readonly IPartitionUtility _partitionUtility;
         private readonly ITopicPartitionFlyweight _partitionFlyweight;
         private readonly IKafkaProducer<Null, BackplaneMessage> _producer;

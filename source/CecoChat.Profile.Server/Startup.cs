@@ -15,25 +15,22 @@ namespace CecoChat.Profile.Server
 {
     public class Startup
     {
-        private readonly IOtelSamplingOptions _otelSamplingOptions;
-        private readonly IJaegerOptions _jaegerOptions;
-        private readonly ISwaggerOptions _swaggerOptions;
+        private readonly OtelSamplingOptions _otelSamplingOptions;
+        private readonly JaegerOptions _jaegerOptions;
+        private readonly SwaggerOptions _swaggerOptions;
 
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
 
-            JaegerOptions jaegerOptions = new();
-            Configuration.GetSection("Jaeger").Bind(jaegerOptions);
-            _jaegerOptions = jaegerOptions;
+            _jaegerOptions = new();
+            Configuration.GetSection("Jaeger").Bind(_jaegerOptions);
 
-            OtelSamplingOptions otelSamplingOptions = new();
-            Configuration.GetSection("OtelSampling").Bind(otelSamplingOptions);
-            _otelSamplingOptions = otelSamplingOptions;
+            _otelSamplingOptions = new();
+            Configuration.GetSection("OtelSampling").Bind(_otelSamplingOptions);
 
-            SwaggerOptions swaggerOptions = new();
-            Configuration.GetSection("Swagger").Bind(swaggerOptions);
-            _swaggerOptions = swaggerOptions;
+            _swaggerOptions = new();
+            Configuration.GetSection("Swagger").Bind(_swaggerOptions);
         }
 
         public IConfiguration Configuration { get; }

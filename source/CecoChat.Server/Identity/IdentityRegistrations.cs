@@ -10,7 +10,7 @@ namespace CecoChat.Server.Identity
 {
     public static class IdentityRegistrations
     {
-        public static IServiceCollection AddJwtAuthentication(this IServiceCollection services, IJwtOptions jwtOptions)
+        public static IServiceCollection AddJwtAuthentication(this IServiceCollection services, JwtOptions jwtOptions)
         {
             services
                 .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

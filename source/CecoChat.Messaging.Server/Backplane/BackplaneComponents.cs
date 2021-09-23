@@ -17,7 +17,7 @@ namespace CecoChat.Messaging.Server.Backplane
     public sealed class BackplaneComponents : IBackplaneComponents
     {
         private readonly ILogger _logger;
-        private readonly IBackplaneOptions _backplaneOptions;
+        private readonly BackplaneOptions _backplaneOptions;
         private readonly ITopicPartitionFlyweight _topicPartitionFlyweight;
         private readonly ISendProducer _sendProducer;
         private readonly IReceiversConsumer _receiversConsumer;

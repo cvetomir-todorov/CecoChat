@@ -27,7 +27,7 @@ namespace CecoChat.Messaging.Server.Backplane
     public sealed class ReceiversConsumer : IReceiversConsumer
     {
         private readonly ILogger _logger;
-        private readonly IBackplaneOptions _backplaneOptions;
+        private readonly BackplaneOptions _backplaneOptions;
         private readonly ITopicPartitionFlyweight _partitionFlyweight;
         private readonly IKafkaConsumer<Null, BackplaneMessage> _consumer;
         private readonly IClientContainer _clientContainer;

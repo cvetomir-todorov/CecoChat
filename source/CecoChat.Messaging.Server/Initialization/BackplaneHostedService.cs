@@ -11,7 +11,7 @@ namespace CecoChat.Messaging.Server.Initialization
 {
     public sealed class BackplaneHostedService : IHostedService, IDisposable
     {
-        private readonly IBackplaneOptions _backplaneOptions;
+        private readonly BackplaneOptions _backplaneOptions;
         private readonly IBackplaneComponents _backplaneComponents;
         private readonly IPartitioningConfig _partitioningConfig;
         private readonly CancellationToken _appStoppingCt;

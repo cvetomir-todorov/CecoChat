@@ -14,16 +14,16 @@ namespace CecoChat.Data.IDGen
         ValueTask<GetIDResult> GetID(long userID, CancellationToken ct);
     }
 
-    public struct GetIDResult
+    public readonly struct GetIDResult
     {
         public bool Success => ID > 0;
-        public long ID { get; set; }
+        public long ID { get; init; }
     }
 
     public sealed class IDGenClient : IIDGenClient
     {
         private readonly ILogger _logger;
-        private readonly IIDGenOptions _options;
+        private readonly IDGenOptions _options;
         private readonly Contracts.IDGen.IDGen.IDGenClient _client;
         private readonly ConcurrentQueue<long> _idBuffer;
         private readonly SemaphoreSlim _generatedNewIDs;

@@ -2,20 +2,7 @@
 
 namespace CecoChat.Kafka
 {
-    public interface IKafkaProducerOptions
-    {
-        string ProducerID { get; }
-
-        Acks Acks { get; }
-
-        double LingerMs { get; }
-
-        int MessageTimeoutMs { get; }
-
-        int MessageSendMaxRetries { get; }
-    }
-
-    public sealed class KafkaProducerOptions : IKafkaProducerOptions
+    public sealed class KafkaProducerOptions
     {
         public string ProducerID { get; set; }
 

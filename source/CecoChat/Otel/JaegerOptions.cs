@@ -2,18 +2,7 @@
 
 namespace CecoChat.Otel
 {
-    public interface IJaegerOptions
-    {
-        string AgentHost { get; }
-
-        int AgentPort { get; }
-
-        ExportProcessorType ExportProcessorType { get; }
-
-        int BatchExportScheduledDelayMillis{ get; }
-    }
-
-    public sealed class JaegerOptions : IJaegerOptions
+    public sealed class JaegerOptions
     {
         public string AgentHost { get; set; }
 

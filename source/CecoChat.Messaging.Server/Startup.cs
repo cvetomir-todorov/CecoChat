@@ -26,31 +26,27 @@ namespace CecoChat.Messaging.Server
 {
     public class Startup
     {
-        private readonly IJwtOptions _jwtOptions;
-        private readonly IOtelSamplingOptions _otelSamplingOptions;
-        private readonly IJaegerOptions _jaegerOptions;
-        private readonly IIDGenOptions _idGenOptions;
+        private readonly JwtOptions _jwtOptions;
+        private readonly OtelSamplingOptions _otelSamplingOptions;
+        private readonly JaegerOptions _jaegerOptions;
+        private readonly IDGenOptions _idGenOptions;
 
         public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
             Configuration = configuration;
             Environment = environment;
 
-            JwtOptions jwtOptions = new();
-            Configuration.GetSection("Jwt").Bind(jwtOptions);
-            _jwtOptions = jwtOptions;
+            _jwtOptions = new();
+            Configuration.GetSection("Jwt").Bind(_jwtOptions);
 
-            OtelSamplingOptions otelSamplingOptions = new();
-            Configuration.GetSection("OtelSampling").Bind(otelSamplingOptions);
-            _otelSamplingOptions = otelSamplingOptions;
+            _otelSamplingOptions = new();
+            Configuration.GetSection("OtelSampling").Bind(_otelSamplingOptions);
 
-            JaegerOptions jaegerOptions = new();
-            Configuration.GetSection("Jaeger").Bind(jaegerOptions);
-            _jaegerOptions = jaegerOptions;
+            _jaegerOptions = new();
+            Configuration.GetSection("Jaeger").Bind(_jaegerOptions);
 
-            IDGenOptions idGenOptions = new();
-            Configuration.GetSection("IDGen").Bind(idGenOptions);
-            _idGenOptions = idGenOptions;
+            _idGenOptions = new();
+            Configuration.GetSection("IDGen").Bind(_idGenOptions);
         }
 
         public IConfiguration Configuration { get; }

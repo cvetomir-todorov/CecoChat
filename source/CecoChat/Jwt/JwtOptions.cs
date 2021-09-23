@@ -2,18 +2,7 @@
 
 namespace CecoChat.Jwt
 {
-    public interface IJwtOptions
-    {
-        string Secret { get; }
-
-        string Issuer { get; }
-
-        string Audience { get; }
-
-        TimeSpan AccessTokenExpiration { get; }
-    }
-
-    public sealed class JwtOptions : IJwtOptions
+    public sealed class JwtOptions
     {
         public string Secret { get; set; }
 
