@@ -4,14 +4,14 @@ using CecoChat.Data.Config.History;
 using CecoChat.Data.Config.Partitioning;
 using Microsoft.Extensions.Hosting;
 
-namespace CecoChat.Connect.Server.Initialization
+namespace CecoChat.Connect.Server.HostedServices
 {
-    public sealed class ConfigHostedService : IHostedService
+    public sealed class InitDynamicConfig : IHostedService
     {
         private readonly IPartitioningConfig _partitioningConfig;
         private readonly IHistoryConfig _historyConfig;
 
-        public ConfigHostedService(
+        public InitDynamicConfig(
             IPartitioningConfig partitioningConfig,
             IHistoryConfig historyConfig)
         {

@@ -5,19 +5,19 @@ using CecoChat.Data.History;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace CecoChat.Materialize.Server.Initialization
+namespace CecoChat.History.Server.HostedServices
 {
-    public sealed class PrepareQueriesHostedService : IHostedService
+    public sealed class PrepareHistoryQueries : IHostedService
     {
         private readonly ILogger _logger;
-        private readonly INewMessageRepository _newMessageRepository;
+        private readonly IHistoryRepository _historyRepository;
 
-        public PrepareQueriesHostedService(
-            ILogger<PrepareQueriesHostedService> logger,
-            INewMessageRepository newMessageRepository)
+        public PrepareHistoryQueries(
+            ILogger<PrepareHistoryQueries> logger,
+            IHistoryRepository historyRepository)
         {
             _logger = logger;
-            _newMessageRepository = newMessageRepository;
+            _historyRepository = historyRepository;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -27,7 +27,7 @@ namespace CecoChat.Materialize.Server.Initialization
                 try
                 {
                     _logger.LogInformation("Start preparing queries...");
-                    _newMessageRepository.Prepare();
+                    _historyRepository.Prepare();
                     _logger.LogInformation("Completed preparing queries.");
                 }
                 catch (Exception exception)

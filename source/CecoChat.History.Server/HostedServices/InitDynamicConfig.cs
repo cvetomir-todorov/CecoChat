@@ -3,13 +3,13 @@ using System.Threading.Tasks;
 using CecoChat.Data.Config.History;
 using Microsoft.Extensions.Hosting;
 
-namespace CecoChat.History.Server.Initialization
+namespace CecoChat.History.Server.HostedServices
 {
-    public sealed class ConfigHostedService : IHostedService
+    public sealed class InitDynamicConfig : IHostedService
     {
         private readonly IHistoryConfig _historyConfig;
 
-        public ConfigHostedService(
+        public InitDynamicConfig(
             IHistoryConfig historyConfig)
         {
             _historyConfig = historyConfig;

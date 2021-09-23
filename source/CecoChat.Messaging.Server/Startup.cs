@@ -9,7 +9,7 @@ using CecoChat.Kafka;
 using CecoChat.Kafka.Instrumentation;
 using CecoChat.Messaging.Server.Backplane;
 using CecoChat.Messaging.Server.Clients;
-using CecoChat.Messaging.Server.Initialization;
+using CecoChat.Messaging.Server.HostedServices;
 using CecoChat.Otel;
 using CecoChat.Server;
 using CecoChat.Server.Backplane;
@@ -84,9 +84,9 @@ namespace CecoChat.Messaging.Server
         public void ConfigureContainer(ContainerBuilder builder)
         {
             // ordered hosted services
-            builder.RegisterHostedService<ConfigHostedService>();
-            builder.RegisterHostedService<BackplaneHostedService>();
-            builder.RegisterHostedService<PartitionsChangedHostedService>();
+            builder.RegisterHostedService<InitDynamicConfig>();
+            builder.RegisterHostedService<StartBackplaneComponents>();
+            builder.RegisterHostedService<HandlePartitionsChanged>();
 
             // configuration
             builder.RegisterModule(new ConfigDbAutofacModule
