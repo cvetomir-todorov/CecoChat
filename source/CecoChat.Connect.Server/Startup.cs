@@ -1,6 +1,6 @@
 using Autofac;
 using CecoChat.Autofac;
-using CecoChat.Connect.Server.Initialization;
+using CecoChat.Connect.Server.HostedServices;
 using CecoChat.Data.Config;
 using CecoChat.Jwt;
 using CecoChat.Otel;
@@ -74,7 +74,7 @@ namespace CecoChat.Connect.Server
         public void ConfigureContainer(ContainerBuilder builder)
         {
             // ordered hosted services
-            builder.RegisterHostedService<ConfigHostedService>();
+            builder.RegisterHostedService<InitDynamicConfig>();
 
             // configuration
             builder.RegisterModule(new ConfigDbAutofacModule

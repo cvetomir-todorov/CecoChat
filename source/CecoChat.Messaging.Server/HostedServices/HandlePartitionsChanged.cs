@@ -11,9 +11,9 @@ using CecoChat.Messaging.Server.Clients;
 using CecoChat.Server.Backplane;
 using Microsoft.Extensions.Hosting;
 
-namespace CecoChat.Messaging.Server.Initialization
+namespace CecoChat.Messaging.Server.HostedServices
 {
-    public sealed class PartitionsChangedHostedService : IHostedService, ISubscriber<PartitionsChangedEventData>
+    public sealed class HandlePartitionsChanged : IHostedService, ISubscriber<PartitionsChangedEventData>
     {
         private readonly IBackplaneComponents _backplaneComponents;
         private readonly IPartitionUtility _partitionUtility;
@@ -21,7 +21,7 @@ namespace CecoChat.Messaging.Server.Initialization
         private readonly IEvent<PartitionsChangedEventData> _partitionsChanged;
         private readonly Guid _partitionsChangedToken;
 
-        public PartitionsChangedHostedService(
+        public HandlePartitionsChanged(
             IBackplaneComponents backplaneComponents,
             IPartitionUtility partitionUtility,
             IClientContainer clientContainer,

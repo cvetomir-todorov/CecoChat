@@ -4,7 +4,7 @@ using CecoChat.Data.Config;
 using CecoChat.Data.History;
 using CecoChat.Data.History.Instrumentation;
 using CecoChat.History.Server.Clients;
-using CecoChat.History.Server.Initialization;
+using CecoChat.History.Server.HostedServices;
 using CecoChat.Jwt;
 using CecoChat.Otel;
 using CecoChat.Server;
@@ -69,9 +69,9 @@ namespace CecoChat.History.Server
         public void ConfigureContainer(ContainerBuilder builder)
         {
             // ordered hosted services
-            builder.RegisterHostedService<ConfigHostedService>();
-            builder.RegisterHostedService<InitializeDbHostedService>();
-            builder.RegisterHostedService<PrepareQueriesHostedService>();
+            builder.RegisterHostedService<InitDynamicConfig>();
+            builder.RegisterHostedService<InitHistoryDb>();
+            builder.RegisterHostedService<PrepareHistoryQueries>();
 
             // configuration
             builder.RegisterModule(new ConfigDbAutofacModule

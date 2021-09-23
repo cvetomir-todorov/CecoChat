@@ -5,17 +5,17 @@ using CecoChat.Materialize.Server.Backplane;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace CecoChat.Materialize.Server.Initialization
+namespace CecoChat.Materialize.Server.HostedServices
 {
-    public sealed class MaterializeMessagesHostedService : IHostedService, IDisposable
+    public sealed class StartMaterializeMessages : IHostedService, IDisposable
     {
         private readonly ILogger _logger;
         private readonly IMaterializeConsumer _materializeConsumer;
         private readonly CancellationToken _appStoppingCt;
         private CancellationTokenSource _stoppedCts;
 
-        public MaterializeMessagesHostedService(
-            ILogger<MaterializeMessagesHostedService> logger,
+        public StartMaterializeMessages(
+            ILogger<StartMaterializeMessages> logger,
             IHostApplicationLifetime applicationLifetime,
             IMaterializeConsumer materializeConsumer)
         {

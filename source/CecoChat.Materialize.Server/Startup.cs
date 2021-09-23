@@ -6,7 +6,7 @@ using CecoChat.Data.History.Instrumentation;
 using CecoChat.Kafka;
 using CecoChat.Kafka.Instrumentation;
 using CecoChat.Materialize.Server.Backplane;
-using CecoChat.Materialize.Server.Initialization;
+using CecoChat.Materialize.Server.HostedServices;
 using CecoChat.Otel;
 using CecoChat.Server;
 using Confluent.Kafka;
@@ -55,9 +55,9 @@ namespace CecoChat.Materialize.Server
         public void ConfigureContainer(ContainerBuilder builder)
         {
             // ordered hosted services
-            builder.RegisterHostedService<InitializeDbHostedService>();
-            builder.RegisterHostedService<PrepareQueriesHostedService>();
-            builder.RegisterHostedService<MaterializeMessagesHostedService>();
+            builder.RegisterHostedService<InitHistoryDb>();
+            builder.RegisterHostedService<PrepareHistoryQueries>();
+            builder.RegisterHostedService<StartMaterializeMessages>();
 
             // history
             builder.RegisterModule(new HistoryDbAutofacModule

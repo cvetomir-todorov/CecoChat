@@ -7,9 +7,9 @@ using CecoChat.Messaging.Server.Backplane;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 
-namespace CecoChat.Messaging.Server.Initialization
+namespace CecoChat.Messaging.Server.HostedServices
 {
-    public sealed class BackplaneHostedService : IHostedService, IDisposable
+    public sealed class StartBackplaneComponents : IHostedService, IDisposable
     {
         private readonly BackplaneOptions _backplaneOptions;
         private readonly IBackplaneComponents _backplaneComponents;
@@ -17,7 +17,7 @@ namespace CecoChat.Messaging.Server.Initialization
         private readonly CancellationToken _appStoppingCt;
         private CancellationTokenSource _stoppedCts;
 
-        public BackplaneHostedService(
+        public StartBackplaneComponents(
             IHostApplicationLifetime applicationLifetime,
             IOptions<BackplaneOptions> backplaneOptions,
             IBackplaneComponents backplaneComponents,

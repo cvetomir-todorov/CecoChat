@@ -3,13 +3,13 @@ using System.Threading.Tasks;
 using CecoChat.Data.History;
 using Microsoft.Extensions.Hosting;
 
-namespace CecoChat.Materialize.Server.Initialization
+namespace CecoChat.History.Server.HostedServices
 {
-    public sealed class InitializeDbHostedService : IHostedService
+    public sealed class InitHistoryDb : IHostedService
     {
         private readonly IHistoryDbInitializer _dbInitializer;
 
-        public InitializeDbHostedService(
+        public InitHistoryDb(
             IHistoryDbInitializer dbInitializer)
         {
             _dbInitializer = dbInitializer;

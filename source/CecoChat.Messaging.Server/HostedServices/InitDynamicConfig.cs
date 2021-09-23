@@ -6,16 +6,16 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace CecoChat.Messaging.Server.Initialization
+namespace CecoChat.Messaging.Server.HostedServices
 {
-    public sealed class ConfigHostedService : IHostedService
+    public sealed class InitDynamicConfig : IHostedService
     {
         private readonly ILogger _logger;
         private readonly BackplaneOptions _backplaneOptions;
         private readonly IPartitioningConfig _partitioningConfig;
 
-        public ConfigHostedService(
-            ILogger<ConfigHostedService> logger,
+        public InitDynamicConfig(
+            ILogger<InitDynamicConfig> logger,
             IOptions<BackplaneOptions> backplaneOptions,
             IPartitioningConfig partitioningConfig)
         {
