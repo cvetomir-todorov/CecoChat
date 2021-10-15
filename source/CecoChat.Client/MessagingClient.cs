@@ -185,6 +185,7 @@ namespace CecoChat.Client
                 SenderId = _userID,
                 ReceiverId = receiverID,
                 Type = ClientMessageType.PlainText,
+                Status = ClientMessageStatus.Unprocessed,
                 Text = text
             };
 

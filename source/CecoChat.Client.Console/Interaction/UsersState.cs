@@ -17,7 +17,7 @@ namespace CecoChat.Client.Console.Interaction
             }
 
             System.Console.Clear();
-            System.Console.WriteLine("Choose user to chat (press '0'...'9') | Refresh (press 'r') | Exit (press 'x'):");
+            System.Console.WriteLine("Choose user to chat (press '0'...'9') | New (press 'n') | Refresh (press 'r') | Exit (press 'x'):");
             List<long> userIDs = States.Storage.GetUsers();
             int key = 0;
             foreach (long userID in userIDs)
@@ -29,6 +29,11 @@ namespace CecoChat.Client.Console.Interaction
             if (char.IsNumber(keyInfo.KeyChar))
             {
                 return ProcessNumberKey(keyInfo, userIDs);
+            }
+            else if (keyInfo.KeyChar == 'n' || keyInfo.KeyChar == 'N')
+            {
+                States.Context.ReloadData = false;
+                return States.FindUser;
             }
             else if (keyInfo.KeyChar == 'r' || keyInfo.KeyChar == 'R')
             {
