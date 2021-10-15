@@ -41,11 +41,11 @@ namespace CecoChat.Data.History
 
         private const string InsertIntoMessagesForUser =
             "INSERT INTO messages_for_user " +
-            "(user_id, message_id, sender_id, receiver_id, message_type, status, data) " +
+            "(user_id, message_id, sender_id, receiver_id, type, status, data) " +
             "VALUES (?, ?, ?, ?, ?, ?, ?)";
         private const string InsertIntoMessagesForDialog =
             "INSERT INTO messages_for_dialog " +
-            "(dialog_id, message_id, sender_id, receiver_id, message_type, status, data) " +
+            "(dialog_id, message_id, sender_id, receiver_id, type, status, data) " +
             "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         public void Prepare()
