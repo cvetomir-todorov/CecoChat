@@ -1,5 +1,4 @@
-﻿using System;
-using CecoChat.Contracts.Backplane;
+﻿using CecoChat.Contracts.Backplane;
 using CecoChat.Contracts.Client;
 using CecoChat.Contracts.History;
 
@@ -34,8 +33,10 @@ namespace CecoChat.Server
                     backplaneMessage.Text = clientMessage.Text;
                     break;
                 default:
-                    throw new NotSupportedException($"{typeof(ClientMessageType).FullName} value {clientMessage.Type} is not supported.");
+                    throw new EnumValueNotSupportedException(clientMessage.Type);
             }
+
+            // ignore status
 
             return backplaneMessage;
         }
@@ -56,7 +57,19 @@ namespace CecoChat.Server
                     historyMessage.Text = backplaneMessage.Text;
                     break;
                 default:
-                    throw new NotSupportedException($"{typeof(BackplaneMessageType).FullName} value {backplaneMessage.Type} is not supported.");
+                    throw new EnumValueNotSupportedException(backplaneMessage.Type);
+            }
+
+            switch (backplaneMessage.Status)
+            {
+                case BackplaneMessageStatus.Processed:
+                    historyMessage.Status = HistoryMessageStatus.Processed;
+                    break;
+                case BackplaneMessageStatus.Delivered:
+                    historyMessage.Status = HistoryMessageStatus.Delivered;
+                    break;
+                default:
+                    throw new EnumValueNotSupportedException(backplaneMessage.Status);
             }
 
             return historyMessage;
@@ -78,7 +91,19 @@ namespace CecoChat.Server
                     clientMessage.Text = backplaneMessage.Text;
                     break;
                 default:
-                    throw new NotSupportedException($"{typeof(BackplaneMessageType).FullName} value {backplaneMessage.Type} is not supported.");
+                    throw new EnumValueNotSupportedException(backplaneMessage.Type);
+            }
+
+            switch (backplaneMessage.Status)
+            {
+                case BackplaneMessageStatus.Processed:
+                    clientMessage.Status = ClientMessageStatus.Processed;
+                    break;
+                case BackplaneMessageStatus.Delivered:
+                    clientMessage.Status = ClientMessageStatus.Delivered;
+                    break;
+                default:
+                    throw new EnumValueNotSupportedException(backplaneMessage.Status);
             }
 
             return clientMessage;
@@ -100,7 +125,19 @@ namespace CecoChat.Server
                     clientMessage.Text = historyMessage.Text;
                     break;
                 default:
-                    throw new NotSupportedException($"{typeof(HistoryMessageType).FullName} value {historyMessage.Type} is not supported.");
+                    throw new EnumValueNotSupportedException(historyMessage.Type);
+            }
+
+            switch (historyMessage.Status)
+            {
+                case HistoryMessageStatus.Processed:
+                    clientMessage.Status = ClientMessageStatus.Processed;
+                    break;
+                case HistoryMessageStatus.Delivered:
+                    clientMessage.Status = ClientMessageStatus.Delivered;
+                    break;
+                default:
+                    throw new EnumValueNotSupportedException(historyMessage.Status);
             }
 
             return clientMessage;

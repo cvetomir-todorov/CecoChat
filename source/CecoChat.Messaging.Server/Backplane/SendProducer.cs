@@ -76,11 +76,11 @@ namespace CecoChat.Messaging.Server.Backplane
 
             if (client != null)
             {
-                AckType ackType = isDelivered ? AckType.Processed : AckType.Lost;
+                ClientMessageStatus status = isDelivered ? ClientMessageStatus.Processed : ClientMessageStatus.Lost;
                 ClientMessage ackMessage = new()
                 {
                     Type = ClientMessageType.Ack,
-                    AckType = ackType,
+                    Status = status,
                     MessageId = backplaneMessage.MessageId,
                     SenderId = backplaneMessage.SenderId,
                     ReceiverId = backplaneMessage.ReceiverId

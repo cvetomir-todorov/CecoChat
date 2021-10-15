@@ -7,13 +7,18 @@ message HistoryMessage {
   int64 sender_id = 2;
   int64 receiver_id = 3;
   HistoryMessageType type = 4;
+  HistoryMessageStatus status = 5;
   oneof data {
-    string text = 5;
+    string text = 6;
   }
 }
 
 enum HistoryMessageType {
   UNKNOWN = 0;
   PLAIN_TEXT = 1;
-  ACK = 2;
+}
+
+enum HistoryMessageStatus {
+  PROCESSED = 0;
+  DELIVERED = 1;
 }

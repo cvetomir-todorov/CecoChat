@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using CecoChat.Contracts.History;
 
 namespace CecoChat.Data.History
@@ -8,9 +7,13 @@ namespace CecoChat.Data.History
     {
         sbyte MapHistoryToDbMessageType(HistoryMessageType historyMessageType);
 
+        sbyte MapHistoryToDbMessageStatus(HistoryMessageStatus historyMessageStatus);
+
         IDictionary<string, string> MapHistoryToDbData(HistoryMessage historyMessage);
 
         HistoryMessageType MapDbToHistoryMessageType(sbyte dbMessageType);
+
+        HistoryMessageStatus MapDbToHistoryMessageStatus(sbyte dbMessageStatus);
 
         void MapDbToHistoryData(IDictionary<string, string> data, HistoryMessage historyMessage);
     }
@@ -25,7 +28,18 @@ namespace CecoChat.Data.History
             {
                 case HistoryMessageType.PlainText: return (sbyte) DbMessageType.PlainText;
                 default:
-                    throw new NotSupportedException($"{typeof(HistoryMessageType).FullName} value {historyMessageType} is not supported.");
+                    throw new EnumValueNotSupportedException(historyMessageType);
+            }
+        }
+
+        public sbyte MapHistoryToDbMessageStatus(HistoryMessageStatus historyMessageStatus)
+        {
+            switch (historyMessageStatus)
+            {
+                case HistoryMessageStatus.Processed: return (sbyte)DbMessageStatus.Processed;
+                case HistoryMessageStatus.Delivered: return (sbyte)DbMessageStatus.Delivered;
+                default:
+                    throw new EnumValueNotSupportedException(historyMessageStatus);
             }
         }
 
@@ -38,7 +52,7 @@ namespace CecoChat.Data.History
                     {PlainTextKey, historyMessage.Text}
                 };
                 default:
-                    throw new NotSupportedException($"{typeof(HistoryMessageType).FullName} value {historyMessage.Type} is not supported.");
+                    throw new EnumValueNotSupportedException(historyMessage.Type);
             }
         }
 
@@ -50,7 +64,20 @@ namespace CecoChat.Data.History
             {
                 case DbMessageType.PlainText: return HistoryMessageType.PlainText;
                 default:
-                    throw new NotSupportedException($"{typeof(DbMessageType).FullName} value {dbMessageTypeAsEnum} is not supported.");
+                    throw new EnumValueNotSupportedException(dbMessageTypeAsEnum);
+            }
+        }
+
+        public HistoryMessageStatus MapDbToHistoryMessageStatus(sbyte dbMessageStatus)
+        {
+            DbMessageStatus dbMessageStatusAsEnum = (DbMessageStatus)dbMessageStatus;
+
+            switch (dbMessageStatusAsEnum)
+            {
+                case DbMessageStatus.Processed: return HistoryMessageStatus.Processed;
+                case DbMessageStatus.Delivered: return HistoryMessageStatus.Delivered;
+                default:
+                    throw new EnumValueNotSupportedException(dbMessageStatusAsEnum);
             }
         }
 
@@ -64,7 +91,7 @@ namespace CecoChat.Data.History
                     break;
                 }
                 default:
-                    throw new NotSupportedException($"{typeof(HistoryMessageType).FullName} value {historyMessage.Type} is not supported.");
+                    throw new EnumValueNotSupportedException(historyMessage.Type);
             }
         }
     }
