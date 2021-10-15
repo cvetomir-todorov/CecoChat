@@ -4,7 +4,7 @@
   message_id bigint,
   sender_id bigint,
   receiver_id bigint,
-  message_type tinyint,
+  type tinyint,
   status tinyint,
   data map<text,text>,
   PRIMARY KEY (user_id, message_id)
