@@ -9,12 +9,18 @@ message BackplaneMessage {
   int64 sender_id = 3;
   int64 receiver_id = 4;
   BackplaneMessageType type = 5;
+  BackplaneMessageStatus status = 6;
   oneof data {
-    string text = 6;
+    string text = 7;
   }
 }
 
 enum BackplaneMessageType {
   UNKNOWN = 0;
   PLAIN_TEXT = 1;
+}
+
+enum BackplaneMessageStatus {
+  PROCESSED = 0;
+  DELIVERED = 1;
 }

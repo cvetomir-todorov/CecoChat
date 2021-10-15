@@ -41,12 +41,12 @@ namespace CecoChat.Data.History
 
         private const string InsertIntoMessagesForUser =
             "INSERT INTO messages_for_user " +
-            "(user_id, message_id, sender_id, receiver_id, message_type, data) " +
-            "VALUES (?, ?, ?, ?, ?, ?)";
+            "(user_id, message_id, sender_id, receiver_id, message_type, status, data) " +
+            "VALUES (?, ?, ?, ?, ?, ?, ?)";
         private const string InsertIntoMessagesForDialog =
             "INSERT INTO messages_for_dialog " +
-            "(dialog_id, message_id, sender_id, receiver_id, message_type, data) " +
-            "VALUES (?, ?, ?, ?, ?, ?)";
+            "(dialog_id, message_id, sender_id, receiver_id, message_type, status, data) " +
+            "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         public void Prepare()
         {
@@ -80,15 +80,16 @@ namespace CecoChat.Data.History
             long senderID = message.SenderId;
             long receiverID = message.ReceiverId;
             sbyte dbMessageType = _mapper.MapHistoryToDbMessageType(message.Type);
+            sbyte dbMessageStatus = _mapper.MapHistoryToDbMessageStatus(message.Status);
             IDictionary<string, string> data = _mapper.MapHistoryToDbData(message);
             string dialogID = _dataUtility.CreateDialogID(senderID, receiverID);
 
             BoundStatement insertForSender = _messagesForUserQuery.Value.Bind(
-                senderID, message.MessageId, senderID, receiverID, dbMessageType, data);
+                senderID, message.MessageId, senderID, receiverID, dbMessageType, dbMessageStatus, data);
             BoundStatement insertForReceiver = _messagesForUserQuery.Value.Bind(
-                receiverID, message.MessageId, senderID, receiverID, dbMessageType, data);
+                receiverID, message.MessageId, senderID, receiverID, dbMessageType, dbMessageStatus, data);
             BoundStatement insertForDialog = _messagesForDialogQuery.Value.Bind(
-                dialogID, message.MessageId, senderID, receiverID, dbMessageType, data);
+                dialogID, message.MessageId, senderID, receiverID, dbMessageType, dbMessageStatus, data);
 
             BatchStatement insertBatch = new BatchStatement()
                 .Add(insertForSender)

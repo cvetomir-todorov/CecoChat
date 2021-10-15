@@ -48,6 +48,7 @@ namespace CecoChat.Messaging.Server.Clients
             _logger.LogTrace("Message for {0} received {1}.", userClaims, clientMessage);
 
             BackplaneMessage backplaneMessage = _mapper.MapClientToBackplaneMessage(clientMessage);
+            backplaneMessage.Status = BackplaneMessageStatus.Processed;
             backplaneMessage.ClientId = userClaims.ClientID.ToUuid();
             _sendProducer.ProduceMessage(backplaneMessage);
 

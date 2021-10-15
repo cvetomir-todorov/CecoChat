@@ -6,4 +6,10 @@
         PlainText = 1,
         Ack = 2
     }
+
+    internal enum DbMessageStatus : sbyte
+    {
+        Processed = 0,
+        Delivered = 1
+    }
 }

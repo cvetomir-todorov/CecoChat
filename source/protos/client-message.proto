@@ -7,9 +7,9 @@ message ClientMessage {
   int64 sender_id = 2;
   int64 receiver_id = 3;
   ClientMessageType type = 4;
+  ClientMessageStatus status = 5;
   oneof data {
-      string text = 5;
-      AckType ackType = 6;
+      string text = 6;
   }
 }
 
@@ -20,8 +20,9 @@ enum ClientMessageType {
   ACK = 3;
 }
 
-enum AckType {
-  LOST = 0;
-  PROCESSED = 1;
-  DELIVERED = 2;
+enum ClientMessageStatus {
+  UNPROCESSED = 0;
+  LOST = 1;
+  PROCESSED = 2;
+  DELIVERED = 3;
 }
