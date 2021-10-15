@@ -11,6 +11,7 @@ namespace CecoChat.Client.Console.Interaction
             Context = new StateContext();
 
             Users = new UsersState(this);
+            FindUser = new FindUserState(this);
             Dialog = new DialogState(this);
             SendMessage = new SendMessageState(this);
             Final = new FinalState(this);
@@ -21,6 +22,7 @@ namespace CecoChat.Client.Console.Interaction
         public StateContext Context { get; }
 
         public State Users { get; }
+        public State FindUser { get; }
         public State Dialog { get; }
         public State SendMessage { get; }
         public State Final { get; }

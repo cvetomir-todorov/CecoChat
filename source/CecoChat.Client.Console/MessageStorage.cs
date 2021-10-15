@@ -90,7 +90,7 @@ namespace CecoChat.Client.Console
                     _messageMap.TryAdd(response.Message.MessageId, message);
                 }
 
-                message.AckStatus = AckStatuses.Map(response.Message.AckType);
+                message.AckStatus = AckStatuses.Map(response.Message.Status);
             }
 
             public IEnumerable<Message> GetMessages()
@@ -104,17 +104,19 @@ namespace CecoChat.Client.Console
 
         private static class AckStatuses
         {
-            public static readonly string Delivered = "Delivered";
-            public static readonly string Processed = "Processed";
-            public static readonly string Lost = "Lost";
+            private static readonly string Delivered = "Delivered";
+            private static readonly string Processed = "Processed";
+            private static readonly string Lost = "Lost";
+            private static readonly string Unprocessed = "Unprocessed"; 
 
-            public static string Map(AckType ack)
+            public static string Map(ClientMessageStatus ack)
             {
                 switch (ack)
                 {
-                    case AckType.Delivered: return Delivered;
-                    case AckType.Processed: return Processed;
-                    case AckType.Lost: return Lost;
+                    case ClientMessageStatus.Delivered: return Delivered;
+                    case ClientMessageStatus.Processed: return Processed;
+                    case ClientMessageStatus.Lost: return Lost;
+                    case ClientMessageStatus.Unprocessed: return Unprocessed;
                     default: return string.Empty;
                 }
             }
