@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using CecoChat.Contracts.History;
+﻿using CecoChat.Contracts.History;
 
 namespace CecoChat.Data.History
 {
@@ -9,13 +8,9 @@ namespace CecoChat.Data.History
 
         sbyte MapHistoryToDbMessageStatus(HistoryMessageStatus historyMessageStatus);
 
-        IDictionary<string, string> MapHistoryToDbData(HistoryMessage historyMessage);
-
         HistoryMessageType MapDbToHistoryMessageType(sbyte dbMessageType);
 
         HistoryMessageStatus MapDbToHistoryMessageStatus(sbyte dbMessageStatus);
-
-        void MapDbToHistoryData(IDictionary<string, string> data, HistoryMessage historyMessage);
     }
 
     internal sealed class MessageMapper : IMessageMapper
@@ -43,19 +38,6 @@ namespace CecoChat.Data.History
             }
         }
 
-        public IDictionary<string, string> MapHistoryToDbData(HistoryMessage historyMessage)
-        {
-            switch (historyMessage.Type)
-            {
-                case HistoryMessageType.PlainText: return new SortedDictionary<string, string>
-                {
-                    {PlainTextKey, historyMessage.Text}
-                };
-                default:
-                    throw new EnumValueNotSupportedException(historyMessage.Type);
-            }
-        }
-
         public HistoryMessageType MapDbToHistoryMessageType(sbyte dbMessageType)
         {
             DbMessageType dbMessageTypeAsEnum = (DbMessageType) dbMessageType;
@@ -78,20 +60,6 @@ namespace CecoChat.Data.History
                 case DbMessageStatus.Delivered: return HistoryMessageStatus.Delivered;
                 default:
                     throw new EnumValueNotSupportedException(dbMessageStatusAsEnum);
-            }
-        }
-
-        public void MapDbToHistoryData(IDictionary<string, string> data, HistoryMessage historyMessage)
-        {
-            switch (historyMessage.Type)
-            {
-                case HistoryMessageType.PlainText:
-                {
-                    historyMessage.Text = data[PlainTextKey];
-                    break;
-                }
-                default:
-                    throw new EnumValueNotSupportedException(historyMessage.Type);
             }
         }
     }

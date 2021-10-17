@@ -123,8 +123,7 @@ namespace CecoChat.Data.History
                 message.Type = _mapper.MapDbToHistoryMessageType(messageType);
                 sbyte status = row.GetValue<sbyte>("status");
                 message.Status = _mapper.MapDbToHistoryMessageStatus(status);
-                IDictionary<string, string> data = row.GetValue<IDictionary<string, string>>("data");
-                _mapper.MapDbToHistoryData(data, message);
+                message.Text = row.GetValue<string>("data");
                 IDictionary<long, string> reactions = row.GetValue<IDictionary<long, string>>("reactions");
                 if (reactions != null)
                 {
