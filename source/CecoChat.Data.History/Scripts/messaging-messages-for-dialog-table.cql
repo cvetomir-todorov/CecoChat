@@ -7,6 +7,7 @@
   type tinyint,
   status tinyint,
   data map<text,text>,
+  reactions map<bigint,text>,
   PRIMARY KEY (dialog_id, message_id)
 )
 WITH CLUSTERING ORDER BY (message_id DESC);
