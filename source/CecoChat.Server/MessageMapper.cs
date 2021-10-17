@@ -1,4 +1,5 @@
-﻿using CecoChat.Contracts.Backplane;
+﻿using System.Collections.Generic;
+using CecoChat.Contracts.Backplane;
 using CecoChat.Contracts.Client;
 using CecoChat.Contracts.History;
 
@@ -138,6 +139,11 @@ namespace CecoChat.Server
                     break;
                 default:
                     throw new EnumValueNotSupportedException(historyMessage.Status);
+            }
+
+            foreach (KeyValuePair<long, string> pair in historyMessage.Reactions)
+            {
+                clientMessage.Reactions.Add(pair.Key, pair.Value);
             }
 
             return clientMessage;

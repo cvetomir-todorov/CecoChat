@@ -11,6 +11,7 @@ message ClientMessage {
   oneof data {
       string text = 6;
   }
+  map<int64, string> reactions = 7;
 }
 
 enum ClientMessageType {
