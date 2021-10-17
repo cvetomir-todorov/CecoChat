@@ -43,10 +43,10 @@ namespace CecoChat.Data.History
         }
 
         private const string SelectMessagesForUser =
-            "SELECT message_id, sender_id, receiver_id, type, status, data " +
+            "SELECT message_id, sender_id, receiver_id, type, status, data, reactions " +
             "FROM messages_for_user WHERE user_id = ? AND message_id < ? ORDER BY message_id DESC LIMIT ?";
         private const string SelectMessagesForDialog =
-            "SELECT message_id, sender_id, receiver_id, type, status, data " +
+            "SELECT message_id, sender_id, receiver_id, type, status, data, reactions " +
             "FROM messages_for_dialog WHERE dialog_id = ? AND message_id < ? ORDER BY message_id DESC LIMIT ?";
 
         public void Prepare()
@@ -125,6 +125,11 @@ namespace CecoChat.Data.History
                 message.Status = _mapper.MapDbToHistoryMessageStatus(status);
                 IDictionary<string, string> data = row.GetValue<IDictionary<string, string>>("data");
                 _mapper.MapDbToHistoryData(data, message);
+                IDictionary<long, string> reactions = row.GetValue<IDictionary<long, string>>("reactions");
+                if (reactions != null)
+                {
+                    message.Reactions.Add(reactions);
+                }
 
                 messages.Add(message);
             }

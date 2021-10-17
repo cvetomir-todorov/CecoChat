@@ -12,12 +12,14 @@ namespace CecoChat.Data.History
         public IConfiguration HistoryDbConfiguration { get; init; }
 
         public bool RegisterHistory { get; init; }
+        
+        public bool RegisterReactions { get; init; }
 
         public bool RegisterNewMessage { get; init; }
 
         protected override void Load(ContainerBuilder builder)
         {
-            if (!RegisterHistory && !RegisterNewMessage)
+            if (!RegisterHistory && !RegisterReactions && !RegisterNewMessage)
             {
                 return;
             }
@@ -33,6 +35,10 @@ namespace CecoChat.Data.History
             if (RegisterHistory)
             {
                 builder.RegisterType<HistoryRepository>().As<IHistoryRepository>().SingleInstance();
+            }
+            if (RegisterReactions)
+            {
+                builder.RegisterType<ReactionRepository>().As<IReactionRepository>().SingleInstance();
             }
             if (RegisterNewMessage)
             {
