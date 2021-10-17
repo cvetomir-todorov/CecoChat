@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using Cassandra;
 using CecoChat.Contracts.History;
@@ -81,7 +80,7 @@ namespace CecoChat.Data.History
             long receiverID = message.ReceiverId;
             sbyte dbMessageType = _mapper.MapHistoryToDbMessageType(message.Type);
             sbyte dbMessageStatus = _mapper.MapHistoryToDbMessageStatus(message.Status);
-            IDictionary<string, string> data = _mapper.MapHistoryToDbData(message);
+            string data = message.Text;
             string dialogID = _dataUtility.CreateDialogID(senderID, receiverID);
 
             BoundStatement insertForSender = _messagesForUserQuery.Value.Bind(

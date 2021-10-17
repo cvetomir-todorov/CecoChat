@@ -6,7 +6,7 @@
   receiver_id bigint,
   type tinyint,
   status tinyint,
-  data map<text,text>,
+  data text,
   reactions map<bigint,text>,
   PRIMARY KEY (user_id, message_id)
 )
