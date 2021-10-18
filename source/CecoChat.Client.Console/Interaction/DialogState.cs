@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace CecoChat.Client.Console.Interaction
@@ -15,16 +16,16 @@ namespace CecoChat.Client.Console.Interaction
             {
                 await GetDialogHistory(States.Context.UserID);
             }
-            
+
             List<Message> messages = States.Storage.GetDialogMessages(States.Context.UserID);
-            messages.Sort((left, right) => left.Data.MessageId.CompareTo(right.Data.MessageId));
+            messages.Sort((left, right) => left.MessageID.CompareTo(right.MessageID));
 
             System.Console.Clear();
             foreach (Message message in messages)
             {
                 DisplayMessage(message);
             }
-            System.Console.WriteLine("Write (press 'w') | Refresh (press 'r') | Return (press 'x')");
+            System.Console.WriteLine("Write (press 'w') | React (press 'r') | Refresh (press 'f') | Return (press 'x')");
 
             ConsoleKeyInfo keyInfo = System.Console.ReadKey(intercept: true);
             if (keyInfo.KeyChar == 'w' || keyInfo.KeyChar == 'W')
@@ -33,6 +34,11 @@ namespace CecoChat.Client.Console.Interaction
                 return States.SendMessage;
             }
             else if (keyInfo.KeyChar == 'r' || keyInfo.KeyChar == 'R')
+            {
+                States.Context.ReloadData = false;
+                return States.React;
+            }
+            else if (keyInfo.KeyChar == 'f' || keyInfo.KeyChar == 'F')
             {
                 States.Context.ReloadData = true;
                 return States.Dialog;
@@ -51,11 +57,23 @@ namespace CecoChat.Client.Console.Interaction
 
         private void DisplayMessage(Message message)
         {
-            string sender = message.Data.SenderId == States.Client.UserID ? "You" : message.Data.SenderId.ToString();
-            string ackStatus = string.IsNullOrWhiteSpace(message.AckStatus) ? string.Empty : $" {message.AckStatus}";
+            string sender = message.SenderID == States.Client.UserID ? "You" : message.SenderID.ToString();
+            string reactions = string.Empty;
+            if (message.Reactions.Count > 0)
+            {
+                StringBuilder reactionsBuilder = new();
+                foreach (KeyValuePair<long,string> pair in message.Reactions)
+                {
+                    reactionsBuilder.AppendFormat(" {0}={1}", pair.Key, pair.Value);
+                }
 
-            System.Console.WriteLine("[{0:F} #{3}{4}] {1}: {2}",
-                message.Data.MessageId.ToTimestamp(), sender, message.Data.Text, message.SequenceNumber, ackStatus);
+                reactions = reactionsBuilder.ToString();
+            }
+
+            System.Console.WriteLine("[{0:F}] {1}: {2} (#{3}|{4}|ID: {5} |{6} reactions:{7})",
+                message.MessageID.ToTimestamp(), sender, message.Data,
+                message.SequenceNumber, message.Status, message.MessageID,
+                message.Reactions.Count, reactions);
         }
     }
 }

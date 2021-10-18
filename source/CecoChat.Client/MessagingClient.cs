@@ -7,7 +7,8 @@ using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using CecoChat.Contracts.Client;
+using CecoChat.Contracts.History;
+using CecoChat.Contracts.Messaging;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Grpc.Net.Client;
@@ -21,9 +22,11 @@ namespace CecoChat.Client
         private Metadata _grpcMetadata;
         private GrpcChannel _messagingChannel;
         private GrpcChannel _historyChannel;
+        private GrpcChannel _reactionChannel;
         private Listen.ListenClient _listenClient;
         private Send.SendClient _sendClient;
         private History.HistoryClient _historyClient;
+        private Reaction.ReactionClient _reactionClient;
 
         public MessagingClient()
         {
@@ -39,6 +42,9 @@ namespace CecoChat.Client
 
             _historyChannel?.ShutdownAsync().Wait();
             _historyChannel?.Dispose();
+
+            _reactionChannel?.ShutdownAsync().Wait();
+            _reactionChannel?.Dispose();
         }
 
         public long UserID => _userID;
@@ -58,10 +64,13 @@ namespace CecoChat.Client
             _messagingChannel = GrpcChannel.ForAddress(connectResponse.MessagingServerAddress);
             _historyChannel?.Dispose();
             _historyChannel = GrpcChannel.ForAddress(connectResponse.HistoryServerAddress);
+            _reactionChannel?.Dispose();
+            _reactionChannel = GrpcChannel.ForAddress(connectResponse.HistoryServerAddress);
 
             _listenClient = new Listen.ListenClient(_messagingChannel);
             _sendClient = new Send.SendClient(_messagingChannel);
             _historyClient = new History.HistoryClient(_historyChannel);
+            _reactionClient = new Reaction.ReactionClient(_historyChannel);
         }
 
         private async Task<CreateSessionResponse> CreateSession(CreateSessionRequest request, string profileServer)
@@ -129,13 +138,13 @@ namespace CecoChat.Client
                 while (!ct.IsCancellationRequested && await serverStream.ResponseStream.MoveNext())
                 {
                     ListenResponse response = serverStream.ResponseStream.Current;
-                    if (response.Message.Type == ClientMessageType.Disconnect)
+                    if (response.Type == MessageType.Disconnect)
                     {
                         Disconnected?.Invoke(this, EventArgs.Empty);
                     }
-                    else if (response.Message.Type == ClientMessageType.Ack)
+                    else if (response.Type == MessageType.Delivery)
                     {
-                        MessageAcknowledged?.Invoke(this, response);
+                        MessageDelivered?.Invoke(this, response);
                     }
                     else
                     {
@@ -151,13 +160,13 @@ namespace CecoChat.Client
 
         public event EventHandler<ListenResponse> MessageReceived;
 
-        public event EventHandler<ListenResponse> MessageAcknowledged;
+        public event EventHandler<ListenResponse> MessageDelivered;
 
         public event EventHandler Disconnected;
 
         public event EventHandler<Exception> ExceptionOccurred;
 
-        public async Task<IList<ClientMessage>> GetUserHistory(DateTime olderThan)
+        public async Task<IList<HistoryItem>> GetUserHistory(DateTime olderThan)
         {
             GetUserHistoryRequest request = new()
             {
@@ -167,36 +176,52 @@ namespace CecoChat.Client
             return response.Messages;
         }
 
-        public async Task<IList<ClientMessage>> GetDialogHistory(long otherUserID, DateTime olderThan)
+        public async Task<IList<HistoryItem>> GetChatHistory(long otherUserID, DateTime olderThan)
         {
-            GetDialogHistoryRequest request = new()
+            GetChatHistoryRequest request = new()
             {
                 OtherUserId = otherUserID,
                 OlderThan = Timestamp.FromDateTime(olderThan)
             };
-            GetDialogHistoryResponse response = await _historyClient.GetDialogHistoryAsync(request, _grpcMetadata);
+            GetChatHistoryResponse response = await _historyClient.GetChatHistoryAsync(request, _grpcMetadata);
             return response.Messages;
         }
 
-        public async Task<ClientMessage> SendPlainTextMessage(long receiverID, string text)
+        public async Task<long> SendPlainTextMessage(long receiverID, string text)
         {
-            ClientMessage message = new()
+            SendMessageRequest request = new()
             {
                 SenderId = _userID,
                 ReceiverId = receiverID,
-                Type = ClientMessageType.PlainText,
-                Status = ClientMessageStatus.Unprocessed,
-                Text = text
+                DataType = Contracts.Messaging.DataType.PlainText,
+                Data = text
             };
 
-            SendMessageRequest request = new()
-            {
-                Message = message
-            };
             SendMessageResponse response = await _sendClient.SendMessageAsync(request, _grpcMetadata);
+            return response.MessageId;
+        }
 
-            message.MessageId = response.MessageId;
-            return message;
+        public async Task React(long messageID, long senderID, long receiverID)
+        {
+            ReactRequest request = new()
+            {
+                MessageId = messageID,
+                SenderId = senderID,
+                ReceiverId = receiverID,
+                Reaction = "\\u1F44D" // thumbs-up
+            };
+            await _reactionClient.ReactAsync(request, _grpcMetadata);
+        }
+
+        public async Task UnReact(long messageID, long senderID, long receiverID)
+        {
+            UnReactRequest request = new()
+            {
+                MessageId = messageID,
+                SenderId = senderID,
+                ReceiverId = receiverID
+            };
+            await _reactionClient.UnReactAsync(request, _grpcMetadata);
         }
     }
 }

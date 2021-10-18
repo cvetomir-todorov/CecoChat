@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using CecoChat.Contracts.Client;
+using CecoChat.Contracts.History;
 
 namespace CecoChat.Client.Console.Interaction
 {
@@ -16,22 +16,66 @@ namespace CecoChat.Client.Console.Interaction
 
         protected async Task GetUserHistory()
         {
-            IList<ClientMessage> messages = await States.Client.GetUserHistory(DateTime.UtcNow);
-            foreach (ClientMessage message in messages)
+            IList<HistoryItem> history = await States.Client.GetUserHistory(DateTime.UtcNow);
+            foreach (HistoryItem item in history)
             {
-                States.Storage.AddMessage(new ListenResponse {Message = message});
+                Message message = CreateMessage(item);
+                States.Storage.AddMessage(message);
             }
         }
 
         protected async Task GetDialogHistory(long userID)
         {
-            IList<ClientMessage> messages = await States.Client.GetDialogHistory(userID, DateTime.UtcNow);
-            foreach (ClientMessage message in messages)
+            IList<HistoryItem> history = await States.Client.GetChatHistory(userID, DateTime.UtcNow);
+            foreach (HistoryItem item in history)
             {
-                States.Storage.AddMessage(new ListenResponse {Message = message});
+                Message message = CreateMessage(item);
+                States.Storage.AddMessage(message);
             }
         }
 
         public abstract Task<State> Execute();
+
+        private static Message CreateMessage(HistoryItem item)
+        {
+            Message message = new()
+            {
+                MessageID = item.MessageId,
+                SenderID = item.SenderId,
+                ReceiverID = item.ReceiverId,
+            };
+
+            switch (item.DataType)
+            {
+                case Contracts.History.DataType.PlainText:
+                    message.DataType = DataType.PlainText;
+                    message.Data = item.Data;
+                    break;
+                default:
+                    throw new EnumValueNotSupportedException(item.DataType);
+            }
+
+            switch (item.Status)
+            {
+                case Contracts.History.DeliveryStatus.Processed:
+                    message.Status = DeliveryStatus.Processed;
+                    break;
+                case Contracts.History.DeliveryStatus.Delivered:
+                    message.Status = DeliveryStatus.Delivered;
+                    break;
+                case Contracts.History.DeliveryStatus.Seen:
+                    message.Status = DeliveryStatus.Seen;
+                    break;
+                default:
+                    throw new EnumValueNotSupportedException(item.Status);
+            }
+
+            foreach (KeyValuePair<long, string> pair in item.Reactions)
+            {
+                message.Reactions.Add(pair.Key, pair.Value);
+            }
+
+            return message;
+        }
     }
 }

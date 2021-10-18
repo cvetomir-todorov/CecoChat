@@ -10,7 +10,7 @@ namespace CecoChat.Client.Console.Interaction
         public override Task<State> Execute()
         {
             System.Console.Clear();
-            System.Console.Write("Enter user ID (0 to exit): ");
+            System.Console.Write("Enter user ID ('0' to exit): ");
 
             string userIDString = System.Console.ReadLine();
             if (string.IsNullOrWhiteSpace(userIDString) ||
