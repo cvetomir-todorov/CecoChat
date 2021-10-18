@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using CecoChat.Contracts;
 using CecoChat.Contracts.Backplane;
-using CecoChat.Contracts.Client;
+using CecoChat.Contracts.Messaging;
 using CecoChat.Kafka;
 using CecoChat.Messaging.Server.Clients;
 using CecoChat.Server.Backplane;
@@ -70,25 +69,23 @@ namespace CecoChat.Messaging.Server.Backplane
         private void DeliveryHandler(bool isDelivered, DeliveryReport<Null, BackplaneMessage> report, Activity activity)
         {
             BackplaneMessage backplaneMessage = report.Message.Value;
-            IEnumerable<IStreamer<ListenResponse>> clients = _clientContainer.EnumerateClients(backplaneMessage.SenderId);
-            Guid clientID = backplaneMessage.ClientId.ToGuid();
-            IStreamer<ListenResponse> client = clients.FirstOrDefault(c => c.ClientID == clientID);
 
-            if (client != null)
+            DeliveryStatus status = isDelivered ? DeliveryStatus.Processed : DeliveryStatus.Lost;
+            ListenResponse deliveryResponse = new()
             {
-                ClientMessageStatus status = isDelivered ? ClientMessageStatus.Processed : ClientMessageStatus.Lost;
-                ClientMessage ackMessage = new()
-                {
-                    Type = ClientMessageType.Ack,
-                    Status = status,
-                    MessageId = backplaneMessage.MessageId,
-                    SenderId = backplaneMessage.SenderId,
-                    ReceiverId = backplaneMessage.ReceiverId
-                };
+                MessageId = backplaneMessage.MessageId,
+                SenderId = backplaneMessage.SenderId,
+                ReceiverId = backplaneMessage.ReceiverId,
+                Type = MessageType.Delivery,
+                Status = status
+            };
+            Guid clientID = backplaneMessage.ClientId.ToGuid();
+            IEnumerable<IStreamer<ListenResponse>> clients = _clientContainer.EnumerateClients(backplaneMessage.SenderId);
 
-                ListenResponse response = new() {Message = ackMessage};
-                client.EnqueueMessage(response, parentActivity: activity);
-                _logger.LogTrace("Sent ack to {0} for message {1}.", clientID, ackMessage);
+            foreach (IStreamer<ListenResponse> client in clients)
+            {
+                client.EnqueueMessage(deliveryResponse, parentActivity: activity);
+                _logger.LogTrace("Sent delivery response to client {0} for message {1}.", clientID, deliveryResponse);
             }
         }
     }

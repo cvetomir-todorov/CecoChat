@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Threading;
 using CecoChat.Contracts;
 using CecoChat.Contracts.Backplane;
-using CecoChat.Contracts.Client;
+using CecoChat.Contracts.Messaging;
 using CecoChat.Kafka;
 using CecoChat.Messaging.Server.Clients;
 using CecoChat.Server;
@@ -31,7 +31,7 @@ namespace CecoChat.Messaging.Server.Backplane
         private readonly ITopicPartitionFlyweight _partitionFlyweight;
         private readonly IKafkaConsumer<Null, BackplaneMessage> _consumer;
         private readonly IClientContainer _clientContainer;
-        private readonly IMessageMapper _mapper;
+        private readonly IContractDataMapper _mapper;
         private bool _isInitialized;
         private readonly object _initializationLock;
 
@@ -41,7 +41,7 @@ namespace CecoChat.Messaging.Server.Backplane
             ITopicPartitionFlyweight partitionFlyweight,
             IFactory<IKafkaConsumer<Null, BackplaneMessage>> consumerFactory,
             IClientContainer clientContainer,
-            IMessageMapper mapper)
+            IContractDataMapper mapper)
         {
             _logger = logger;
             _backplaneOptions = backplaneOptions.Value;
@@ -94,9 +94,7 @@ namespace CecoChat.Messaging.Server.Backplane
             Guid senderClientID = backplaneMessage.ClientId.ToGuid();
             IEnumerable<IStreamer<ListenResponse>> receiverClients = _clientContainer.EnumerateClients(backplaneMessage.ReceiverId);
 
-            ClientMessage clientMessage = _mapper.MapBackplaneToClientMessage(backplaneMessage);
-            ListenResponse response = new() {Message = clientMessage};
-
+            ListenResponse response = _mapper.CreateListenResponse(backplaneMessage);
             EnqueueMessage(senderClientID, response, receiverClients, out int successCount, out int allCount);
             LogResults(backplaneMessage, successCount, allCount);
         }

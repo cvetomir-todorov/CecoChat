@@ -1,0 +1,21 @@
+syntax = "proto3";
+option csharp_namespace = "CecoChat.Contracts.Messaging";
+package CecoChat.Contracts.Messaging;
+import "data-type.proto";
+
+service Send {
+  rpc SendMessage(SendMessageRequest) returns (SendMessageResponse);
+}
+
+message SendMessageRequest {
+  int64 sender_id = 1;
+  int64 receiver_id = 2;
+  DataType data_type = 3;
+  oneof request_data {
+    string data = 4;
+  }
+}
+
+message SendMessageResponse {
+  int64 message_id = 1;
+}

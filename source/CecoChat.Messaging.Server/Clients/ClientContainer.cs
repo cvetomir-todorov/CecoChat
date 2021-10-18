@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using CecoChat.Contracts.Client;
+using CecoChat.Contracts.Messaging;
 
 namespace CecoChat.Messaging.Server.Clients
 {

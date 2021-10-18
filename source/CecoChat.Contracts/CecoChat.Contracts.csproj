@@ -20,23 +20,32 @@
     <Protobuf Include="..\protos\backplane-message.proto">
       <Link>Backplane\backplane-message.proto</Link>
     </Protobuf>
-    <Protobuf Include="..\protos\client-message.proto">
-      <Link>Client\client-message.proto</Link>
-    </Protobuf>
-    <Protobuf Include="..\protos\history-service.proto" GrpcServices="All">
-      <Link>Client\history-service.proto</Link>
-    </Protobuf>
-    <Protobuf Include="..\protos\listen-service.proto" GrpcServices="All">
-      <Link>Client\listen-service.proto</Link>
-    </Protobuf>
-    <Protobuf Include="..\protos\send-service.proto" GrpcServices="All">
-      <Link>Client\send-service.proto</Link>
-    </Protobuf>
     <Protobuf Include="..\protos\history-message.proto">
       <Link>History\history-message.proto</Link>
     </Protobuf>
+    <Protobuf Include="..\protos\history\history-service.proto">
+      <Link>History\history-service.proto</Link>
+    </Protobuf>
     <Protobuf Include="..\protos\idgen-service.proto" GrpcServices="All">
       <Link>IDGen\idgen-service.proto</Link>
+    </Protobuf>
+    <Protobuf Include="..\protos\messaging\message-type.proto">
+      <Link>Messaging\message-type.proto</Link>
+    </Protobuf>
+    <Protobuf Include="..\protos\messaging\data-type.proto">
+      <Link>Messaging\data-type.proto</Link>
+    </Protobuf>
+    <Protobuf Include="..\protos\messaging\delivery-status.proto">
+      <Link>Messaging\delivery-status.proto</Link>
+    </Protobuf>
+    <Protobuf Include="..\protos\messaging\send-service.proto" GrpcServices="All">
+      <Link>Messaging\send-service.proto</Link>
+    </Protobuf>
+    <Protobuf Include="..\protos\messaging\reaction-service.proto" GrpcServices="All">
+      <Link>Messaging\reaction-service.proto</Link>
+    </Protobuf>
+    <Protobuf Include="..\protos\messaging\listen-service.proto" GrpcServices="All">
+      <Link>Messaging\listen-service.proto</Link>
     </Protobuf>
   </ItemGroup>
 

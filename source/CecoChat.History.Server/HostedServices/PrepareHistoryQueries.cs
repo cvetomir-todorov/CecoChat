@@ -11,13 +11,16 @@ namespace CecoChat.History.Server.HostedServices
     {
         private readonly ILogger _logger;
         private readonly IHistoryRepository _historyRepository;
+        private readonly IReactionRepository _reactionRepository;
 
         public PrepareHistoryQueries(
             ILogger<PrepareHistoryQueries> logger,
-            IHistoryRepository historyRepository)
+            IHistoryRepository historyRepository,
+            IReactionRepository reactionRepository)
         {
             _logger = logger;
             _historyRepository = historyRepository;
+            _reactionRepository = reactionRepository;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -28,6 +31,7 @@ namespace CecoChat.History.Server.HostedServices
                 {
                     _logger.LogInformation("Start preparing queries...");
                     _historyRepository.Prepare();
+                    _reactionRepository.Prepare();
                     _logger.LogInformation("Completed preparing queries.");
                 }
                 catch (Exception exception)

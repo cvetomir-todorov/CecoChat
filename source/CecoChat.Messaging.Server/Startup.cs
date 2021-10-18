@@ -119,6 +119,7 @@ namespace CecoChat.Messaging.Server
             // shared
             builder.RegisterType<MonotonicClock>().As<IClock>().SingleInstance();
             builder.RegisterType<MessageMapper>().As<IMessageMapper>().SingleInstance();
+            builder.RegisterType<ContractDataMapper>().As<IContractDataMapper>().SingleInstance();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

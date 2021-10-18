@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using CecoChat.Contracts.Client;
+using CecoChat.Contracts.Messaging;
 using CecoChat.Server.Identity;
 using Grpc.Core;
 using Microsoft.AspNetCore.Authorization;
@@ -39,7 +38,7 @@ namespace CecoChat.Messaging.Server.Clients
             _logger.LogInformation("{0} from {1} connected.", userClaims, address);
 
             IGrpcListenStreamer streamer = _streamerFactory.Create();
-            streamer.Initialize(userClaims.ClientID, responseStream, StaticStreamingStrategy.Instance);
+            streamer.Initialize(userClaims.ClientID, responseStream);
             await ProcessMessages(streamer, userClaims, address, context.CancellationToken);
         }
 
@@ -79,29 +78,6 @@ namespace CecoChat.Messaging.Server.Clients
                     _logger.LogInformation("{0} from {1} disconnected.", userClaims, address);
                 }
                 streamer.Dispose();
-            }
-        }
-
-        private sealed class StaticStreamingStrategy : IStreamingStrategy
-        {
-            public static readonly StaticStreamingStrategy Instance = new();
-
-            private static readonly HashSet<ClientMessageType> _blacklistedTypes = new()
-            {
-                ClientMessageType.Disconnect, ClientMessageType.Unknown
-            };
-
-            private StaticStreamingStrategy()
-            {}
-
-            public bool IsFinal(ListenResponse response)
-            {
-                return response.Message.Type == ClientMessageType.Disconnect;
-            }
-
-            public bool AffectsSequencing(ListenResponse response)
-            {
-                return !_blacklistedTypes.Contains(response.Message.Type);
             }
         }
     }

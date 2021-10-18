@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using CecoChat.Contracts;
 using CecoChat.Contracts.Backplane;
-using CecoChat.Contracts.Client;
+using CecoChat.Contracts.Messaging;
 using CecoChat.Data.IDGen;
 using CecoChat.Messaging.Server.Backplane;
 using CecoChat.Server;
@@ -21,14 +20,14 @@ namespace CecoChat.Messaging.Server.Clients
         private readonly IIDGenClient _idGenClient;
         private readonly ISendProducer _sendProducer;
         private readonly IClientContainer _clientContainer;
-        private readonly IMessageMapper _mapper;
+        private readonly IContractDataMapper _mapper;
 
         public GrpcSendService(
             ILogger<GrpcSendService> logger,
             IIDGenClient idGenClient,
             ISendProducer sendProducer,
             IClientContainer clientContainer,
-            IMessageMapper mapper)
+            IContractDataMapper mapper)
         {
             _logger = logger;
             _idGenClient = idGenClient;
@@ -43,19 +42,15 @@ namespace CecoChat.Messaging.Server.Clients
             UserClaims userClaims = GetUserClaims(context);
             long messageID = await GetMessageID(userClaims, context);
 
-            ClientMessage clientMessage = request.Message;
-            clientMessage.MessageId = messageID;
-            _logger.LogTrace("Message for {0} received {1}.", userClaims, clientMessage);
+            _logger.LogTrace("User {0} sent message with generated ID {1}: {2}.", userClaims, messageID, request);
 
-            BackplaneMessage backplaneMessage = _mapper.MapClientToBackplaneMessage(clientMessage);
-            backplaneMessage.Status = BackplaneMessageStatus.Processed;
-            backplaneMessage.ClientId = userClaims.ClientID.ToUuid();
+            BackplaneMessage backplaneMessage = _mapper.CreateBackplaneMessage(request, userClaims.ClientID, messageID);
             _sendProducer.ProduceMessage(backplaneMessage);
 
-            EnqueueMessagesForSenders(clientMessage, userClaims.ClientID, out int successCount, out int allCount);
-            LogResults(clientMessage, successCount, allCount);
+            (int successCount, int allCount) = EnqueueMessagesForSenders(request, messageID, userClaims.ClientID);
+            LogResults(request, messageID, successCount, allCount);
 
-            SendMessageResponse response = new() {MessageId = clientMessage.MessageId};
+            SendMessageResponse response = new() {MessageId = messageID};
             return response;
         }
 
@@ -84,18 +79,18 @@ namespace CecoChat.Messaging.Server.Clients
             return result.ID;
         }
 
-        private void EnqueueMessagesForSenders(ClientMessage clientMessage, Guid senderID, out int successCount, out int allCount)
+        private (int successCount, int allCount) EnqueueMessagesForSenders(SendMessageRequest request, long messageID, Guid senderClientID)
         {
             // do not call clients.Count since it is expensive and uses locks
-            successCount = 0;
-            allCount = 0;
+            int successCount = 0;
+            int allCount = 0;
 
-            IEnumerable<IStreamer<ListenResponse>> senderClients = _clientContainer.EnumerateClients(clientMessage.SenderId);
-            ListenResponse response = new() {Message = clientMessage};
+            IEnumerable<IStreamer<ListenResponse>> senderClients = _clientContainer.EnumerateClients(request.SenderId);
+            ListenResponse response = _mapper.CreateListenResponse(request, messageID);
 
             foreach (IStreamer<ListenResponse> senderClient in senderClients)
             {
-                if (senderClient.ClientID != senderID)
+                if (senderClient.ClientID != senderClientID)
                 {
                     if (senderClient.EnqueueMessage(response, parentActivity: Activity.Current))
                     {
@@ -105,19 +100,21 @@ namespace CecoChat.Messaging.Server.Clients
                     allCount++;
                 }
             }
+
+            return (successCount, allCount);
         }
 
-        private void LogResults(ClientMessage clientMessage, int successCount, int allCount)
+        private void LogResults(SendMessageRequest request, long messageID, int successCount, int allCount)
         {
             if (successCount < allCount)
             {
                 _logger.LogWarning("Connected senders with ID {0} ({1} out of {2}) were queued message {3}.",
-                    clientMessage.SenderId, successCount, allCount, clientMessage.MessageId);
+                    request.SenderId, successCount, allCount, messageID);
             }
             else if (allCount > 0)
             {
                 _logger.LogTrace("Connected senders with ID {0} (all {1}) were queued message {2}.",
-                    clientMessage.SenderId, successCount, clientMessage.MessageId);
+                    request.SenderId, successCount, messageID);
             }
         }
     }
