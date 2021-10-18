@@ -10,6 +10,10 @@ namespace CecoChat.Data.History.Instrumentation
 
         Activity StartGetHistory(string name, ISession session, long userID);
 
+        Activity StartAddReaction(ISession session, long reactorID);
+
+        Activity StartRemoveReaction(ISession session, long reactorID);
+
         void Stop(Activity activity, bool operationSuccess);
     }
 
@@ -25,15 +29,14 @@ namespace CecoChat.Data.History.Instrumentation
         public Activity StartNewDialogMessage(ISession session, long messageID)
         {
             Activity activity = _activityUtility.Start(
-                HistoryInstrumentation.Operations.HistoryNewDialogMessage,
+                HistoryInstrumentation.Operations.NewDialogMessage,
                 HistoryInstrumentation.ActivitySource,
                 ActivityKind.Client,
                 Activity.Current?.Context);
 
             if (activity.IsAllDataRequested)
             {
-                Enrich(session, activity);
-                activity.SetTag(HistoryInstrumentation.Keys.DbOperation, HistoryInstrumentation.Values.DbOperationBatchWrite);
+                Enrich(HistoryInstrumentation.Values.DbOperationBatchWrite, session, activity);
                 activity.SetTag("message.id", messageID);
             }
 
@@ -50,9 +53,42 @@ namespace CecoChat.Data.History.Instrumentation
 
             if (activity.IsAllDataRequested)
             {
-                Enrich(session, activity);
-                activity.SetTag(HistoryInstrumentation.Keys.DbOperation, HistoryInstrumentation.Values.DbOperationOneRead);
+                Enrich(HistoryInstrumentation.Values.DbOperationOneRead, session, activity);
                 activity.SetTag("user.id", userID);
+            }
+
+            return activity;
+        }
+
+        public Activity StartAddReaction(ISession session, long reactorID)
+        {
+            Activity activity = _activityUtility.Start(
+                HistoryInstrumentation.Operations.AddReaction,
+                HistoryInstrumentation.ActivitySource,
+                ActivityKind.Client,
+                Activity.Current?.Context);
+
+            if (activity.IsAllDataRequested)
+            {
+                Enrich(HistoryInstrumentation.Values.DbOperationOneWrite, session, activity);
+                activity.SetTag("reaction.reactor_id", reactorID);
+            }
+
+            return activity;
+        }
+
+        public Activity StartRemoveReaction(ISession session, long reactorID)
+        {
+            Activity activity = _activityUtility.Start(
+                HistoryInstrumentation.Operations.RemoveReaction,
+                HistoryInstrumentation.ActivitySource,
+                ActivityKind.Client,
+                Activity.Current?.Context);
+
+            if (activity.IsAllDataRequested)
+            {
+                Enrich(HistoryInstrumentation.Values.DbOperationOneWrite, session, activity);
+                activity.SetTag("reaction.reactor_id", reactorID);
             }
 
             return activity;
@@ -63,8 +99,9 @@ namespace CecoChat.Data.History.Instrumentation
             _activityUtility.Stop(activity, operationSuccess);
         }
 
-        private static void Enrich(ISession session, Activity activity)
+        private static void Enrich(string operation, ISession session, Activity activity)
         {
+            activity.SetTag(HistoryInstrumentation.Keys.DbOperation, operation);
             activity.SetTag(HistoryInstrumentation.Keys.DbSystem, HistoryInstrumentation.Values.DbSystemCassandra);
             activity.SetTag(HistoryInstrumentation.Keys.DbName, session.Keyspace);
             activity.SetTag(HistoryInstrumentation.Keys.DbSessionName, session.SessionName);
