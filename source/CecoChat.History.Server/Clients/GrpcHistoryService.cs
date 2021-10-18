@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using CecoChat.Contracts.Client;
 using CecoChat.Contracts.History;
 using CecoChat.Data.Config.History;
 using CecoChat.Data.History;
@@ -13,23 +12,23 @@ using Microsoft.Extensions.Logging;
 
 namespace CecoChat.History.Server.Clients
 {
-    public sealed class GrpcHistoryService : Contracts.Client.History.HistoryBase
+    public sealed class GrpcHistoryService : Contracts.History.History.HistoryBase
     {
         private readonly ILogger _logger;
         private readonly IHistoryConfig _historyConfig;
         private readonly IHistoryRepository _historyRepository;
-        private readonly IMessageMapper _messageMapper;
+        private readonly IContractDataMapper _mapper;
 
         public GrpcHistoryService(
             ILogger<GrpcHistoryService> logger,
             IHistoryConfig historyConfig,
             IHistoryRepository historyRepository,
-            IMessageMapper messageMapper)
+            IContractDataMapper mapper)
         {
             _logger = logger;
             _historyConfig = historyConfig;
             _historyRepository = historyRepository;
-            _messageMapper = messageMapper;
+            _mapper = mapper;
         }
 
         [Authorize(Roles = "user")]
@@ -48,8 +47,8 @@ namespace CecoChat.History.Server.Clients
             GetUserHistoryResponse response = new();
             foreach (HistoryMessage historyMessage in historyMessages)
             {
-                ClientMessage clientMessage = _messageMapper.MapHistoryToClientMessage(historyMessage);
-                response.Messages.Add(clientMessage);
+                HistoryItem historyItem = _mapper.CreateHistoryItem(historyMessage);
+                response.Messages.Add(historyItem);
             }
 
             _logger.LogTrace("Responding with {0} messages for user {1} history.", response.Messages.Count, userID);
@@ -57,12 +56,12 @@ namespace CecoChat.History.Server.Clients
         }
 
         [Authorize(Roles = "user")]
-        public override async Task<GetDialogHistoryResponse> GetDialogHistory(GetDialogHistoryRequest request, ServerCallContext context)
+        public override async Task<GetChatHistoryResponse> GetChatHistory(GetChatHistoryRequest request, ServerCallContext context)
         {
             if (!context.GetHttpContext().User.TryGetUserID(out long userID))
             {
                 _logger.LogError("Client from {0} was authorized but has no parseable access token.", context.Peer);
-                return new GetDialogHistoryResponse();
+                return new GetChatHistoryResponse();
             }
             Activity.Current?.SetTag("user.id", userID);
 
@@ -71,14 +70,14 @@ namespace CecoChat.History.Server.Clients
             IReadOnlyCollection<HistoryMessage> historyMessages = await _historyRepository
                 .GetDialogHistory(userID, otherUserID, request.OlderThan.ToDateTime(), _historyConfig.DialogMessageCount);
 
-            GetDialogHistoryResponse response = new();
+            GetChatHistoryResponse response = new();
             foreach (HistoryMessage historyMessage in historyMessages)
             {
-                ClientMessage clientMessage = _messageMapper.MapHistoryToClientMessage(historyMessage);
-                response.Messages.Add(clientMessage);
+                HistoryItem historyItem = _mapper.CreateHistoryItem(historyMessage);
+                response.Messages.Add(historyItem);
             }
 
-            _logger.LogTrace("Responding with {0} messages for dialog between [{1} <-> {2}].", response.Messages.Count, userID, otherUserID);
+            _logger.LogTrace("Responding with {0} messages for chat between [{1} <-> {2}].", response.Messages.Count, userID, otherUserID);
             return response;
         }
     }

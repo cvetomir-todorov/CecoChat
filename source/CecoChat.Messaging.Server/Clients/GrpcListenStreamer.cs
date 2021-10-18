@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using CecoChat.Contracts.Client;
+using CecoChat.Contracts.Messaging;
 using CecoChat.Grpc.Instrumentation;
 using Grpc.Core;
 using Microsoft.Extensions.Logging;
@@ -13,14 +13,7 @@ namespace CecoChat.Messaging.Server.Clients
 {
     public interface IGrpcListenStreamer : IStreamer<ListenResponse>
     {
-        void Initialize(Guid clientID, IServerStreamWriter<ListenResponse> streamWriter, IStreamingStrategy streamingStrategy);
-    }
-
-    public interface IStreamingStrategy
-    {
-        bool IsFinal(ListenResponse response);
-
-        bool AffectsSequencing(ListenResponse response);
+        void Initialize(Guid clientID, IServerStreamWriter<ListenResponse> streamWriter);
     }
 
     /// <summary>
@@ -34,7 +27,6 @@ namespace CecoChat.Messaging.Server.Clients
         private readonly SemaphoreSlim _signalProcessing;
 
         private IServerStreamWriter<ListenResponse> _streamWriter;
-        private IStreamingStrategy _streamingStrategy;
         private Guid _clientID;
         private int _sequenceNumber;
 
@@ -51,7 +43,6 @@ namespace CecoChat.Messaging.Server.Clients
                 collection: new ConcurrentQueue<MessageContext>(),
                 boundedCapacity: clientOptions.SendMessagesHighWatermark);
             _signalProcessing = new SemaphoreSlim(initialCount: 0, maxCount: 1);
-            _streamingStrategy = DefaultStreamingStrategy.Instance;
         }
 
         public void Dispose()
@@ -60,21 +51,17 @@ namespace CecoChat.Messaging.Server.Clients
             _messageQueue.Dispose();
         }
 
-        public void Initialize(Guid clientID, IServerStreamWriter<ListenResponse> streamWriter, IStreamingStrategy streamingStrategy)
+        public void Initialize(Guid clientID, IServerStreamWriter<ListenResponse> streamWriter)
         {
             _clientID = clientID;
             _streamWriter = streamWriter;
-            _streamingStrategy = streamingStrategy;
         }
 
         public Guid ClientID => _clientID;
 
         public bool EnqueueMessage(ListenResponse message, Activity parentActivity = null)
         {
-            if (_streamingStrategy.AffectsSequencing(message))
-            {
-                _sequenceNumber++;
-            }
+            _sequenceNumber++;
 
             bool isAdded = _messageQueue.TryAdd(new MessageContext
             {
@@ -124,7 +111,7 @@ namespace CecoChat.Messaging.Server.Clients
 
                 try
                 {
-                    processedFinalMessage = _streamingStrategy.IsFinal(messageContext.Message);
+                    processedFinalMessage = messageContext.Message.Type == MessageType.Disconnect;
                     messageContext.Message.SequenceNumber = _sequenceNumber;
                     await _streamWriter.WriteAsync(messageContext.Message);
                     success = true;
@@ -155,7 +142,7 @@ namespace CecoChat.Messaging.Server.Clients
         {
             const string service = nameof(GrpcListenService);
             const string method = nameof(GrpcListenService.Listen);
-            string name = $"{service}.{method}/StreamMessage.{message.Message.Type}";
+            string name = $"{service}.{method}/StreamMessage.{message.Type}";
 
             return _grpcActivityUtility.StartServiceMethod(name, service, method, parentActivity.Context);
         }
@@ -165,24 +152,6 @@ namespace CecoChat.Messaging.Server.Clients
             public ListenResponse Message { get; init; }
 
             public Activity ParentActivity { get; init; }
-        }
-
-        private sealed class DefaultStreamingStrategy : IStreamingStrategy
-        {
-            public static readonly DefaultStreamingStrategy Instance = new();
-
-            private DefaultStreamingStrategy()
-            {}
-
-            public bool IsFinal(ListenResponse response)
-            {
-                return false;
-            }
-
-            public bool AffectsSequencing(ListenResponse response)
-            {
-                return true;
-            }
         }
     }
 }

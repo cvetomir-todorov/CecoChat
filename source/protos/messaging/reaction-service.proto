@@ -1,0 +1,27 @@
+syntax = "proto3";
+option csharp_namespace = "CecoChat.Contracts.Messaging";
+package CecoChat.Contracts.Messaging;
+
+service Reaction {
+  rpc React(ReactRequest) returns (ReactResponse);
+  rpc UnReact(UnReactRequest) returns (UnReactResponse);
+}
+
+message ReactRequest {
+  int64 message_id = 1;
+  int64 sender_id = 2;
+  int64 receiver_id = 3;
+  string reaction = 4;
+}
+
+message ReactResponse{
+}
+
+message UnReactRequest {
+  int64 message_id = 1;
+  int64 sender_id = 2;
+  int64 receiver_id = 3;
+}
+
+message UnReactResponse {
+}

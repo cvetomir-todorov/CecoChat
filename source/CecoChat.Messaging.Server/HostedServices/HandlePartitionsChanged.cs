@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using CecoChat.Contracts.Client;
+using CecoChat.Contracts.Messaging;
 using CecoChat.Data.Config.Partitioning;
 using CecoChat.Events;
 using CecoChat.Kafka;
@@ -59,8 +59,7 @@ namespace CecoChat.Messaging.Server.HostedServices
 
         private void DisconnectClients(int partitionCount, PartitionRange partitions)
         {
-            ClientMessage disconnectMessage = new() {Type = ClientMessageType.Disconnect};
-            ListenResponse response = new() {Message = disconnectMessage};
+            ListenResponse response = new() {Type = MessageType.Disconnect};
 
             foreach (KeyValuePair<long, IEnumerable<IStreamer<ListenResponse>>> pair in _clientContainer.EnumerateAllClients())
             {

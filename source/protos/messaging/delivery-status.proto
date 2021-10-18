@@ -1,0 +1,11 @@
+syntax = "proto3";
+option csharp_namespace = "CecoChat.Contracts.Messaging";
+package CecoChat.Contracts.Messaging;
+
+enum DeliveryStatus {
+  UNPROCESSED = 0;
+  LOST = 1;
+  PROCESSED = 2;
+  DELIVERED = 3;
+  SEEN = 4;
+}
