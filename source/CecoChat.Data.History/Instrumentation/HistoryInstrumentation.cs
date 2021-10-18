@@ -14,9 +14,11 @@ namespace CecoChat.Data.History.Instrumentation
 
         public static class Operations
         {
-            public const string HistoryNewDialogMessage = "HistoryDB.NewDialogMessage";
-            public const string HistoryGetUserHistory = "HistoryDB.GetUserHistory";
-            public const string HistoryGetDialogHistory = "HistoryDB.GetDialogHistory";
+            public const string NewDialogMessage = "HistoryDB.NewDialogMessage";
+            public const string GetUserHistory = "HistoryDB.GetUserHistory";
+            public const string GetDialogHistory = "HistoryDB.GetDialogHistory";
+            public const string AddReaction = "HistoryDB.AddReaction";
+            public const string RemoveReaction = "HistoryDB.RemoveReaction";
         }
 
         public static class Keys
@@ -31,6 +33,7 @@ namespace CecoChat.Data.History.Instrumentation
         {
             public const string DbSystemCassandra = "cassandra";
             public const string DbOperationBatchWrite = "batch_write";
+            public const string DbOperationOneWrite = "one_write";
             public const string DbOperationOneRead = "one_read";
         }
     }

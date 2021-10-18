@@ -61,7 +61,7 @@ namespace CecoChat.Data.History
         public async Task<IReadOnlyCollection<HistoryMessage>> GetUserHistory(long userID, DateTime olderThan, int countLimit)
         {
             Activity activity = _historyActivityUtility.StartGetHistory(
-                HistoryInstrumentation.Operations.HistoryGetUserHistory, _dataUtility.MessagingSession, userID);
+                HistoryInstrumentation.Operations.GetUserHistory, _dataUtility.MessagingSession, userID);
             bool success = false;
 
             try
@@ -85,7 +85,7 @@ namespace CecoChat.Data.History
         public async Task<IReadOnlyCollection<HistoryMessage>> GetDialogHistory(long userID, long otherUserID, DateTime olderThan, int countLimit)
         {
             Activity activity = _historyActivityUtility.StartGetHistory(
-                HistoryInstrumentation.Operations.HistoryGetDialogHistory, _dataUtility.MessagingSession, userID);
+                HistoryInstrumentation.Operations.GetDialogHistory, _dataUtility.MessagingSession, userID);
             bool success = false;
 
             try
