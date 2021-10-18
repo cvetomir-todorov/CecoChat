@@ -14,6 +14,7 @@ namespace CecoChat.Client.Console.Interaction
             FindUser = new FindUserState(this);
             Dialog = new DialogState(this);
             SendMessage = new SendMessageState(this);
+            React = new ReactState(this);
             Final = new FinalState(this);
         }
 
@@ -25,6 +26,7 @@ namespace CecoChat.Client.Console.Interaction
         public State FindUser { get; }
         public State Dialog { get; }
         public State SendMessage { get; }
+        public State React { get; }
         public State Final { get; }
     }
 
@@ -32,6 +34,7 @@ namespace CecoChat.Client.Console.Interaction
     {
         public bool ReloadData { get; set; }
         public long UserID { get; set; }
+        public long DialogID { get; set; }
     }
 
     public sealed class FinalState : State

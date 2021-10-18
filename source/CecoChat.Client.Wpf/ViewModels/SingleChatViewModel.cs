@@ -27,7 +27,7 @@ namespace CecoChat.Client.Wpf.ViewModels
             _messageMap = new();
 
             MessagingClient.MessageReceived += MessagingClientOnMessageReceived;
-            MessagingClient.MessageAcknowledged += MessagingClientOnMessageAcknowledged;
+            MessagingClient.MessageDelivered += MessagingClientOnMessageDelivered;
 
             Messages = new ObservableCollection<SingleChatMessageViewModel>();
             SendMessage = new AsyncRelayCommand(SendMessageExecuted);
@@ -55,7 +55,7 @@ namespace CecoChat.Client.Wpf.ViewModels
             InsertMessage(response.Message, response.SequenceNumber);
         }
 
-        private void MessagingClientOnMessageAcknowledged(object sender, ListenResponse response)
+        private void MessagingClientOnMessageDelivered(object sender, ListenResponse response)
         {
             if (_messageMap.TryGetValue(response.Message.MessageId, out SingleChatMessageViewModel messageVM))
             {
@@ -88,7 +88,7 @@ namespace CecoChat.Client.Wpf.ViewModels
             Messages.Clear();
 
             IEnumerable<ClientMessage> storedMessages = MessageStorage.GetMessages(otherUserID);
-            IList<ClientMessage> dialogHistory = await MessagingClient.GetDialogHistory(otherUserID, DateTime.UtcNow);
+            IList<ClientMessage> dialogHistory = await MessagingClient.GetChatHistory(otherUserID, DateTime.UtcNow);
             IEnumerable<ClientMessage> allMessages = storedMessages.Union(dialogHistory);
 
             foreach (ClientMessage message in allMessages)

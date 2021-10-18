@@ -2,21 +2,13 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using CecoChat.Contracts.Client;
 
 namespace CecoChat.Client.Console
 {
-    public sealed class Message
-    {
-        public ClientMessage Data { get; init; }
-        public int SequenceNumber { get; init; }
-        public string AckStatus { get; set; }
-    }
-
     public sealed class MessageStorage
     {
         private readonly long _userID;
-        private readonly ConcurrentDictionary<long, Dialog> _dialogMap;
+        private readonly ConcurrentDictionary<long, Chat> _dialogMap;
 
         public MessageStorage(long userID)
         {
@@ -24,18 +16,18 @@ namespace CecoChat.Client.Console
             _dialogMap = new();
         }
 
-        public void AddMessage(ListenResponse response)
+        public void AddMessage(Message message)
         {
-            long otherUserId = GetOtherUserID(response.Message);
-            Dialog dialog = _dialogMap.GetOrAdd(otherUserId, _ => new Dialog());
-            dialog.AddOrAcknowledge(response);
+            long otherUserId = GetOtherUserID(message);
+            Chat chat = _dialogMap.GetOrAdd(otherUserId, _ => new Chat());
+            chat.AddNew(message);
         }
 
-        public void AcknowledgeMessage(ListenResponse response)
+        public void AcknowledgeMessage(Message message)
         {
-            long otherUserID = GetOtherUserID(response.Message);
-            Dialog dialog = _dialogMap.GetOrAdd(otherUserID, _ => new Dialog());
-            dialog.AddOrAcknowledge(response);
+            long otherUserID = GetOtherUserID(message);
+            Chat chat = _dialogMap.GetOrAdd(otherUserID, _ => new Chat());
+            chat.UpdateDeliveryStatus(message);
         }
 
         public List<long> GetUsers()
@@ -47,7 +39,7 @@ namespace CecoChat.Client.Console
         {
             List<Message> messages = new();
 
-            if (_dialogMap.TryGetValue(userID, out Dialog dialog))
+            if (_dialogMap.TryGetValue(userID, out Chat dialog))
             {
                 messages.AddRange(dialog.GetMessages());
             }
@@ -55,42 +47,54 @@ namespace CecoChat.Client.Console
             return messages;
         }
 
-        private long GetOtherUserID(ClientMessage message)
+        public bool TryGetMessage(long userID, long messageID, out Message message)
         {
-            if (message.SenderId != _userID)
+            message = null;
+            if (!_dialogMap.TryGetValue(userID, out Chat dialog))
             {
-                return message.SenderId;
+                return false;
             }
-            if (message.ReceiverId != _userID)
+
+            return dialog.TryGetMessage(messageID, out message);
+        }
+
+        private long GetOtherUserID(Message message)
+        {
+            if (message.SenderID != _userID)
             {
-                return message.ReceiverId;
+                return message.SenderID;
+            }
+            if (message.ReceiverID != _userID)
+            {
+                return message.ReceiverID;
             }
 
             throw new InvalidOperationException($"Message '{message}' is from current user {_userID} to himself.");
         }
 
-        private sealed class Dialog
+        private sealed class Chat
         {
             private readonly ConcurrentDictionary<long, Message> _messageMap;
 
-            public Dialog()
+            public Chat()
             {
                 _messageMap = new();
             }
 
-            public void AddOrAcknowledge(ListenResponse response)
+            public void AddNew(Message message)
             {
-                if (!_messageMap.TryGetValue(response.Message.MessageId, out Message message))
+                if (!_messageMap.TryGetValue(message.MessageID, out _))
                 {
-                    message = new()
-                    {
-                        Data = response.Message,
-                        SequenceNumber = response.SequenceNumber,
-                    };
-                    _messageMap.TryAdd(response.Message.MessageId, message);
+                    _messageMap.TryAdd(message.MessageID, message);
                 }
+            }
 
-                message.AckStatus = AckStatuses.Map(response.Message.Status);
+            public void UpdateDeliveryStatus(Message message)
+            {
+                if (_messageMap.TryGetValue(message.MessageID, out Message existing))
+                {
+                    existing.Status = message.Status;
+                }
             }
 
             public IEnumerable<Message> GetMessages()
@@ -100,25 +104,10 @@ namespace CecoChat.Client.Console
                     yield return pair.Value;
                 }
             }
-        }
 
-        private static class AckStatuses
-        {
-            private static readonly string Delivered = "Delivered";
-            private static readonly string Processed = "Processed";
-            private static readonly string Lost = "Lost";
-            private static readonly string Unprocessed = "Unprocessed"; 
-
-            public static string Map(ClientMessageStatus ack)
+            public bool TryGetMessage(long messageID, out Message message)
             {
-                switch (ack)
-                {
-                    case ClientMessageStatus.Delivered: return Delivered;
-                    case ClientMessageStatus.Processed: return Processed;
-                    case ClientMessageStatus.Lost: return Lost;
-                    case ClientMessageStatus.Unprocessed: return Unprocessed;
-                    default: return string.Empty;
-                }
+                return _messageMap.TryGetValue(messageID, out message);
             }
         }
     }

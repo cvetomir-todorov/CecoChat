@@ -1,5 +1,4 @@
 using System.Threading.Tasks;
-using CecoChat.Contracts.Client;
 
 namespace CecoChat.Client.Console.Interaction
 {
@@ -17,8 +16,17 @@ namespace CecoChat.Client.Console.Interaction
                 return States.Dialog;
             }
 
-            ClientMessage message = await States.Client.SendPlainTextMessage(States.Context.UserID, plainText);
-            States.Storage.AddMessage(new ListenResponse {Message = message});
+            long messageID = await States.Client.SendPlainTextMessage(States.Context.UserID, plainText);
+            Message message = new()
+            {
+                MessageID = messageID,
+                SenderID = States.Client.UserID,
+                ReceiverID = States.Context.UserID,
+                DataType = DataType.PlainText,
+                Data = plainText,
+                Status = DeliveryStatus.Unprocessed
+            };
+            States.Storage.AddMessage(message);
 
             States.Context.ReloadData = true;
             return States.Dialog;
