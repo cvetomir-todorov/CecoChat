@@ -14,39 +14,21 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Protobuf Include="..\protos\uuid.proto">
-      <Link>uuid.proto</Link>
-    </Protobuf>
-    <Protobuf Include="..\protos\backplane-message.proto">
-      <Link>Backplane\backplane-message.proto</Link>
-    </Protobuf>
-    <Protobuf Include="..\protos\history-message.proto">
-      <Link>History\history-message.proto</Link>
-    </Protobuf>
-    <Protobuf Include="..\protos\history\history-service.proto">
-      <Link>History\history-service.proto</Link>
-    </Protobuf>
-    <Protobuf Include="..\protos\idgen-service.proto" GrpcServices="All">
-      <Link>IDGen\idgen-service.proto</Link>
-    </Protobuf>
-    <Protobuf Include="..\protos\messaging\message-type.proto">
-      <Link>Messaging\message-type.proto</Link>
-    </Protobuf>
-    <Protobuf Include="..\protos\messaging\data-type.proto">
-      <Link>Messaging\data-type.proto</Link>
-    </Protobuf>
-    <Protobuf Include="..\protos\messaging\delivery-status.proto">
-      <Link>Messaging\delivery-status.proto</Link>
-    </Protobuf>
-    <Protobuf Include="..\protos\messaging\send-service.proto" GrpcServices="All">
-      <Link>Messaging\send-service.proto</Link>
-    </Protobuf>
-    <Protobuf Include="..\protos\messaging\reaction-service.proto" GrpcServices="All">
-      <Link>Messaging\reaction-service.proto</Link>
-    </Protobuf>
-    <Protobuf Include="..\protos\messaging\listen-service.proto" GrpcServices="All">
-      <Link>Messaging\listen-service.proto</Link>
-    </Protobuf>
+    <Protobuf Include="backplane\backplane-message.proto" />
+    <Protobuf Include="history\data-type.proto" />
+    <Protobuf Include="history\delivery-status.proto" />
+    <Protobuf Include="history\history-message.proto"/>
+    <Protobuf Include="history\history-service.proto" />
+    <Protobuf Include="history\data-message.proto" />
+    <Protobuf Include="history\reaction-message.proto" />
+    <Protobuf Include="idgen\idgen-service.proto" GrpcServices="All" />
+    <Protobuf Include="messaging\message-type.proto" />
+    <Protobuf Include="messaging\data-type.proto" />
+    <Protobuf Include="messaging\delivery-status.proto" />
+    <Protobuf Include="messaging\send-service.proto" GrpcServices="All" />
+    <Protobuf Include="messaging\reaction-service.proto" GrpcServices="All" />
+    <Protobuf Include="messaging\listen-service.proto" GrpcServices="All" />
+    <Protobuf Include="uuid.proto" />
   </ItemGroup>
 
 </Project>

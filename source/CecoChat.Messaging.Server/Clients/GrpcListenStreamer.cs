@@ -11,13 +11,13 @@ using Microsoft.Extensions.Options;
 
 namespace CecoChat.Messaging.Server.Clients
 {
-    public interface IGrpcListenStreamer : IStreamer<ListenResponse>
+    public interface IGrpcListenStreamer : IStreamer<ListenNotification>
     {
-        void Initialize(Guid clientID, IServerStreamWriter<ListenResponse> streamWriter);
+        void Initialize(Guid clientID, IServerStreamWriter<ListenNotification> streamWriter);
     }
 
     /// <summary>
-    /// Streams <see cref="ListenResponse"/> instances to a connected client.
+    /// Streams <see cref="ListenNotification"/> instances to a connected client.
     /// </summary>
     public sealed class GrpcListenStreamer : IGrpcListenStreamer
     {
@@ -26,7 +26,7 @@ namespace CecoChat.Messaging.Server.Clients
         private readonly BlockingCollection<MessageContext> _messageQueue;
         private readonly SemaphoreSlim _signalProcessing;
 
-        private IServerStreamWriter<ListenResponse> _streamWriter;
+        private IServerStreamWriter<ListenNotification> _streamWriter;
         private Guid _clientID;
         private int _sequenceNumber;
 
@@ -51,7 +51,7 @@ namespace CecoChat.Messaging.Server.Clients
             _messageQueue.Dispose();
         }
 
-        public void Initialize(Guid clientID, IServerStreamWriter<ListenResponse> streamWriter)
+        public void Initialize(Guid clientID, IServerStreamWriter<ListenNotification> streamWriter)
         {
             _clientID = clientID;
             _streamWriter = streamWriter;
@@ -59,7 +59,7 @@ namespace CecoChat.Messaging.Server.Clients
 
         public Guid ClientID => _clientID;
 
-        public bool EnqueueMessage(ListenResponse message, Activity parentActivity = null)
+        public bool EnqueueMessage(ListenNotification message, Activity parentActivity = null)
         {
             _sequenceNumber++;
 
@@ -138,7 +138,7 @@ namespace CecoChat.Messaging.Server.Clients
             return new EmptyQueueResult {Stop = processedFinalMessage};
         }
 
-        private Activity StartActivity(ListenResponse message, Activity parentActivity)
+        private Activity StartActivity(ListenNotification message, Activity parentActivity)
         {
             const string service = nameof(GrpcListenService);
             const string method = nameof(GrpcListenService.Listen);
@@ -149,7 +149,7 @@ namespace CecoChat.Messaging.Server.Clients
 
         private record MessageContext
         {
-            public ListenResponse Message { get; init; }
+            public ListenNotification Message { get; init; }
 
             public Activity ParentActivity { get; init; }
         }

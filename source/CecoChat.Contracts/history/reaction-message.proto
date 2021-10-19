@@ -1,0 +1,17 @@
+syntax = "proto3";
+option csharp_namespace = "CecoChat.Contracts.History";
+package CecoChat.Contracts.History;
+
+message ReactionMessage {
+  int64 message_id = 1;
+  int64 sender_id = 2;
+  int64 receiver_id = 3;
+  int64 reactor_id = 4;
+  NewReactionType type = 5;
+  string reaction = 6;
+}
+
+enum NewReactionType {
+  SET = 0;
+  UNSET = 1;
+}

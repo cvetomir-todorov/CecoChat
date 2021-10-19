@@ -59,19 +59,19 @@ namespace CecoChat.Messaging.Server.HostedServices
 
         private void DisconnectClients(int partitionCount, PartitionRange partitions)
         {
-            ListenResponse response = new() {Type = MessageType.Disconnect};
+            ListenNotification notification = new() {Type = MessageType.Disconnect};
 
-            foreach (KeyValuePair<long, IEnumerable<IStreamer<ListenResponse>>> pair in _clientContainer.EnumerateAllClients())
+            foreach (KeyValuePair<long, IEnumerable<IStreamer<ListenNotification>>> pair in _clientContainer.EnumerateAllClients())
             {
                 long userID = pair.Key;
-                IEnumerable<IStreamer<ListenResponse>> clients = pair.Value;
+                IEnumerable<IStreamer<ListenNotification>> clients = pair.Value;
 
                 int userPartition = _partitionUtility.ChoosePartition(userID, partitionCount);
                 if (!partitions.Contains(userPartition))
                 {
-                    foreach (IStreamer<ListenResponse> client in clients)
+                    foreach (IStreamer<ListenNotification> client in clients)
                     {
-                        client.EnqueueMessage(response);
+                        client.EnqueueMessage(notification);
                     }
                 }
             }

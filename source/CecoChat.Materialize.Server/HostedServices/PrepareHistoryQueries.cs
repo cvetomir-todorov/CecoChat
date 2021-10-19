@@ -11,13 +11,16 @@ namespace CecoChat.Materialize.Server.HostedServices
     {
         private readonly ILogger _logger;
         private readonly INewMessageRepository _newMessageRepository;
+        private readonly IReactionRepository _reactionRepository;
 
         public PrepareHistoryQueries(
             ILogger<PrepareHistoryQueries> logger,
-            INewMessageRepository newMessageRepository)
+            INewMessageRepository newMessageRepository,
+            IReactionRepository reactionRepository)
         {
             _logger = logger;
             _newMessageRepository = newMessageRepository;
+            _reactionRepository = reactionRepository;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -28,6 +31,7 @@ namespace CecoChat.Materialize.Server.HostedServices
                 {
                     _logger.LogInformation("Start preparing queries...");
                     _newMessageRepository.Prepare();
+                    _reactionRepository.Prepare();
                     _logger.LogInformation("Completed preparing queries.");
                 }
                 catch (Exception exception)

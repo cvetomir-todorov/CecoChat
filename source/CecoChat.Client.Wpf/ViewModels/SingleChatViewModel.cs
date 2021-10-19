@@ -88,7 +88,7 @@ namespace CecoChat.Client.Wpf.ViewModels
             Messages.Clear();
 
             IEnumerable<ClientMessage> storedMessages = MessageStorage.GetMessages(otherUserID);
-            IList<ClientMessage> dialogHistory = await MessagingClient.GetChatHistory(otherUserID, DateTime.UtcNow);
+            IList<ClientMessage> dialogHistory = await MessagingClient.GetHistory(otherUserID, DateTime.UtcNow);
             IEnumerable<ClientMessage> allMessages = storedMessages.Union(dialogHistory);
 
             foreach (ClientMessage message in allMessages)

@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Cassandra;
+using CecoChat.Contracts.History;
 using CecoChat.Data.History.Instrumentation;
 using Microsoft.Extensions.Logging;
 
@@ -11,9 +12,9 @@ namespace CecoChat.Data.History
     {
         void Prepare();
 
-        Task AddReaction(long messageID, long senderID, long receiverID, long reactorID, string reaction);
+        Task SetReaction(ReactionMessage message);
 
-        Task RemoveReaction(long messageID, long senderID, long receiverID, long reactorID);
+        Task UnsetReaction(ReactionMessage message);
     }
 
     internal class ReactionRepository : IReactionRepository
@@ -21,8 +22,8 @@ namespace CecoChat.Data.History
         private readonly ILogger _logger;
         private readonly IHistoryActivityUtility _historyActivityUtility;
         private readonly IDataUtility _dataUtility;
-        private readonly Lazy<PreparedStatement> _addReactionQuery;
-        private readonly Lazy<PreparedStatement> _removeReactionQuery;
+        private readonly Lazy<PreparedStatement> _setReactionQuery;
+        private readonly Lazy<PreparedStatement> _unsetReactionQuery;
 
         public ReactionRepository(
             ILogger<ReactionRepository> logger,
@@ -33,37 +34,37 @@ namespace CecoChat.Data.History
             _historyActivityUtility = historyActivityUtility;
             _dataUtility = dataUtility;
 
-            _addReactionQuery = new Lazy<PreparedStatement>(() => _dataUtility.PrepareQuery(AddReactionCommand));
-            _removeReactionQuery = new Lazy<PreparedStatement>(() => _dataUtility.PrepareQuery(RemoveReactionCommand));
+            _setReactionQuery = new Lazy<PreparedStatement>(() => _dataUtility.PrepareQuery(SetReactionCommand));
+            _unsetReactionQuery = new Lazy<PreparedStatement>(() => _dataUtility.PrepareQuery(UnsetReactionCommand));
         }
 
-        private const string AddReactionCommand =
+        private const string SetReactionCommand =
             "UPDATE messages_for_dialog SET reactions[?] = ? WHERE dialog_id = ? AND message_id = ?";
-        private const string RemoveReactionCommand =
+        private const string UnsetReactionCommand =
             "DELETE reactions[?] FROM messages_for_dialog WHERE dialog_id = ? AND message_id = ?";
 
         public void Prepare()
         {
-            PreparedStatement _ = _addReactionQuery.Value;
+            PreparedStatement _ = _setReactionQuery.Value;
             #pragma warning disable IDE0059
-            PreparedStatement __ = _removeReactionQuery.Value;
+            PreparedStatement __ = _unsetReactionQuery.Value;
             #pragma warning restore IDE0059
         }
 
-        public async Task AddReaction(long messageID, long senderID, long receiverID, long reactorID, string reaction)
+        public async Task SetReaction(ReactionMessage message)
         {
-            Activity activity = _historyActivityUtility.StartAddReaction(_dataUtility.MessagingSession, reactorID);
+            Activity activity = _historyActivityUtility.StartSetReaction(_dataUtility.MessagingSession, message.ReactorId);
             bool success = false;
 
             try
             {
-                string dialogID = _dataUtility.CreateDialogID(senderID, receiverID);
-                BoundStatement query = _addReactionQuery.Value.Bind(reactorID, reaction, dialogID, messageID);
+                string dialogID = _dataUtility.CreateDialogID(message.SenderId, message.ReceiverId);
+                BoundStatement query = _setReactionQuery.Value.Bind(message.ReactorId, message.Reaction, dialogID, message.MessageId);
                 query.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
                 query.SetIdempotence(false);
                 await _dataUtility.MessagingSession.ExecuteAsync(query);
                 success = true;
-                _logger.LogTrace("User {0} reacted with {1} to message {2}.", reactorID, reaction, messageID);
+                _logger.LogTrace("User {0} reacted with {1} to message {2}.", message.ReactorId, message.Reaction, message.MessageId);
             }
             finally
             {
@@ -71,20 +72,20 @@ namespace CecoChat.Data.History
             }
         }
 
-        public async Task RemoveReaction(long messageID, long senderID, long receiverID, long reactorID)
+        public async Task UnsetReaction(ReactionMessage message)
         {
-            Activity activity = _historyActivityUtility.StartRemoveReaction(_dataUtility.MessagingSession, reactorID);
+            Activity activity = _historyActivityUtility.StartUnsetReaction(_dataUtility.MessagingSession, message.ReactorId);
             bool success = false;
 
             try
             {
-                string dialogID = _dataUtility.CreateDialogID(senderID, receiverID);
-                BoundStatement query = _removeReactionQuery.Value.Bind(reactorID, dialogID, messageID);
+                string dialogID = _dataUtility.CreateDialogID(message.SenderId, message.ReceiverId);
+                BoundStatement query = _unsetReactionQuery.Value.Bind(message.ReactorId, dialogID, message.MessageId);
                 query.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
                 query.SetIdempotence(false);
                 await _dataUtility.MessagingSession.ExecuteAsync(query);
                 success = true;
-                _logger.LogTrace("User {0} removed reaction to message {1}.", reactorID, messageID);
+                _logger.LogTrace("User {0} removed reaction to message {1}.", message.ReactorId, message.MessageId);
             }
             finally
             {

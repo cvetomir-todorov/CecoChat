@@ -1,25 +1,17 @@
 syntax = "proto3";
 option csharp_namespace = "CecoChat.Contracts.History";
 package CecoChat.Contracts.History;
+import "history/data-type.proto";
+import "history/delivery-status.proto";
 
 message HistoryMessage {
   int64 message_id = 1;
   int64 sender_id = 2;
   int64 receiver_id = 3;
-  HistoryMessageType type = 4;
-  HistoryMessageStatus status = 5;
-  oneof data {
-    string text = 6;
+  DataType data_type = 4;
+  oneof message_data {
+    string data = 5;
   }
+  DeliveryStatus status = 6;
   map<int64, string> reactions = 7;
-}
-
-enum HistoryMessageType {
-  UNKNOWN = 0;
-  PLAIN_TEXT = 1;
-}
-
-enum HistoryMessageStatus {
-  PROCESSED = 0;
-  DELIVERED = 1;
 }

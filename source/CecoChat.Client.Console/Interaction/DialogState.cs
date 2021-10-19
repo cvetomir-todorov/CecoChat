@@ -70,7 +70,7 @@ namespace CecoChat.Client.Console.Interaction
                 reactions = reactionsBuilder.ToString();
             }
 
-            System.Console.WriteLine("[{0:F}] {1}: {2} (#{3}|{4}|ID: {5} |{6} reactions:{7})",
+            System.Console.WriteLine("[{0:F}] {1}: {2} (#{3}|{4}|ID: {5} |{6} reaction(s):{7})",
                 message.MessageID.ToTimestamp(), sender, message.Data,
                 message.SequenceNumber, message.Status, message.MessageID,
                 message.Reactions.Count, reactions);

@@ -15,8 +15,9 @@ namespace CecoChat.Client.Console
             MessageStorage storage = new(client.UserID);
 
             client.ExceptionOccurred += ShowException;
-            client.MessageReceived += (_, response) => AddReceivedMessage(response, storage);
-            client.MessageDelivered += (_, response) => UpdateMessageDeliveryStatus(response, storage);
+            client.MessageReceived += (_, notification) => AddReceivedMessage(notification, storage);
+            client.MessageDelivered += (_, notification) => UpdateMessageDeliveryStatus(notification, storage);
+            client.ReactionReceived += (_, notification) => UpdateReaction(notification, storage);
             client.ListenForMessages(CancellationToken.None);
 
             await RunStateMachine(client, storage);
@@ -38,51 +39,51 @@ namespace CecoChat.Client.Console
             System.Console.WriteLine(exception);
         }
 
-        private static void AddReceivedMessage(ListenResponse response, MessageStorage storage)
+        private static void AddReceivedMessage(ListenNotification notification, MessageStorage storage)
         {
-            if (response.Type != MessageType.Data)
+            if (notification.Type != MessageType.Data)
             {
-                throw new InvalidOperationException($"Response {response} should have type {MessageType.Data}.");
+                throw new InvalidOperationException($"Notification {notification} should have type {MessageType.Data}.");
             }
 
             Message message = new()
             {
-                MessageID = response.MessageId,
-                SenderID = response.SenderId,
-                ReceiverID = response.ReceiverId,
-                SequenceNumber = response.SequenceNumber,
-                Data = response.MessageData.Data,
+                MessageID = notification.MessageId,
+                SenderID = notification.SenderId,
+                ReceiverID = notification.ReceiverId,
+                SequenceNumber = notification.SequenceNumber,
                 Status = DeliveryStatus.Processed
             };
 
-            switch (response.MessageData.Type)
+            switch (notification.Data.Type)
             {
                 case Contracts.Messaging.DataType.PlainText:
                     message.DataType = DataType.PlainText;
+                    message.Data = notification.Data.Data;
                     break;
                 default:
-                    throw new EnumValueNotSupportedException(response.MessageData.Type);
+                    throw new EnumValueNotSupportedException(notification.Data.Type);
             }
 
             storage.AddMessage(message);
         }
 
-        private static void UpdateMessageDeliveryStatus(ListenResponse response, MessageStorage storage)
+        private static void UpdateMessageDeliveryStatus(ListenNotification notification, MessageStorage storage)
         {
-            if (response.Type != MessageType.Delivery)
+            if (notification.Type != MessageType.Delivery)
             {
-                throw new InvalidOperationException($"Response {response} should have type {MessageType.Delivery}.");
+                throw new InvalidOperationException($"Notification {notification} should have type {MessageType.Delivery}.");
             }
 
             Message message = new()
             {
-                MessageID = response.MessageId,
-                SenderID = response.SenderId,
-                ReceiverID = response.ReceiverId,
-                SequenceNumber = response.SequenceNumber,
+                MessageID = notification.MessageId,
+                SenderID = notification.SenderId,
+                ReceiverID = notification.ReceiverId,
+                SequenceNumber = notification.SequenceNumber,
             };
 
-            switch (response.Status)
+            switch (notification.Status)
             {
                 case Contracts.Messaging.DeliveryStatus.Lost:
                     message.Status = DeliveryStatus.Lost;
@@ -97,10 +98,36 @@ namespace CecoChat.Client.Console
                     message.Status = DeliveryStatus.Seen;
                     break;
                 default:
-                    throw new EnumValueNotSupportedException(response.Status);
+                    throw new EnumValueNotSupportedException(notification.Status);
             }
 
             storage.AcknowledgeMessage(message);
+        }
+
+        private static void UpdateReaction(ListenNotification notification, MessageStorage storage)
+        {
+            if (notification.Type != MessageType.Reaction)
+            {
+                throw new InvalidOperationException($"Notification {notification} should have type {MessageType.Reaction}.");
+            }
+
+            if (!storage.TryGetMessage(notification.SenderId, notification.ReceiverId, notification.MessageId, out Message message))
+            {
+                // the message is not in the local history
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(notification.Reaction.Reaction))
+            {
+                if (message.Reactions.ContainsKey(notification.Reaction.ReactorId))
+                {
+                    message.Reactions.Remove(notification.Reaction.ReactorId);
+                }
+            }
+            else
+            {
+                message.Reactions.Add(notification.Reaction.ReactorId, notification.Reaction.Reaction);
+            }
         }
 
         private static async Task RunStateMachine(MessagingClient client, MessageStorage storage)

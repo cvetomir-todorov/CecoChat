@@ -11,7 +11,7 @@ namespace CecoChat.Data.History
     {
         void Prepare();
 
-        void AddNewDialogMessage(HistoryMessage message);
+        void AddMessage(DataMessage message);
     }
 
     internal sealed class NewMessageRepository : INewMessageRepository
@@ -56,9 +56,9 @@ namespace CecoChat.Data.History
             #pragma warning restore IDE0059
         }
 
-        public void AddNewDialogMessage(HistoryMessage message)
+        public void AddMessage(DataMessage message)
         {
-            Activity activity = _historyActivityUtility.StartNewDialogMessage(_dataUtility.MessagingSession, message.MessageId);
+            Activity activity = _historyActivityUtility.StartAddDataMessage(_dataUtility.MessagingSession, message.MessageId);
             bool success = false;
 
             try
@@ -74,13 +74,13 @@ namespace CecoChat.Data.History
             }
         }
 
-        private BatchStatement CreateInsertBatch(HistoryMessage message)
+        private BatchStatement CreateInsertBatch(DataMessage message)
         {
             long senderID = message.SenderId;
             long receiverID = message.ReceiverId;
-            sbyte dbMessageType = _mapper.MapHistoryToDbMessageType(message.Type);
-            sbyte dbMessageStatus = _mapper.MapHistoryToDbMessageStatus(message.Status);
-            string data = message.Text;
+            sbyte dbMessageType = _mapper.MapHistoryToDbDataType(message.DataType);
+            sbyte dbMessageStatus = _mapper.MapHistoryToDbDeliveryStatus(message.Status);
+            string data = message.Data;
             string dialogID = _dataUtility.CreateDialogID(senderID, receiverID);
 
             BoundStatement insertForSender = _messagesForUserQuery.Value.Bind(

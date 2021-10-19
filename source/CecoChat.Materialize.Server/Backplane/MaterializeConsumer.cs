@@ -24,21 +24,24 @@ namespace CecoChat.Materialize.Server.Backplane
         private readonly ILogger _logger;
         private readonly BackplaneOptions _backplaneOptions;
         private readonly IKafkaConsumer<Null, BackplaneMessage> _consumer;
-        private readonly IMessageMapper _mapper;
+        private readonly IContractDataMapper _mapper;
         private readonly INewMessageRepository _newMessageRepository;
+        private readonly IReactionRepository _reactionRepository;
 
         public MaterializeConsumer(
             ILogger<MaterializeConsumer> logger,
             IOptions<BackplaneOptions> backplaneOptions,
             IFactory<IKafkaConsumer<Null, BackplaneMessage>> consumerFactory,
-            IMessageMapper mapper,
-            INewMessageRepository newMessageRepository)
+            IContractDataMapper mapper,
+            INewMessageRepository newMessageRepository,
+            IReactionRepository reactionRepository)
         {
             _logger = logger;
             _backplaneOptions = backplaneOptions.Value;
             _consumer = consumerFactory.Create();
             _mapper = mapper;
             _newMessageRepository = newMessageRepository;
+            _reactionRepository = reactionRepository;
         }
 
         public void Dispose()
@@ -60,12 +63,41 @@ namespace CecoChat.Materialize.Server.Backplane
             {
                 _consumer.Consume(consumeResult =>
                 {
-                    HistoryMessage historyMessage = _mapper.MapBackplaneToHistoryMessage(consumeResult.Message.Value);
-                    _newMessageRepository.AddNewDialogMessage(historyMessage);
+                    BackplaneMessage backplaneMessage = consumeResult.Message.Value;
+                    switch (backplaneMessage.Type)
+                    {
+                        case MessageType.Data:
+                            AddDataMessage(backplaneMessage);
+                            break;
+                        case MessageType.Reaction:
+                            AddReaction(backplaneMessage);
+                            break;
+                        default:
+                            throw new EnumValueNotSupportedException(backplaneMessage.Type);
+                    }
                 }, ct);
             }
 
             _logger.LogInformation("Stopped materializing messages.");
+        }
+
+        private void AddDataMessage(BackplaneMessage backplaneMessage)
+        {
+            DataMessage dataMessage = _mapper.CreateDataMessage(backplaneMessage);
+            _newMessageRepository.AddMessage(dataMessage);
+        }
+
+        private void AddReaction(BackplaneMessage backplaneMessage)
+        {
+            ReactionMessage reactionMessage = _mapper.CreateReactionMessage(backplaneMessage);
+            if (reactionMessage.Type == NewReactionType.Set)
+            {
+                _reactionRepository.SetReaction(reactionMessage);
+            }
+            else
+            {
+                _reactionRepository.UnsetReaction(reactionMessage);
+            }
         }
     }
 }
