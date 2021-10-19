@@ -16,8 +16,8 @@ namespace CecoChat.Client.Console.Interaction
 
         protected async Task GetUserHistory()
         {
-            IList<HistoryItem> history = await States.Client.GetUserHistory(DateTime.UtcNow);
-            foreach (HistoryItem item in history)
+            IList<HistoryMessage> history = await States.Client.GetUserHistory(DateTime.UtcNow);
+            foreach (HistoryMessage item in history)
             {
                 Message message = CreateMessage(item);
                 States.Storage.AddMessage(message);
@@ -26,8 +26,8 @@ namespace CecoChat.Client.Console.Interaction
 
         protected async Task GetDialogHistory(long userID)
         {
-            IList<HistoryItem> history = await States.Client.GetChatHistory(userID, DateTime.UtcNow);
-            foreach (HistoryItem item in history)
+            IList<HistoryMessage> history = await States.Client.GetHistory(userID, DateTime.UtcNow);
+            foreach (HistoryMessage item in history)
             {
                 Message message = CreateMessage(item);
                 States.Storage.AddMessage(message);
@@ -36,7 +36,7 @@ namespace CecoChat.Client.Console.Interaction
 
         public abstract Task<State> Execute();
 
-        private static Message CreateMessage(HistoryItem item)
+        private static Message CreateMessage(HistoryMessage item)
         {
             Message message = new()
             {

@@ -92,26 +92,26 @@ namespace CecoChat.Messaging.Server.Backplane
         private void ProcessMessage(BackplaneMessage backplaneMessage)
         {
             Guid senderClientID = backplaneMessage.ClientId.ToGuid();
-            IEnumerable<IStreamer<ListenResponse>> receiverClients = _clientContainer.EnumerateClients(backplaneMessage.ReceiverId);
+            IEnumerable<IStreamer<ListenNotification>> receiverClients = _clientContainer.EnumerateClients(backplaneMessage.ReceiverId);
 
-            ListenResponse response = _mapper.CreateListenResponse(backplaneMessage);
-            EnqueueMessage(senderClientID, response, receiverClients, out int successCount, out int allCount);
+            ListenNotification notification = _mapper.CreateListenNotification(backplaneMessage);
+            EnqueueMessage(senderClientID, notification, receiverClients, out int successCount, out int allCount);
             LogResults(backplaneMessage, successCount, allCount);
         }
 
         private static void EnqueueMessage(
-            Guid senderClientID, ListenResponse response, IEnumerable<IStreamer<ListenResponse>> receiverClients,
+            Guid senderClientID, ListenNotification notification, IEnumerable<IStreamer<ListenNotification>> receiverClients,
             out int successCount, out int allCount)
         {
             // do not call clients.Count since it is expensive and uses locks
             successCount = 0;
             allCount = 0;
 
-            foreach (IStreamer<ListenResponse> receiverClient in receiverClients)
+            foreach (IStreamer<ListenNotification> receiverClient in receiverClients)
             {
                 if (receiverClient.ClientID != senderClientID)
                 {
-                    if (receiverClient.EnqueueMessage(response, parentActivity: Activity.Current))
+                    if (receiverClient.EnqueueMessage(notification, parentActivity: Activity.Current))
                     {
                         successCount++;
                     }

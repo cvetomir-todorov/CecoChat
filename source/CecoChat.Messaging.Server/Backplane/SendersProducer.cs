@@ -14,14 +14,14 @@ using Microsoft.Extensions.Options;
 
 namespace CecoChat.Messaging.Server.Backplane
 {
-    public interface ISendProducer : IDisposable
+    public interface ISendersProducer : IDisposable
     {
         int PartitionCount { get; set; }
 
         void ProduceMessage(BackplaneMessage message);
     }
 
-    public sealed class SendProducer : ISendProducer
+    public sealed class SendersProducer : ISendersProducer
     {
         private readonly ILogger _logger;
         private readonly BackplaneOptions _backplaneOptions;
@@ -30,8 +30,8 @@ namespace CecoChat.Messaging.Server.Backplane
         private readonly IKafkaProducer<Null, BackplaneMessage> _producer;
         private readonly IClientContainer _clientContainer;
 
-        public SendProducer(
-            ILogger<SendProducer> logger,
+        public SendersProducer(
+            ILogger<SendersProducer> logger,
             IOptions<BackplaneOptions> backplaneOptions,
             IHostApplicationLifetime applicationLifetime,
             IPartitionUtility partitionUtility,
@@ -70,22 +70,22 @@ namespace CecoChat.Messaging.Server.Backplane
         {
             BackplaneMessage backplaneMessage = report.Message.Value;
 
-            DeliveryStatus status = isDelivered ? DeliveryStatus.Processed : DeliveryStatus.Lost;
-            ListenResponse deliveryResponse = new()
+            Contracts.Messaging.DeliveryStatus status = isDelivered ? Contracts.Messaging.DeliveryStatus.Processed : Contracts.Messaging.DeliveryStatus.Lost;
+            ListenNotification deliveryNotification = new()
             {
                 MessageId = backplaneMessage.MessageId,
                 SenderId = backplaneMessage.SenderId,
                 ReceiverId = backplaneMessage.ReceiverId,
-                Type = MessageType.Delivery,
+                Type = Contracts.Messaging.MessageType.Delivery,
                 Status = status
             };
             Guid clientID = backplaneMessage.ClientId.ToGuid();
-            IEnumerable<IStreamer<ListenResponse>> clients = _clientContainer.EnumerateClients(backplaneMessage.SenderId);
+            IEnumerable<IStreamer<ListenNotification>> clients = _clientContainer.EnumerateClients(backplaneMessage.SenderId);
 
-            foreach (IStreamer<ListenResponse> client in clients)
+            foreach (IStreamer<ListenNotification> client in clients)
             {
-                client.EnqueueMessage(deliveryResponse, parentActivity: activity);
-                _logger.LogTrace("Sent delivery response to client {0} for message {1}.", clientID, deliveryResponse);
+                client.EnqueueMessage(deliveryNotification, parentActivity: activity);
+                _logger.LogTrace("Sent delivery notification to client {0} for message {1}.", clientID, deliveryNotification);
             }
         }
     }

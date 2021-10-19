@@ -63,7 +63,8 @@ namespace CecoChat.Materialize.Server
             builder.RegisterModule(new HistoryDbAutofacModule
             {
                 HistoryDbConfiguration = Configuration.GetSection("HistoryDB"),
-                RegisterNewMessage = true
+                RegisterNewMessage = true,
+                RegisterReactions = true
             });
 
             // backplane
@@ -73,7 +74,7 @@ namespace CecoChat.Materialize.Server
             builder.RegisterOptions<BackplaneOptions>(Configuration.GetSection("Backplane"));
 
             // shared
-            builder.RegisterType<MessageMapper>().As<IMessageMapper>().SingleInstance();
+            builder.RegisterType<ContractDataMapper>().As<IContractDataMapper>().SingleInstance();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

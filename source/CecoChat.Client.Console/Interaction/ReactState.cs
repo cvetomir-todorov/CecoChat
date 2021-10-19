@@ -20,7 +20,7 @@ namespace CecoChat.Client.Console.Interaction
                 return States.Dialog;
             }
 
-            if (!States.Storage.TryGetMessage(States.Context.UserID, messageID, out Message message))
+            if (!States.Storage.TryGetMessage(States.Client.UserID, States.Context.UserID, messageID, out Message message))
             {
                 States.Context.ReloadData = true;
                 return States.Dialog;

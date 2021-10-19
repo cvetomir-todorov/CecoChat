@@ -47,10 +47,12 @@ namespace CecoChat.Client.Console
             return messages;
         }
 
-        public bool TryGetMessage(long userID, long messageID, out Message message)
+        public bool TryGetMessage(long userID1, long userID2, long messageID, out Message message)
         {
+            long otherUserID = GetOtherUserID(userID1, userID2);
+            
             message = null;
-            if (!_dialogMap.TryGetValue(userID, out Chat dialog))
+            if (!_dialogMap.TryGetValue(otherUserID, out Chat dialog))
             {
                 return false;
             }
@@ -60,16 +62,21 @@ namespace CecoChat.Client.Console
 
         private long GetOtherUserID(Message message)
         {
-            if (message.SenderID != _userID)
+            return GetOtherUserID(message.SenderID, message.ReceiverID);
+        }
+
+        private long GetOtherUserID(long userID1, long userID2)
+        {
+            if (userID1 != _userID)
             {
-                return message.SenderID;
+                return userID1;
             }
-            if (message.ReceiverID != _userID)
+            if (userID2 != _userID)
             {
-                return message.ReceiverID;
+                return userID2;
             }
 
-            throw new InvalidOperationException($"Message '{message}' is from current user {_userID} to himself.");
+            throw new InvalidOperationException($"Message is from current user {_userID} to himself.");
         }
 
         private sealed class Chat

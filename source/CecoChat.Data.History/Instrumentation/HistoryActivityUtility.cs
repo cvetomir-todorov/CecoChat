@@ -6,13 +6,13 @@ namespace CecoChat.Data.History.Instrumentation
 {
     internal interface IHistoryActivityUtility
     {
-        Activity StartNewDialogMessage(ISession session, long messageID);
+        Activity StartAddDataMessage(ISession session, long messageID);
 
         Activity StartGetHistory(string name, ISession session, long userID);
 
-        Activity StartAddReaction(ISession session, long reactorID);
+        Activity StartSetReaction(ISession session, long reactorID);
 
-        Activity StartRemoveReaction(ISession session, long reactorID);
+        Activity StartUnsetReaction(ISession session, long reactorID);
 
         void Stop(Activity activity, bool operationSuccess);
     }
@@ -26,10 +26,10 @@ namespace CecoChat.Data.History.Instrumentation
             _activityUtility = activityUtility;
         }
 
-        public Activity StartNewDialogMessage(ISession session, long messageID)
+        public Activity StartAddDataMessage(ISession session, long messageID)
         {
             Activity activity = _activityUtility.Start(
-                HistoryInstrumentation.Operations.NewDialogMessage,
+                HistoryInstrumentation.Operations.AddDataMessage,
                 HistoryInstrumentation.ActivitySource,
                 ActivityKind.Client,
                 Activity.Current?.Context);
@@ -60,10 +60,10 @@ namespace CecoChat.Data.History.Instrumentation
             return activity;
         }
 
-        public Activity StartAddReaction(ISession session, long reactorID)
+        public Activity StartSetReaction(ISession session, long reactorID)
         {
             Activity activity = _activityUtility.Start(
-                HistoryInstrumentation.Operations.AddReaction,
+                HistoryInstrumentation.Operations.SetReaction,
                 HistoryInstrumentation.ActivitySource,
                 ActivityKind.Client,
                 Activity.Current?.Context);
@@ -77,10 +77,10 @@ namespace CecoChat.Data.History.Instrumentation
             return activity;
         }
 
-        public Activity StartRemoveReaction(ISession session, long reactorID)
+        public Activity StartUnsetReaction(ISession session, long reactorID)
         {
             Activity activity = _activityUtility.Start(
-                HistoryInstrumentation.Operations.RemoveReaction,
+                HistoryInstrumentation.Operations.UnsetReaction,
                 HistoryInstrumentation.ActivitySource,
                 ActivityKind.Client,
                 Activity.Current?.Context);

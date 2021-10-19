@@ -109,7 +109,7 @@ namespace CecoChat.Messaging.Server
             builder.RegisterModule(new PartitionUtilityAutofacModule());
             builder.RegisterType<BackplaneComponents>().As<IBackplaneComponents>().SingleInstance();
             builder.RegisterType<TopicPartitionFlyweight>().As<ITopicPartitionFlyweight>().SingleInstance();
-            builder.RegisterType<SendProducer>().As<ISendProducer>().SingleInstance();
+            builder.RegisterType<SendersProducer>().As<ISendersProducer>().SingleInstance();
             builder.RegisterType<ReceiversConsumer>().As<IReceiversConsumer>().SingleInstance();
             builder.RegisterFactory<KafkaProducer<Null, BackplaneMessage>, IKafkaProducer<Null, BackplaneMessage>>();
             builder.RegisterFactory<KafkaConsumer<Null, BackplaneMessage>, IKafkaConsumer<Null, BackplaneMessage>>();
@@ -118,7 +118,6 @@ namespace CecoChat.Messaging.Server
 
             // shared
             builder.RegisterType<MonotonicClock>().As<IClock>().SingleInstance();
-            builder.RegisterType<MessageMapper>().As<IMessageMapper>().SingleInstance();
             builder.RegisterType<ContractDataMapper>().As<IContractDataMapper>().SingleInstance();
         }
 
@@ -137,6 +136,7 @@ namespace CecoChat.Messaging.Server
             {
                 endpoints.MapGrpcService<GrpcListenService>();
                 endpoints.MapGrpcService<GrpcSendService>();
+                endpoints.MapGrpcService<GrpcReactionService>();
             });
         }
     }

@@ -7,7 +7,6 @@ using CecoChat.History.Server.Clients;
 using CecoChat.History.Server.HostedServices;
 using CecoChat.Jwt;
 using CecoChat.Otel;
-using CecoChat.Server;
 using CecoChat.Server.Identity;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -84,13 +83,8 @@ namespace CecoChat.History.Server
             builder.RegisterModule(new HistoryDbAutofacModule
             {
                 HistoryDbConfiguration = Configuration.GetSection("HistoryDB"),
-                RegisterHistory = true,
-                RegisterReactions = true
+                RegisterHistory = true
             });
-
-            // shared
-            builder.RegisterType<MessageMapper>().As<IMessageMapper>().SingleInstance();
-            builder.RegisterType<ContractDataMapper>().As<IContractDataMapper>().SingleInstance();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -107,7 +101,6 @@ namespace CecoChat.History.Server
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapGrpcService<GrpcHistoryService>();
-                endpoints.MapGrpcService<GrpcReactionService>();
             });
         }
     }

@@ -4,60 +4,58 @@ namespace CecoChat.Data.History
 {
     internal interface IMessageMapper
     {
-        sbyte MapHistoryToDbMessageType(HistoryMessageType historyMessageType);
+        sbyte MapHistoryToDbDataType(DataType dataType);
 
-        sbyte MapHistoryToDbMessageStatus(HistoryMessageStatus historyMessageStatus);
+        sbyte MapHistoryToDbDeliveryStatus(DeliveryStatus deliveryStatus);
 
-        HistoryMessageType MapDbToHistoryMessageType(sbyte dbMessageType);
+        DataType MapDbToHistoryDataType(sbyte dbDataType);
 
-        HistoryMessageStatus MapDbToHistoryMessageStatus(sbyte dbMessageStatus);
+        DeliveryStatus MapDbToHistoryDeliveryStatus(sbyte dbDeliveryStatus);
     }
 
     internal sealed class MessageMapper : IMessageMapper
     {
-        private const string PlainTextKey = "plain_text";
-
-        public sbyte MapHistoryToDbMessageType(HistoryMessageType historyMessageType)
+        public sbyte MapHistoryToDbDataType(DataType dataType)
         {
-            switch (historyMessageType)
+            switch (dataType)
             {
-                case HistoryMessageType.PlainText: return (sbyte) DbMessageType.PlainText;
+                case DataType.PlainText: return (sbyte) DbMessageType.PlainText;
                 default:
-                    throw new EnumValueNotSupportedException(historyMessageType);
+                    throw new EnumValueNotSupportedException(dataType);
             }
         }
 
-        public sbyte MapHistoryToDbMessageStatus(HistoryMessageStatus historyMessageStatus)
+        public sbyte MapHistoryToDbDeliveryStatus(DeliveryStatus deliveryStatus)
         {
-            switch (historyMessageStatus)
+            switch (deliveryStatus)
             {
-                case HistoryMessageStatus.Processed: return (sbyte)DbMessageStatus.Processed;
-                case HistoryMessageStatus.Delivered: return (sbyte)DbMessageStatus.Delivered;
+                case DeliveryStatus.Processed: return (sbyte)DbMessageStatus.Processed;
+                case DeliveryStatus.Delivered: return (sbyte)DbMessageStatus.Delivered;
                 default:
-                    throw new EnumValueNotSupportedException(historyMessageStatus);
+                    throw new EnumValueNotSupportedException(deliveryStatus);
             }
         }
 
-        public HistoryMessageType MapDbToHistoryMessageType(sbyte dbMessageType)
+        public DataType MapDbToHistoryDataType(sbyte dbDataType)
         {
-            DbMessageType dbMessageTypeAsEnum = (DbMessageType) dbMessageType;
+            DbMessageType dbDataTypeAsEnum = (DbMessageType)dbDataType;
 
-            switch (dbMessageTypeAsEnum)
+            switch (dbDataTypeAsEnum)
             {
-                case DbMessageType.PlainText: return HistoryMessageType.PlainText;
+                case DbMessageType.PlainText: return DataType.PlainText;
                 default:
-                    throw new EnumValueNotSupportedException(dbMessageTypeAsEnum);
+                    throw new EnumValueNotSupportedException(dbDataTypeAsEnum);
             }
         }
 
-        public HistoryMessageStatus MapDbToHistoryMessageStatus(sbyte dbMessageStatus)
+        public DeliveryStatus MapDbToHistoryDeliveryStatus(sbyte dbDeliveryStatus)
         {
-            DbMessageStatus dbMessageStatusAsEnum = (DbMessageStatus)dbMessageStatus;
+            DbMessageStatus dbMessageStatusAsEnum = (DbMessageStatus)dbDeliveryStatus;
 
             switch (dbMessageStatusAsEnum)
             {
-                case DbMessageStatus.Processed: return HistoryMessageStatus.Processed;
-                case DbMessageStatus.Delivered: return HistoryMessageStatus.Delivered;
+                case DbMessageStatus.Processed: return DeliveryStatus.Processed;
+                case DbMessageStatus.Delivered: return DeliveryStatus.Delivered;
                 default:
                     throw new EnumValueNotSupportedException(dbMessageStatusAsEnum);
             }

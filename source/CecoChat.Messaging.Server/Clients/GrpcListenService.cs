@@ -26,7 +26,7 @@ namespace CecoChat.Messaging.Server.Clients
         }
 
         [Authorize(Roles = "user")]
-        public override async Task Listen(ListenRequest request, IServerStreamWriter<ListenResponse> responseStream, ServerCallContext context)
+        public override async Task Listen(ListenSubscription subscription, IServerStreamWriter<ListenNotification> notificationStream, ServerCallContext context)
         {
             string address = context.Peer;
             if (!context.GetHttpContext().User.TryGetUserClaims(out UserClaims userClaims))
@@ -38,7 +38,7 @@ namespace CecoChat.Messaging.Server.Clients
             _logger.LogInformation("{0} from {1} connected.", userClaims, address);
 
             IGrpcListenStreamer streamer = _streamerFactory.Create();
-            streamer.Initialize(userClaims.ClientID, responseStream);
+            streamer.Initialize(userClaims.ClientID, notificationStream);
             await ProcessMessages(streamer, userClaims, address, context.CancellationToken);
         }
 

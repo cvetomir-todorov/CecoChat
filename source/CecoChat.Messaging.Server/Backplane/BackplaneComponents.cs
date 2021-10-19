@@ -19,20 +19,20 @@ namespace CecoChat.Messaging.Server.Backplane
         private readonly ILogger _logger;
         private readonly BackplaneOptions _backplaneOptions;
         private readonly ITopicPartitionFlyweight _topicPartitionFlyweight;
-        private readonly ISendProducer _sendProducer;
+        private readonly ISendersProducer _sendersProducer;
         private readonly IReceiversConsumer _receiversConsumer;
 
         public BackplaneComponents(
             ILogger<BackplaneComponents> logger,
             IOptions<BackplaneOptions> backplaneOptions,
             ITopicPartitionFlyweight topicPartitionFlyweight,
-            ISendProducer sendProducer,
+            ISendersProducer sendersProducer,
             IReceiversConsumer receiversConsumer)
         {
             _logger = logger;
             _backplaneOptions = backplaneOptions.Value;
             _topicPartitionFlyweight = topicPartitionFlyweight;
-            _sendProducer = sendProducer;
+            _sendersProducer = sendersProducer;
             _receiversConsumer = receiversConsumer;
         }
 
@@ -46,7 +46,7 @@ namespace CecoChat.Messaging.Server.Backplane
                     _backplaneOptions.MessagesTopicName, currentPartitionCount, partitionCount);
             }
 
-            _sendProducer.PartitionCount = partitionCount;
+            _sendersProducer.PartitionCount = partitionCount;
             _receiversConsumer.Prepare(partitions);
 
             _logger.LogInformation("Prepared backplane components for topic {0} to use partitions {1}.",

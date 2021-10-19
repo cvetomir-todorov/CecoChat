@@ -18,20 +18,20 @@ namespace CecoChat.Messaging.Server.Clients
     {
         private readonly ILogger _logger;
         private readonly IIDGenClient _idGenClient;
-        private readonly ISendProducer _sendProducer;
+        private readonly ISendersProducer _sendersProducer;
         private readonly IClientContainer _clientContainer;
         private readonly IContractDataMapper _mapper;
 
         public GrpcSendService(
             ILogger<GrpcSendService> logger,
             IIDGenClient idGenClient,
-            ISendProducer sendProducer,
+            ISendersProducer sendersProducer,
             IClientContainer clientContainer,
             IContractDataMapper mapper)
         {
             _logger = logger;
             _idGenClient = idGenClient;
-            _sendProducer = sendProducer;
+            _sendersProducer = sendersProducer;
             _clientContainer = clientContainer;
             _mapper = mapper;
         }
@@ -45,7 +45,7 @@ namespace CecoChat.Messaging.Server.Clients
             _logger.LogTrace("User {0} sent message with generated ID {1}: {2}.", userClaims, messageID, request);
 
             BackplaneMessage backplaneMessage = _mapper.CreateBackplaneMessage(request, userClaims.ClientID, messageID);
-            _sendProducer.ProduceMessage(backplaneMessage);
+            _sendersProducer.ProduceMessage(backplaneMessage);
 
             (int successCount, int allCount) = EnqueueMessagesForSenders(request, messageID, userClaims.ClientID);
             LogResults(request, messageID, successCount, allCount);
@@ -85,14 +85,14 @@ namespace CecoChat.Messaging.Server.Clients
             int successCount = 0;
             int allCount = 0;
 
-            IEnumerable<IStreamer<ListenResponse>> senderClients = _clientContainer.EnumerateClients(request.SenderId);
-            ListenResponse response = _mapper.CreateListenResponse(request, messageID);
+            IEnumerable<IStreamer<ListenNotification>> senderClients = _clientContainer.EnumerateClients(request.SenderId);
+            ListenNotification notification = _mapper.CreateListenNotification(request, messageID);
 
-            foreach (IStreamer<ListenResponse> senderClient in senderClients)
+            foreach (IStreamer<ListenNotification> senderClient in senderClients)
             {
                 if (senderClient.ClientID != senderClientID)
                 {
-                    if (senderClient.EnqueueMessage(response, parentActivity: Activity.Current))
+                    if (senderClient.EnqueueMessage(notification, parentActivity: Activity.Current))
                     {
                         successCount++;
                     }

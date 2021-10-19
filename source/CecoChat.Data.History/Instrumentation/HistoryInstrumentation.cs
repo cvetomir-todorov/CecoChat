@@ -14,11 +14,11 @@ namespace CecoChat.Data.History.Instrumentation
 
         public static class Operations
         {
-            public const string NewDialogMessage = "HistoryDB.NewDialogMessage";
+            public const string AddDataMessage = "HistoryDB.AddDataMessage";
             public const string GetUserHistory = "HistoryDB.GetUserHistory";
-            public const string GetDialogHistory = "HistoryDB.GetDialogHistory";
-            public const string AddReaction = "HistoryDB.AddReaction";
-            public const string RemoveReaction = "HistoryDB.RemoveReaction";
+            public const string GetHistory = "HistoryDB.GetHistory";
+            public const string SetReaction = "HistoryDB.SetReaction";
+            public const string UnsetReaction = "HistoryDB.UnsetReaction";
         }
 
         public static class Keys

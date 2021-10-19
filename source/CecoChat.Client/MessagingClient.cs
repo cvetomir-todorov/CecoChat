@@ -22,7 +22,6 @@ namespace CecoChat.Client
         private Metadata _grpcMetadata;
         private GrpcChannel _messagingChannel;
         private GrpcChannel _historyChannel;
-        private GrpcChannel _reactionChannel;
         private Listen.ListenClient _listenClient;
         private Send.SendClient _sendClient;
         private History.HistoryClient _historyClient;
@@ -42,9 +41,6 @@ namespace CecoChat.Client
 
             _historyChannel?.ShutdownAsync().Wait();
             _historyChannel?.Dispose();
-
-            _reactionChannel?.ShutdownAsync().Wait();
-            _reactionChannel?.Dispose();
         }
 
         public long UserID => _userID;
@@ -64,13 +60,11 @@ namespace CecoChat.Client
             _messagingChannel = GrpcChannel.ForAddress(connectResponse.MessagingServerAddress);
             _historyChannel?.Dispose();
             _historyChannel = GrpcChannel.ForAddress(connectResponse.HistoryServerAddress);
-            _reactionChannel?.Dispose();
-            _reactionChannel = GrpcChannel.ForAddress(connectResponse.HistoryServerAddress);
 
             _listenClient = new Listen.ListenClient(_messagingChannel);
             _sendClient = new Send.SendClient(_messagingChannel);
             _historyClient = new History.HistoryClient(_historyChannel);
-            _reactionClient = new Reaction.ReactionClient(_historyChannel);
+            _reactionClient = new Reaction.ReactionClient(_messagingChannel);
         }
 
         private async Task<CreateSessionResponse> CreateSession(CreateSessionRequest request, string profileServer)
@@ -124,31 +118,36 @@ namespace CecoChat.Client
 
         public void ListenForMessages(CancellationToken ct)
         {
-            ListenRequest request = new();
-            AsyncServerStreamingCall<ListenResponse> serverStream = _listenClient.Listen(request, _grpcMetadata, cancellationToken: ct);
+            ListenSubscription subscription = new();
+            AsyncServerStreamingCall<ListenNotification> serverStream = _listenClient.Listen(subscription, _grpcMetadata, cancellationToken: ct);
             Task.Factory.StartNew(
                 async () => await ListenForNewMessages(serverStream, ct),
                 TaskCreationOptions.LongRunning);
         }
 
-        private async Task ListenForNewMessages(AsyncServerStreamingCall<ListenResponse> serverStream, CancellationToken ct)
+        private async Task ListenForNewMessages(AsyncServerStreamingCall<ListenNotification> serverStream, CancellationToken ct)
         {
             try
             {
                 while (!ct.IsCancellationRequested && await serverStream.ResponseStream.MoveNext())
                 {
-                    ListenResponse response = serverStream.ResponseStream.Current;
-                    if (response.Type == MessageType.Disconnect)
+                    ListenNotification notification = serverStream.ResponseStream.Current;
+                    switch (notification.Type)
                     {
-                        Disconnected?.Invoke(this, EventArgs.Empty);
-                    }
-                    else if (response.Type == MessageType.Delivery)
-                    {
-                        MessageDelivered?.Invoke(this, response);
-                    }
-                    else
-                    {
-                        MessageReceived?.Invoke(this, response);
+                        case MessageType.Data:
+                            MessageReceived?.Invoke(this, notification);
+                            break;
+                        case MessageType.Disconnect:
+                            Disconnected?.Invoke(this, EventArgs.Empty);
+                            break;
+                        case MessageType.Delivery:
+                            MessageDelivered?.Invoke(this, notification);
+                            break;
+                        case MessageType.Reaction:
+                            ReactionReceived?.Invoke(this, notification);
+                            break;
+                        default:
+                            throw new EnumValueNotSupportedException(notification.Type);
                     }
                 }
             }
@@ -158,15 +157,17 @@ namespace CecoChat.Client
             }
         }
 
-        public event EventHandler<ListenResponse> MessageReceived;
+        public event EventHandler<ListenNotification> MessageReceived;
 
-        public event EventHandler<ListenResponse> MessageDelivered;
+        public event EventHandler<ListenNotification> ReactionReceived; 
+
+        public event EventHandler<ListenNotification> MessageDelivered;
 
         public event EventHandler Disconnected;
 
         public event EventHandler<Exception> ExceptionOccurred;
 
-        public async Task<IList<HistoryItem>> GetUserHistory(DateTime olderThan)
+        public async Task<IList<HistoryMessage>> GetUserHistory(DateTime olderThan)
         {
             GetUserHistoryRequest request = new()
             {
@@ -176,14 +177,14 @@ namespace CecoChat.Client
             return response.Messages;
         }
 
-        public async Task<IList<HistoryItem>> GetChatHistory(long otherUserID, DateTime olderThan)
+        public async Task<IList<HistoryMessage>> GetHistory(long otherUserID, DateTime olderThan)
         {
-            GetChatHistoryRequest request = new()
+            GetHistoryRequest request = new()
             {
                 OtherUserId = otherUserID,
                 OlderThan = Timestamp.FromDateTime(olderThan)
             };
-            GetChatHistoryResponse response = await _historyClient.GetChatHistoryAsync(request, _grpcMetadata);
+            GetHistoryResponse response = await _historyClient.GetHistoryAsync(request, _grpcMetadata);
             return response.Messages;
         }
 

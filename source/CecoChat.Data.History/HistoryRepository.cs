@@ -15,7 +15,7 @@ namespace CecoChat.Data.History
 
         Task<IReadOnlyCollection<HistoryMessage>> GetUserHistory(long userID, DateTime olderThan, int countLimit);
 
-        Task<IReadOnlyCollection<HistoryMessage>> GetDialogHistory(long userID, long otherUserID, DateTime olderThan, int countLimit);
+        Task<IReadOnlyCollection<HistoryMessage>> GetHistory(long userID, long otherUserID, DateTime olderThan, int countLimit);
     }
 
     internal sealed class HistoryRepository : IHistoryRepository
@@ -82,10 +82,10 @@ namespace CecoChat.Data.History
             }
         }
 
-        public async Task<IReadOnlyCollection<HistoryMessage>> GetDialogHistory(long userID, long otherUserID, DateTime olderThan, int countLimit)
+        public async Task<IReadOnlyCollection<HistoryMessage>> GetHistory(long userID, long otherUserID, DateTime olderThan, int countLimit)
         {
             Activity activity = _historyActivityUtility.StartGetHistory(
-                HistoryInstrumentation.Operations.GetDialogHistory, _dataUtility.MessagingSession, userID);
+                HistoryInstrumentation.Operations.GetHistory, _dataUtility.MessagingSession, userID);
             bool success = false;
 
             try
@@ -120,10 +120,10 @@ namespace CecoChat.Data.History
                 message.SenderId = row.GetValue<long>("sender_id");
                 message.ReceiverId = row.GetValue<long>("receiver_id");
                 sbyte messageType = row.GetValue<sbyte>("type");
-                message.Type = _mapper.MapDbToHistoryMessageType(messageType);
+                message.DataType = _mapper.MapDbToHistoryDataType(messageType);
+                message.Data = row.GetValue<string>("data");
                 sbyte status = row.GetValue<sbyte>("status");
-                message.Status = _mapper.MapDbToHistoryMessageStatus(status);
-                message.Text = row.GetValue<string>("data");
+                message.Status = _mapper.MapDbToHistoryDeliveryStatus(status);
                 IDictionary<long, string> reactions = row.GetValue<IDictionary<long, string>>("reactions");
                 if (reactions != null)
                 {
