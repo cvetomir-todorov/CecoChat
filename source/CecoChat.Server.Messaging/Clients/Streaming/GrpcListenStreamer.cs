@@ -147,7 +147,7 @@ namespace CecoChat.Server.Messaging.Clients.Streaming
             return _grpcActivityUtility.StartServiceMethod(name, service, method, parentActivity.Context);
         }
 
-        private record MessageContext
+        private sealed record MessageContext
         {
             public ListenNotification Message { get; init; }
 
