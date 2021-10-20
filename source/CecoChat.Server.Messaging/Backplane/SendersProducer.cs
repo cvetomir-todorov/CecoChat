@@ -5,14 +5,14 @@ using CecoChat.Contracts;
 using CecoChat.Contracts.Backplane;
 using CecoChat.Contracts.Messaging;
 using CecoChat.Kafka;
-using CecoChat.Messaging.Server.Clients;
 using CecoChat.Server.Backplane;
+using CecoChat.Server.Messaging.Clients;
 using Confluent.Kafka;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace CecoChat.Messaging.Server.Backplane
+namespace CecoChat.Server.Messaging.Backplane
 {
     public interface ISendersProducer : IDisposable
     {

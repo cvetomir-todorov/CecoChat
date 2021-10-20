@@ -6,12 +6,12 @@ using CecoChat.Contracts.Messaging;
 using CecoChat.Data.Config.Partitioning;
 using CecoChat.Events;
 using CecoChat.Kafka;
-using CecoChat.Messaging.Server.Backplane;
-using CecoChat.Messaging.Server.Clients;
 using CecoChat.Server.Backplane;
+using CecoChat.Server.Messaging.Backplane;
+using CecoChat.Server.Messaging.Clients;
 using Microsoft.Extensions.Hosting;
 
-namespace CecoChat.Messaging.Server.HostedServices
+namespace CecoChat.Server.Messaging.HostedServices
 {
     public sealed class HandlePartitionsChanged : IHostedService, ISubscriber<PartitionsChangedEventData>
     {

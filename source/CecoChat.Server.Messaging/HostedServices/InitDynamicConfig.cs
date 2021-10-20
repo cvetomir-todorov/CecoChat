@@ -1,12 +1,12 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using CecoChat.Data.Config.Partitioning;
-using CecoChat.Messaging.Server.Backplane;
+using CecoChat.Server.Messaging.Backplane;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace CecoChat.Messaging.Server.HostedServices
+namespace CecoChat.Server.Messaging.HostedServices
 {
     public sealed class InitDynamicConfig : IHostedService
     {

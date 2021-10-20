@@ -7,13 +7,12 @@ using CecoChat.Grpc.Instrumentation;
 using CecoChat.Jwt;
 using CecoChat.Kafka;
 using CecoChat.Kafka.Instrumentation;
-using CecoChat.Messaging.Server.Backplane;
-using CecoChat.Messaging.Server.Clients;
-using CecoChat.Messaging.Server.HostedServices;
 using CecoChat.Otel;
-using CecoChat.Server;
 using CecoChat.Server.Backplane;
 using CecoChat.Server.Identity;
+using CecoChat.Server.Messaging.Backplane;
+using CecoChat.Server.Messaging.Clients;
+using CecoChat.Server.Messaging.HostedServices;
 using Confluent.Kafka;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -22,7 +21,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OpenTelemetry.Trace;
 
-namespace CecoChat.Messaging.Server
+namespace CecoChat.Server.Messaging
 {
     public class Startup
     {

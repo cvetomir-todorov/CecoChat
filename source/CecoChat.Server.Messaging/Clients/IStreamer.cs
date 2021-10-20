@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace CecoChat.Messaging.Server.Clients
+namespace CecoChat.Server.Messaging.Clients
 {
     public interface IStreamer<in TMessage> : IDisposable
     {

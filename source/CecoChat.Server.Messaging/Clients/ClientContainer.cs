@@ -4,7 +4,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using CecoChat.Contracts.Messaging;
 
-namespace CecoChat.Messaging.Server.Clients
+namespace CecoChat.Server.Messaging.Clients
 {
     public interface IClientContainer
     {
