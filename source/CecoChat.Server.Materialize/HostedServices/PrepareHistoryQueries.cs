@@ -5,7 +5,7 @@ using CecoChat.Data.History;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace CecoChat.Materialize.Server.HostedServices
+namespace CecoChat.Server.Materialize.HostedServices
 {
     public sealed class PrepareHistoryQueries : IHostedService
     {
