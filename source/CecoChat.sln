@@ -11,7 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Server", "Server", "{8A833F
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Client", "Client", "{44AE3E31-FA07-4616-9F29-3D2EACF18A68}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CecoChat.Materialize.Server", "CecoChat.Materialize.Server\CecoChat.Materialize.Server.csproj", "{5BDA0EB2-2E0B-44C1-B44B-9F408B0EB2B7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CecoChat.Server.Materialize", "CecoChat.Server.Materialize\CecoChat.Server.Materialize.csproj", "{5BDA0EB2-2E0B-44C1-B44B-9F408B0EB2B7}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CecoChat", "CecoChat\CecoChat.csproj", "{C5D4AA9D-5D7B-4EFC-A56D-112CFB59164D}"
 EndProject
