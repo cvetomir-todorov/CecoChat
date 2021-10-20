@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace CecoChat.Profile.Server.Controllers
+namespace CecoChat.Server.Profile.Controllers
 {
     public sealed class CreateSessionRequest
     {

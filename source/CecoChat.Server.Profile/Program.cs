@@ -1,7 +1,6 @@
-using CecoChat.Server;
 using Microsoft.Extensions.Hosting;
 
-namespace CecoChat.Profile.Server
+namespace CecoChat.Server.Profile
 {
     public static class Program
     {
