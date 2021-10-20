@@ -29,14 +29,22 @@ namespace CecoChat.Client.Console.Interaction
             if (message.Reactions.ContainsKey(Client.UserID))
             {
                 await Client.UnReact(messageID, message.SenderID, message.ReceiverID);
+                message.Reactions.Remove(Client.UserID);
             }
             else
             {
-                await Client.React(messageID, message.SenderID, message.ReceiverID);
+                string reaction = Reactions.ThumbsUp;
+                await Client.React(messageID, message.SenderID, message.ReceiverID, reaction);
+                message.Reactions.Add(Client.UserID, reaction);
             }
 
             Context.ReloadData = true;
             return States.Chat;
+        }
+
+        private static class Reactions
+        {
+            public static readonly string ThumbsUp = "\\u1F44D";
         }
     }
 }
