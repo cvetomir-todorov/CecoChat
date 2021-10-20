@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using CecoChat.Data.History;
 using Microsoft.Extensions.Hosting;
 
-namespace CecoChat.History.Server.HostedServices
+namespace CecoChat.Server.History.HostedServices
 {
     public sealed class InitHistoryDb : IHostedService
     {

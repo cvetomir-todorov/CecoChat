@@ -3,10 +3,10 @@ using CecoChat.Autofac;
 using CecoChat.Data.Config;
 using CecoChat.Data.History;
 using CecoChat.Data.History.Instrumentation;
-using CecoChat.History.Server.Clients;
-using CecoChat.History.Server.HostedServices;
 using CecoChat.Jwt;
 using CecoChat.Otel;
+using CecoChat.Server.History.Clients;
+using CecoChat.Server.History.HostedServices;
 using CecoChat.Server.Identity;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -15,7 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OpenTelemetry.Trace;
 
-namespace CecoChat.History.Server
+namespace CecoChat.Server.History
 {
     public class Startup
     {

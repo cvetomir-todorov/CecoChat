@@ -9,7 +9,7 @@ using Grpc.Core;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
 
-namespace CecoChat.History.Server.Clients
+namespace CecoChat.Server.History.Clients
 {
     public sealed class GrpcHistoryService : Contracts.History.History.HistoryBase
     {
