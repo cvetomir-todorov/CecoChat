@@ -43,11 +43,6 @@ namespace CecoChat.Client.Console.Interaction
                 Context.ReloadData = true;
                 return States.Chat;
             }
-            else if (keyInfo.KeyChar == 'l' || keyInfo.KeyChar == 'L')
-            {
-                Context.ReloadData = false;
-                return States.Chat;
-            }
             else if (keyInfo.KeyChar == 'x' || keyInfo.KeyChar == 'X')
             {
                 Context.ReloadData = true;
@@ -55,6 +50,7 @@ namespace CecoChat.Client.Console.Interaction
             }
             else
             {
+                // includes local refresh
                 Context.ReloadData = false;
                 return States.Chat;
             }
