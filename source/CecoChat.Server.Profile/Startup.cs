@@ -11,7 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OpenTelemetry.Trace;
 
-namespace CecoChat.Profile.Server
+namespace CecoChat.Server.Profile
 {
     public class Startup
     {

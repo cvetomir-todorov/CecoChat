@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
-namespace CecoChat.Profile.Server.Controllers
+namespace CecoChat.Server.Profile.Controllers
 {
     [ApiController]
     [Route("api/session")]
