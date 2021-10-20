@@ -1,7 +1,6 @@
-using CecoChat.Server;
 using Microsoft.Extensions.Hosting;
 
-namespace CecoChat.IDGen.Server
+namespace CecoChat.Server.IDGen
 {
     public static class Program
     {

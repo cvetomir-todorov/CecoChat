@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using CecoChat.Contracts.IDGen;
 using Grpc.Core;
 
-namespace CecoChat.IDGen.Server.Generation
+namespace CecoChat.Server.IDGen.Generation
 {
     public sealed class GrpcIDGenService : Contracts.IDGen.IDGen.IDGenBase
     {

@@ -1,13 +1,13 @@
 using Autofac;
 using CecoChat.Autofac;
-using CecoChat.IDGen.Server.Generation;
+using CecoChat.Server.IDGen.Generation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace CecoChat.IDGen.Server
+namespace CecoChat.Server.IDGen
 {
     public class Startup
     {
