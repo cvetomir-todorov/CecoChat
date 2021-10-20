@@ -17,13 +17,13 @@ namespace CecoChat.Client.Console.Interaction
                 messageID == 0)
             {
                 States.Context.ReloadData = true;
-                return States.Dialog;
+                return States.Chat;
             }
 
             if (!States.Storage.TryGetMessage(States.Client.UserID, States.Context.UserID, messageID, out Message message))
             {
                 States.Context.ReloadData = true;
-                return States.Dialog;
+                return States.Chat;
             }
 
             if (message.Reactions.ContainsKey(States.Client.UserID))
@@ -36,7 +36,7 @@ namespace CecoChat.Client.Console.Interaction
             }
 
             States.Context.ReloadData = true;
-            return States.Dialog;
+            return States.Chat;
         }
     }
 }

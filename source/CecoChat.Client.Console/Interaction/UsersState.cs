@@ -63,7 +63,7 @@ namespace CecoChat.Client.Console.Interaction
             {
                 States.Context.UserID = userIDs[index];
                 States.Context.ReloadData = true;
-                return States.Dialog;
+                return States.Chat;
             }
         }
     }

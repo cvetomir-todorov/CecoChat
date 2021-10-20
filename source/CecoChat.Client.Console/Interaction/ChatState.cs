@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace CecoChat.Client.Console.Interaction
 {
-    public sealed class DialogState : State
+    public sealed class ChatState : State
     {
-        public DialogState(StateContainer states) : base(states)
+        public ChatState(StateContainer states) : base(states)
         {}
 
         public override async Task<State> Execute()
@@ -25,7 +25,7 @@ namespace CecoChat.Client.Console.Interaction
             {
                 DisplayMessage(message);
             }
-            System.Console.WriteLine("Write (press 'w') | React (press 'r') | Refresh (press 'f') | Return (press 'x')");
+            System.Console.WriteLine("Write (press 'w') | React (press 'r') | Refresh (press 'f') | Local refresh (press 'l') | Return (press 'x')");
 
             ConsoleKeyInfo keyInfo = System.Console.ReadKey(intercept: true);
             if (keyInfo.KeyChar == 'w' || keyInfo.KeyChar == 'W')
@@ -41,7 +41,12 @@ namespace CecoChat.Client.Console.Interaction
             else if (keyInfo.KeyChar == 'f' || keyInfo.KeyChar == 'F')
             {
                 States.Context.ReloadData = true;
-                return States.Dialog;
+                return States.Chat;
+            }
+            else if (keyInfo.KeyChar == 'l' || keyInfo.KeyChar == 'L')
+            {
+                States.Context.ReloadData = false;
+                return States.Chat;
             }
             else if (keyInfo.KeyChar == 'x' || keyInfo.KeyChar == 'X')
             {
@@ -51,7 +56,7 @@ namespace CecoChat.Client.Console.Interaction
             else
             {
                 States.Context.ReloadData = false;
-                return States.Dialog;
+                return States.Chat;
             }
         }
 

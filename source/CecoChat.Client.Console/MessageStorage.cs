@@ -8,38 +8,31 @@ namespace CecoChat.Client.Console
     public sealed class MessageStorage
     {
         private readonly long _userID;
-        private readonly ConcurrentDictionary<long, Chat> _dialogMap;
+        private readonly ConcurrentDictionary<long, Chat> _chatMap;
 
         public MessageStorage(long userID)
         {
             _userID = userID;
-            _dialogMap = new();
+            _chatMap = new();
         }
 
         public void AddMessage(Message message)
         {
             long otherUserId = GetOtherUserID(message);
-            Chat chat = _dialogMap.GetOrAdd(otherUserId, _ => new Chat());
+            Chat chat = _chatMap.GetOrAdd(otherUserId, _ => new Chat());
             chat.AddNew(message);
-        }
-
-        public void AcknowledgeMessage(Message message)
-        {
-            long otherUserID = GetOtherUserID(message);
-            Chat chat = _dialogMap.GetOrAdd(otherUserID, _ => new Chat());
-            chat.UpdateDeliveryStatus(message);
         }
 
         public List<long> GetUsers()
         {
-            return _dialogMap.Keys.ToList();
+            return _chatMap.Keys.ToList();
         }
 
         public List<Message> GetDialogMessages(long userID)
         {
             List<Message> messages = new();
 
-            if (_dialogMap.TryGetValue(userID, out Chat dialog))
+            if (_chatMap.TryGetValue(userID, out Chat dialog))
             {
                 messages.AddRange(dialog.GetMessages());
             }
@@ -50,9 +43,9 @@ namespace CecoChat.Client.Console
         public bool TryGetMessage(long userID1, long userID2, long messageID, out Message message)
         {
             long otherUserID = GetOtherUserID(userID1, userID2);
-            
+
             message = null;
-            if (!_dialogMap.TryGetValue(otherUserID, out Chat dialog))
+            if (!_chatMap.TryGetValue(otherUserID, out Chat dialog))
             {
                 return false;
             }
@@ -93,14 +86,6 @@ namespace CecoChat.Client.Console
                 if (!_messageMap.TryGetValue(message.MessageID, out _))
                 {
                     _messageMap.TryAdd(message.MessageID, message);
-                }
-            }
-
-            public void UpdateDeliveryStatus(Message message)
-            {
-                if (_messageMap.TryGetValue(message.MessageID, out Message existing))
-                {
-                    existing.Status = message.Status;
                 }
             }
 
