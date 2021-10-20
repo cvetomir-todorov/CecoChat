@@ -5,14 +5,13 @@ using System.Threading.Tasks;
 using CecoChat.Contracts.Backplane;
 using CecoChat.Contracts.Messaging;
 using CecoChat.Data.IDGen;
-using CecoChat.Messaging.Server.Backplane;
-using CecoChat.Server;
 using CecoChat.Server.Identity;
+using CecoChat.Server.Messaging.Backplane;
 using Grpc.Core;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
 
-namespace CecoChat.Messaging.Server.Clients
+namespace CecoChat.Server.Messaging.Clients
 {
     public sealed class GrpcSendService : Send.SendBase
     {

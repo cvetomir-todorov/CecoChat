@@ -1,4 +1,4 @@
-﻿namespace CecoChat.Messaging.Server.Clients
+﻿namespace CecoChat.Server.Messaging.Clients
 {
     public sealed class ClientOptions
     {

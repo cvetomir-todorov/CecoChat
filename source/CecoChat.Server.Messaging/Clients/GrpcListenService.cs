@@ -7,7 +7,7 @@ using Grpc.Core;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
 
-namespace CecoChat.Messaging.Server.Clients
+namespace CecoChat.Server.Messaging.Clients
 {
     public sealed class GrpcListenService : Listen.ListenBase
     {

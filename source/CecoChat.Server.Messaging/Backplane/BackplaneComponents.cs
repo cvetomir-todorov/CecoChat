@@ -5,7 +5,7 @@ using CecoChat.Kafka;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace CecoChat.Messaging.Server.Backplane
+namespace CecoChat.Server.Messaging.Backplane
 {
     public interface IBackplaneComponents
     {
