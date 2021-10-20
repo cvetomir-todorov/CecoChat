@@ -9,8 +9,6 @@ message DataMessage {
   int64 sender_id = 2;
   int64 receiver_id = 3;
   DataType data_type = 4;
-  oneof request_data {
-    string data = 5;
-  }
+  string data = 5;
   DeliveryStatus status = 6;
 }
