@@ -14,23 +14,27 @@ namespace CecoChat.Client.Console.Interaction
             States = states;
         }
 
+        protected MessageStorage Storage => States.Storage;
+        protected MessagingClient Client => States.Client;
+        protected StateContext Context => States.Context;
+
         protected async Task GetUserHistory()
         {
-            IList<HistoryMessage> history = await States.Client.GetUserHistory(DateTime.UtcNow);
+            IList<HistoryMessage> history = await Client.GetUserHistory(DateTime.UtcNow);
             foreach (HistoryMessage item in history)
             {
                 Message message = CreateMessage(item);
-                States.Storage.AddMessage(message);
+                Storage.AddMessage(message);
             }
         }
 
         protected async Task GetDialogHistory(long userID)
         {
-            IList<HistoryMessage> history = await States.Client.GetHistory(userID, DateTime.UtcNow);
+            IList<HistoryMessage> history = await Client.GetHistory(userID, DateTime.UtcNow);
             foreach (HistoryMessage item in history)
             {
                 Message message = CreateMessage(item);
-                States.Storage.AddMessage(message);
+                Storage.AddMessage(message);
             }
         }
 

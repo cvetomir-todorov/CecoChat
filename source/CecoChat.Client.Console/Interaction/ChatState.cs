@@ -12,12 +12,12 @@ namespace CecoChat.Client.Console.Interaction
 
         public override async Task<State> Execute()
         {
-            if (States.Context.ReloadData)
+            if (Context.ReloadData)
             {
-                await GetDialogHistory(States.Context.UserID);
+                await GetDialogHistory(Context.UserID);
             }
 
-            List<Message> messages = States.Storage.GetDialogMessages(States.Context.UserID);
+            List<Message> messages = Storage.GetDialogMessages(Context.UserID);
             messages.Sort((left, right) => left.MessageID.CompareTo(right.MessageID));
 
             System.Console.Clear();
@@ -30,39 +30,39 @@ namespace CecoChat.Client.Console.Interaction
             ConsoleKeyInfo keyInfo = System.Console.ReadKey(intercept: true);
             if (keyInfo.KeyChar == 'w' || keyInfo.KeyChar == 'W')
             {
-                States.Context.ReloadData = false;
+                Context.ReloadData = false;
                 return States.SendMessage;
             }
             else if (keyInfo.KeyChar == 'r' || keyInfo.KeyChar == 'R')
             {
-                States.Context.ReloadData = false;
+                Context.ReloadData = false;
                 return States.React;
             }
             else if (keyInfo.KeyChar == 'f' || keyInfo.KeyChar == 'F')
             {
-                States.Context.ReloadData = true;
+                Context.ReloadData = true;
                 return States.Chat;
             }
             else if (keyInfo.KeyChar == 'l' || keyInfo.KeyChar == 'L')
             {
-                States.Context.ReloadData = false;
+                Context.ReloadData = false;
                 return States.Chat;
             }
             else if (keyInfo.KeyChar == 'x' || keyInfo.KeyChar == 'X')
             {
-                States.Context.ReloadData = true;
+                Context.ReloadData = true;
                 return States.Users;
             }
             else
             {
-                States.Context.ReloadData = false;
+                Context.ReloadData = false;
                 return States.Chat;
             }
         }
 
         private void DisplayMessage(Message message)
         {
-            string sender = message.SenderID == States.Client.UserID ? "You" : message.SenderID.ToString();
+            string sender = message.SenderID == Client.UserID ? "You" : message.SenderID.ToString();
             string reactions = string.Empty;
             if (message.Reactions.Count > 0)
             {
