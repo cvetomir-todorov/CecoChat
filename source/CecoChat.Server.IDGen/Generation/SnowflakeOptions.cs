@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace CecoChat.IDGen.Server.Generation
+namespace CecoChat.Server.IDGen.Generation
 {
     public sealed class SnowflakeOptions
     {
