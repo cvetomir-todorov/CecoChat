@@ -36,26 +36,26 @@ namespace CecoChat.Client.Console.Interaction
 
         public abstract Task<State> Execute();
 
-        private static Message CreateMessage(HistoryMessage item)
+        private static Message CreateMessage(HistoryMessage historyMessage)
         {
             Message message = new()
             {
-                MessageID = item.MessageId,
-                SenderID = item.SenderId,
-                ReceiverID = item.ReceiverId,
+                MessageID = historyMessage.MessageId,
+                SenderID = historyMessage.SenderId,
+                ReceiverID = historyMessage.ReceiverId,
             };
 
-            switch (item.DataType)
+            switch (historyMessage.DataType)
             {
                 case Contracts.History.DataType.PlainText:
                     message.DataType = DataType.PlainText;
-                    message.Data = item.Data;
+                    message.Data = historyMessage.Data;
                     break;
                 default:
-                    throw new EnumValueNotSupportedException(item.DataType);
+                    throw new EnumValueNotSupportedException(historyMessage.DataType);
             }
 
-            switch (item.Status)
+            switch (historyMessage.Status)
             {
                 case Contracts.History.DeliveryStatus.Processed:
                     message.Status = DeliveryStatus.Processed;
@@ -67,10 +67,10 @@ namespace CecoChat.Client.Console.Interaction
                     message.Status = DeliveryStatus.Seen;
                     break;
                 default:
-                    throw new EnumValueNotSupportedException(item.Status);
+                    throw new EnumValueNotSupportedException(historyMessage.Status);
             }
 
-            foreach (KeyValuePair<long, string> pair in item.Reactions)
+            foreach (KeyValuePair<long, string> pair in historyMessage.Reactions)
             {
                 message.Reactions.Add(pair.Key, pair.Value);
             }

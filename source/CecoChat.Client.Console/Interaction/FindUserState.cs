@@ -24,7 +24,7 @@ namespace CecoChat.Client.Console.Interaction
             {
                 States.Context.ReloadData = true;
                 States.Context.UserID = userID;
-                return Task.FromResult(States.Dialog);
+                return Task.FromResult(States.Chat);
             }
         }
     }
