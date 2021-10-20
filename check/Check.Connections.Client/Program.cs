@@ -5,7 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using CecoChat.Contracts.Client;
+using CecoChat.Contracts.Messaging;
 using CommandLine;
 using Grpc.Net.Client;
 
@@ -104,21 +104,15 @@ namespace Check.Connections.Client
             {
                 for (int i = 0; i < commandLine.MessageCount; ++i)
                 {
-                    ClientMessage message = new()
+                    SendMessageRequest request = new()
                     {
                         SenderId = 1,
                         ReceiverId = 2,
-                        Type = ClientMessageType.PlainText,
-                        Text = "dummy"
-                    };
-                    SendMessageRequest request = new()
-                    {
-                        Message = message
+                        DataType = DataType.PlainText,
+                        Data = "dummy"
                     };
 
-                    SendMessageResponse response = await client.SendClient.SendMessageAsync(request);
-                    message.MessageId = response.MessageId;
-
+                    await client.SendClient.SendMessageAsync(request);
                     await Task.Delay(TimeSpan.FromSeconds(1));
                 }
 

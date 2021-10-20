@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using CecoChat.Contracts.Client;
+using CecoChat.Contracts.Messaging;
 using Grpc.Core;
 
 namespace Check.Connections.Server.Clients
