@@ -202,14 +202,14 @@ namespace CecoChat.Client
             return response.MessageId;
         }
 
-        public async Task React(long messageID, long senderID, long receiverID)
+        public async Task React(long messageID, long senderID, long receiverID, string reaction)
         {
             ReactRequest request = new()
             {
                 MessageId = messageID,
                 SenderId = senderID,
                 ReceiverId = receiverID,
-                Reaction = "\\u1F44D" // thumbs-up
+                Reaction = reaction
             };
             await _reactionClient.ReactAsync(request, _grpcMetadata);
         }
