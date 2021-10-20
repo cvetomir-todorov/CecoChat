@@ -5,10 +5,9 @@ using CecoChat.Data.History;
 using CecoChat.Data.History.Instrumentation;
 using CecoChat.Kafka;
 using CecoChat.Kafka.Instrumentation;
-using CecoChat.Materialize.Server.Backplane;
-using CecoChat.Materialize.Server.HostedServices;
 using CecoChat.Otel;
-using CecoChat.Server;
+using CecoChat.Server.Materialize.Backplane;
+using CecoChat.Server.Materialize.HostedServices;
 using Confluent.Kafka;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -16,7 +15,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace CecoChat.Materialize.Server
+namespace CecoChat.Server.Materialize
 {
     public class Startup
     {

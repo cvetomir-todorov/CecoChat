@@ -1,7 +1,6 @@
-using CecoChat.Server;
 using Microsoft.Extensions.Hosting;
 
-namespace CecoChat.Materialize.Server
+namespace CecoChat.Server.Materialize
 {
     public static class Program
     {

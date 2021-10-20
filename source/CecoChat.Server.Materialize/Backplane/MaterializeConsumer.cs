@@ -4,13 +4,12 @@ using CecoChat.Contracts.Backplane;
 using CecoChat.Contracts.History;
 using CecoChat.Data.History;
 using CecoChat.Kafka;
-using CecoChat.Server;
 using CecoChat.Server.Backplane;
 using Confluent.Kafka;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace CecoChat.Materialize.Server.Backplane
+namespace CecoChat.Server.Materialize.Backplane
 {
     public interface IMaterializeConsumer : IDisposable
     {
