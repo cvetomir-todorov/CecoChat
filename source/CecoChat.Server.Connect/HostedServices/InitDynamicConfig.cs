@@ -4,7 +4,7 @@ using CecoChat.Data.Config.History;
 using CecoChat.Data.Config.Partitioning;
 using Microsoft.Extensions.Hosting;
 
-namespace CecoChat.Connect.Server.HostedServices
+namespace CecoChat.Server.Connect.HostedServices
 {
     public sealed class InitDynamicConfig : IHostedService
     {

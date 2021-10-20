@@ -1,4 +1,4 @@
-﻿namespace CecoChat.Connect.Server.Controllers
+﻿namespace CecoChat.Server.Connect.Controllers
 {
     public sealed class ConnectResponse
     {

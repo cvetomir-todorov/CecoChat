@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-namespace CecoChat.Connect.Server.Controllers
+namespace CecoChat.Server.Connect.Controllers
 {
     [ApiController]
     [Route("api/connect")]

@@ -1,10 +1,10 @@
 using Autofac;
 using CecoChat.Autofac;
-using CecoChat.Connect.Server.HostedServices;
 using CecoChat.Data.Config;
 using CecoChat.Jwt;
 using CecoChat.Otel;
 using CecoChat.Server.Backplane;
+using CecoChat.Server.Connect.HostedServices;
 using CecoChat.Server.Identity;
 using CecoChat.Swagger;
 using FluentValidation.AspNetCore;
@@ -15,7 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OpenTelemetry.Trace;
 
-namespace CecoChat.Connect.Server
+namespace CecoChat.Server.Connect
 {
     public class Startup
     {
