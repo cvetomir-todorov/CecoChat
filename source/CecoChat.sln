@@ -23,7 +23,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CecoChat.Server", "CecoChat
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CecoChat.Client.Console", "CecoChat.Client.Console\CecoChat.Client.Console.csproj", "{9D560593-98F0-4CED-9B4E-F2EE975264DA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CecoChat.History.Server", "CecoChat.History.Server\CecoChat.History.Server.csproj", "{27FB1957-1237-446C-BC7B-C4A3ACB8234A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CecoChat.Server.History", "CecoChat.Server.History\CecoChat.Server.History.csproj", "{27FB1957-1237-446C-BC7B-C4A3ACB8234A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CecoChat.Server.Connect", "CecoChat.Server.Connect\CecoChat.Server.Connect.csproj", "{4A2BBA46-E004-4353-97B4-DEB23502AA83}"
 EndProject
