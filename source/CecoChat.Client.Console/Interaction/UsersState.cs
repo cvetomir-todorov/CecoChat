@@ -11,14 +11,14 @@ namespace CecoChat.Client.Console.Interaction
 
         public override async Task<State> Execute()
         {
-            if (States.Context.ReloadData)
+            if (Context.ReloadData)
             {
                 await GetUserHistory();
             }
 
             System.Console.Clear();
             System.Console.WriteLine("Choose user to chat (press '0'...'9') | New (press 'n') | Refresh (press 'f') | Exit (press 'x'):");
-            List<long> userIDs = States.Storage.GetUsers();
+            List<long> userIDs = Storage.GetUsers();
             int key = 0;
             foreach (long userID in userIDs)
             {
@@ -32,12 +32,12 @@ namespace CecoChat.Client.Console.Interaction
             }
             else if (keyInfo.KeyChar == 'n' || keyInfo.KeyChar == 'N')
             {
-                States.Context.ReloadData = false;
+                Context.ReloadData = false;
                 return States.FindUser;
             }
             else if (keyInfo.KeyChar == 'f' || keyInfo.KeyChar == 'F')
             {
-                States.Context.ReloadData = true;
+                Context.ReloadData = true;
                 return States.Users;
             }
             else if (keyInfo.KeyChar == 'x' || keyInfo.KeyChar == 'X')
@@ -46,7 +46,7 @@ namespace CecoChat.Client.Console.Interaction
             }
             else
             {
-                States.Context.ReloadData = false;
+                Context.ReloadData = false;
                 return States.Users;
             }
         }
@@ -56,13 +56,13 @@ namespace CecoChat.Client.Console.Interaction
             int index = keyInfo.KeyChar - '0';
             if (index < 0 || index >= userIDs.Count)
             {
-                States.Context.ReloadData = false;
+                Context.ReloadData = false;
                 return States.Users;
             }
             else
             {
-                States.Context.UserID = userIDs[index];
-                States.Context.ReloadData = true;
+                Context.UserID = userIDs[index];
+                Context.ReloadData = true;
                 return States.Chat;
             }
         }

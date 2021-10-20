@@ -17,13 +17,13 @@ namespace CecoChat.Client.Console.Interaction
                 !long.TryParse(userIDString, out long userID) ||
                 userID == 0)
             {
-                States.Context.ReloadData = true;
+                Context.ReloadData = true;
                 return Task.FromResult(States.Users);
             }
             else
             {
-                States.Context.ReloadData = true;
-                States.Context.UserID = userID;
+                Context.ReloadData = true;
+                Context.UserID = userID;
                 return Task.FromResult(States.Chat);
             }
         }

@@ -16,26 +16,26 @@ namespace CecoChat.Client.Console.Interaction
                 !long.TryParse(messageIDString, out long messageID) ||
                 messageID == 0)
             {
-                States.Context.ReloadData = true;
+                Context.ReloadData = true;
                 return States.Chat;
             }
 
-            if (!States.Storage.TryGetMessage(States.Client.UserID, States.Context.UserID, messageID, out Message message))
+            if (!Storage.TryGetMessage(Client.UserID, Context.UserID, messageID, out Message message))
             {
-                States.Context.ReloadData = true;
+                Context.ReloadData = true;
                 return States.Chat;
             }
 
-            if (message.Reactions.ContainsKey(States.Client.UserID))
+            if (message.Reactions.ContainsKey(Client.UserID))
             {
-                await States.Client.UnReact(messageID, message.SenderID, message.ReceiverID);
+                await Client.UnReact(messageID, message.SenderID, message.ReceiverID);
             }
             else
             {
-                await States.Client.React(messageID, message.SenderID, message.ReceiverID);
+                await Client.React(messageID, message.SenderID, message.ReceiverID);
             }
 
-            States.Context.ReloadData = true;
+            Context.ReloadData = true;
             return States.Chat;
         }
     }

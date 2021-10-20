@@ -9,26 +9,26 @@ namespace CecoChat.Client.Console.Interaction
 
         public override async Task<State> Execute()
         {
-            System.Console.Write("Message to ID={0}: ", States.Context.UserID);
+            System.Console.Write("Message to ID={0}: ", Context.UserID);
             string plainText = System.Console.ReadLine();
             if (string.IsNullOrWhiteSpace(plainText))
             {
                 return States.Chat;
             }
 
-            long messageID = await States.Client.SendPlainTextMessage(States.Context.UserID, plainText);
+            long messageID = await Client.SendPlainTextMessage(Context.UserID, plainText);
             Message message = new()
             {
                 MessageID = messageID,
-                SenderID = States.Client.UserID,
-                ReceiverID = States.Context.UserID,
+                SenderID = Client.UserID,
+                ReceiverID = Context.UserID,
                 DataType = DataType.PlainText,
                 Data = plainText,
                 Status = DeliveryStatus.Unprocessed
             };
-            States.Storage.AddMessage(message);
+            Storage.AddMessage(message);
 
-            States.Context.ReloadData = true;
+            Context.ReloadData = true;
             return States.Chat;
         }
     }
