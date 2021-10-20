@@ -11,9 +11,7 @@ message SendMessageRequest {
   int64 sender_id = 1;
   int64 receiver_id = 2;
   DataType data_type = 3;
-  oneof request_data {
-    string data = 4;
-  }
+  string data = 4;
 }
 
 message SendMessageResponse {
