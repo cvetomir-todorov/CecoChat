@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
@@ -65,10 +65,8 @@ namespace CecoChat.Events
 
         private async Task ProcessEvent(TEventData eventData)
         {
-            foreach (KeyValuePair<Guid, SubscriberInfo> pair in _subscribersMap)
+            foreach (SubscriberInfo context in _subscribersMap.Select(pair => pair.Value))
             {
-                SubscriberInfo context = pair.Value;
-
                 try
                 {
                     if (context.Condition(eventData))
