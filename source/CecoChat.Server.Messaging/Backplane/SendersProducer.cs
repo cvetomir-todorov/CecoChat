@@ -6,7 +6,7 @@ using CecoChat.Contracts.Backplane;
 using CecoChat.Contracts.Messaging;
 using CecoChat.Kafka;
 using CecoChat.Server.Backplane;
-using CecoChat.Server.Messaging.Clients;
+using CecoChat.Server.Messaging.Clients.Streaming;
 using Confluent.Kafka;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;

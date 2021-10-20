@@ -7,6 +7,7 @@ using CecoChat.Contracts.Messaging;
 using CecoChat.Data.IDGen;
 using CecoChat.Server.Identity;
 using CecoChat.Server.Messaging.Backplane;
+using CecoChat.Server.Messaging.Clients.Streaming;
 using Grpc.Core;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;

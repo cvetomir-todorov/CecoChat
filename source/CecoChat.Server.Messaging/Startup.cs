@@ -12,6 +12,7 @@ using CecoChat.Server.Backplane;
 using CecoChat.Server.Identity;
 using CecoChat.Server.Messaging.Backplane;
 using CecoChat.Server.Messaging.Clients;
+using CecoChat.Server.Messaging.Clients.Streaming;
 using CecoChat.Server.Messaging.HostedServices;
 using Confluent.Kafka;
 using Microsoft.AspNetCore.Builder;

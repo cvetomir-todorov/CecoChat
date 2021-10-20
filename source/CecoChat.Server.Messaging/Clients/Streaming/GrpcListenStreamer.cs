@@ -9,7 +9,7 @@ using Grpc.Core;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace CecoChat.Server.Messaging.Clients
+namespace CecoChat.Server.Messaging.Clients.Streaming
 {
     public interface IGrpcListenStreamer : IStreamer<ListenNotification>
     {
