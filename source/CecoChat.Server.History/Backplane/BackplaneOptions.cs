@@ -1,6 +1,6 @@
 ﻿using CecoChat.Kafka;
 
-namespace CecoChat.Server.Materialize.Backplane
+namespace CecoChat.Server.History.Backplane
 {
     public sealed class BackplaneOptions
     {
