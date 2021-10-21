@@ -1,13 +1,18 @@
 using Autofac;
 using CecoChat.Autofac;
+using CecoChat.Contracts.Backplane;
 using CecoChat.Data.Config;
 using CecoChat.Data.History;
 using CecoChat.Data.History.Instrumentation;
 using CecoChat.Jwt;
+using CecoChat.Kafka;
+using CecoChat.Kafka.Instrumentation;
 using CecoChat.Otel;
+using CecoChat.Server.History.Backplane;
 using CecoChat.Server.History.Clients;
 using CecoChat.Server.History.HostedServices;
 using CecoChat.Server.Identity;
+using Confluent.Kafka;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -49,6 +54,7 @@ namespace CecoChat.Server.History
             {
                 otel.AddServiceResource(new OtelServiceResource {Namespace = "CecoChat", Name = "History", Version = "0.1"});
                 otel.AddAspNetCoreInstrumentation(aspnet => aspnet.EnableGrpcAspNetCoreSupport = true);
+                otel.AddKafkaInstrumentation();
                 otel.AddHistoryInstrumentation();
                 otel.ConfigureSampling(_otelSamplingOptions);
                 otel.ConfigureJaegerExporter(_jaegerOptions);
@@ -71,6 +77,7 @@ namespace CecoChat.Server.History
             builder.RegisterHostedService<InitDynamicConfig>();
             builder.RegisterHostedService<InitHistoryDb>();
             builder.RegisterHostedService<PrepareHistoryQueries>();
+            builder.RegisterHostedService<StartMaterializeMessages>();
 
             // configuration
             builder.RegisterModule(new ConfigDbAutofacModule
@@ -83,8 +90,16 @@ namespace CecoChat.Server.History
             builder.RegisterModule(new HistoryDbAutofacModule
             {
                 HistoryDbConfiguration = Configuration.GetSection("HistoryDB"),
-                RegisterHistory = true
             });
+
+            // backplane
+            builder.RegisterType<MaterializeConsumer>().As<IMaterializeConsumer>().SingleInstance();
+            builder.RegisterFactory<KafkaConsumer<Null, BackplaneMessage>, IKafkaConsumer<Null, BackplaneMessage>>();
+            builder.RegisterModule(new KafkaInstrumentationAutofacModule());
+            builder.RegisterOptions<BackplaneOptions>(Configuration.GetSection("Backplane"));
+
+            // shared
+            builder.RegisterType<ContractDataMapper>().As<IContractDataMapper>().SingleInstance();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

@@ -11,19 +11,8 @@ namespace CecoChat.Data.History
     {
         public IConfiguration HistoryDbConfiguration { get; init; }
 
-        public bool RegisterHistory { get; init; }
-        
-        public bool RegisterReactions { get; init; }
-
-        public bool RegisterNewMessage { get; init; }
-
         protected override void Load(ContainerBuilder builder)
         {
-            if (!RegisterHistory && !RegisterReactions && !RegisterNewMessage)
-            {
-                return;
-            }
-
             builder.RegisterModule(new CassandraAutofacModule<HistoryDbContext, IHistoryDbContext>
             {
                 CassandraConfiguration = HistoryDbConfiguration
@@ -32,18 +21,9 @@ namespace CecoChat.Data.History
             builder.RegisterType<DataUtility>().As<IDataUtility>().SingleInstance();
             builder.RegisterType<MessageMapper>().As<IMessageMapper>().SingleInstance();
 
-            if (RegisterHistory)
-            {
-                builder.RegisterType<HistoryRepository>().As<IHistoryRepository>().SingleInstance();
-            }
-            if (RegisterReactions)
-            {
-                builder.RegisterType<ReactionRepository>().As<IReactionRepository>().SingleInstance();
-            }
-            if (RegisterNewMessage)
-            {
-                builder.RegisterType<NewMessageRepository>().As<INewMessageRepository>().SingleInstance();
-            }
+            builder.RegisterType<HistoryRepository>().As<IHistoryRepository>().SingleInstance();
+            builder.RegisterType<ReactionRepository>().As<IReactionRepository>().SingleInstance();
+            builder.RegisterType<NewMessageRepository>().As<INewMessageRepository>().SingleInstance();
 
             string utilityName = $"{nameof(HistoryActivityUtility)}.{nameof(IActivityUtility)}";
 

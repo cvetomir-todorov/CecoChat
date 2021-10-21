@@ -9,7 +9,7 @@ using Confluent.Kafka;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace CecoChat.Server.Materialize.Backplane
+namespace CecoChat.Server.History.Backplane
 {
     public interface IMaterializeConsumer : IDisposable
     {
