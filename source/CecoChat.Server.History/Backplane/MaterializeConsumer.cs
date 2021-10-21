@@ -2,7 +2,7 @@
 using System.Threading;
 using CecoChat.Contracts.Backplane;
 using CecoChat.Contracts.History;
-using CecoChat.Data.History;
+using CecoChat.Data.History.Repos;
 using CecoChat.Kafka;
 using CecoChat.Server.Backplane;
 using Confluent.Kafka;
@@ -24,23 +24,23 @@ namespace CecoChat.Server.History.Backplane
         private readonly BackplaneOptions _backplaneOptions;
         private readonly IKafkaConsumer<Null, BackplaneMessage> _consumer;
         private readonly IContractDataMapper _mapper;
-        private readonly INewMessageRepository _newMessageRepository;
-        private readonly IReactionRepository _reactionRepository;
+        private readonly INewMessageRepo _newMessageRepo;
+        private readonly IReactionRepo _reactionRepo;
 
         public MaterializeConsumer(
             ILogger<MaterializeConsumer> logger,
             IOptions<BackplaneOptions> backplaneOptions,
             IFactory<IKafkaConsumer<Null, BackplaneMessage>> consumerFactory,
             IContractDataMapper mapper,
-            INewMessageRepository newMessageRepository,
-            IReactionRepository reactionRepository)
+            INewMessageRepo newMessageRepo,
+            IReactionRepo reactionRepo)
         {
             _logger = logger;
             _backplaneOptions = backplaneOptions.Value;
             _consumer = consumerFactory.Create();
             _mapper = mapper;
-            _newMessageRepository = newMessageRepository;
-            _reactionRepository = reactionRepository;
+            _newMessageRepo = newMessageRepo;
+            _reactionRepo = reactionRepo;
         }
 
         public void Dispose()
@@ -83,7 +83,7 @@ namespace CecoChat.Server.History.Backplane
         private void AddDataMessage(BackplaneMessage backplaneMessage)
         {
             DataMessage dataMessage = _mapper.CreateDataMessage(backplaneMessage);
-            _newMessageRepository.AddMessage(dataMessage);
+            _newMessageRepo.AddMessage(dataMessage);
         }
 
         private void AddReaction(BackplaneMessage backplaneMessage)
@@ -91,11 +91,11 @@ namespace CecoChat.Server.History.Backplane
             ReactionMessage reactionMessage = _mapper.CreateReactionMessage(backplaneMessage);
             if (reactionMessage.Type == NewReactionType.Set)
             {
-                _reactionRepository.SetReaction(reactionMessage);
+                _reactionRepo.SetReaction(reactionMessage);
             }
             else
             {
-                _reactionRepository.UnsetReaction(reactionMessage);
+                _reactionRepo.UnsetReaction(reactionMessage);
             }
         }
     }

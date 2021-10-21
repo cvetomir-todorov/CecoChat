@@ -1,8 +1,8 @@
 ﻿using CecoChat.Contracts.History;
 
-namespace CecoChat.Data.History
+namespace CecoChat.Data.History.Repos
 {
-    internal interface IMessageMapper
+    internal interface IDataMapper
     {
         sbyte MapHistoryToDbDataType(DataType dataType);
 
@@ -13,13 +13,13 @@ namespace CecoChat.Data.History
         DeliveryStatus MapDbToHistoryDeliveryStatus(sbyte dbDeliveryStatus);
     }
 
-    internal sealed class MessageMapper : IMessageMapper
+    internal sealed class DataMapper : IDataMapper
     {
         public sbyte MapHistoryToDbDataType(DataType dataType)
         {
             switch (dataType)
             {
-                case DataType.PlainText: return (sbyte) DbMessageType.PlainText;
+                case DataType.PlainText: return (sbyte) DbDataType.PlainText;
                 default:
                     throw new EnumValueNotSupportedException(dataType);
             }
@@ -29,8 +29,8 @@ namespace CecoChat.Data.History
         {
             switch (deliveryStatus)
             {
-                case DeliveryStatus.Processed: return (sbyte)DbMessageStatus.Processed;
-                case DeliveryStatus.Delivered: return (sbyte)DbMessageStatus.Delivered;
+                case DeliveryStatus.Processed: return (sbyte)DbDeliveryStatus.Processed;
+                case DeliveryStatus.Delivered: return (sbyte)DbDeliveryStatus.Delivered;
                 default:
                     throw new EnumValueNotSupportedException(deliveryStatus);
             }
@@ -38,11 +38,11 @@ namespace CecoChat.Data.History
 
         public DataType MapDbToHistoryDataType(sbyte dbDataType)
         {
-            DbMessageType dbDataTypeAsEnum = (DbMessageType)dbDataType;
+            DbDataType dbDataTypeAsEnum = (DbDataType)dbDataType;
 
             switch (dbDataTypeAsEnum)
             {
-                case DbMessageType.PlainText: return DataType.PlainText;
+                case DbDataType.PlainText: return DataType.PlainText;
                 default:
                     throw new EnumValueNotSupportedException(dbDataTypeAsEnum);
             }
@@ -50,14 +50,14 @@ namespace CecoChat.Data.History
 
         public DeliveryStatus MapDbToHistoryDeliveryStatus(sbyte dbDeliveryStatus)
         {
-            DbMessageStatus dbMessageStatusAsEnum = (DbMessageStatus)dbDeliveryStatus;
+            DbDeliveryStatus dbDeliveryStatusAsEnum = (DbDeliveryStatus)dbDeliveryStatus;
 
-            switch (dbMessageStatusAsEnum)
+            switch (dbDeliveryStatusAsEnum)
             {
-                case DbMessageStatus.Processed: return DeliveryStatus.Processed;
-                case DbMessageStatus.Delivered: return DeliveryStatus.Delivered;
+                case DbDeliveryStatus.Processed: return DeliveryStatus.Processed;
+                case DbDeliveryStatus.Delivered: return DeliveryStatus.Delivered;
                 default:
-                    throw new EnumValueNotSupportedException(dbMessageStatusAsEnum);
+                    throw new EnumValueNotSupportedException(dbDeliveryStatusAsEnum);
             }
         }
     }

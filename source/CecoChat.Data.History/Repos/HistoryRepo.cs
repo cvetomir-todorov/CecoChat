@@ -7,9 +7,9 @@ using CecoChat.Contracts.History;
 using CecoChat.Data.History.Instrumentation;
 using Microsoft.Extensions.Logging;
 
-namespace CecoChat.Data.History
+namespace CecoChat.Data.History.Repos
 {
-    public interface IHistoryRepository
+    public interface IHistoryRepo
     {
         void Prepare();
 
@@ -18,20 +18,20 @@ namespace CecoChat.Data.History
         Task<IReadOnlyCollection<HistoryMessage>> GetHistory(long userID, long otherUserID, DateTime olderThan, int countLimit);
     }
 
-    internal sealed class HistoryRepository : IHistoryRepository
+    internal sealed class HistoryRepo : IHistoryRepo
     {
         private readonly ILogger _logger;
         private readonly IHistoryActivityUtility _historyActivityUtility;
         private readonly IDataUtility _dataUtility;
-        private readonly IMessageMapper _mapper;
+        private readonly IDataMapper _mapper;
         private readonly Lazy<PreparedStatement> _userHistoryQuery;
         private readonly Lazy<PreparedStatement> _dialogHistoryQuery;
 
-        public HistoryRepository(
-            ILogger<HistoryRepository> logger,
+        public HistoryRepo(
+            ILogger<HistoryRepo> logger,
             IHistoryActivityUtility historyActivityUtility,
             IDataUtility dataUtility,
-            IMessageMapper mapper)
+            IDataMapper mapper)
         {
             _logger = logger;
             _historyActivityUtility = historyActivityUtility;

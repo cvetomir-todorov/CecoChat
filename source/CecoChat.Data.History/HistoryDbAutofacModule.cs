@@ -2,6 +2,7 @@
 using CecoChat.Autofac;
 using CecoChat.Cassandra;
 using CecoChat.Data.History.Instrumentation;
+using CecoChat.Data.History.Repos;
 using CecoChat.Tracing;
 using Microsoft.Extensions.Configuration;
 
@@ -19,11 +20,11 @@ namespace CecoChat.Data.History
             });
             builder.RegisterType<HistoryDbInitializer>().As<IHistoryDbInitializer>().SingleInstance();
             builder.RegisterType<DataUtility>().As<IDataUtility>().SingleInstance();
-            builder.RegisterType<MessageMapper>().As<IMessageMapper>().SingleInstance();
+            builder.RegisterType<DataMapper>().As<IDataMapper>().SingleInstance();
 
-            builder.RegisterType<HistoryRepository>().As<IHistoryRepository>().SingleInstance();
-            builder.RegisterType<ReactionRepository>().As<IReactionRepository>().SingleInstance();
-            builder.RegisterType<NewMessageRepository>().As<INewMessageRepository>().SingleInstance();
+            builder.RegisterType<HistoryRepo>().As<IHistoryRepo>().SingleInstance();
+            builder.RegisterType<ReactionRepo>().As<IReactionRepo>().SingleInstance();
+            builder.RegisterType<NewMessageRepo>().As<INewMessageRepo>().SingleInstance();
 
             string utilityName = $"{nameof(HistoryActivityUtility)}.{nameof(IActivityUtility)}";
 

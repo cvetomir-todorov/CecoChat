@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using CecoChat.Data.History;
+using CecoChat.Data.History.Repos;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -10,20 +10,20 @@ namespace CecoChat.Server.History.HostedServices
     public sealed class PrepareHistoryQueries : IHostedService
     {
         private readonly ILogger _logger;
-        private readonly IHistoryRepository _historyRepository;
-        private readonly INewMessageRepository _newMessageRepository;
-        private readonly IReactionRepository _reactionRepository;
+        private readonly IHistoryRepo _historyRepo;
+        private readonly INewMessageRepo _newMessageRepo;
+        private readonly IReactionRepo _reactionRepo;
 
         public PrepareHistoryQueries(
             ILogger<PrepareHistoryQueries> logger,
-            IHistoryRepository historyRepository,
-            INewMessageRepository newMessageRepository,
-            IReactionRepository reactionRepository)
+            IHistoryRepo historyRepo,
+            INewMessageRepo newMessageRepo,
+            IReactionRepo reactionRepo)
         {
             _logger = logger;
-            _historyRepository = historyRepository;
-            _newMessageRepository = newMessageRepository;
-            _reactionRepository = reactionRepository;
+            _historyRepo = historyRepo;
+            _newMessageRepo = newMessageRepo;
+            _reactionRepo = reactionRepo;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -33,9 +33,9 @@ namespace CecoChat.Server.History.HostedServices
                 try
                 {
                     _logger.LogInformation("Start preparing queries...");
-                    _historyRepository.Prepare();
-                    _newMessageRepository.Prepare();
-                    _reactionRepository.Prepare();
+                    _historyRepo.Prepare();
+                    _newMessageRepo.Prepare();
+                    _reactionRepo.Prepare();
                     _logger.LogInformation("Completed preparing queries.");
                 }
                 catch (Exception exception)

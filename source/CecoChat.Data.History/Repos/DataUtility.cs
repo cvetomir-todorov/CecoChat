@@ -2,7 +2,7 @@
 using Cassandra;
 using Microsoft.Extensions.Logging;
 
-namespace CecoChat.Data.History
+namespace CecoChat.Data.History.Repos
 {
     internal interface IDataUtility
     {
