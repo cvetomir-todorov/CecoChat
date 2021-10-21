@@ -48,14 +48,6 @@ jobs:
         push: true
         tags: cvetomirtodorov/cecochat-idgen:0.1
 
-    - name: Materialize image
-      uses: docker/build-push-action@v2
-      with:
-        file: run/cecochat/Materialize.Dockerfile
-        context: ./source
-        push: true
-        tags: cvetomirtodorov/cecochat-materialize:0.1
-
     - name: Messaging image
       uses: docker/build-push-action@v2
       with:
