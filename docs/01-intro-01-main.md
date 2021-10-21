@@ -1,17 +1,20 @@
 # Capabilities
 
-## Functional
+## Functional features
 
-* User can send messages to and receive messages from other users
-* User can react to messages
+* User can send messages to other users
+* User receives messages from other users in real-time
+* User can (un)react to messages with emojis
 * User can connect with multiple clients
-* User is shown at connect the missed messages while being offline
+* User is shown the missed messages
 * User can review chat history at a random point in time between him and another user 
-* User receives an ACK when the message has been processed by the system
+* User receives a delivery notification when the message has been processed
 
-Currently no user profile and friendship are implemented so clients rely on user IDs.
+Limitations:
+* No user profile and friendship are implemented so clients rely on user IDs.
+* No clients exist, only ones for development purposes.
 
-## Non-functional
+## Non-functional features
 
 * Reliability
   - Durability is preferred at the cost of some latency
