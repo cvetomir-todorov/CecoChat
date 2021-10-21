@@ -6,9 +6,9 @@ using CecoChat.Contracts.History;
 using CecoChat.Data.History.Instrumentation;
 using Microsoft.Extensions.Logging;
 
-namespace CecoChat.Data.History
+namespace CecoChat.Data.History.Repos
 {
-    public interface IReactionRepository
+    public interface IReactionRepo
     {
         void Prepare();
 
@@ -17,7 +17,7 @@ namespace CecoChat.Data.History
         Task UnsetReaction(ReactionMessage message);
     }
 
-    internal class ReactionRepository : IReactionRepository
+    internal class ReactionRepo : IReactionRepo
     {
         private readonly ILogger _logger;
         private readonly IHistoryActivityUtility _historyActivityUtility;
@@ -27,8 +27,8 @@ namespace CecoChat.Data.History
         private readonly Lazy<PreparedStatement> _unsetReactionQuery;
         private readonly Lazy<PreparedStatement> _unsetReactionQueryForUser;
 
-        public ReactionRepository(
-            ILogger<ReactionRepository> logger,
+        public ReactionRepo(
+            ILogger<ReactionRepo> logger,
             IHistoryActivityUtility historyActivityUtility,
             IDataUtility dataUtility)
         {

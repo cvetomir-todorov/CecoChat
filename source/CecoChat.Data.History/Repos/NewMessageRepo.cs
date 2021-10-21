@@ -5,29 +5,29 @@ using CecoChat.Contracts.History;
 using CecoChat.Data.History.Instrumentation;
 using Microsoft.Extensions.Logging;
 
-namespace CecoChat.Data.History
+namespace CecoChat.Data.History.Repos
 {
-    public interface INewMessageRepository
+    public interface INewMessageRepo
     {
         void Prepare();
 
         void AddMessage(DataMessage message);
     }
 
-    internal sealed class NewMessageRepository : INewMessageRepository
+    internal sealed class NewMessageRepo : INewMessageRepo
     {
         private readonly ILogger _logger;
         private readonly IHistoryActivityUtility _historyActivityUtility;
         private readonly IDataUtility _dataUtility;
-        private readonly IMessageMapper _mapper;
+        private readonly IDataMapper _mapper;
         private readonly Lazy<PreparedStatement> _messagesForUserQuery;
         private readonly Lazy<PreparedStatement> _messagesForDialogQuery;
 
-        public NewMessageRepository(
-            ILogger<NewMessageRepository> logger,
+        public NewMessageRepo(
+            ILogger<NewMessageRepo> logger,
             IHistoryActivityUtility historyActivityUtility,
             IDataUtility dataUtility,
-            IMessageMapper mapper)
+            IDataMapper mapper)
         {
             _logger = logger;
             _historyActivityUtility = historyActivityUtility;

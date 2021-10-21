@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using CecoChat.Contracts.History;
 using CecoChat.Data.Config.History;
-using CecoChat.Data.History;
+using CecoChat.Data.History.Repos;
 using CecoChat.Server.Identity;
 using Grpc.Core;
 using Microsoft.AspNetCore.Authorization;
@@ -15,16 +15,16 @@ namespace CecoChat.Server.History.Clients
     {
         private readonly ILogger _logger;
         private readonly IHistoryConfig _historyConfig;
-        private readonly IHistoryRepository _historyRepository;
+        private readonly IHistoryRepo _historyRepo;
 
         public GrpcHistoryService(
             ILogger<GrpcHistoryService> logger,
             IHistoryConfig historyConfig,
-            IHistoryRepository historyRepository)
+            IHistoryRepo historyRepo)
         {
             _logger = logger;
             _historyConfig = historyConfig;
-            _historyRepository = historyRepository;
+            _historyRepo = historyRepo;
         }
 
         [Authorize(Roles = "user")]
@@ -37,7 +37,7 @@ namespace CecoChat.Server.History.Clients
             }
             Activity.Current?.SetTag("user.id", userID);
 
-            IReadOnlyCollection<HistoryMessage> historyMessages = await _historyRepository
+            IReadOnlyCollection<HistoryMessage> historyMessages = await _historyRepo
                 .GetUserHistory(userID, request.OlderThan.ToDateTime(), _historyConfig.UserMessageCount);
 
             GetUserHistoryResponse response = new();
@@ -59,7 +59,7 @@ namespace CecoChat.Server.History.Clients
 
             long otherUserID = request.OtherUserId;
 
-            IReadOnlyCollection<HistoryMessage> historyMessages = await _historyRepository
+            IReadOnlyCollection<HistoryMessage> historyMessages = await _historyRepo
                 .GetHistory(userID, otherUserID, request.OlderThan.ToDateTime(), _historyConfig.DialogMessageCount);
 
             GetHistoryResponse response = new();
