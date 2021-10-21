@@ -3,10 +3,11 @@
 ## Functional
 
 * User can send messages to and receive messages from other users
+* User can react to messages
 * User can connect with multiple clients
 * User is shown at connect the missed messages while being offline
 * User can review chat history at a random point in time between him and another user 
-* User receives an ACK when the message has been delivered to the chat
+* User receives an ACK when the message has been processed by the system
 
 Currently no user profile and friendship are implemented so clients rely on user IDs.
 

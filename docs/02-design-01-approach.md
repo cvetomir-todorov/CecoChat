@@ -65,7 +65,7 @@ Chat history has the following needs:
   - When a user logs-in and needs all new messages
   - When a user reviews a dialog back in time
 
-Cassandra as a history database answers those needs very well. And this time the Kafka consumer group for materialize servers can safely use the built-in partition auto-balancing.
+Cassandra as a history database answers those needs very well. And this time the Kafka consumer group for materialization can safely use the built-in partition auto-balancing.
 
 # Reliable messaging and consistency
 

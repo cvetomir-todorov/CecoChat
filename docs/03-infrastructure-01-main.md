@@ -11,7 +11,6 @@ A Github Actions workflow is set up to:
   - [Connect](https://hub.docker.com/repository/docker/cvetomirtodorov/cecochat-connect)
   - [History](https://hub.docker.com/repository/docker/cvetomirtodorov/cecochat-history)
   - [ID Gen](https://hub.docker.com/repository/docker/cvetomirtodorov/cecochat-idgen)
-  - [Materialize](https://hub.docker.com/repository/docker/cvetomirtodorov/cecochat-materialize)
   - [Messaging](https://hub.docker.com/repository/docker/cvetomirtodorov/cecochat-messaging)
 
 # Run locally
@@ -61,7 +60,6 @@ In order to containerize CecoChat you can use the folder which contains the [Doc
 
 * 1 Connect server
 * 2 Messaging servers
-* 1 Materialize server
 * 1 History server
 * 1 ID Gen server
 
