@@ -28,26 +28,6 @@ namespace CecoChat.Server.History.Clients
         }
 
         [Authorize(Roles = "user")]
-        public override async Task<GetUserHistoryResponse> GetUserHistory(GetUserHistoryRequest request, ServerCallContext context)
-        {
-            if (!context.GetHttpContext().User.TryGetUserID(out long userID))
-            {
-                _logger.LogError("Client from {0} was authorized but has no parseable access token.", context.Peer);
-                return new GetUserHistoryResponse();
-            }
-            Activity.Current?.SetTag("user.id", userID);
-
-            IReadOnlyCollection<HistoryMessage> historyMessages = await _historyRepo
-                .GetUserHistory(userID, request.OlderThan.ToDateTime(), _historyConfig.UserMessageCount);
-
-            GetUserHistoryResponse response = new();
-            response.Messages.Add(historyMessages);
-
-            _logger.LogTrace("Responding with {0} messages for user {1} history.", response.Messages.Count, userID);
-            return response;
-        }
-
-        [Authorize(Roles = "user")]
         public override async Task<GetHistoryResponse> GetHistory(GetHistoryRequest request, ServerCallContext context)
         {
             if (!context.GetHttpContext().User.TryGetUserID(out long userID))
@@ -57,15 +37,13 @@ namespace CecoChat.Server.History.Clients
             }
             Activity.Current?.SetTag("user.id", userID);
 
-            long otherUserID = request.OtherUserId;
-
             IReadOnlyCollection<HistoryMessage> historyMessages = await _historyRepo
-                .GetHistory(userID, otherUserID, request.OlderThan.ToDateTime(), _historyConfig.DialogMessageCount);
+                .GetHistory(userID, request.OtherUserId, request.OlderThan.ToDateTime(), _historyConfig.DialogMessageCount);
 
             GetHistoryResponse response = new();
             response.Messages.Add(historyMessages);
 
-            _logger.LogTrace("Responding with {0} messages for chat between [{1} <-> {2}].", response.Messages.Count, userID, otherUserID);
+            _logger.LogTrace("Responding with {0} messages for chat between [{1} <-> {2}].", response.Messages.Count, userID, request.OtherUserId);
             return response;
         }
     }

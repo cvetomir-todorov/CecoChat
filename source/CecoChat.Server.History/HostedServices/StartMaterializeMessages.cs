@@ -10,17 +10,17 @@ namespace CecoChat.Server.History.HostedServices
     public sealed class StartMaterializeMessages : IHostedService, IDisposable
     {
         private readonly ILogger _logger;
-        private readonly IMaterializeConsumer _materializeConsumer;
+        private readonly IHistoryConsumer _historyConsumer;
         private readonly CancellationToken _appStoppingCt;
         private CancellationTokenSource _stoppedCts;
 
         public StartMaterializeMessages(
             ILogger<StartMaterializeMessages> logger,
             IHostApplicationLifetime applicationLifetime,
-            IMaterializeConsumer materializeConsumer)
+            IHistoryConsumer historyConsumer)
         {
             _logger = logger;
-            _materializeConsumer = materializeConsumer;
+            _historyConsumer = historyConsumer;
 
             _appStoppingCt = applicationLifetime.ApplicationStopping;
         }
@@ -34,16 +34,17 @@ namespace CecoChat.Server.History.HostedServices
         {
             _stoppedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _appStoppingCt);
 
-            _materializeConsumer.Prepare();
+            _historyConsumer.Prepare();
+
             Task.Factory.StartNew(() =>
             {
                 try
                 {
-                    _materializeConsumer.Start(_stoppedCts.Token);
+                    _historyConsumer.Start(_stoppedCts.Token);
                 }
                 catch (Exception exception)
                 {
-                    _logger.LogCritical(exception, "Failure in materialize messages consumer.");
+                    _logger.LogCritical(exception, "Failure in history consumer.");
                 }
             }, _stoppedCts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Current);
 
