@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using Cassandra;
+using CecoChat.Otel;
 using CecoChat.Tracing;
 
 namespace CecoChat.Data.History.Instrumentation
@@ -36,7 +37,7 @@ namespace CecoChat.Data.History.Instrumentation
 
             if (activity.IsAllDataRequested)
             {
-                Enrich(HistoryInstrumentation.Values.DbOperationBatchWrite, session, activity);
+                Enrich(OtelInstrumentation.Values.DbOperationBatchWrite, session, activity);
                 activity.SetTag("message.id", messageID);
             }
 
@@ -53,7 +54,7 @@ namespace CecoChat.Data.History.Instrumentation
 
             if (activity.IsAllDataRequested)
             {
-                Enrich(HistoryInstrumentation.Values.DbOperationOneRead, session, activity);
+                Enrich(OtelInstrumentation.Values.DbOperationOneRead, session, activity);
                 activity.SetTag("user.id", userID);
             }
 
@@ -70,7 +71,7 @@ namespace CecoChat.Data.History.Instrumentation
 
             if (activity.IsAllDataRequested)
             {
-                Enrich(HistoryInstrumentation.Values.DbOperationOneWrite, session, activity);
+                Enrich(OtelInstrumentation.Values.DbOperationOneWrite, session, activity);
                 activity.SetTag("reaction.reactor_id", reactorID);
             }
 
@@ -87,7 +88,7 @@ namespace CecoChat.Data.History.Instrumentation
 
             if (activity.IsAllDataRequested)
             {
-                Enrich(HistoryInstrumentation.Values.DbOperationOneWrite, session, activity);
+                Enrich(OtelInstrumentation.Values.DbOperationOneWrite, session, activity);
                 activity.SetTag("reaction.reactor_id", reactorID);
             }
 
@@ -101,10 +102,10 @@ namespace CecoChat.Data.History.Instrumentation
 
         private static void Enrich(string operation, ISession session, Activity activity)
         {
-            activity.SetTag(HistoryInstrumentation.Keys.DbOperation, operation);
-            activity.SetTag(HistoryInstrumentation.Keys.DbSystem, HistoryInstrumentation.Values.DbSystemCassandra);
-            activity.SetTag(HistoryInstrumentation.Keys.DbName, session.Keyspace);
-            activity.SetTag(HistoryInstrumentation.Keys.DbSessionName, session.SessionName);
+            activity.SetTag(OtelInstrumentation.Keys.DbOperation, operation);
+            activity.SetTag(OtelInstrumentation.Keys.DbSystem, OtelInstrumentation.Values.DbSystemCassandra);
+            activity.SetTag(OtelInstrumentation.Keys.DbName, session.Keyspace);
+            activity.SetTag(OtelInstrumentation.Keys.DbSessionName, session.SessionName);
         }
     }
 }

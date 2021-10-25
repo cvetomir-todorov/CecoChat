@@ -28,21 +28,5 @@ namespace CecoChat.Data.History.Instrumentation
             public const string SetReaction = "HistoryDB.SetReaction";
             public const string UnsetReaction = "HistoryDB.UnsetReaction";
         }
-
-        public static class Keys
-        {
-            public const string DbSystem = "db.system";
-            public const string DbName = "db.name";
-            public const string DbSessionName = "db.session_name";
-            public const string DbOperation = "db.operation";
-        }
-
-        public static class Values
-        {
-            public const string DbSystemCassandra = "cassandra";
-            public const string DbOperationBatchWrite = "batch_write";
-            public const string DbOperationOneWrite = "one_write";
-            public const string DbOperationOneRead = "one_read";
-        }
     }
 }

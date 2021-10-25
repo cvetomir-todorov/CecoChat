@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Text;
+using CecoChat.Otel;
 using CecoChat.Tracing;
 using Confluent.Kafka;
 using Microsoft.Extensions.Logging;
@@ -94,14 +95,14 @@ namespace CecoChat.Kafka.Instrumentation
             byte[] traceFlagsBytes = BitConverter.GetBytes((int)activityContext.TraceFlags);
 
             message.Headers ??= new Headers();
-            message.Headers.Add(KafkaInstrumentation.Keys.HeaderTraceId, traceIdBytes);
-            message.Headers.Add(KafkaInstrumentation.Keys.HeaderSpanId, spanIdBytes);
-            message.Headers.Add(KafkaInstrumentation.Keys.HeaderTraceFlags, traceFlagsBytes);
+            message.Headers.Add(OtelInstrumentation.Keys.HeaderTraceId, traceIdBytes);
+            message.Headers.Add(OtelInstrumentation.Keys.HeaderSpanId, spanIdBytes);
+            message.Headers.Add(OtelInstrumentation.Keys.HeaderTraceFlags, traceFlagsBytes);
 
             if (activityContext.TraceState != null)
             {
                 byte[] traceStateBytes = Encoding.UTF8.GetBytes(activityContext.TraceState);
-                message.Headers.Add(KafkaInstrumentation.Keys.HeaderTraceState, traceStateBytes);
+                message.Headers.Add(OtelInstrumentation.Keys.HeaderTraceState, traceStateBytes);
             }
         }
 
@@ -113,16 +114,16 @@ namespace CecoChat.Kafka.Instrumentation
                 return false;
             }
 
-            if (consumeResult.Message.Headers.TryGetLastBytes(KafkaInstrumentation.Keys.HeaderTraceId, out byte[] traceIdBytes) &&
-                consumeResult.Message.Headers.TryGetLastBytes(KafkaInstrumentation.Keys.HeaderSpanId, out byte[] spanIdBytes) &&
-                consumeResult.Message.Headers.TryGetLastBytes(KafkaInstrumentation.Keys.HeaderTraceFlags, out byte[] traceFlagsBytes))
+            if (consumeResult.Message.Headers.TryGetLastBytes(OtelInstrumentation.Keys.HeaderTraceId, out byte[] traceIdBytes) &&
+                consumeResult.Message.Headers.TryGetLastBytes(OtelInstrumentation.Keys.HeaderSpanId, out byte[] spanIdBytes) &&
+                consumeResult.Message.Headers.TryGetLastBytes(OtelInstrumentation.Keys.HeaderTraceFlags, out byte[] traceFlagsBytes))
             {
                 ActivityTraceId traceId = ActivityTraceId.CreateFromBytes(traceIdBytes);
                 ActivitySpanId spanId = ActivitySpanId.CreateFromBytes(spanIdBytes);
                 ActivityTraceFlags traceFlags = (ActivityTraceFlags)BitConverter.ToInt32(traceFlagsBytes);
 
                 string traceState = null;
-                if (consumeResult.Message.Headers.TryGetLastBytes(KafkaInstrumentation.Keys.HeaderTraceState, out byte[] traceStateBytes))
+                if (consumeResult.Message.Headers.TryGetLastBytes(OtelInstrumentation.Keys.HeaderTraceState, out byte[] traceStateBytes))
                 {
                     traceState = Encoding.UTF8.GetString(traceStateBytes);
                 }
@@ -143,13 +144,13 @@ namespace CecoChat.Kafka.Instrumentation
             {
                 activity.DisplayName = displayName;
 
-                activity.SetTag(KafkaInstrumentation.Keys.TagMessagingSystem, KafkaInstrumentation.Values.TagMessagingSystemKafka);
-                activity.SetTag(KafkaInstrumentation.Keys.TagMessagingDestinationKind, KafkaInstrumentation.Values.TagMessagingDestinationKindTopic);
-                activity.SetTag(KafkaInstrumentation.Keys.TagMessagingDestination, topic);
+                activity.SetTag(OtelInstrumentation.Keys.MessagingSystem, OtelInstrumentation.Values.MessagingSystemKafka);
+                activity.SetTag(OtelInstrumentation.Keys.MessagingDestinationKind, OtelInstrumentation.Values.MessagingDestinationKindTopic);
+                activity.SetTag(OtelInstrumentation.Keys.MessagingDestination, topic);
 
                 if (partition.HasValue)
                 {
-                    activity.SetTag(KafkaInstrumentation.Keys.TagMessagingKafkaPartition, partition.Value);
+                    activity.SetTag(OtelInstrumentation.Keys.MessagingKafkaPartition, partition.Value);
                 }
             }
         }
