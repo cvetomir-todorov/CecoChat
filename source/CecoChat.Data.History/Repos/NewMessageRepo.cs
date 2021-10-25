@@ -20,8 +20,7 @@ namespace CecoChat.Data.History.Repos
         private readonly IHistoryActivityUtility _historyActivityUtility;
         private readonly IDataUtility _dataUtility;
         private readonly IDataMapper _mapper;
-        private readonly Lazy<PreparedStatement> _messagesForUserQuery;
-        private readonly Lazy<PreparedStatement> _messagesForDialogQuery;
+        private readonly Lazy<PreparedStatement> _messagesForChatQuery;
 
         public NewMessageRepo(
             ILogger<NewMessageRepo> logger,
@@ -34,26 +33,17 @@ namespace CecoChat.Data.History.Repos
             _dataUtility = dataUtility;
             _mapper = mapper;
 
-            _messagesForUserQuery = new Lazy<PreparedStatement>(() => _dataUtility.PrepareQuery(InsertIntoMessagesForUser));
-            _messagesForDialogQuery = new Lazy<PreparedStatement>(() => _dataUtility.PrepareQuery(InsertIntoMessagesForDialog));
+            _messagesForChatQuery = new Lazy<PreparedStatement>(() => _dataUtility.PrepareQuery(InsertIntoMessagesForChat));
         }
 
-        private const string InsertIntoMessagesForUser =
-            "INSERT INTO messages_for_user " +
-            "(user_id, message_id, sender_id, receiver_id, type, status, data) " +
-            "VALUES (?, ?, ?, ?, ?, ?, ?)";
-        private const string InsertIntoMessagesForDialog =
-            "INSERT INTO messages_for_dialog " +
-            "(dialog_id, message_id, sender_id, receiver_id, type, status, data) " +
+        private const string InsertIntoMessagesForChat =
+            "INSERT INTO messages_for_chat " +
+            "(chat_id, message_id, sender_id, receiver_id, type, status, data) " +
             "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         public void Prepare()
         {
-            // preparing the queries beforehand is optional and is implemented using the lazy pattern
-            PreparedStatement _ = _messagesForUserQuery.Value;
-            #pragma warning disable IDE0059
-            PreparedStatement __ = _messagesForDialogQuery.Value;
-            #pragma warning restore IDE0059
+            PreparedStatement _ = _messagesForChatQuery.Value;
         }
 
         public void AddMessage(DataMessage message)
@@ -63,40 +53,23 @@ namespace CecoChat.Data.History.Repos
 
             try
             {
-                BatchStatement insertBatch = CreateInsertBatch(message);
-                _dataUtility.MessagingSession.Execute(insertBatch);
+                sbyte dbMessageType = _mapper.MapHistoryToDbDataType(message.DataType);
+                sbyte dbMessageStatus = _mapper.MapHistoryToDbDeliveryStatus(message.Status);
+                string chatID = _dataUtility.CreateChatID(message.SenderId, message.ReceiverId);
+
+                BoundStatement query = _messagesForChatQuery.Value.Bind(
+                    chatID, message.MessageId, message.SenderId, message.ReceiverId, dbMessageType, dbMessageStatus, message.Data);
+                query.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
+                query.SetIdempotence(false);
+
+                _dataUtility.MessagingSession.Execute(query);
                 success = true;
-                _logger.LogTrace("Persisted for sender, receiver and dialog the message {0}.", message);
+                _logger.LogTrace("Persisted the message {0}.", message);
             }
             finally
             {
                 _historyActivityUtility.Stop(activity, success);
             }
-        }
-
-        private BatchStatement CreateInsertBatch(DataMessage message)
-        {
-            long senderID = message.SenderId;
-            long receiverID = message.ReceiverId;
-            sbyte dbMessageType = _mapper.MapHistoryToDbDataType(message.DataType);
-            sbyte dbMessageStatus = _mapper.MapHistoryToDbDeliveryStatus(message.Status);
-            string data = message.Data;
-            string dialogID = _dataUtility.CreateDialogID(senderID, receiverID);
-
-            BoundStatement insertForSender = _messagesForUserQuery.Value.Bind(
-                senderID, message.MessageId, senderID, receiverID, dbMessageType, dbMessageStatus, data);
-            BoundStatement insertForReceiver = _messagesForUserQuery.Value.Bind(
-                receiverID, message.MessageId, senderID, receiverID, dbMessageType, dbMessageStatus, data);
-            BoundStatement insertForDialog = _messagesForDialogQuery.Value.Bind(
-                dialogID, message.MessageId, senderID, receiverID, dbMessageType, dbMessageStatus, data);
-
-            BatchStatement insertBatch = new BatchStatement()
-                .Add(insertForSender)
-                .Add(insertForReceiver)
-                .Add(insertForDialog);
-            insertBatch.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
-            insertBatch.SetIdempotence(false);
-            return insertBatch;
         }
     }
 }

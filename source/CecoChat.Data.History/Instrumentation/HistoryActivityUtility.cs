@@ -8,7 +8,7 @@ namespace CecoChat.Data.History.Instrumentation
     {
         Activity StartAddDataMessage(ISession session, long messageID);
 
-        Activity StartGetHistory(string name, ISession session, long userID);
+        Activity StartGetHistory(ISession session, long userID);
 
         Activity StartSetReaction(ISession session, long reactorID);
 
@@ -43,10 +43,10 @@ namespace CecoChat.Data.History.Instrumentation
             return activity;
         }
 
-        public Activity StartGetHistory(string name, ISession session, long userID)
+        public Activity StartGetHistory(ISession session, long userID)
         {
             Activity activity = _activityUtility.Start(
-                name,
+                HistoryInstrumentation.Operations.GetHistory,
                 HistoryInstrumentation.ActivitySource,
                 ActivityKind.Client,
                 Activity.Current?.Context);

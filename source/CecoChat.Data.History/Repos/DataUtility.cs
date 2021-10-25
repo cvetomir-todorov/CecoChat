@@ -10,7 +10,7 @@ namespace CecoChat.Data.History.Repos
 
         PreparedStatement PrepareQuery(string cql);
 
-        string CreateDialogID(long userID1, long userID2);
+        string CreateChatID(long userID1, long userID2);
     }
 
     internal sealed class DataUtility : IDataUtility
@@ -35,7 +35,7 @@ namespace CecoChat.Data.History.Repos
             return preparedQuery;
         }
 
-        public string CreateDialogID(long userID1, long userID2)
+        public string CreateChatID(long userID1, long userID2)
         {
             long min = Math.Min(userID1, userID2);
             long max = Math.Max(userID1, userID2);
