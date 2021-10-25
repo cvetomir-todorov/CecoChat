@@ -13,8 +13,6 @@ namespace CecoChat.Data.History.Repos
     {
         void Prepare();
 
-        Task<IReadOnlyCollection<HistoryMessage>> GetUserHistory(long userID, DateTime olderThan, int countLimit);
-
         Task<IReadOnlyCollection<HistoryMessage>> GetHistory(long userID, long otherUserID, DateTime olderThan, int countLimit);
     }
 
@@ -24,8 +22,7 @@ namespace CecoChat.Data.History.Repos
         private readonly IHistoryActivityUtility _historyActivityUtility;
         private readonly IDataUtility _dataUtility;
         private readonly IDataMapper _mapper;
-        private readonly Lazy<PreparedStatement> _userHistoryQuery;
-        private readonly Lazy<PreparedStatement> _dialogHistoryQuery;
+        private readonly Lazy<PreparedStatement> _historyQuery;
 
         public HistoryRepo(
             ILogger<HistoryRepo> logger,
@@ -38,67 +35,35 @@ namespace CecoChat.Data.History.Repos
             _dataUtility = dataUtility;
             _mapper = mapper;
 
-            _userHistoryQuery = new Lazy<PreparedStatement>(() => _dataUtility.PrepareQuery(SelectMessagesForUser));
-            _dialogHistoryQuery = new Lazy<PreparedStatement>(() => _dataUtility.PrepareQuery(SelectMessagesForDialog));
+            _historyQuery = new Lazy<PreparedStatement>(() => _dataUtility.PrepareQuery(SelectMessagesForChat));
         }
 
-        private const string SelectMessagesForUser =
+        private const string SelectMessagesForChat =
             "SELECT message_id, sender_id, receiver_id, type, status, data, reactions " +
-            "FROM messages_for_user WHERE user_id = ? AND message_id < ? ORDER BY message_id DESC LIMIT ?";
-        private const string SelectMessagesForDialog =
-            "SELECT message_id, sender_id, receiver_id, type, status, data, reactions " +
-            "FROM messages_for_dialog WHERE dialog_id = ? AND message_id < ? ORDER BY message_id DESC LIMIT ?";
+            "FROM messages_for_chat WHERE chat_id = ? AND message_id < ? ORDER BY message_id DESC LIMIT ?";
 
         public void Prepare()
         {
-            // preparing the queries beforehand is optional and is implemented using the lazy pattern
-            PreparedStatement _ = _userHistoryQuery.Value;
-            #pragma warning disable IDE0059
-            PreparedStatement __ = _dialogHistoryQuery.Value;
-            #pragma warning restore IDE0059
-        }
-
-        public async Task<IReadOnlyCollection<HistoryMessage>> GetUserHistory(long userID, DateTime olderThan, int countLimit)
-        {
-            Activity activity = _historyActivityUtility.StartGetHistory(
-                HistoryInstrumentation.Operations.GetUserHistory, _dataUtility.MessagingSession, userID);
-            bool success = false;
-
-            try
-            {
-                long olderThanSnowflake = olderThan.ToSnowflakeCeiling();
-                BoundStatement query = _userHistoryQuery.Value.Bind(userID, olderThanSnowflake, countLimit);
-                query.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
-                query.SetIdempotence(true);
-                List<HistoryMessage> messages = await GetMessages(query, countLimit);
-                success = true;
-
-                _logger.LogTrace("Returned {0} messages for user {1} older than {2}.", messages.Count, userID, olderThan);
-                return messages;
-            }
-            finally
-            {
-                _historyActivityUtility.Stop(activity, success);
-            }
+            PreparedStatement _ = _historyQuery.Value;
         }
 
         public async Task<IReadOnlyCollection<HistoryMessage>> GetHistory(long userID, long otherUserID, DateTime olderThan, int countLimit)
         {
-            Activity activity = _historyActivityUtility.StartGetHistory(
-                HistoryInstrumentation.Operations.GetHistory, _dataUtility.MessagingSession, userID);
+            Activity activity = _historyActivityUtility.StartGetHistory(_dataUtility.MessagingSession, userID);
             bool success = false;
 
             try
             {
-                string dialogID = _dataUtility.CreateDialogID(userID, otherUserID);
+                string chatID = _dataUtility.CreateChatID(userID, otherUserID);
                 long olderThanSnowflake = olderThan.ToSnowflakeCeiling();
-                BoundStatement query = _dialogHistoryQuery.Value.Bind(dialogID, olderThanSnowflake, countLimit);
-                query.SetIdempotence(true);
+                BoundStatement query = _historyQuery.Value.Bind(chatID, olderThanSnowflake, countLimit);
                 query.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
+                query.SetIdempotence(true);
+
                 List<HistoryMessage> messages = await GetMessages(query, countLimit);
                 success = true;
 
-                _logger.LogTrace("Returned {0} messages between [{1} <-> {2}] older than {3}.", messages.Count, userID, otherUserID, olderThan);
+                _logger.LogTrace("Returned {0} messages between for chat {1} which are older than {2}.", messages.Count, chatID, olderThan);
                 return messages;
             }
             finally

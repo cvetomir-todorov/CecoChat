@@ -1,6 +1,6 @@
-﻿CREATE TABLE messaging.messages_for_dialog
+﻿CREATE TABLE messaging.messages_for_chat
 (
-  dialog_id text,
+  chat_id text,
   message_id bigint,
   sender_id bigint,
   receiver_id bigint,
@@ -8,6 +8,6 @@
   status tinyint,
   data text,
   reactions map<bigint,text>,
-  PRIMARY KEY (dialog_id, message_id)
+  PRIMARY KEY (chat_id, message_id)
 )
 WITH CLUSTERING ORDER BY (message_id DESC);
