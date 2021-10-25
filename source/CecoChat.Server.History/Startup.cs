@@ -93,7 +93,7 @@ namespace CecoChat.Server.History
             });
 
             // backplane
-            builder.RegisterType<MaterializeConsumer>().As<IMaterializeConsumer>().SingleInstance();
+            builder.RegisterType<HistoryConsumer>().As<IHistoryConsumer>().SingleInstance();
             builder.RegisterFactory<KafkaConsumer<Null, BackplaneMessage>, IKafkaConsumer<Null, BackplaneMessage>>();
             builder.RegisterModule(new KafkaInstrumentationAutofacModule());
             builder.RegisterOptions<BackplaneOptions>(Configuration.GetSection("Backplane"));

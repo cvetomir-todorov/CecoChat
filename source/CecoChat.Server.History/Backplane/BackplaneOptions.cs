@@ -6,7 +6,7 @@ namespace CecoChat.Server.History.Backplane
     {
         public KafkaOptions Kafka { get; set; }
 
-        public KafkaConsumerOptions MaterializeConsumer { get; set; }
+        public KafkaConsumerOptions HistoryConsumer { get; set; }
 
         public string MessagesTopicName { get; set; }
     }
