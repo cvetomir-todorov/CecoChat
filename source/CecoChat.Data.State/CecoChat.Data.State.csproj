@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Scripts\state-user-chat-state-type.cql" />
+    <EmbeddedResource Include="Scripts\state-chats-table.cql" />
+    <EmbeddedResource Include="Scripts\state-keyspace.cql" />
+    <EmbeddedResource Include="Scripts\state-user-chats-table.cql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CassandraCSharpDriver" Version="3.16.3" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CecoChat\CecoChat.csproj" />
+    <ProjectReference Include="..\CecoChat.Contracts\CecoChat.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>
