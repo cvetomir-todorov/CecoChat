@@ -1,6 +1,9 @@
 using Autofac;
 using CecoChat.Autofac;
 using CecoChat.Data.State;
+using CecoChat.Jwt;
+using CecoChat.Server.Identity;
+using CecoChat.Server.State.Clients;
 using CecoChat.Server.State.HostedServices;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -12,15 +15,30 @@ namespace CecoChat.Server.State
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        private readonly JwtOptions _jwtOptions;
+
+        public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
             Configuration = configuration;
+            Environment = environment;
+
+            _jwtOptions = new();
+            configuration.GetSection("Jwt").Bind(_jwtOptions);
         }
 
         public IConfiguration Configuration { get; }
 
+        public IWebHostEnvironment Environment { get; }
+
         public void ConfigureServices(IServiceCollection services)
         {
+            // security
+            services.AddJwtAuthentication(_jwtOptions);
+            services.AddAuthorization();
+
+            // clients
+            services.AddGrpc(rpc => rpc.EnableDetailedErrors = Environment.IsDevelopment());
+
             // required
             services.AddOptions();
         }
@@ -47,6 +65,7 @@ namespace CecoChat.Server.State
             app.UseRouting();
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapGrpcService<GrpcStateService>();
             });
         }
     }

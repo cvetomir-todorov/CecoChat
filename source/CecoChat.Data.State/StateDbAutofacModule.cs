@@ -1,6 +1,7 @@
 using Autofac;
 using CecoChat.Autofac;
 using CecoChat.Cassandra;
+using CecoChat.Data.State.Repos;
 using Microsoft.Extensions.Configuration;
 
 namespace CecoChat.Data.State
@@ -19,6 +20,8 @@ namespace CecoChat.Data.State
             builder.RegisterType<CassandraDbInitializer>().As<ICassandraDbInitializer>()
                 .WithNamedParameter(typeof(ICassandraDbContext), stateDbModule.DbContextName)
                 .SingleInstance();
+
+            builder.RegisterType<ChatStateRepo>().As<IChatStateRepo>().SingleInstance();
         }
     }
 }

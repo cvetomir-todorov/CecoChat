@@ -1,0 +1,17 @@
+syntax = "proto3";
+option csharp_namespace = "CecoChat.Contracts.State";
+package CecoChat.Contracts.State;
+import "google/protobuf/timestamp.proto";
+import "state/chat-state.proto";
+
+service State {
+  rpc GetChats(GetChatsRequest) returns (GetChatsResponse);
+}
+
+message GetChatsRequest {
+  google.protobuf.Timestamp newer_than = 1;
+}
+
+message GetChatsResponse {
+  repeated ChatState chats = 1;
+}

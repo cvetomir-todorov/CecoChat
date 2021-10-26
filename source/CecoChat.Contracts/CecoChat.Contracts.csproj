@@ -17,7 +17,7 @@
     <Protobuf Include="backplane\backplane-message.proto" />
     <Protobuf Include="history\data-type.proto" />
     <Protobuf Include="history\delivery-status.proto" />
-    <Protobuf Include="history\history-message.proto"/>
+    <Protobuf Include="history\history-message.proto" />
     <Protobuf Include="history\history-service.proto" />
     <Protobuf Include="history\data-message.proto" />
     <Protobuf Include="history\reaction-message.proto" />
@@ -28,6 +28,8 @@
     <Protobuf Include="messaging\send-service.proto" GrpcServices="All" />
     <Protobuf Include="messaging\reaction-service.proto" GrpcServices="All" />
     <Protobuf Include="messaging\listen-service.proto" GrpcServices="All" />
+    <Protobuf Include="state\chat-state.proto" />
+    <Protobuf Include="state\state-service.proto" GrpcServices="All" />
     <Protobuf Include="uuid.proto" />
   </ItemGroup>
 

@@ -5,8 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Scripts\state-user-chat-state-type.cql" />
-    <EmbeddedResource Include="Scripts\state-chats-table.cql" />
     <EmbeddedResource Include="Scripts\state-keyspace.cql" />
     <EmbeddedResource Include="Scripts\state-user-chats-table.cql" />
   </ItemGroup>
