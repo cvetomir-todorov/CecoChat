@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -6,29 +6,28 @@ using System.Reflection;
 using Cassandra;
 using Microsoft.Extensions.Logging;
 
-namespace CecoChat.Data.History
+namespace CecoChat.Cassandra
 {
-    public interface IHistoryDbInitializer
+    public interface ICassandraDbInitializer
     {
-        void Initialize();
+        void Initialize(string keyspace, Assembly scriptSource);
     }
 
-    internal sealed class HistoryDbInitializer : IHistoryDbInitializer
+    public sealed class CassandraDbInitializer : ICassandraDbInitializer
     {
         private readonly ILogger _logger;
-        private readonly IHistoryDbContext _dbContext;
+        private readonly ICassandraDbContext _dbContext;
 
-        public HistoryDbInitializer(
-            ILogger<HistoryDbInitializer> logger,
-            IHistoryDbContext dbContext)
+        public CassandraDbInitializer(
+            ILogger<CassandraDbInitializer> logger,
+            ICassandraDbContext dbContext)
         {
             _logger = logger;
             _dbContext = dbContext;
         }
 
-        public void Initialize()
+        public void Initialize(string keyspace, Assembly scriptSource)
         {
-            string keyspace = _dbContext.MessagingKeyspace;
             if (_dbContext.ExistsKeyspace(keyspace))
             {
                 _logger.LogInformation("Keyspace {0} already initialized.", keyspace);
@@ -36,7 +35,7 @@ namespace CecoChat.Data.History
             }
 
             _logger.LogInformation("Keyspace {0} needs initialization.", keyspace);
-            List<CqlScript> cqls = GetCqlScripts(keyspace);
+            List<CqlScript> cqls = GetCqlScripts(keyspace, scriptSource);
             _logger.LogInformation("Loaded {0} CQL scripts for keyspace {1} initialization.", cqls.Count, keyspace);
             ISession session = _dbContext.GetSession();
 
@@ -52,24 +51,24 @@ namespace CecoChat.Data.History
             public string Content { get; init; }
         }
 
-        private static List<CqlScript> GetCqlScripts(string keyspace)
+        private static List<CqlScript> GetCqlScripts(string keyspace, Assembly scriptSource)
         {
-            Assembly targetAssembly = Assembly.GetExecutingAssembly();
-            string messagingPrefix = keyspace + "-";
-            List<string> allScripts = targetAssembly
+            string keyspacePrefix = keyspace + "-";
+            List<string> allScripts = scriptSource
                 .GetManifestResourceNames()
-                .Where(name => name.Contains(messagingPrefix) &&
+                .Where(name => name.Contains(keyspacePrefix) &&
                                name.EndsWith(".cql"))
                 .ToList();
 
-            IEnumerable<string> keyspaces = allScripts.Where(name => name.Contains("keyspace"));
-            IEnumerable<string> tables = allScripts.Where(name => name.Contains("table"));
-            IEnumerable<string> allOrdered = keyspaces.Union(tables);
+            IEnumerable<string> keyspaces = allScripts.Where(name => name.EndsWith("-keyspace.cql"));
+            IEnumerable<string> types = allScripts.Where(name => name.Contains("-type.cql"));
+            IEnumerable<string> tables = allScripts.Where(name => name.Contains("-table.cql"));
+            IEnumerable<string> allOrdered = keyspaces.Union(types).Union(tables);
 
             List<CqlScript> cqls = allOrdered
                 .Select(resourceName =>
                 {
-                    using Stream resourceStream = targetAssembly.GetManifestResourceStream(resourceName);
+                    using Stream resourceStream = scriptSource.GetManifestResourceStream(resourceName);
                     if (resourceStream == null)
                     {
                         throw new InvalidOperationException($"Failed to load CQL script {resourceName}.");
@@ -98,7 +97,7 @@ namespace CecoChat.Data.History
             }
             catch (AlreadyExistsException alreadyExistsException)
             {
-                _logger.LogWarning(alreadyExistsException.Message);
+                _logger.LogWarning("Creation error: {0}", alreadyExistsException.Message);
             }
         }
     }

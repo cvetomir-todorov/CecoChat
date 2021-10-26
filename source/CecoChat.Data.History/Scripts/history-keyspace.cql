@@ -1,4 +1,4 @@
-﻿CREATE KEYSPACE messaging
+﻿CREATE KEYSPACE history
   WITH REPLICATION =
   {
     'class' : 'NetworkTopologyStrategy',

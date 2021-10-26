@@ -6,9 +6,9 @@ namespace CecoChat.Data.History
 {
     public interface IHistoryDbContext : ICassandraDbContext
     {
-        string MessagingKeyspace { get; }
+        string Keyspace { get; }
 
-        ISession Messaging { get; }
+        ISession Session { get; }
     }
 
     internal sealed class HistoryDbContext : CassandraDbContext, IHistoryDbContext
@@ -16,8 +16,8 @@ namespace CecoChat.Data.History
         public HistoryDbContext(IOptions<CassandraOptions> options) : base(options)
         {}
 
-        public string MessagingKeyspace => "messaging";
+        public string Keyspace => "history";
 
-        public ISession Messaging => GetSession(MessagingKeyspace);
+        public ISession Session => GetSession(Keyspace);
     }
 }

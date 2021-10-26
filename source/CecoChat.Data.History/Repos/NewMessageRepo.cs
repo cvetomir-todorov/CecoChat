@@ -48,7 +48,7 @@ namespace CecoChat.Data.History.Repos
 
         public void AddMessage(DataMessage message)
         {
-            Activity activity = _historyActivityUtility.StartAddDataMessage(_dataUtility.MessagingSession, message.MessageId);
+            Activity activity = _historyActivityUtility.StartAddDataMessage(_dataUtility.Session, message.MessageId);
             bool success = false;
 
             try
@@ -62,7 +62,7 @@ namespace CecoChat.Data.History.Repos
                 query.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
                 query.SetIdempotence(false);
 
-                _dataUtility.MessagingSession.Execute(query);
+                _dataUtility.Session.Execute(query);
                 success = true;
                 _logger.LogTrace("Persisted the message {0}.", message);
             }

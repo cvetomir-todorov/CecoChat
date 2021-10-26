@@ -49,7 +49,7 @@ namespace CecoChat.Data.History.Repos
 
         public async Task<IReadOnlyCollection<HistoryMessage>> GetHistory(long userID, long otherUserID, DateTime olderThan, int countLimit)
         {
-            Activity activity = _historyActivityUtility.StartGetHistory(_dataUtility.MessagingSession, userID);
+            Activity activity = _historyActivityUtility.StartGetHistory(_dataUtility.Session, userID);
             bool success = false;
 
             try
@@ -74,7 +74,7 @@ namespace CecoChat.Data.History.Repos
 
         private async Task<List<HistoryMessage>> GetMessages(IStatement query, int countHint)
         {
-            RowSet rows = await _dataUtility.MessagingSession.ExecuteAsync(query);
+            RowSet rows = await _dataUtility.Session.ExecuteAsync(query);
             List<HistoryMessage> messages = new(capacity: countHint);
 
             foreach (Row row in rows)
