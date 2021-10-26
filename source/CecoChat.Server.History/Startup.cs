@@ -76,7 +76,6 @@ namespace CecoChat.Server.History
             // ordered hosted services
             builder.RegisterHostedService<InitDynamicConfig>();
             builder.RegisterHostedService<InitHistoryDb>();
-            builder.RegisterHostedService<PrepareHistoryQueries>();
             builder.RegisterHostedService<StartMaterializeMessages>();
 
             // configuration
