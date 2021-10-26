@@ -14,11 +14,15 @@ namespace CecoChat.Data.History
 
         protected override void Load(ContainerBuilder builder)
         {
-            builder.RegisterModule(new CassandraAutofacModule<HistoryDbContext, IHistoryDbContext>
+            CassandraAutofacModule<HistoryDbContext, IHistoryDbContext> historyDbModule = new()
             {
                 CassandraConfiguration = HistoryDbConfiguration
-            });
-            builder.RegisterType<HistoryDbInitializer>().As<IHistoryDbInitializer>().SingleInstance();
+            };
+            builder.RegisterModule(historyDbModule);
+            builder.RegisterType<CassandraDbInitializer>().As<ICassandraDbInitializer>()
+                .WithNamedParameter(typeof(ICassandraDbContext), historyDbModule.DbContextName)
+                .SingleInstance();
+
             builder.RegisterType<DataUtility>().As<IDataUtility>().SingleInstance();
             builder.RegisterType<DataMapper>().As<IDataMapper>().SingleInstance();
 

@@ -6,7 +6,7 @@ namespace CecoChat.Data.History.Repos
 {
     internal interface IDataUtility
     {
-        ISession MessagingSession { get; }
+        ISession Session { get; }
 
         PreparedStatement PrepareQuery(string cql);
 
@@ -26,11 +26,11 @@ namespace CecoChat.Data.History.Repos
             _dbContext = dbContext;
         }
 
-        public ISession MessagingSession => _dbContext.Messaging;
+        public ISession Session => _dbContext.Session;
 
         public PreparedStatement PrepareQuery(string cql)
         {
-            PreparedStatement preparedQuery = _dbContext.Messaging.Prepare(cql);
+            PreparedStatement preparedQuery = _dbContext.Session.Prepare(cql);
             _logger.LogDebug("Prepared CQL '{0}'.", cql);
             return preparedQuery;
         }
