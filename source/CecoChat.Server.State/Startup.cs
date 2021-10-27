@@ -53,6 +53,7 @@ namespace CecoChat.Server.State
             {
                 StateDbConfiguration = Configuration.GetSection("StateDB")
             });
+            builder.RegisterType<StateCache>().As<IStateCache>().SingleInstance();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
