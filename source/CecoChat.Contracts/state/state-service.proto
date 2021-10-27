@@ -6,6 +6,7 @@ import "state/chat-state.proto";
 
 service State {
   rpc GetChats(GetChatsRequest) returns (GetChatsResponse);
+  rpc SendMessage(SendMessageRequest) returns (SendMessageResponse);
 }
 
 message GetChatsRequest {
@@ -14,4 +15,12 @@ message GetChatsRequest {
 
 message GetChatsResponse {
   repeated ChatState chats = 1;
+}
+
+message SendMessageRequest {
+  int64 message_id = 1;
+  int64 receiver_id = 2;
+}
+
+message SendMessageResponse {
 }
