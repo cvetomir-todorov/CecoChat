@@ -20,22 +20,22 @@ namespace CecoChat.Data.History.Repos
     {
         private readonly ILogger _logger;
         private readonly IHistoryActivityUtility _historyActivityUtility;
-        private readonly IDataUtility _dataUtility;
+        private readonly IHistoryDbContext _dbContext;
         private readonly IDataMapper _mapper;
         private readonly Lazy<PreparedStatement> _historyQuery;
 
         public HistoryRepo(
             ILogger<HistoryRepo> logger,
             IHistoryActivityUtility historyActivityUtility,
-            IDataUtility dataUtility,
+            IHistoryDbContext dbContext,
             IDataMapper mapper)
         {
             _logger = logger;
             _historyActivityUtility = historyActivityUtility;
-            _dataUtility = dataUtility;
+            _dbContext = dbContext;
             _mapper = mapper;
 
-            _historyQuery = new Lazy<PreparedStatement>(() => _dataUtility.PrepareQuery(SelectMessagesForChat));
+            _historyQuery = new Lazy<PreparedStatement>(() => _dbContext.PrepareQuery(SelectMessagesForChat));
         }
 
         private const string SelectMessagesForChat =
@@ -49,12 +49,12 @@ namespace CecoChat.Data.History.Repos
 
         public async Task<IReadOnlyCollection<HistoryMessage>> GetHistory(long userID, long otherUserID, DateTime olderThan, int countLimit)
         {
-            Activity activity = _historyActivityUtility.StartGetHistory(_dataUtility.Session, userID);
+            Activity activity = _historyActivityUtility.StartGetHistory(_dbContext.Session, userID);
             bool success = false;
 
             try
             {
-                string chatID = _dataUtility.CreateChatID(userID, otherUserID);
+                string chatID = DataUtility.CreateChatID(userID, otherUserID);
                 long olderThanSnowflake = olderThan.ToSnowflakeCeiling();
                 BoundStatement query = _historyQuery.Value.Bind(chatID, olderThanSnowflake, countLimit);
                 query.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
@@ -74,7 +74,7 @@ namespace CecoChat.Data.History.Repos
 
         private async Task<List<HistoryMessage>> GetMessages(IStatement query, int countHint)
         {
-            RowSet rows = await _dataUtility.Session.ExecuteAsync(query);
+            RowSet rows = await _dbContext.Session.ExecuteAsync(query);
             List<HistoryMessage> messages = new(capacity: countHint);
 
             foreach (Row row in rows)
