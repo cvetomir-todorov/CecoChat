@@ -23,9 +23,7 @@ namespace CecoChat.Data.History
                 .WithNamedParameter(typeof(ICassandraDbContext), historyDbModule.DbContextName)
                 .SingleInstance();
 
-            builder.RegisterType<DataUtility>().As<IDataUtility>().SingleInstance();
             builder.RegisterType<DataMapper>().As<IDataMapper>().SingleInstance();
-
             builder.RegisterType<HistoryRepo>().As<IHistoryRepo>().SingleInstance();
             builder.RegisterType<ReactionRepo>().As<IReactionRepo>().SingleInstance();
             builder.RegisterType<NewMessageRepo>().As<INewMessageRepo>().SingleInstance();

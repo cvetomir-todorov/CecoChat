@@ -18,22 +18,22 @@ namespace CecoChat.Data.History.Repos
     {
         private readonly ILogger _logger;
         private readonly IHistoryActivityUtility _historyActivityUtility;
-        private readonly IDataUtility _dataUtility;
+        private readonly IHistoryDbContext _dbContext;
         private readonly IDataMapper _mapper;
         private readonly Lazy<PreparedStatement> _messagesForChatQuery;
 
         public NewMessageRepo(
             ILogger<NewMessageRepo> logger,
             IHistoryActivityUtility historyActivityUtility,
-            IDataUtility dataUtility,
+            IHistoryDbContext dbContext,
             IDataMapper mapper)
         {
             _logger = logger;
             _historyActivityUtility = historyActivityUtility;
-            _dataUtility = dataUtility;
+            _dbContext = dbContext;
             _mapper = mapper;
 
-            _messagesForChatQuery = new Lazy<PreparedStatement>(() => _dataUtility.PrepareQuery(InsertIntoMessagesForChat));
+            _messagesForChatQuery = new Lazy<PreparedStatement>(() => _dbContext.PrepareQuery(InsertIntoMessagesForChat));
         }
 
         private const string InsertIntoMessagesForChat =
@@ -48,21 +48,21 @@ namespace CecoChat.Data.History.Repos
 
         public void AddMessage(DataMessage message)
         {
-            Activity activity = _historyActivityUtility.StartAddDataMessage(_dataUtility.Session, message.MessageId);
+            Activity activity = _historyActivityUtility.StartAddDataMessage(_dbContext.Session, message.MessageId);
             bool success = false;
 
             try
             {
                 sbyte dbMessageType = _mapper.MapHistoryToDbDataType(message.DataType);
                 sbyte dbMessageStatus = _mapper.MapHistoryToDbDeliveryStatus(message.Status);
-                string chatID = _dataUtility.CreateChatID(message.SenderId, message.ReceiverId);
+                string chatID = DataUtility.CreateChatID(message.SenderId, message.ReceiverId);
 
                 BoundStatement query = _messagesForChatQuery.Value.Bind(
                     chatID, message.MessageId, message.SenderId, message.ReceiverId, dbMessageType, dbMessageStatus, message.Data);
                 query.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
                 query.SetIdempotence(false);
 
-                _dataUtility.Session.Execute(query);
+                _dbContext.Session.Execute(query);
                 success = true;
                 _logger.LogTrace("Persisted the message {0}.", message);
             }

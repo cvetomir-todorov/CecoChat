@@ -1,5 +1,6 @@
 ﻿using Cassandra;
 using CecoChat.Cassandra;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace CecoChat.Data.History
@@ -9,15 +10,30 @@ namespace CecoChat.Data.History
         string Keyspace { get; }
 
         ISession Session { get; }
+
+        PreparedStatement PrepareQuery(string cql);
     }
 
     internal sealed class HistoryDbContext : CassandraDbContext, IHistoryDbContext
     {
-        public HistoryDbContext(IOptions<CassandraOptions> options) : base(options)
-        {}
+        private readonly ILogger _logger;
+
+        public HistoryDbContext(
+            ILogger<HistoryDbContext> logger,
+            IOptions<CassandraOptions> options) : base(options)
+        {
+            _logger = logger;
+        }
 
         public string Keyspace => "history";
 
         public ISession Session => GetSession(Keyspace);
+
+        public PreparedStatement PrepareQuery(string cql)
+        {
+            PreparedStatement preparedQuery = Session.Prepare(cql);
+            _logger.LogDebug("Prepared CQL '{0}'.", cql);
+            return preparedQuery;
+        }
     }
 }

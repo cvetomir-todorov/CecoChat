@@ -21,21 +21,21 @@ namespace CecoChat.Data.History.Repos
     {
         private readonly ILogger _logger;
         private readonly IHistoryActivityUtility _historyActivityUtility;
-        private readonly IDataUtility _dataUtility;
+        private readonly IHistoryDbContext _dbContext;
         private readonly Lazy<PreparedStatement> _setReactionQuery;
         private readonly Lazy<PreparedStatement> _unsetReactionQuery;
 
         public ReactionRepo(
             ILogger<ReactionRepo> logger,
             IHistoryActivityUtility historyActivityUtility,
-            IDataUtility dataUtility)
+            IHistoryDbContext dbContext)
         {
             _logger = logger;
             _historyActivityUtility = historyActivityUtility;
-            _dataUtility = dataUtility;
+            _dbContext = dbContext;
 
-            _setReactionQuery = new Lazy<PreparedStatement>(() => _dataUtility.PrepareQuery(SetReactionCommand));
-            _unsetReactionQuery = new Lazy<PreparedStatement>(() => _dataUtility.PrepareQuery(UnsetReactionCommand));
+            _setReactionQuery = new Lazy<PreparedStatement>(() => _dbContext.PrepareQuery(SetReactionCommand));
+            _unsetReactionQuery = new Lazy<PreparedStatement>(() => _dbContext.PrepareQuery(UnsetReactionCommand));
         }
 
         private const string SetReactionCommand =
@@ -53,16 +53,16 @@ namespace CecoChat.Data.History.Repos
 
         public async Task SetReaction(ReactionMessage message)
         {
-            Activity activity = _historyActivityUtility.StartSetReaction(_dataUtility.Session, message.ReactorId);
+            Activity activity = _historyActivityUtility.StartSetReaction(_dbContext.Session, message.ReactorId);
             bool success = false;
 
             try
             {
-                string chatID = _dataUtility.CreateChatID(message.SenderId, message.ReceiverId);
+                string chatID = DataUtility.CreateChatID(message.SenderId, message.ReceiverId);
                 BoundStatement query = _setReactionQuery.Value.Bind(message.ReactorId, message.Reaction, chatID, message.MessageId);
                 query.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
                 query.SetIdempotence(false);
-                await _dataUtility.Session.ExecuteAsync(query);
+                await _dbContext.Session.ExecuteAsync(query);
 
                 success = true;
                 _logger.LogTrace("User {0} reacted with {1} to message {2}.", message.ReactorId, message.Reaction, message.MessageId);
@@ -75,16 +75,16 @@ namespace CecoChat.Data.History.Repos
 
         public async Task UnsetReaction(ReactionMessage message)
         {
-            Activity activity = _historyActivityUtility.StartUnsetReaction(_dataUtility.Session, message.ReactorId);
+            Activity activity = _historyActivityUtility.StartUnsetReaction(_dbContext.Session, message.ReactorId);
             bool success = false;
 
             try
             {
-                string chatID = _dataUtility.CreateChatID(message.SenderId, message.ReceiverId);
+                string chatID = DataUtility.CreateChatID(message.SenderId, message.ReceiverId);
                 BoundStatement query = _unsetReactionQuery.Value.Bind(message.ReactorId, chatID, message.MessageId);
                 query.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
                 query.SetIdempotence(false);
-                await _dataUtility.Session.ExecuteAsync(query);
+                await _dbContext.Session.ExecuteAsync(query);
 
                 success = true;
                 _logger.LogTrace("User {0} removed reaction to message {1}.", message.ReactorId, message.MessageId);
