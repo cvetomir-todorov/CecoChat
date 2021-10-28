@@ -57,40 +57,36 @@ namespace CecoChat.Server.State.Clients
 
         private void UpdateSenderChat(long senderID, string chatID, long messageID)
         {
-            if (_cache.TryGetUserChat(senderID, chatID, out ChatState chat))
-            {
-                chat.NewestMessage = messageID;
-            }
-            else
-            {
-                chat = _repo.GetChat(senderID, chatID);
-                chat.NewestMessage = messageID;
-
-                _cache.UpdateUserChat(senderID, chat);
-            }
+            ChatState chat = GetChatFromDBIntoCache(senderID, chatID);
+            chat.NewestMessage = Math.Max(chat.NewestMessage, messageID);
 
             _repo.UpdateChat(senderID, chat);
         }
 
         private void UpdateReceiverChat(long receiverID, string chatID, long messageID)
         {
-            if (_cache.TryGetUserChat(receiverID, chatID, out ChatState chat))
-            {
-                chat.NewestMessage = messageID;
-                chat.OtherUserDelivered = messageID;
-                chat.OtherUserSeen = messageID;
-            }
-            else
-            {
-                chat = _repo.GetChat(receiverID, chatID);
-                chat.NewestMessage = messageID;
-                chat.OtherUserDelivered = messageID;
-                chat.OtherUserSeen = messageID;
-
-                _cache.UpdateUserChat(receiverID, chat);
-            }
+            ChatState chat = GetChatFromDBIntoCache(receiverID, chatID);
+            chat.NewestMessage = Math.Max(chat.NewestMessage, messageID);
+            chat.OtherUserDelivered = Math.Max(chat.OtherUserDelivered, messageID);
+            chat.OtherUserSeen = Math.Max(chat.OtherUserSeen, messageID);
 
             _repo.UpdateChat(receiverID, chat);
+        }
+
+        private ChatState GetChatFromDBIntoCache(long userID, string chatID)
+        {
+            if (!_cache.TryGetUserChat(userID, chatID, out ChatState chat))
+            {
+                chat = _repo.GetChat(userID, chatID);
+                chat ??= new ChatState
+                {
+                    ChatId = chatID
+                };
+
+                _cache.UpdateUserChat(userID, chat);
+            }
+
+            return chat;
         }
 
         private static long GetUserID(ServerCallContext context)
