@@ -1,0 +1,7 @@
+syntax = "proto3";
+option csharp_namespace = "CecoChat.Contracts.Backplane";
+package CecoChat.Contracts.Backplane;
+
+enum DataType {
+  PLAIN_TEXT = 0;
+}

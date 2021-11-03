@@ -15,6 +15,9 @@
 
   <ItemGroup>
     <Protobuf Include="backplane\backplane-message.proto" />
+    <Protobuf Include="backplane\data-type.proto" />
+    <Protobuf Include="backplane\delivery-status.proto" />
+    <Protobuf Include="backplane\message-type.proto" />
     <Protobuf Include="history\data-type.proto" />
     <Protobuf Include="history\delivery-status.proto" />
     <Protobuf Include="history\history-message.proto" />

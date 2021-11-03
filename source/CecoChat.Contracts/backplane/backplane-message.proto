@@ -2,6 +2,9 @@ syntax = "proto3";
 option csharp_namespace = "CecoChat.Contracts.Backplane";
 package CecoChat.Contracts.Backplane;
 import "uuid.proto";
+import "backplane/message-type.proto";
+import "backplane/data-type.proto";
+import "backplane/delivery-status.proto";
 
 message BackplaneMessage {
   int64 message_id = 1;
@@ -16,26 +19,9 @@ message BackplaneMessage {
   }
 }
 
-enum MessageType {
-  DATA = 0;
-  DISCONNECT = 1;
-  DELIVERY = 2;
-  REACTION = 3;
-}
-
 message BackplaneData {
   DataType type = 1;
   string data = 2;
-}
-
-enum DataType {
-  PLAIN_TEXT = 0;
-}
-
-enum DeliveryStatus {
-  PROCESSED = 0;
-  DELIVERED = 1;
-  SEEN = 2;
 }
 
 message BackplaneReaction {
