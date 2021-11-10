@@ -90,12 +90,12 @@ namespace CecoChat.Server.State.Backplane
         private void UpdateReceiverStateOnDataOrReaction(BackplaneMessage backplaneMessage)
         {
             string chatID = DataUtility.CreateChatID(backplaneMessage.SenderId, backplaneMessage.ReceiverId);
-            ChatState chat = GetChatFromDBIntoCache(backplaneMessage.ReceiverId, chatID);
-            chat.NewestMessage = Math.Max(chat.NewestMessage, backplaneMessage.MessageId);
-            chat.OtherUserDelivered = Math.Max(chat.OtherUserDelivered, backplaneMessage.MessageId);
-            chat.OtherUserSeen = Math.Max(chat.OtherUserSeen, backplaneMessage.MessageId);
+            ChatState receiverChat = GetChatFromDBIntoCache(backplaneMessage.ReceiverId, chatID);
+            receiverChat.NewestMessage = Math.Max(receiverChat.NewestMessage, backplaneMessage.MessageId);
+            receiverChat.OtherUserDelivered = Math.Max(receiverChat.OtherUserDelivered, backplaneMessage.MessageId);
+            receiverChat.OtherUserSeen = Math.Max(receiverChat.OtherUserSeen, backplaneMessage.MessageId);
 
-            _repo.UpdateChat(backplaneMessage.ReceiverId, chat);
+            _repo.UpdateChat(backplaneMessage.ReceiverId, receiverChat);
         }
 
         private ChatState GetChatFromDBIntoCache(long userID, string chatID)
