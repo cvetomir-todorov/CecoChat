@@ -28,6 +28,7 @@ namespace CecoChat.Server.History.HostedServices
         public void Dispose()
         {
             _stoppedCts?.Dispose();
+            _historyConsumer.Dispose();
         }
 
         public Task StartAsync(CancellationToken cancellationToken)

@@ -7,7 +7,7 @@ using Microsoft.Extensions.Options;
 
 namespace CecoChat.Server.Messaging.Backplane
 {
-    public interface IBackplaneComponents
+    public interface IBackplaneComponents : IDisposable
     {
         void ConfigurePartitioning(int partitionCount, PartitionRange partitions);
 
@@ -34,6 +34,12 @@ namespace CecoChat.Server.Messaging.Backplane
             _topicPartitionFlyweight = topicPartitionFlyweight;
             _sendersProducer = sendersProducer;
             _receiversConsumer = receiversConsumer;
+        }
+
+        public void Dispose()
+        {
+            _sendersProducer.Dispose();
+            _receiversConsumer.Dispose();
         }
 
         public void ConfigurePartitioning(int partitionCount, PartitionRange partitions)
