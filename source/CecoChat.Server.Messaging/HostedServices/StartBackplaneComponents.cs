@@ -33,6 +33,7 @@ namespace CecoChat.Server.Messaging.HostedServices
         public void Dispose()
         {
             _stoppedCts?.Dispose();
+            _backplaneComponents.Dispose();
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
