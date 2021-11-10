@@ -1,10 +1,15 @@
 using Autofac;
 using CecoChat.Autofac;
+using CecoChat.Contracts.Backplane;
 using CecoChat.Data.State;
 using CecoChat.Jwt;
+using CecoChat.Kafka;
+using CecoChat.Kafka.Instrumentation;
 using CecoChat.Server.Identity;
+using CecoChat.Server.State.Backplane;
 using CecoChat.Server.State.Clients;
 using CecoChat.Server.State.HostedServices;
+using Confluent.Kafka;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -47,6 +52,7 @@ namespace CecoChat.Server.State
         {
             // ordered hosted services
             builder.RegisterHostedService<InitStateDb>();
+            builder.RegisterHostedService<StartBackplaneComponents>();
 
             // state
             builder.RegisterModule(new StateDbAutofacModule
@@ -54,6 +60,10 @@ namespace CecoChat.Server.State
                 StateDbConfiguration = Configuration.GetSection("StateDB")
             });
             builder.RegisterType<StateCache>().As<IStateCache>().SingleInstance();
+            builder.RegisterType<StateConsumer>().As<IStateConsumer>().SingleInstance();
+            builder.RegisterFactory<KafkaConsumer<Null, BackplaneMessage>, IKafkaConsumer<Null, BackplaneMessage>>();
+            builder.RegisterModule(new KafkaInstrumentationAutofacModule());
+            builder.RegisterOptions<BackplaneOptions>(Configuration.GetSection("Backplane"));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
