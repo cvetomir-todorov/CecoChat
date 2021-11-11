@@ -4,16 +4,16 @@ using System.Threading.Tasks;
 
 namespace CecoChat.Client.Console.Interaction
 {
-    public sealed class UsersState : State
+    public sealed class AllChatsState : State
     {
-        public UsersState(StateContainer states) : base(states)
+        public AllChatsState(StateContainer states) : base(states)
         {}
 
         public override async Task<State> Execute()
         {
             if (Context.ReloadData)
             {
-                await GetUserHistory();
+                await GetChats();
             }
 
             System.Console.Clear();
@@ -38,7 +38,7 @@ namespace CecoChat.Client.Console.Interaction
             else if (keyInfo.KeyChar == 'f' || keyInfo.KeyChar == 'F')
             {
                 Context.ReloadData = true;
-                return States.Users;
+                return States.AllChats;
             }
             else if (keyInfo.KeyChar == 'x' || keyInfo.KeyChar == 'X')
             {
@@ -47,7 +47,7 @@ namespace CecoChat.Client.Console.Interaction
             else
             {
                 Context.ReloadData = false;
-                return States.Users;
+                return States.AllChats;
             }
         }
 
@@ -57,13 +57,13 @@ namespace CecoChat.Client.Console.Interaction
             if (index < 0 || index >= userIDs.Count)
             {
                 Context.ReloadData = false;
-                return States.Users;
+                return States.AllChats;
             }
             else
             {
                 Context.UserID = userIDs[index];
                 Context.ReloadData = true;
-                return States.Chat;
+                return States.OneChat;
             }
         }
     }

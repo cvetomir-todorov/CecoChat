@@ -13,7 +13,7 @@ namespace CecoChat.Client.Console.Interaction
             string plainText = System.Console.ReadLine();
             if (string.IsNullOrWhiteSpace(plainText))
             {
-                return States.Chat;
+                return States.OneChat;
             }
 
             long messageID = await Client.SendPlainTextMessage(Context.UserID, plainText);
@@ -29,7 +29,7 @@ namespace CecoChat.Client.Console.Interaction
             Storage.AddMessage(message);
 
             Context.ReloadData = true;
-            return States.Chat;
+            return States.OneChat;
         }
     }
 }

@@ -16,10 +16,21 @@ namespace CecoChat.Client.Console
             _chatMap = new();
         }
 
+        public void AddOrUpdateChat(Chat chat)
+        {
+            Chat targetChat = _chatMap.GetOrAdd(chat.OtherUserID, _ => chat);
+            if (!ReferenceEquals(chat, targetChat))
+            {
+                targetChat.NewestMessage = chat.NewestMessage;
+                targetChat.OtherUserDelivered = chat.OtherUserDelivered;
+                targetChat.OtherUserSeen = chat.OtherUserSeen;
+            }
+        }
+
         public void AddMessage(Message message)
         {
-            long otherUserId = GetOtherUserID(message);
-            Chat chat = _chatMap.GetOrAdd(otherUserId, _ => new Chat());
+            long otherUserId = GetOtherUserID(message.SenderID, message.ReceiverID);
+            Chat chat = _chatMap.GetOrAdd(otherUserId, _ => new Chat(otherUserId));
             chat.AddNew(message);
         }
 
@@ -28,13 +39,13 @@ namespace CecoChat.Client.Console
             return _chatMap.Keys.ToList();
         }
 
-        public List<Message> GetDialogMessages(long userID)
+        public List<Message> GetChatMessages(long userID)
         {
             List<Message> messages = new();
 
-            if (_chatMap.TryGetValue(userID, out Chat dialog))
+            if (_chatMap.TryGetValue(userID, out Chat chat))
             {
-                messages.AddRange(dialog.GetMessages());
+                messages.AddRange(chat.GetMessages());
             }
 
             return messages;
@@ -53,11 +64,6 @@ namespace CecoChat.Client.Console
             return dialog.TryGetMessage(messageID, out message);
         }
 
-        private long GetOtherUserID(Message message)
-        {
-            return GetOtherUserID(message.SenderID, message.ReceiverID);
-        }
-
         private long GetOtherUserID(long userID1, long userID2)
         {
             if (userID1 != _userID)
@@ -70,37 +76,6 @@ namespace CecoChat.Client.Console
             }
 
             throw new InvalidOperationException($"Message is from current user {_userID} to himself.");
-        }
-
-        private sealed class Chat
-        {
-            private readonly ConcurrentDictionary<long, Message> _messageMap;
-
-            public Chat()
-            {
-                _messageMap = new();
-            }
-
-            public void AddNew(Message message)
-            {
-                if (!_messageMap.TryGetValue(message.MessageID, out _))
-                {
-                    _messageMap.TryAdd(message.MessageID, message);
-                }
-            }
-
-            public IEnumerable<Message> GetMessages()
-            {
-                foreach (KeyValuePair<long,Message> pair in _messageMap)
-                {
-                    yield return pair.Value;
-                }
-            }
-
-            public bool TryGetMessage(long messageID, out Message message)
-            {
-                return _messageMap.TryGetValue(messageID, out message);
-            }
         }
     }
 }

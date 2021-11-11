@@ -2,15 +2,18 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using CecoChat.Contracts.History;
+using CecoChat.Data;
 
 namespace CecoChat.Client.Console.Interaction
 {
     public abstract class State
     {
+        private DateTime _lastKnownChatState;
         protected StateContainer States { get; }
 
         protected State(StateContainer states)
         {
+            _lastKnownChatState = Snowflake.Epoch;
             States = states;
         }
 
@@ -18,17 +21,21 @@ namespace CecoChat.Client.Console.Interaction
         protected MessagingClient Client => States.Client;
         protected StateContext Context => States.Context;
 
-        protected async Task GetUserHistory()
+        protected async Task GetChats()
         {
-            IList<HistoryMessage> history = await Client.GetUserHistory(DateTime.UtcNow);
-            foreach (HistoryMessage item in history)
+            DateTime currentState = DateTime.UtcNow;
+            IList<Contracts.State.ChatState> chatStates = await Client.GetChats(_lastKnownChatState);
+
+            foreach (Contracts.State.ChatState chatState in chatStates)
             {
-                Message message = CreateMessage(item);
-                Storage.AddMessage(message);
+                Chat chat = CreateChat(chatState);
+                Storage.AddOrUpdateChat(chat);
             }
+
+            _lastKnownChatState = currentState;
         }
 
-        protected async Task GetDialogHistory(long userID)
+        protected async Task GetHistory(long userID)
         {
             IList<HistoryMessage> history = await Client.GetHistory(userID, DateTime.UtcNow);
             foreach (HistoryMessage item in history)
@@ -39,6 +46,19 @@ namespace CecoChat.Client.Console.Interaction
         }
 
         public abstract Task<State> Execute();
+
+        private Chat CreateChat(Contracts.State.ChatState chatState)
+        {
+            long otherUserID = DataUtility.GetOtherUsedID(chatState.ChatId, Client.UserID);
+            Chat chat = new(otherUserID)
+            {
+                NewestMessage = chatState.NewestMessage,
+                OtherUserDelivered = chatState.OtherUserDelivered,
+                OtherUserSeen = chatState.OtherUserSeen
+            };
+
+            return chat;
+        }
 
         private static Message CreateMessage(HistoryMessage historyMessage)
         {
