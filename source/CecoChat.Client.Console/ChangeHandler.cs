@@ -25,7 +25,6 @@ namespace CecoChat.Client.Console
                 SenderID = notification.SenderId,
                 ReceiverID = notification.ReceiverId,
                 SequenceNumber = notification.SequenceNumber,
-                Status = DeliveryStatus.Processed
             };
 
             switch (notification.Data.Type)
@@ -48,25 +47,26 @@ namespace CecoChat.Client.Console
                 throw new InvalidOperationException($"Notification {notification} should have type {MessageType.Delivery}.");
             }
 
-            if (!_storage.TryGetMessage(notification.SenderId, notification.ReceiverId, notification.MessageId, out Message message))
+            if (!_storage.TryGetChat(notification.SenderId, notification.ReceiverId, out Chat chat))
             {
-                // the message is not in the local history
-                return;
+                long otherUserID = _storage.GetOtherUserID(notification.SenderId, notification.ReceiverId);
+                chat = new Chat(otherUserID)
+                {
+                    NewestMessage = notification.MessageId
+                };
+                _storage.AddOrUpdateChat(chat);
             }
 
             switch (notification.Status)
             {
-                case Contracts.Messaging.DeliveryStatus.Lost:
-                    message.Status = DeliveryStatus.Lost;
+                case DeliveryStatus.Processed:
+                    chat.Processed = notification.MessageId;
                     break;
-                case Contracts.Messaging.DeliveryStatus.Processed:
-                    message.Status = DeliveryStatus.Processed;
+                case DeliveryStatus.Delivered:
+                    chat.OtherUserDelivered = notification.MessageId;
                     break;
-                case Contracts.Messaging.DeliveryStatus.Delivered:
-                    message.Status = DeliveryStatus.Delivered;
-                    break;
-                case Contracts.Messaging.DeliveryStatus.Seen:
-                    message.Status = DeliveryStatus.Seen;
+                case DeliveryStatus.Seen:
+                    chat.OtherUserSeen = notification.MessageId;
                     break;
                 default:
                     throw new EnumValueNotSupportedException(notification.Status);

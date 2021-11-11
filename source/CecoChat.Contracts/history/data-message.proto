@@ -2,7 +2,6 @@ syntax = "proto3";
 option csharp_namespace = "CecoChat.Contracts.History";
 package CecoChat.Contracts.History;
 import "history/data-type.proto";
-import "history/delivery-status.proto";
 
 message DataMessage {
   int64 message_id = 1;
@@ -10,5 +9,4 @@ message DataMessage {
   int64 receiver_id = 3;
   DataType data_type = 4;
   string data = 5;
-  DeliveryStatus status = 6;
 }

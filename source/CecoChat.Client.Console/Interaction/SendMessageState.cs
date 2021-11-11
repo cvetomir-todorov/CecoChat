@@ -24,7 +24,6 @@ namespace CecoChat.Client.Console.Interaction
                 ReceiverID = Context.UserID,
                 DataType = DataType.PlainText,
                 Data = plainText,
-                Status = DeliveryStatus.Unprocessed
             };
             Storage.AddMessage(message);
 

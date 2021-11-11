@@ -37,9 +37,9 @@ namespace CecoChat.Data.History.Repos
         }
 
         private const string InsertIntoMessagesForChat =
-            "INSERT INTO messages_for_chat " +
-            "(chat_id, message_id, sender_id, receiver_id, type, status, data) " +
-            "VALUES (?, ?, ?, ?, ?, ?, ?)";
+            "INSERT INTO chat_messages " +
+            "(chat_id, message_id, sender_id, receiver_id, type, data) " +
+            "VALUES (?, ?, ?, ?, ?, ?)";
 
         public void Prepare()
         {
@@ -54,11 +54,10 @@ namespace CecoChat.Data.History.Repos
             try
             {
                 sbyte dbMessageType = _mapper.MapHistoryToDbDataType(message.DataType);
-                sbyte dbMessageStatus = _mapper.MapHistoryToDbDeliveryStatus(message.Status);
                 string chatID = DataUtility.CreateChatID(message.SenderId, message.ReceiverId);
 
                 BoundStatement query = _messagesForChatQuery.Value.Bind(
-                    chatID, message.MessageId, message.SenderId, message.ReceiverId, dbMessageType, dbMessageStatus, message.Data);
+                    chatID, message.MessageId, message.SenderId, message.ReceiverId, dbMessageType, message.Data);
                 query.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
                 query.SetIdempotence(false);
 

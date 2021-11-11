@@ -19,7 +19,6 @@
     <Protobuf Include="backplane\delivery-status.proto" />
     <Protobuf Include="backplane\message-type.proto" />
     <Protobuf Include="history\data-type.proto" />
-    <Protobuf Include="history\delivery-status.proto" />
     <Protobuf Include="history\history-message.proto" />
     <Protobuf Include="history\history-service.proto" />
     <Protobuf Include="history\data-message.proto" />

@@ -79,21 +79,6 @@ namespace CecoChat.Client.Console.Interaction
                     throw new EnumValueNotSupportedException(historyMessage.DataType);
             }
 
-            switch (historyMessage.Status)
-            {
-                case Contracts.History.DeliveryStatus.Processed:
-                    message.Status = DeliveryStatus.Processed;
-                    break;
-                case Contracts.History.DeliveryStatus.Delivered:
-                    message.Status = DeliveryStatus.Delivered;
-                    break;
-                case Contracts.History.DeliveryStatus.Seen:
-                    message.Status = DeliveryStatus.Seen;
-                    break;
-                default:
-                    throw new EnumValueNotSupportedException(historyMessage.Status);
-            }
-
             foreach (KeyValuePair<long, string> pair in historyMessage.Reactions)
             {
                 message.Reactions.Add(pair.Key, pair.Value);

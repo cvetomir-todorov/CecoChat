@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Scripts\history-keyspace.cql" />
-    <EmbeddedResource Include="Scripts\history-messages-for-chat-table.cql" />
+    <EmbeddedResource Include="Scripts\history-chat-messages-table.cql" />
   </ItemGroup>
 
   <ItemGroup>
