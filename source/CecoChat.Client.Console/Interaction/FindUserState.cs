@@ -18,13 +18,13 @@ namespace CecoChat.Client.Console.Interaction
                 userID == 0)
             {
                 Context.ReloadData = true;
-                return Task.FromResult(States.Users);
+                return Task.FromResult(States.AllChats);
             }
             else
             {
                 Context.ReloadData = true;
                 Context.UserID = userID;
-                return Task.FromResult(States.Chat);
+                return Task.FromResult(States.OneChat);
             }
         }
     }

@@ -8,9 +8,9 @@ namespace CecoChat.Client.Console.Interaction
             Storage = storage;
             Context = new StateContext();
 
-            Users = new UsersState(this);
+            AllChats = new AllChatsState(this);
             FindUser = new FindUserState(this);
-            Chat = new ChatState(this);
+            OneChat = new OneChatState(this);
             SendMessage = new SendMessageState(this);
             React = new ReactState(this);
             Final = new FinalState(this);
@@ -20,9 +20,9 @@ namespace CecoChat.Client.Console.Interaction
         public MessageStorage Storage { get; }
         public StateContext Context { get; }
 
-        public State Users { get; }
+        public State AllChats { get; }
         public State FindUser { get; }
-        public State Chat { get; }
+        public State OneChat { get; }
         public State SendMessage { get; }
         public State React { get; }
         public State Final { get; }

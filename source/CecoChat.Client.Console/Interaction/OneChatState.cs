@@ -5,19 +5,19 @@ using System.Threading.Tasks;
 
 namespace CecoChat.Client.Console.Interaction
 {
-    public sealed class ChatState : State
+    public sealed class OneChatState : State
     {
-        public ChatState(StateContainer states) : base(states)
+        public OneChatState(StateContainer states) : base(states)
         {}
 
         public override async Task<State> Execute()
         {
             if (Context.ReloadData)
             {
-                await GetDialogHistory(Context.UserID);
+                await GetHistory(Context.UserID);
             }
 
-            List<Message> messages = Storage.GetDialogMessages(Context.UserID);
+            List<Message> messages = Storage.GetChatMessages(Context.UserID);
             messages.Sort((left, right) => left.MessageID.CompareTo(right.MessageID));
 
             System.Console.Clear();
@@ -41,18 +41,18 @@ namespace CecoChat.Client.Console.Interaction
             else if (keyInfo.KeyChar == 'f' || keyInfo.KeyChar == 'F')
             {
                 Context.ReloadData = true;
-                return States.Chat;
+                return States.OneChat;
             }
             else if (keyInfo.KeyChar == 'x' || keyInfo.KeyChar == 'X')
             {
                 Context.ReloadData = true;
-                return States.Users;
+                return States.AllChats;
             }
             else
             {
                 // includes local refresh
                 Context.ReloadData = false;
-                return States.Chat;
+                return States.OneChat;
             }
         }
 

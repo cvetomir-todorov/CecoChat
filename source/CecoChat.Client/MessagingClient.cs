@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using CecoChat.Contracts.History;
 using CecoChat.Contracts.Messaging;
+using CecoChat.Contracts.State;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Grpc.Net.Client;
@@ -22,10 +23,12 @@ namespace CecoChat.Client
         private Metadata _grpcMetadata;
         private GrpcChannel _messagingChannel;
         private GrpcChannel _historyChannel;
+        private GrpcChannel _stateChannel;
         private Listen.ListenClient _listenClient;
         private Send.SendClient _sendClient;
-        private History.HistoryClient _historyClient;
         private Reaction.ReactionClient _reactionClient;
+        private History.HistoryClient _historyClient;
+        private State.StateClient _stateClient;
 
         public MessagingClient()
         {
@@ -41,6 +44,9 @@ namespace CecoChat.Client
 
             _historyChannel?.ShutdownAsync().Wait();
             _historyChannel?.Dispose();
+
+            _stateChannel?.ShutdownAsync().Wait();
+            _stateChannel?.Dispose();
         }
 
         public long UserID => _userID;
@@ -60,11 +66,15 @@ namespace CecoChat.Client
             _messagingChannel = GrpcChannel.ForAddress(connectResponse.MessagingServerAddress);
             _historyChannel?.Dispose();
             _historyChannel = GrpcChannel.ForAddress(connectResponse.HistoryServerAddress);
+            _stateChannel?.Dispose();
+            // TODO: use a BFF for history and state
+            _stateChannel = GrpcChannel.ForAddress("https://localhost:31002");
 
             _listenClient = new Listen.ListenClient(_messagingChannel);
             _sendClient = new Send.SendClient(_messagingChannel);
-            _historyClient = new History.HistoryClient(_historyChannel);
             _reactionClient = new Reaction.ReactionClient(_messagingChannel);
+            _historyClient = new History.HistoryClient(_historyChannel);
+            _stateClient = new State.StateClient(_stateChannel);
         }
 
         private async Task<CreateSessionResponse> CreateSession(CreateSessionRequest request, string profileServer)
@@ -167,14 +177,14 @@ namespace CecoChat.Client
 
         public event EventHandler<Exception> ExceptionOccurred;
 
-        public async Task<IList<HistoryMessage>> GetUserHistory(DateTime olderThan)
+        public async Task<IList<ChatState>> GetChats(DateTime newerThan)
         {
-            GetUserHistoryRequest request = new()
+            GetChatsRequest request = new()
             {
-                OlderThan = Timestamp.FromDateTime(olderThan)
+                NewerThan = newerThan.ToTimestamp()
             };
-            GetUserHistoryResponse response = await _historyClient.GetUserHistoryAsync(request, _grpcMetadata);
-            return response.Messages;
+            GetChatsResponse response = await _stateClient.GetChatsAsync(request, _grpcMetadata);
+            return response.Chats;
         }
 
         public async Task<IList<HistoryMessage>> GetHistory(long otherUserID, DateTime olderThan)

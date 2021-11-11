@@ -43,7 +43,7 @@ namespace CecoChat.Client.Console
         {
             StateContainer states = new(client, storage);
             states.Context.ReloadData = true;
-            State currentState = states.Users;
+            State currentState = states.AllChats;
 
             while (currentState != states.Final)
             {
