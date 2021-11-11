@@ -44,19 +44,19 @@ namespace CecoChat.Server.Messaging.Backplane
 
         public void ConfigurePartitioning(int partitionCount, PartitionRange partitions)
         {
-            int currentPartitionCount = _topicPartitionFlyweight.GetTopicPartitionCount(_backplaneOptions.MessagesTopicName);
+            int currentPartitionCount = _topicPartitionFlyweight.GetTopicPartitionCount(_backplaneOptions.TopicMessagesByReceiver);
             if (currentPartitionCount < partitionCount)
             {
-                _topicPartitionFlyweight.AddOrUpdate(_backplaneOptions.MessagesTopicName, partitionCount);
+                _topicPartitionFlyweight.AddOrUpdate(_backplaneOptions.TopicMessagesByReceiver, partitionCount);
                 _logger.LogInformation("Increase cached partitions for topic {0} from {1} to {2}.",
-                    _backplaneOptions.MessagesTopicName, currentPartitionCount, partitionCount);
+                    _backplaneOptions.TopicMessagesByReceiver, currentPartitionCount, partitionCount);
             }
 
             _sendersProducer.PartitionCount = partitionCount;
             _receiversConsumer.Prepare(partitions);
 
             _logger.LogInformation("Prepared backplane components for topic {0} to use partitions {1}.",
-                _backplaneOptions.MessagesTopicName, partitions);
+                _backplaneOptions.TopicMessagesByReceiver, partitions);
         }
 
         public void StartConsumption(CancellationToken ct)

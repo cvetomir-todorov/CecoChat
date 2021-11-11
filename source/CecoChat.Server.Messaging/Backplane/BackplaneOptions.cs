@@ -12,6 +12,6 @@ namespace CecoChat.Server.Messaging.Backplane
 
         public string ServerID { get; set; }
 
-        public string MessagesTopicName { get; set; }
+        public string TopicMessagesByReceiver { get; set; }
     }
 }

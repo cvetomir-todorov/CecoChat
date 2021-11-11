@@ -8,6 +8,6 @@ namespace CecoChat.Server.State.Backplane
 
         public KafkaConsumerOptions StateConsumer { get; set; }
 
-        public string MessagesTopicName { get; set; }
+        public string TopicMessagesByReceiver { get; set; }
     }
 }
