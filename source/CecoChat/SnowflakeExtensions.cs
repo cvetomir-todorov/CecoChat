@@ -5,6 +5,8 @@ namespace CecoChat
     public static class Snowflake
     {
         public static readonly DateTime Epoch = new(2021, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        public static long Now => DateTime.Now.ToSnowflake();
+        public static long UtcNow => DateTime.UtcNow.ToSnowflake();
     }
 
     public static class SnowflakeExtensions
