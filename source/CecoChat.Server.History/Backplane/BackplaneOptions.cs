@@ -8,6 +8,6 @@ namespace CecoChat.Server.History.Backplane
 
         public KafkaConsumerOptions HistoryConsumer { get; set; }
 
-        public string MessagesTopicName { get; set; }
+        public string TopicMessagesByReceiver { get; set; }
     }
 }

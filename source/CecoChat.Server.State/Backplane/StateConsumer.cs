@@ -50,7 +50,7 @@ namespace CecoChat.Server.State.Backplane
         public void Prepare()
         {
             _consumer.Initialize(_backplaneOptions.Kafka, _backplaneOptions.StateConsumer, new BackplaneMessageDeserializer());
-            _consumer.Subscribe(_backplaneOptions.MessagesTopicName);
+            _consumer.Subscribe(_backplaneOptions.TopicMessagesByReceiver);
         }
 
         public void Start(CancellationToken ct)

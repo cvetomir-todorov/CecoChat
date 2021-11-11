@@ -68,7 +68,7 @@ namespace CecoChat.Server.Messaging.Backplane
                 }
             }
 
-            _consumer.Assign(_backplaneOptions.MessagesTopicName, partitions, _partitionFlyweight);
+            _consumer.Assign(_backplaneOptions.TopicMessagesByReceiver, partitions, _partitionFlyweight);
         }
 
         public void Start(CancellationToken ct)
