@@ -15,17 +15,16 @@ namespace CecoChat.Client.Console
 
         public long OtherUserID { get; }
 
-        /// <summary>
-        /// The ID of the newest message in the chat.
-        /// </summary>
+        // The ID of the newest message in the chat.
         public long NewestMessage { get; set; }
-        /// <summary>
-        /// The ID of the last message delivered to the other user.
-        /// </summary>
+
+        // The ID of the last processed message. 
+        public long Processed { get; set; }
+
+        // The ID of the last message delivered to the other user.
         public long OtherUserDelivered { get; set; }
-        /// <summary>
-        /// The ID of the last message seen by the other user.
-        /// </summary>
+
+        // The ID of the last message seen by the other user.
         public long OtherUserSeen { get; set; }
 
         public void AddNew(Message message)

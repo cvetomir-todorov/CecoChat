@@ -4,10 +4,4 @@
     {
         PlainText = 0
     }
-
-    internal enum DbDeliveryStatus : sbyte
-    {
-        Processed = 0,
-        Delivered = 1
-    }
 }

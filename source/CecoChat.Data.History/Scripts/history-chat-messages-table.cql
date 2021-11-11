@@ -1,11 +1,10 @@
-﻿CREATE TABLE history.messages_for_chat
+﻿CREATE TABLE history.chat_messages
 (
   chat_id text,
   message_id bigint,
   sender_id bigint,
   receiver_id bigint,
   type tinyint,
-  status tinyint,
   data text,
   reactions map<bigint,text>,
   PRIMARY KEY (chat_id, message_id)

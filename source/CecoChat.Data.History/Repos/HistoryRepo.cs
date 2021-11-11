@@ -39,8 +39,9 @@ namespace CecoChat.Data.History.Repos
         }
 
         private const string SelectMessagesForChat =
-            "SELECT message_id, sender_id, receiver_id, type, status, data, reactions " +
-            "FROM messages_for_chat WHERE chat_id = ? AND message_id < ? ORDER BY message_id DESC LIMIT ?";
+            "SELECT message_id, sender_id, receiver_id, type, data, reactions " +
+            "FROM chat_messages " +
+            "WHERE chat_id = ? AND message_id < ? ORDER BY message_id DESC LIMIT ?";
 
         public void Prepare()
         {
@@ -87,8 +88,6 @@ namespace CecoChat.Data.History.Repos
                 sbyte messageType = row.GetValue<sbyte>("type");
                 message.DataType = _mapper.MapDbToHistoryDataType(messageType);
                 message.Data = row.GetValue<string>("data");
-                sbyte status = row.GetValue<sbyte>("status");
-                message.Status = _mapper.MapDbToHistoryDeliveryStatus(status);
                 IDictionary<long, string> reactions = row.GetValue<IDictionary<long, string>>("reactions");
                 if (reactions != null)
                 {

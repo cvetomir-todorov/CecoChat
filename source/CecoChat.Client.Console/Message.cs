@@ -9,7 +9,6 @@ namespace CecoChat.Client.Console
         public long ReceiverID { get; set; }
         public DataType DataType { get; set; }
         public string Data { get; set; }
-        public DeliveryStatus Status { get; set; }
         public IDictionary<long, string> Reactions { get; }
         public int SequenceNumber { get; set; }
 
@@ -22,10 +21,5 @@ namespace CecoChat.Client.Console
     public enum DataType
     {
         PlainText
-    }
-
-    public enum DeliveryStatus
-    {
-        Unprocessed, Lost, Processed, Delivered, Seen
     }
 }

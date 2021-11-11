@@ -1,9 +1,0 @@
-syntax = "proto3";
-option csharp_namespace = "CecoChat.Contracts.History";
-package CecoChat.Contracts.History;
-
-enum DeliveryStatus {
-  PROCESSED = 0;
-  DELIVERED = 1;
-  SEEN = 2;
-}

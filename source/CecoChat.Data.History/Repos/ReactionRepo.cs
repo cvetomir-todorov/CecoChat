@@ -39,9 +39,13 @@ namespace CecoChat.Data.History.Repos
         }
 
         private const string SetReactionCommand =
-            "UPDATE messages_for_chat SET reactions[?] = ? WHERE chat_id = ? AND message_id = ?";
+            "UPDATE chat_messages " +
+            "SET reactions[?] = ? " +
+            "WHERE chat_id = ? AND message_id = ?";
         private const string UnsetReactionCommand =
-            "DELETE reactions[?] FROM messages_for_chat WHERE chat_id = ? AND message_id = ?";
+            "DELETE reactions[?] " +
+            "FROM chat_messages " +
+            "WHERE chat_id = ? AND message_id = ?";
 
         public void Prepare()
         {

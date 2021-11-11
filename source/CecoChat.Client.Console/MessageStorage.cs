@@ -64,7 +64,13 @@ namespace CecoChat.Client.Console
             return dialog.TryGetMessage(messageID, out message);
         }
 
-        private long GetOtherUserID(long userID1, long userID2)
+        public bool TryGetChat(long userID1, long userID2, out Chat chat)
+        {
+            long otherUserID = GetOtherUserID(userID1, userID2);
+            return _chatMap.TryGetValue(otherUserID, out chat);
+        }
+
+        public long GetOtherUserID(long userID1, long userID2)
         {
             if (userID1 != _userID)
             {
