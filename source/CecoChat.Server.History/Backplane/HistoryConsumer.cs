@@ -24,23 +24,20 @@ namespace CecoChat.Server.History.Backplane
         private readonly BackplaneOptions _backplaneOptions;
         private readonly IKafkaConsumer<Null, BackplaneMessage> _consumer;
         private readonly IContractDataMapper _mapper;
-        private readonly INewMessageRepo _newMessageRepo;
-        private readonly IReactionRepo _reactionRepo;
+        private readonly IChatMessageRepo _messageRepo;
 
         public HistoryConsumer(
             ILogger<HistoryConsumer> logger,
             IOptions<BackplaneOptions> backplaneOptions,
             IFactory<IKafkaConsumer<Null, BackplaneMessage>> consumerFactory,
             IContractDataMapper mapper,
-            INewMessageRepo newMessageRepo,
-            IReactionRepo reactionRepo)
+            IChatMessageRepo messageRepo)
         {
             _logger = logger;
             _backplaneOptions = backplaneOptions.Value;
             _consumer = consumerFactory.Create();
             _mapper = mapper;
-            _newMessageRepo = newMessageRepo;
-            _reactionRepo = reactionRepo;
+            _messageRepo = messageRepo;
         }
 
         public void Dispose()
@@ -91,19 +88,20 @@ namespace CecoChat.Server.History.Backplane
         private void AddDataMessage(BackplaneMessage backplaneMessage)
         {
             DataMessage dataMessage = _mapper.CreateDataMessage(backplaneMessage);
-            _newMessageRepo.AddMessage(dataMessage);
+            _messageRepo.AddMessage(dataMessage);
         }
 
+        // TODO: handle errors since this is async
         private void AddReaction(BackplaneMessage backplaneMessage)
         {
             ReactionMessage reactionMessage = _mapper.CreateReactionMessage(backplaneMessage);
             if (reactionMessage.Type == NewReactionType.Set)
             {
-                _reactionRepo.SetReaction(reactionMessage);
+                _messageRepo.SetReaction(reactionMessage);
             }
             else
             {
-                _reactionRepo.UnsetReaction(reactionMessage);
+                _messageRepo.UnsetReaction(reactionMessage);
             }
         }
     }

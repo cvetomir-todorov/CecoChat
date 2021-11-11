@@ -15,16 +15,16 @@ namespace CecoChat.Server.History.Clients
     {
         private readonly ILogger _logger;
         private readonly IHistoryConfig _historyConfig;
-        private readonly IHistoryRepo _historyRepo;
+        private readonly IChatMessageRepo _messageRepo;
 
         public GrpcHistoryService(
             ILogger<GrpcHistoryService> logger,
             IHistoryConfig historyConfig,
-            IHistoryRepo historyRepo)
+            IChatMessageRepo messageRepo)
         {
             _logger = logger;
             _historyConfig = historyConfig;
-            _historyRepo = historyRepo;
+            _messageRepo = messageRepo;
         }
 
         [Authorize(Roles = "user")]
@@ -37,7 +37,7 @@ namespace CecoChat.Server.History.Clients
             }
             Activity.Current?.SetTag("user.id", userID);
 
-            IReadOnlyCollection<HistoryMessage> historyMessages = await _historyRepo
+            IReadOnlyCollection<HistoryMessage> historyMessages = await _messageRepo
                 .GetHistory(userID, request.OtherUserId, request.OlderThan.ToDateTime(), _historyConfig.DialogMessageCount);
 
             GetHistoryResponse response = new();

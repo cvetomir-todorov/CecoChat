@@ -13,22 +13,16 @@ namespace CecoChat.Server.History.HostedServices
     {
         private readonly ILogger _logger;
         private readonly ICassandraDbInitializer _dbInitializer;
-        private readonly IHistoryRepo _historyRepo;
-        private readonly INewMessageRepo _newMessageRepo;
-        private readonly IReactionRepo _reactionRepo;
+        private readonly IChatMessageRepo _messageRepo;
 
         public InitHistoryDb(
             ILogger<InitHistoryDb> logger,
             ICassandraDbInitializer dbInitializer,
-            IHistoryRepo historyRepo,
-            INewMessageRepo newMessageRepo,
-            IReactionRepo reactionRepo)
+            IChatMessageRepo messageRepo)
         {
             _logger = logger;
             _dbInitializer = dbInitializer;
-            _historyRepo = historyRepo;
-            _newMessageRepo = newMessageRepo;
-            _reactionRepo = reactionRepo;
+            _messageRepo = messageRepo;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -40,9 +34,7 @@ namespace CecoChat.Server.History.HostedServices
                 try
                 {
                     _logger.LogInformation("Start preparing queries...");
-                    _historyRepo.Prepare();
-                    _newMessageRepo.Prepare();
-                    _reactionRepo.Prepare();
+                    _messageRepo.Prepare();
                     _logger.LogInformation("Completed preparing queries.");
                 }
                 catch (Exception exception)

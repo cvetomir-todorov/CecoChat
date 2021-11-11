@@ -2,6 +2,11 @@
 
 namespace CecoChat.Data.History.Repos
 {
+    internal enum DbDataType : sbyte
+    {
+        PlainText = 0
+    }
+
     internal interface IDataMapper
     {
         sbyte MapHistoryToDbDataType(DataType dataType);
