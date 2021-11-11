@@ -74,6 +74,8 @@ namespace CecoChat.Server.State
             }
 
             app.UseRouting();
+            app.UseAuthentication();
+            app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapGrpcService<GrpcStateService>();
