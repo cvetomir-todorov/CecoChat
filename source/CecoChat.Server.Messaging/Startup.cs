@@ -111,6 +111,7 @@ namespace CecoChat.Server.Messaging
             builder.RegisterType<TopicPartitionFlyweight>().As<ITopicPartitionFlyweight>().SingleInstance();
             builder.RegisterType<SendersProducer>().As<ISendersProducer>().SingleInstance();
             builder.RegisterType<ReceiversConsumer>().As<IReceiversConsumer>().SingleInstance();
+            builder.RegisterType<MessageReplicator>().As<IMessageReplicator>().SingleInstance();
             builder.RegisterFactory<KafkaProducer<Null, BackplaneMessage>, IKafkaProducer<Null, BackplaneMessage>>();
             builder.RegisterFactory<KafkaConsumer<Null, BackplaneMessage>, IKafkaConsumer<Null, BackplaneMessage>>();
             builder.RegisterModule(new KafkaInstrumentationAutofacModule());
