@@ -1,1 +1,2 @@
 kafka-topics --zookeeper zookeeper:2181 --create --topic messages-by-receiver --partitions 360 --replication-factor 2 --config min.insync.replicas=2
+kafka-topics --zookeeper zookeeper:2181 --create --topic messages-by-sender --partitions 360 --replication-factor 2 --config min.insync.replicas=2

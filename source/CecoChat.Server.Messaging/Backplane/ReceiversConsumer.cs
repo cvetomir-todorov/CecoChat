@@ -14,6 +14,9 @@ using Microsoft.Extensions.Options;
 
 namespace CecoChat.Server.Messaging.Backplane
 {
+    /// <summary>
+    /// Consumes messages partitioned by receiver ID and sends them to the connected receiver clients.
+    /// </summary>
     public interface IReceiversConsumer : IDisposable
     {
         void Prepare(PartitionRange partitions);

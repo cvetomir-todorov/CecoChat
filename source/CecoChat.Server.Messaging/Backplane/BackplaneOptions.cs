@@ -10,8 +10,14 @@ namespace CecoChat.Server.Messaging.Backplane
 
         public KafkaConsumerOptions ReceiversConsumer { get; set; }
 
+        public KafkaConsumerOptions ReplicatingConsumer { get; set; }
+
+        public KafkaProducerOptions ReplicatingProducer { get; set; }
+
         public string ServerID { get; set; }
 
         public string TopicMessagesByReceiver { get; set; }
+
+        public string TopicMessagesBySender { get; set; }
     }
 }
