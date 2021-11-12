@@ -45,7 +45,7 @@ namespace CecoChat.Server.History.HostedServices
                 }
                 catch (Exception exception)
                 {
-                    _logger.LogCritical(exception, "Failure in history consumer.");
+                    _logger.LogCritical(exception, "Failure in consumer {0}.", _historyConsumer.ConsumerID);
                 }
             }, _stoppedCts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Current);
 

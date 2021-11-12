@@ -45,7 +45,7 @@ namespace CecoChat.Server.State.HostedServices
                 }
                 catch (Exception exception)
                 {
-                    _logger.LogCritical(exception, "Failure in state consumer.");
+                    _logger.LogCritical(exception, "Failure in consumer {0}.", _stateConsumer.ConsumerID);
                 }
             }, _stoppedCts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Current);
 
