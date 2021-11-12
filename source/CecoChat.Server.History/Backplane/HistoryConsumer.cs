@@ -16,6 +16,8 @@ namespace CecoChat.Server.History.Backplane
         void Prepare();
 
         void Start(CancellationToken ct);
+
+        string ConsumerID { get; }
     }
 
     public sealed class HistoryConsumer : IHistoryConsumer
@@ -65,6 +67,8 @@ namespace CecoChat.Server.History.Backplane
 
             _logger.LogInformation("Stopped creating history from messages.");
         }
+
+        public string ConsumerID => _backplaneOptions.HistoryConsumer.ConsumerGroupID;
 
         private void Process(BackplaneMessage backplaneMessage)
         {

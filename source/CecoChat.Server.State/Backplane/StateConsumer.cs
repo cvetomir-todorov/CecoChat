@@ -18,6 +18,8 @@ namespace CecoChat.Server.State.Backplane
         void Prepare();
 
         void Start(CancellationToken ct);
+
+        string ConsumerID { get; }
     }
 
     public sealed class StateConsumer : IStateConsumer
@@ -67,6 +69,8 @@ namespace CecoChat.Server.State.Backplane
 
             _logger.LogInformation("Stopped creating state from messages.");
         }
+
+        public string ConsumerID => _backplaneOptions.StateConsumer.ConsumerGroupID;
 
         private void Process(BackplaneMessage backplaneMessage)
         {
