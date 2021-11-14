@@ -123,14 +123,15 @@ namespace CecoChat.Server.State.Backplane
             switch (backplaneMessage.Type)
             {
                 case MessageType.Data:
-                case MessageType.Reaction:
                     UpdateSenderState(backplaneMessage);
                     break;
                 case MessageType.Delivery:
                     // to be implemented
                     break;
+                case MessageType.Reaction:
+                    // ignore because the message ID is for a previously sent message
                 case MessageType.Disconnect:
-                    // ignore these
+                    // ignore because this is designated to the client apps only
                     break;
                 default:
                     throw new EnumValueNotSupportedException(backplaneMessage.Type);
