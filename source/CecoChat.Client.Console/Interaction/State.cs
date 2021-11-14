@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using CecoChat.Client.Console.LocalStorage;
 using CecoChat.Contracts.History;
 using CecoChat.Data;
 
@@ -72,7 +73,7 @@ namespace CecoChat.Client.Console.Interaction
             switch (historyMessage.DataType)
             {
                 case Contracts.History.DataType.PlainText:
-                    message.DataType = DataType.PlainText;
+                    message.DataType = LocalStorage.DataType.PlainText;
                     message.Data = historyMessage.Data;
                     break;
                 default:

@@ -1,3 +1,5 @@
+using CecoChat.Client.Console.LocalStorage;
+
 namespace CecoChat.Client.Console.Interaction
 {
     public sealed class StateContainer

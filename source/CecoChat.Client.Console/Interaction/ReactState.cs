@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using CecoChat.Client.Console.LocalStorage;
 
 namespace CecoChat.Client.Console.Interaction
 {
