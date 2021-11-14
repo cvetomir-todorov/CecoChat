@@ -143,12 +143,29 @@ namespace CecoChat.Server.State.Backplane
             long targetUserID = backplaneMessage.ReceiverId;
             string chatID = DataUtility.CreateChatID(backplaneMessage.SenderId, backplaneMessage.ReceiverId);
             ChatState receiverChat = GetChatFromDBIntoCache(targetUserID, chatID);
-            receiverChat.NewestMessage = Math.Max(receiverChat.NewestMessage, backplaneMessage.MessageId);
-            receiverChat.OtherUserDelivered = Math.Max(receiverChat.OtherUserDelivered, backplaneMessage.MessageId);
-            receiverChat.OtherUserSeen = Math.Max(receiverChat.OtherUserSeen, backplaneMessage.MessageId);
 
-            _repo.UpdateChat(targetUserID, receiverChat);
-            _logger.LogTrace("Updated receiver state for user {0} chat {1} with message {2}.", targetUserID, chatID, backplaneMessage.MessageId);
+            bool needsUpdate = false;
+            if (backplaneMessage.MessageId > receiverChat.NewestMessage)
+            {
+                receiverChat.NewestMessage = backplaneMessage.MessageId;
+                needsUpdate = true;
+            }
+            if (backplaneMessage.MessageId > receiverChat.OtherUserDelivered)
+            {
+                receiverChat.OtherUserDelivered = backplaneMessage.MessageId;
+                needsUpdate = true;
+            }
+            if (backplaneMessage.MessageId > receiverChat.OtherUserSeen)
+            {
+                receiverChat.OtherUserSeen = backplaneMessage.MessageId;
+                needsUpdate = true;
+            }
+
+            if (needsUpdate)
+            {
+                _repo.UpdateChat(targetUserID, receiverChat);
+                _logger.LogTrace("Updated receiver state for user {0} chat {1} with message {2}.", targetUserID, chatID, backplaneMessage.MessageId);
+            }
         }
 
         private void UpdateSenderState(BackplaneMessage backplaneMessage)
@@ -156,10 +173,19 @@ namespace CecoChat.Server.State.Backplane
             long targetUserID = backplaneMessage.SenderId;
             string chatID = DataUtility.CreateChatID(backplaneMessage.SenderId, backplaneMessage.ReceiverId);
             ChatState senderChat = GetChatFromDBIntoCache(targetUserID, chatID);
-            senderChat.NewestMessage = Math.Max(senderChat.NewestMessage, backplaneMessage.MessageId);
 
-            _repo.UpdateChat(targetUserID, senderChat);
-            _logger.LogTrace("Updated sender state for user {0} chat {1} with message {2}.", targetUserID, chatID, backplaneMessage.MessageId);
+            bool needsUpdate = false;
+            if (backplaneMessage.MessageId > senderChat.NewestMessage)
+            {
+                senderChat.NewestMessage = backplaneMessage.MessageId;
+                needsUpdate = true;
+            }
+
+            if (needsUpdate)
+            {
+                _repo.UpdateChat(targetUserID, senderChat);
+                _logger.LogTrace("Updated sender state for user {0} chat {1} with message {2}.", targetUserID, chatID, backplaneMessage.MessageId);
+            }
         }
 
         private ChatState GetChatFromDBIntoCache(long userID, string chatID)
