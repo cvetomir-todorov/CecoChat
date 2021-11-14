@@ -17,9 +17,9 @@ namespace CecoChat.Data.History.Repos
 
         void AddMessage(DataMessage message);
 
-        Task SetReaction(ReactionMessage message);
+        void SetReaction(ReactionMessage message);
 
-        Task UnsetReaction(ReactionMessage message);
+        void UnsetReaction(ReactionMessage message);
     }
 
     internal class ChatMessageRepo : IChatMessageRepo
@@ -149,7 +149,7 @@ namespace CecoChat.Data.History.Repos
             }
         }
 
-        public async Task SetReaction(ReactionMessage message)
+        public void SetReaction(ReactionMessage message)
         {
             Activity activity = _historyActivityUtility.StartSetReaction(_dbContext.Session, message.ReactorId);
             bool success = false;
@@ -160,7 +160,7 @@ namespace CecoChat.Data.History.Repos
                 BoundStatement query = _setReactionQuery.Value.Bind(message.ReactorId, message.Reaction, chatID, message.MessageId);
                 query.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
                 query.SetIdempotence(false);
-                await _dbContext.Session.ExecuteAsync(query);
+                _dbContext.Session.Execute(query);
 
                 success = true;
                 _logger.LogTrace("User {0} reacted with {1} to message {2}.", message.ReactorId, message.Reaction, message.MessageId);
@@ -171,7 +171,7 @@ namespace CecoChat.Data.History.Repos
             }
         }
 
-        public async Task UnsetReaction(ReactionMessage message)
+        public void UnsetReaction(ReactionMessage message)
         {
             Activity activity = _historyActivityUtility.StartUnsetReaction(_dbContext.Session, message.ReactorId);
             bool success = false;
@@ -182,7 +182,7 @@ namespace CecoChat.Data.History.Repos
                 BoundStatement query = _unsetReactionQuery.Value.Bind(message.ReactorId, chatID, message.MessageId);
                 query.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
                 query.SetIdempotence(false);
-                await _dbContext.Session.ExecuteAsync(query);
+                _dbContext.Session.Execute(query);
 
                 success = true;
                 _logger.LogTrace("User {0} removed reaction to message {1}.", message.ReactorId, message.MessageId);

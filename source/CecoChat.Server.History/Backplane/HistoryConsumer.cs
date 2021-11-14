@@ -95,7 +95,6 @@ namespace CecoChat.Server.History.Backplane
             _messageRepo.AddMessage(dataMessage);
         }
 
-        // TODO: handle errors since this is async
         private void AddReaction(BackplaneMessage backplaneMessage)
         {
             ReactionMessage reactionMessage = _mapper.CreateReactionMessage(backplaneMessage);

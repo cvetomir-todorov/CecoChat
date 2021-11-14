@@ -39,7 +39,7 @@ namespace CecoChat.Client.Console.Interaction
                 message.Reactions.Add(Client.UserID, reaction);
             }
 
-            Context.ReloadData = true;
+            Context.ReloadData = false;
             return States.OneChat;
         }
 
