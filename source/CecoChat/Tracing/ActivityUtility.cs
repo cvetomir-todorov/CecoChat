@@ -7,7 +7,7 @@ namespace CecoChat.Tracing
 {
     public interface IActivityUtility
     {
-        Activity Start(string name, ActivitySource source, ActivityKind kind, ActivityContext? parentContext);
+        Activity Start(string operationName, ActivitySource source, ActivityKind kind, ActivityContext? parentContext);
 
         /// <summary>
         /// By default calling <see cref="Activity.Stop"/> sets the <see cref="Activity.Current"/>
@@ -18,11 +18,11 @@ namespace CecoChat.Tracing
 
     public sealed class ActivityUtility : IActivityUtility
     {
-        public Activity Start(string name, ActivitySource source, ActivityKind kind, ActivityContext? parentContext)
+        public Activity Start(string operationName, ActivitySource source, ActivityKind kind, ActivityContext? parentContext)
         {
             // always create a new activity because ActivitySource.Start may return null if the trace ID is not sampled
             // otherwise child activities are eligible for sampling because without a parent they have a new trace ID
-            Activity activity = new(name);
+            Activity activity = new(operationName);
 
             if (parentContext.HasValue)
             {
