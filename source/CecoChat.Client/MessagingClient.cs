@@ -212,25 +212,25 @@ namespace CecoChat.Client
             return response.MessageId;
         }
 
-        public async Task React(long messageID, long senderID, long receiverID, string reaction)
+        public async Task React(long messageID, long otherUserID, string reaction)
         {
             ReactRequest request = new()
             {
                 MessageId = messageID,
-                SenderId = senderID,
-                ReceiverId = receiverID,
+                SenderId = _userID,
+                ReceiverId = otherUserID,
                 Reaction = reaction
             };
             await _reactionClient.ReactAsync(request, _grpcMetadata);
         }
 
-        public async Task UnReact(long messageID, long senderID, long receiverID)
+        public async Task UnReact(long messageID, long otherUserID)
         {
             UnReactRequest request = new()
             {
                 MessageId = messageID,
-                SenderId = senderID,
-                ReceiverId = receiverID
+                SenderId = _userID,
+                ReceiverId = otherUserID
             };
             await _reactionClient.UnReactAsync(request, _grpcMetadata);
         }
