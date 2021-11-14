@@ -61,7 +61,6 @@ namespace CecoChat.Server.State.Backplane
             _receiversConsumer.Initialize(_backplaneOptions.Kafka, _backplaneOptions.ReceiversConsumer, new BackplaneMessageDeserializer());
             _sendersConsumer.Initialize(_backplaneOptions.Kafka, _backplaneOptions.SendersConsumer, new BackplaneMessageDeserializer());
 
-            // TODO: setup this service to work with specific partitions just like the messaging service
             _receiversConsumer.Subscribe(_backplaneOptions.TopicMessagesByReceiver);
             _sendersConsumer.Subscribe(_backplaneOptions.TopicMessagesBySender);
         }

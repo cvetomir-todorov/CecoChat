@@ -67,7 +67,6 @@ namespace CecoChat.Client
             _historyChannel?.Dispose();
             _historyChannel = GrpcChannel.ForAddress(connectResponse.HistoryServerAddress);
             _stateChannel?.Dispose();
-            // TODO: use a BFF for history and state
             _stateChannel = GrpcChannel.ForAddress("https://localhost:31002");
 
             _listenClient = new Listen.ListenClient(_messagingChannel);
