@@ -66,7 +66,7 @@ namespace CecoChat.Kafka
                 .SetValueSerializer(valueSerializer)
                 .Build();
             _producerOptions = producerOptions;
-            _id = $"{KafkaProducerIDGenerator.GetNextID()}@{producerOptions.ProducerID}";
+            _id = $"{producerOptions.ProducerID}_id{KafkaProducerIDGenerator.GetNextID()}";
         }
 
         public void Produce(Message<TKey, TValue> message, TopicPartition topicPartition, DeliveryHandler<TKey, TValue> deliveryHandler = null)

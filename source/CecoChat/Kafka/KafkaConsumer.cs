@@ -69,7 +69,7 @@ namespace CecoChat.Kafka
                 .SetValueDeserializer(valueDeserializer)
                 .Build();
             _consumerOptions = consumerOptions;
-            _id = $"{KafkaConsumerIDGenerator.GetNextID()}@{consumerOptions.ConsumerGroupID}";
+            _id = $"{consumerOptions.ConsumerGroupID}_id{KafkaConsumerIDGenerator.GetNextID()}";
         }
 
         public void Subscribe(string topic)
