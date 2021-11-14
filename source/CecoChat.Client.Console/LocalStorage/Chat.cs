@@ -1,7 +1,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 
-namespace CecoChat.Client.Console
+namespace CecoChat.Client.Console.LocalStorage
 {
     public sealed class Chat
     {

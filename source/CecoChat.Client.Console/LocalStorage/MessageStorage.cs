@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CecoChat.Client.Console
+namespace CecoChat.Client.Console.LocalStorage
 {
     public sealed class MessageStorage
     {

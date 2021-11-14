@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using CecoChat.Client.Console.Interaction;
+using CecoChat.Client.Console.LocalStorage;
 
 namespace CecoChat.Client.Console
 {
