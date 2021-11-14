@@ -27,7 +27,7 @@ namespace CecoChat.Client.Console.Interaction
             };
             Storage.AddMessage(message);
 
-            Context.ReloadData = true;
+            Context.ReloadData = false;
             return States.OneChat;
         }
     }
