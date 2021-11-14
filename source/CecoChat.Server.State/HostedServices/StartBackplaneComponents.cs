@@ -33,19 +33,30 @@ namespace CecoChat.Server.State.HostedServices
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            _stoppedCts = CancellationTokenSource.CreateLinkedTokenSource(_appStoppingCt);
-
+            _stoppedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _appStoppingCt);
             _stateConsumer.Prepare();
 
             Task.Factory.StartNew(() =>
             {
                 try
                 {
-                    _stateConsumer.Start(_stoppedCts.Token);
+                    _stateConsumer.StartConsumingReceiverMessages(_stoppedCts.Token);
                 }
                 catch (Exception exception)
                 {
-                    _logger.LogCritical(exception, "Failure in consumer {0}.", _stateConsumer.ConsumerID);
+                    _logger.LogCritical(exception, "Failure in consumer {0}.", _stateConsumer.ReceiverConsumerID);
+                }
+            }, _stoppedCts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+
+            Task.Factory.StartNew(() =>
+            {
+                try
+                {
+                    _stateConsumer.StartConsumingSenderMessages(_stoppedCts.Token);
+                }
+                catch (Exception exception)
+                {
+                    _logger.LogCritical(exception, "Failure in consumer {0}.", _stateConsumer.SenderConsumerID);
                 }
             }, _stoppedCts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Current);
 
