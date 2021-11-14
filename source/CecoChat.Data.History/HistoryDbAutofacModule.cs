@@ -27,7 +27,6 @@ namespace CecoChat.Data.History
             builder.RegisterType<ChatMessageRepo>().As<IChatMessageRepo>().SingleInstance();
 
             string utilityName = $"{nameof(HistoryActivityUtility)}.{nameof(IActivityUtility)}";
-
             builder.RegisterType<HistoryActivityUtility>().As<IHistoryActivityUtility>()
                 .WithNamedParameter(typeof(IActivityUtility), utilityName)
                 .SingleInstance();
