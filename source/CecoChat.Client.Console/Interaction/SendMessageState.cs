@@ -14,6 +14,7 @@ namespace CecoChat.Client.Console.Interaction
             string plainText = System.Console.ReadLine();
             if (string.IsNullOrWhiteSpace(plainText))
             {
+                Context.ReloadData = false;
                 return States.OneChat;
             }
 

@@ -17,13 +17,13 @@ namespace CecoChat.Client.Console.Interaction
                 !long.TryParse(messageIDString, out long messageID) ||
                 messageID == 0)
             {
-                Context.ReloadData = true;
+                Context.ReloadData = false;
                 return States.OneChat;
             }
 
             if (!Storage.TryGetMessage(Client.UserID, Context.UserID, messageID, out Message message))
             {
-                Context.ReloadData = true;
+                Context.ReloadData = false;
                 return States.OneChat;
             }
 
