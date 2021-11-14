@@ -5,6 +5,7 @@ using CecoChat.Contracts.State;
 
 namespace CecoChat.Server.State.Clients
 {
+    // TODO: use a real cache with an eviction policy, consider moving it elsewhere
     public interface IStateCache
     {
         IReadOnlyCollection<ChatState> GetUserChats(long userID);

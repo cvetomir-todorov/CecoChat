@@ -17,16 +17,21 @@ namespace CecoChat.Server.State.Backplane
     {
         void Prepare();
 
-        void Start(CancellationToken ct);
+        void StartConsumingReceiverMessages(CancellationToken ct);
 
-        string ConsumerID { get; }
+        void StartConsumingSenderMessages(CancellationToken ct);
+
+        string ReceiverConsumerID { get; }
+
+        string SenderConsumerID { get; }
     }
 
     public sealed class StateConsumer : IStateConsumer
     {
         private readonly ILogger _logger;
         private readonly BackplaneOptions _backplaneOptions;
-        private readonly IKafkaConsumer<Null, BackplaneMessage> _consumer;
+        private readonly IKafkaConsumer<Null, BackplaneMessage> _receiversConsumer;
+        private readonly IKafkaConsumer<Null, BackplaneMessage> _sendersConsumer;
         private readonly IChatStateRepo _repo;
         private readonly IStateCache _cache;
 
@@ -39,46 +44,68 @@ namespace CecoChat.Server.State.Backplane
         {
             _logger = logger;
             _backplaneOptions = backplaneOptions.Value;
-            _consumer = consumerFactory.Create();
+            _receiversConsumer = consumerFactory.Create();
+            _sendersConsumer = consumerFactory.Create();
             _repo = repo;
             _cache = cache;
         }
 
         public void Dispose()
         {
-            _consumer.Dispose();
+            _receiversConsumer.Dispose();
+            _sendersConsumer.Dispose();
         }
 
         public void Prepare()
         {
-            _consumer.Initialize(_backplaneOptions.Kafka, _backplaneOptions.StateConsumer, new BackplaneMessageDeserializer());
-            _consumer.Subscribe(_backplaneOptions.TopicMessagesByReceiver);
+            _receiversConsumer.Initialize(_backplaneOptions.Kafka, _backplaneOptions.ReceiversConsumer, new BackplaneMessageDeserializer());
+            _sendersConsumer.Initialize(_backplaneOptions.Kafka, _backplaneOptions.SendersConsumer, new BackplaneMessageDeserializer());
+
+            _receiversConsumer.Subscribe(_backplaneOptions.TopicMessagesByReceiver);
+            _sendersConsumer.Subscribe(_backplaneOptions.TopicMessagesBySender);
         }
 
-        public void Start(CancellationToken ct)
+        public void StartConsumingReceiverMessages(CancellationToken ct)
         {
-            _logger.LogInformation("Start creating state from messages.");
+            _logger.LogInformation("Start creating receiver state from messages.");
 
             while (!ct.IsCancellationRequested)
             {
-                _consumer.Consume(consumeResult =>
+                _receiversConsumer.Consume(consumeResult =>
                 {
-                    Process(consumeResult.Message.Value);
+                    ProcessMessageForReceivers(consumeResult.Message.Value);
                 }, ct);
             }
 
-            _logger.LogInformation("Stopped creating state from messages.");
+            _logger.LogInformation("Stopped creating receiver state from messages.");
         }
 
-        public string ConsumerID => _backplaneOptions.StateConsumer.ConsumerGroupID;
+        public void StartConsumingSenderMessages(CancellationToken ct)
+        {
+            _logger.LogInformation("Start creating sender state from messages.");
 
-        private void Process(BackplaneMessage backplaneMessage)
+            while (!ct.IsCancellationRequested)
+            {
+                _sendersConsumer.Consume(consumeResult =>
+                {
+                    ProcessMessageForSenders(consumeResult.Message.Value);
+                }, ct);
+            }
+
+            _logger.LogInformation("Stopped creating sender state from messages.");
+        }
+
+        public string ReceiverConsumerID => _backplaneOptions.ReceiversConsumer.ConsumerGroupID;
+
+        public string SenderConsumerID => _backplaneOptions.SendersConsumer.ConsumerGroupID;
+
+        private void ProcessMessageForReceivers(BackplaneMessage backplaneMessage)
         {
             switch (backplaneMessage.Type)
             {
                 case MessageType.Data:
                 case MessageType.Reaction:
-                    UpdateReceiverStateOnDataOrReaction(backplaneMessage);
+                    UpdateReceiverState(backplaneMessage);
                     break;
                 case MessageType.Delivery:
                     // to be implemented
@@ -91,15 +118,47 @@ namespace CecoChat.Server.State.Backplane
             }
         }
 
-        private void UpdateReceiverStateOnDataOrReaction(BackplaneMessage backplaneMessage)
+        private void ProcessMessageForSenders(BackplaneMessage backplaneMessage)
         {
+            switch (backplaneMessage.Type)
+            {
+                case MessageType.Data:
+                case MessageType.Reaction:
+                    UpdateSenderState(backplaneMessage);
+                    break;
+                case MessageType.Delivery:
+                    // to be implemented
+                    break;
+                case MessageType.Disconnect:
+                    // ignore these
+                    break;
+                default:
+                    throw new EnumValueNotSupportedException(backplaneMessage.Type);
+            }
+        }
+
+        private void UpdateReceiverState(BackplaneMessage backplaneMessage)
+        {
+            long targetUserID = backplaneMessage.ReceiverId;
             string chatID = DataUtility.CreateChatID(backplaneMessage.SenderId, backplaneMessage.ReceiverId);
-            ChatState receiverChat = GetChatFromDBIntoCache(backplaneMessage.ReceiverId, chatID);
+            ChatState receiverChat = GetChatFromDBIntoCache(targetUserID, chatID);
             receiverChat.NewestMessage = Math.Max(receiverChat.NewestMessage, backplaneMessage.MessageId);
             receiverChat.OtherUserDelivered = Math.Max(receiverChat.OtherUserDelivered, backplaneMessage.MessageId);
             receiverChat.OtherUserSeen = Math.Max(receiverChat.OtherUserSeen, backplaneMessage.MessageId);
 
-            _repo.UpdateChat(backplaneMessage.ReceiverId, receiverChat);
+            _repo.UpdateChat(targetUserID, receiverChat);
+            _logger.LogTrace("Updated receiver state for user {0} chat {1} with message {2}.", targetUserID, chatID, backplaneMessage.MessageId);
+        }
+
+        private void UpdateSenderState(BackplaneMessage backplaneMessage)
+        {
+            long targetUserID = backplaneMessage.SenderId;
+            string chatID = DataUtility.CreateChatID(backplaneMessage.SenderId, backplaneMessage.ReceiverId);
+            ChatState senderChat = GetChatFromDBIntoCache(targetUserID, chatID);
+            senderChat.NewestMessage = Math.Max(senderChat.NewestMessage, backplaneMessage.MessageId);
+
+            _repo.UpdateChat(targetUserID, senderChat);
+            _logger.LogTrace("Updated sender state for user {0} chat {1} with message {2}.", targetUserID, chatID, backplaneMessage.MessageId);
         }
 
         private ChatState GetChatFromDBIntoCache(long userID, string chatID)

@@ -128,6 +128,7 @@ namespace CecoChat.Data.State.Repos
             query.SetIdempotence(false);
 
             _dbContext.Session.Execute(query);
+            _logger.LogTrace("Updated chat {0} for user {1}.", chat.ChatId, userID);
         }
     }
 }
