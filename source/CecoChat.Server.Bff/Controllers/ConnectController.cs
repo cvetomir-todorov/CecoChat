@@ -1,21 +1,20 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using CecoChat.Jwt;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
-namespace CecoChat.Server.Profile.Controllers
+namespace CecoChat.Server.Bff.Controllers
 {
     [ApiController]
-    [Route("api/session")]
-    public sealed class SessionController : ControllerBase
+    [Route("api/connect")]
+    public class ConnectController : ControllerBase
     {
         private readonly ILogger _logger;
         private readonly JwtOptions _jwtOptions;
@@ -24,8 +23,8 @@ namespace CecoChat.Server.Profile.Controllers
         private readonly SigningCredentials _signingCredentials;
         private readonly JwtSecurityTokenHandler _jwtTokenHandler;
 
-        public SessionController(
-            ILogger<SessionController> logger,
+        public ConnectController(
+            ILogger<ConnectController> logger,
             IOptions<JwtOptions> jwtOptions,
             IClock clock)
         {
@@ -39,16 +38,8 @@ namespace CecoChat.Server.Profile.Controllers
             _jwtTokenHandler.OutboundClaimTypeMap.Clear();
         }
 
-        private readonly Dictionary<string, long> _userIDMap = new()
-        {
-            {"bob", 1},
-            {"alice", 2},
-            {"peter", 1200}
-        };
-
-        [AllowAnonymous]
-        [HttpPost]
-        public IActionResult CreateSession([FromBody] CreateSessionRequest request)
+        [HttpGet]
+        public IActionResult Connect([FromBody] ConnectRequest request)
         {
             if (!_userIDMap.TryGetValue(request.Username, out long userID))
             {
@@ -56,6 +47,26 @@ namespace CecoChat.Server.Profile.Controllers
             }
             Activity.Current?.AddTag("user.id", userID);
 
+            (Guid clientID, string accessToken) = CreateSession(userID); 
+            _logger.LogInformation("User {0} authenticated and assigned user ID {1} and client ID {2}.", request.Username, userID, clientID);
+
+            ConnectResponse response = new()
+            {
+                ClientID = clientID,
+                AccessToken = accessToken
+            };
+            return Ok(response);
+        }
+
+        private readonly Dictionary<string, long> _userIDMap = new()
+        {
+            {"bob", 1},
+            {"alice", 2},
+            {"peter", 1200}
+        };
+
+        private (Guid, string) CreateSession(long userID)
+        {
             Guid clientID = Guid.NewGuid();
             Claim[] claims =
             {
@@ -63,21 +74,12 @@ namespace CecoChat.Server.Profile.Controllers
                 new(ClaimTypes.Actor, clientID.ToString()),
                 new(ClaimTypes.Role, "user")
             };
-            string accessToken = CreateAccessToken(claims);
-            _logger.LogInformation("User {0} authenticated and assigned user ID {1} and client ID {2}.", request.Username, userID, clientID);
 
-            CreateSessionResponse response = new() {AccessToken = accessToken};
-            return Ok(response);
-        }
-
-        private string CreateAccessToken(Claim[] claims)
-        {
             DateTime expiration = _clock.GetNowUtc().Add(_jwtOptions.AccessTokenExpiration);
-
             JwtSecurityToken jwtToken = new(_jwtOptions.Issuer, _jwtOptions.Audience, claims, null, expiration, _signingCredentials);
             string accessToken = _jwtTokenHandler.WriteToken(jwtToken);
 
-            return accessToken;
+            return (clientID, accessToken);
         }
     }
 }
