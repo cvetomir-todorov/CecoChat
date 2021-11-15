@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using CecoChat.Client;
+using CecoChat.ConsoleClient.Api;
 using CecoChat.ConsoleClient.LocalStorage;
 using CecoChat.Contracts.History;
 using CecoChat.Data;
