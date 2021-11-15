@@ -2,6 +2,7 @@ using Autofac;
 using CecoChat.Autofac;
 using CecoChat.Data.Config;
 using CecoChat.Jwt;
+using CecoChat.Server.Backplane;
 using CecoChat.Server.Bff.HostedServices;
 using CecoChat.Swagger;
 using FluentValidation.AspNetCore;
@@ -52,9 +53,11 @@ namespace CecoChat.Server.Bff
             builder.RegisterModule(new ConfigDbAutofacModule
             {
                 RedisConfiguration = Configuration.GetSection("ConfigDB"),
-                RegisterHistory = true,
                 RegisterPartitioning = true
             });
+
+            // backplane
+            builder.RegisterModule(new PartitionUtilityAutofacModule());
 
             // security
             builder.RegisterOptions<JwtOptions>(Configuration.GetSection("Jwt"));

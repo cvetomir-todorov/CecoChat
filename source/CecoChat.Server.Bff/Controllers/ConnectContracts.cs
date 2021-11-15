@@ -22,5 +22,6 @@ namespace CecoChat.Server.Bff.Controllers
     {
         public Guid ClientID { get; set; }
         public string AccessToken { get; set; }
+        public string MessagingServerAddress { get; set; }
     }
 }
