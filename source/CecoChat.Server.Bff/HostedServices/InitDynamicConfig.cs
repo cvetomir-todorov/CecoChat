@@ -1,6 +1,5 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using CecoChat.Data.Config.History;
 using CecoChat.Data.Config.Partitioning;
 using Microsoft.Extensions.Hosting;
 
@@ -9,14 +8,10 @@ namespace CecoChat.Server.Bff.HostedServices
     public sealed class InitDynamicConfig : IHostedService
     {
         private readonly IPartitioningConfig _partitioningConfig;
-        private readonly IHistoryConfig _historyConfig;
 
-        public InitDynamicConfig(
-            IPartitioningConfig partitioningConfig,
-            IHistoryConfig historyConfig)
+        public InitDynamicConfig(IPartitioningConfig partitioningConfig)
         {
             _partitioningConfig = partitioningConfig;
-            _historyConfig = historyConfig;
         }
 
         public async Task StartAsync(CancellationToken cancellationToken)
@@ -24,10 +19,6 @@ namespace CecoChat.Server.Bff.HostedServices
             await _partitioningConfig.Initialize(new PartitioningConfigUsage
             {
                 UseServerAddresses = true
-            });
-            await _historyConfig.Initialize(new HistoryConfigUsage
-            {
-                UseServerAddress = true
             });
         }
 

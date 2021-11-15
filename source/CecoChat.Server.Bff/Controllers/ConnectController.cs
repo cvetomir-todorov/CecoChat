@@ -4,7 +4,9 @@ using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using CecoChat.Data.Config.Partitioning;
 using CecoChat.Jwt;
+using CecoChat.Server.Backplane;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -21,6 +23,8 @@ namespace CecoChat.Server.Bff.Controllers
         private readonly ILogger _logger;
         private readonly JwtOptions _jwtOptions;
         private readonly IClock _clock;
+        private readonly IPartitionUtility _partitionUtility;
+        private readonly IPartitioningConfig _partitioningConfig;
 
         private readonly SigningCredentials _signingCredentials;
         private readonly JwtSecurityTokenHandler _jwtTokenHandler;
@@ -28,11 +32,15 @@ namespace CecoChat.Server.Bff.Controllers
         public ConnectController(
             ILogger<ConnectController> logger,
             IOptions<JwtOptions> jwtOptions,
-            IClock clock)
+            IClock clock,
+            IPartitionUtility partitionUtility,
+            IPartitioningConfig partitioningConfig)
         {
             _logger = logger;
             _jwtOptions = jwtOptions.Value;
             _clock = clock;
+            _partitionUtility = partitionUtility;
+            _partitioningConfig = partitioningConfig;
 
             byte[] secret = Encoding.UTF8.GetBytes(_jwtOptions.Secret);
             _signingCredentials = new SigningCredentials(new SymmetricSecurityKey(secret), SecurityAlgorithms.HmacSha256Signature);
@@ -56,10 +64,15 @@ namespace CecoChat.Server.Bff.Controllers
             (Guid clientID, string accessToken) = CreateSession(userID); 
             _logger.LogInformation("User {0} authenticated and assigned user ID {1} and client ID {2}.", request.Username, userID, clientID);
 
+            int partition = _partitionUtility.ChoosePartition(userID, _partitioningConfig.PartitionCount);
+            string messagingServerAddress = _partitioningConfig.GetServerAddress(partition);
+            _logger.LogInformation("User with ID {0} in partition {1} assigned to messaging server {2}.", userID, partition, messagingServerAddress);
+
             ConnectResponse response = new()
             {
                 ClientID = clientID,
-                AccessToken = accessToken
+                AccessToken = accessToken,
+                MessagingServerAddress = messagingServerAddress
             };
             return Ok(response);
         }
