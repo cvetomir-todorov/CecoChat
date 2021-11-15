@@ -2,6 +2,7 @@ using Autofac;
 using CecoChat.Autofac;
 using CecoChat.Data.Config;
 using CecoChat.Jwt;
+using CecoChat.Otel;
 using CecoChat.Server.Backplane;
 using CecoChat.Server.Bff.HostedServices;
 using CecoChat.Swagger;
@@ -11,12 +12,15 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using OpenTelemetry.Trace;
 
 namespace CecoChat.Server.Bff
 {
     public class Startup
     {
         private readonly SwaggerOptions _swaggerOptions;
+        private readonly OtelSamplingOptions _otelSamplingOptions;
+        private readonly JaegerOptions _jaegerOptions;
 
         public Startup(IConfiguration configuration)
         {
@@ -24,12 +28,27 @@ namespace CecoChat.Server.Bff
 
             _swaggerOptions = new();
             Configuration.GetSection("Swagger").Bind(_swaggerOptions);
+
+            _otelSamplingOptions = new();
+            Configuration.GetSection("OtelSampling").Bind(_otelSamplingOptions);
+
+            _jaegerOptions = new();
+            Configuration.GetSection("Jaeger").Bind(_jaegerOptions);
         }
 
         public IConfiguration Configuration { get; }
 
         public void ConfigureServices(IServiceCollection services)
         {
+            // telemetry
+            services.AddOpenTelemetryTracing(otel =>
+            {
+                otel.AddServiceResource(new OtelServiceResource {Namespace = "CecoChat", Name = "BFF", Version = "0.1"});
+                otel.AddAspNetCoreInstrumentation();
+                otel.ConfigureSampling(_otelSamplingOptions);
+                otel.ConfigureJaegerExporter(_jaegerOptions);
+            });
+
             // web
             services
                 .AddControllers()
