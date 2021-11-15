@@ -4,9 +4,11 @@ using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using CecoChat.Contracts.Bff;
 using CecoChat.Data.Config.Partitioning;
 using CecoChat.Jwt;
 using CecoChat.Server.Backplane;
+using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -16,6 +18,15 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace CecoChat.Server.Bff.Controllers
 {
+    public sealed class ConnectRequestValidator : AbstractValidator<ConnectRequest>
+    {
+        public ConnectRequestValidator()
+        {
+            RuleFor(x => x.Username).NotNull().NotEmpty();
+            RuleFor(x => x.Password).NotNull().NotEmpty();
+        }
+    }
+
     [ApiController]
     [Route("api/connect")]
     public class ConnectController : ControllerBase
@@ -53,7 +64,7 @@ namespace CecoChat.Server.Bff.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public ActionResult<ConnectResponse> Connect([FromBody][BindRequired] ConnectRequest request)
+        public IActionResult Connect([FromBody][BindRequired] ConnectRequest request)
         {
             if (!_userIDMap.TryGetValue(request.Username, out long userID))
             {
