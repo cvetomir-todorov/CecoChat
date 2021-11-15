@@ -7,7 +7,7 @@ using Grpc.Core;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace CecoChat.Data.IDGen
+namespace CecoChat.Client.IDGen
 {
     public interface IIDGenClient : IDisposable
     {
@@ -87,10 +87,10 @@ namespace CecoChat.Data.IDGen
                 return;
             }
 
-            Task _ = GenerateNewIDsAsync(originatorID, count);
+            ValueTask _ = GenerateNewIDsAsync(originatorID, count);
         }
 
-        private async Task GenerateNewIDsAsync(long originatorID, int count)
+        private async ValueTask GenerateNewIDsAsync(long originatorID, int count)
         {
             try
             {

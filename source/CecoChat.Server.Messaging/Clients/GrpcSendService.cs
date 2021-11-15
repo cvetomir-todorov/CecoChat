@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using CecoChat.Client.IDGen;
 using CecoChat.Contracts.Backplane;
 using CecoChat.Contracts.Messaging;
-using CecoChat.Data.IDGen;
 using CecoChat.Server.Identity;
 using CecoChat.Server.Messaging.Backplane;
 using CecoChat.Server.Messaging.Clients.Streaming;
