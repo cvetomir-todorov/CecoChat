@@ -1,4 +1,4 @@
-﻿namespace CecoChat.Client
+﻿namespace CecoChat.ConsoleClient.Api
 {
     internal sealed class CreateSessionRequest
     {

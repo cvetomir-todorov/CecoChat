@@ -1,4 +1,4 @@
-using CecoChat.Client;
+using CecoChat.ConsoleClient.Api;
 using CecoChat.ConsoleClient.LocalStorage;
 
 namespace CecoChat.ConsoleClient.Interaction
