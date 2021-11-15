@@ -1,9 +1,5 @@
-using Autofac;
-using CecoChat.Autofac;
-using CecoChat.Jwt;
 using CecoChat.Otel;
 using CecoChat.Swagger;
-using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -47,26 +43,10 @@ namespace CecoChat.Server.Profile
             });
 
             // web
-            services
-                .AddControllers()
-                .AddFluentValidation(fluentValidation =>
-                {
-                    fluentValidation.DisableDataAnnotationsValidation = true;
-                    fluentValidation.RegisterValidatorsFromAssemblyContaining<Startup>();
-                });
             services.AddSwaggerServices(_swaggerOptions);
 
             // required
             services.AddOptions();
-        }
-
-        public void ConfigureContainer(ContainerBuilder builder)
-        {
-            // security
-            builder.RegisterOptions<JwtOptions>(Configuration.GetSection("Jwt"));
-
-            // shared
-            builder.RegisterType<MonotonicClock>().As<IClock>().SingleInstance();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
