@@ -4,7 +4,6 @@ using CecoChat.Data.Config;
 using CecoChat.Jwt;
 using CecoChat.Otel;
 using CecoChat.Server.Backplane;
-using CecoChat.Server.Connect.HostedServices;
 using CecoChat.Server.Identity;
 using CecoChat.Swagger;
 using FluentValidation.AspNetCore;
@@ -73,9 +72,6 @@ namespace CecoChat.Server.Connect
 
         public void ConfigureContainer(ContainerBuilder builder)
         {
-            // ordered hosted services
-            builder.RegisterHostedService<InitDynamicConfig>();
-
             // configuration
             builder.RegisterModule(new ConfigDbAutofacModule
             {
