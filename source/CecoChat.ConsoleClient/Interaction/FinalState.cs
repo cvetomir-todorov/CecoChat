@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace CecoChat.Client.Console.Interaction
+namespace CecoChat.ConsoleClient.Interaction
 {
     public sealed class FinalState : State
     {

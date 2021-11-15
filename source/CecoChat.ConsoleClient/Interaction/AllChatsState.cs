@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace CecoChat.Client.Console.Interaction
+namespace CecoChat.ConsoleClient.Interaction
 {
     public sealed class AllChatsState : State
     {
@@ -16,16 +16,16 @@ namespace CecoChat.Client.Console.Interaction
                 await GetChats();
             }
 
-            System.Console.Clear();
-            System.Console.WriteLine("Choose user to chat (press '0'...'9') | New (press 'n') | Refresh (press 'f') | Exit (press 'x'):");
+            Console.Clear();
+            Console.WriteLine("Choose user to chat (press '0'...'9') | New (press 'n') | Refresh (press 'f') | Exit (press 'x'):");
             List<long> userIDs = Storage.GetUsers();
             int key = 0;
             foreach (long userID in userIDs)
             {
-                System.Console.WriteLine("ID={0} (press '{1}')", userID, key++);
+                Console.WriteLine("ID={0} (press '{1}')", userID, key++);
             }
 
-            ConsoleKeyInfo keyInfo = System.Console.ReadKey(intercept: true);
+            ConsoleKeyInfo keyInfo = Console.ReadKey(intercept: true);
             if (char.IsNumber(keyInfo.KeyChar))
             {
                 return ProcessNumberKey(keyInfo, userIDs);

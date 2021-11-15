@@ -1,7 +1,8 @@
+using System;
 using System.Threading.Tasks;
-using CecoChat.Client.Console.LocalStorage;
+using CecoChat.ConsoleClient.LocalStorage;
 
-namespace CecoChat.Client.Console.Interaction
+namespace CecoChat.ConsoleClient.Interaction
 {
     public sealed class ReactState : State
     {
@@ -10,8 +11,8 @@ namespace CecoChat.Client.Console.Interaction
 
         public override async Task<State> Execute()
         {
-            System.Console.Write("Choose message ID ('0' to exit): ");
-            string messageIDString = System.Console.ReadLine();
+            Console.Write("Choose message ID ('0' to exit): ");
+            string messageIDString = Console.ReadLine();
 
             if (string.IsNullOrWhiteSpace(messageIDString) ||
                 !long.TryParse(messageIDString, out long messageID) ||

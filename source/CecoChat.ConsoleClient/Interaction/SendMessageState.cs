@@ -1,7 +1,8 @@
+using System;
 using System.Threading.Tasks;
-using CecoChat.Client.Console.LocalStorage;
+using CecoChat.ConsoleClient.LocalStorage;
 
-namespace CecoChat.Client.Console.Interaction
+namespace CecoChat.ConsoleClient.Interaction
 {
     public sealed class SendMessageState : State
     {
@@ -10,8 +11,8 @@ namespace CecoChat.Client.Console.Interaction
 
         public override async Task<State> Execute()
         {
-            System.Console.Write("Message to ID={0}: ", Context.UserID);
-            string plainText = System.Console.ReadLine();
+            Console.Write("Message to ID={0}: ", Context.UserID);
+            string plainText = Console.ReadLine();
             if (string.IsNullOrWhiteSpace(plainText))
             {
                 Context.ReloadData = false;
