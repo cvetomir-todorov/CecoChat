@@ -3,6 +3,7 @@ using CecoChat.Autofac;
 using CecoChat.Data.Config;
 using CecoChat.Jwt;
 using CecoChat.Server.Bff.HostedServices;
+using CecoChat.Swagger;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -14,9 +15,14 @@ namespace CecoChat.Server.Bff
 {
     public class Startup
     {
+        private readonly SwaggerOptions _swaggerOptions;
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+
+            _swaggerOptions = new();
+            Configuration.GetSection("Swagger").Bind(_swaggerOptions);
         }
 
         public IConfiguration Configuration { get; }
@@ -31,6 +37,7 @@ namespace CecoChat.Server.Bff
                     fluentValidation.DisableDataAnnotationsValidation = true;
                     fluentValidation.RegisterValidatorsFromAssemblyContaining<Startup>();
                 });
+            services.AddSwaggerServices(_swaggerOptions);
 
             // required
             services.AddOptions();
@@ -64,6 +71,11 @@ namespace CecoChat.Server.Bff
             }
 
             app.UseHttpsRedirection();
+            app.MapWhen(context => context.Request.Path.StartsWithSegments("/swagger"), _ =>
+            {
+                app.UseSwaggerMiddlewares(_swaggerOptions);
+            });
+
             app.UseRouting();
             app.UseEndpoints(endpoints =>
             {

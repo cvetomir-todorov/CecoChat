@@ -1,5 +1,4 @@
 using CecoChat.Otel;
-using CecoChat.Swagger;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -13,7 +12,6 @@ namespace CecoChat.Server.Profile
     {
         private readonly OtelSamplingOptions _otelSamplingOptions;
         private readonly JaegerOptions _jaegerOptions;
-        private readonly SwaggerOptions _swaggerOptions;
 
         public Startup(IConfiguration configuration)
         {
@@ -24,9 +22,6 @@ namespace CecoChat.Server.Profile
 
             _otelSamplingOptions = new();
             Configuration.GetSection("OtelSampling").Bind(_otelSamplingOptions);
-
-            _swaggerOptions = new();
-            Configuration.GetSection("Swagger").Bind(_swaggerOptions);
         }
 
         public IConfiguration Configuration { get; }
@@ -42,9 +37,6 @@ namespace CecoChat.Server.Profile
                 otel.ConfigureJaegerExporter(_jaegerOptions);
             });
 
-            // web
-            services.AddSwaggerServices(_swaggerOptions);
-
             // required
             services.AddOptions();
         }
@@ -57,11 +49,6 @@ namespace CecoChat.Server.Profile
             }
 
             app.UseHttpsRedirection();
-            app.MapWhen(context => context.Request.Path.StartsWithSegments("/swagger"), _ =>
-            {
-                app.UseSwaggerMiddlewares(_swaggerOptions);
-            });
-
             app.UseRouting();
             app.UseEndpoints(endpoints =>
             {
