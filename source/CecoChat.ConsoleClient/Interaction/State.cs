@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using CecoChat.Client.Console.LocalStorage;
+using CecoChat.Client;
+using CecoChat.ConsoleClient.LocalStorage;
 using CecoChat.Contracts.History;
 using CecoChat.Data;
 
-namespace CecoChat.Client.Console.Interaction
+namespace CecoChat.ConsoleClient.Interaction
 {
     public abstract class State
     {

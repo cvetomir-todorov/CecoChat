@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using CecoChat.Client.Console.Interaction;
-using CecoChat.Client.Console.LocalStorage;
+using CecoChat.Client;
+using CecoChat.ConsoleClient.Interaction;
+using CecoChat.ConsoleClient.LocalStorage;
 
-namespace CecoChat.Client.Console
+namespace CecoChat.ConsoleClient
 {
     public static class Program
     {
@@ -25,19 +26,19 @@ namespace CecoChat.Client.Console
 
             client.ExceptionOccurred -= ShowException;
             client.Dispose();
-            System.Console.WriteLine("Bye!");
+            Console.WriteLine("Bye!");
         }
 
         private static async Task LogIn(MessagingClient client, string profileServer, string connectServer)
         {
-            System.Console.Write("Username bob (ID=1), alice (ID=2), peter (ID=1200): ");
-            string username = System.Console.ReadLine() ?? string.Empty;
+            Console.Write("Username bob (ID=1), alice (ID=2), peter (ID=1200): ");
+            string username = Console.ReadLine() ?? string.Empty;
             await client.Initialize(username, password: "not-empty", profileServer, connectServer);
         }
 
         private static void ShowException(object _, Exception exception)
         {
-            System.Console.WriteLine(exception);
+            Console.WriteLine(exception);
         }
 
         private static async Task RunStateMachine(MessagingClient client, MessageStorage storage)

@@ -1,7 +1,7 @@
 using System;
 using CecoChat.Contracts.Messaging;
 
-namespace CecoChat.Client.Console.LocalStorage
+namespace CecoChat.ConsoleClient.LocalStorage
 {
     public class ChangeHandler
     {

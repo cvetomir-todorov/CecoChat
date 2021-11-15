@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using CecoChat.Client.Console.LocalStorage;
+using CecoChat.ConsoleClient.LocalStorage;
 
-namespace CecoChat.Client.Console.Interaction
+namespace CecoChat.ConsoleClient.Interaction
 {
     public sealed class OneChatState : State
     {
@@ -21,14 +21,14 @@ namespace CecoChat.Client.Console.Interaction
             List<Message> messages = Storage.GetChatMessages(Context.UserID);
             messages.Sort((left, right) => left.MessageID.CompareTo(right.MessageID));
 
-            System.Console.Clear();
+            Console.Clear();
             foreach (Message message in messages)
             {
                 DisplayMessage(message);
             }
-            System.Console.WriteLine("Write (press 'w') | React (press 'r') | Refresh (press 'f') | Local refresh (press 'l') | Return (press 'x')");
+            Console.WriteLine("Write (press 'w') | React (press 'r') | Refresh (press 'f') | Local refresh (press 'l') | Return (press 'x')");
 
-            ConsoleKeyInfo keyInfo = System.Console.ReadKey(intercept: true);
+            ConsoleKeyInfo keyInfo = Console.ReadKey(intercept: true);
             if (keyInfo.KeyChar == 'w' || keyInfo.KeyChar == 'W')
             {
                 Context.ReloadData = false;
@@ -72,7 +72,7 @@ namespace CecoChat.Client.Console.Interaction
                 reactions = reactionsBuilder.ToString();
             }
 
-            System.Console.WriteLine("[{0:F}] {1}: {2} (#{3}|ID: {4} |{5} reaction(s):{6})",
+            Console.WriteLine("[{0:F}] {1}: {2} (#{3}|ID: {4} |{5} reaction(s):{6})",
                 message.MessageID.ToTimestamp(), sender, message.Data,
                 message.SequenceNumber, message.MessageID,
                 message.Reactions.Count, reactions);

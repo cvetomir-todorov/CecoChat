@@ -1,6 +1,7 @@
+using System;
 using System.Threading.Tasks;
 
-namespace CecoChat.Client.Console.Interaction
+namespace CecoChat.ConsoleClient.Interaction
 {
     public sealed class FindUserState : State
     {
@@ -9,10 +10,10 @@ namespace CecoChat.Client.Console.Interaction
 
         public override Task<State> Execute()
         {
-            System.Console.Clear();
-            System.Console.Write("Enter user ID ('0' to exit): ");
+            Console.Clear();
+            Console.Write("Enter user ID ('0' to exit): ");
 
-            string userIDString = System.Console.ReadLine();
+            string userIDString = Console.ReadLine();
             if (string.IsNullOrWhiteSpace(userIDString) ||
                 !long.TryParse(userIDString, out long userID) ||
                 userID == 0)
