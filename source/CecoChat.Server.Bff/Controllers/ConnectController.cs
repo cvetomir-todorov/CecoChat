@@ -5,7 +5,9 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using CecoChat.Jwt;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -38,8 +40,12 @@ namespace CecoChat.Server.Bff.Controllers
             _jwtTokenHandler.OutboundClaimTypeMap.Clear();
         }
 
-        [HttpGet]
-        public IActionResult Connect([FromBody] ConnectRequest request)
+        [HttpPost(Name = "Connect")]
+        [ProducesResponseType(typeof(ConnectResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public ActionResult<ConnectResponse> Connect([FromBody][BindRequired] ConnectRequest request)
         {
             if (!_userIDMap.TryGetValue(request.Username, out long userID))
             {
