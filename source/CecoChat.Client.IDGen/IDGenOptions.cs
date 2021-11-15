@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CecoChat.Data.IDGen
+namespace CecoChat.Client.IDGen
 {
     public sealed class IDGenOptions
     {

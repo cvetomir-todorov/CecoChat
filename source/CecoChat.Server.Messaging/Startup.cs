@@ -1,8 +1,8 @@
 using Autofac;
 using CecoChat.Autofac;
+using CecoChat.Client.IDGen;
 using CecoChat.Contracts.Backplane;
 using CecoChat.Data.Config;
-using CecoChat.Data.IDGen;
 using CecoChat.Grpc.Instrumentation;
 using CecoChat.Jwt;
 using CecoChat.Kafka;
