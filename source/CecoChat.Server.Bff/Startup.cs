@@ -1,10 +1,13 @@
 using Autofac;
 using CecoChat.Autofac;
+using CecoChat.Client.History;
+using CecoChat.Client.State;
 using CecoChat.Data.Config;
 using CecoChat.Jwt;
 using CecoChat.Otel;
 using CecoChat.Server.Backplane;
 using CecoChat.Server.Bff.HostedServices;
+using CecoChat.Server.Identity;
 using CecoChat.Swagger;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
@@ -18,6 +21,9 @@ namespace CecoChat.Server.Bff
 {
     public class Startup
     {
+        private readonly HistoryOptions _historyOptions;
+        private readonly StateOptions _stateOptions;
+        private readonly JwtOptions _jwtOptions;
         private readonly SwaggerOptions _swaggerOptions;
         private readonly OtelSamplingOptions _otelSamplingOptions;
         private readonly JaegerOptions _jaegerOptions;
@@ -25,6 +31,15 @@ namespace CecoChat.Server.Bff
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+
+            _historyOptions = new();
+            Configuration.GetSection("HistoryClient").Bind(_historyOptions);
+
+            _stateOptions = new();
+            Configuration.GetSection("StateClient").Bind(_stateOptions);
+
+            _jwtOptions = new();
+            Configuration.GetSection("Jwt").Bind(_jwtOptions);
 
             _swaggerOptions = new();
             Configuration.GetSection("Swagger").Bind(_swaggerOptions);
@@ -45,9 +60,13 @@ namespace CecoChat.Server.Bff
             {
                 otel.AddServiceResource(new OtelServiceResource {Namespace = "CecoChat", Name = "BFF", Version = "0.1"});
                 otel.AddAspNetCoreInstrumentation();
+                otel.AddGrpcClientInstrumentation(grpc => grpc.SuppressDownstreamInstrumentation = true);
                 otel.ConfigureSampling(_otelSamplingOptions);
                 otel.ConfigureJaegerExporter(_jaegerOptions);
             });
+
+            // security
+            services.AddJwtAuthentication(_jwtOptions);
 
             // web
             services
@@ -58,6 +77,10 @@ namespace CecoChat.Server.Bff
                     fluentValidation.RegisterValidatorsFromAssemblyContaining<Startup>();
                 });
             services.AddSwaggerServices(_swaggerOptions);
+
+            // downstream services
+            services.AddHistoryClient(_historyOptions);
+            services.AddStateClient(_stateOptions);
 
             // required
             services.AddOptions();
@@ -77,6 +100,12 @@ namespace CecoChat.Server.Bff
 
             // backplane
             builder.RegisterModule(new PartitionUtilityAutofacModule());
+
+            // downstream services
+            builder.RegisterType<HistoryClient>().As<IHistoryClient>().SingleInstance();
+            builder.RegisterOptions<HistoryOptions>(Configuration.GetSection("HistoryClient"));
+            builder.RegisterType<StateClient>().As<IStateClient>().SingleInstance();
+            builder.RegisterOptions<StateOptions>(Configuration.GetSection("StateClient"));
 
             // security
             builder.RegisterOptions<JwtOptions>(Configuration.GetSection("Jwt"));
@@ -99,6 +128,8 @@ namespace CecoChat.Server.Bff
             });
 
             app.UseRouting();
+            app.UseAuthentication();
+            app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
