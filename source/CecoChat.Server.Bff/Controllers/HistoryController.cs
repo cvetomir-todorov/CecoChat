@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
@@ -24,7 +25,7 @@ namespace CecoChat.Server.Bff.Controllers
     }
 
     [ApiController]
-    [Route("api")]
+    [Route("api/history")]
     public class HistoryController : ControllerBase
     {
         private readonly ILogger _logger;
@@ -39,13 +40,13 @@ namespace CecoChat.Server.Bff.Controllers
         }
 
         [Authorize(Roles = "user")]
-        [HttpGet("history", Name = "GetHistory")]
+        [HttpGet("messages", Name = "GetMessages")]
         [ProducesResponseType(typeof(GetHistoryResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetHistory([FromQuery][BindRequired] GetHistoryRequest request, CancellationToken ct)
+        public async Task<IActionResult> GetMessages([FromQuery][BindRequired] GetHistoryRequest request, CancellationToken ct)
         {
             if (!TryGetUserClaims(HttpContext, out UserClaims userClaims))
             {
@@ -56,8 +57,14 @@ namespace CecoChat.Server.Bff.Controllers
                 return Unauthorized();
             }
 
+            if (request.OlderThan.Kind != DateTimeKind.Utc)
+            {
+                request.OlderThan = request.OlderThan.ToUniversalTime();
+            }
             IReadOnlyCollection<Contracts.History.HistoryMessage> serviceMessages = await _historyClient.GetHistory(userClaims.UserID, request.OtherUserID, request.OlderThan, accessToken, ct);
             List<HistoryMessage> clientMessages = MapMessages(serviceMessages);
+
+            _logger.LogTrace("Return {0} messages for user {1} and client {2}.", clientMessages.Count, userClaims.UserID, userClaims.ClientID);
             return Ok(new GetHistoryResponse
             {
                 Messages = clientMessages

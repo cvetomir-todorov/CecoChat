@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
@@ -23,7 +24,7 @@ namespace CecoChat.Server.Bff.Controllers
     }
 
     [ApiController]
-    [Route("api")]
+    [Route("api/state")]
     public class StateController : ControllerBase
     {
         private readonly ILogger _logger;
@@ -55,8 +56,14 @@ namespace CecoChat.Server.Bff.Controllers
                 return Unauthorized();
             }
 
+            if (request.NewerThan.Kind != DateTimeKind.Utc)
+            {
+                request.NewerThan = request.NewerThan.ToUniversalTime();
+            }
             IReadOnlyCollection<Contracts.State.ChatState> serviceChats = await _client.GetChats(userClaims.UserID, request.NewerThan, accessToken, ct);
             List<ChatState> clientChats = MapChats(serviceChats);
+
+            _logger.LogTrace("Return {0} chats for user {1} and client {2}.", clientChats.Count, userClaims.UserID, userClaims.ClientID);
             return Ok(new GetChatsResponse
             {
                 Chats = clientChats

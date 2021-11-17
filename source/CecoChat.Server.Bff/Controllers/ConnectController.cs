@@ -28,7 +28,7 @@ namespace CecoChat.Server.Bff.Controllers
     }
 
     [ApiController]
-    [Route("api/connect")]
+    [Route("api")]
     public class ConnectController : ControllerBase
     {
         private readonly ILogger _logger;
@@ -59,7 +59,7 @@ namespace CecoChat.Server.Bff.Controllers
             _jwtTokenHandler.OutboundClaimTypeMap.Clear();
         }
 
-        [HttpPost(Name = "Connect")]
+        [HttpPost("connect", Name = "Connect")]
         [ProducesResponseType(typeof(ConnectResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
