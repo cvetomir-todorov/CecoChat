@@ -61,7 +61,7 @@ namespace CecoChat.Server.Bff
             {
                 otel.AddServiceResource(new OtelServiceResource {Namespace = "CecoChat", Name = "BFF", Version = "0.1"});
                 otel.AddAspNetCoreInstrumentation();
-                otel.AddGrpcClientInstrumentation(grpc => grpc.SuppressDownstreamInstrumentation = true);
+                otel.AddGrpcClientInstrumentation(grpc => grpc.SuppressDownstreamInstrumentation = false);
                 otel.ConfigureSampling(_otelSamplingOptions);
                 otel.ConfigureJaegerExporter(_jaegerOptions);
             });
