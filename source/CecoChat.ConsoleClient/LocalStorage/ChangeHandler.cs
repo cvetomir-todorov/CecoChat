@@ -11,7 +11,7 @@ namespace CecoChat.ConsoleClient.LocalStorage
         {
             _storage = storage;
         }
-        
+
         public void AddReceivedMessage(ListenNotification notification)
         {
             if (notification.Type != MessageType.Data)

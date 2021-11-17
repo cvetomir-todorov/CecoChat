@@ -12,7 +12,7 @@ namespace CecoChat.ConsoleClient
         public static async Task Main()
         {
             MessagingClient client = new();
-            await LogIn(client, profileServer: "https://localhost:31005", connectServer: "https://localhost:31000");
+            await LogIn(client, "https://localhost:31000");
             MessageStorage storage = new(client.UserID);
             ChangeHandler changeHandler = new(storage);
 
@@ -29,11 +29,11 @@ namespace CecoChat.ConsoleClient
             Console.WriteLine("Bye!");
         }
 
-        private static async Task LogIn(MessagingClient client, string profileServer, string connectServer)
+        private static async Task LogIn(MessagingClient client, string bffAddress)
         {
             Console.Write("Username bob (ID=1), alice (ID=2), peter (ID=1200): ");
             string username = Console.ReadLine() ?? string.Empty;
-            await client.Initialize(username, password: "not-empty", profileServer, connectServer);
+            await client.Initialize(username, password: "not-empty", bffAddress);
         }
 
         private static void ShowException(object _, Exception exception)

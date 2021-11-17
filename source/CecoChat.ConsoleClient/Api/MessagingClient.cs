@@ -1,123 +1,62 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Net;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using CecoChat.Contracts.History;
+using CecoChat.Contracts.Bff;
 using CecoChat.Contracts.Messaging;
-using CecoChat.Contracts.State;
-using Google.Protobuf.WellKnownTypes;
+using CecoChat.Data;
 using Grpc.Core;
 using Grpc.Net.Client;
+using Refit;
 
 namespace CecoChat.ConsoleClient.Api
 {
     public sealed class MessagingClient : IDisposable
     {
-        private readonly HttpClient _httpClient;
         private long _userID;
+        private string _accessToken;
+        private IBffClient _bffClient;
         private Metadata _grpcMetadata;
         private GrpcChannel _messagingChannel;
-        private GrpcChannel _historyChannel;
-        private GrpcChannel _stateChannel;
         private Listen.ListenClient _listenClient;
         private Send.SendClient _sendClient;
         private Reaction.ReactionClient _reactionClient;
-        private History.HistoryClient _historyClient;
-        private State.StateClient _stateClient;
-
-        public MessagingClient()
-        {
-            _httpClient = new HttpClient();
-        }
 
         public void Dispose()
         {
-            _httpClient.Dispose();
-
+            _bffClient?.Dispose();
             _messagingChannel?.ShutdownAsync().Wait();
             _messagingChannel?.Dispose();
-
-            _historyChannel?.ShutdownAsync().Wait();
-            _historyChannel?.Dispose();
-
-            _stateChannel?.ShutdownAsync().Wait();
-            _stateChannel?.Dispose();
         }
 
         public long UserID => _userID;
 
-        public async Task Initialize(string username, string password, string profileServer, string connectServer)
+        public async Task Initialize(string username, string password, string bffAddress)
         {
-            CreateSessionRequest createSessionRequest = new()
+            _bffClient?.Dispose();
+            _bffClient = RestService.For<IBffClient>(bffAddress);
+
+            ConnectRequest connectRequest = new()
             {
                 Username = username,
                 Password = password
             };
-            CreateSessionResponse createSessionResponse = await CreateSession(createSessionRequest, profileServer);
-            ConnectResponse connectResponse = await GetConnectInfo(createSessionResponse.AccessToken, connectServer);
-            ProcessAccessToken(createSessionResponse.AccessToken);
+            ConnectResponse connectResponse = await _bffClient.Connect(connectRequest);
+            ProcessAccessToken(connectResponse.AccessToken);
 
             _messagingChannel?.Dispose();
             _messagingChannel = GrpcChannel.ForAddress(connectResponse.MessagingServerAddress);
-            _historyChannel?.Dispose();
-            _historyChannel = GrpcChannel.ForAddress(connectResponse.HistoryServerAddress);
-            _stateChannel?.Dispose();
-            _stateChannel = GrpcChannel.ForAddress("https://localhost:31002");
 
             _listenClient = new Listen.ListenClient(_messagingChannel);
             _sendClient = new Send.SendClient(_messagingChannel);
             _reactionClient = new Reaction.ReactionClient(_messagingChannel);
-            _historyClient = new History.HistoryClient(_historyChannel);
-            _stateClient = new State.StateClient(_stateChannel);
-        }
-
-        private async Task<CreateSessionResponse> CreateSession(CreateSessionRequest request, string profileServer)
-        {
-            UriBuilder builder = new(uri: profileServer);
-            builder.Path = "api/session";
-
-            HttpRequestMessage requestMessage = new(HttpMethod.Post, builder.Uri);
-            requestMessage.Version = HttpVersion.Version20;
-            string requestString = JsonSerializer.Serialize(request);
-            requestMessage.Content = new StringContent(requestString);
-            requestMessage.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-            requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-            HttpResponseMessage responseMessage = await _httpClient.SendAsync(requestMessage);
-            responseMessage.EnsureSuccessStatusCode();
-
-            string responseString = await responseMessage.Content.ReadAsStringAsync();
-            CreateSessionResponse response = JsonSerializer.Deserialize<CreateSessionResponse>(responseString,
-                new JsonSerializerOptions {PropertyNamingPolicy = JsonNamingPolicy.CamelCase});
-            return response;
-        }
-
-        private async Task<ConnectResponse> GetConnectInfo(string accessToken, string connectServer)
-        {
-            UriBuilder builder = new(uri: connectServer);
-            builder.Path = "api/connect";
-
-            HttpRequestMessage requestMessage = new(HttpMethod.Get, builder.Uri);
-            requestMessage.Version = HttpVersion.Version20;
-            requestMessage.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-
-            HttpResponseMessage responseMessage = await _httpClient.SendAsync(requestMessage);
-            responseMessage.EnsureSuccessStatusCode();
-
-            string responseString = await responseMessage.Content.ReadAsStringAsync();
-            ConnectResponse response = JsonSerializer.Deserialize<ConnectResponse>(responseString,
-                new JsonSerializerOptions {PropertyNamingPolicy = JsonNamingPolicy.CamelCase});
-            return response;
         }
 
         private void ProcessAccessToken(string accessToken)
         {
+            _accessToken = accessToken;
+
             _grpcMetadata = new();
             _grpcMetadata.Add("Authorization", $"Bearer {accessToken}");
 
@@ -176,25 +115,42 @@ namespace CecoChat.ConsoleClient.Api
 
         public event EventHandler<Exception> ExceptionOccurred;
 
-        public async Task<IList<ChatState>> GetChats(DateTime newerThan)
+        public async Task<IList<LocalStorage.Chat>> GetChats(DateTime newerThan)
         {
             GetChatsRequest request = new()
             {
-                NewerThan = newerThan.ToTimestamp()
+                NewerThan = newerThan
             };
-            GetChatsResponse response = await _stateClient.GetChatsAsync(request, _grpcMetadata);
-            return response.Chats;
+            GetChatsResponse response = await _bffClient.GetStateChats(request, _accessToken);
+
+            List<LocalStorage.Chat> chats = new(capacity: response.Chats.Count);
+            foreach (ChatState bffChat in response.Chats)
+            {
+                long otherUserID = DataUtility.GetOtherUsedID(bffChat.ChatID, UserID);
+                LocalStorage.Chat chat = Map.BffChat(bffChat, otherUserID);
+                chats.Add(chat);
+            }
+
+            return chats;
         }
 
-        public async Task<IList<HistoryMessage>> GetHistory(long otherUserID, DateTime olderThan)
+        public async Task<IList<LocalStorage.Message>> GetHistory(long otherUserID, DateTime olderThan)
         {
             GetHistoryRequest request = new()
             {
-                OtherUserId = otherUserID,
-                OlderThan = Timestamp.FromDateTime(olderThan)
+                OtherUserID = otherUserID,
+                OlderThan = olderThan
             };
-            GetHistoryResponse response = await _historyClient.GetHistoryAsync(request, _grpcMetadata);
-            return response.Messages;
+            GetHistoryResponse response = await _bffClient.GetHistoryMessages(request, _accessToken);
+
+            List<LocalStorage.Message> messages = new(response.Messages.Count);
+            foreach (HistoryMessage bffMessage in response.Messages)
+            {
+                LocalStorage.Message message = Map.BffMessage(bffMessage);
+                messages.Add(message);
+            }
+
+            return messages;
         }
 
         public async Task<long> SendPlainTextMessage(long receiverID, string text)
