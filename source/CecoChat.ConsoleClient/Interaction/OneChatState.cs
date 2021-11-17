@@ -57,6 +57,15 @@ namespace CecoChat.ConsoleClient.Interaction
             }
         }
 
+        private async Task GetHistory(long userID)
+        {
+            IList<Message> history = await Client.GetHistory(userID, DateTime.UtcNow);
+            foreach (Message message in history)
+            {
+                Storage.AddMessage(message);
+            }
+        }
+
         private void DisplayMessage(Message message)
         {
             string sender = message.SenderID == Client.UserID ? "You" : message.SenderID.ToString();
