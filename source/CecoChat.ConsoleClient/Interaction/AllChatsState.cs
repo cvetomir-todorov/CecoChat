@@ -1,13 +1,18 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using CecoChat.ConsoleClient.LocalStorage;
 
 namespace CecoChat.ConsoleClient.Interaction
 {
     public sealed class AllChatsState : State
     {
+        private DateTime _lastKnownChatState;
+
         public AllChatsState(StateContainer states) : base(states)
-        {}
+        {
+            _lastKnownChatState = Snowflake.Epoch;
+        }
 
         public override async Task<State> Execute()
         {
@@ -49,6 +54,19 @@ namespace CecoChat.ConsoleClient.Interaction
                 Context.ReloadData = false;
                 return States.AllChats;
             }
+        }
+
+        private async Task GetChats()
+        {
+            DateTime currentState = DateTime.UtcNow;
+            IList<Chat> chats = await Client.GetChats(_lastKnownChatState);
+
+            foreach (Chat chat in chats)
+            {
+                Storage.AddOrUpdateChat(chat);
+            }
+
+            _lastKnownChatState = currentState;
         }
 
         private State ProcessNumberKey(ConsoleKeyInfo keyInfo, List<long> userIDs)
