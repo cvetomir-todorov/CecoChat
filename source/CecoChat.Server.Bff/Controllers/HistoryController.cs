@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
@@ -57,10 +56,6 @@ namespace CecoChat.Server.Bff.Controllers
                 return Unauthorized();
             }
 
-            if (request.OlderThan.Kind != DateTimeKind.Utc)
-            {
-                request.OlderThan = request.OlderThan.ToUniversalTime();
-            }
             IReadOnlyCollection<Contracts.History.HistoryMessage> serviceMessages = await _historyClient.GetHistory(userClaims.UserID, request.OtherUserID, request.OlderThan, accessToken, ct);
             List<HistoryMessage> clientMessages = MapMessages(serviceMessages);
 

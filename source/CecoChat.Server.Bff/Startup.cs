@@ -6,6 +6,7 @@ using CecoChat.Data.Config;
 using CecoChat.Jwt;
 using CecoChat.Otel;
 using CecoChat.Server.Backplane;
+using CecoChat.Server.Bff.Controllers.Infrastructure;
 using CecoChat.Server.Bff.HostedServices;
 using CecoChat.Server.Identity;
 using CecoChat.Swagger;
@@ -70,7 +71,11 @@ namespace CecoChat.Server.Bff
 
             // web
             services
-                .AddControllers()
+                .AddControllers(mvc =>
+                {
+                    // insert it before the default one so that it takes effect
+                    mvc.ModelBinderProviders.Insert(0, new DateTimeModelBinderProvider());
+                })
                 .AddFluentValidation(fluentValidation =>
                 {
                     fluentValidation.DisableDataAnnotationsValidation = true;
