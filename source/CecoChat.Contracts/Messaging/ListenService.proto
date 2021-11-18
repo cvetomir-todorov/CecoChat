@@ -1,9 +1,9 @@
 syntax = "proto3";
 option csharp_namespace = "CecoChat.Contracts.Messaging";
 package CecoChat.Contracts.Messaging;
-import "messaging/message-type.proto";
-import "messaging/data-type.proto";
-import "messaging/delivery-status.proto";
+import "Messaging/MessageType.proto";
+import "Messaging/DataType.proto";
+import "Messaging/DeliveryStatus.proto";
 
 service Listen {
   rpc Listen(ListenSubscription) returns (stream ListenNotification);

@@ -1,7 +1,7 @@
 syntax = "proto3";
 option csharp_namespace = "CecoChat.Contracts.History";
 package CecoChat.Contracts.History;
-import "history/data-type.proto";
+import "History/DataType.proto";
 
 message HistoryMessage {
   int64 message_id = 1;
