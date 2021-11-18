@@ -18,9 +18,9 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace CecoChat.Server.Bff.Controllers
 {
-    public sealed class ConnectRequestValidator : AbstractValidator<ConnectRequest>
+    public sealed class CreateSessionRequestValidator : AbstractValidator<CreateSessionRequest>
     {
-        public ConnectRequestValidator()
+        public CreateSessionRequestValidator()
         {
             RuleFor(x => x.Username).NotNull().NotEmpty();
             RuleFor(x => x.Password).NotNull().NotEmpty();
@@ -29,7 +29,7 @@ namespace CecoChat.Server.Bff.Controllers
 
     [ApiController]
     [Route("api")]
-    public class ConnectController : ControllerBase
+    public class SessionController : ControllerBase
     {
         private readonly ILogger _logger;
         private readonly JwtOptions _jwtOptions;
@@ -40,8 +40,8 @@ namespace CecoChat.Server.Bff.Controllers
         private readonly SigningCredentials _signingCredentials;
         private readonly JwtSecurityTokenHandler _jwtTokenHandler;
 
-        public ConnectController(
-            ILogger<ConnectController> logger,
+        public SessionController(
+            ILogger<SessionController> logger,
             IOptions<JwtOptions> jwtOptions,
             IClock clock,
             IPartitionUtility partitionUtility,
@@ -59,12 +59,12 @@ namespace CecoChat.Server.Bff.Controllers
             _jwtTokenHandler.OutboundClaimTypeMap.Clear();
         }
 
-        [HttpPost("connect", Name = "Connect")]
-        [ProducesResponseType(typeof(ConnectResponse), StatusCodes.Status200OK)]
+        [HttpPost("session", Name = "Session")]
+        [ProducesResponseType(typeof(CreateSessionResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public IActionResult Connect([FromBody][BindRequired] ConnectRequest request)
+        public IActionResult CreateSession([FromBody][BindRequired] CreateSessionRequest request)
         {
             if (!_userIDMap.TryGetValue(request.Username, out long userID))
             {
@@ -79,7 +79,7 @@ namespace CecoChat.Server.Bff.Controllers
             string messagingServerAddress = _partitioningConfig.GetServerAddress(partition);
             _logger.LogInformation("User with ID {0} in partition {1} assigned to messaging server {2}.", userID, partition, messagingServerAddress);
 
-            ConnectResponse response = new()
+            CreateSessionResponse response = new()
             {
                 ClientID = clientID,
                 AccessToken = accessToken,

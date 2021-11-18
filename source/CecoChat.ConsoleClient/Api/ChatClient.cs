@@ -12,10 +12,11 @@ using Refit;
 
 namespace CecoChat.ConsoleClient.Api
 {
-    public sealed class MessagingClient : IDisposable
+    public sealed class ChatClient : IDisposable
     {
         private long _userID;
         private string _accessToken;
+        private string _messagingServerAddress;
         private IBffClient _bffClient;
         private Metadata _grpcMetadata;
         private GrpcChannel _messagingChannel;
@@ -32,25 +33,19 @@ namespace CecoChat.ConsoleClient.Api
 
         public long UserID => _userID;
 
-        public async Task Initialize(string username, string password, string bffAddress)
+        public async Task CreateSession(string username, string password, string bffAddress)
         {
             _bffClient?.Dispose();
             _bffClient = RestService.For<IBffClient>(bffAddress);
 
-            ConnectRequest connectRequest = new()
+            CreateSessionRequest request = new()
             {
                 Username = username,
                 Password = password
             };
-            ConnectResponse connectResponse = await _bffClient.Connect(connectRequest);
-            ProcessAccessToken(connectResponse.AccessToken);
-
-            _messagingChannel?.Dispose();
-            _messagingChannel = GrpcChannel.ForAddress(connectResponse.MessagingServerAddress);
-
-            _listenClient = new Listen.ListenClient(_messagingChannel);
-            _sendClient = new Send.SendClient(_messagingChannel);
-            _reactionClient = new Reaction.ReactionClient(_messagingChannel);
+            CreateSessionResponse response = await _bffClient.CreateSession(request);
+            ProcessAccessToken(response.AccessToken);
+            _messagingServerAddress = response.MessagingServerAddress;
         }
 
         private void ProcessAccessToken(string accessToken)
@@ -64,8 +59,15 @@ namespace CecoChat.ConsoleClient.Api
             _userID = long.Parse(jwt.Subject);
         }
 
-        public void ListenForMessages(CancellationToken ct)
+        public void StartMessaging(CancellationToken ct)
         {
+            _messagingChannel?.Dispose();
+            _messagingChannel = GrpcChannel.ForAddress(_messagingServerAddress);
+
+            _listenClient = new Listen.ListenClient(_messagingChannel);
+            _sendClient = new Send.SendClient(_messagingChannel);
+            _reactionClient = new Reaction.ReactionClient(_messagingChannel);
+
             ListenSubscription subscription = new();
             AsyncServerStreamingCall<ListenNotification> serverStream = _listenClient.Listen(subscription, _grpcMetadata, cancellationToken: ct);
             Task.Factory.StartNew(
