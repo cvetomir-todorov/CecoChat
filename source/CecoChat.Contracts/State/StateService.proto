@@ -2,7 +2,7 @@ syntax = "proto3";
 option csharp_namespace = "CecoChat.Contracts.State";
 package CecoChat.Contracts.State;
 import "google/protobuf/timestamp.proto";
-import "state/chat-state.proto";
+import "State/ChatState.proto";
 
 service State {
   rpc GetChats(GetChatsRequest) returns (GetChatsResponse);

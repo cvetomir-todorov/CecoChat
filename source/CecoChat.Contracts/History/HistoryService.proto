@@ -2,7 +2,7 @@ syntax = "proto3";
 option csharp_namespace = "CecoChat.Contracts.History";
 package CecoChat.Contracts.History;
 import "google/protobuf/timestamp.proto";
-import "history/history-message.proto";
+import "History/HistoryMessage.proto";
 
 service History {
   rpc GetHistory(GetHistoryRequest) returns (GetHistoryResponse);
