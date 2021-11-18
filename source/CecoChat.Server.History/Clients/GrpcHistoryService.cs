@@ -38,7 +38,7 @@ namespace CecoChat.Server.History.Clients
             Activity.Current?.SetTag("user.id", userID);
 
             IReadOnlyCollection<HistoryMessage> historyMessages = await _messageRepo
-                .GetHistory(userID, request.OtherUserId, request.OlderThan.ToDateTime(), _historyConfig.DialogMessageCount);
+                .GetHistory(userID, request.OtherUserId, request.OlderThan.ToDateTime(), _historyConfig.ChatMessageCount);
 
             GetHistoryResponse response = new();
             response.Messages.Add(historyMessages);

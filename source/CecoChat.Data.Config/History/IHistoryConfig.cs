@@ -4,8 +4,6 @@ namespace CecoChat.Data.Config.History
 {
     public sealed class HistoryConfigUsage
     {
-        public bool UseServerAddress { get; init; }
-
         public bool UseMessageCount { get; init; }
     }
 
@@ -13,10 +11,6 @@ namespace CecoChat.Data.Config.History
     {
         Task Initialize(HistoryConfigUsage usage);
 
-        string ServerAddress { get; }
-
-        int UserMessageCount { get; }
-
-        int DialogMessageCount { get; }
+        int ChatMessageCount { get; }
     }
 }

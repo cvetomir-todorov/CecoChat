@@ -23,40 +23,20 @@ namespace CecoChat.Data.Config.History
         {
             HistoryConfigValues values = new();
 
-            if (usage.UseServerAddress)
-            {
-                values.ServerAddress = await GetServerAddress();
-            }
             if (usage.UseMessageCount)
             {
-                values.UserMessageCount = await GetUserMessageCount();
-                values.DialogMessageCount = await GetDialogMessageCount();
+                values.ChatMessageCount = await GetChatMessageCount();
             }
 
             return values;
         }
 
-        private async Task<string> GetServerAddress()
+        private async Task<int> GetChatMessageCount()
         {
             IDatabase database = _redisContext.GetDatabase();
-            RedisValue value = await database.StringGetAsync(HistoryKeys.ServerAddress);
-            return value;
-        }
-
-        private async Task<int> GetUserMessageCount()
-        {
-            IDatabase database = _redisContext.GetDatabase();
-            RedisValue value = await database.StringGetAsync(HistoryKeys.UserMessageCount);
-            value.TryParse(out int userMessageCount);
-            return userMessageCount;
-        }
-
-        private async Task<int> GetDialogMessageCount()
-        {
-            IDatabase database = _redisContext.GetDatabase();
-            RedisValue value = await database.StringGetAsync(HistoryKeys.DialogMessageCount);
-            value.TryParse(out int dialogMessageCount);
-            return dialogMessageCount;
+            RedisValue value = await database.StringGetAsync(HistoryKeys.ChatMessageCount);
+            value.TryParse(out int chatMessageCount);
+            return chatMessageCount;
         }
     }
 }
