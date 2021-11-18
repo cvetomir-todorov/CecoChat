@@ -28,12 +28,12 @@ namespace CecoChat.Data.Config
             if (RegisterHistory)
             {
                 builder.RegisterType<HistoryConfig>().As<IHistoryConfig>().SingleInstance();
-                builder.RegisterType<HistoryConfigRepository>().As<IHistoryConfigRepository>().SingleInstance();
+                builder.RegisterType<HistoryConfigRepo>().As<IHistoryConfigRepo>().SingleInstance();
             }
             if (RegisterPartitioning)
             {
                 builder.RegisterType<PartitioningConfig>().As<IPartitioningConfig>().SingleInstance();
-                builder.RegisterType<PartitioningConfigRepository>().As<IPartitioningConfigRepository>().SingleInstance();
+                builder.RegisterType<PartitioningConfigRepo>().As<IPartitioningConfigRepo>().SingleInstance();
                 builder.RegisterSingletonEvent<EventSource<PartitionsChangedEventData>, PartitionsChangedEventData>();
             }
         }

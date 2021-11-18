@@ -13,7 +13,7 @@ namespace CecoChat.Data.Config.Partitioning
     {
         private readonly ILogger _logger;
         private readonly IRedisContext _redisContext;
-        private readonly IPartitioningConfigRepository _repository;
+        private readonly IPartitioningConfigRepo _repo;
         private readonly IConfigUtility _configUtility;
         private readonly IEventSource<PartitionsChangedEventData> _partitionsChanged;
 
@@ -24,13 +24,13 @@ namespace CecoChat.Data.Config.Partitioning
         public PartitioningConfig(
             ILogger<PartitioningConfig> logger,
             IRedisContext redisContext,
-            IPartitioningConfigRepository repository,
+            IPartitioningConfigRepo repo,
             IConfigUtility configUtility,
             IEventSource<PartitionsChangedEventData> partitionsChanged)
         {
             _logger = logger;
             _redisContext = redisContext;
-            _repository = repository;
+            _repo = repo;
             _configUtility = configUtility;
             _partitionsChanged = partitionsChanged;
         }
@@ -141,7 +141,7 @@ namespace CecoChat.Data.Config.Partitioning
 
         private async Task<bool> LoadValidateValues(PartitioningConfigUsage usage, PartitioningConfigValidator validator)
         {
-            PartitioningConfigValues values = await _repository.GetValues(usage);
+            PartitioningConfigValues values = await _repo.GetValues(usage);
             _logger.LogInformation("Loading partitioning configuration succeeded.");
 
             bool areValid = _configUtility.ValidateValues("partitioning", values, validator);
