@@ -14,7 +14,7 @@ namespace CecoChat.ConsoleClient.Interaction
         }
 
         protected MessageStorage Storage => States.Storage;
-        protected MessagingClient Client => States.Client;
+        protected ChatClient Client => States.Client;
         protected StateContext Context => States.Context;
 
         public abstract Task<State> Execute();

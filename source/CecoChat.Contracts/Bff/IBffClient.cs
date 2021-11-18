@@ -6,8 +6,8 @@ namespace CecoChat.Contracts.Bff
 {
     public interface IBffClient : IDisposable
     {
-        [Post("/api/connect")]
-        Task<ConnectResponse> Connect([Body] ConnectRequest request);
+        [Post("/api/session")]
+        Task<CreateSessionResponse> CreateSession([Body] CreateSessionRequest request);
 
         [Get("/api/state/chats")]
         Task<GetChatsResponse> GetStateChats([Query] GetChatsRequest request, [Authorize("Bearer")] string accessToken);

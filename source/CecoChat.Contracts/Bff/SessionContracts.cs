@@ -3,7 +3,7 @@ using Refit;
 
 namespace CecoChat.Contracts.Bff
 {
-    public sealed class ConnectRequest
+    public sealed class CreateSessionRequest
     {
         [AliasAs("username")]
         public string Username { get; set; }
@@ -12,7 +12,7 @@ namespace CecoChat.Contracts.Bff
         public string Password { get; set; }
     }
 
-    public sealed class ConnectResponse
+    public sealed class CreateSessionResponse
     {
         [AliasAs("clientID")]
         public Guid ClientID { get; set; }

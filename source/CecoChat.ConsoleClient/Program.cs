@@ -11,8 +11,10 @@ namespace CecoChat.ConsoleClient
     {
         public static async Task Main()
         {
-            MessagingClient client = new();
-            await LogIn(client, "https://localhost:31000");
+            Console.Write("Username bob (ID=1), alice (ID=2), peter (ID=1200): ");
+            string username = Console.ReadLine() ?? string.Empty;
+            ChatClient client = new();
+            await client.CreateSession(username, password: "not-empty", "https://localhost:31000");
             MessageStorage storage = new(client.UserID);
             ChangeHandler changeHandler = new(storage);
 
@@ -20,7 +22,7 @@ namespace CecoChat.ConsoleClient
             client.MessageReceived += (_, notification) => changeHandler.AddReceivedMessage(notification);
             client.MessageDelivered += (_, notification) => changeHandler.UpdateDeliveryStatus(notification);
             client.ReactionReceived += (_, notification) => changeHandler.UpdateReaction(notification);
-            client.ListenForMessages(CancellationToken.None);
+            client.StartMessaging(CancellationToken.None);
 
             await RunStateMachine(client, storage);
 
@@ -29,19 +31,12 @@ namespace CecoChat.ConsoleClient
             Console.WriteLine("Bye!");
         }
 
-        private static async Task LogIn(MessagingClient client, string bffAddress)
-        {
-            Console.Write("Username bob (ID=1), alice (ID=2), peter (ID=1200): ");
-            string username = Console.ReadLine() ?? string.Empty;
-            await client.Initialize(username, password: "not-empty", bffAddress);
-        }
-
         private static void ShowException(object _, Exception exception)
         {
             Console.WriteLine(exception);
         }
 
-        private static async Task RunStateMachine(MessagingClient client, MessageStorage storage)
+        private static async Task RunStateMachine(ChatClient client, MessageStorage storage)
         {
             StateContainer states = new(client, storage);
             states.Context.ReloadData = true;
