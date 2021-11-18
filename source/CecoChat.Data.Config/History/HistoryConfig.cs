@@ -29,11 +29,7 @@ namespace CecoChat.Data.Config.History
             _configUtility = configUtility;
         }
 
-        public string ServerAddress => _values.ServerAddress;
-
-        public int UserMessageCount => _values.UserMessageCount;
-
-        public int DialogMessageCount => _values.DialogMessageCount;
+        public int ChatMessageCount => _values.ChatMessageCount;
 
         public async Task Initialize(HistoryConfigUsage usage)
         {
@@ -55,27 +51,12 @@ namespace CecoChat.Data.Config.History
         {
             ISubscriber subscriber = _redisContext.GetSubscriber();
 
-            if (usage.UseServerAddress)
-            {
-                ChannelMessageQueue serverAddressMQ = await subscriber.SubscribeAsync($"notify:{HistoryKeys.ServerAddress}");
-                serverAddressMQ.OnMessage(channelMessage => _configUtility.HandleChange(channelMessage, HandleServerAddress));
-                _logger.LogInformation("Subscribed for changes about {0} from channel {1}.",
-                    HistoryKeys.ServerAddress, serverAddressMQ.Channel);
-            }
             if (usage.UseMessageCount)
             {
-                ChannelMessageQueue userMessageCountMQ = await subscriber.SubscribeAsync($"notify:{HistoryKeys.MessageCount}");
-                userMessageCountMQ.OnMessage(channelMessage => _configUtility.HandleChange(channelMessage, HandleMessageCount));
-                _logger.LogInformation("Subscribed for changes about {0}, {1} from channel {2}.",
-                    HistoryKeys.UserMessageCount, HistoryKeys.DialogMessageCount, userMessageCountMQ.Channel);
-            }
-        }
-
-        private async Task HandleServerAddress(ChannelMessage channelMessage)
-        {
-            if (_usage.UseServerAddress)
-            {
-                await LoadValidateValues(_usage, _validator);
+                ChannelMessageQueue chatMessageCountMQ = await subscriber.SubscribeAsync($"notify:{HistoryKeys.ChatMessageCount}");
+                chatMessageCountMQ.OnMessage(channelMessage => _configUtility.HandleChange(channelMessage, HandleMessageCount));
+                _logger.LogInformation("Subscribed for changes about {0} from channel {1}.",
+                    HistoryKeys.ChatMessageCount, chatMessageCountMQ.Channel);
             }
         }
 
@@ -101,14 +82,9 @@ namespace CecoChat.Data.Config.History
 
         private void PrintValues(HistoryConfigUsage usage, HistoryConfigValues values)
         {
-            if (usage.UseServerAddress)
-            {
-                _logger.LogInformation("Server address set to {0}.", values.ServerAddress);
-            }
             if (usage.UseMessageCount)
             {
-                _logger.LogInformation("User message count set to {0}.", values.UserMessageCount);
-                _logger.LogInformation("Dialog message count set to {0}.", values.DialogMessageCount);
+                _logger.LogInformation("Chat message count set to {0}.", values.ChatMessageCount);
             }
         }
     }

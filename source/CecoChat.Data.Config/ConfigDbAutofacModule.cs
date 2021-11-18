@@ -11,9 +11,9 @@ namespace CecoChat.Data.Config
     {
         public IConfiguration RedisConfiguration { get; init; }
 
-        public bool RegisterHistory { get; init; } = false;
+        public bool RegisterHistory { get; init; }
 
-        public bool RegisterPartitioning { get; init; } = false;
+        public bool RegisterPartitioning { get; init; }
 
         protected override void Load(ContainerBuilder builder)
         {
