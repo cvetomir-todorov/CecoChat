@@ -10,7 +10,7 @@ namespace CecoChat.Data.Config.History
     {
         private readonly ILogger _logger;
         private readonly IRedisContext _redisContext;
-        private readonly IHistoryConfigRepository _repository;
+        private readonly IHistoryConfigRepo _repo;
         private readonly IConfigUtility _configUtility;
 
         private HistoryConfigUsage _usage;
@@ -20,12 +20,12 @@ namespace CecoChat.Data.Config.History
         public HistoryConfig(
             ILogger<HistoryConfig> logger,
             IRedisContext redisContext,
-            IHistoryConfigRepository repository,
+            IHistoryConfigRepo repo,
             IConfigUtility configUtility)
         {
             _logger = logger;
             _redisContext = redisContext;
-            _repository = repository;
+            _repo = repo;
             _configUtility = configUtility;
         }
 
@@ -70,7 +70,7 @@ namespace CecoChat.Data.Config.History
 
         private async Task LoadValidateValues(HistoryConfigUsage usage, HistoryConfigValidator validator)
         {
-            HistoryConfigValues values = await _repository.GetValues(usage);
+            HistoryConfigValues values = await _repo.GetValues(usage);
             _logger.LogInformation("Loading history configuration succeeded.");
 
             if (_configUtility.ValidateValues("history", values, validator))

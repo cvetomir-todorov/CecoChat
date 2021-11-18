@@ -5,16 +5,16 @@ using StackExchange.Redis;
 
 namespace CecoChat.Data.Config.Partitioning
 {
-    internal interface IPartitioningConfigRepository
+    internal interface IPartitioningConfigRepo
     {
         Task<PartitioningConfigValues> GetValues(PartitioningConfigUsage usage);
     }
 
-    internal sealed class PartitioningConfigRepository : IPartitioningConfigRepository
+    internal sealed class PartitioningConfigRepo : IPartitioningConfigRepo
     {
         private readonly IRedisContext _redisContext;
 
-        public PartitioningConfigRepository(
+        public PartitioningConfigRepo(
             IRedisContext redisContext)
         {
             _redisContext = redisContext;
