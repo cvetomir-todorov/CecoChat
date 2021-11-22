@@ -78,6 +78,8 @@ namespace CecoChat.Client.IDGen
                 DateTime deadline = DateTime.UtcNow.Add(_options.Communication.CallTimeout);
 
                 GenerateManyResponse response = _client.GenerateMany(request, deadline: deadline);
+                // consider using 2 channels and switch them atomically in a green-blue manner
+                // concurrent collections Clear method could be slow due to locking 
                 _idBuffer.Clear();
                 foreach (long id in response.Ids)
                 {
