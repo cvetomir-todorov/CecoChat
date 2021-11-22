@@ -18,6 +18,7 @@ namespace CecoChat.Client.State
     public sealed class StateClient : IStateClient
     {
         private readonly ILogger _logger;
+        private readonly StateOptions _options;
         private readonly Contracts.State.State.StateClient _client;
 
         public StateClient(
@@ -26,9 +27,10 @@ namespace CecoChat.Client.State
             Contracts.State.State.StateClient client)
         {
             _logger = logger;
+            _options = options.Value;
             _client = client;
 
-            _logger.LogInformation("State address set to {0}.", options.Value.Address);
+            _logger.LogInformation("State address set to {0}.", _options.Address);
         }
 
         public void Dispose()
@@ -43,7 +45,8 @@ namespace CecoChat.Client.State
 
             Metadata grpcMetadata = new();
             grpcMetadata.Add("Authorization", $"Bearer {accessToken}");
-            GetChatsResponse response = await _client.GetChatsAsync(request, headers: grpcMetadata, cancellationToken: ct);
+            DateTime deadline = DateTime.UtcNow.Add(_options.CallTimeout);
+            GetChatsResponse response = await _client.GetChatsAsync(request, headers: grpcMetadata, deadline, cancellationToken: ct);
 
             _logger.LogTrace("Returned {0} chats for user {1} which are newer than {2}.", response.Chats.Count, userID, newerThan);
             return response.Chats;
