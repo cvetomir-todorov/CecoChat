@@ -68,7 +68,7 @@ namespace CecoChat.Server.Messaging.Clients
 
         private async Task<long> GetMessageID(UserClaims userClaims, ServerCallContext context)
         {
-            GetIDResult result = await _idGenClient.GetID(userClaims.UserID, context.CancellationToken);
+            GetIDResult result = await _idGenClient.GetID(context.CancellationToken);
             if (!result.Success)
             {
                 Metadata metadata = new();
