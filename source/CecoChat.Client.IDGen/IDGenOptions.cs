@@ -11,10 +11,10 @@ namespace CecoChat.Client.IDGen
 
     public sealed class IDGenGenerationOptions
     {
+        public long OriginatorID { get; set; }
         public int RefreshIDsCount { get; set; }
-        public int MaxConcurrentRequests { get; set; }
+        public TimeSpan RefreshIDsInterval { get; set; }
         public TimeSpan GetIDWaitInterval { get; set; }
-        public TimeSpan InvalidateIDsInterval { get; set; }
     }
 
     public sealed class IDGenCommunicationOptions
