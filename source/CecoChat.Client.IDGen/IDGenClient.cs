@@ -39,15 +39,15 @@ namespace CecoChat.Client.IDGen
             _options = options.Value;
             _client = client;
 
-            _logger.LogInformation("IDGen address set to {0}.", _options.Communication.Address);
+            _logger.LogInformation("IDGen address set to {0}.", _options.Address);
             _idBuffer = new();
             _idChannel = new(_idBuffer);
-            _getIDWaitIntervalMilliseconds = (int)_options.Generation.GetIDWaitInterval.TotalMilliseconds;
+            _getIDWaitIntervalMilliseconds = (int)_options.GetIDWaitInterval.TotalMilliseconds;
             _invalidateIDsTimer = new(
                 callback: _ => RefreshIDs(),
                 state: null,
                 dueTime: TimeSpan.Zero, 
-                period: _options.Generation.RefreshIDsInterval);
+                period: _options.RefreshIDsInterval);
         }
 
         public void Dispose()
@@ -72,10 +72,10 @@ namespace CecoChat.Client.IDGen
             {
                 GenerateManyRequest request = new()
                 {
-                    OriginatorId = _options.Generation.OriginatorID,
-                    Count = _options.Generation.RefreshIDsCount
+                    OriginatorId = _options.OriginatorID,
+                    Count = _options.RefreshIDsCount
                 };
-                DateTime deadline = DateTime.UtcNow.Add(_options.Communication.CallTimeout);
+                DateTime deadline = DateTime.UtcNow.Add(_options.CallTimeout);
 
                 GenerateManyResponse response = _client.GenerateMany(request, deadline: deadline);
                 // consider using 2 channels and switch them atomically in a green-blue manner
