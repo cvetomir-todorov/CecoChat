@@ -12,9 +12,9 @@ namespace CecoChat.Polly
 {
     public static class HttpClientBuilderExtensions
     {
-        public static void AddGrpcRetryPolicy(this IHttpClientBuilder builder, RetryOptions retryOptions)
+        public static IHttpClientBuilder AddGrpcRetryPolicy(this IHttpClientBuilder builder, RetryOptions retryOptions)
         {
-            builder.AddPolicyHandler(_ => HandleFailure(retryOptions));
+            return builder.AddPolicyHandler(_ => HandleFailure(retryOptions));
         }
 
         private static IAsyncPolicy<HttpResponseMessage> HandleFailure(RetryOptions retryOptions)
