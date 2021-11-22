@@ -1,5 +1,4 @@
-using System.Net.Http;
-using System.Threading;
+using CecoChat.HttpClient;
 using CecoChat.Polly;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -13,17 +12,8 @@ namespace CecoChat.Client.History
                 {
                     grpc.Address = options.Address;
                 })
-                .ConfigurePrimaryHttpMessageHandler(CreateMessageHandler)
+                .ConfigureSocketsPrimaryHttpClientHandler(options.SocketsHttpHandler)
                 .AddGrpcRetryPolicy(options.Retry);
-        }
-
-        private static HttpMessageHandler CreateMessageHandler()
-        {
-            return new SocketsHttpHandler
-            {
-                PooledConnectionIdleTimeout = Timeout.InfiniteTimeSpan,
-                EnableMultipleHttp2Connections = true
-            };
         }
     }
 }
