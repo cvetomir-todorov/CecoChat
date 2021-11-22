@@ -1,5 +1,6 @@
 using System.Net.Http;
 using System.Threading;
+using CecoChat.Polly;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CecoChat.Client.History
@@ -12,7 +13,8 @@ namespace CecoChat.Client.History
                 {
                     grpc.Address = options.Address;
                 })
-                .ConfigurePrimaryHttpMessageHandler(CreateMessageHandler);
+                .ConfigurePrimaryHttpMessageHandler(CreateMessageHandler)
+                .AddGrpcRetryPolicy(options.Retry);
         }
 
         private static HttpMessageHandler CreateMessageHandler()
