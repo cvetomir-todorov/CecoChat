@@ -103,6 +103,7 @@ namespace CecoChat.Server.Messaging
 
             // idgen
             builder.RegisterType<IDGenClient>().As<IIDGenClient>().SingleInstance();
+            builder.RegisterType<IDChannel>().As<IIDChannel>().SingleInstance();
             builder.RegisterOptions<IDGenOptions>(Configuration.GetSection("IDGen"));
 
             // backplane
