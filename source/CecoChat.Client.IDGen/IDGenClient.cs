@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 using CecoChat.Contracts.IDGen;
@@ -25,24 +24,21 @@ namespace CecoChat.Client.IDGen
         private readonly ILogger _logger;
         private readonly IDGenOptions _options;
         private readonly Contracts.IDGen.IDGen.IDGenClient _client;
-        private readonly ConcurrentQueue<long> _idBuffer;
-        private readonly BlockingCollection<long> _idChannel;
-        private readonly int _getIDWaitIntervalMilliseconds;
+        private readonly IIDChannel _idChannel;
         private readonly Timer _invalidateIDsTimer;
 
         public IDGenClient(
             ILogger<IDGenClient> logger,
             IOptions<IDGenOptions> options,
-            Contracts.IDGen.IDGen.IDGenClient client)
+            Contracts.IDGen.IDGen.IDGenClient client,
+            IIDChannel idChannel)
         {
             _logger = logger;
             _options = options.Value;
             _client = client;
+            _idChannel = idChannel;
 
             _logger.LogInformation("IDGen address set to {0}.", _options.Address);
-            _idBuffer = new();
-            _idChannel = new(_idBuffer);
-            _getIDWaitIntervalMilliseconds = (int)_options.GetIDWaitInterval.TotalMilliseconds;
             _invalidateIDsTimer = new(
                 callback: _ => RefreshIDs(),
                 state: null,
@@ -57,7 +53,7 @@ namespace CecoChat.Client.IDGen
 
         public ValueTask<GetIDResult> GetID(CancellationToken ct)
         {
-            if (!_idChannel.TryTake(out long id, _getIDWaitIntervalMilliseconds, ct))
+            if (!_idChannel.TryTakeID(out long id, _options.GetIDWaitInterval, ct))
             {
                 _logger.LogWarning("Timed-out while waiting for new IDs to be generated.");
                 return ValueTask.FromResult(new GetIDResult());
@@ -68,6 +64,7 @@ namespace CecoChat.Client.IDGen
 
         private void RefreshIDs()
         {
+            // TODO: consider ensuring no more than 1 call is pending
             try
             {
                 GenerateManyRequest request = new()
@@ -77,14 +74,9 @@ namespace CecoChat.Client.IDGen
                 };
                 DateTime deadline = DateTime.UtcNow.Add(_options.CallTimeout);
 
+                _idChannel.ClearIDs();
                 GenerateManyResponse response = _client.GenerateMany(request, deadline: deadline);
-                // consider using 2 channels and switch them atomically in a green-blue manner
-                // concurrent collections Clear method could be slow due to locking 
-                _idBuffer.Clear();
-                foreach (long id in response.Ids)
-                {
-                    _idChannel.Add(id);
-                }
+                _idChannel.AddNewIDs(response.Ids);
             }
             catch (RpcException rpcException)
             {
