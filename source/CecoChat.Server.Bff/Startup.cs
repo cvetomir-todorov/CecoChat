@@ -107,10 +107,14 @@ namespace CecoChat.Server.Bff
             builder.RegisterModule(new PartitionUtilityAutofacModule());
 
             // downstream services
-            builder.RegisterType<HistoryClient>().As<IHistoryClient>().SingleInstance();
-            builder.RegisterOptions<HistoryOptions>(Configuration.GetSection("HistoryClient"));
-            builder.RegisterType<StateClient>().As<IStateClient>().SingleInstance();
-            builder.RegisterOptions<StateOptions>(Configuration.GetSection("StateClient"));
+            builder.RegisterModule(new HistoryClientAutofacModule
+            {
+                HistoryClientConfiguration = Configuration.GetSection("HistoryClient")
+            });
+            builder.RegisterModule(new StateClientAutofacModule
+            {
+                StateClientConfiguration = Configuration.GetSection("StateClient")
+            });
 
             // security
             builder.RegisterOptions<JwtOptions>(Configuration.GetSection("Jwt"));

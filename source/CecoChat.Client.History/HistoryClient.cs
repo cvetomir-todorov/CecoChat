@@ -15,7 +15,7 @@ namespace CecoChat.Client.History
         Task<IReadOnlyCollection<HistoryMessage>> GetHistory(long userID, long otherUserID, DateTime olderThan, string accessToken, CancellationToken ct);
     }
 
-    public sealed class HistoryClient : IHistoryClient
+    internal sealed class HistoryClient : IHistoryClient
     {
         private readonly ILogger _logger;
         private readonly HistoryOptions _options;
