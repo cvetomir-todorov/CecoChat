@@ -51,15 +51,16 @@ namespace CecoChat.Client.IDGen
             _invalidateIDsTimer.Dispose();
         }
 
-        public ValueTask<GetIDResult> GetID(CancellationToken ct)
+        public async ValueTask<GetIDResult> GetID(CancellationToken ct)
         {
-            if (!_idChannel.TryTakeID(out long id, _options.GetIDWaitInterval, ct))
+            (bool success, long id) = await _idChannel.TryTakeID(_options.GetIDWaitInterval, ct); 
+            if (!success)
             {
                 _logger.LogWarning("Timed-out while waiting for new IDs to be generated.");
-                return ValueTask.FromResult(new GetIDResult());
+                return new GetIDResult();
             }
 
-            return ValueTask.FromResult(new GetIDResult {ID = id});
+            return new GetIDResult {ID = id};
         }
 
         private void RefreshIDs()
