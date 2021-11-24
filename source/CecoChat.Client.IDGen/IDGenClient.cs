@@ -26,6 +26,9 @@ namespace CecoChat.Client.IDGen
         private readonly Contracts.IDGen.IDGen.IDGenClient _client;
         private readonly IIDChannel _idChannel;
         private readonly Timer _invalidateIDsTimer;
+        private int _isRefreshing;
+        private static readonly int True = 1;
+        private static readonly int False = 0;
 
         public IDGenClient(
             ILogger<IDGenClient> logger,
@@ -65,7 +68,12 @@ namespace CecoChat.Client.IDGen
 
         private void RefreshIDs()
         {
-            // TODO: consider ensuring no more than 1 call is pending
+            if (True == Interlocked.CompareExchange(ref _isRefreshing, True, False))
+            {
+                _logger.LogWarning("Failed to refresh IDs since previous refresh hasn't completed yet.");
+                return;
+            }
+
             try
             {
                 GenerateManyRequest request = new()
@@ -86,6 +94,10 @@ namespace CecoChat.Client.IDGen
             catch (Exception exception)
             {
                 _logger.LogError(exception, "Failed to refresh IDs.");
+            }
+            finally
+            {
+                Interlocked.Exchange(ref _isRefreshing, False);
             }
         }
     }
