@@ -6,8 +6,7 @@ using System.Threading.Tasks;
 
 namespace CecoChat.Client.IDGen
 {
-    // TODO: make internal and register in an AutoFac module
-    public interface IIDChannel
+    internal interface IIDChannel
     {
         ValueTask<(bool, long)> TryTakeID(TimeSpan timeout, CancellationToken ct);
 
@@ -16,7 +15,7 @@ namespace CecoChat.Client.IDGen
         void AddNewIDs(IReadOnlyCollection<long> newIDs);
     }
 
-    public sealed class IDChannel : IIDChannel
+    internal sealed class IDChannel : IIDChannel
     {
         private readonly Channel<long> _blueChannel;
         private readonly Channel<long> _greenChannel;

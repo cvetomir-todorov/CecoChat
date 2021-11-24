@@ -102,9 +102,10 @@ namespace CecoChat.Server.Messaging
             builder.RegisterOptions<ClientOptions>(Configuration.GetSection("Clients"));
 
             // idgen
-            builder.RegisterType<IDGenClient>().As<IIDGenClient>().SingleInstance();
-            builder.RegisterType<IDChannel>().As<IIDChannel>().SingleInstance();
-            builder.RegisterOptions<IDGenOptions>(Configuration.GetSection("IDGen"));
+            builder.RegisterModule(new IDGenAutofacModule
+            {
+                IDGenConfiguration = Configuration.GetSection("IDGen")
+            });
 
             // backplane
             builder.RegisterModule(new PartitionUtilityAutofacModule());
