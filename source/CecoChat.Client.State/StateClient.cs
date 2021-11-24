@@ -15,7 +15,7 @@ namespace CecoChat.Client.State
         Task<IReadOnlyCollection<ChatState>> GetChats(long userID, DateTime newerThan, string accessToken, CancellationToken ct);
     }
 
-    public sealed class StateClient : IStateClient
+    internal sealed class StateClient : IStateClient
     {
         private readonly ILogger _logger;
         private readonly StateOptions _options;
