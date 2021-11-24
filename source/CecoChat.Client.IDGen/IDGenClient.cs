@@ -19,7 +19,7 @@ namespace CecoChat.Client.IDGen
         public long ID { get; init; }
     }
 
-    public sealed class IDGenClient : IIDGenClient
+    internal sealed class IDGenClient : IIDGenClient
     {
         private readonly ILogger _logger;
         private readonly IDGenOptions _options;
