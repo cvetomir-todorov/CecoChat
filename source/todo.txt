@@ -1,4 +1,0 @@
-* use a BFF for history and state
-  - Update messaging client state channel address
-* use a real cache with an eviction policy
-* setup state service to work with specific partitions just like the messaging service

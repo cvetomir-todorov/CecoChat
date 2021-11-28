@@ -1,6 +1,6 @@
 # What next
 
-## Functional features
+## Essential features
 
 * Add user/profile features
   - User authentication and authorization
@@ -9,6 +9,9 @@
 * Add clients
   - Web-based
   - Mobile
+
+## Additional features
+
 * Privacy
   - Add end-to-end encryption for messages
 * Media messages
@@ -26,23 +29,21 @@
   - Away
   - Busy
 
-## Non-functional features
+## Technical features
 
 * Architecture
-  - Design communication between cells
-  - Consider creating a backend for frontend
-* Reliability
+  - Design cross-region communication
+* Security
   - Rate limiting
+  - Use secure transports and protocols on communication level
 * Observability
   - Metrics for system resources, communication/db, app-specific
   - Monitoring
   - Health checks
 * Deployment
-  - Failover
   - Load balancing
   - Auto-scaling
-* Security
-  - Use secure transports and protocols on communication level
+  - Failover
 
 ## Development
 
@@ -51,11 +52,14 @@
 * Automated testing
   - Setup infrastructure for test running
   - Add system tests
-  - Add integration tests for each component
-  - Add unit tests for parts worth the effort
+  - Add unit tests for each service
+  - Add low-level tests for components worth the effort
 
 ## Improvements
 
+* Essential
+  - Implement LRU cache in State service
+  - Partition data for State service
 * Performance
   - Benchmark Cassandra write batches and consider alternatives
   - Benchmark Kafka and improve its configuration
