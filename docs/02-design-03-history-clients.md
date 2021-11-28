@@ -7,7 +7,7 @@ History servers use a standard Kafka consumer group with automatic partition ass
 
 # Clients
 
-![Clients](images/cecochat-04-clients.png)
+![Clients](images/cecochat-05-clients.png)
 
 Because of the messaging servers state each client needs to be connected to the correct messaging server. This problem could be solved via a load balancer which extracts the user ID from the client's access token. This is an operation which would require an additional decryption and application load-balancing for every message. Instead the connect server is used to find out which the messaging server is. This happens only once and the clients use that address to connect directly to their messaging server. There are operational issues with this approach but the additional application load-balancing and decryption is avoided. To make things consistent the connect server returns the history server address as well, but here it could be the HTTP load-balancer address.
 

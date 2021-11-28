@@ -1,6 +1,6 @@
 # Configuration
 
-![Configuration](images/cecochat-05-configuration.png)
+![Configuration](images/cecochat-06-configuration.png)
 
 The configuration database stores information related to server partition assignment. Each messaging server is assigned a server ID. The configuration database stores the address and partitions for each server ID. It is used by:
 
@@ -18,7 +18,7 @@ Redis conveniently supports simple keys for plain data such as partition count a
 
 # Failover
 
-![Failover](images/cecochat-06-failover.png)
+![Failover](images/cecochat-07-failover.png)
 
 Each Kafka partition is consumed by exactly one messaging server. Once this server is declared dead it should be replaced by a new one. To speed things up the deployment infrastructure should keep idle messaging servers waiting. Idle ones also have server IDs as described in the configuration section. Replacing a dead server then costs:
 
