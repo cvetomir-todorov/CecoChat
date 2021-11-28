@@ -2,7 +2,18 @@
 
 ![Overall design](images/cecochat-01-overall.png)
 
-Clients connect to messaging servers in order to chat. Messaging servers communicate with each other indirectly using a PUB/SUB backplane. The PUB/SUB backplane also acts like an event log. The history servers transform messages from the event log into a history database which is the source of truth. The history is available for querying by the clients via history servers. Clients obtain the addresses for the messaging and history servers from a connect server. ID Gen servers are used to generate message IDs in a distributed and scalable way. The messaging, history, connect servers use dynamic configuration which is updated centrally. Splitting the different responsibilities between separate servers allows for independent scaling. A deployment infrastructure takes care of failover, growth/shrinkage of the different server sets based on load and predictive analytics.
+* Clients initially connect to a Backend for frontend (BFF) service in order to create their session
+* Clients acquire user chats and chat history from the State and History services via the BFF
+* Clients connect to Messaging service in order to chat with each other
+* Messaging servers exchange data between each other indirectly using a PUB/SUB backplane
+* PUB/SUB backplane distributes the traffic between Messaging servers
+* ID Gen service is used to generate Snowflake message IDs
+* State service transform the messages from the PUB/SUB backplane into State database which is the source of truth 
+* History service transform messages and reactions from the PUB/SUB backplane into a History database which is the source of truth
+* Splitting the different responsibilities between separate services allows for independent scaling
+* The services use dynamic configuration which is updated centrally
+* Observability is achieved via distributed tracing, log aggregation and monitoring with metrics
+* Deployment infrastructure takes care of failover, growth/shrinkage of the different services based on load and predictive analytics
 
 All the diagrams are in the [diagrams](diagrams/) folder and [draw.io](https://app.diagrams.net/) is needed in order to view them. From the `Help` item in the menu a desktop tool could be downloaded, if preferred. Currently this is the [link with the releases](https://github.com/jgraph/drawio-desktop/releases).
 
@@ -10,13 +21,18 @@ All the diagrams are in the [diagrams](diagrams/) folder and [draw.io](https://a
 
 ## Client communication
 
-Clients use HTTP when they need to find out where to connect. After that gRPC is utilized in order to obtain history and exchange messages:
+* Clients use HTTP to communicate with the BFF service
+* Client use gRPC to communication with the Messaging service
+* If web browser support is needed it is worth considering replacing gRPC with HTTP and WebSockets because HTTP/2 doesn't allow it to be used easily in the browser
+* [gRPC-web](https://github.com/grpc/grpc-web) uses an [Envoy proxy](https://www.envoyproxy.io/) which supports server-side streaming but that would be expensive to implement
+
+## Service synchronous communication
+
+Servers communicate synchronously with each other via gRPC:
 * open-source software backed by Google
-* supports multiple languages, which is important for the variety of clients
+* supports multiple languages
 * lightweight and has good performance
 * based on HTTP/2 which allows for both inter-operability and optimizations from the protocol
-* uses full-duplex communication which is possible in mobile and desktop clients
-* usage of HTTP/2 doesn't allow it to be used easily in the browser but [gRPC-web](https://github.com/grpc/grpc-web) uses an [Envoy proxy](https://www.envoyproxy.io/) which supports server-side streaming.
 
 ## PUB/SUB backplane
 
@@ -32,9 +48,9 @@ PUB/SUB backplane is based on Apache Kafka:
 * has some known operability issues with partition redistribution among a consumer group
 * relies on ZooKeeper as an additional element in the infrastructure
 
-## History DB
+## State and History databases
 
-History is based on Apache Cassandra:
+State and history are based on Apache Cassandra:
 * open-source software backed by DataStax
 * linearly scalable
 * distributed with auto-partitioning and auto-replication
@@ -54,18 +70,24 @@ Configuration is based on Redis:
 * lightweight and performant
 * easy to use and manage
 * has a built-in PUB/SUB mechanism
+* should be replaced by a more reliable technology in the future, e.g. a relational DB for storage and Kafka for notifications
 
 ## Application servers
 
-The application servers use ASP.NET and .NET 5 which are the heirs of ASP.NET Core and .NET Core:
+The application servers use ASP.NET/.NET 5 which are the heirs of ASP.NET Core and .NET Core:
 * open-source software backed by Microsoft
 * very mature, feature-rich, lots of tools
 * widely-used with a big community
 * well supported
+* should be updated to ASP.NET/.NET 6 and regularly to the expected upcoming next versions
 
-## Operations
+## Observability
 
-* Containerization relies on Docker for its maturity, popularity, tooling and integration
-* Distributed tracing is based on OpenTelemetry and Jaeger is configured for viewing traces and spans
-* Log aggregation is based on the EFK stack consisting of ElasticSearch, Fluentd and Kibana
-* Deployment infrastructure - TBD
+* distributed tracing is based on OpenTelemetry and Jaeger is configured for viewing traces and spans
+* log aggregation is based on the EFK stack consisting of ElasticSearch, Fluentd and Kibana
+* monitoring and metrics - TBD
+
+## Deployment
+
+* containerization relies on Docker for its maturity, popularity, tooling and integration
+* orchestration - TBD, probably Kubernetes

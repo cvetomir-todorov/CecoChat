@@ -7,12 +7,12 @@
 * User can (un)react to messages with emojis
 * User can connect with multiple clients
 * User is shown the missed messages
-* User can review chat history at a random point in time between him and another user 
+* User can review chat history at a random point in time 
 * User receives a delivery notification when the message has been processed
 
 Limitations:
-* No user profile and friendship are implemented so clients rely on user IDs.
-* No clients exist, only ones for development purposes.
+* No user profile and friendship are implemented
+* No clients exist, only a client for development purposes
 
 ## Non-functional features
 
@@ -25,13 +25,12 @@ Limitations:
 * Security
   - TLS used on communication level
   - Access tokens for authn and authz
+* Observability
+  - Distributed tracing
+  - Log aggregation
 * Maintainability
-  - Operations
-    - Distributed tracing
-    - Log aggregation
-  - Development
-    - Sonarcloud quality gate
-    - Open-source technologies
+  - Sonarcloud code quality gate
+  - Open-source technologies
 
 ## More
 

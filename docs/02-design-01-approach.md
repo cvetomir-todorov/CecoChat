@@ -3,7 +3,8 @@
 The problems we solve so far include:
 * Concurrent connections limit
 * Exchange messages between different messaging servers
-* Persist messages as history
+* Persist messages and reactions as chat history
+* Update user chats from messages
 * Reliable messaging and consistency
 * Message IDs
 
@@ -57,15 +58,29 @@ Cons
 
 The approach using a PUB/SUB backplane was chosen because of the pros listed at the cost of complexity increase in deployment and configuration. Kafka is particularly suitable to this approach, although partition assignment for the messaging server's Kafka consumer group need to be manual. There needs to be centralized dynamic configuration with mapping between messaging server and partitions assigned to it. Additionally the addresses of all messaging servers would need to be present so clients know where to connect to.
 
-# Persist messages as history
+# Persist messages and reactions as chat history
 
 Chat history has the following needs:
+* Partitioning of chat messages based on chat ID.
 * Fast small writes in the most recent part of messages. That would happen as the data is materialized from the PUB/SUB backplane.
 * Recent and random range queries of messages for the following use cases:
-  - When a user logs-in and needs all new messages
-  - When a user reviews a dialog back in time
+  - When a user opens a chat
+  - When a user reviews a chat back in time
 
 Cassandra as a history database answers those needs very well. And this time the Kafka consumer group for materialization can safely use the built-in partition auto-balancing.
+
+# Update user chats from messages
+
+User chats has the following needs:
+* Partitioning of user chats based on user ID.
+* Fast small writes for the currently active users and the chats they are using. That would happen as the data is materialized from the PUB/SUB backplane.
+* Fast query for user chats when a user logs-in.
+
+Cassandra as a state database answers those needs very well.
+
+The user chat state holds the newest message ID, which is timestamped since it is a Snowflake. This way users know if they have a new message for a particular chat. Messages for a given chat come from the PUB/SUB backplane from different Kafka partitions and thus are not guaranteed to be time ordered. So when we update a user chat newest message ID we need to check if it is actually newer. But Cassandra doesn't support updating a record via a WHERE clause for columns other than PARTITIONING KEY and CLUSTERING KEY since it doesn't perform a read before doing a write. One Cassandra-based way to work around this is via lightweight transactions which contact all replicas for the given keyspace. That increases latency and slows down the processing of messages from the PUB/SUB backplane.
+
+As a solution we're using an in-memory LRU cache containing the user chats. That way, updating the user chat newest message ID is done in-memory and the user chat is updated in the database only if needed. Additionally, user chats that are already in memory are not loaded from the database.
 
 # Reliable messaging and consistency
 
@@ -81,7 +96,7 @@ After each client connects or reconnects it gets all missed messages from the hi
 
 In order for clients to know about missing messages they can check for new messages at reasonable intervals. That would be costly in terms of traffic so the session-based counters could be used as a primary indicator. That may increase the interval but not obsolete the regular checks.
 
-To reduce the need for regular checks - these could be performed only for the most recent messages, not all messages exchanged in a dialog. If the clients requires previous chat history they can use the history servers after explicit user UI interaction.
+To reduce the need for regular checks - these could be performed only for the most recent messages, not all messages exchanged in a chat. If the clients requires previous chat history they can use the history servers after explicit user UI interaction.
 
 To make checking for missing messages cheaper we can use Cassandra custom aggregate functions. A custom one could calculate a hash for messages in a given interval. It can use the message ID and would be very effective since data won't leave the database. Clients can utilize it by getting a hash of the messages in a given interval, calculate the same for the messages they have locally for the same interval and compare them. Only if the hashes differ clients would request the messages in that interval.
 
@@ -93,7 +108,7 @@ Each message needs to have unique ID. Additionally it is associated with a times
 
 UUID/GUID instances are globally unique and easily generated. Timestamps are easily generated as well. Unfortunately these two have larger size of 16 bytes for UUID/GUID and 8 bytes for timestamps. That means 24 bytes in total.
 
-Cassandra is a KKV database. The V stands for value and the KK means that there are 2 keys. The first K is a partitioning key and indicates which partition the data is in. We would use the user ID or dialog ID as Cassandra partitioning key. The second K is a clustering key and is used to physically sort the data in that partition. Since we want to make range queries by time it makes sense to use the timestamp as Cassandra clustering key.
+Cassandra is a KKV database. The V stands for value and the KK means that there are 2 keys. The first K is a partitioning key and indicates which partition the data is in. We would use the user ID or chat ID as Cassandra partitioning key. The second K is a clustering key and is used to physically sort the data in that partition. Since we want to make range queries by time it makes sense to use the timestamp as Cassandra clustering key.
 
 With these indexes in place if we want to make a query by message ID we won't be able to do so in Cassandra as there's no such an index. We can only make such a query by the clustering key which is a timestamp. Using timestamps instead of message IDs is dangerous due to their possible duplication and different representation in different systems. Ideally we would want to use message IDs which are guaranteed to be unique and are simpler. Unfortunately UUID/GUIDs are not simple. And even if they were we would need a secondary index for that kind of query. Cassandra secondary indexes are dangerous as they are spread throughout the nodes in the cluster. That means a query using a secondary index could affect much more nodes that we want to, reducing performance in result.
 
