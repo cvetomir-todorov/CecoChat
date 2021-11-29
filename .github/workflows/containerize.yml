@@ -24,13 +24,29 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
-    - name: Connect image
+    - name: BFF image
       uses: docker/build-push-action@v2
       with:
-        file: run/cecochat/Connect.Dockerfile
+        file: run/cecochat/Bff.Dockerfile
         context: ./source
         push: true
-        tags: cvetomirtodorov/cecochat-connect:0.1
+        tags: cvetomirtodorov/cecochat-bff:0.1
+
+    - name: Messaging image
+      uses: docker/build-push-action@v2
+      with:
+        file: run/cecochat/Messaging.Dockerfile
+        context: ./source
+        push: true
+        tags: cvetomirtodorov/cecochat-messaging:0.1
+
+    - name: State image
+      uses: docker/build-push-action@v2
+      with:
+        file: run/cecochat/State.Dockerfile
+        context: ./source
+        push: true
+        tags: cvetomirtodorov/cecochat-state:0.1
 
     - name: History image
       uses: docker/build-push-action@v2
@@ -47,19 +63,3 @@ jobs:
         context: ./source
         push: true
         tags: cvetomirtodorov/cecochat-idgen:0.1
-
-    - name: Messaging image
-      uses: docker/build-push-action@v2
-      with:
-        file: run/cecochat/Messaging.Dockerfile
-        context: ./source
-        push: true
-        tags: cvetomirtodorov/cecochat-messaging:0.1
-
-    - name: Profile image
-      uses: docker/build-push-action@v2
-      with:
-        file: run/cecochat/Profile.Dockerfile
-        context: ./source
-        push: true
-        tags: cvetomirtodorov/cecochat-profile:0.1
