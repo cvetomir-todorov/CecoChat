@@ -13,8 +13,8 @@ namespace CecoChat.ConsoleClient
         {
             Console.Write("Username bob (ID=1), alice (ID=2), peter (ID=1200): ");
             string username = Console.ReadLine() ?? string.Empty;
-            ChatClient client = new();
-            await client.CreateSession(username, password: "not-empty", "https://localhost:31000");
+            ChatClient client = new("https://localhost:31000");
+            await client.CreateSession(username, password: "not-empty");
             MessageStorage storage = new(client.UserID);
             ChangeHandler changeHandler = new(storage);
 
