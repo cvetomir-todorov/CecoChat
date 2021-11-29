@@ -14,30 +14,32 @@ namespace CecoChat.ConsoleClient.Api
 {
     public sealed class ChatClient : IDisposable
     {
+        private readonly IBffClient _bffClient;
         private long _userID;
         private string _accessToken;
         private string _messagingServerAddress;
-        private IBffClient _bffClient;
         private Metadata _grpcMetadata;
         private GrpcChannel _messagingChannel;
         private Listen.ListenClient _listenClient;
         private Send.SendClient _sendClient;
         private Reaction.ReactionClient _reactionClient;
 
+        public ChatClient(string bffAddress)
+        {
+            _bffClient = RestService.For<IBffClient>(bffAddress);
+        }
+
         public void Dispose()
         {
-            _bffClient?.Dispose();
+            _bffClient.Dispose();
             _messagingChannel?.ShutdownAsync().Wait();
             _messagingChannel?.Dispose();
         }
 
         public long UserID => _userID;
 
-        public async Task CreateSession(string username, string password, string bffAddress)
+        public async Task CreateSession(string username, string password)
         {
-            _bffClient?.Dispose();
-            _bffClient = RestService.For<IBffClient>(bffAddress);
-
             CreateSessionRequest request = new()
             {
                 Username = username,
