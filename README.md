@@ -57,3 +57,7 @@
   - [CI pipeline](docs/infrastructure-main.md#CI-pipeline)
   - [Run locally](docs/infrastructure-main.md#Run-locally)
 * [What next](docs/what-next.md)
+
+# Design
+
+![Design](docs/images/cecochat-01-overall.png)

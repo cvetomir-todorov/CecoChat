@@ -4,7 +4,7 @@ OpenTelemetry is utilized to make flow of communication and data exchange observ
 
 ## Resources
 
-Each server is represented as a separate resource with namespace, name and version.
+Each service is represented as a separate resource with namespace, name and version.
 
 ## Instrumentation
 
@@ -32,9 +32,9 @@ EFK stack is utilized to aggregate, store, view, search all logs and setup alert
 
 ## Aggregation
 
-In Debug/Development mode servers are configured to write logs directly to ElasticSearch. Serilog provides a specialized formatter using the JSON fields which ElasticSearch understands.
+In Debug/Development mode services are configured to write logs directly to ElasticSearch. Serilog provides a specialized formatter using the JSON fields which ElasticSearch understands.
 
-In Release/Production mode the servers simply write logs to `stdout`. The same Serilog formatter for ElasticSearch is used. Docker logging driver for Fluentd is configured in the docker-compose file. It enables sending the logs to a Fluentd container. It matches them by tag, parses them by using only the `log` JSON field and sends that data to ElasticSearch.
+In Release/Production mode the services simply write logs to `stdout`. The same Serilog formatter for ElasticSearch is used. Docker logging driver for Fluentd is configured in the docker-compose file. It enables sending the logs to a Fluentd container. It matches them by tag, parses them by using only the `log` JSON field and sends that data to ElasticSearch.
 
 Both modes are configured to create indexes with different names because there is a slight difference in the fields. Also it makes it easier to know where the logs came from.
 
