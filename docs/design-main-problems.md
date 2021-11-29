@@ -1,6 +1,5 @@
-# Approach
+# Main problems
 
-The problems we solve so far include:
 * Concurrent connections limit
 * Exchange messages between different messaging servers
 * Persist messages and reactions as chat history
@@ -10,7 +9,7 @@ The problems we solve so far include:
 
 # Concurrent connections limit
 
-As seen in the [concurrent connection benchmark](01-intro-01-main.md#Concurrent-connections-benchmark) and [back of the envelope calculations](01-intro-01-main.md#Back-of-the-envelope-calculations) the system is limited by how many concurrent connections a messaging server can handle. That means we would need a lot of messaging servers and linearly scalable technologies and we need to support a high level of concurrency. The usage of Kafka, Cassandra and the .NET async programming model make a good start.
+As seen in the [concurrent connection benchmark](intro-main.md#Concurrent-connections-benchmark) and [back of the envelope calculations](intro-main.md#Back-of-the-envelope-calculations) the system is limited by how many concurrent connections a messaging server can handle. That means we would need a lot of messaging servers and linearly scalable technologies and we need to support a high level of concurrency. The usage of Kafka, Cassandra and the .NET async programming model make a good start.
 
 # Exchange messages between different messaging servers
 

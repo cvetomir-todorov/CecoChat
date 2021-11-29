@@ -61,13 +61,11 @@
   - Implement LRU cache in State service
   - Partition data for State service
 * Performance
-  - Benchmark Cassandra write batches and consider alternatives
   - Benchmark Kafka and improve its configuration
 * Observability
   - Improve existing distributed tracing - baggage propagation, custom instrumentation implementation
   - Improve existing log aggregation - performance of Fluentd, ElasticSearch index customizations
 * Misc
-  - Improve design and add implementation so that clients are certain there are no missed messages
   - Improve monotonic clock skew and make snowflake ID generation to use it as `IdGen.ITimeSource`
   - Improve partition assignment when servers are added/removed in order to minimize disconnects
   - Improve error handling, resilience, validation (e.g. gRPC requests)
