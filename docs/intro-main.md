@@ -21,7 +21,7 @@ Limitations:
   - Eventual consistency guarantees - once the sent message is processed it will eventually be persisted and delivered
 * Scalability
   - Designed for 10-100 mln of active users, which unfortunately is expensive to validate due to the infrastructure required
-  - Numbers from the [back-of-the-envelope calculation](01-intro-02-back-of-the-envelope.md) and the linear scalability of the main technologies show that the solution is realistic
+  - Numbers from the [back-of-the-envelope calculation](intro-back-of-the-envelope.md) and the linear scalability of the main technologies show that the solution is realistic
 * Security
   - TLS used on communication level
   - Access tokens for authn and authz
@@ -31,10 +31,6 @@ Limitations:
 * Maintainability
   - Sonarcloud code quality gate
   - Open-source technologies
-
-## More
-
-[Design approach](02-design-01-approach.md) and the whole design section go into more detail for the different areas of the solution. [What next](05-what-next.md) covers capabilities to be added.
 
 # Concurrent connections benchmark
 
@@ -70,7 +66,7 @@ The client-side port exhaustion limitation will be mitigated by the fact that ea
 
 # Back of the envelope calculations
 
-The [back-of-the-envelope](01-intro-02-back-of-the-envelope.md) file contains the detailed calculations. A messaging server is the server to which users directly connect to. A key limit is **64 k connections per messaging server**. A simple calculation tells that **1.6 k messaging servers** are needed in order to support **100 mln active users**. We would consider **256 bytes message size**.
+The [back-of-the-envelope](intro-back-of-the-envelope.md) file contains the detailed calculations. A messaging server is the server to which users directly connect to. A key limit is **64 k connections per messaging server**. A simple calculation tells that **1.6 k messaging servers** are needed in order to support **100 mln active users**. We would consider **256 bytes message size**.
 
 ## Daily 24 hour usage
 

@@ -58,15 +58,14 @@ Before running the containers some preparation steps need to be done manually. T
 
 In order to containerize CecoChat you can use the folder which contains the [Docker files](../run/cecochat/) for building the Docker images. Internally the Docker files do `dotnet publish` and use `Release` configuration but this can be changed as prefered. The `docker-compose` file creates containers for:
 
-* 1 Connect server
+* 1 BFF server
 * 2 Messaging servers
 * 1 History server
+* 1 State server
 * 1 ID Gen server
 
 It uses `ASPNETCORE_ENVIRONMENT=Production` and overrides tracing options to persists all traces.
 
 ## Clients
 
-I've written a very basic console client. There is also a WPF desktop client for Windows which has some decent UI. A browser or WebAssembly client would be ideal in the future although that would require setting up a proxy to [enable gRPC-web](https://github.com/grpc/grpc-web).
-
-The machine running the clients needs to trust the [self-signed certificates](../source/certificates/).
+I've written a very basic console client. The machine running the clients needs to trust the [self-signed certificates](../source/certificates/).

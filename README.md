@@ -1,4 +1,4 @@
-[System design](docs/01-intro-03-overall-design-technologies.md) of a chat for 10-100 millions active users. [Partial implementation](source/) based on Kafka, Cassandra, gRPC, Redis, .NET 5, ASP.NET. [Configurable](docs/04-production-01-main.md#Configurability) and [partially-observable](docs/04-production-01-main.md#Distributed-tracing) environment with containerized components which can be [ran locally](docs/03-infrastructure-01-main.md#Run-locally) and is based on Docker, OpenTelemetry, Fluentd, ElasticSearch, Kibana, Jaeger. I appreciate all comments so feel free to use the `Discussions` tab.
+[System design](docs/design-overall.md) of a chat for 10-100 millions active users. [Partial implementation](source/) based on Kafka, Cassandra, gRPC, Redis, .NET 5, ASP.NET. [Configurable](docs/design-configuration.md) and [partially-observable](docs/design-observability.md) environment with containerized components which can be [ran locally](docs/infrastructure-main.md#Run-locally) and is based on Docker, OpenTelemetry, Fluentd, ElasticSearch, Kibana, Jaeger. I appreciate all comments so feel free to use the `Discussions` tab.
 
 # Code
 
@@ -40,20 +40,20 @@
 # Documentation
 
 * Intro
-  - [Capabilities](docs/01-intro-01-main.md#Capabilities)
-  - [Concurrent connections benchmark](docs/01-intro-01-main.md#Concurrent-connections-benchmark)
-  - [Back of the envelope calculations](docs/01-intro-01-main.md#Back-of-the-envelope-calculations)
-  - [Overall design, technologies](docs/01-intro-03-overall-design-technologies.md)
+  - [Capabilities](docs/intro-main.md#Capabilities)
+  - [Concurrent connections benchmark](docs/intro-main.md#Concurrent-connections-benchmark)
+  - [Back of the envelope calculations](docs/intro-back-of-the-envelope.md)
 * Design
-  - [Approach, main problems](docs/02-design-01-approach.md)
-  - [Send, receive, multiple clients for same user](docs/02-design-02-send-receive.md)
-  - [History, clients](docs/02-design-03-history-clients.md)
-  - [Configuration, failover](docs/02-design-04-configuration-failover.md)
-* Production readiness
-  - [Configurability](docs/04-production-01-main.md#Configurability)
-  - [Distributed tracing](docs/04-production-01-main.md#Distributed-tracing)
-  - [Log aggregation](docs/04-production-01-main.md#Log-aggregation)
+  - [Overall design](docs/design-overall.md)
+  - [Technologies](docs/design-technologies.md)
+  - [Main problems](docs/design-main-problems.md)
+  - [Messaging](docs/design-messaging.md)
+  - [User chats, chat history](docs/design-state-history.md)
+  - [Clients](docs/design-clients.md)
+  - [Configuration](docs/design-configuration.md)
+  - [Observability](docs/design-observability.md)
+  - [Deployment](docs/design-deployment.md)
 * Infrastructure
-  - [CI pipeline](docs/03-infrastructure-01-main.md#CI-pipeline)
-  - [Run locally](docs/03-infrastructure-01-main.md#Run-locally)
-* [What next](docs/05-what-next.md)
+  - [CI pipeline](docs/infrastructure-main.md#CI-pipeline)
+  - [Run locally](docs/infrastructure-main.md#Run-locally)
+* [What next](docs/what-next.md)
