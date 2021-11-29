@@ -3,21 +3,21 @@
 ## Client communication
 
 * Clients use HTTP to communicate with the BFF service
-* Client use gRPC to communication with the Messaging service
+* Clients use gRPC to communication with the Messaging service
 * If web browser support is needed it is worth considering replacing gRPC with HTTP and WebSockets because HTTP/2 doesn't allow it to be used easily in the browser
 * [gRPC-web](https://github.com/grpc/grpc-web) uses an [Envoy proxy](https://www.envoyproxy.io/) which supports server-side streaming but that would be expensive to implement
 
 ## Service synchronous communication
 
-Servers communicate synchronously with each other via gRPC:
+Services communicate synchronously with each other via gRPC:
 * open-source software backed by Google
 * supports multiple languages
 * lightweight and has good performance
 * based on HTTP/2 which allows for both inter-operability and optimizations from the protocol
 
-## PUB/SUB backplane
+## Service asynchronous communication
 
-PUB/SUB backplane is based on Apache Kafka:
+Services communicate asynchronously via the PUB/SUB backplane which is based on Apache Kafka:
 * open-source software backed by Confluent
 * a linearly scalable message broker
 * enables a superb throughput due to its balanced distribution of partition leadership throughout the cluster
@@ -53,9 +53,9 @@ Configuration is based on Redis:
 * has a built-in PUB/SUB mechanism
 * should be replaced by a more reliable technology in the future, e.g. a relational DB for storage and Kafka for notifications
 
-## Application servers
+## Services
 
-The application servers use ASP.NET/.NET 5 which are the heirs of ASP.NET Core and .NET Core:
+The services use ASP.NET/.NET 5 which are the heirs of ASP.NET/.NET Core:
 * open-source software backed by Microsoft
 * very mature, feature-rich, lots of tools
 * widely-used with a big community

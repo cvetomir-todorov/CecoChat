@@ -75,7 +75,7 @@ User chats has the following needs:
 * Fast small writes for the currently active users and the chats they are using. That would happen as the data is materialized from the PUB/SUB backplane.
 * Fast query for user chats when a user logs-in.
 
-Cassandra as a state database answers those needs very well.
+Cassandra as a state database answers those needs well enough.
 
 The user chat state holds the newest message ID, which is timestamped since it is a Snowflake. This way users know if they have a new message for a particular chat. Messages for a given chat come from the PUB/SUB backplane from different Kafka partitions and thus are not guaranteed to be time ordered. So when we update a user chat newest message ID we need to check if it is actually newer. But Cassandra doesn't support updating a record via a WHERE clause for columns other than PARTITIONING KEY and CLUSTERING KEY since it doesn't perform a read before doing a write. One Cassandra-based way to work around this is via lightweight transactions which contact all replicas for the given keyspace. That increases latency and slows down the processing of messages from the PUB/SUB backplane.
 
@@ -89,13 +89,13 @@ Kafka provides a delivery handler callback which is used to send an ACK to clien
 
 ## Receiving messages
 
-After each client connects or reconnects it gets all missed messages from the history servers. In the messaging servers the client is dedicated an in-memory message queue which is bounded. When the message queue is full that would mean newer messages will be dropped. In order for the client to know about that - each new message triggers an increase to a session counter sent along with the message itself. If a client sees a gap it may use the history servers in order to obtain missing messages.
+After each client connects or reconnects it gets all missed messages from the history service. In the messaging service the client is dedicated an in-memory message queue which is bounded. When the message queue is full that would mean newer messages will be dropped. In order for the client to know about that - each new message triggers an increase to a session counter sent along with the message itself. If a client sees a gap it may use the history service in order to obtain missing messages.
 
 ## Consistency
 
 In order for clients to know about missing messages they can check for new messages at reasonable intervals. That would be costly in terms of traffic so the session-based counters could be used as a primary indicator. That may increase the interval but not obsolete the regular checks.
 
-To reduce the need for regular checks - these could be performed only for the most recent messages, not all messages exchanged in a chat. If the clients requires previous chat history they can use the history servers after explicit user UI interaction.
+To reduce the need for regular checks - these could be performed only for the most recent messages, not all messages exchanged in a chat. If the clients requires previous chat history they can use the history service after explicit user UI interaction.
 
 To make checking for missing messages cheaper we can use Cassandra custom aggregate functions. A custom one could calculate a hash for messages in a given interval. It can use the message ID and would be very effective since data won't leave the database. Clients can utilize it by getting a hash of the messages in a given interval, calculate the same for the messages they have locally for the same interval and compare them. Only if the hashes differ clients would request the messages in that interval.
 
@@ -121,4 +121,4 @@ In order to fit more timestamps snowflakes use an epoch - `timestamp = epoch-tic
 
 The way snowflakes are used is - `41 timestamp bits + 8 generator bits + 14 sequence bits`. That means we have up to **256 generators**, each of which can generate up to **16384 IDs** per snowflake tick. We're using **1 ms tick** which means that we have close to **70 years interval**.
 
-If we generated message IDs in messaging servers we would need a lot of generator IDs since we have a lot of messaging servers. In order to assign less bits for the generator ID we use dedicated ID Gen servers. This introduces an additional element in the system and increases the operation complexity. The latency is also increased since messaging servers now need to obtain an ID from the ID Gen servers. When the IDs are requested in a batch though that effect is reduced at the cost of some additional complexity in the implementation.
+If we generated message IDs in messaging service we would need a lot of generator IDs since we have a lot of messaging servers. In order to assign less bits for the generator ID we introduce a dedicated ID Gen service. This introduces an additional element in the system and increases the operation complexity. The latency is also increased since messaging service now need to obtain an ID from the ID Gen service. When the IDs are requested in a batch though that effect is reduced at the cost of some additional complexity in the implementation.
