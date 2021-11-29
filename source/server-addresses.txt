@@ -2,5 +2,5 @@ https://localhost:31000 bff
 https://localhost:31001 messaging1
 https://localhost:31011 messaging2
 https://localhost:31003 history
-https://localhost:31004 identity
+https://localhost:31004 idgen
 https://localhost:31002 state

@@ -2,10 +2,10 @@ version: '3'
 networks:
   cecochat:
 services:
-  cecochat-connect:
-    image: ceco.com/cecochat/connect:0.1
-    container_name: cecochat-connect
-    hostname: connect
+  cecochat-bff:
+    image: ceco.com/cecochat/bff:0.1
+    container_name: cecochat-bff
+    hostname: bff
     networks: &networks
       - cecochat
     ports:
@@ -20,6 +20,8 @@ services:
       ASPNETCORE_HTTPS_PORT: 443
       ASPNETCORE_Kestrel__Certificates__Default__Path: "/app/cecochat-dev.pfx"
       ASPNETCORE_Kestrel__Certificates__Default__Password: "cecochat"
+      CECOCHAT_HistoryClient__Address: "https://history"
+      CECOCHAT_StateClient__Address: "https://state"
       CECOCHAT_ConfigDB__Endpoints__0: "redis1:6379"
       CECOCHAT_OtelSampling__Strategy: "AlwaysOn"
       CECOCHAT_Jaeger__AgentHost: jaeger
@@ -49,8 +51,8 @@ services:
       CECOCHAT_Backplane__ServerID: s1
       CECOCHAT_Backplane__Kafka__BootstrapServers__0: kafka1:19091
       CECOCHAT_Backplane__Kafka__BootstrapServers__1: kafka2:19092
-      CECOCHAT_IDGen__Generation__OriginatorID: 1
-      CECOCHAT_IDGen__Communication__Address: "https://idgen"
+      CECOCHAT_IDGen__OriginatorID: 1
+      CECOCHAT_IDGen__Address: "https://idgen"
       CECOCHAT_OtelSampling__Strategy: "AlwaysOn"
       CECOCHAT_Jaeger__AgentHost: jaeger
     logging: *fluentd-logging
@@ -75,8 +77,32 @@ services:
       CECOCHAT_Backplane__ServerID: s2
       CECOCHAT_Backplane__Kafka__BootstrapServers__0: kafka1:19091
       CECOCHAT_Backplane__Kafka__BootstrapServers__1: kafka2:19092
-      CECOCHAT_IDGen__Generation__OriginatorID: 2
-      CECOCHAT_IDGen__Communication__Address: "https://idgen"
+      CECOCHAT_IDGen__OriginatorID: 2
+      CECOCHAT_IDGen__Address: "https://idgen"
+      CECOCHAT_OtelSampling__Strategy: "AlwaysOn"
+      CECOCHAT_Jaeger__AgentHost: jaeger
+    logging: *fluentd-logging
+  cecochat-state:
+    image: ceco.com/cecochat/state:0.1
+    container_name: cecochat-state
+    hostname: state
+    networks: *networks
+    ports:
+      - "31002:443"
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: https://+
+      ASPNETCORE_HTTPS_PORT: 443
+      ASPNETCORE_Kestrel__Certificates__Default__Path: "/app/cecochat-dev.pfx"
+      ASPNETCORE_Kestrel__Certificates__Default__Password: "cecochat"
+      CECOCHAT_StateDB__ContactPoints__0: cass1
+      CECOCHAT_StateDB__ContactPoints__1: cass2
+      CECOCHAT_Backplane__Kafka__BootstrapServers__0: kafka1:19091
+      CECOCHAT_Backplane__Kafka__BootstrapServers__1: kafka2:19092
       CECOCHAT_OtelSampling__Strategy: "AlwaysOn"
       CECOCHAT_Jaeger__AgentHost: jaeger
     logging: *fluentd-logging
@@ -112,26 +138,6 @@ services:
     networks: *networks
     ports:
       - "31004:443"
-    deploy:
-      resources:
-        limits:
-          memory: 128M
-    environment:
-      ASPNETCORE_ENVIRONMENT: Production
-      ASPNETCORE_URLS: https://+
-      ASPNETCORE_HTTPS_PORT: 443
-      ASPNETCORE_Kestrel__Certificates__Default__Path: "/app/cecochat-dev.pfx"
-      ASPNETCORE_Kestrel__Certificates__Default__Password: "cecochat"
-      CECOCHAT_OtelSampling__Strategy: "AlwaysOn"
-      CECOCHAT_Jaeger__AgentHost: jaeger
-    logging: *fluentd-logging
-  cecochat-profile:
-    image: ceco.com/cecochat/profile:0.1
-    container_name: cecochat-profile
-    hostname: profile
-    networks: *networks
-    ports:
-      - "31005:443"
     deploy:
       resources:
         limits:
