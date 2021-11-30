@@ -20,7 +20,6 @@ namespace CecoChat.ConsoleClient.Api
         private string _messagingServerAddress;
         private Metadata _grpcMetadata;
         private GrpcChannel _messagingChannel;
-        private Listen.ListenClient _listenClient;
         private Send.SendClient _sendClient;
         private Reaction.ReactionClient _reactionClient;
 
@@ -66,12 +65,12 @@ namespace CecoChat.ConsoleClient.Api
             _messagingChannel?.Dispose();
             _messagingChannel = GrpcChannel.ForAddress(_messagingServerAddress);
 
-            _listenClient = new Listen.ListenClient(_messagingChannel);
+            Listen.ListenClient listenClient = new(_messagingChannel);
             _sendClient = new Send.SendClient(_messagingChannel);
             _reactionClient = new Reaction.ReactionClient(_messagingChannel);
 
             ListenSubscription subscription = new();
-            AsyncServerStreamingCall<ListenNotification> serverStream = _listenClient.Listen(subscription, _grpcMetadata, cancellationToken: ct);
+            AsyncServerStreamingCall<ListenNotification> serverStream = listenClient.Listen(subscription, _grpcMetadata, cancellationToken: ct);
             Task.Factory.StartNew(
                 async () => await ListenForNewMessages(serverStream, ct),
                 TaskCreationOptions.LongRunning);
