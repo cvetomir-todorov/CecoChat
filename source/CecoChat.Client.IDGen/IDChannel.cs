@@ -59,18 +59,20 @@ namespace CecoChat.Client.IDGen
 
         public void ClearIDs()
         {
-            // drain the current channel
             while (_currentChannel.Reader.TryRead(out long _))
-            {}
+            {
+                // drain the current channel
+            }
         }
 
         public void AddNewIDs(IReadOnlyCollection<long> newIDs)
         {
             Channel<long> otherChannel = _blueChannel != _currentChannel ? _blueChannel : _greenChannel;
 
-            // drain the other channel
             while (otherChannel.Reader.TryRead(out long _))
-            {}
+            {
+                // drain the other channel
+            }
 
             foreach (long newID in newIDs)
             {

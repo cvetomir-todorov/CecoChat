@@ -34,7 +34,9 @@ namespace CecoChat.Client.History
         }
 
         public void Dispose()
-        {}
+        {
+            // nothing to dispose for now, but keep the IDisposable as part of the contract
+        }
 
         public async Task<IReadOnlyCollection<HistoryMessage>> GetHistory(long userID, long otherUserID, DateTime olderThan, string accessToken, CancellationToken ct)
         {

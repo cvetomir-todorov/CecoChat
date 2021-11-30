@@ -34,7 +34,9 @@ namespace CecoChat.Client.State
         }
 
         public void Dispose()
-        {}
+        {
+            // nothing to dispose for now, but keep the IDisposable as part of the contract
+        }
 
         public async Task<IReadOnlyCollection<ChatState>> GetChats(long userID, DateTime newerThan, string accessToken, CancellationToken ct)
         {
