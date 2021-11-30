@@ -79,7 +79,7 @@ namespace CecoChat.Server.Bff.Controllers
             return clientMessages;
         }
 
-        private HistoryMessage MapMessage(Contracts.History.HistoryMessage fromService)
+        private static HistoryMessage MapMessage(Contracts.History.HistoryMessage fromService)
         {
             HistoryMessage toClient = new()
             {

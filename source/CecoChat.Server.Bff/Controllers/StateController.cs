@@ -65,7 +65,7 @@ namespace CecoChat.Server.Bff.Controllers
             });
         }
 
-        private List<ChatState> MapChats(IReadOnlyCollection<Contracts.State.ChatState> serviceChats)
+        private static List<ChatState> MapChats(IReadOnlyCollection<Contracts.State.ChatState> serviceChats)
         {
             List<ChatState> clientChats = new();
 
