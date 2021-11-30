@@ -66,7 +66,7 @@ namespace CecoChat.Server.Bff.Controllers
             });
         }
 
-        private List<HistoryMessage> MapMessages(IReadOnlyCollection<Contracts.History.HistoryMessage> serviceMessages)
+        private static List<HistoryMessage> MapMessages(IReadOnlyCollection<Contracts.History.HistoryMessage> serviceMessages)
         {
             List<HistoryMessage> clientMessages = new(capacity: serviceMessages.Count);
 
