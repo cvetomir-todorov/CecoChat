@@ -104,12 +104,13 @@ namespace CecoChat.Server.State.Backplane
             switch (backplaneMessage.Type)
             {
                 case MessageType.Data:
-                case MessageType.Reaction:
                     UpdateReceiverState(backplaneMessage);
                     break;
                 case MessageType.Delivery:
                     // to be implemented
                     break;
+                case MessageType.Reaction:
+                    // ignore because the message ID is for a previously sent message
                 case MessageType.Disconnect:
                     // ignore these
                     break;
