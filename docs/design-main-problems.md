@@ -1,15 +1,25 @@
 # Main problems
 
-* Concurrent connections limit
+* Back of the envelope calculations
 * Exchange messages between different messaging servers
-* Persist messages and reactions as chat history
-* Update user chats from messages
-* Reliable messaging and consistency
 * Message IDs
+* Reliable messaging and consistency
 
-# Concurrent connections limit
+# Back of the envelope calculations
 
-As seen in the [concurrent connection benchmark](intro-main.md#Concurrent-connections-benchmark) and [back of the envelope calculations](intro-main.md#Back-of-the-envelope-calculations) the system is limited by how many concurrent connections a messaging server can handle. That means we would need a lot of messaging servers and linearly scalable technologies and we need to support a high level of concurrency. The usage of Kafka, Cassandra and the .NET async programming model make a good start.
+The [back-of-the-envelope](design-back-of-the-envelope.md) file contains the detailed calculations. They are based on the [concurrent connections limit](design-connection-limit.md) showing that a messaging server is limited to **64 k connections**. The calculation tells us that **1.6 k messaging servers** are needed in order to support **100 mln active users**. We would consider **256 bytes message size**.
+
+## Daily 24 hour usage
+
+Calculating the daily usage with **640 mln users** spread throughout the day each of which sends **128 messages per day** gives us **950 000 messages/s for the cell** and **232 MB/s for the cell** with **0.15 MB/s per messaging server**.
+
+## Peak 1 hour usage
+
+Calculating a peak usage for **1 hour** daily where **80%** of the maximum users - **80 mln active users** send **50%** of their daily messages - **64 messages** we get **1 423 000 messages/s for the cell** and **348 MB/s for the cell** with **0.22 MB/s per messaging server**.
+
+## Conclusion
+
+These numbers do not take into account the security and transport data overhead. Additionally, this traffic would be multiplied. For example sending a message would require that data to be passed between different layers, possibly to multiple recipients. Numbers are not small when we look at the system as a whole. But for a single messaging server the throughput is tiny. The system is limited by how many concurrent connections a messaging server can handle. That means we would need a lot of messaging servers and linearly scalable technologies and we need to support a high level of concurrency. The usage of Kafka, Cassandra and the .NET async programming model make a good start.
 
 # Exchange messages between different messaging servers
 
@@ -57,48 +67,6 @@ Cons
 
 The approach using a PUB/SUB backplane was chosen because of the pros listed at the cost of complexity increase in deployment and configuration. Kafka is particularly suitable to this approach, although partition assignment for the messaging server's Kafka consumer group need to be manual. There needs to be centralized dynamic configuration with mapping between messaging server and partitions assigned to it. Additionally the addresses of all messaging servers would need to be present so clients know where to connect to.
 
-# Persist messages and reactions as chat history
-
-Chat history has the following needs:
-* Partitioning of chat messages based on chat ID.
-* Fast small writes in the most recent part of messages. That would happen as the data is materialized from the PUB/SUB backplane.
-* Recent and random range queries of messages for the following use cases:
-  - When a user opens a chat
-  - When a user reviews a chat back in time
-
-Cassandra as a history database answers those needs very well. And this time the Kafka consumer group for materialization can safely use the built-in partition auto-balancing.
-
-# Update user chats from messages
-
-User chats has the following needs:
-* Partitioning of user chats based on user ID.
-* Fast small writes for the currently active users and the chats they are using. That would happen as the data is materialized from the PUB/SUB backplane.
-* Fast query for user chats when a user logs-in.
-
-Cassandra as a state database answers those needs well enough.
-
-The user chat state holds the newest message ID, which is timestamped since it is a Snowflake. This way users know if they have a new message for a particular chat. Messages for a given chat come from the PUB/SUB backplane from different Kafka partitions and thus are not guaranteed to be time ordered. So when we update a user chat newest message ID we need to check if it is actually newer. But Cassandra doesn't support updating a record via a WHERE clause for columns other than PARTITIONING KEY and CLUSTERING KEY since it doesn't perform a read before doing a write. One Cassandra-based way to work around this is via lightweight transactions which contact all replicas for the given keyspace. That increases latency and slows down the processing of messages from the PUB/SUB backplane.
-
-As a solution we're using an in-memory LRU cache containing the user chats. That way, updating the user chat newest message ID is done in-memory and the user chat is updated in the database only if needed. Additionally, user chats that are already in memory are not loaded from the database.
-
-# Reliable messaging and consistency
-
-## Sending messages
-
-Kafka provides a delivery handler callback which is used to send an ACK to clients indicating the persistance status. In order to guarantee durability the replication factor needs to be increased to 2 or 3. There needs to be at least 1 in-sync replica. Using this configuration once the message gets into the Kafka cluster then the small likelyhood of 2 brokers failing will mean a very small percentage of messages will be lost. If the ACK is negative then automatic retry would not be used in order to avoid self-inflicted DDoS. The client UI would simply present the user with indication that the message hasn't been processed and interactive means for it to be re-sent.
-
-## Receiving messages
-
-After each client connects or reconnects it gets all missed messages from the history service. In the messaging service the client is dedicated an in-memory message queue which is bounded. When the message queue is full that would mean newer messages will be dropped. In order for the client to know about that - each new message triggers an increase to a session counter sent along with the message itself. If a client sees a gap it may use the history service in order to obtain missing messages.
-
-## Consistency
-
-In order for clients to know about missing messages they can check for new messages at reasonable intervals. That would be costly in terms of traffic so the session-based counters could be used as a primary indicator. That may increase the interval but not obsolete the regular checks.
-
-To reduce the need for regular checks - these could be performed only for the most recent messages, not all messages exchanged in a chat. If the clients requires previous chat history they can use the history service after explicit user UI interaction.
-
-To make checking for missing messages cheaper we can use Cassandra custom aggregate functions. A custom one could calculate a hash for messages in a given interval. It can use the message ID and would be very effective since data won't leave the database. Clients can utilize it by getting a hash of the messages in a given interval, calculate the same for the messages they have locally for the same interval and compare them. Only if the hashes differ clients would request the messages in that interval.
-
 # Message IDs
 
 Each message needs to have unique ID. Additionally it is associated with a timestamp. There are a few ways to do it.
@@ -122,3 +90,21 @@ In order to fit more timestamps snowflakes use an epoch - `timestamp = epoch-tic
 The way snowflakes are used is - `41 timestamp bits + 8 generator bits + 14 sequence bits`. That means we have up to **256 generators**, each of which can generate up to **16384 IDs** per snowflake tick. We're using **1 ms tick** which means that we have close to **70 years interval**.
 
 If we generated message IDs in messaging service we would need a lot of generator IDs since we have a lot of messaging servers. In order to assign less bits for the generator ID we introduce a dedicated ID Gen service. This introduces an additional element in the system and increases the operation complexity. The latency is also increased since messaging service now need to obtain an ID from the ID Gen service. When the IDs are requested in a batch though that effect is reduced at the cost of some additional complexity in the implementation.
+
+# Reliable messaging and consistency
+
+## Sending messages
+
+Kafka provides a delivery handler callback which is used to send an ACK to clients indicating the persistance status. In order to guarantee durability the replication factor needs to be increased to 2 or 3. There needs to be at least 1 in-sync replica. Using this configuration once the message gets into the Kafka cluster then the small likelyhood of 2 brokers failing will mean a very small percentage of messages will be lost. If the ACK is negative then automatic retry would not be used in order to avoid self-inflicted DDoS. The client UI would simply present the user with indication that the message hasn't been processed and interactive means for it to be re-sent.
+
+## Receiving messages
+
+After each client connects or reconnects it gets all missed messages from the history service. In the messaging service the client is dedicated an in-memory message queue which is bounded. When the message queue is full that would mean newer messages will be dropped. In order for the client to know about that - each new message triggers an increase to a session counter sent along with the message itself. If a client sees a gap it may use the history service in order to obtain missing messages.
+
+## Consistency
+
+In order for clients to know about missing messages they can check for new messages at reasonable intervals. That would be costly in terms of traffic so the session-based counters could be used as a primary indicator. That may increase the interval but not obsolete the regular checks.
+
+To reduce the need for regular checks - these could be performed only for the most recent messages, not all messages exchanged in a chat. If the clients requires previous chat history they can use the history service after explicit user UI interaction.
+
+To make checking for missing messages cheaper we can use Cassandra custom aggregate functions. A custom one could calculate a hash for messages in a given interval. It can use the message ID and would be very effective since data won't leave the database. Clients can utilize it by getting a hash of the messages in a given interval, calculate the same for the messages they have locally for the same interval and compare them. Only if the hashes differ clients would request the messages in that interval.

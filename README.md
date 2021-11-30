@@ -1,4 +1,4 @@
-[System design](docs/design-overall.md) of a chat for 10-100 millions active users. [Partial implementation](source/) based on Kafka, Cassandra, gRPC, Redis, .NET 5, ASP.NET. [Configurable](docs/design-configuration.md) and [partially-observable](docs/design-observability.md) environment with containerized components which can be [ran locally](docs/infrastructure-main.md#Run-locally) and is based on Docker, OpenTelemetry, Fluentd, ElasticSearch, Kibana, Jaeger. I appreciate all comments so feel free to use the `Discussions` tab.
+[System design](docs/design-overall.md) of a chat for 10-100 millions active users. [Partial implementation](source/) based on Kafka, Cassandra, HTTP, gRPC, Redis, .NET 5, ASP.NET. [Configurable](docs/design-configuration.md) and [partially-observable](docs/design-observability.md) environment with containerized components which can be [ran locally](docs/infrastructure-main.md#Run-locally) and is based on Docker, OpenTelemetry, Jaeger, ElasticSearch, Fluentd, Kibana. I appreciate all comments so feel free to use the `Discussions` tab.
 
 # Code
 
@@ -19,16 +19,18 @@
 ![Kafka](docs/tech-images/kafka.png)
 ![Cassandra](docs/tech-images/cassandra.png)
 ![gRPC](docs/tech-images/grpc.png)
-![Redis](docs/tech-images/redis.png)
 ![Protocol buffers](docs/tech-images/protocol-buffers.png)
+![HTTP](docs/tech-images/http.png)
 ![Swagger](docs/tech-images/swagger.png)
+![JSON](docs/tech-images/json.png)
+![Redis](docs/tech-images/redis.png)
 
 ![Docker](docs/tech-images/docker.png)
 ![OpenTelemetry](docs/tech-images/open-telemetry.png)
-![Fluentd](docs/tech-images/fluentd.png)
-![ElasticSearch](docs/tech-images/elasticsearch.png)
-![Kibana](docs/tech-images/kibana.png)
 ![Jaeger](docs/tech-images/jaeger.png)
+![ElasticSearch](docs/tech-images/elasticsearch.png)
+![Fluentd](docs/tech-images/fluentd.png)
+![Kibana](docs/tech-images/kibana.png)
 
 ![.NET](docs/tech-images/dotnet.png)
 ![ASP.NET](docs/tech-images/aspnet.png)
@@ -40,12 +42,12 @@
 # Documentation
 
 * Intro
-  - [Capabilities](docs/intro-main.md#Capabilities)
-  - [Concurrent connections benchmark](docs/intro-main.md#Concurrent-connections-benchmark)
-  - [Back of the envelope calculations](docs/intro-back-of-the-envelope.md)
+  - [Capabilities](docs/intro-main.md)
 * Design
   - [Overall design](docs/design-overall.md)
   - [Technologies](docs/design-technologies.md)
+  - [Concurrent connections limit](docs/design-connection-limit.md)
+  - [Back of the envelope calculations](docs/design-back-of-the-envelope.md)
   - [Main problems](docs/design-main-problems.md)
   - [Messaging](docs/design-messaging.md)
   - [User chats, chat history](docs/design-state-history.md)

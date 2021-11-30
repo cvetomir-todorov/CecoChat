@@ -1,4 +1,4 @@
-# Cell limits
+# System limits
 
 * Targets
   - 100 000 000 max users at the same time
@@ -33,7 +33,7 @@
 # Peak
 
 * 1 hour peak
-* 80% of cell is busy = 80 000 000 active users
+* 80% of system is busy = 80 000 000 active users
 * 50% of user daily messages are sent = 64 messages for each user peak
 
 ### Messages

@@ -5,13 +5,13 @@ Each messaging server is uniquely assigned part of the messages from the PUB/SUB
 Recipient Kafka partition = Hash(Recipient ID) % Partition count
 ```
 
-The hash function from the formula needs to be stable because it would be run on different servers. It needs to provide an excellent distribution since we don't want hot partitions. And since this is the same function which is used to decide which messaging server each client connects to - we don't want to hit our messaging server connection number limit. The performance requirements are not key, it just doesn't need to be slow. I used [FNV](https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function) which satisfied the requirements. I [checked](../check/) how it behaves and its total distribution deviation and max one are small enough.
+The hash function from the formula needs to be stable because it would be run on different servers. It needs to provide an **excellent** distribution since we don't want hot partitions. And since this is the same function which is used to decide which messaging server each client connects to - we don't want to hit our messaging server connection number limit. The performance requirements are not key, it just doesn't need to be slow. I used [FNV](https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function) which satisfied the requirements. I [checked](../check/) how it behaves and its total distribution deviation and max one are small enough.
 
 # Send
 
 ![Send messages](images/cecochat-02-message-send.png)
 
-The Kafka producer doesn't use the default auto-partitioning when sending messages. Instead it is doing it manually. It is required since each messaging server is stateful - the clients connected to it are assigned to specific partitions. Fortunately the Kafka .NET client API has these capabilities.
+The Kafka producer doesn't use the default auto-partitioning when sending messages. Instead it is choosing a partiotion for the sent message manually. It is required since each messaging server is stateful - the clients connected to it are assigned to specific partitions. Fortunately the Kafka .NET client API has these capabilities.
 
 Additionally we use the Kafka delivery handler in order to send the client a positive or negative ACK. It is used by the client to know whether the message has been processed.
 
@@ -19,9 +19,9 @@ Additionally we use the Kafka delivery handler in order to send the client a pos
 
 ![Receive messages](images/cecochat-03-message-receive.png)
 
-Each messaging server contains a Kafka consumer which is manually assigned Kafka partitions and consumes messages only from them. Only clients whose user ID matches the assigned partitions according to the formula connects to that messaging server.
+Each messaging server contains a Kafka consumer which is manually assigned Kafka partitions and consumes messages only from them. Only clients whose hashed user ID value matches the assigned partitions according to the formula connects to that messaging server.
 
-Messages for a client are enqueued in a bounded message queue. That helps limit the memory for each client. If the client is a slow receiver though there is a possibility for the messages to fill the queue up. Which means that some messages would get dropped. Using counters sent along with each message the client can track for gaps and use the history service in order to get missing messages.
+Messages for a client are enqueued in a bounded message queue. That helps limit the memory for each client. If the client is a slow receiver though there is a possibility for the messages to fill the queue up. Which means that some messages would get dropped. Using counters sent along with each message the client can track for gaps and use the history service in order to get missing messages. This is described in detail in [reliable messaging and consistency section](design-main-problems.md#reliable-messaging-and-consistency).
 
 # Multiple clients
 
