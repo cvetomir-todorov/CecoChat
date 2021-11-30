@@ -32,9 +32,11 @@ namespace CecoChat.Server.State.Clients
         {
             long userID = GetUserID(context);
             DateTime newerThan = request.NewerThan.ToDateTime();
-            IReadOnlyCollection<ChatState> chatsFromDB = await _repo.GetChats(userID, newerThan);
-            _cache.UpdateUserChats(userID, chatsFromDB);
-            IReadOnlyCollection<ChatState> chats = _cache.GetUserChats(userID);
+            IReadOnlyCollection<ChatState> chats = await _repo.GetChats(userID, newerThan);
+            foreach (ChatState chat in chats)
+            {
+                _cache.UpdateUserChat(userID, chat);
+            }
 
             GetChatsResponse response = new();
             response.Chats.Add(chats);
