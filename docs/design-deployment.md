@@ -2,10 +2,22 @@
 
 ![Deployment](images/cecochat-07-deployment.png)
 
-Each Kafka partition is consumed by exactly one messaging server. Once this server is declared dead it should be replaced by a new one. To speed things up the deployment infrastructure should keep idle messaging servers waiting. Idle ones also have server IDs as described in the configuration section. Replacing a dead server then costs:
+## Auto-scaling
 
-* Handling the notification from the deployment infrastructure
-* Updating the server partitions configuration
-* Publishing the configuration change notification
-  - This doesn't affect currently alive messaging servers since their configuration doesn't change
-  - Only the new messaging server is affected when it starts consuming messages
+BFF, History, ID Gen services are stateless which makes this fairly trivial. The deployment infrastructure adds a new instance and the load balancer takes it into account when a new request comes in.
+
+Messaging, State services are stateful. Their state is the Kafka partitions which they are consuming. Therefore the auto-scaling means creating new service instances and distributing some of the partitions to the new instances. All this data is stored in the dynamic configuration which notifies all alive instances.
+
+Example with messaging servers:
+* Kafka partitions are 0-359
+* Messaging servers handling those partitions are `s1 -> [0-179]`, `s2 -> [180-359]`
+* When the load on them is too big some partitions could be redistributed to a new messaging server s3
+* Now the distribution is `s1 -> [0-119]`, `s2 -> [180-299]`, `s3 -> [120-179, 300-359]`
+
+The number of partitions can be big. Kafka clusters are known to work with 10 000 or 20 000 partitions. Which means their distribution can be made even with the appropriate number. Additionally the partitions can be split into smaller partition ranges in order to make it more conventient to create an algorithm for even distribution between the instances.
+
+## Failover
+
+BFF, History, ID Gen services are stateless so if an instance dies the requests are sent to one of the other services via the load balancers. In the meantime the deployment infrastructure keeps the desired number of instances by creating a new one.
+
+Messaging, State services are stateful. If an instance dies the deployment infrastructure would create a new one. In order to speed things up though it can keep a few instances idle. This way the wait interval will be greatly reduced if the time for a new instance to be created is big.
