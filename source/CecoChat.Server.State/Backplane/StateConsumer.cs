@@ -195,7 +195,7 @@ namespace CecoChat.Server.State.Backplane
             {
                 chat = _repo.GetChat(userID, chatID);
                 chat ??= new ChatState {ChatId = chatID};
-                _cache.UpdateUserChat(userID, chat);
+                _cache.AddUserChat(userID, chat);
             }
 
             return chat;

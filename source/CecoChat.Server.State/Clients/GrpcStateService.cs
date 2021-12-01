@@ -35,7 +35,7 @@ namespace CecoChat.Server.State.Clients
             IReadOnlyCollection<ChatState> chats = await _repo.GetChats(userID, newerThan);
             foreach (ChatState chat in chats)
             {
-                _cache.UpdateUserChat(userID, chat);
+                _cache.AddUserChat(userID, chat);
             }
 
             GetChatsResponse response = new();
