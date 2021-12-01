@@ -15,8 +15,8 @@ namespace CecoChat.Server.State.Clients
 
     public sealed class LruStateCache : IStateCache
     {
-        private readonly LinkedList<ChatState> _list;
-        private readonly Dictionary<CacheKey, LinkedListNode<ChatState>> _map;
+        private readonly LinkedList<CacheNode> _list;
+        private readonly Dictionary<CacheKey, LinkedListNode<CacheNode>> _map;
         private readonly int _cacheCapacity;
         private SpinLock _lock;
 
@@ -48,8 +48,8 @@ namespace CecoChat.Server.State.Clients
 
         private bool TryGetUserChat(CacheKey key, out ChatState chat)
         {
-            bool found = _map.TryGetValue(key, out LinkedListNode<ChatState> node);
-            chat = found ? node.Value : null;
+            bool found = _map.TryGetValue(key, out LinkedListNode<CacheNode> node);
+            chat = found ? node.Value.Chat : null;
             if (found)
             {
                 // move as most recent
@@ -80,30 +80,52 @@ namespace CecoChat.Server.State.Clients
 
         private void AddUserChat(CacheKey key, ChatState chat)
         {
-            if (_map.TryGetValue(key, out LinkedListNode<ChatState> node))
+            if (_map.TryGetValue(key, out LinkedListNode<CacheNode> node))
             {
-                node.Value = chat;
+                node.Value = new CacheNode(node.Value.UserID, chat);
                 // move as most recent
                 _list.Remove(node);
                 _list.AddFirst(node);
             }
             else
             {
-                node = _list.AddFirst(chat);
+                CacheNode cacheNode = new(key.UserID, chat);
+                node = _list.AddFirst(cacheNode);
                 if (_list.Count > _cacheCapacity)
                 {
-                    // replace the least-recently used item with one that is most recent when cache is full
+                    // ReSharper disable once PossibleNullReferenceException
+                    CacheNode lastCacheNode = _list.Last.Value;
+                    // remove the least-recently used item when cache is full
                     _list.RemoveLast();
+                    _map.Remove(new CacheKey(lastCacheNode.UserID, lastCacheNode.Chat.ChatId));
                 }
                 _map.Add(key, node);
             }
         }
 
+        private readonly struct CacheNode
+        {
+            public CacheNode(long userID, ChatState chat)
+            {
+                if (userID == 0)
+                {
+                    throw new ArgumentException($"{nameof(userID)} should be > 0.", nameof(userID));
+                }
+                if (chat == null)
+                {
+                    throw new ArgumentNullException($"{nameof(chat)} should be non-null.", nameof(chat));
+                }
+
+                UserID = userID;
+                Chat = chat;
+            }
+
+            public long UserID { get; }
+            public ChatState Chat { get; }
+        }
+
         private readonly struct CacheKey : IEquatable<CacheKey>
         {
-            private readonly long _userID;
-            private readonly string _chatID;
-
             public CacheKey(long userID, string chatID)
             {
                 if (userID == 0)
@@ -114,16 +136,19 @@ namespace CecoChat.Server.State.Clients
                 {
                     throw new ArgumentException($"{nameof(chatID)} should be non-null and non-whitespace.", nameof(chatID));
                 }
-                
-                _userID = userID;
-                _chatID = chatID;
+
+                UserID = userID;
+                ChatID = chatID;
             }
+
+            public long UserID { get; }
+            public string ChatID { get; }
 
             public bool Equals(CacheKey other)
             {
                 return
-                    _userID == other._userID &&
-                    string.Equals(_chatID, other._chatID, StringComparison.InvariantCultureIgnoreCase);
+                    UserID == other.UserID &&
+                    string.Equals(ChatID, other.ChatID, StringComparison.InvariantCultureIgnoreCase);
             }
 
             public override bool Equals(object obj)
@@ -136,8 +161,8 @@ namespace CecoChat.Server.State.Clients
             public override int GetHashCode()
             {
                 HashCode hashCode = new();
-                hashCode.Add(_userID);
-                hashCode.Add(_chatID, StringComparer.InvariantCultureIgnoreCase);
+                hashCode.Add(UserID);
+                hashCode.Add(ChatID, StringComparer.InvariantCultureIgnoreCase);
                 return hashCode.ToHashCode();
             }
 
