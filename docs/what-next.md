@@ -33,6 +33,7 @@
 
 * Architecture
   - Design cross-region communication
+  - Partition data for State service
 * Security
   - Rate limiting
   - Use secure transports and protocols on communication level
@@ -43,6 +44,7 @@
 * Deployment
   - Load balancing
   - Auto-scaling
+    - Distribute partitions between stateful service instances
   - Failover
 
 ## Development
@@ -57,9 +59,6 @@
 
 ## Improvements
 
-* Essential
-  - Implement LRU cache in State service
-  - Partition data for State service
 * Performance
   - Benchmark Kafka and improve its configuration
 * Observability
@@ -67,5 +66,4 @@
   - Improve existing log aggregation - performance of Fluentd, ElasticSearch index customizations
 * Misc
   - Improve monotonic clock skew and make snowflake ID generation to use it as `IdGen.ITimeSource`
-  - Improve partition assignment when servers are added/removed in order to minimize disconnects
   - Improve error handling, resilience, validation (e.g. gRPC requests)
