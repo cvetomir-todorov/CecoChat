@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using CecoChat.Contracts.State;
+using Microsoft.Extensions.Options;
 
 namespace CecoChat.Server.State.Clients
 {
@@ -19,12 +20,11 @@ namespace CecoChat.Server.State.Clients
         private readonly int _cacheCapacity;
         private SpinLock _lock;
 
-        public LruStateCache()
+        public LruStateCache(IOptions<StateCacheOptions> options)
         {
             _list = new();
             _map = new();
-            // TODO: get from config
-            _cacheCapacity = 4;
+            _cacheCapacity = options.Value.Capacity;
             _lock = new();
         }
 
