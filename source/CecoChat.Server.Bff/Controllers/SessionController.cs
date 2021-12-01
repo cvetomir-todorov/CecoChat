@@ -92,6 +92,7 @@ namespace CecoChat.Server.Bff.Controllers
         {
             {"bob", 1},
             {"alice", 2},
+            {"john", 3},
             {"peter", 1200}
         };
 
