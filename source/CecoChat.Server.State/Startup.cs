@@ -81,7 +81,7 @@ namespace CecoChat.Server.State
             {
                 StateDbConfiguration = Configuration.GetSection("StateDB")
             });
-            builder.RegisterType<StateCache>().As<IStateCache>().SingleInstance();
+            builder.RegisterType<LruStateCache>().As<IStateCache>().SingleInstance();
 
             // backplane
             builder.RegisterType<StateConsumer>().As<IStateConsumer>().SingleInstance();
