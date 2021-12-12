@@ -1,4 +1,4 @@
-# Design
+# State and history design
 
 ![State](images/cecochat-04-history-state.png)
 

@@ -21,6 +21,9 @@
 * Delivery notifications
   - Recipient has received the message
   - Recipient has seen the message
+* Messaging
+  - Deletion
+  - Editing
 * Group chats
   - Decide on the limitations
 * Status updates
