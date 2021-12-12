@@ -83,14 +83,16 @@ The services use ASP.NET/.NET 5 which are the heirs of ASP.NET/.NET Core:
 
 ![Autofac](tech-images/autofac.png)
 ![Serilog](tech-images/serilog.png)
-![Polly](tech-images/polly.png)
 ![FluentValidation](tech-images/fluent-validation.png)
+![Refit](tech-images/refit.png)
+![Polly](tech-images/polly.png)
 
 Additional libraries which are all **open-source**:
 * Autofac is the most popular DI container
 * Serilog is one of the most popular logging .NET frameworks
-* Polly is a popular HTTP client policies library
 * FluentValidation is the most popular data validation library
+* Refit is one of the most popular REST clients
+* Polly is a popular HTTP client policies library
 
 ## Observability
 

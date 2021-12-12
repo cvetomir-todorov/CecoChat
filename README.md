@@ -36,8 +36,9 @@
 ![ASP.NET](docs/tech-images/aspnet.png)
 ![Autofac](docs/tech-images/autofac.png)
 ![Serilog](docs/tech-images/serilog.png)
-![Polly](docs/tech-images/polly.png)
 ![FluentValidation](docs/tech-images/fluent-validation.png)
+![Refit](docs/tech-images/refit.png)
+![Polly](docs/tech-images/polly.png)
 
 # Documentation
 
