@@ -1,12 +1,14 @@
-# Distributed tracing
+# Observability
+
+## Distributed tracing
 
 OpenTelemetry is utilized to make flow of communication and data exchange observable and help resolve production issues.
 
-## Resources
+### Resources
 
 Each service is represented as a separate resource with namespace, name and version.
 
-## Instrumentation
+### Instrumentation
 
 The following instrumentations are used:
 * ASP.NET Core (with gRPC support for incoming requests) which is out-of-the box
@@ -18,19 +20,19 @@ Since OpenTelemetry is rather new in .NET there are fewer out-of-the box instrum
 
 The API used is the .NET one which is recommended for now, instead of the OpenTelemetry wrapper. Since it is a bleeding-edge tech that may change. The complexity of the instrumentation implementation is a result of specific details how spans are started/stopped, whether or not a span object is created based on sampling and how spans are tracked via a static execution context. These are interwined with each other and propagating spans, using simultaneously running worker threads, probability-based sampling made doing it a challenge.
 
-## Sampling
+### Sampling
 
 For `Debug` all traces are sampled. For `Release` this is true for 10% of them. Additionally, when health-check APIs are added they should be excluded as well. A configuration based approach is taken which would allow higher degree of customization.
 
-## Exporting
+### Exporting
 
 Jaeger is used in order to show traces and spans since an exporter for it is provided out-of-the-box. Additionally a few other ones could be used as well. The development environment uses the all-in-one Jaeger container which stores traces only in memory and that is enough. For production though a full deployment of Jaeger and all its components would have to be implemented.
 
-# Log aggregation
+## Log aggregation
 
 EFK stack is utilized to aggregate, store, view, search all logs and setup alerts.
 
-## Aggregation
+### Aggregation
 
 In Debug/Development mode services are configured to write logs directly to ElasticSearch. Serilog provides a specialized formatter using the JSON fields which ElasticSearch understands.
 
@@ -38,6 +40,6 @@ In Release/Production mode the services simply write logs to `stdout`. The same 
 
 Both modes are configured to create indexes with different names because there is a slight difference in the fields. Also it makes it easier to know where the logs came from.
 
-## Storage, view, alerts
+### Storage, view, alerts
 
 Once the logs are in the appropriate indexes in ElasticSearch Kibana can be used in order to search by whatever field is needed. Log streaming and alerts can also be used.

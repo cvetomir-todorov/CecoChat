@@ -1,4 +1,6 @@
-# System limits
+# Back of the envelope calculations
+
+## System limits
 
 * Targets
   - 100 000 000 max users at the same time
@@ -12,7 +14,7 @@
   - 1 hour = 60 minutes * 60 seconds = 3 600 seconds
   - 1 day = 24 hours * 60 minutes * 60 seconds = 86 400 seconds
 
-# Daily
+## Daily
 
 * Users come and go throughout the day
 * 640 000 000 active users daily
@@ -30,7 +32,7 @@
 * 20 000 000 MB daily / 86 400 seconds  = ~232 MB/s daily
 * 232 MB/s / 1 600 messaging servers = ~0.15 MB/s per messaging server daily
 
-# Peak
+## Peak
 
 * 1 hour peak
 * 80% of system is busy = 80 000 000 active users
@@ -48,7 +50,7 @@
 * 1 250 000 MB peak / 3 600 seconds = ~348 MB/s peak
 * 348 MB/s / 1 600 messaging servers = ~0.22 MB/s per messaging server peak
 
-# Storage
+## Storage
 
 * 20 000 000 MB daily (from daily throughput)
 * 7 300 000 000 MB yearly

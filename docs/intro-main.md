@@ -10,7 +10,7 @@
 * User can review chat history at a random point in time 
 * User receives a delivery notification when the message has been processed
 
-Limitations:
+## Limitations
 * No user profile and friendship are implemented
 * No clients exist, only a client for development purposes
 
@@ -31,5 +31,5 @@ Limitations:
 * Deployment
   - Containerization
 * Maintainability
-  - Sonarcloud code quality gate
+  - Code quality gate
   - Open-source technologies
