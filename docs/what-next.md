@@ -45,6 +45,7 @@
   - Monitoring
   - Health checks
 * Deployment
+  - Infrastructure as code
   - Load balancing
   - Auto-scaling
     - Distribute partitions between stateful service instances

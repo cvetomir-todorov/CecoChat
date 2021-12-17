@@ -112,3 +112,4 @@ Additional libraries which are all **open-source**:
 
 * containerization relies on Docker for its maturity, popularity, tooling and integration
 * orchestration - TBD, probably Kubernetes
+* infrastructure as code - TBD, probably Terraform
