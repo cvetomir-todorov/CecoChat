@@ -1,10 +1,12 @@
 FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
-WORKDIR /app
 
+WORKDIR /app
 COPY . ./
 RUN dotnet publish CecoChat.Server.History/CecoChat.Server.History.csproj -c Release -o out
 
 FROM mcr.microsoft.com/dotnet/aspnet:5.0 AS runtime
+LABEL author="Cvetomir Todorov"
+
 WORKDIR /app
 COPY --from=build /app/out .
 
