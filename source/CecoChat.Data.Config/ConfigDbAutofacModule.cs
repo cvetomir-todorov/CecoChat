@@ -1,6 +1,7 @@
 ﻿using Autofac;
 using CecoChat.Data.Config.History;
 using CecoChat.Data.Config.Partitioning;
+using CecoChat.Data.Config.Snowflake;
 using CecoChat.Events;
 using CecoChat.Redis;
 using Microsoft.Extensions.Configuration;
@@ -15,9 +16,11 @@ namespace CecoChat.Data.Config
 
         public bool RegisterPartitioning { get; init; }
 
+        public bool RegisterSnowflake { get; init; }
+
         protected override void Load(ContainerBuilder builder)
         {
-            if (RegisterHistory || RegisterPartitioning)
+            if (RegisterHistory || RegisterPartitioning || RegisterSnowflake)
             {
                 builder.RegisterModule(new RedisAutofacModule
                 {
@@ -35,6 +38,11 @@ namespace CecoChat.Data.Config
                 builder.RegisterType<PartitioningConfig>().As<IPartitioningConfig>().SingleInstance();
                 builder.RegisterType<PartitioningConfigRepo>().As<IPartitioningConfigRepo>().SingleInstance();
                 builder.RegisterSingletonEvent<EventSource<PartitionsChangedEventData>, PartitionsChangedEventData>();
+            }
+            if (RegisterSnowflake)
+            {
+                builder.RegisterType<SnowflakeConfig>().As<ISnowflakeConfig>().SingleInstance();
+                builder.RegisterType<SnowflakeConfigRepo>().As<ISnowflakeConfigRepo>().SingleInstance();
             }
         }
     }
