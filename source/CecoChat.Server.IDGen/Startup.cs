@@ -1,6 +1,8 @@
 using Autofac;
 using CecoChat.Autofac;
+using CecoChat.Data.Config;
 using CecoChat.Server.IDGen.Generation;
+using CecoChat.Server.IDGen.HostedServices;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -32,10 +34,20 @@ namespace CecoChat.Server.IDGen
 
         public void ConfigureContainer(ContainerBuilder builder)
         {
+            // ordered hosted services
+            builder.RegisterHostedService<InitDynamicConfig>();
+
+            // configuration
+            builder.RegisterModule(new ConfigDbAutofacModule
+            {
+                RedisConfiguration = Configuration.GetSection("ConfigDB"),
+                RegisterSnowflake = true
+            });
+            builder.RegisterOptions<ConfigOptions>(Configuration.GetSection("Config"));
+
             // snowflake
             builder.RegisterType<SnowflakeGenerator>().As<IIdentityGenerator>().SingleInstance();
             builder.RegisterType<FnvHash>().As<INonCryptoHash>().SingleInstance();
-            builder.RegisterOptions<SnowflakeOptions>(Configuration.GetSection("Snowflake"));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
