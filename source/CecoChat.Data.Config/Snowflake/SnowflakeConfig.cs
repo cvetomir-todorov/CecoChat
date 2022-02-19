@@ -15,7 +15,7 @@ namespace CecoChat.Data.Config.Snowflake
         private readonly IConfigUtility _configUtility;
 
         private SnowflakeConfigValues _values;
-        private SnowflakeConfigValidator _validator; // TODO: make validator readonly field
+        private SnowflakeConfigValidator _validator;
 
         public SnowflakeConfig(
             ILogger<SnowflakeConfig> logger,
@@ -48,10 +48,9 @@ namespace CecoChat.Data.Config.Snowflake
         {
             try
             {
-                await SubscribeForChanges();
-
                 _validator = new SnowflakeConfigValidator();
-                await LoadValidateValues(_validator);
+                await SubscribeForChanges();
+                await LoadValidateValues();
             }
             catch (Exception exception)
             {
@@ -71,15 +70,15 @@ namespace CecoChat.Data.Config.Snowflake
 
         private Task HandleGeneratorIDs(ChannelMessage channelMessage)
         {
-            return LoadValidateValues(_validator);
+            return LoadValidateValues();
         }
 
-        private async Task LoadValidateValues(SnowflakeConfigValidator validator)
+        private async Task LoadValidateValues()
         {
             SnowflakeConfigValues values = await _repo.GetValues();
             _logger.LogInformation("Loading snowflake configuration succeeded.");
 
-            bool areValid = _configUtility.ValidateValues("snowflake", values, validator);
+            bool areValid = _configUtility.ValidateValues("snowflake", values, _validator);
             if (areValid)
             {
                 _values = values;

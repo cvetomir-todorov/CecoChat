@@ -71,10 +71,9 @@ namespace CecoChat.Data.Config.Partitioning
             try
             {
                 _usage = usage;
-                await SubscribeForChanges(usage);
-
                 _validator = new PartitioningConfigValidator(usage);
-                await LoadValidateValues(usage, _validator);
+                await SubscribeForChanges(usage);
+                await LoadValidateValues(usage);
             }
             catch (Exception exception)
             {
@@ -109,7 +108,7 @@ namespace CecoChat.Data.Config.Partitioning
                 return;
             }
 
-            bool areValid = await LoadValidateValues(_usage, _validator);
+            bool areValid = await LoadValidateValues(_usage);
             if (areValid && !string.IsNullOrWhiteSpace(_usage.ServerPartitionChangesToWatch))
             {
                 PartitioningConfigValues values = _values;
@@ -135,16 +134,16 @@ namespace CecoChat.Data.Config.Partitioning
         {
             if (_usage.UseServerAddresses)
             {
-                await LoadValidateValues(_usage, _validator);
+                await LoadValidateValues(_usage);
             }
         }
 
-        private async Task<bool> LoadValidateValues(PartitioningConfigUsage usage, PartitioningConfigValidator validator)
+        private async Task<bool> LoadValidateValues(PartitioningConfigUsage usage)
         {
             PartitioningConfigValues values = await _repo.GetValues(usage);
             _logger.LogInformation("Loading partitioning configuration succeeded.");
 
-            bool areValid = _configUtility.ValidateValues("partitioning", values, validator);
+            bool areValid = _configUtility.ValidateValues("partitioning", values, _validator);
             if (areValid)
             {
                 _values = values;
