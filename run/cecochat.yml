@@ -148,6 +148,8 @@ services:
       ASPNETCORE_HTTPS_PORT: 443
       ASPNETCORE_Kestrel__Certificates__Default__Path: "/app/cecochat-dev.pfx"
       ASPNETCORE_Kestrel__Certificates__Default__Password: "cecochat"
+      CECOCHAT_Config__ServerID: "1"
+      CECOCHAT_ConfigDB__Endpoints__0: "redis1:6379"
       CECOCHAT_OtelSampling__Strategy: "AlwaysOn"
       CECOCHAT_Jaeger__AgentHost: jaeger
     logging: *fluentd-logging

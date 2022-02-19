@@ -5,3 +5,6 @@ redis-cli HMSET partitioning.server-addresses s1 https://localhost:31001 s2 http
 
 # history
 redis-cli SET history.chat.message-count 32
+
+# snowflake
+redis-cli HSET snowflake.server-generator-ids 1 1,2,3,4
