@@ -36,10 +36,9 @@ namespace CecoChat.Data.Config.History
             try
             {
                 _usage = usage;
-                await SubscribeForChanges(usage);
-
                 _validator = new HistoryConfigValidator(usage);
-                await LoadValidateValues(usage, _validator);
+                await SubscribeForChanges(usage);
+                await LoadValidateValues(usage);
             }
             catch (Exception exception)
             {
@@ -64,16 +63,16 @@ namespace CecoChat.Data.Config.History
         {
             if (_usage.UseMessageCount)
             {
-                await LoadValidateValues(_usage, _validator);
+                await LoadValidateValues(_usage);
             }
         }
 
-        private async Task LoadValidateValues(HistoryConfigUsage usage, HistoryConfigValidator validator)
+        private async Task LoadValidateValues(HistoryConfigUsage usage)
         {
             HistoryConfigValues values = await _repo.GetValues(usage);
             _logger.LogInformation("Loading history configuration succeeded.");
 
-            if (_configUtility.ValidateValues("history", values, validator))
+            if (_configUtility.ValidateValues("history", values, _validator))
             {
                 _values = values;
                 PrintValues(usage, values);
