@@ -88,6 +88,7 @@ namespace CecoChat.Data.Config.Snowflake
 
         private void PrintValues(SnowflakeConfigValues values)
         {
+            _logger.LogInformation("Total of {0} server(s) configured:", values.ServerGeneratorIDs.Count);
             foreach (KeyValuePair<string, List<short>> pair in values.ServerGeneratorIDs)
             {
                 _logger.LogInformation("Server {0} is assigned generator IDs: [{1}].", pair.Key, string.Join(separator: ", ", pair.Value));
