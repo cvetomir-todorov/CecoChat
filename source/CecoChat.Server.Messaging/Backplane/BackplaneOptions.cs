@@ -14,8 +14,6 @@ namespace CecoChat.Server.Messaging.Backplane
 
         public KafkaProducerOptions ReplicatingProducer { get; set; }
 
-        public string ServerID { get; set; }
-
         public string TopicMessagesByReceiver { get; set; }
 
         public string TopicMessagesBySender { get; set; }

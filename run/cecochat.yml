@@ -48,7 +48,7 @@ services:
       ASPNETCORE_Kestrel__Certificates__Default__Path: "/app/cecochat-dev.pfx"
       ASPNETCORE_Kestrel__Certificates__Default__Password: "cecochat"
       CECOCHAT_ConfigDB__Endpoints__0: "redis1:6379"
-      CECOCHAT_Backplane__ServerID: s1
+      CECOCHAT_Config__ServerID: s1
       CECOCHAT_Backplane__Kafka__BootstrapServers__0: kafka1:19091
       CECOCHAT_Backplane__Kafka__BootstrapServers__1: kafka2:19092
       CECOCHAT_IDGen__OriginatorID: 1

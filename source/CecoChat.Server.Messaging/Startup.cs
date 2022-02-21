@@ -94,6 +94,7 @@ namespace CecoChat.Server.Messaging
                 RedisConfiguration = Configuration.GetSection("ConfigDB"),
                 RegisterPartitioning = true
             });
+            builder.RegisterOptions<ConfigOptions>(Configuration.GetSection("Config"));
 
             // clients
             builder.RegisterModule(new GrpcInstrumentationAutofacModule());
