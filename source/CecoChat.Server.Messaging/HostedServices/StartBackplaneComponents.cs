@@ -11,7 +11,7 @@ namespace CecoChat.Server.Messaging.HostedServices
 {
     public sealed class StartBackplaneComponents : IHostedService, IDisposable
     {
-        private readonly BackplaneOptions _backplaneOptions;
+        private readonly ConfigOptions _configOptions;
         private readonly IBackplaneComponents _backplaneComponents;
         private readonly IPartitioningConfig _partitioningConfig;
         private readonly CancellationToken _appStoppingCt;
@@ -19,11 +19,11 @@ namespace CecoChat.Server.Messaging.HostedServices
 
         public StartBackplaneComponents(
             IHostApplicationLifetime applicationLifetime,
-            IOptions<BackplaneOptions> backplaneOptions,
+            IOptions<ConfigOptions> configOptions,
             IBackplaneComponents backplaneComponents,
             IPartitioningConfig partitioningConfig)
         {
-            _backplaneOptions = backplaneOptions.Value;
+            _configOptions = configOptions.Value;
             _backplaneComponents = backplaneComponents;
             _partitioningConfig = partitioningConfig;
 
@@ -41,7 +41,7 @@ namespace CecoChat.Server.Messaging.HostedServices
             _stoppedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _appStoppingCt);
 
             int partitionCount = _partitioningConfig.PartitionCount;
-            PartitionRange partitions = _partitioningConfig.GetServerPartitions(_backplaneOptions.ServerID);
+            PartitionRange partitions = _partitioningConfig.GetServerPartitions(_configOptions.ServerID);
 
             _backplaneComponents.ConfigurePartitioning(partitionCount, partitions);
             _backplaneComponents.StartConsumption(_stoppedCts.Token);
