@@ -113,7 +113,7 @@ namespace CecoChat.Server.State.Clients
                 }
                 if (chat == null)
                 {
-                    throw new ArgumentNullException($"{nameof(chat)} should be non-null.", nameof(chat));
+                    throw new ArgumentNullException(nameof(chat), $"{nameof(chat)} should be non-null.");
                 }
 
                 UserID = userID;
