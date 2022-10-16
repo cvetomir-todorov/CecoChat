@@ -1,1 +1,1 @@
-docker-compose -f kafka.yml -f cassandra.yml -f redis.yml up -d
+docker compose -f kafka.yml -f cassandra.yml -f redis.yml up -d
