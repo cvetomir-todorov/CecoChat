@@ -22,7 +22,7 @@ services:
       - cecochat-zookeeper-data:/data
       - cecochat-zookeeper-datalog:/datalog
   kafka1:
-    image: confluentinc/cp-kafka:5.5.3
+    image: confluentinc/cp-kafka:7.2.2
     container_name: cecochat-kafka1
     hostname: kafka1
     networks: *networks
@@ -47,7 +47,7 @@ services:
     depends_on: 
       - zookeeper
   kafka2:
-    image: confluentinc/cp-kafka:5.5.3
+    image: confluentinc/cp-kafka:7.2.2
     container_name: cecochat-kafka2
     hostname: kafka2
     networks: *networks
