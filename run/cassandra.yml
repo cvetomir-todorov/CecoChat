@@ -3,7 +3,7 @@ networks:
   cecochat:
 services:
   cass1:
-    image: cassandra:3.11.9
+    image: cassandra:3.11.13
     container_name: cecochat-cass1
     healthcheck: &healthcheck
       test: ["CMD", "cqlsh", "-e", "describe keyspaces"]
@@ -32,7 +32,7 @@ services:
       - cecochat-cass1-data:/var/lib/cassandra
       - cecochat-cass1-conf:/etc/cassandra
   cass2:
-    image: cassandra:3.11.9
+    image: cassandra:3.11.13
     container_name: cecochat-cass2
     healthcheck: *healthcheck
     hostname: cass2
