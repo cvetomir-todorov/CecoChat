@@ -1,3 +1,4 @@
+using System.Reflection;
 using Autofac;
 using CecoChat.Autofac;
 using CecoChat.Client.History;
@@ -10,6 +11,7 @@ using CecoChat.Server.Bff.Controllers.Infrastructure;
 using CecoChat.Server.Bff.HostedServices;
 using CecoChat.Server.Identity;
 using CecoChat.Swagger;
+using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -70,17 +72,16 @@ namespace CecoChat.Server.Bff
             services.AddJwtAuthentication(_jwtOptions);
 
             // web
-            services
-                .AddControllers(mvc =>
-                {
-                    // insert it before the default one so that it takes effect
-                    mvc.ModelBinderProviders.Insert(0, new DateTimeModelBinderProvider());
-                })
-                .AddFluentValidation(fluentValidation =>
-                {
-                    fluentValidation.DisableDataAnnotationsValidation = true;
-                    fluentValidation.RegisterValidatorsFromAssemblyContaining<Startup>();
-                });
+            services.AddControllers(mvc =>
+            {
+                // insert it before the default one so that it takes effect
+                mvc.ModelBinderProviders.Insert(0, new DateTimeModelBinderProvider());
+            });
+            services.AddFluentValidationAutoValidation(fluentValidation =>
+            {
+                fluentValidation.DisableDataAnnotationsValidation = true;
+            });
+            services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
             services.AddSwaggerServices(_swaggerOptions);
 
             // downstream services
