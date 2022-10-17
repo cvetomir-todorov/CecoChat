@@ -3,7 +3,7 @@ networks:
   cecochat:
 services:
   redis1:
-    image: redis:6.0.10
+    image: redis:7.0.5
     container_name: cecochat-redis1
     hostname: redis1
     networks: &networks
