@@ -6,7 +6,7 @@ namespace CecoChat
     {
         public static int ToMillisInt32(this TimeSpan interval)
         {
-            return (int) interval.TotalMilliseconds;
+            return (int)interval.TotalMilliseconds;
         }
     }
 }

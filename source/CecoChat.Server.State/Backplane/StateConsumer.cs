@@ -111,6 +111,7 @@ namespace CecoChat.Server.State.Backplane
                     break;
                 case MessageType.Reaction:
                     // ignore because the message ID is for a previously sent message
+                    break;
                 case MessageType.Disconnect:
                     // ignore these
                     break;
@@ -131,6 +132,7 @@ namespace CecoChat.Server.State.Backplane
                     break;
                 case MessageType.Reaction:
                     // ignore because the message ID is for a previously sent message
+                    break;
                 case MessageType.Disconnect:
                     // ignore because this is designated to the client apps only
                     break;
@@ -194,7 +196,7 @@ namespace CecoChat.Server.State.Backplane
             if (!_cache.TryGetUserChat(userID, chatID, out ChatState chat))
             {
                 chat = _repo.GetChat(userID, chatID);
-                chat ??= new ChatState {ChatId = chatID};
+                chat ??= new ChatState { ChatId = chatID };
                 _cache.AddUserChat(userID, chat);
             }
 

@@ -17,7 +17,7 @@ namespace CecoChat
             short value0 = (short)(value >> 48);
             short value1 = (short)(value >> 32);
             short value2 = (short)(value >> 16);
-            short value3 = (short) value;
+            short value3 = (short)value;
 
             int hash = 92821;
             const int prime = 486187739;

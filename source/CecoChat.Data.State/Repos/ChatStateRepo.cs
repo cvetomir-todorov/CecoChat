@@ -60,10 +60,10 @@ namespace CecoChat.Data.State.Repos
         public void Prepare()
         {
             PreparedStatement _ = _chatsQuery.Value;
-            #pragma warning disable IDE0059
+#pragma warning disable IDE0059
             PreparedStatement __ = _chatQuery.Value;
             PreparedStatement ___ = _updateQuery.Value;
-            #pragma warning restore IDE0059
+#pragma warning restore IDE0059
         }
 
         public async Task<IReadOnlyCollection<ChatState>> GetChats(long userID, DateTime newerThan)

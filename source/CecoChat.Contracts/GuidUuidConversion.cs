@@ -14,8 +14,8 @@ namespace CecoChat.Contracts
             }
 
             // MSB -> LSB: time_low (32 bits) | time_mid (16 bits) | time_hi_and_version (16 bits)
-            ulong timeLow = (ulong) BinaryPrimitives.ReadUInt32LittleEndian(bytes.Slice(0, 4)) << 32;
-            ulong timeMid = (ulong) BinaryPrimitives.ReadUInt16LittleEndian(bytes.Slice(4, 2)) << 16;
+            ulong timeLow = (ulong)BinaryPrimitives.ReadUInt32LittleEndian(bytes.Slice(0, 4)) << 32;
+            ulong timeMid = (ulong)BinaryPrimitives.ReadUInt16LittleEndian(bytes.Slice(4, 2)) << 16;
             ulong timeHiAndVersion = BinaryPrimitives.ReadUInt16LittleEndian(bytes.Slice(6, 2));
 
             Uuid uuid = new();
@@ -31,9 +31,9 @@ namespace CecoChat.Contracts
             Span<byte> bytes = stackalloc byte[16];
 
             // MSB -> LSB: time_low (32 bits) | time_mid (16 bits) | time_hi_and_version (16 bits)
-            uint timeLow = (uint) (uuid.High64 >> 32);
-            ushort timeMid = (ushort) ((uuid.High64 >> 16) & 0xFFFF);
-            ushort timeHiAndVersion = (ushort) (uuid.High64 & 0xFFFF);
+            uint timeLow = (uint)(uuid.High64 >> 32);
+            ushort timeMid = (ushort)((uuid.High64 >> 16) & 0xFFFF);
+            ushort timeHiAndVersion = (ushort)(uuid.High64 & 0xFFFF);
 
             BinaryPrimitives.WriteUInt32LittleEndian(bytes.Slice(0, 4), timeLow);
             BinaryPrimitives.WriteUInt16LittleEndian(bytes.Slice(4, 2), timeMid);

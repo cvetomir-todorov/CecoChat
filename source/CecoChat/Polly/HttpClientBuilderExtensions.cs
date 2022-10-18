@@ -4,8 +4,8 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using Microsoft.Extensions.DependencyInjection;
 using Grpc.Core;
+using Microsoft.Extensions.DependencyInjection;
 using Polly;
 
 namespace CecoChat.Polly

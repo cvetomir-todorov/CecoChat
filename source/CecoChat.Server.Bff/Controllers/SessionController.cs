@@ -72,7 +72,7 @@ namespace CecoChat.Server.Bff.Controllers
             }
             Activity.Current?.AddTag("user.id", userID);
 
-            (Guid clientID, string accessToken) = CreateSession(userID); 
+            (Guid clientID, string accessToken) = CreateSession(userID);
             _logger.LogInformation("User {0} authenticated and assigned user ID {1} and client ID {2}.", request.Username, userID, clientID);
 
             int partition = _partitionUtility.ChoosePartition(userID, _partitioningConfig.PartitionCount);
@@ -90,10 +90,10 @@ namespace CecoChat.Server.Bff.Controllers
 
         private readonly Dictionary<string, long> _userIDMap = new()
         {
-            {"bob", 1},
-            {"alice", 2},
-            {"john", 3},
-            {"peter", 1200}
+            { "bob", 1 },
+            { "alice", 2 },
+            { "john", 3 },
+            { "peter", 1200 }
         };
 
         private (Guid, string) CreateSession(long userID)

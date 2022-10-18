@@ -12,7 +12,7 @@ namespace CecoChat.Kafka.Instrumentation
             return builder.AddSource(KafkaInstrumentation.ActivitySource.Name);
         }
     }
-    
+
     internal static class KafkaInstrumentation
     {
         private static readonly string ActivitySourceName = "OpenTelemetry.Instrumentation.CecoChatKafka";

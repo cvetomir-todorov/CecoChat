@@ -52,7 +52,7 @@ namespace CecoChat.Server.History
             // telemetry
             services.AddOpenTelemetryTracing(otel =>
             {
-                otel.AddServiceResource(new OtelServiceResource {Namespace = "CecoChat", Name = "History", Version = "0.1"});
+                otel.AddServiceResource(new OtelServiceResource { Namespace = "CecoChat", Name = "History", Version = "0.1" });
                 otel.AddAspNetCoreInstrumentation(aspnet => aspnet.EnableGrpcAspNetCoreSupport = true);
                 otel.AddKafkaInstrumentation();
                 otel.AddHistoryInstrumentation();

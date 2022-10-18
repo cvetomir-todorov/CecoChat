@@ -102,7 +102,7 @@ namespace CecoChat.Server.Bff.Controllers
             {
                 toClient.Reactions = new Dictionary<long, string>(capacity: fromService.Reactions.Count);
 
-                foreach (KeyValuePair<long,string> reaction in fromService.Reactions)
+                foreach (KeyValuePair<long, string> reaction in fromService.Reactions)
                 {
                     toClient.Reactions.Add(reaction.Key, reaction.Value);
                 }

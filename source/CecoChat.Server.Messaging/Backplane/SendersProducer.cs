@@ -61,7 +61,7 @@ namespace CecoChat.Server.Messaging.Backplane
         {
             int partition = _partitionUtility.ChoosePartition(message.ReceiverId, PartitionCount);
             TopicPartition topicPartition = _partitionFlyweight.GetTopicPartition(_backplaneOptions.TopicMessagesByReceiver, partition);
-            Message<Null, BackplaneMessage> kafkaMessage = new() {Value = message};
+            Message<Null, BackplaneMessage> kafkaMessage = new() { Value = message };
 
             _producer.Produce(kafkaMessage, topicPartition, DeliveryHandler);
         }

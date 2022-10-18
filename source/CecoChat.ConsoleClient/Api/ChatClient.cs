@@ -110,7 +110,7 @@ namespace CecoChat.ConsoleClient.Api
 
         public event EventHandler<ListenNotification> MessageReceived;
 
-        public event EventHandler<ListenNotification> ReactionReceived; 
+        public event EventHandler<ListenNotification> ReactionReceived;
 
         public event EventHandler<ListenNotification> MessageDelivered;
 

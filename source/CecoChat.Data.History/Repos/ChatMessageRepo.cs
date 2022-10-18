@@ -70,11 +70,11 @@ namespace CecoChat.Data.History.Repos
         public void Prepare()
         {
             PreparedStatement _ = _historyQuery.Value;
-            #pragma warning disable IDE0059
+#pragma warning disable IDE0059
             PreparedStatement __ = _messagesForChatQuery.Value;
             PreparedStatement ___ = _setReactionQuery.Value;
             PreparedStatement ____ = _unsetReactionQuery.Value;
-            #pragma warning restore IDE0059
+#pragma warning restore IDE0059
         }
 
         public async Task<IReadOnlyCollection<HistoryMessage>> GetHistory(long userID, long otherUserID, DateTime olderThan, int countLimit)

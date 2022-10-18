@@ -18,7 +18,7 @@ namespace CecoChat.Server.IDGen.Generation
         public override Task<GenerateOneResponse> GenerateOne(GenerateOneRequest request, ServerCallContext context)
         {
             long id = _generator.GenerateOne(request.OriginatorId);
-            return Task.FromResult(new GenerateOneResponse {Id = id});
+            return Task.FromResult(new GenerateOneResponse { Id = id });
         }
 
         public override Task<GenerateManyResponse> GenerateMany(GenerateManyRequest request, ServerCallContext context)

@@ -59,7 +59,7 @@ namespace CecoChat.Server.Messaging.HostedServices
 
         private void DisconnectClients(int partitionCount, PartitionRange partitions)
         {
-            ListenNotification notification = new() {Type = MessageType.Disconnect};
+            ListenNotification notification = new() { Type = MessageType.Disconnect };
 
             foreach (KeyValuePair<long, IEnumerable<IStreamer<ListenNotification>>> pair in _clientContainer.EnumerateAllClients())
             {

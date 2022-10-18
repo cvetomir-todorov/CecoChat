@@ -20,7 +20,7 @@ namespace CecoChat.Data.History.Repos
         {
             switch (dataType)
             {
-                case DataType.PlainText: return (sbyte) DbDataType.PlainText;
+                case DataType.PlainText: return (sbyte)DbDataType.PlainText;
                 default:
                     throw new EnumValueNotSupportedException(dataType);
             }
