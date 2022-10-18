@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace CecoChat.Cassandra;
+﻿namespace CecoChat.Cassandra;
 
 public sealed class CassandraOptions
 {

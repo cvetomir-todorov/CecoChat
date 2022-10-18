@@ -1,5 +1,3 @@
-using System;
-
 namespace CecoChat.HttpClient;
 
 public sealed class SocketsHttpHandlerOptions

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using CecoChat.Events;
+﻿using CecoChat.Events;
 using CecoChat.Kafka;
 using CecoChat.Redis;
 using Microsoft.Extensions.Logging;

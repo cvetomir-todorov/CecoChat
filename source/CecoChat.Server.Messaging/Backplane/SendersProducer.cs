@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using CecoChat.Contracts;
 using CecoChat.Contracts.Backplane;
 using CecoChat.Contracts.Messaging;
@@ -8,8 +6,6 @@ using CecoChat.Kafka;
 using CecoChat.Server.Backplane;
 using CecoChat.Server.Messaging.Clients.Streaming;
 using Confluent.Kafka;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace CecoChat.Server.Messaging.Backplane;

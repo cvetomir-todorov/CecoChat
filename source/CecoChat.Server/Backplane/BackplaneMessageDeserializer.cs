@@ -1,5 +1,4 @@
-﻿using System;
-using CecoChat.Contracts.Backplane;
+﻿using CecoChat.Contracts.Backplane;
 using Confluent.Kafka;
 using Google.Protobuf;
 using SerializationContext = Confluent.Kafka.SerializationContext;

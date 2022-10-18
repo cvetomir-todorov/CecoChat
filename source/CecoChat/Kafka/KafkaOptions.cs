@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace CecoChat.Kafka;
+﻿namespace CecoChat.Kafka;
 
 public sealed class KafkaOptions
 {

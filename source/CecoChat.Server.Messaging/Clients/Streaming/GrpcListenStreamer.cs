@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Diagnostics;
-using System.Threading;
-using System.Threading.Tasks;
 using CecoChat.Contracts.Messaging;
 using CecoChat.Grpc.Instrumentation;
 using Grpc.Core;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace CecoChat.Server.Messaging.Clients.Streaming;

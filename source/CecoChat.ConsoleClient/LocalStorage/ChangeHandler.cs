@@ -1,4 +1,3 @@
-using System;
 using CecoChat.Contracts.Messaging;
 
 namespace CecoChat.ConsoleClient.LocalStorage;

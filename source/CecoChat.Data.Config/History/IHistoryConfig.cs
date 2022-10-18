@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-namespace CecoChat.Data.Config.History;
+﻿namespace CecoChat.Data.Config.History;
 
 public sealed class HistoryConfigUsage
 {

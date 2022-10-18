@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace CecoChat.ConsoleClient.LocalStorage;
 
 public sealed class Message

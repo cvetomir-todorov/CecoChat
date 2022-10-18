@@ -1,5 +1,3 @@
-using System;
-using System.Threading.Tasks;
 using CecoChat.ConsoleClient.LocalStorage;
 
 namespace CecoChat.ConsoleClient.Interaction;

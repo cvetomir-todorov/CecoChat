@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace CecoChat.Redis;
+﻿namespace CecoChat.Redis;
 
 public sealed class RedisOptions
 {

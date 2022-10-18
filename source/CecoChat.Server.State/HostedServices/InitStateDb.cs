@@ -1,11 +1,6 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using CecoChat.Cassandra;
 using CecoChat.Data.State;
 using CecoChat.Data.State.Repos;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 
 namespace CecoChat.Server.State.HostedServices;
 

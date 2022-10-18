@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
 using CecoChat.Client.IDGen;
 using CecoChat.Contracts.Backplane;
 using CecoChat.Contracts.Messaging;
@@ -10,7 +7,6 @@ using CecoChat.Server.Messaging.Backplane;
 using CecoChat.Server.Messaging.Clients.Streaming;
 using Grpc.Core;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.Logging;
 
 namespace CecoChat.Server.Messaging.Clients;
 

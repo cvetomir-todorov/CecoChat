@@ -1,4 +1,3 @@
-using System;
 using Refit;
 
 namespace CecoChat.Contracts.Bff;

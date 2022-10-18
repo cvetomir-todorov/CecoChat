@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace CecoChat.Kafka;
+﻿namespace CecoChat.Kafka;
 
 public readonly struct PartitionRange : IEquatable<PartitionRange>
 {

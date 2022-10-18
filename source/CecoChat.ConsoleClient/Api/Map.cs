@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace CecoChat.ConsoleClient.Api;
 
 public static class Map

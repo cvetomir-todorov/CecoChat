@@ -1,10 +1,6 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using CecoChat.Data.Config.Partitioning;
+﻿using CecoChat.Data.Config.Partitioning;
 using CecoChat.Kafka;
 using CecoChat.Server.Messaging.Backplane;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 
 namespace CecoChat.Server.Messaging.HostedServices;

@@ -1,8 +1,4 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-using CecoChat.Data.Config.Partitioning;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+﻿using CecoChat.Data.Config.Partitioning;
 using Microsoft.Extensions.Options;
 
 namespace CecoChat.Server.Messaging.HostedServices;

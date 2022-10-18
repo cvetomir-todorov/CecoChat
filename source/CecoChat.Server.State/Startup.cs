@@ -12,11 +12,6 @@ using CecoChat.Server.State.Backplane;
 using CecoChat.Server.State.Clients;
 using CecoChat.Server.State.HostedServices;
 using Confluent.Kafka;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using OpenTelemetry.Trace;
 
 namespace CecoChat.Server.State;

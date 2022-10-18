@@ -13,11 +13,6 @@ using CecoChat.Server.History.Clients;
 using CecoChat.Server.History.HostedServices;
 using CecoChat.Server.Identity;
 using Confluent.Kafka;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using OpenTelemetry.Trace;
 
 namespace CecoChat.Server.History;

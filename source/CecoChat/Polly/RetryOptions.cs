@@ -1,5 +1,3 @@
-using System;
-
 namespace CecoChat.Polly;
 
 public sealed class RetryOptions

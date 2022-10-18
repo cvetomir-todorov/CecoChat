@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using CecoChat.Redis;
+﻿using CecoChat.Redis;
 using StackExchange.Redis;
 
 namespace CecoChat.Data.Config.History;

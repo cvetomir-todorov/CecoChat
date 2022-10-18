@@ -1,7 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-
-namespace CecoChat.Events;
+﻿namespace CecoChat.Events;
 
 public interface ISubscriber<in TEventData>
 {

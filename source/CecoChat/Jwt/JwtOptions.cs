@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace CecoChat.Jwt;
+﻿namespace CecoChat.Jwt;
 
 public sealed class JwtOptions
 {

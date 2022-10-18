@@ -1,4 +1,3 @@
-using System;
 using CecoChat.HttpClient;
 using CecoChat.Polly;
 

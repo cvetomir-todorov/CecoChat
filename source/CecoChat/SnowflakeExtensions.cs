@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace CecoChat;
+﻿namespace CecoChat;
 
 public static class Snowflake
 {

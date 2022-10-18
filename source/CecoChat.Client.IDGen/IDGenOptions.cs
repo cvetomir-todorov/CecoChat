@@ -1,5 +1,4 @@
-﻿using System;
-using CecoChat.HttpClient;
+﻿using CecoChat.HttpClient;
 using CecoChat.Polly;
 
 namespace CecoChat.Client.IDGen;
