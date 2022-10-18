@@ -1,5 +1,3 @@
-using Microsoft.Extensions.Hosting;
-
 namespace CecoChat.Server.History;
 
 public static class Program

@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using CecoChat.ConsoleClient.Api;
 using CecoChat.ConsoleClient.LocalStorage;
 

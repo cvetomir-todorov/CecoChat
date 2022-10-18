@@ -1,5 +1,3 @@
-using System;
-using System.Threading;
 using CecoChat.Contracts.Backplane;
 using CecoChat.Contracts.State;
 using CecoChat.Data;
@@ -8,7 +6,6 @@ using CecoChat.Kafka;
 using CecoChat.Server.Backplane;
 using CecoChat.Server.State.Clients;
 using Confluent.Kafka;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace CecoChat.Server.State.Backplane;

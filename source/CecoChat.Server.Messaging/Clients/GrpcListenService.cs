@@ -1,12 +1,8 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using CecoChat.Contracts.Messaging;
+﻿using CecoChat.Contracts.Messaging;
 using CecoChat.Server.Identity;
 using CecoChat.Server.Messaging.Clients.Streaming;
 using Grpc.Core;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.Logging;
 
 namespace CecoChat.Server.Messaging.Clients;
 

@@ -1,13 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
 using CecoChat.Contracts.History;
 using CecoChat.Data.Config.History;
 using CecoChat.Data.History.Repos;
 using CecoChat.Server.Identity;
 using Grpc.Core;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.Logging;
 
 namespace CecoChat.Server.History.Clients;
 

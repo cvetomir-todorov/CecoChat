@@ -1,16 +1,11 @@
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Threading;
-using System.Threading.Tasks;
 using CecoChat.Client.State;
 using CecoChat.Contracts.Bff;
 using CecoChat.Server.Identity;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.Extensions.Logging;
 
 namespace CecoChat.Server.Bff.Controllers;
 

@@ -3,11 +3,6 @@ using CecoChat.Autofac;
 using CecoChat.Data.Config;
 using CecoChat.Server.IDGen.Generation;
 using CecoChat.Server.IDGen.HostedServices;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 
 namespace CecoChat.Server.IDGen;
 

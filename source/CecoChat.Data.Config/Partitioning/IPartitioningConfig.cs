@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using CecoChat.Kafka;
+﻿using CecoChat.Kafka;
 
 namespace CecoChat.Data.Config.Partitioning;
 

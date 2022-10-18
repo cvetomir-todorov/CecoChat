@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using CecoChat.Kafka;
+﻿using CecoChat.Kafka;
 using CecoChat.Redis;
 using StackExchange.Redis;
 

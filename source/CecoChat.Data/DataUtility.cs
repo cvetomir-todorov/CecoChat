@@ -1,5 +1,3 @@
-using System;
-
 namespace CecoChat.Data;
 
 public static class DataUtility

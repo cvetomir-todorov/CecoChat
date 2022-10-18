@@ -1,4 +1,3 @@
-using System;
 using CecoChat.Contracts;
 using CecoChat.Contracts.Backplane;
 using CecoChat.Contracts.History;

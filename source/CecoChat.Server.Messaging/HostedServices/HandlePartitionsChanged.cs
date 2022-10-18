@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using CecoChat.Contracts.Messaging;
+﻿using CecoChat.Contracts.Messaging;
 using CecoChat.Data.Config.Partitioning;
 using CecoChat.Events;
 using CecoChat.Kafka;
 using CecoChat.Server.Backplane;
 using CecoChat.Server.Messaging.Backplane;
 using CecoChat.Server.Messaging.Clients.Streaming;
-using Microsoft.Extensions.Hosting;
 
 namespace CecoChat.Server.Messaging.HostedServices;
 

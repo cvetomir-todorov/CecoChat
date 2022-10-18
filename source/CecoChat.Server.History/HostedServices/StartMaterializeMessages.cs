@@ -1,9 +1,4 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using CecoChat.Server.History.Backplane;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+﻿using CecoChat.Server.History.Backplane;
 
 namespace CecoChat.Server.History.HostedServices;
 

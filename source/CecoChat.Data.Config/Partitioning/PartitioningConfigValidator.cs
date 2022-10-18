@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using CecoChat.Kafka;
+﻿using CecoChat.Kafka;
 using FluentValidation;
 
 namespace CecoChat.Data.Config.Partitioning;

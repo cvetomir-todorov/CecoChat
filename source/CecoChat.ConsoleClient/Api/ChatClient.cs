@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.IdentityModel.Tokens.Jwt;
 using CecoChat.Contracts.Bff;
 using CecoChat.Contracts.Messaging;
 using CecoChat.Data;

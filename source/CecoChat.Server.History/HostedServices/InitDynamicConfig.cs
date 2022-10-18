@@ -1,7 +1,4 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-using CecoChat.Data.Config.History;
-using Microsoft.Extensions.Hosting;
+﻿using CecoChat.Data.Config.History;
 
 namespace CecoChat.Server.History.HostedServices;
 

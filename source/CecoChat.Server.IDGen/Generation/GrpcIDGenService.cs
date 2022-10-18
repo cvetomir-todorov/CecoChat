@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using CecoChat.Contracts.IDGen;
+﻿using CecoChat.Contracts.IDGen;
 using Grpc.Core;
 
 namespace CecoChat.Server.IDGen.Generation;

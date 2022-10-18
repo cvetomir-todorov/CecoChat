@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Threading.Tasks;
 using Cassandra;
 using CecoChat.Contracts.History;
 using CecoChat.Data.History.Instrumentation;

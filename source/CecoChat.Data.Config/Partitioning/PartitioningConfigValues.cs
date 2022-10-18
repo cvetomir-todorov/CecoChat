@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using CecoChat.Kafka;
+﻿using CecoChat.Kafka;
 
 namespace CecoChat.Data.Config.Partitioning;
 

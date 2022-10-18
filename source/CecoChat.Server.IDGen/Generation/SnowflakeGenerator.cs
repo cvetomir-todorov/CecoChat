@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using CecoChat.Data.Config.Snowflake;
+﻿using CecoChat.Data.Config.Snowflake;
 using CecoChat.Server.IDGen.HostedServices;
 using IdGen;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace CecoChat.Server.IDGen.Generation;

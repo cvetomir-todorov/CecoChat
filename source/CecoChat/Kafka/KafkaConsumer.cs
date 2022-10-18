@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Threading;
+﻿using System.Diagnostics;
 using CecoChat.Kafka.Instrumentation;
 using Confluent.Kafka;
 using Microsoft.Extensions.Logging;

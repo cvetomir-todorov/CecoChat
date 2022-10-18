@@ -1,6 +1,3 @@
-using System;
-using System.Threading.Tasks;
-
 namespace CecoChat.ConsoleClient.Interaction;
 
 public sealed class FindUserState : State

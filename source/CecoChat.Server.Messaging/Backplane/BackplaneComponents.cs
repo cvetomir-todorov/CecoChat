@@ -1,8 +1,4 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using CecoChat.Kafka;
-using Microsoft.Extensions.Logging;
+﻿using CecoChat.Kafka;
 using Microsoft.Extensions.Options;
 
 namespace CecoChat.Server.Messaging.Backplane;

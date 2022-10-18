@@ -1,5 +1,4 @@
-﻿using System;
-using System.Globalization;
+﻿using System.Globalization;
 using OpenTelemetry.Trace;
 
 namespace CecoChat.Otel;

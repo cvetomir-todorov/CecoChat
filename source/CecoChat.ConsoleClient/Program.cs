@@ -1,7 +1,4 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using CecoChat.ConsoleClient.Api;
+﻿using CecoChat.ConsoleClient.Api;
 using CecoChat.ConsoleClient.Interaction;
 using CecoChat.ConsoleClient.LocalStorage;
 

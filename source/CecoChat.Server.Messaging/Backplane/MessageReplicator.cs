@@ -1,11 +1,7 @@
-using System;
-using System.Threading;
 using CecoChat.Contracts.Backplane;
 using CecoChat.Kafka;
 using CecoChat.Server.Backplane;
 using Confluent.Kafka;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace CecoChat.Server.Messaging.Backplane;

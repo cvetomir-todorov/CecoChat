@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace CecoChat.Data.Config.Snowflake;
 
 internal sealed class SnowflakeConfigValues
