@@ -2,37 +2,36 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
-namespace CecoChat
-{
-    public interface IClock
-    {
-        DateTime GetNowUtc();
+namespace CecoChat;
 
-        DateTime GetNowLocal();
+public interface IClock
+{
+    DateTime GetNowUtc();
+
+    DateTime GetNowLocal();
+}
+
+public sealed class MonotonicClock : IClock
+{
+    private static readonly DateTime _startUtc;
+    private static readonly Stopwatch _stopwatch;
+
+    static MonotonicClock()
+    {
+        _stopwatch = new Stopwatch();
+        _stopwatch.Start();
+        _startUtc = DateTime.UtcNow;
     }
 
-    public sealed class MonotonicClock : IClock
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public DateTime GetNowUtc()
     {
-        private static readonly DateTime _startUtc;
-        private static readonly Stopwatch _stopwatch;
+        return _startUtc.Add(_stopwatch.Elapsed);
+    }
 
-        static MonotonicClock()
-        {
-            _stopwatch = new Stopwatch();
-            _stopwatch.Start();
-            _startUtc = DateTime.UtcNow;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public DateTime GetNowUtc()
-        {
-            return _startUtc.Add(_stopwatch.Elapsed);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public DateTime GetNowLocal()
-        {
-            return GetNowUtc().ToLocalTime();
-        }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public DateTime GetNowLocal()
+    {
+        return GetNowUtc().ToLocalTime();
     }
 }

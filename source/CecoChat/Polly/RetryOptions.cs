@@ -1,13 +1,12 @@
 using System;
 
-namespace CecoChat.Polly
+namespace CecoChat.Polly;
+
+public sealed class RetryOptions
 {
-    public sealed class RetryOptions
-    {
-        public int RetryCount { get; set; }
-        public TimeSpan InitialBackOff { get; set; }
-        public double BackOffMultiplier { get; set; }
-        public TimeSpan MaxBackOff { get; set; }
-        public int MaxJitterMs { get; set; }
-    }
+    public int RetryCount { get; set; }
+    public TimeSpan InitialBackOff { get; set; }
+    public double BackOffMultiplier { get; set; }
+    public TimeSpan MaxBackOff { get; set; }
+    public int MaxJitterMs { get; set; }
 }

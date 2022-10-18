@@ -3,29 +3,28 @@ using System.Threading.Tasks;
 using CecoChat.Data.Config.History;
 using Microsoft.Extensions.Hosting;
 
-namespace CecoChat.Server.History.HostedServices
+namespace CecoChat.Server.History.HostedServices;
+
+public sealed class InitDynamicConfig : IHostedService
 {
-    public sealed class InitDynamicConfig : IHostedService
+    private readonly IHistoryConfig _historyConfig;
+
+    public InitDynamicConfig(
+        IHistoryConfig historyConfig)
     {
-        private readonly IHistoryConfig _historyConfig;
+        _historyConfig = historyConfig;
+    }
 
-        public InitDynamicConfig(
-            IHistoryConfig historyConfig)
+    public async Task StartAsync(CancellationToken cancellationToken)
+    {
+        await _historyConfig.Initialize(new HistoryConfigUsage
         {
-            _historyConfig = historyConfig;
-        }
+            UseMessageCount = true
+        });
+    }
 
-        public async Task StartAsync(CancellationToken cancellationToken)
-        {
-            await _historyConfig.Initialize(new HistoryConfigUsage
-            {
-                UseMessageCount = true
-            });
-        }
-
-        public Task StopAsync(CancellationToken cancellationToken)
-        {
-            return Task.CompletedTask;
-        }
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
     }
 }

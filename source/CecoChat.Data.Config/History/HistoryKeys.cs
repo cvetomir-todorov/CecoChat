@@ -1,7 +1,6 @@
-﻿namespace CecoChat.Data.Config.History
+﻿namespace CecoChat.Data.Config.History;
+
+internal static class HistoryKeys
 {
-    internal static class HistoryKeys
-    {
-        public const string ChatMessageCount = "history.chat.message-count";
-    }
+    public const string ChatMessageCount = "history.chat.message-count";
 }

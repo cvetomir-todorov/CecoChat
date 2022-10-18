@@ -1,7 +1,6 @@
-namespace CecoChat.Server.Messaging.HostedServices
+namespace CecoChat.Server.Messaging.HostedServices;
+
+public sealed class ConfigOptions
 {
-    public sealed class ConfigOptions
-    {
-        public string ServerID { get; set; }
-    }
+    public string ServerID { get; set; }
 }

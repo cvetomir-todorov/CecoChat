@@ -1,7 +1,6 @@
-﻿namespace CecoChat.Data.Config.History
+﻿namespace CecoChat.Data.Config.History;
+
+internal sealed class HistoryConfigValues
 {
-    internal sealed class HistoryConfigValues
-    {
-        public int ChatMessageCount { get; set; }
-    }
+    public int ChatMessageCount { get; set; }
 }

@@ -3,28 +3,27 @@ using System.Threading.Tasks;
 using CecoChat.Data.Config.Partitioning;
 using Microsoft.Extensions.Hosting;
 
-namespace CecoChat.Server.Bff.HostedServices
+namespace CecoChat.Server.Bff.HostedServices;
+
+public sealed class InitDynamicConfig : IHostedService
 {
-    public sealed class InitDynamicConfig : IHostedService
+    private readonly IPartitioningConfig _partitioningConfig;
+
+    public InitDynamicConfig(IPartitioningConfig partitioningConfig)
     {
-        private readonly IPartitioningConfig _partitioningConfig;
+        _partitioningConfig = partitioningConfig;
+    }
 
-        public InitDynamicConfig(IPartitioningConfig partitioningConfig)
+    public async Task StartAsync(CancellationToken cancellationToken)
+    {
+        await _partitioningConfig.Initialize(new PartitioningConfigUsage
         {
-            _partitioningConfig = partitioningConfig;
-        }
+            UseServerAddresses = true
+        });
+    }
 
-        public async Task StartAsync(CancellationToken cancellationToken)
-        {
-            await _partitioningConfig.Initialize(new PartitioningConfigUsage
-            {
-                UseServerAddresses = true
-            });
-        }
-
-        public Task StopAsync(CancellationToken cancellationToken)
-        {
-            return Task.CompletedTask;
-        }
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
     }
 }

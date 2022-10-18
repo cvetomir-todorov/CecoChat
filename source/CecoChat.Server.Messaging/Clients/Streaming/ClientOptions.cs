@@ -1,7 +1,6 @@
-﻿namespace CecoChat.Server.Messaging.Clients.Streaming
+﻿namespace CecoChat.Server.Messaging.Clients.Streaming;
+
+public sealed class ClientOptions
 {
-    public sealed class ClientOptions
-    {
-        public int SendMessagesHighWatermark { get; set; }
-    }
+    public int SendMessagesHighWatermark { get; set; }
 }

@@ -3,83 +3,82 @@ using CecoChat.Kafka;
 using CecoChat.Redis;
 using StackExchange.Redis;
 
-namespace CecoChat.Data.Config.Partitioning
+namespace CecoChat.Data.Config.Partitioning;
+
+internal interface IPartitioningConfigRepo
 {
-    internal interface IPartitioningConfigRepo
+    Task<PartitioningConfigValues> GetValues(PartitioningConfigUsage usage);
+}
+
+internal sealed class PartitioningConfigRepo : IPartitioningConfigRepo
+{
+    private readonly IRedisContext _redisContext;
+
+    public PartitioningConfigRepo(
+        IRedisContext redisContext)
     {
-        Task<PartitioningConfigValues> GetValues(PartitioningConfigUsage usage);
+        _redisContext = redisContext;
     }
 
-    internal sealed class PartitioningConfigRepo : IPartitioningConfigRepo
+    public async Task<PartitioningConfigValues> GetValues(PartitioningConfigUsage usage)
     {
-        private readonly IRedisContext _redisContext;
+        PartitioningConfigValues values = new();
 
-        public PartitioningConfigRepo(
-            IRedisContext redisContext)
+        values.PartitionCount = await GetPartitionCount();
+        await GetServerPartitions(usage, values);
+        await GetServerAddresses(usage, values);
+
+        return values;
+    }
+
+    private async Task<int> GetPartitionCount()
+    {
+        IDatabase database = _redisContext.GetDatabase();
+        RedisValue value = await database.StringGetAsync(PartitioningKeys.PartitionCount);
+        value.TryParse(out int partitionCount);
+        return partitionCount;
+    }
+
+    private async Task GetServerPartitions(PartitioningConfigUsage usage, PartitioningConfigValues values)
+    {
+        if (!usage.UseServerPartitions && !usage.UseServerAddresses)
         {
-            _redisContext = redisContext;
+            return;
         }
 
-        public async Task<PartitioningConfigValues> GetValues(PartitioningConfigUsage usage)
+        IDatabase database = _redisContext.GetDatabase();
+        HashEntry[] pairs = await database.HashGetAllAsync(PartitioningKeys.ServerPartitions);
+
+        foreach (HashEntry pair in pairs)
         {
-            PartitioningConfigValues values = new();
-
-            values.PartitionCount = await GetPartitionCount();
-            await GetServerPartitions(usage, values);
-            await GetServerAddresses(usage, values);
-
-            return values;
-        }
-
-        private async Task<int> GetPartitionCount()
-        {
-            IDatabase database = _redisContext.GetDatabase();
-            RedisValue value = await database.StringGetAsync(PartitioningKeys.PartitionCount);
-            value.TryParse(out int partitionCount);
-            return partitionCount;
-        }
-
-        private async Task GetServerPartitions(PartitioningConfigUsage usage, PartitioningConfigValues values)
-        {
-            if (!usage.UseServerPartitions && !usage.UseServerAddresses)
+            string server = pair.Name;
+            if (PartitionRange.TryParse(pair.Value, separator: '-', out PartitionRange partitions))
             {
-                return;
-            }
-
-            IDatabase database = _redisContext.GetDatabase();
-            HashEntry[] pairs = await database.HashGetAllAsync(PartitioningKeys.ServerPartitions);
-
-            foreach (HashEntry pair in pairs)
-            {
-                string server = pair.Name;
-                if (PartitionRange.TryParse(pair.Value, separator: '-', out PartitionRange partitions))
+                for (int partition = partitions.Lower; partition <= partitions.Upper; ++partition)
                 {
-                    for (int partition = partitions.Lower; partition <= partitions.Upper; ++partition)
-                    {
-                        values.PartitionServerMap[partition] = server;
-                    }
+                    values.PartitionServerMap[partition] = server;
                 }
-
-                values.ServerPartitionsMap[server] = partitions;
             }
+
+            values.ServerPartitionsMap[server] = partitions;
+        }
+    }
+
+    private async Task GetServerAddresses(PartitioningConfigUsage usage, PartitioningConfigValues values)
+    {
+        if (!usage.UseServerAddresses)
+        {
+            return;
         }
 
-        private async Task GetServerAddresses(PartitioningConfigUsage usage, PartitioningConfigValues values)
+        IDatabase database = _redisContext.GetDatabase();
+        HashEntry[] pairs = await database.HashGetAllAsync(PartitioningKeys.ServerAddresses);
+
+        foreach (HashEntry pair in pairs)
         {
-            if (!usage.UseServerAddresses)
-            {
-                return;
-            }
-
-            IDatabase database = _redisContext.GetDatabase();
-            HashEntry[] pairs = await database.HashGetAllAsync(PartitioningKeys.ServerAddresses);
-
-            foreach (HashEntry pair in pairs)
-            {
-                string server = pair.Name;
-                string address = pair.Value;
-                values.ServerAddressMap[server] = address;
-            }
+            string server = pair.Name;
+            string address = pair.Value;
+            values.ServerAddressMap[server] = address;
         }
     }
 }

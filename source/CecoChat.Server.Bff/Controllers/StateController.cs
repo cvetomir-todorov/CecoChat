@@ -12,89 +12,88 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
 
-namespace CecoChat.Server.Bff.Controllers
+namespace CecoChat.Server.Bff.Controllers;
+
+public sealed class GetChatsRequestValidator : AbstractValidator<GetChatsRequest>
 {
-    public sealed class GetChatsRequestValidator : AbstractValidator<GetChatsRequest>
+    public GetChatsRequestValidator()
     {
-        public GetChatsRequestValidator()
-        {
-            RuleFor(x => x.NewerThan).GreaterThanOrEqualTo(Snowflake.Epoch);
-        }
+        RuleFor(x => x.NewerThan).GreaterThanOrEqualTo(Snowflake.Epoch);
+    }
+}
+
+[ApiController]
+[Route("api/state")]
+public class StateController : ControllerBase
+{
+    private readonly ILogger _logger;
+    private readonly IStateClient _client;
+
+    public StateController(
+        ILogger<StateController> logger,
+        IStateClient client)
+    {
+        _logger = logger;
+        _client = client;
     }
 
-    [ApiController]
-    [Route("api/state")]
-    public class StateController : ControllerBase
+    [Authorize(Roles = "user")]
+    [HttpGet("chats", Name = "GetChats")]
+    [ProducesResponseType(typeof(GetChatsResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GetChats([FromQuery][BindRequired] GetChatsRequest request, CancellationToken ct)
     {
-        private readonly ILogger _logger;
-        private readonly IStateClient _client;
-
-        public StateController(
-            ILogger<StateController> logger,
-            IStateClient client)
+        if (!TryGetUserClaims(HttpContext, out UserClaims userClaims))
         {
-            _logger = logger;
-            _client = client;
+            return Unauthorized();
+        }
+        if (!HttpContext.TryGetBearerAccessTokenValue(out string accessToken))
+        {
+            return Unauthorized();
         }
 
-        [Authorize(Roles = "user")]
-        [HttpGet("chats", Name = "GetChats")]
-        [ProducesResponseType(typeof(GetChatsResponse), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetChats([FromQuery][BindRequired] GetChatsRequest request, CancellationToken ct)
+        IReadOnlyCollection<Contracts.State.ChatState> serviceChats = await _client.GetChats(userClaims.UserID, request.NewerThan, accessToken, ct);
+        List<ChatState> clientChats = MapChats(serviceChats);
+
+        _logger.LogTrace("Return {0} chats for user {1} and client {2}.", clientChats.Count, userClaims.UserID, userClaims.ClientID);
+        return Ok(new GetChatsResponse
         {
-            if (!TryGetUserClaims(HttpContext, out UserClaims userClaims))
-            {
-                return Unauthorized();
-            }
-            if (!HttpContext.TryGetBearerAccessTokenValue(out string accessToken))
-            {
-                return Unauthorized();
-            }
+            Chats = clientChats
+        });
+    }
 
-            IReadOnlyCollection<Contracts.State.ChatState> serviceChats = await _client.GetChats(userClaims.UserID, request.NewerThan, accessToken, ct);
-            List<ChatState> clientChats = MapChats(serviceChats);
+    private static List<ChatState> MapChats(IReadOnlyCollection<Contracts.State.ChatState> serviceChats)
+    {
+        List<ChatState> clientChats = new();
 
-            _logger.LogTrace("Return {0} chats for user {1} and client {2}.", clientChats.Count, userClaims.UserID, userClaims.ClientID);
-            return Ok(new GetChatsResponse
+        foreach (Contracts.State.ChatState serviceChat in serviceChats)
+        {
+            ChatState clientChat = new()
             {
-                Chats = clientChats
-            });
+                ChatID = serviceChat.ChatId,
+                NewestMessage = serviceChat.NewestMessage,
+                OtherUserDelivered = serviceChat.OtherUserDelivered,
+                OtherUserSeen = serviceChat.OtherUserSeen
+            };
+
+            clientChats.Add(clientChat);
         }
 
-        private static List<ChatState> MapChats(IReadOnlyCollection<Contracts.State.ChatState> serviceChats)
+        return clientChats;
+    }
+
+    private bool TryGetUserClaims(HttpContext context, out UserClaims userClaims)
+    {
+        if (!context.User.TryGetUserClaims(out userClaims))
         {
-            List<ChatState> clientChats = new();
-
-            foreach (Contracts.State.ChatState serviceChat in serviceChats)
-            {
-                ChatState clientChat = new()
-                {
-                    ChatID = serviceChat.ChatId,
-                    NewestMessage = serviceChat.NewestMessage,
-                    OtherUserDelivered = serviceChat.OtherUserDelivered,
-                    OtherUserSeen = serviceChat.OtherUserSeen
-                };
-
-                clientChats.Add(clientChat);
-            }
-
-            return clientChats;
+            _logger.LogError("Client from was authorized but has no parseable access token.");
+            return false;
         }
 
-        private bool TryGetUserClaims(HttpContext context, out UserClaims userClaims)
-        {
-            if (!context.User.TryGetUserClaims(out userClaims))
-            {
-                _logger.LogError("Client from was authorized but has no parseable access token.");
-                return false;
-            }
-
-            Activity.Current?.SetTag("user.id", userClaims.UserID);
-            return true;
-        }
+        Activity.Current?.SetTag("user.id", userClaims.UserID);
+        return true;
     }
 }

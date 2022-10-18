@@ -1,14 +1,13 @@
-﻿namespace CecoChat.Otel
+﻿namespace CecoChat.Otel;
+
+public enum OtelSamplingStrategy
 {
-    public enum OtelSamplingStrategy
-    {
-        AlwaysOff, AlwaysOn, Probability
-    }
+    AlwaysOff, AlwaysOn, Probability
+}
 
-    public sealed class OtelSamplingOptions
-    {
-        public OtelSamplingStrategy Strategy { get; set; }
+public sealed class OtelSamplingOptions
+{
+    public OtelSamplingStrategy Strategy { get; set; }
 
-        public double Probability { get; set; }
-    }
+    public double Probability { get; set; }
 }

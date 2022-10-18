@@ -5,94 +5,93 @@ using CecoChat.Redis;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 
-namespace CecoChat.Data.Config.Snowflake
+namespace CecoChat.Data.Config.Snowflake;
+
+internal sealed class SnowflakeConfig : ISnowflakeConfig
 {
-    internal sealed class SnowflakeConfig : ISnowflakeConfig
+    private readonly ILogger _logger;
+    private readonly IRedisContext _redisContext;
+    private readonly ISnowflakeConfigRepo _repo;
+    private readonly IConfigUtility _configUtility;
+
+    private SnowflakeConfigValues _values;
+    private SnowflakeConfigValidator _validator;
+
+    public SnowflakeConfig(
+        ILogger<SnowflakeConfig> logger,
+        IRedisContext redisContext,
+        ISnowflakeConfigRepo repo,
+        IConfigUtility configUtility)
     {
-        private readonly ILogger _logger;
-        private readonly IRedisContext _redisContext;
-        private readonly ISnowflakeConfigRepo _repo;
-        private readonly IConfigUtility _configUtility;
+        _logger = logger;
+        _redisContext = redisContext;
+        _repo = repo;
+        _configUtility = configUtility;
+    }
 
-        private SnowflakeConfigValues _values;
-        private SnowflakeConfigValidator _validator;
+    public void Dispose()
+    {
+        _redisContext.Dispose();
+    }
 
-        public SnowflakeConfig(
-            ILogger<SnowflakeConfig> logger,
-            IRedisContext redisContext,
-            ISnowflakeConfigRepo repo,
-            IConfigUtility configUtility)
+    public IReadOnlyCollection<short> GetGeneratorIDs(string server)
+    {
+        if (!_values.ServerGeneratorIDs.TryGetValue(server, out List<short> generatorIDs))
         {
-            _logger = logger;
-            _redisContext = redisContext;
-            _repo = repo;
-            _configUtility = configUtility;
+            throw new InvalidOperationException($"No snowflake generator IDs configured for server {server}.");
         }
 
-        public void Dispose()
+        return generatorIDs;
+    }
+
+    public async Task Initialize()
+    {
+        try
         {
-            _redisContext.Dispose();
+            _validator = new SnowflakeConfigValidator();
+            await SubscribeForChanges();
+            await LoadValidateValues();
         }
-
-        public IReadOnlyCollection<short> GetGeneratorIDs(string server)
+        catch (Exception exception)
         {
-            if (!_values.ServerGeneratorIDs.TryGetValue(server, out List<short> generatorIDs))
-            {
-                throw new InvalidOperationException($"No snowflake generator IDs configured for server {server}.");
-            }
-
-            return generatorIDs;
+            _logger.LogError(exception, "Initializing snowflake config failed.");
         }
+    }
 
-        public async Task Initialize()
+    private async Task SubscribeForChanges()
+    {
+        ISubscriber subscriber = _redisContext.GetSubscriber();
+
+        ChannelMessageQueue generatorIDsMQ = await subscriber.SubscribeAsync($"notify:{SnowflakeKeys.ServerGeneratorIDs}");
+        generatorIDsMQ.OnMessage(channelMessage => _configUtility.HandleChange(channelMessage, HandleGeneratorIDs));
+        _logger.LogInformation("Subscribed for changes about {0} from channel {1}.",
+            SnowflakeKeys.ServerGeneratorIDs, generatorIDsMQ.Channel);
+    }
+
+    private Task HandleGeneratorIDs(ChannelMessage channelMessage)
+    {
+        return LoadValidateValues();
+    }
+
+    private async Task LoadValidateValues()
+    {
+        SnowflakeConfigValues values = await _repo.GetValues();
+        _logger.LogInformation("Loading snowflake configuration succeeded.");
+
+        bool areValid = _configUtility.ValidateValues("snowflake", values, _validator);
+        if (areValid)
         {
-            try
-            {
-                _validator = new SnowflakeConfigValidator();
-                await SubscribeForChanges();
-                await LoadValidateValues();
-            }
-            catch (Exception exception)
-            {
-                _logger.LogError(exception, "Initializing snowflake config failed.");
-            }
+            _values = values;
+            PrintValues(values);
         }
+    }
 
-        private async Task SubscribeForChanges()
+    private void PrintValues(SnowflakeConfigValues values)
+    {
+        _logger.LogInformation("Total of {0} server(s) configured:", values.ServerGeneratorIDs.Count);
+        foreach (KeyValuePair<string, List<short>> pair in values.ServerGeneratorIDs)
         {
-            ISubscriber subscriber = _redisContext.GetSubscriber();
-
-            ChannelMessageQueue generatorIDsMQ = await subscriber.SubscribeAsync($"notify:{SnowflakeKeys.ServerGeneratorIDs}");
-            generatorIDsMQ.OnMessage(channelMessage => _configUtility.HandleChange(channelMessage, HandleGeneratorIDs));
-            _logger.LogInformation("Subscribed for changes about {0} from channel {1}.",
-                SnowflakeKeys.ServerGeneratorIDs, generatorIDsMQ.Channel);
-        }
-
-        private Task HandleGeneratorIDs(ChannelMessage channelMessage)
-        {
-            return LoadValidateValues();
-        }
-
-        private async Task LoadValidateValues()
-        {
-            SnowflakeConfigValues values = await _repo.GetValues();
-            _logger.LogInformation("Loading snowflake configuration succeeded.");
-
-            bool areValid = _configUtility.ValidateValues("snowflake", values, _validator);
-            if (areValid)
-            {
-                _values = values;
-                PrintValues(values);
-            }
-        }
-
-        private void PrintValues(SnowflakeConfigValues values)
-        {
-            _logger.LogInformation("Total of {0} server(s) configured:", values.ServerGeneratorIDs.Count);
-            foreach (KeyValuePair<string, List<short>> pair in values.ServerGeneratorIDs)
-            {
-                _logger.LogInformation("Server {0} is assigned generator IDs: [{1}].", pair.Key, string.Join(separator: ", ", pair.Value));
-            }
+            _logger.LogInformation("Server {0} is assigned generator IDs: [{1}].", pair.Key, string.Join(separator: ", ", pair.Value));
         }
     }
 }

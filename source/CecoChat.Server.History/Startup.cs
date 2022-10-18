@@ -20,102 +20,101 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OpenTelemetry.Trace;
 
-namespace CecoChat.Server.History
+namespace CecoChat.Server.History;
+
+public class Startup
 {
-    public class Startup
+    private readonly JwtOptions _jwtOptions;
+    private readonly OtelSamplingOptions _otelSamplingOptions;
+    private readonly JaegerOptions _jaegerOptions;
+
+    public Startup(IConfiguration configuration, IWebHostEnvironment environment)
     {
-        private readonly JwtOptions _jwtOptions;
-        private readonly OtelSamplingOptions _otelSamplingOptions;
-        private readonly JaegerOptions _jaegerOptions;
+        Configuration = configuration;
+        Environment = environment;
 
-        public Startup(IConfiguration configuration, IWebHostEnvironment environment)
+        _jwtOptions = new();
+        Configuration.GetSection("Jwt").Bind(_jwtOptions);
+
+        _otelSamplingOptions = new();
+        Configuration.GetSection("OtelSampling").Bind(_otelSamplingOptions);
+
+        _jaegerOptions = new();
+        Configuration.GetSection("Jaeger").Bind(_jaegerOptions);
+    }
+
+    public IConfiguration Configuration { get; }
+
+    public IWebHostEnvironment Environment { get; }
+
+    public void ConfigureServices(IServiceCollection services)
+    {
+        // telemetry
+        services.AddOpenTelemetryTracing(otel =>
         {
-            Configuration = configuration;
-            Environment = environment;
+            otel.AddServiceResource(new OtelServiceResource { Namespace = "CecoChat", Name = "History", Version = "0.1" });
+            otel.AddAspNetCoreInstrumentation(aspnet => aspnet.EnableGrpcAspNetCoreSupport = true);
+            otel.AddKafkaInstrumentation();
+            otel.AddHistoryInstrumentation();
+            otel.ConfigureSampling(_otelSamplingOptions);
+            otel.ConfigureJaegerExporter(_jaegerOptions);
+        });
 
-            _jwtOptions = new();
-            Configuration.GetSection("Jwt").Bind(_jwtOptions);
+        // security
+        services.AddJwtAuthentication(_jwtOptions);
+        services.AddAuthorization();
 
-            _otelSamplingOptions = new();
-            Configuration.GetSection("OtelSampling").Bind(_otelSamplingOptions);
+        // clients
+        services.AddGrpc(rpc => rpc.EnableDetailedErrors = Environment.IsDevelopment());
 
-            _jaegerOptions = new();
-            Configuration.GetSection("Jaeger").Bind(_jaegerOptions);
+        // required
+        services.AddOptions();
+    }
+
+    public void ConfigureContainer(ContainerBuilder builder)
+    {
+        // ordered hosted services
+        builder.RegisterHostedService<InitDynamicConfig>();
+        builder.RegisterHostedService<InitHistoryDb>();
+        builder.RegisterHostedService<StartMaterializeMessages>();
+
+        // configuration
+        builder.RegisterModule(new ConfigDbAutofacModule
+        {
+            RedisConfiguration = Configuration.GetSection("ConfigDB"),
+            RegisterHistory = true
+        });
+
+        // history
+        builder.RegisterModule(new HistoryDbAutofacModule
+        {
+            HistoryDbConfiguration = Configuration.GetSection("HistoryDB"),
+        });
+
+        // backplane
+        builder.RegisterType<HistoryConsumer>().As<IHistoryConsumer>().SingleInstance();
+        builder.RegisterFactory<KafkaConsumer<Null, BackplaneMessage>, IKafkaConsumer<Null, BackplaneMessage>>();
+        builder.RegisterModule(new KafkaInstrumentationAutofacModule());
+        builder.RegisterOptions<BackplaneOptions>(Configuration.GetSection("Backplane"));
+
+        // shared
+        builder.RegisterType<ContractDataMapper>().As<IContractDataMapper>().SingleInstance();
+    }
+
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    {
+        if (env.IsDevelopment())
+        {
+            app.UseDeveloperExceptionPage();
         }
 
-        public IConfiguration Configuration { get; }
-
-        public IWebHostEnvironment Environment { get; }
-
-        public void ConfigureServices(IServiceCollection services)
+        app.UseHttpsRedirection();
+        app.UseRouting();
+        app.UseAuthentication();
+        app.UseAuthorization();
+        app.UseEndpoints(endpoints =>
         {
-            // telemetry
-            services.AddOpenTelemetryTracing(otel =>
-            {
-                otel.AddServiceResource(new OtelServiceResource { Namespace = "CecoChat", Name = "History", Version = "0.1" });
-                otel.AddAspNetCoreInstrumentation(aspnet => aspnet.EnableGrpcAspNetCoreSupport = true);
-                otel.AddKafkaInstrumentation();
-                otel.AddHistoryInstrumentation();
-                otel.ConfigureSampling(_otelSamplingOptions);
-                otel.ConfigureJaegerExporter(_jaegerOptions);
-            });
-
-            // security
-            services.AddJwtAuthentication(_jwtOptions);
-            services.AddAuthorization();
-
-            // clients
-            services.AddGrpc(rpc => rpc.EnableDetailedErrors = Environment.IsDevelopment());
-
-            // required
-            services.AddOptions();
-        }
-
-        public void ConfigureContainer(ContainerBuilder builder)
-        {
-            // ordered hosted services
-            builder.RegisterHostedService<InitDynamicConfig>();
-            builder.RegisterHostedService<InitHistoryDb>();
-            builder.RegisterHostedService<StartMaterializeMessages>();
-
-            // configuration
-            builder.RegisterModule(new ConfigDbAutofacModule
-            {
-                RedisConfiguration = Configuration.GetSection("ConfigDB"),
-                RegisterHistory = true
-            });
-
-            // history
-            builder.RegisterModule(new HistoryDbAutofacModule
-            {
-                HistoryDbConfiguration = Configuration.GetSection("HistoryDB"),
-            });
-
-            // backplane
-            builder.RegisterType<HistoryConsumer>().As<IHistoryConsumer>().SingleInstance();
-            builder.RegisterFactory<KafkaConsumer<Null, BackplaneMessage>, IKafkaConsumer<Null, BackplaneMessage>>();
-            builder.RegisterModule(new KafkaInstrumentationAutofacModule());
-            builder.RegisterOptions<BackplaneOptions>(Configuration.GetSection("Backplane"));
-
-            // shared
-            builder.RegisterType<ContractDataMapper>().As<IContractDataMapper>().SingleInstance();
-        }
-
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-        {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-
-            app.UseHttpsRedirection();
-            app.UseRouting();
-            app.UseAuthentication();
-            app.UseAuthorization();
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapGrpcService<GrpcHistoryService>();
-            });
-        }
+            endpoints.MapGrpcService<GrpcHistoryService>();
+        });
     }
 }

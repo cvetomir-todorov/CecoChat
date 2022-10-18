@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace CecoChat.Kafka
+namespace CecoChat.Kafka;
+
+public sealed class KafkaOptions
 {
-    public sealed class KafkaOptions
-    {
-        public List<string> BootstrapServers { get; set; }
-    }
+    public List<string> BootstrapServers { get; set; }
 }

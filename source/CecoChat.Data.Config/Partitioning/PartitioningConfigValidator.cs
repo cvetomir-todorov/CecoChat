@@ -3,145 +3,144 @@ using System.Collections.Generic;
 using CecoChat.Kafka;
 using FluentValidation;
 
-namespace CecoChat.Data.Config.Partitioning
+namespace CecoChat.Data.Config.Partitioning;
+
+internal sealed class PartitioningConfigValidator : AbstractValidator<PartitioningConfigValues>
 {
-    internal sealed class PartitioningConfigValidator : AbstractValidator<PartitioningConfigValues>
+    private const int PartitionCountMin = 2;
+    private const int PartitionCountMax = 10000;
+
+    public PartitioningConfigValidator(PartitioningConfigUsage usage)
     {
-        private const int PartitionCountMin = 2;
-        private const int PartitionCountMax = 10000;
+        RuleFor(x => x.PartitionCount).InclusiveBetween(from: PartitionCountMin, to: PartitionCountMax);
+        RuleFor(x => x.PartitionServerMap).Custom(ValidatePartitionServerMap);
 
-        public PartitioningConfigValidator(PartitioningConfigUsage usage)
+        if (usage.UseServerPartitions || usage.UseServerAddresses)
         {
-            RuleFor(x => x.PartitionCount).InclusiveBetween(from: PartitionCountMin, to: PartitionCountMax);
-            RuleFor(x => x.PartitionServerMap).Custom(ValidatePartitionServerMap);
+            RuleFor(x => x.ServerPartitionsMap).Custom(ValidateServerPartitionsMap);
+        }
+        if (usage.UseServerAddresses)
+        {
+            RuleFor(x => x.ServerAddressMap).Custom(ValidateServerAddressMap);
+        }
+    }
 
-            if (usage.UseServerPartitions || usage.UseServerAddresses)
-            {
-                RuleFor(x => x.ServerPartitionsMap).Custom(ValidateServerPartitionsMap);
-            }
-            if (usage.UseServerAddresses)
-            {
-                RuleFor(x => x.ServerAddressMap).Custom(ValidateServerAddressMap);
-            }
+    private static void ValidatePartitionServerMap(IDictionary<int, string> partitionServerMap, ValidationContext<PartitioningConfigValues> context)
+    {
+        PartitioningConfigValues values = context.InstanceToValidate;
+        if (!IsPartitionCountValid(values.PartitionCount))
+        {
+            return;
         }
 
-        private static void ValidatePartitionServerMap(IDictionary<int, string> partitionServerMap, ValidationContext<PartitioningConfigValues> context)
+        List<int> withWhitespaceServer = new();
+        List<int> withMissingServer = new();
+
+        for (int partition = 0; partition < values.PartitionCount; ++partition)
         {
-            PartitioningConfigValues values = context.InstanceToValidate;
-            if (!IsPartitionCountValid(values.PartitionCount))
+            if (partitionServerMap.TryGetValue(partition, out string server))
             {
-                return;
-            }
-
-            List<int> withWhitespaceServer = new();
-            List<int> withMissingServer = new();
-
-            for (int partition = 0; partition < values.PartitionCount; ++partition)
-            {
-                if (partitionServerMap.TryGetValue(partition, out string server))
+                if (string.IsNullOrWhiteSpace(server))
                 {
-                    if (string.IsNullOrWhiteSpace(server))
-                    {
-                        withWhitespaceServer.Add(partition);
-                    }
-                }
-                else
-                {
-                    withMissingServer.Add(partition);
+                    withWhitespaceServer.Add(partition);
                 }
             }
-
-            if (withWhitespaceServer.Count > 0)
+            else
             {
-                context.AddFailure($"Server is null or whitespace for partitions [{string.Join(',', withWhitespaceServer)}].");
-            }
-            if (withMissingServer.Count > 0)
-            {
-                context.AddFailure($"Server is missing for partitions [{string.Join(',', withMissingServer)}].");
+                withMissingServer.Add(partition);
             }
         }
 
-        private static void ValidateServerPartitionsMap(IDictionary<string, PartitionRange> serverPartitionRangeMap, ValidationContext<PartitioningConfigValues> context)
+        if (withWhitespaceServer.Count > 0)
         {
-            PartitioningConfigValues values = context.InstanceToValidate;
-            if (!IsPartitionCountValid(values.PartitionCount))
+            context.AddFailure($"Server is null or whitespace for partitions [{string.Join(',', withWhitespaceServer)}].");
+        }
+        if (withMissingServer.Count > 0)
+        {
+            context.AddFailure($"Server is missing for partitions [{string.Join(',', withMissingServer)}].");
+        }
+    }
+
+    private static void ValidateServerPartitionsMap(IDictionary<string, PartitionRange> serverPartitionRangeMap, ValidationContext<PartitioningConfigValues> context)
+    {
+        PartitioningConfigValues values = context.InstanceToValidate;
+        if (!IsPartitionCountValid(values.PartitionCount))
+        {
+            return;
+        }
+
+        HashSet<int> uniquePartitions = new();
+
+        foreach (KeyValuePair<string, PartitionRange> pair in serverPartitionRangeMap)
+        {
+            string server = pair.Key;
+            PartitionRange partitions = pair.Value;
+            ValidateSingleServerPartitions(server, partitions, values.PartitionCount, uniquePartitions, context);
+        }
+    }
+
+    private static void ValidateSingleServerPartitions(
+        string server, PartitionRange partitions,
+        int partitionCount, HashSet<int> uniquePartitions,
+        ValidationContext<PartitioningConfigValues> context)
+    {
+        List<int> overlappingPartitions = new();
+        List<int> invalidPartitions = new();
+
+        if (string.IsNullOrWhiteSpace(server))
+        {
+            context.AddFailure($"Server for partitions {partitions} is null or whitespace.");
+        }
+
+        for (int partition = partitions.Lower; partition <= partitions.Upper; ++partition)
+        {
+            if (!uniquePartitions.Add(partition))
             {
-                return;
+                overlappingPartitions.Add(partition);
             }
-
-            HashSet<int> uniquePartitions = new();
-
-            foreach (KeyValuePair<string, PartitionRange> pair in serverPartitionRangeMap)
+            if (partition < 0 || partition > partitionCount - 1)
             {
-                string server = pair.Key;
-                PartitionRange partitions = pair.Value;
-                ValidateSingleServerPartitions(server, partitions, values.PartitionCount, uniquePartitions, context);
+                invalidPartitions.Add(partition);
             }
         }
 
-        private static void ValidateSingleServerPartitions(
-            string server, PartitionRange partitions,
-            int partitionCount, HashSet<int> uniquePartitions,
-            ValidationContext<PartitioningConfigValues> context)
+        if (overlappingPartitions.Count > 0)
         {
-            List<int> overlappingPartitions = new();
-            List<int> invalidPartitions = new();
+            context.AddFailure($"Server {server} has partitions that overlap with existing ones [{string.Join(',', overlappingPartitions)}].");
+        }
+        if (invalidPartitions.Count > 0)
+        {
+            context.AddFailure($"Server {server} has invalid partitions [{string.Join(',', invalidPartitions)}].");
+        }
+    }
+
+    private static void ValidateServerAddressMap(IDictionary<string, string> serverAddressMap, ValidationContext<PartitioningConfigValues> context)
+    {
+        PartitioningConfigValues values = context.InstanceToValidate;
+        if (!IsPartitionCountValid(values.PartitionCount))
+        {
+            return;
+        }
+
+        foreach (KeyValuePair<string, string> pair in serverAddressMap)
+        {
+            string server = pair.Key;
+            string address = pair.Value;
 
             if (string.IsNullOrWhiteSpace(server))
             {
-                context.AddFailure($"Server for partitions {partitions} is null or whitespace.");
+                context.AddFailure($"Server for address {address} is null or whitespace.");
             }
-
-            for (int partition = partitions.Lower; partition <= partitions.Upper; ++partition)
+            if (!Uri.TryCreate(address, UriKind.Absolute, out _))
             {
-                if (!uniquePartitions.Add(partition))
-                {
-                    overlappingPartitions.Add(partition);
-                }
-                if (partition < 0 || partition > partitionCount - 1)
-                {
-                    invalidPartitions.Add(partition);
-                }
-            }
-
-            if (overlappingPartitions.Count > 0)
-            {
-                context.AddFailure($"Server {server} has partitions that overlap with existing ones [{string.Join(',', overlappingPartitions)}].");
-            }
-            if (invalidPartitions.Count > 0)
-            {
-                context.AddFailure($"Server {server} has invalid partitions [{string.Join(',', invalidPartitions)}].");
+                context.AddFailure($"Address '{address}' for server {server} is not valid.");
             }
         }
+    }
 
-        private static void ValidateServerAddressMap(IDictionary<string, string> serverAddressMap, ValidationContext<PartitioningConfigValues> context)
-        {
-            PartitioningConfigValues values = context.InstanceToValidate;
-            if (!IsPartitionCountValid(values.PartitionCount))
-            {
-                return;
-            }
-
-            foreach (KeyValuePair<string, string> pair in serverAddressMap)
-            {
-                string server = pair.Key;
-                string address = pair.Value;
-
-                if (string.IsNullOrWhiteSpace(server))
-                {
-                    context.AddFailure($"Server for address {address} is null or whitespace.");
-                }
-                if (!Uri.TryCreate(address, UriKind.Absolute, out _))
-                {
-                    context.AddFailure($"Address '{address}' for server {server} is not valid.");
-                }
-            }
-        }
-
-        private static bool IsPartitionCountValid(int partitionCount)
-        {
-            bool isValid = partitionCount >= PartitionCountMin && partitionCount <= PartitionCountMax;
-            return isValid;
-        }
+    private static bool IsPartitionCountValid(int partitionCount)
+    {
+        bool isValid = partitionCount >= PartitionCountMin && partitionCount <= PartitionCountMax;
+        return isValid;
     }
 }

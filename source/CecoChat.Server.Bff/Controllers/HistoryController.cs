@@ -12,115 +12,114 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
 
-namespace CecoChat.Server.Bff.Controllers
+namespace CecoChat.Server.Bff.Controllers;
+
+public sealed class GetHistoryRequestValidator : AbstractValidator<GetHistoryRequest>
 {
-    public sealed class GetHistoryRequestValidator : AbstractValidator<GetHistoryRequest>
+    public GetHistoryRequestValidator()
     {
-        public GetHistoryRequestValidator()
-        {
-            RuleFor(x => x.OtherUserID).GreaterThan(0);
-            RuleFor(x => x.OlderThan).GreaterThan(Snowflake.Epoch);
-        }
+        RuleFor(x => x.OtherUserID).GreaterThan(0);
+        RuleFor(x => x.OlderThan).GreaterThan(Snowflake.Epoch);
+    }
+}
+
+[ApiController]
+[Route("api/history")]
+public class HistoryController : ControllerBase
+{
+    private readonly ILogger _logger;
+    private readonly IHistoryClient _historyClient;
+
+    public HistoryController(
+        ILogger<HistoryController> logger,
+        IHistoryClient historyClient)
+    {
+        _logger = logger;
+        _historyClient = historyClient;
     }
 
-    [ApiController]
-    [Route("api/history")]
-    public class HistoryController : ControllerBase
+    [Authorize(Roles = "user")]
+    [HttpGet("messages", Name = "GetMessages")]
+    [ProducesResponseType(typeof(GetHistoryResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GetMessages([FromQuery][BindRequired] GetHistoryRequest request, CancellationToken ct)
     {
-        private readonly ILogger _logger;
-        private readonly IHistoryClient _historyClient;
-
-        public HistoryController(
-            ILogger<HistoryController> logger,
-            IHistoryClient historyClient)
+        if (!TryGetUserClaims(HttpContext, out UserClaims userClaims))
         {
-            _logger = logger;
-            _historyClient = historyClient;
+            return Unauthorized();
+        }
+        if (!HttpContext.TryGetBearerAccessTokenValue(out string accessToken))
+        {
+            return Unauthorized();
         }
 
-        [Authorize(Roles = "user")]
-        [HttpGet("messages", Name = "GetMessages")]
-        [ProducesResponseType(typeof(GetHistoryResponse), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetMessages([FromQuery][BindRequired] GetHistoryRequest request, CancellationToken ct)
+        IReadOnlyCollection<Contracts.History.HistoryMessage> serviceMessages = await _historyClient.GetHistory(userClaims.UserID, request.OtherUserID, request.OlderThan, accessToken, ct);
+        List<HistoryMessage> clientMessages = MapMessages(serviceMessages);
+
+        _logger.LogTrace("Return {0} messages for user {1} and client {2}.", clientMessages.Count, userClaims.UserID, userClaims.ClientID);
+        return Ok(new GetHistoryResponse
         {
-            if (!TryGetUserClaims(HttpContext, out UserClaims userClaims))
-            {
-                return Unauthorized();
-            }
-            if (!HttpContext.TryGetBearerAccessTokenValue(out string accessToken))
-            {
-                return Unauthorized();
-            }
+            Messages = clientMessages
+        });
+    }
 
-            IReadOnlyCollection<Contracts.History.HistoryMessage> serviceMessages = await _historyClient.GetHistory(userClaims.UserID, request.OtherUserID, request.OlderThan, accessToken, ct);
-            List<HistoryMessage> clientMessages = MapMessages(serviceMessages);
+    private static List<HistoryMessage> MapMessages(IReadOnlyCollection<Contracts.History.HistoryMessage> serviceMessages)
+    {
+        List<HistoryMessage> clientMessages = new(capacity: serviceMessages.Count);
 
-            _logger.LogTrace("Return {0} messages for user {1} and client {2}.", clientMessages.Count, userClaims.UserID, userClaims.ClientID);
-            return Ok(new GetHistoryResponse
-            {
-                Messages = clientMessages
-            });
+        foreach (Contracts.History.HistoryMessage serviceMessage in serviceMessages)
+        {
+            HistoryMessage clientMessage = MapMessage(serviceMessage);
+            clientMessages.Add(clientMessage);
         }
 
-        private static List<HistoryMessage> MapMessages(IReadOnlyCollection<Contracts.History.HistoryMessage> serviceMessages)
+        return clientMessages;
+    }
+
+    private static HistoryMessage MapMessage(Contracts.History.HistoryMessage fromService)
+    {
+        HistoryMessage toClient = new()
         {
-            List<HistoryMessage> clientMessages = new(capacity: serviceMessages.Count);
+            MessageID = fromService.MessageId,
+            SenderID = fromService.SenderId,
+            ReceiverID = fromService.ReceiverId,
+        };
 
-            foreach (Contracts.History.HistoryMessage serviceMessage in serviceMessages)
-            {
-                HistoryMessage clientMessage = MapMessage(serviceMessage);
-                clientMessages.Add(clientMessage);
-            }
-
-            return clientMessages;
+        switch (fromService.DataType)
+        {
+            case Contracts.History.DataType.PlainText:
+                toClient.DataType = DataType.PlainText;
+                toClient.Data = fromService.Data;
+                break;
+            default:
+                throw new EnumValueNotSupportedException(fromService.DataType);
         }
 
-        private static HistoryMessage MapMessage(Contracts.History.HistoryMessage fromService)
+        if (fromService.Reactions != null && fromService.Reactions.Count > 0)
         {
-            HistoryMessage toClient = new()
-            {
-                MessageID = fromService.MessageId,
-                SenderID = fromService.SenderId,
-                ReceiverID = fromService.ReceiverId,
-            };
+            toClient.Reactions = new Dictionary<long, string>(capacity: fromService.Reactions.Count);
 
-            switch (fromService.DataType)
+            foreach (KeyValuePair<long, string> reaction in fromService.Reactions)
             {
-                case Contracts.History.DataType.PlainText:
-                    toClient.DataType = DataType.PlainText;
-                    toClient.Data = fromService.Data;
-                    break;
-                default:
-                    throw new EnumValueNotSupportedException(fromService.DataType);
+                toClient.Reactions.Add(reaction.Key, reaction.Value);
             }
-
-            if (fromService.Reactions != null && fromService.Reactions.Count > 0)
-            {
-                toClient.Reactions = new Dictionary<long, string>(capacity: fromService.Reactions.Count);
-
-                foreach (KeyValuePair<long, string> reaction in fromService.Reactions)
-                {
-                    toClient.Reactions.Add(reaction.Key, reaction.Value);
-                }
-            }
-
-            return toClient;
         }
 
-        private bool TryGetUserClaims(HttpContext context, out UserClaims userClaims)
-        {
-            if (!context.User.TryGetUserClaims(out userClaims))
-            {
-                _logger.LogError("Client from was authorized but has no parseable access token.");
-                return false;
-            }
+        return toClient;
+    }
 
-            Activity.Current?.SetTag("user.id", userClaims.UserID);
-            return true;
+    private bool TryGetUserClaims(HttpContext context, out UserClaims userClaims)
+    {
+        if (!context.User.TryGetUserClaims(out userClaims))
+        {
+            _logger.LogError("Client from was authorized but has no parseable access token.");
+            return false;
         }
+
+        Activity.Current?.SetTag("user.id", userClaims.UserID);
+        return true;
     }
 }
