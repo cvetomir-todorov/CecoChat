@@ -1,16 +1,15 @@
 ﻿using System.Threading.Tasks;
 
-namespace CecoChat.Data.Config.History
+namespace CecoChat.Data.Config.History;
+
+public sealed class HistoryConfigUsage
 {
-    public sealed class HistoryConfigUsage
-    {
-        public bool UseMessageCount { get; init; }
-    }
+    public bool UseMessageCount { get; init; }
+}
 
-    public interface IHistoryConfig
-    {
-        Task Initialize(HistoryConfigUsage usage);
+public interface IHistoryConfig
+{
+    Task Initialize(HistoryConfigUsage usage);
 
-        int ChatMessageCount { get; }
-    }
+    int ChatMessageCount { get; }
 }

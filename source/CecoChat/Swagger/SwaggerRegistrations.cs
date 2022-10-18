@@ -3,51 +3,50 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 
-namespace CecoChat.Swagger
+namespace CecoChat.Swagger;
+
+public static class SwaggerRegistrations
 {
-    public static class SwaggerRegistrations
+    public static void AddSwaggerServices(this IServiceCollection services, SwaggerOptions options)
     {
-        public static void AddSwaggerServices(this IServiceCollection services, SwaggerOptions options)
+        if (options.UseSwagger)
         {
-            if (options.UseSwagger)
+            services.AddSwaggerGen(config =>
             {
-                services.AddSwaggerGen(config =>
+                if (options.AddAuthorizationHeader)
                 {
-                    if (options.AddAuthorizationHeader)
+                    config.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
                     {
-                        config.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
-                        {
-                            Type = SecuritySchemeType.ApiKey,
-                            In = ParameterLocation.Header,
-                            Name = "Authorization",
-                            Description = "Standard Authorization header using the Bearer scheme. Example: \"bearer {token}\""
-                        });
+                        Type = SecuritySchemeType.ApiKey,
+                        In = ParameterLocation.Header,
+                        Name = "Authorization",
+                        Description = "Standard Authorization header using the Bearer scheme. Example: \"bearer {token}\""
+                    });
 
-                        config.OperationFilter<SecurityRequirementsOperationFilter>();
-                    }
+                    config.OperationFilter<SecurityRequirementsOperationFilter>();
+                }
 
-                    config.SwaggerDoc(options.OpenApiInfo.Version, options.OpenApiInfo);
-                });
-                services.ConfigureSwaggerGen(config =>
-                {
-                    config.CustomSchemaIds(type => type.FullName);
-                });
-            }
+                config.SwaggerDoc(options.OpenApiInfo.Version, options.OpenApiInfo);
+            });
+            services.ConfigureSwaggerGen(config =>
+            {
+                config.CustomSchemaIds(type => type.FullName);
+            });
+        }
+    }
+
+    public static void UseSwaggerMiddlewares(this IApplicationBuilder app, SwaggerOptions options)
+    {
+        if (options.UseSwagger)
+        {
+            app.UseSwagger();
         }
 
-        public static void UseSwaggerMiddlewares(this IApplicationBuilder app, SwaggerOptions options)
+        if (options.UseSwaggerUI)
         {
-            if (options.UseSwagger)
-            {
-                app.UseSwagger();
-            }
-
-            if (options.UseSwaggerUI)
-            {
-                app.UseSwaggerUI(config => config.SwaggerEndpoint(
-                    url: options.Url,
-                    name: $"{options.OpenApiInfo.Title} {options.OpenApiInfo.Version}"));
-            }
+            app.UseSwaggerUI(config => config.SwaggerEndpoint(
+                url: options.Url,
+                name: $"{options.OpenApiInfo.Title} {options.OpenApiInfo.Version}"));
         }
     }
 }

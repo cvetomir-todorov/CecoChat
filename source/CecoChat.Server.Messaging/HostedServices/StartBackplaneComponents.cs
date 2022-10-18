@@ -7,51 +7,50 @@ using CecoChat.Server.Messaging.Backplane;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 
-namespace CecoChat.Server.Messaging.HostedServices
+namespace CecoChat.Server.Messaging.HostedServices;
+
+public sealed class StartBackplaneComponents : IHostedService, IDisposable
 {
-    public sealed class StartBackplaneComponents : IHostedService, IDisposable
+    private readonly ConfigOptions _configOptions;
+    private readonly IBackplaneComponents _backplaneComponents;
+    private readonly IPartitioningConfig _partitioningConfig;
+    private readonly CancellationToken _appStoppingCt;
+    private CancellationTokenSource _stoppedCts;
+
+    public StartBackplaneComponents(
+        IHostApplicationLifetime applicationLifetime,
+        IOptions<ConfigOptions> configOptions,
+        IBackplaneComponents backplaneComponents,
+        IPartitioningConfig partitioningConfig)
     {
-        private readonly ConfigOptions _configOptions;
-        private readonly IBackplaneComponents _backplaneComponents;
-        private readonly IPartitioningConfig _partitioningConfig;
-        private readonly CancellationToken _appStoppingCt;
-        private CancellationTokenSource _stoppedCts;
+        _configOptions = configOptions.Value;
+        _backplaneComponents = backplaneComponents;
+        _partitioningConfig = partitioningConfig;
 
-        public StartBackplaneComponents(
-            IHostApplicationLifetime applicationLifetime,
-            IOptions<ConfigOptions> configOptions,
-            IBackplaneComponents backplaneComponents,
-            IPartitioningConfig partitioningConfig)
-        {
-            _configOptions = configOptions.Value;
-            _backplaneComponents = backplaneComponents;
-            _partitioningConfig = partitioningConfig;
+        _appStoppingCt = applicationLifetime.ApplicationStopping;
+    }
 
-            _appStoppingCt = applicationLifetime.ApplicationStopping;
-        }
+    public void Dispose()
+    {
+        _stoppedCts?.Dispose();
+        _backplaneComponents.Dispose();
+    }
 
-        public void Dispose()
-        {
-            _stoppedCts?.Dispose();
-            _backplaneComponents.Dispose();
-        }
+    public Task StartAsync(CancellationToken cancellationToken)
+    {
+        _stoppedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _appStoppingCt);
 
-        public Task StartAsync(CancellationToken cancellationToken)
-        {
-            _stoppedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _appStoppingCt);
+        int partitionCount = _partitioningConfig.PartitionCount;
+        PartitionRange partitions = _partitioningConfig.GetServerPartitions(_configOptions.ServerID);
 
-            int partitionCount = _partitioningConfig.PartitionCount;
-            PartitionRange partitions = _partitioningConfig.GetServerPartitions(_configOptions.ServerID);
+        _backplaneComponents.ConfigurePartitioning(partitionCount, partitions);
+        _backplaneComponents.StartConsumption(_stoppedCts.Token);
 
-            _backplaneComponents.ConfigurePartitioning(partitionCount, partitions);
-            _backplaneComponents.StartConsumption(_stoppedCts.Token);
+        return Task.CompletedTask;
+    }
 
-            return Task.CompletedTask;
-        }
-
-        public Task StopAsync(CancellationToken cancellationToken)
-        {
-            return Task.CompletedTask;
-        }
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
     }
 }

@@ -6,61 +6,60 @@ using FluentValidation.Results;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 
-namespace CecoChat.Data.Config
-{
-    internal interface IConfigUtility
-    {
-        Task HandleChange(ChannelMessage channelMessage, Func<ChannelMessage, Task> handleAction);
+namespace CecoChat.Data.Config;
 
-        bool ValidateValues<TValues>(string configurationContext, TValues values, IValidator<TValues> validator);
+internal interface IConfigUtility
+{
+    Task HandleChange(ChannelMessage channelMessage, Func<ChannelMessage, Task> handleAction);
+
+    bool ValidateValues<TValues>(string configurationContext, TValues values, IValidator<TValues> validator);
+}
+
+internal sealed class ConfigUtility : IConfigUtility
+{
+    private readonly ILogger _logger;
+
+    public ConfigUtility(
+        ILogger<ConfigUtility> logger)
+    {
+        _logger = logger;
     }
 
-    internal sealed class ConfigUtility : IConfigUtility
+    public async Task HandleChange(ChannelMessage channelMessage, Func<ChannelMessage, Task> handleAction)
     {
-        private readonly ILogger _logger;
-
-        public ConfigUtility(
-            ILogger<ConfigUtility> logger)
+        try
         {
-            _logger = logger;
+            _logger.LogInformation("Detected change {0}.", channelMessage);
+            await handleAction(channelMessage);
+        }
+        catch (Exception exception)
+        {
+            _logger.LogError(exception, "Error occurred while processing change {0}.", channelMessage);
+        }
+    }
+
+    public bool ValidateValues<TValues>(string configurationContext, TValues values, IValidator<TValues> validator)
+    {
+        ValidationResult validationResult = validator.Validate(values);
+        if (validationResult.IsValid)
+        {
+            _logger.LogInformation("Validating {0} configuration succeeded.", configurationContext);
+        }
+        else
+        {
+            StringBuilder errorBuilder = new();
+            errorBuilder
+                .AppendFormat("Validating {0} configuration failed.", configurationContext)
+                .AppendLine();
+
+            foreach (ValidationFailure validationFailure in validationResult.Errors)
+            {
+                errorBuilder.AppendLine(validationFailure.ErrorMessage);
+            }
+
+            _logger.LogError(errorBuilder.ToString());
         }
 
-        public async Task HandleChange(ChannelMessage channelMessage, Func<ChannelMessage, Task> handleAction)
-        {
-            try
-            {
-                _logger.LogInformation("Detected change {0}.", channelMessage);
-                await handleAction(channelMessage);
-            }
-            catch (Exception exception)
-            {
-                _logger.LogError(exception, "Error occurred while processing change {0}.", channelMessage);
-            }
-        }
-
-        public bool ValidateValues<TValues>(string configurationContext, TValues values, IValidator<TValues> validator)
-        {
-            ValidationResult validationResult = validator.Validate(values);
-            if (validationResult.IsValid)
-            {
-                _logger.LogInformation("Validating {0} configuration succeeded.", configurationContext);
-            }
-            else
-            {
-                StringBuilder errorBuilder = new();
-                errorBuilder
-                    .AppendFormat("Validating {0} configuration failed.", configurationContext)
-                    .AppendLine();
-
-                foreach (ValidationFailure validationFailure in validationResult.Errors)
-                {
-                    errorBuilder.AppendLine(validationFailure.ErrorMessage);
-                }
-
-                _logger.LogError(errorBuilder.ToString());
-            }
-
-            return validationResult.IsValid;
-        }
+        return validationResult.IsValid;
     }
 }

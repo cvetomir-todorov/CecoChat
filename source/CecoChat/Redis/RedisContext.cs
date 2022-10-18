@@ -4,97 +4,96 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using StackExchange.Redis;
 
-namespace CecoChat.Redis
+namespace CecoChat.Redis;
+
+public interface IRedisContext : IDisposable, IAsyncDisposable
 {
-    public interface IRedisContext : IDisposable, IAsyncDisposable
+    IConnectionMultiplexer Connection { get; }
+
+    IDatabase GetDatabase(int db = -1);
+
+    ISubscriber GetSubscriber();
+}
+
+public sealed class RedisContext : IRedisContext
+{
+    private readonly ILogger _logger;
+    private readonly RedisOptions _redisOptions;
+    private readonly Lazy<ConnectionMultiplexer> _connection;
+
+    public RedisContext(
+        ILogger<RedisContext> logger,
+        IOptions<RedisOptions> options)
     {
-        IConnectionMultiplexer Connection { get; }
-
-        IDatabase GetDatabase(int db = -1);
-
-        ISubscriber GetSubscriber();
+        _logger = logger;
+        _redisOptions = options.Value;
+        _connection = new(Connect);
     }
 
-    public sealed class RedisContext : IRedisContext
+    public void Dispose()
     {
-        private readonly ILogger _logger;
-        private readonly RedisOptions _redisOptions;
-        private readonly Lazy<ConnectionMultiplexer> _connection;
-
-        public RedisContext(
-            ILogger<RedisContext> logger,
-            IOptions<RedisOptions> options)
+        if (_connection.IsValueCreated)
         {
-            _logger = logger;
-            _redisOptions = options.Value;
-            _connection = new(Connect);
+            _connection.Value.Close();
+        }
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        if (_connection.IsValueCreated)
+        {
+            return new ValueTask(_connection.Value.CloseAsync());
         }
 
-        public void Dispose()
+        return ValueTask.CompletedTask;
+    }
+
+    public IConnectionMultiplexer Connection => _connection.Value;
+
+    public IDatabase GetDatabase(int db = -1)
+    {
+        return Connection.GetDatabase(db);
+    }
+
+    public ISubscriber GetSubscriber()
+    {
+        return Connection.GetSubscriber();
+    }
+
+    private ConnectionMultiplexer Connect()
+    {
+        ConfigurationOptions redisConfiguration = CreateRedisConfiguration();
+        ConnectionMultiplexer connection = ConnectionMultiplexer.Connect(redisConfiguration);
+        _logger.LogInformation("Redis connection '{0}' is {1}.",
+            connection.Configuration, connection.IsConnected ? "established" : "not established");
+
+        connection.ConnectionFailed += (_, args) =>
         {
-            if (_connection.IsValueCreated)
-            {
-                _connection.Value.Close();
-            }
+            _logger.LogWarning(args.Exception, "Redis connection to {0} failed.", args.EndPoint);
+        };
+        connection.ConnectionRestored += (_, args) =>
+        {
+            _logger.LogInformation("Redis connection to {0} restored.", args.EndPoint);
+        };
+
+        return connection;
+    }
+
+    private ConfigurationOptions CreateRedisConfiguration()
+    {
+        ConfigurationOptions redisConfiguration = new()
+        {
+            ConnectRetry = _redisOptions.ConnectRetry,
+            ConnectTimeout = _redisOptions.ConnectTimeout,
+            KeepAlive = _redisOptions.KeepAlive,
+            ReconnectRetryPolicy = new ExponentialRetry(deltaBackOffMilliseconds: 1000)
+        };
+
+        foreach (string endpoint in _redisOptions.Endpoints)
+        {
+            redisConfiguration.EndPoints.Add(endpoint);
         }
 
-        public ValueTask DisposeAsync()
-        {
-            if (_connection.IsValueCreated)
-            {
-                return new ValueTask(_connection.Value.CloseAsync());
-            }
-
-            return ValueTask.CompletedTask;
-        }
-
-        public IConnectionMultiplexer Connection => _connection.Value;
-
-        public IDatabase GetDatabase(int db = -1)
-        {
-            return Connection.GetDatabase(db);
-        }
-
-        public ISubscriber GetSubscriber()
-        {
-            return Connection.GetSubscriber();
-        }
-
-        private ConnectionMultiplexer Connect()
-        {
-            ConfigurationOptions redisConfiguration = CreateRedisConfiguration();
-            ConnectionMultiplexer connection = ConnectionMultiplexer.Connect(redisConfiguration);
-            _logger.LogInformation("Redis connection '{0}' is {1}.",
-                connection.Configuration, connection.IsConnected ? "established" : "not established");
-
-            connection.ConnectionFailed += (_, args) =>
-            {
-                _logger.LogWarning(args.Exception, "Redis connection to {0} failed.", args.EndPoint);
-            };
-            connection.ConnectionRestored += (_, args) =>
-            {
-                _logger.LogInformation("Redis connection to {0} restored.", args.EndPoint);
-            };
-
-            return connection;
-        }
-
-        private ConfigurationOptions CreateRedisConfiguration()
-        {
-            ConfigurationOptions redisConfiguration = new()
-            {
-                ConnectRetry = _redisOptions.ConnectRetry,
-                ConnectTimeout = _redisOptions.ConnectTimeout,
-                KeepAlive = _redisOptions.KeepAlive,
-                ReconnectRetryPolicy = new ExponentialRetry(deltaBackOffMilliseconds: 1000)
-            };
-
-            foreach (string endpoint in _redisOptions.Endpoints)
-            {
-                redisConfiguration.EndPoints.Add(endpoint);
-            }
-
-            return redisConfiguration;
-        }
+        return redisConfiguration;
     }
 }

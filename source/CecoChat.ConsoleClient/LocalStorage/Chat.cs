@@ -1,51 +1,50 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 
-namespace CecoChat.ConsoleClient.LocalStorage
+namespace CecoChat.ConsoleClient.LocalStorage;
+
+public sealed class Chat
 {
-    public sealed class Chat
+    private readonly ConcurrentDictionary<long, Message> _messageMap;
+
+    public Chat(long otherUserID)
     {
-        private readonly ConcurrentDictionary<long, Message> _messageMap;
+        OtherUserID = otherUserID;
+        _messageMap = new();
+    }
 
-        public Chat(long otherUserID)
+    public long OtherUserID { get; }
+
+    // The ID of the newest message in the chat.
+    public long NewestMessage { get; set; }
+
+    // The ID of the last processed message. 
+    public long Processed { get; set; }
+
+    // The ID of the last message delivered to the other user.
+    public long OtherUserDelivered { get; set; }
+
+    // The ID of the last message seen by the other user.
+    public long OtherUserSeen { get; set; }
+
+    public void AddNew(Message message)
+    {
+        if (!_messageMap.TryGetValue(message.MessageID, out _))
         {
-            OtherUserID = otherUserID;
-            _messageMap = new();
+            _messageMap.TryAdd(message.MessageID, message);
         }
+    }
 
-        public long OtherUserID { get; }
-
-        // The ID of the newest message in the chat.
-        public long NewestMessage { get; set; }
-
-        // The ID of the last processed message. 
-        public long Processed { get; set; }
-
-        // The ID of the last message delivered to the other user.
-        public long OtherUserDelivered { get; set; }
-
-        // The ID of the last message seen by the other user.
-        public long OtherUserSeen { get; set; }
-
-        public void AddNew(Message message)
+    public IEnumerable<Message> GetMessages()
+    {
+        foreach (KeyValuePair<long, Message> pair in _messageMap)
         {
-            if (!_messageMap.TryGetValue(message.MessageID, out _))
-            {
-                _messageMap.TryAdd(message.MessageID, message);
-            }
+            yield return pair.Value;
         }
+    }
 
-        public IEnumerable<Message> GetMessages()
-        {
-            foreach (KeyValuePair<long, Message> pair in _messageMap)
-            {
-                yield return pair.Value;
-            }
-        }
-
-        public bool TryGetMessage(long messageID, out Message message)
-        {
-            return _messageMap.TryGetValue(messageID, out message);
-        }
+    public bool TryGetMessage(long messageID, out Message message)
+    {
+        return _messageMap.TryGetValue(messageID, out message);
     }
 }

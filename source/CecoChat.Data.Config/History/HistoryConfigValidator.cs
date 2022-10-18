@@ -1,15 +1,14 @@
 ﻿using FluentValidation;
 
-namespace CecoChat.Data.Config.History
+namespace CecoChat.Data.Config.History;
+
+internal sealed class HistoryConfigValidator : AbstractValidator<HistoryConfigValues>
 {
-    internal sealed class HistoryConfigValidator : AbstractValidator<HistoryConfigValues>
+    public HistoryConfigValidator(HistoryConfigUsage usage)
     {
-        public HistoryConfigValidator(HistoryConfigUsage usage)
+        if (usage.UseMessageCount)
         {
-            if (usage.UseMessageCount)
-            {
-                RuleFor(x => x.ChatMessageCount).InclusiveBetween(@from: 16, to: 128);
-            }
+            RuleFor(x => x.ChatMessageCount).InclusiveBetween(@from: 16, to: 128);
         }
     }
 }

@@ -1,13 +1,12 @@
 using Microsoft.Extensions.Hosting;
 
-namespace CecoChat.Server.IDGen
+namespace CecoChat.Server.IDGen;
+
+public static class Program
 {
-    public static class Program
+    public static void Main(string[] args)
     {
-        public static void Main(string[] args)
-        {
-            IHostBuilder hostBuilder = EntryPoint.CreateDefaultHostBuilder(args, startupContext: typeof(Startup));
-            EntryPoint.CreateAndRunHost(hostBuilder, loggerContext: typeof(Program));
-        }
+        IHostBuilder hostBuilder = EntryPoint.CreateDefaultHostBuilder(args, startupContext: typeof(Startup));
+        EntryPoint.CreateAndRunHost(hostBuilder, loggerContext: typeof(Program));
     }
 }

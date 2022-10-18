@@ -11,68 +11,67 @@ using CecoChat.Server.Messaging.Backplane;
 using CecoChat.Server.Messaging.Clients.Streaming;
 using Microsoft.Extensions.Hosting;
 
-namespace CecoChat.Server.Messaging.HostedServices
+namespace CecoChat.Server.Messaging.HostedServices;
+
+public sealed class HandlePartitionsChanged : IHostedService, ISubscriber<PartitionsChangedEventData>
 {
-    public sealed class HandlePartitionsChanged : IHostedService, ISubscriber<PartitionsChangedEventData>
+    private readonly IBackplaneComponents _backplaneComponents;
+    private readonly IPartitionUtility _partitionUtility;
+    private readonly IClientContainer _clientContainer;
+    private readonly IEvent<PartitionsChangedEventData> _partitionsChanged;
+    private readonly Guid _partitionsChangedToken;
+
+    public HandlePartitionsChanged(
+        IBackplaneComponents backplaneComponents,
+        IPartitionUtility partitionUtility,
+        IClientContainer clientContainer,
+        IEvent<PartitionsChangedEventData> partitionsChanged)
     {
-        private readonly IBackplaneComponents _backplaneComponents;
-        private readonly IPartitionUtility _partitionUtility;
-        private readonly IClientContainer _clientContainer;
-        private readonly IEvent<PartitionsChangedEventData> _partitionsChanged;
-        private readonly Guid _partitionsChangedToken;
+        _backplaneComponents = backplaneComponents;
+        _partitionUtility = partitionUtility;
+        _clientContainer = clientContainer;
+        _partitionsChanged = partitionsChanged;
 
-        public HandlePartitionsChanged(
-            IBackplaneComponents backplaneComponents,
-            IPartitionUtility partitionUtility,
-            IClientContainer clientContainer,
-            IEvent<PartitionsChangedEventData> partitionsChanged)
+        _partitionsChangedToken = _partitionsChanged.Subscribe(this);
+    }
+
+    public Task StartAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
+    }
+
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        _partitionsChanged.Unsubscribe(_partitionsChangedToken);
+        return Task.CompletedTask;
+    }
+
+    public ValueTask Handle(PartitionsChangedEventData eventData)
+    {
+        int partitionCount = eventData.PartitionCount;
+        PartitionRange partitions = eventData.Partitions;
+
+        DisconnectClients(partitionCount, partitions);
+        _backplaneComponents.ConfigurePartitioning(partitionCount, partitions);
+
+        return ValueTask.CompletedTask;
+    }
+
+    private void DisconnectClients(int partitionCount, PartitionRange partitions)
+    {
+        ListenNotification notification = new() { Type = MessageType.Disconnect };
+
+        foreach (KeyValuePair<long, IEnumerable<IStreamer<ListenNotification>>> pair in _clientContainer.EnumerateAllClients())
         {
-            _backplaneComponents = backplaneComponents;
-            _partitionUtility = partitionUtility;
-            _clientContainer = clientContainer;
-            _partitionsChanged = partitionsChanged;
+            long userID = pair.Key;
+            IEnumerable<IStreamer<ListenNotification>> clients = pair.Value;
 
-            _partitionsChangedToken = _partitionsChanged.Subscribe(this);
-        }
-
-        public Task StartAsync(CancellationToken cancellationToken)
-        {
-            return Task.CompletedTask;
-        }
-
-        public Task StopAsync(CancellationToken cancellationToken)
-        {
-            _partitionsChanged.Unsubscribe(_partitionsChangedToken);
-            return Task.CompletedTask;
-        }
-
-        public ValueTask Handle(PartitionsChangedEventData eventData)
-        {
-            int partitionCount = eventData.PartitionCount;
-            PartitionRange partitions = eventData.Partitions;
-
-            DisconnectClients(partitionCount, partitions);
-            _backplaneComponents.ConfigurePartitioning(partitionCount, partitions);
-
-            return ValueTask.CompletedTask;
-        }
-
-        private void DisconnectClients(int partitionCount, PartitionRange partitions)
-        {
-            ListenNotification notification = new() { Type = MessageType.Disconnect };
-
-            foreach (KeyValuePair<long, IEnumerable<IStreamer<ListenNotification>>> pair in _clientContainer.EnumerateAllClients())
+            int userPartition = _partitionUtility.ChoosePartition(userID, partitionCount);
+            if (!partitions.Contains(userPartition))
             {
-                long userID = pair.Key;
-                IEnumerable<IStreamer<ListenNotification>> clients = pair.Value;
-
-                int userPartition = _partitionUtility.ChoosePartition(userID, partitionCount);
-                if (!partitions.Contains(userPartition))
+                foreach (IStreamer<ListenNotification> client in clients)
                 {
-                    foreach (IStreamer<ListenNotification> client in clients)
-                    {
-                        client.EnqueueMessage(notification);
-                    }
+                    client.EnqueueMessage(notification);
                 }
             }
         }

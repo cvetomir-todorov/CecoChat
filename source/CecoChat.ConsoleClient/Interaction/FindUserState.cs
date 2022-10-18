@@ -1,32 +1,31 @@
 using System;
 using System.Threading.Tasks;
 
-namespace CecoChat.ConsoleClient.Interaction
+namespace CecoChat.ConsoleClient.Interaction;
+
+public sealed class FindUserState : State
 {
-    public sealed class FindUserState : State
+    public FindUserState(StateContainer states) : base(states)
+    { }
+
+    public override Task<State> Execute()
     {
-        public FindUserState(StateContainer states) : base(states)
-        { }
+        Console.Clear();
+        Console.Write("Enter user ID ('0' to exit): ");
 
-        public override Task<State> Execute()
+        string userIDString = Console.ReadLine();
+        if (string.IsNullOrWhiteSpace(userIDString) ||
+            !long.TryParse(userIDString, out long userID) ||
+            userID == 0)
         {
-            Console.Clear();
-            Console.Write("Enter user ID ('0' to exit): ");
-
-            string userIDString = Console.ReadLine();
-            if (string.IsNullOrWhiteSpace(userIDString) ||
-                !long.TryParse(userIDString, out long userID) ||
-                userID == 0)
-            {
-                Context.ReloadData = true;
-                return Task.FromResult(States.AllChats);
-            }
-            else
-            {
-                Context.ReloadData = true;
-                Context.UserID = userID;
-                return Task.FromResult(States.OneChat);
-            }
+            Context.ReloadData = true;
+            return Task.FromResult(States.AllChats);
+        }
+        else
+        {
+            Context.ReloadData = true;
+            Context.UserID = userID;
+            return Task.FromResult(States.OneChat);
         }
     }
 }

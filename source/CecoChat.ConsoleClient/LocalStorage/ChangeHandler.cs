@@ -1,102 +1,101 @@
 using System;
 using CecoChat.Contracts.Messaging;
 
-namespace CecoChat.ConsoleClient.LocalStorage
+namespace CecoChat.ConsoleClient.LocalStorage;
+
+public class ChangeHandler
 {
-    public class ChangeHandler
+    private readonly MessageStorage _storage;
+
+    public ChangeHandler(MessageStorage storage)
     {
-        private readonly MessageStorage _storage;
+        _storage = storage;
+    }
 
-        public ChangeHandler(MessageStorage storage)
+    public void AddReceivedMessage(ListenNotification notification)
+    {
+        if (notification.Type != MessageType.Data)
         {
-            _storage = storage;
+            throw new InvalidOperationException($"Notification {notification} should have type {MessageType.Data}.");
         }
 
-        public void AddReceivedMessage(ListenNotification notification)
+        Message message = new()
         {
-            if (notification.Type != MessageType.Data)
-            {
-                throw new InvalidOperationException($"Notification {notification} should have type {MessageType.Data}.");
-            }
+            MessageID = notification.MessageId,
+            SenderID = notification.SenderId,
+            ReceiverID = notification.ReceiverId,
+            SequenceNumber = notification.SequenceNumber,
+        };
 
-            Message message = new()
+        switch (notification.Data.Type)
+        {
+            case Contracts.Messaging.DataType.PlainText:
+                message.DataType = DataType.PlainText;
+                message.Data = notification.Data.Data;
+                break;
+            default:
+                throw new EnumValueNotSupportedException(notification.Data.Type);
+        }
+
+        _storage.AddMessage(message);
+    }
+
+    public void UpdateDeliveryStatus(ListenNotification notification)
+    {
+        if (notification.Type != MessageType.Delivery)
+        {
+            throw new InvalidOperationException($"Notification {notification} should have type {MessageType.Delivery}.");
+        }
+
+        if (!_storage.TryGetChat(notification.SenderId, notification.ReceiverId, out Chat chat))
+        {
+            long otherUserID = _storage.GetOtherUserID(notification.SenderId, notification.ReceiverId);
+            chat = new Chat(otherUserID)
             {
-                MessageID = notification.MessageId,
-                SenderID = notification.SenderId,
-                ReceiverID = notification.ReceiverId,
-                SequenceNumber = notification.SequenceNumber,
+                NewestMessage = notification.MessageId
             };
-
-            switch (notification.Data.Type)
-            {
-                case Contracts.Messaging.DataType.PlainText:
-                    message.DataType = DataType.PlainText;
-                    message.Data = notification.Data.Data;
-                    break;
-                default:
-                    throw new EnumValueNotSupportedException(notification.Data.Type);
-            }
-
-            _storage.AddMessage(message);
+            _storage.AddOrUpdateChat(chat);
         }
 
-        public void UpdateDeliveryStatus(ListenNotification notification)
+        switch (notification.Status)
         {
-            if (notification.Type != MessageType.Delivery)
-            {
-                throw new InvalidOperationException($"Notification {notification} should have type {MessageType.Delivery}.");
-            }
+            case DeliveryStatus.Processed:
+                chat.Processed = notification.MessageId;
+                break;
+            case DeliveryStatus.Delivered:
+                chat.OtherUserDelivered = notification.MessageId;
+                break;
+            case DeliveryStatus.Seen:
+                chat.OtherUserSeen = notification.MessageId;
+                break;
+            default:
+                throw new EnumValueNotSupportedException(notification.Status);
+        }
+    }
 
-            if (!_storage.TryGetChat(notification.SenderId, notification.ReceiverId, out Chat chat))
-            {
-                long otherUserID = _storage.GetOtherUserID(notification.SenderId, notification.ReceiverId);
-                chat = new Chat(otherUserID)
-                {
-                    NewestMessage = notification.MessageId
-                };
-                _storage.AddOrUpdateChat(chat);
-            }
-
-            switch (notification.Status)
-            {
-                case DeliveryStatus.Processed:
-                    chat.Processed = notification.MessageId;
-                    break;
-                case DeliveryStatus.Delivered:
-                    chat.OtherUserDelivered = notification.MessageId;
-                    break;
-                case DeliveryStatus.Seen:
-                    chat.OtherUserSeen = notification.MessageId;
-                    break;
-                default:
-                    throw new EnumValueNotSupportedException(notification.Status);
-            }
+    public void UpdateReaction(ListenNotification notification)
+    {
+        if (notification.Type != MessageType.Reaction)
+        {
+            throw new InvalidOperationException($"Notification {notification} should have type {MessageType.Reaction}.");
         }
 
-        public void UpdateReaction(ListenNotification notification)
+        if (!_storage.TryGetMessage(notification.SenderId, notification.ReceiverId, notification.MessageId, out Message message))
         {
-            if (notification.Type != MessageType.Reaction)
-            {
-                throw new InvalidOperationException($"Notification {notification} should have type {MessageType.Reaction}.");
-            }
+            // the message is not in the local history
+            return;
+        }
 
-            if (!_storage.TryGetMessage(notification.SenderId, notification.ReceiverId, notification.MessageId, out Message message))
+        if (string.IsNullOrWhiteSpace(notification.Reaction.Reaction))
+        {
+            if (message.Reactions.ContainsKey(notification.Reaction.ReactorId))
             {
-                // the message is not in the local history
-                return;
+                message.Reactions.Remove(notification.Reaction.ReactorId);
             }
-
-            if (string.IsNullOrWhiteSpace(notification.Reaction.Reaction))
-            {
-                if (message.Reactions.ContainsKey(notification.Reaction.ReactorId))
-                {
-                    message.Reactions.Remove(notification.Reaction.ReactorId);
-                }
-            }
-            else
-            {
-                message.Reactions.Add(notification.Reaction.ReactorId, notification.Reaction.Reaction);
-            }
+        }
+        else
+        {
+            message.Reactions.Add(notification.Reaction.ReactorId, notification.Reaction.Reaction);
         }
     }
 }

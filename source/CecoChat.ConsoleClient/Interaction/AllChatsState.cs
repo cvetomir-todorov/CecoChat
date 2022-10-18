@@ -3,86 +3,85 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using CecoChat.ConsoleClient.LocalStorage;
 
-namespace CecoChat.ConsoleClient.Interaction
+namespace CecoChat.ConsoleClient.Interaction;
+
+public sealed class AllChatsState : State
 {
-    public sealed class AllChatsState : State
+    private DateTime _lastKnownChatState;
+
+    public AllChatsState(StateContainer states) : base(states)
     {
-        private DateTime _lastKnownChatState;
+        _lastKnownChatState = Snowflake.Epoch;
+    }
 
-        public AllChatsState(StateContainer states) : base(states)
+    public override async Task<State> Execute()
+    {
+        if (Context.ReloadData)
         {
-            _lastKnownChatState = Snowflake.Epoch;
+            await GetChats();
         }
 
-        public override async Task<State> Execute()
+        Console.Clear();
+        Console.WriteLine("Choose user to chat (press '0'...'9') | New (press 'n') | Refresh (press 'f') | Exit (press 'x'):");
+        List<long> userIDs = Storage.GetUsers();
+        int key = 0;
+        foreach (long userID in userIDs)
         {
-            if (Context.ReloadData)
-            {
-                await GetChats();
-            }
-
-            Console.Clear();
-            Console.WriteLine("Choose user to chat (press '0'...'9') | New (press 'n') | Refresh (press 'f') | Exit (press 'x'):");
-            List<long> userIDs = Storage.GetUsers();
-            int key = 0;
-            foreach (long userID in userIDs)
-            {
-                Console.WriteLine("ID={0} (press '{1}')", userID, key++);
-            }
-
-            ConsoleKeyInfo keyInfo = Console.ReadKey(intercept: true);
-            if (char.IsNumber(keyInfo.KeyChar))
-            {
-                return ProcessNumberKey(keyInfo, userIDs);
-            }
-            else if (keyInfo.KeyChar == 'n' || keyInfo.KeyChar == 'N')
-            {
-                Context.ReloadData = false;
-                return States.FindUser;
-            }
-            else if (keyInfo.KeyChar == 'f' || keyInfo.KeyChar == 'F')
-            {
-                Context.ReloadData = true;
-                return States.AllChats;
-            }
-            else if (keyInfo.KeyChar == 'x' || keyInfo.KeyChar == 'X')
-            {
-                return States.Final;
-            }
-            else
-            {
-                Context.ReloadData = false;
-                return States.AllChats;
-            }
+            Console.WriteLine("ID={0} (press '{1}')", userID, key++);
         }
 
-        private async Task GetChats()
+        ConsoleKeyInfo keyInfo = Console.ReadKey(intercept: true);
+        if (char.IsNumber(keyInfo.KeyChar))
         {
-            DateTime currentState = DateTime.UtcNow;
-            IList<Chat> chats = await Client.GetChats(_lastKnownChatState);
+            return ProcessNumberKey(keyInfo, userIDs);
+        }
+        else if (keyInfo.KeyChar == 'n' || keyInfo.KeyChar == 'N')
+        {
+            Context.ReloadData = false;
+            return States.FindUser;
+        }
+        else if (keyInfo.KeyChar == 'f' || keyInfo.KeyChar == 'F')
+        {
+            Context.ReloadData = true;
+            return States.AllChats;
+        }
+        else if (keyInfo.KeyChar == 'x' || keyInfo.KeyChar == 'X')
+        {
+            return States.Final;
+        }
+        else
+        {
+            Context.ReloadData = false;
+            return States.AllChats;
+        }
+    }
 
-            foreach (Chat chat in chats)
-            {
-                Storage.AddOrUpdateChat(chat);
-            }
+    private async Task GetChats()
+    {
+        DateTime currentState = DateTime.UtcNow;
+        IList<Chat> chats = await Client.GetChats(_lastKnownChatState);
 
-            _lastKnownChatState = currentState;
+        foreach (Chat chat in chats)
+        {
+            Storage.AddOrUpdateChat(chat);
         }
 
-        private State ProcessNumberKey(ConsoleKeyInfo keyInfo, List<long> userIDs)
+        _lastKnownChatState = currentState;
+    }
+
+    private State ProcessNumberKey(ConsoleKeyInfo keyInfo, List<long> userIDs)
+    {
+        int index = keyInfo.KeyChar - '0';
+        if (index < 0 || index >= userIDs.Count)
         {
-            int index = keyInfo.KeyChar - '0';
-            if (index < 0 || index >= userIDs.Count)
-            {
-                Context.ReloadData = false;
-                return States.AllChats;
-            }
-            else
-            {
-                Context.UserID = userIDs[index];
-                Context.ReloadData = true;
-                return States.OneChat;
-            }
+            Context.ReloadData = false;
+            return States.AllChats;
+        }
+        else
+        {
+            Context.UserID = userIDs[index];
+            Context.ReloadData = true;
+            return States.OneChat;
         }
     }
 }
