@@ -26,7 +26,7 @@ namespace CecoChat.Events
         }
 
         protected virtual void Dispose(bool isDisposing)
-        {}
+        { }
 
         public Guid Subscribe(ISubscriber<TEventData> subscriber)
         {

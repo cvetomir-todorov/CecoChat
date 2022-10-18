@@ -37,7 +37,7 @@ namespace CecoChat.ConsoleClient.LocalStorage
 
         public IEnumerable<Message> GetMessages()
         {
-            foreach (KeyValuePair<long,Message> pair in _messageMap)
+            foreach (KeyValuePair<long, Message> pair in _messageMap)
             {
                 yield return pair.Value;
             }

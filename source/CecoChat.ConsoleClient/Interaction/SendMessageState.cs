@@ -7,7 +7,7 @@ namespace CecoChat.ConsoleClient.Interaction
     public sealed class SendMessageState : State
     {
         public SendMessageState(StateContainer states) : base(states)
-        {}
+        { }
 
         public override async Task<State> Execute()
         {

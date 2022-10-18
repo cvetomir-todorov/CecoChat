@@ -12,7 +12,7 @@ namespace CecoChat.Data.History.Instrumentation
             return builder.AddSource(HistoryInstrumentation.ActivitySource.Name);
         }
     }
-    
+
     internal static class HistoryInstrumentation
     {
         private static readonly string ActivitySourceName = "OpenTelemetry.Instrumentation.CecoChatHistoryDB";

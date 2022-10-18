@@ -6,7 +6,7 @@ namespace CecoChat.ConsoleClient.Interaction
     public sealed class FindUserState : State
     {
         public FindUserState(StateContainer states) : base(states)
-        {}
+        { }
 
         public override Task<State> Execute()
         {

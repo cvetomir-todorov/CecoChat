@@ -9,7 +9,7 @@ namespace CecoChat.ConsoleClient.Interaction
     public sealed class OneChatState : State
     {
         public OneChatState(StateContainer states) : base(states)
-        {}
+        { }
 
         public override async Task<State> Execute()
         {
@@ -73,7 +73,7 @@ namespace CecoChat.ConsoleClient.Interaction
             if (message.Reactions.Count > 0)
             {
                 StringBuilder reactionsBuilder = new();
-                foreach (KeyValuePair<long,string> pair in message.Reactions)
+                foreach (KeyValuePair<long, string> pair in message.Reactions)
                 {
                     reactionsBuilder.AppendFormat(" {0}={1}", pair.Key, pair.Value);
                 }

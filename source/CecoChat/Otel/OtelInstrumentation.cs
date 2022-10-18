@@ -8,7 +8,7 @@ namespace CecoChat.Otel
             public const string DbName = "db.name";
             public const string DbSessionName = "db.session_name";
             public const string DbOperation = "db.operation";
-            
+
             public const string MessagingSystem = "messaging.system";
             public const string MessagingDestination = "messaging.destination";
             public const string MessagingDestinationKind = "messaging.destination_kind";

@@ -99,7 +99,7 @@ namespace CecoChat.Server.Messaging.Clients.Streaming
         {
             public bool Stop { get; init; }
         }
- 
+
         private async Task<EmptyQueueResult> EmptyQueue(CancellationToken ct)
         {
             bool processedFinalMessage = false;
@@ -122,12 +122,12 @@ namespace CecoChat.Server.Messaging.Clients.Streaming
                 {
                     // completed gRPC request is equivalent to client being disconnected
                     // even if underlying connection is still active
-                    return new EmptyQueueResult {Stop = true};
+                    return new EmptyQueueResult { Stop = true };
                 }
                 catch (Exception exception)
                 {
                     _logger.LogError(exception, "Failed to send {0} message {1}", _clientID, messageContext.Message);
-                    return new EmptyQueueResult {Stop = true};
+                    return new EmptyQueueResult { Stop = true };
                 }
                 finally
                 {
@@ -135,7 +135,7 @@ namespace CecoChat.Server.Messaging.Clients.Streaming
                 }
             }
 
-            return new EmptyQueueResult {Stop = processedFinalMessage};
+            return new EmptyQueueResult { Stop = processedFinalMessage };
         }
 
         private Activity StartActivity(ListenNotification message, Activity parentActivity)

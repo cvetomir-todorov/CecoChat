@@ -31,7 +31,7 @@ namespace CecoChat.Kafka
             {
                 checked
                 {
-                    return (ushort) (Upper - Lower + 1);
+                    return (ushort)(Upper - Lower + 1);
                 }
             }
         }
@@ -49,10 +49,9 @@ namespace CecoChat.Kafka
 
         public bool Equals(PartitionRange other)
         {
-            return 
-                Lower == other.Lower && 
-                Upper == other.Upper && 
-                IsNotEmpty == other.IsNotEmpty;
+            return Lower == other.Lower &&
+                   Upper == other.Upper &&
+                   IsNotEmpty == other.IsNotEmpty;
         }
 
         public override bool Equals(object obj)

@@ -7,7 +7,7 @@ namespace CecoChat.ConsoleClient.Interaction
     public sealed class ReactState : State
     {
         public ReactState(StateContainer states) : base(states)
-        {}
+        { }
 
         public override async Task<State> Execute()
         {

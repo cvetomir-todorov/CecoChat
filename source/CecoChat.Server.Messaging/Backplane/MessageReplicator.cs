@@ -90,7 +90,7 @@ namespace CecoChat.Server.Messaging.Backplane
                     BackplaneMessage message = consumeResult.Message.Value;
                     int partition = _partitionUtility.ChoosePartition(message.SenderId, PartitionCount);
                     TopicPartition topicPartition = _partitionFlyweight.GetTopicPartition(_backplaneOptions.TopicMessagesBySender, partition);
-                    Message<Null, BackplaneMessage> kafkaMessage = new() {Value = message};
+                    Message<Null, BackplaneMessage> kafkaMessage = new() { Value = message };
                     // the producer built-in delivery handler will log by default when messages are not delivered 
                     _producer.Produce(kafkaMessage, topicPartition);
                 }, ct);

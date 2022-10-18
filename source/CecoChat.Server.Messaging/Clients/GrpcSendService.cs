@@ -50,7 +50,7 @@ namespace CecoChat.Server.Messaging.Clients
             (int successCount, int allCount) = EnqueueMessagesForSenders(request, messageID, userClaims.ClientID);
             LogResults(request, messageID, successCount, allCount);
 
-            SendMessageResponse response = new() {MessageId = messageID};
+            SendMessageResponse response = new() { MessageId = messageID };
             return response;
         }
 

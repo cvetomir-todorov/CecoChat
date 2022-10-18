@@ -51,7 +51,7 @@ namespace CecoChat.Server.State
             // telemetry
             services.AddOpenTelemetryTracing(otel =>
             {
-                otel.AddServiceResource(new OtelServiceResource {Namespace = "CecoChat", Name = "State", Version = "0.1"});
+                otel.AddServiceResource(new OtelServiceResource { Namespace = "CecoChat", Name = "State", Version = "0.1" });
                 otel.AddAspNetCoreInstrumentation(aspnet => aspnet.EnableGrpcAspNetCoreSupport = true);
                 otel.AddKafkaInstrumentation();
                 otel.AddStateInstrumentation();
