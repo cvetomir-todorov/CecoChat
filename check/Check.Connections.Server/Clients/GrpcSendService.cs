@@ -2,14 +2,13 @@
 using CecoChat.Contracts.Messaging;
 using Grpc.Core;
 
-namespace Check.Connections.Server.Clients
+namespace Check.Connections.Server.Clients;
+
+public sealed class GrpcSendService : Send.SendBase
 {
-    public sealed class GrpcSendService : Send.SendBase
+    public override Task<SendMessageResponse> SendMessage(SendMessageRequest request, ServerCallContext context)
     {
-        public override Task<SendMessageResponse> SendMessage(SendMessageRequest request, ServerCallContext context)
-        {
-            SendMessageResponse response = new();
-            return Task.FromResult(response);
-        }
+        SendMessageResponse response = new();
+        return Task.FromResult(response);
     }
 }
