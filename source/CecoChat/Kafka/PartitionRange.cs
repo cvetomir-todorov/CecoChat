@@ -52,7 +52,7 @@ public readonly struct PartitionRange : IEquatable<PartitionRange>
                IsNotEmpty == other.IsNotEmpty;
     }
 
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         return obj is PartitionRange other && Equals(other);
     }

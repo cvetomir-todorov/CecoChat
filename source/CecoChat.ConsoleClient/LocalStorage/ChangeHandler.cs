@@ -46,7 +46,7 @@ public class ChangeHandler
             throw new InvalidOperationException($"Notification {notification} should have type {MessageType.Delivery}.");
         }
 
-        if (!_storage.TryGetChat(notification.SenderId, notification.ReceiverId, out Chat chat))
+        if (!_storage.TryGetChat(notification.SenderId, notification.ReceiverId, out Chat? chat))
         {
             long otherUserID = _storage.GetOtherUserID(notification.SenderId, notification.ReceiverId);
             chat = new Chat(otherUserID)
@@ -79,7 +79,7 @@ public class ChangeHandler
             throw new InvalidOperationException($"Notification {notification} should have type {MessageType.Reaction}.");
         }
 
-        if (!_storage.TryGetMessage(notification.SenderId, notification.ReceiverId, notification.MessageId, out Message message))
+        if (!_storage.TryGetMessage(notification.SenderId, notification.ReceiverId, notification.MessageId, out Message? message))
         {
             // the message is not in the local history
             return;

@@ -10,14 +10,16 @@ namespace CecoChat.Data.State;
 
 public class StateDbAutofacModule : Module
 {
-    public IConfiguration StateDbConfiguration { get; init; }
+    private readonly IConfiguration _stateDbConfiguration;
+
+    public StateDbAutofacModule(IConfiguration stateDbConfiguration)
+    {
+        _stateDbConfiguration = stateDbConfiguration;
+    }
 
     protected override void Load(ContainerBuilder builder)
     {
-        CassandraAutofacModule<StateDbContext, IStateDbContext> stateDbModule = new()
-        {
-            CassandraConfiguration = StateDbConfiguration
-        };
+        CassandraAutofacModule<StateDbContext, IStateDbContext> stateDbModule = new(_stateDbConfiguration);
         builder.RegisterModule(stateDbModule);
         builder.RegisterType<CassandraDbInitializer>().As<ICassandraDbInitializer>()
             .WithNamedParameter(typeof(ICassandraDbContext), stateDbModule.DbContextName)

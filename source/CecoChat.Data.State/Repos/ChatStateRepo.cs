@@ -12,7 +12,7 @@ public interface IChatStateRepo
 
     Task<IReadOnlyCollection<ChatState>> GetChats(long userID, DateTime newerThan);
 
-    ChatState GetChat(long userID, string chatID);
+    ChatState? GetChat(long userID, string chatID);
 
     void UpdateChat(long userID, ChatState chat);
 }
@@ -99,7 +99,7 @@ internal class ChatStateRepo : IChatStateRepo
         }
     }
 
-    public ChatState GetChat(long userID, string chatID)
+    public ChatState? GetChat(long userID, string chatID)
     {
         Activity activity = _stateActivityUtility.StartGetChat(_dbContext.Session, userID, chatID);
         bool success = false;
@@ -111,8 +111,8 @@ internal class ChatStateRepo : IChatStateRepo
             query.SetIdempotence(true);
 
             RowSet rows = _dbContext.Session.Execute(query);
-            Row row = rows.FirstOrDefault();
-            ChatState chat = null;
+            Row? row = rows.FirstOrDefault();
+            ChatState? chat = null;
             if (row != null)
             {
                 chat = new();

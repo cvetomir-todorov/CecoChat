@@ -6,11 +6,16 @@ namespace CecoChat.Client.History;
 
 public sealed class HistoryClientAutofacModule : Module
 {
-    public IConfiguration HistoryClientConfiguration { get; init; }
+    private readonly IConfiguration _historyClientConfiguration;
+
+    public HistoryClientAutofacModule(IConfiguration historyClientConfiguration)
+    {
+        _historyClientConfiguration = historyClientConfiguration;
+    }
 
     protected override void Load(ContainerBuilder builder)
     {
         builder.RegisterType<HistoryClient>().As<IHistoryClient>().SingleInstance();
-        builder.RegisterOptions<HistoryOptions>(HistoryClientConfiguration);
+        builder.RegisterOptions<HistoryOptions>(_historyClientConfiguration);
     }
 }

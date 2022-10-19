@@ -10,7 +10,7 @@ public sealed class SendMessageState : State
     public override async Task<State> Execute()
     {
         Console.Write("Message to ID={0}: ", Context.UserID);
-        string plainText = Console.ReadLine();
+        string? plainText = Console.ReadLine();
         if (string.IsNullOrWhiteSpace(plainText))
         {
             Context.ReloadData = false;

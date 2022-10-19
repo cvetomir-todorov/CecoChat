@@ -11,8 +11,8 @@ internal sealed class SnowflakeConfig : ISnowflakeConfig
     private readonly ISnowflakeConfigRepo _repo;
     private readonly IConfigUtility _configUtility;
 
-    private SnowflakeConfigValues _values;
-    private SnowflakeConfigValidator _validator;
+    private SnowflakeConfigValidator? _validator;
+    private SnowflakeConfigValues? _values;
 
     public SnowflakeConfig(
         ILogger<SnowflakeConfig> logger,
@@ -33,7 +33,9 @@ internal sealed class SnowflakeConfig : ISnowflakeConfig
 
     public IReadOnlyCollection<short> GetGeneratorIDs(string server)
     {
-        if (!_values.ServerGeneratorIDs.TryGetValue(server, out List<short> generatorIDs))
+        EnsureInitialized();
+
+        if (!_values!.ServerGeneratorIDs.TryGetValue(server, out List<short>? generatorIDs))
         {
             throw new InvalidOperationException($"No snowflake generator IDs configured for server {server}.");
         }
@@ -72,10 +74,12 @@ internal sealed class SnowflakeConfig : ISnowflakeConfig
 
     private async Task LoadValidateValues()
     {
+        EnsureInitialized();
+
         SnowflakeConfigValues values = await _repo.GetValues();
         _logger.LogInformation("Loading snowflake configuration succeeded.");
 
-        bool areValid = _configUtility.ValidateValues("snowflake", values, _validator);
+        bool areValid = _configUtility.ValidateValues("snowflake", values, _validator!);
         if (areValid)
         {
             _values = values;
@@ -89,6 +93,14 @@ internal sealed class SnowflakeConfig : ISnowflakeConfig
         foreach (KeyValuePair<string, List<short>> pair in values.ServerGeneratorIDs)
         {
             _logger.LogInformation("Server {0} is assigned generator IDs: [{1}].", pair.Key, string.Join(separator: ", ", pair.Value));
+        }
+    }
+
+    private void EnsureInitialized()
+    {
+        if (_validator == null)
+        {
+            throw new InvalidOperationException($"Call '{nameof(Initialize)}' to initialize the config.");
         }
     }
 }

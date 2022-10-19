@@ -28,7 +28,7 @@ public static class Program
         Console.WriteLine("Bye!");
     }
 
-    private static void ShowException(object _, Exception exception)
+    private static void ShowException(object? _, Exception exception)
     {
         Console.WriteLine(exception);
     }

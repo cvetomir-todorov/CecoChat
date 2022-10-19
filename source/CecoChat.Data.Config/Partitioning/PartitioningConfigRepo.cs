@@ -1,5 +1,6 @@
 ﻿using CecoChat.Kafka;
 using CecoChat.Redis;
+using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 
 namespace CecoChat.Data.Config.Partitioning;
@@ -11,11 +12,14 @@ internal interface IPartitioningConfigRepo
 
 internal sealed class PartitioningConfigRepo : IPartitioningConfigRepo
 {
+    private readonly ILogger _logger;
     private readonly IRedisContext _redisContext;
 
     public PartitioningConfigRepo(
+        ILogger<PartitioningConfigRepo> logger,
         IRedisContext redisContext)
     {
+        _logger = logger;
         _redisContext = redisContext;
     }
 
@@ -50,8 +54,16 @@ internal sealed class PartitioningConfigRepo : IPartitioningConfigRepo
 
         foreach (HashEntry pair in pairs)
         {
-            string server = pair.Name;
-            if (PartitionRange.TryParse(pair.Value, separator: '-', out PartitionRange partitions))
+            string? server = pair.Name;
+            string? partitionsValue = pair.Value;
+
+            if (server == null || partitionsValue == null)
+            {
+                _logger.LogError("Empty values are present in hash config {HashConfig}", PartitioningKeys.ServerPartitions);
+                continue;
+            }
+
+            if (PartitionRange.TryParse(partitionsValue, separator: '-', out PartitionRange partitions))
             {
                 for (int partition = partitions.Lower; partition <= partitions.Upper; ++partition)
                 {
@@ -75,8 +87,15 @@ internal sealed class PartitioningConfigRepo : IPartitioningConfigRepo
 
         foreach (HashEntry pair in pairs)
         {
-            string server = pair.Name;
-            string address = pair.Value;
+            string? server = pair.Name;
+            string? address = pair.Value;
+
+            if (server == null || address == null)
+            {
+                _logger.LogError("Empty values are present in hash config {HashConfig}", PartitioningKeys.ServerAddresses);
+                continue;
+            }
+
             values.ServerAddressMap[server] = address;
         }
     }

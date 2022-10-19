@@ -72,10 +72,8 @@ public class Startup
         builder.RegisterHostedService<StartBackplaneComponents>();
 
         // state
-        builder.RegisterModule(new StateDbAutofacModule
-        {
-            StateDbConfiguration = Configuration.GetSection("StateDB")
-        });
+        IConfiguration stateDbConfig = Configuration.GetSection("StateDB");
+        builder.RegisterModule(new StateDbAutofacModule(stateDbConfig));
         builder.RegisterType<LruStateCache>().As<IStateCache>().SingleInstance();
         builder.RegisterOptions<StateCacheOptions>(Configuration.GetSection("StateCache"));
 

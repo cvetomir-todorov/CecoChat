@@ -6,7 +6,7 @@ public sealed class Message
     public long SenderID { get; set; }
     public long ReceiverID { get; set; }
     public DataType DataType { get; set; }
-    public string Data { get; set; }
+    public string Data { get; set; } = string.Empty;
     public IDictionary<long, string> Reactions { get; }
     public int SequenceNumber { get; set; }
 

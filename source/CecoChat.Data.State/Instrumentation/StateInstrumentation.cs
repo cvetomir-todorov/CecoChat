@@ -16,7 +16,7 @@ internal static class StateInstrumentation
 {
     private static readonly string ActivitySourceName = "OpenTelemetry.Instrumentation.CecoChatStateDB";
     private static readonly AssemblyName _assemblyName = typeof(StateInstrumentation).Assembly.GetName();
-    private static readonly Version _activitySourceVersion = _assemblyName.Version;
+    private static readonly Version _activitySourceVersion = _assemblyName.Version!;
 
     internal static readonly ActivitySource ActivitySource = new(ActivitySourceName, _activitySourceVersion.ToString());
 

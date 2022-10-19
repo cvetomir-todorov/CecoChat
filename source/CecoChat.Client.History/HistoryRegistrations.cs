@@ -8,6 +8,15 @@ public static class HistoryRegistrations
 {
     public static void AddHistoryClient(this IServiceCollection services, HistoryOptions options)
     {
+        if (options.SocketsHttpHandler == null)
+        {
+            throw new ArgumentNullException(nameof(options.SocketsHttpHandler));
+        }
+        if (options.Retry == null)
+        {
+            throw new ArgumentNullException(nameof(options.Retry));
+        }
+
         services.AddGrpcClient<Contracts.History.History.HistoryClient>(grpc =>
             {
                 grpc.Address = options.Address;

@@ -11,7 +11,7 @@ public sealed class BackplaneMessageDeserializer : IDeserializer<BackplaneMessag
     {
         if (isNull)
         {
-            return default;
+            return null!;
         }
 
         BackplaneMessage message = new();

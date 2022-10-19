@@ -7,6 +7,6 @@ public sealed class FinalState : State
 
     public override Task<State> Execute()
     {
-        return Task.FromResult<State>(null);
+        throw new NotSupportedException();
     }
 }

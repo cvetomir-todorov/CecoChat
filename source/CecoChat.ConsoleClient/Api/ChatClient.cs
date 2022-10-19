@@ -12,12 +12,12 @@ public sealed class ChatClient : IDisposable
 {
     private readonly IBffClient _bffClient;
     private long _userID;
-    private string _accessToken;
-    private string _messagingServerAddress;
-    private Metadata _grpcMetadata;
-    private GrpcChannel _messagingChannel;
-    private Send.SendClient _sendClient;
-    private Reaction.ReactionClient _reactionClient;
+    private string? _accessToken;
+    private string? _messagingServerAddress;
+    private Metadata? _grpcMetadata;
+    private GrpcChannel? _messagingChannel;
+    private Send.SendClient? _sendClient;
+    private Reaction.ReactionClient? _reactionClient;
 
     public ChatClient(string bffAddress)
     {
@@ -59,7 +59,7 @@ public sealed class ChatClient : IDisposable
     public void StartMessaging(CancellationToken ct)
     {
         _messagingChannel?.Dispose();
-        _messagingChannel = GrpcChannel.ForAddress(_messagingServerAddress);
+        _messagingChannel = GrpcChannel.ForAddress(_messagingServerAddress!);
 
         Listen.ListenClient listenClient = new(_messagingChannel);
         _sendClient = new Send.SendClient(_messagingChannel);
@@ -104,15 +104,15 @@ public sealed class ChatClient : IDisposable
         }
     }
 
-    public event EventHandler<ListenNotification> MessageReceived;
+    public event EventHandler<ListenNotification>? MessageReceived;
 
-    public event EventHandler<ListenNotification> ReactionReceived;
+    public event EventHandler<ListenNotification>? ReactionReceived;
 
-    public event EventHandler<ListenNotification> MessageDelivered;
+    public event EventHandler<ListenNotification>? MessageDelivered;
 
-    public event EventHandler Disconnected;
+    public event EventHandler? Disconnected;
 
-    public event EventHandler<Exception> ExceptionOccurred;
+    public event EventHandler<Exception>? ExceptionOccurred;
 
     public async Task<IList<LocalStorage.Chat>> GetChats(DateTime newerThan)
     {
@@ -120,9 +120,9 @@ public sealed class ChatClient : IDisposable
         {
             NewerThan = newerThan
         };
-        GetChatsResponse response = await _bffClient.GetStateChats(request, _accessToken);
+        GetChatsResponse response = await _bffClient.GetStateChats(request, _accessToken!);
 
-        List<LocalStorage.Chat> chats = new(capacity: response.Chats.Count);
+        List<LocalStorage.Chat> chats = new(capacity: response.Chats.Length);
         foreach (ChatState bffChat in response.Chats)
         {
             long otherUserID = DataUtility.GetOtherUsedID(bffChat.ChatID, UserID);
@@ -140,9 +140,9 @@ public sealed class ChatClient : IDisposable
             OtherUserID = otherUserID,
             OlderThan = olderThan
         };
-        GetHistoryResponse response = await _bffClient.GetHistoryMessages(request, _accessToken);
+        GetHistoryResponse response = await _bffClient.GetHistoryMessages(request, _accessToken!);
 
-        List<LocalStorage.Message> messages = new(response.Messages.Count);
+        List<LocalStorage.Message> messages = new(response.Messages.Length);
         foreach (HistoryMessage bffMessage in response.Messages)
         {
             LocalStorage.Message message = Map.BffMessage(bffMessage);
@@ -162,7 +162,7 @@ public sealed class ChatClient : IDisposable
             Data = text
         };
 
-        SendMessageResponse response = await _sendClient.SendMessageAsync(request, _grpcMetadata);
+        SendMessageResponse response = await _sendClient!.SendMessageAsync(request, _grpcMetadata);
         return response.MessageId;
     }
 
@@ -175,7 +175,7 @@ public sealed class ChatClient : IDisposable
             ReceiverId = otherUserID,
             Reaction = reaction
         };
-        await _reactionClient.ReactAsync(request, _grpcMetadata);
+        await _reactionClient!.ReactAsync(request, _grpcMetadata);
     }
 
     public async Task UnReact(long messageID, long otherUserID)
@@ -186,6 +186,6 @@ public sealed class ChatClient : IDisposable
             SenderId = _userID,
             ReceiverId = otherUserID
         };
-        await _reactionClient.UnReactAsync(request, _grpcMetadata);
+        await _reactionClient!.UnReactAsync(request, _grpcMetadata);
     }
 }

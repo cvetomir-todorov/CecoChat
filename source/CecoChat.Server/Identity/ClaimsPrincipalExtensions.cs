@@ -17,7 +17,7 @@ public sealed class UserClaims
 
 public static class ClaimsPrincipalExtensions
 {
-    public static bool TryGetUserClaims(this ClaimsPrincipal user, out UserClaims userClaims)
+    public static bool TryGetUserClaims(this ClaimsPrincipal user, out UserClaims? userClaims)
     {
         if (!user.TryGetUserID(out long userID))
         {

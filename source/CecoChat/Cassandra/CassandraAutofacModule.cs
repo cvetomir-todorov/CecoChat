@@ -8,15 +8,24 @@ public class CassandraAutofacModule<TDbContextImplementation, TDbContext> : Modu
     where TDbContext : class, ICassandraDbContext
     where TDbContextImplementation : CassandraDbContext, TDbContext
 {
-    public IConfiguration CassandraConfiguration { get; init; }
+    private readonly IConfiguration _cassandraConfiguration;
+    private readonly string _dbContextName;
 
-    public string DbContextName { get; init; } = typeof(TDbContext).Name;
+    public CassandraAutofacModule(IConfiguration cassandraConfiguration, string? dbContextName = null)
+    {
+        _cassandraConfiguration = cassandraConfiguration;
+
+        dbContextName ??= typeof(TDbContext).Name;
+        _dbContextName = dbContextName;
+    }
+
+    public string DbContextName => _dbContextName;
 
     protected override void Load(ContainerBuilder builder)
     {
         builder.RegisterType<TDbContextImplementation>().As<TDbContext>()
-            .Named<ICassandraDbContext>(DbContextName)
+            .Named<ICassandraDbContext>(_dbContextName)
             .SingleInstance();
-        builder.RegisterOptions<CassandraOptions>(CassandraConfiguration);
+        builder.RegisterOptions<CassandraOptions>(_cassandraConfiguration);
     }
 }

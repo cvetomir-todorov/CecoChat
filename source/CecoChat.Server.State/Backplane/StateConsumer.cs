@@ -190,7 +190,7 @@ public sealed class StateConsumer : IStateConsumer
 
     private ChatState GetChatFromDBIntoCache(long userID, string chatID)
     {
-        if (!_cache.TryGetUserChat(userID, chatID, out ChatState chat))
+        if (!_cache.TryGetUserChat(userID, chatID, out ChatState? chat))
         {
             chat = _repo.GetChat(userID, chatID);
             chat ??= new ChatState { ChatId = chatID };

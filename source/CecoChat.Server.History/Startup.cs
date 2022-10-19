@@ -74,17 +74,12 @@ public class Startup
         builder.RegisterHostedService<StartMaterializeMessages>();
 
         // configuration
-        builder.RegisterModule(new ConfigDbAutofacModule
-        {
-            RedisConfiguration = Configuration.GetSection("ConfigDB"),
-            RegisterHistory = true
-        });
+        IConfiguration configDbConfig = Configuration.GetSection("ConfigDB");
+        builder.RegisterModule(new ConfigDbAutofacModule(configDbConfig, registerHistory: true));
 
         // history
-        builder.RegisterModule(new HistoryDbAutofacModule
-        {
-            HistoryDbConfiguration = Configuration.GetSection("HistoryDB"),
-        });
+        IConfiguration historyDbConfig = Configuration.GetSection("HistoryDB");
+        builder.RegisterModule(new HistoryDbAutofacModule(historyDbConfig));
 
         // backplane
         builder.RegisterType<HistoryConsumer>().As<IHistoryConsumer>().SingleInstance();

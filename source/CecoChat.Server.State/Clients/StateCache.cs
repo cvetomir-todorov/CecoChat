@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using CecoChat.Contracts.State;
 using Microsoft.Extensions.Options;
 
@@ -5,7 +6,7 @@ namespace CecoChat.Server.State.Clients;
 
 public interface IStateCache
 {
-    bool TryGetUserChat(long userID, string chatID, out ChatState chat);
+    bool TryGetUserChat(long userID, string chatID, [NotNullWhen(returnValue: true)] out ChatState? chat);
 
     void AddUserChat(long userID, ChatState chat);
 }
@@ -25,7 +26,7 @@ public sealed class LruStateCache : IStateCache
         _lock = new();
     }
 
-    public bool TryGetUserChat(long userID, string chatID, out ChatState chat)
+    public bool TryGetUserChat(long userID, string chatID, [NotNullWhen(returnValue: true)] out ChatState? chat)
     {
         CacheKey key = new(userID, chatID);
         bool lockTaken = false;
@@ -43,18 +44,20 @@ public sealed class LruStateCache : IStateCache
         }
     }
 
-    private bool TryGetUserChat(CacheKey key, out ChatState chat)
+    private bool TryGetUserChat(CacheKey key, [NotNullWhen(returnValue: true)] out ChatState? chat)
     {
-        bool found = _map.TryGetValue(key, out LinkedListNode<CacheNode> node);
-        chat = found ? node.Value.Chat : null;
-        if (found)
+        if (_map.TryGetValue(key, out LinkedListNode<CacheNode>? node))
         {
+            chat = node.Value.Chat;
             // move as most recent
             _list.Remove(node);
             _list.AddFirst(node);
+
+            return true;
         }
 
-        return found;
+        chat = null;
+        return false;
     }
 
     public void AddUserChat(long userID, ChatState chat)
@@ -77,7 +80,7 @@ public sealed class LruStateCache : IStateCache
 
     private void AddUserChat(CacheKey key, ChatState chat)
     {
-        if (_map.TryGetValue(key, out LinkedListNode<CacheNode> node))
+        if (_map.TryGetValue(key, out LinkedListNode<CacheNode>? node))
         {
             node.Value = new CacheNode(node.Value.UserID, chat);
             // move as most recent
@@ -90,8 +93,7 @@ public sealed class LruStateCache : IStateCache
             node = _list.AddFirst(cacheNode);
             if (_list.Count > _cacheCapacity)
             {
-                // ReSharper disable once PossibleNullReferenceException
-                CacheNode lastCacheNode = _list.Last.Value;
+                CacheNode lastCacheNode = _list.Last!.Value;
                 // remove the least-recently used item when cache is full
                 _list.RemoveLast();
                 _map.Remove(new CacheKey(lastCacheNode.UserID, lastCacheNode.Chat.ChatId));
@@ -148,7 +150,7 @@ public sealed class LruStateCache : IStateCache
                 string.Equals(ChatID, other.ChatID, StringComparison.InvariantCultureIgnoreCase);
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return
                 obj is CacheKey other &&

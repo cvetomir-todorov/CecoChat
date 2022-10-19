@@ -10,36 +10,38 @@ namespace CecoChat.Data.Config;
 
 public sealed class ConfigDbAutofacModule : Module
 {
-    public IConfiguration RedisConfiguration { get; init; }
+    private readonly IConfiguration _redisConfiguration;
+    private readonly bool _registerHistory;
+    private readonly bool _registerPartitioning;
+    private readonly bool _registerSnowflake;
 
-    public bool RegisterHistory { get; init; }
-
-    public bool RegisterPartitioning { get; init; }
-
-    public bool RegisterSnowflake { get; init; }
+    public ConfigDbAutofacModule(IConfiguration redisConfiguration, bool registerHistory = false, bool registerPartitioning = false, bool registerSnowflake = false)
+    {
+        _redisConfiguration = redisConfiguration;
+        _registerHistory = registerHistory;
+        _registerPartitioning = registerPartitioning;
+        _registerSnowflake = registerSnowflake;
+    }
 
     protected override void Load(ContainerBuilder builder)
     {
-        if (RegisterHistory || RegisterPartitioning || RegisterSnowflake)
+        if (_registerHistory || _registerPartitioning || _registerSnowflake)
         {
-            builder.RegisterModule(new RedisAutofacModule
-            {
-                RedisConfiguration = RedisConfiguration
-            });
+            builder.RegisterModule(new RedisAutofacModule(_redisConfiguration));
             builder.RegisterType<ConfigUtility>().As<IConfigUtility>().SingleInstance();
         }
-        if (RegisterHistory)
+        if (_registerHistory)
         {
             builder.RegisterType<HistoryConfig>().As<IHistoryConfig>().SingleInstance();
             builder.RegisterType<HistoryConfigRepo>().As<IHistoryConfigRepo>().SingleInstance();
         }
-        if (RegisterPartitioning)
+        if (_registerPartitioning)
         {
             builder.RegisterType<PartitioningConfig>().As<IPartitioningConfig>().SingleInstance();
             builder.RegisterType<PartitioningConfigRepo>().As<IPartitioningConfigRepo>().SingleInstance();
             builder.RegisterSingletonEvent<EventSource<PartitionsChangedEventData>, PartitionsChangedEventData>();
         }
-        if (RegisterSnowflake)
+        if (_registerSnowflake)
         {
             builder.RegisterType<SnowflakeConfig>().As<ISnowflakeConfig>().SingleInstance();
             builder.RegisterType<SnowflakeConfigRepo>().As<ISnowflakeConfigRepo>().SingleInstance();

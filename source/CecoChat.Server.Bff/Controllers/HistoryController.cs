@@ -42,36 +42,23 @@ public class HistoryController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetMessages([FromQuery][BindRequired] GetHistoryRequest request, CancellationToken ct)
     {
-        if (!TryGetUserClaims(HttpContext, out UserClaims userClaims))
+        if (!TryGetUserClaims(HttpContext, out UserClaims? userClaims))
         {
             return Unauthorized();
         }
-        if (!HttpContext.TryGetBearerAccessTokenValue(out string accessToken))
+        if (!HttpContext.TryGetBearerAccessTokenValue(out string? accessToken))
         {
             return Unauthorized();
         }
 
-        IReadOnlyCollection<Contracts.History.HistoryMessage> serviceMessages = await _historyClient.GetHistory(userClaims.UserID, request.OtherUserID, request.OlderThan, accessToken, ct);
-        List<HistoryMessage> clientMessages = MapMessages(serviceMessages);
+        IReadOnlyCollection<Contracts.History.HistoryMessage> serviceMessages = await _historyClient.GetHistory(userClaims!.UserID, request.OtherUserID, request.OlderThan, accessToken!, ct);
+        HistoryMessage[] clientMessages = serviceMessages.Select(MapMessage).ToArray();
 
-        _logger.LogTrace("Return {0} messages for user {1} and client {2}.", clientMessages.Count, userClaims.UserID, userClaims.ClientID);
+        _logger.LogTrace("Return {0} messages for user {1} and client {2}.", clientMessages.Length, userClaims.UserID, userClaims.ClientID);
         return Ok(new GetHistoryResponse
         {
             Messages = clientMessages
         });
-    }
-
-    private static List<HistoryMessage> MapMessages(IReadOnlyCollection<Contracts.History.HistoryMessage> serviceMessages)
-    {
-        List<HistoryMessage> clientMessages = new(capacity: serviceMessages.Count);
-
-        foreach (Contracts.History.HistoryMessage serviceMessage in serviceMessages)
-        {
-            HistoryMessage clientMessage = MapMessage(serviceMessage);
-            clientMessages.Add(clientMessage);
-        }
-
-        return clientMessages;
     }
 
     private static HistoryMessage MapMessage(Contracts.History.HistoryMessage fromService)
@@ -106,7 +93,7 @@ public class HistoryController : ControllerBase
         return toClient;
     }
 
-    private bool TryGetUserClaims(HttpContext context, out UserClaims userClaims)
+    private bool TryGetUserClaims(HttpContext context, out UserClaims? userClaims)
     {
         if (!context.User.TryGetUserClaims(out userClaims))
         {
@@ -114,7 +101,7 @@ public class HistoryController : ControllerBase
             return false;
         }
 
-        Activity.Current?.SetTag("user.id", userClaims.UserID);
+        Activity.Current?.SetTag("user.id", userClaims!.UserID);
         return true;
     }
 }

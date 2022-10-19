@@ -35,7 +35,7 @@ public sealed class ClientContainer : IClientContainer
 
     public void RemoveClient(in long userID, IStreamer<ListenNotification> client)
     {
-        if (_userMap.TryGetValue(userID, out UserClients userClients))
+        if (_userMap.TryGetValue(userID, out UserClients? userClients))
         {
             bool isRemoved = userClients.Clients.TryRemove(client.ClientID, out _);
             if (!isRemoved)
@@ -47,7 +47,7 @@ public sealed class ClientContainer : IClientContainer
 
     public IEnumerable<IStreamer<ListenNotification>> EnumerateClients(in long userID)
     {
-        if (_userMap.TryGetValue(userID, out UserClients userClients))
+        if (_userMap.TryGetValue(userID, out UserClients? userClients))
         {
             return userClients;
         }

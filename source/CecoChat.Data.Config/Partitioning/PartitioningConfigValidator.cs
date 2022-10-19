@@ -36,7 +36,7 @@ internal sealed class PartitioningConfigValidator : AbstractValidator<Partitioni
 
         for (int partition = 0; partition < values.PartitionCount; ++partition)
         {
-            if (partitionServerMap.TryGetValue(partition, out string server))
+            if (partitionServerMap.TryGetValue(partition, out string? server))
             {
                 if (string.IsNullOrWhiteSpace(server))
                 {

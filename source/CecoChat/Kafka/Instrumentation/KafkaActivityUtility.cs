@@ -13,9 +13,9 @@ public interface IKafkaActivityUtility
 
     void StopProducer(Activity activity, bool operationSuccess);
 
-    Activity StartConsumer<TKey, TValue>(ConsumeResult<TKey, TValue> consumeResult, string consumerID);
+    Activity? StartConsumer<TKey, TValue>(ConsumeResult<TKey, TValue> consumeResult, string consumerID);
 
-    void StopConsumer(Activity activity, bool operationSuccess);
+    void StopConsumer(Activity? activity, bool operationSuccess);
 }
 
 internal sealed class KafkaActivityUtility : IKafkaActivityUtility
@@ -33,7 +33,7 @@ internal sealed class KafkaActivityUtility : IKafkaActivityUtility
 
     public Activity StartProducer<TKey, TValue>(Message<TKey, TValue> message, string producerID, string topic, int? partition = null)
     {
-        Activity parent = Activity.Current;
+        Activity? parent = Activity.Current;
         Activity activity = _activityUtility.Start(
             KafkaInstrumentation.Operations.Production,
             KafkaInstrumentation.ActivitySource,
@@ -58,7 +58,7 @@ internal sealed class KafkaActivityUtility : IKafkaActivityUtility
         _activityUtility.Stop(activity, operationSuccess, relyOnDefaultPolicyOfSettingCurrentActivity: false);
     }
 
-    public Activity StartConsumer<TKey, TValue>(ConsumeResult<TKey, TValue> consumeResult, string consumerID)
+    public Activity? StartConsumer<TKey, TValue>(ConsumeResult<TKey, TValue> consumeResult, string consumerID)
     {
         if (!TryExtractTraceData(consumeResult, out ActivityContext parentContext))
         {
@@ -79,7 +79,7 @@ internal sealed class KafkaActivityUtility : IKafkaActivityUtility
         return activity;
     }
 
-    public void StopConsumer(Activity activity, bool operationSuccess)
+    public void StopConsumer(Activity? activity, bool operationSuccess)
     {
         // do not change the Activity.Current
         _activityUtility.Stop(activity, operationSuccess, relyOnDefaultPolicyOfSettingCurrentActivity: false);
@@ -121,7 +121,7 @@ internal sealed class KafkaActivityUtility : IKafkaActivityUtility
             ActivitySpanId spanId = ActivitySpanId.CreateFromBytes(spanIdBytes);
             ActivityTraceFlags traceFlags = (ActivityTraceFlags)BitConverter.ToInt32(traceFlagsBytes);
 
-            string traceState = null;
+            string? traceState = null;
             if (consumeResult.Message.Headers.TryGetLastBytes(OtelInstrumentation.Keys.HeaderTraceState, out byte[] traceStateBytes))
             {
                 traceState = Encoding.UTF8.GetString(traceStateBytes);

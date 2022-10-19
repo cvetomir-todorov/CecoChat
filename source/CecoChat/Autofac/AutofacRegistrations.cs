@@ -32,6 +32,8 @@ public static class AutofacRegistrations
     }
 
     public static void RegisterFactory<TImplementation, TService>(this ContainerBuilder builder)
+        where TImplementation : notnull
+        where TService : notnull
     {
         builder.RegisterType<TImplementation>().As<TService>().InstancePerDependency();
         builder.Register(componentContext =>

@@ -30,9 +30,13 @@ public sealed class TopicPartitionFlyweight : ITopicPartitionFlyweight
     public void Add(string topic, int partitionCount)
     {
         if (string.IsNullOrWhiteSpace(topic))
+        {
             throw new ArgumentException($"{nameof(topic)} should be a non-empty non-whitespace string.");
+        }
         if (partitionCount <= 0)
+        {
             throw new ArgumentException($"{nameof(partitionCount)} should be greater than zero.");
+        }
 
         Set(topic, partitionCount, strictlyAdd: true);
     }
@@ -40,9 +44,13 @@ public sealed class TopicPartitionFlyweight : ITopicPartitionFlyweight
     public void AddOrUpdate(string topic, int partitionCount)
     {
         if (string.IsNullOrWhiteSpace(topic))
+        {
             throw new ArgumentException($"{nameof(topic)} should be a non-empty non-whitespace string.");
+        }
         if (partitionCount <= 0)
+        {
             throw new ArgumentException($"{nameof(partitionCount)} should be greater than zero.");
+        }
 
         Set(topic, partitionCount, strictlyAdd: false);
     }
@@ -74,13 +82,21 @@ public sealed class TopicPartitionFlyweight : ITopicPartitionFlyweight
     public TopicPartition GetTopicPartition(string topic, int partition)
     {
         if (string.IsNullOrWhiteSpace(topic))
+        {
             throw new ArgumentException($"{nameof(topic)} should be a non-empty non-whitespace string.");
+        }
         if (partition < 0)
+        {
             throw new ArgumentException($"{nameof(partition)} should be greater than zero.");
-        if (!_topicPartitionsMap.TryGetValue(topic, out TopicPartition[] topicPartitions))
+        }
+        if (!_topicPartitionsMap.TryGetValue(topic, out TopicPartition[]? topicPartitions))
+        {
             throw new InvalidOperationException($"Topic {topic} should be added first.");
+        }
         if (partition >= topicPartitions.Length)
+        {
             throw new InvalidOperationException($"Partition {partition} for topic {topic} should be within [0, {topicPartitions.Length - 1}].");
+        }
 
         return topicPartitions[partition];
     }
@@ -88,9 +104,11 @@ public sealed class TopicPartitionFlyweight : ITopicPartitionFlyweight
     public int GetTopicPartitionCount(string topic)
     {
         if (string.IsNullOrWhiteSpace(topic))
+        {
             throw new ArgumentException($"{nameof(topic)} should be a non-empty non-whitespace string.");
+        }
 
-        if (!_topicPartitionsMap.TryGetValue(topic, out TopicPartition[] topicPartitions))
+        if (!_topicPartitionsMap.TryGetValue(topic, out TopicPartition[]? topicPartitions))
         {
             return 0;
         }
