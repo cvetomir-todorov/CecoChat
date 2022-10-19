@@ -22,7 +22,7 @@ public sealed class GrpcListenStreamer : IGrpcListenStreamer
     private readonly BlockingCollection<MessageContext> _messageQueue;
     private readonly SemaphoreSlim _signalProcessing;
 
-    private IServerStreamWriter<ListenNotification> _streamWriter;
+    private IServerStreamWriter<ListenNotification>? _streamWriter;
     private Guid _clientID;
     private int _sequenceNumber;
 
@@ -39,6 +39,7 @@ public sealed class GrpcListenStreamer : IGrpcListenStreamer
             collection: new ConcurrentQueue<MessageContext>(),
             boundedCapacity: clientOptions.SendMessagesHighWatermark);
         _signalProcessing = new SemaphoreSlim(initialCount: 0, maxCount: 1);
+        _clientID = Guid.Empty;
     }
 
     public void Dispose()
@@ -49,22 +50,22 @@ public sealed class GrpcListenStreamer : IGrpcListenStreamer
 
     public void Initialize(Guid clientID, IServerStreamWriter<ListenNotification> streamWriter)
     {
+        if (clientID == Guid.Empty)
+        {
+            throw new ArgumentException($"{nameof(clientID)} should not be an empty GUID.", nameof(clientID));
+        }
+
         _clientID = clientID;
         _streamWriter = streamWriter;
     }
 
     public Guid ClientID => _clientID;
 
-    public bool EnqueueMessage(ListenNotification message, Activity parentActivity = null)
+    public bool EnqueueMessage(ListenNotification message, Activity? parentActivity = null)
     {
         _sequenceNumber++;
 
-        bool isAdded = _messageQueue.TryAdd(new MessageContext
-        {
-            Message = message,
-            ParentActivity = parentActivity
-        });
-
+        bool isAdded = _messageQueue.TryAdd(new MessageContext(message, parentActivity));
         if (isAdded)
         {
             _signalProcessing.Release();
@@ -79,6 +80,11 @@ public sealed class GrpcListenStreamer : IGrpcListenStreamer
 
     public async Task ProcessMessages(CancellationToken ct)
     {
+        if (_clientID == Guid.Empty || _streamWriter == null)
+        {
+            throw new InvalidOperationException($"Call '{nameof(Initialize)}' before '{nameof(ProcessMessages)}'.");
+        }
+
         while (!ct.IsCancellationRequested)
         {
             await _signalProcessing.WaitAsync(ct);
@@ -100,7 +106,7 @@ public sealed class GrpcListenStreamer : IGrpcListenStreamer
     {
         bool processedFinalMessage = false;
 
-        while (!ct.IsCancellationRequested && _messageQueue.TryTake(out MessageContext messageContext))
+        while (!ct.IsCancellationRequested && _messageQueue.TryTake(out MessageContext? messageContext))
         {
             Activity activity = StartActivity(messageContext.Message, messageContext.ParentActivity);
             bool success = false;
@@ -109,7 +115,7 @@ public sealed class GrpcListenStreamer : IGrpcListenStreamer
             {
                 processedFinalMessage = messageContext.Message.Type == MessageType.Disconnect;
                 messageContext.Message.SequenceNumber = _sequenceNumber;
-                await _streamWriter.WriteAsync(messageContext.Message);
+                await _streamWriter!.WriteAsync(messageContext.Message);
                 success = true;
                 _logger.LogTrace("Sent {0} message {1}", _clientID, messageContext.Message);
             }
@@ -134,19 +140,25 @@ public sealed class GrpcListenStreamer : IGrpcListenStreamer
         return new EmptyQueueResult { Stop = processedFinalMessage };
     }
 
-    private Activity StartActivity(ListenNotification message, Activity parentActivity)
+    private Activity StartActivity(ListenNotification message, Activity? parentActivity)
     {
         const string service = nameof(GrpcListenService);
         const string method = nameof(GrpcListenService.Listen);
         string name = $"{service}.{method}/StreamMessage.{message.Type}";
 
-        return _grpcActivityUtility.StartServiceMethod(name, service, method, parentActivity.Context);
+        return _grpcActivityUtility.StartServiceMethod(name, service, method, parentActivity?.Context);
     }
 
     private sealed record MessageContext
     {
-        public ListenNotification Message { get; init; }
+        public MessageContext(ListenNotification message, Activity? parentActivity)
+        {
+            Message = message;
+            ParentActivity = parentActivity;
+        }
 
-        public Activity ParentActivity { get; init; }
+        public ListenNotification Message { get; }
+
+        public Activity? ParentActivity { get; }
     }
 }

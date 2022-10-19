@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 
 namespace CecoChat.ConsoleClient.LocalStorage;
 
@@ -40,7 +41,7 @@ public sealed class MessageStorage
     {
         List<Message> messages = new();
 
-        if (_chatMap.TryGetValue(userID, out Chat chat))
+        if (_chatMap.TryGetValue(userID, out Chat? chat))
         {
             messages.AddRange(chat.GetMessages());
         }
@@ -48,12 +49,12 @@ public sealed class MessageStorage
         return messages;
     }
 
-    public bool TryGetMessage(long userID1, long userID2, long messageID, out Message message)
+    public bool TryGetMessage(long userID1, long userID2, long messageID, [NotNullWhen(returnValue: true)] out Message? message)
     {
         long otherUserID = GetOtherUserID(userID1, userID2);
 
         message = null;
-        if (!_chatMap.TryGetValue(otherUserID, out Chat dialog))
+        if (!_chatMap.TryGetValue(otherUserID, out Chat? dialog))
         {
             return false;
         }
@@ -61,7 +62,7 @@ public sealed class MessageStorage
         return dialog.TryGetMessage(messageID, out message);
     }
 
-    public bool TryGetChat(long userID1, long userID2, out Chat chat)
+    public bool TryGetChat(long userID1, long userID2, [NotNullWhen(returnValue: true)] out Chat? chat)
     {
         long otherUserID = GetOtherUserID(userID1, userID2);
         return _chatMap.TryGetValue(otherUserID, out chat);

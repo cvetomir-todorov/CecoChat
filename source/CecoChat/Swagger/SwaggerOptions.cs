@@ -8,9 +8,9 @@ public sealed class SwaggerOptions
 
     public bool UseSwaggerUI { get; set; }
 
-    public string Url { get; set; }
+    public Uri? Url { get; set; }
 
     public bool AddAuthorizationHeader { get; set; }
 
-    public OpenApiInfo OpenApiInfo { get; set; }
+    public OpenApiInfo OpenApiInfo { get; set; } = new();
 }

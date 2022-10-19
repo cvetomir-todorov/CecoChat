@@ -33,11 +33,8 @@ public class Startup
         builder.RegisterHostedService<InitDynamicConfig>();
 
         // configuration
-        builder.RegisterModule(new ConfigDbAutofacModule
-        {
-            RedisConfiguration = Configuration.GetSection("ConfigDB"),
-            RegisterSnowflake = true
-        });
+        IConfiguration configDbConfig = Configuration.GetSection("ConfigDB");
+        builder.RegisterModule(new ConfigDbAutofacModule(configDbConfig, registerSnowflake: true));
         builder.RegisterOptions<ConfigOptions>(Configuration.GetSection("Config"));
 
         // snowflake

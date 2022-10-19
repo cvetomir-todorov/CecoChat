@@ -46,7 +46,7 @@ public static class HttpClientBuilderExtensions
         {
             return StatusCode.OK;
         }
-        if (headers.TryGetValues(grpcStatusHeader, out IEnumerable<string> values))
+        if (headers.TryGetValues(grpcStatusHeader, out IEnumerable<string>? values))
         {
             return (StatusCode)int.Parse(values.First());
         }

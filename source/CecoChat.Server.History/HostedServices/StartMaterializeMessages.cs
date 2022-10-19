@@ -7,7 +7,7 @@ public sealed class StartMaterializeMessages : IHostedService, IDisposable
     private readonly ILogger _logger;
     private readonly IHistoryConsumer _historyConsumer;
     private readonly CancellationToken _appStoppingCt;
-    private CancellationTokenSource _stoppedCts;
+    private CancellationTokenSource? _stoppedCts;
 
     public StartMaterializeMessages(
         ILogger<StartMaterializeMessages> logger,

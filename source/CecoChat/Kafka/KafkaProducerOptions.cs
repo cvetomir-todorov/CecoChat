@@ -4,7 +4,7 @@ namespace CecoChat.Kafka;
 
 public sealed class KafkaProducerOptions
 {
-    public string ProducerID { get; set; }
+    public string ProducerID { get; set; } = string.Empty;
 
     public Acks Acks { get; set; }
 

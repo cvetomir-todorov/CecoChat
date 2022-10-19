@@ -4,13 +4,13 @@ namespace CecoChat.Server.State.Backplane;
 
 public sealed class BackplaneOptions
 {
-    public KafkaOptions Kafka { get; set; }
+    public KafkaOptions Kafka { get; set; } = new();
 
-    public KafkaConsumerOptions ReceiversConsumer { get; set; }
+    public KafkaConsumerOptions ReceiversConsumer { get; set; } = new();
 
-    public KafkaConsumerOptions SendersConsumer { get; set; }
+    public KafkaConsumerOptions SendersConsumer { get; set; } = new();
 
-    public string TopicMessagesByReceiver { get; set; }
+    public string TopicMessagesByReceiver { get; set; } = string.Empty;
 
-    public string TopicMessagesBySender { get; set; }
+    public string TopicMessagesBySender { get; set; } = string.Empty;
 }

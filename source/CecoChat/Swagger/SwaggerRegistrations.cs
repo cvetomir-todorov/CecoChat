@@ -44,8 +44,13 @@ public static class SwaggerRegistrations
 
         if (options.UseSwaggerUI)
         {
+            if (options.Url == null)
+            {
+                throw new InvalidOperationException("Missing Swagger URL.");
+            }
+
             app.UseSwaggerUI(config => config.SwaggerEndpoint(
-                url: options.Url,
+                url: options.Url.ToString(),
                 name: $"{options.OpenApiInfo.Title} {options.OpenApiInfo.Version}"));
         }
     }

@@ -11,13 +11,13 @@ public sealed class GetChatsRequest
 public sealed class GetChatsResponse
 {
     [AliasAs("chats")]
-    public List<ChatState> Chats { get; set; }
+    public ChatState[] Chats { get; set; } = Array.Empty<ChatState>();
 }
 
 public sealed class ChatState
 {
     [AliasAs("chatID")]
-    public string ChatID { get; set; }
+    public string ChatID { get; set; } = string.Empty;
 
     [AliasAs("newestMessage")]
     public long NewestMessage { get; set; }

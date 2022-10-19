@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 
 namespace CecoChat.ConsoleClient.LocalStorage;
 
@@ -42,7 +43,7 @@ public sealed class Chat
         }
     }
 
-    public bool TryGetMessage(long messageID, out Message message)
+    public bool TryGetMessage(long messageID, [NotNullWhen(returnValue: true)] out Message? message)
     {
         return _messageMap.TryGetValue(messageID, out message);
     }

@@ -26,16 +26,16 @@ public sealed class GrpcListenService : Listen.ListenBase
     public override async Task Listen(ListenSubscription subscription, IServerStreamWriter<ListenNotification> notificationStream, ServerCallContext context)
     {
         string address = context.Peer;
-        if (!context.GetHttpContext().User.TryGetUserClaims(out UserClaims userClaims))
+        if (!context.GetHttpContext().User.TryGetUserClaims(out UserClaims? userClaims))
         {
             _logger.LogError("Client from {0} was authorized but has no parseable access token.", address);
-            return;
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "Access token could not be parsed."));
         }
 
         _logger.LogInformation("{0} from {1} connected.", userClaims, address);
 
         IGrpcListenStreamer streamer = _streamerFactory.Create();
-        streamer.Initialize(userClaims.ClientID, notificationStream);
+        streamer.Initialize(userClaims!.ClientID, notificationStream);
         await ProcessMessages(streamer, userClaims, address, context.CancellationToken);
     }
 

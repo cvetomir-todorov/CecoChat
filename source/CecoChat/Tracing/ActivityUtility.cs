@@ -12,7 +12,7 @@ public interface IActivityUtility
     /// By default calling <see cref="Activity.Stop"/> sets the <see cref="Activity.Current"/>
     /// to the <see cref="Activity.Parent"/> of the stopped activity which may not be desired.
     /// </summary>
-    void Stop(Activity activity, bool success, bool relyOnDefaultPolicyOfSettingCurrentActivity = true);
+    void Stop(Activity? activity, bool success, bool relyOnDefaultPolicyOfSettingCurrentActivity = true);
 }
 
 public sealed class ActivityUtility : IActivityUtility
@@ -57,14 +57,14 @@ public sealed class ActivityUtility : IActivityUtility
         return Expression.Lambda<Action<Activity, ActivityKind>>(body, instance, propertyValue).Compile();
     }
 
-    public void Stop(Activity activity, bool success, bool relyOnDefaultPolicyOfSettingCurrentActivity = true)
+    public void Stop(Activity? activity, bool success, bool relyOnDefaultPolicyOfSettingCurrentActivity = true)
     {
         if (activity != null)
         {
             Status status = success ? Status.Ok : Status.Error;
             activity.SetStatus(status);
 
-            Activity currentActivity = Activity.Current;
+            Activity? currentActivity = Activity.Current;
             activity.Stop();
 
             if (!relyOnDefaultPolicyOfSettingCurrentActivity)

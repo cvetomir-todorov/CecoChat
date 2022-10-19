@@ -10,7 +10,7 @@ public sealed class FindUserState : State
         Console.Clear();
         Console.Write("Enter user ID ('0' to exit): ");
 
-        string userIDString = Console.ReadLine();
+        string? userIDString = Console.ReadLine();
         if (string.IsNullOrWhiteSpace(userIDString) ||
             !long.TryParse(userIDString, out long userID) ||
             userID == 0)

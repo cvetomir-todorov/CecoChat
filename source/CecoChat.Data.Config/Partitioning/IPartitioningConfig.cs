@@ -6,7 +6,7 @@ public sealed class PartitioningConfigUsage
 {
     public bool UseServerPartitions { get; set; }
 
-    public string ServerPartitionChangesToWatch { get; set; }
+    public string ServerPartitionChangesToWatch { get; set; } = string.Empty;
 
     public bool UseServerAddresses { get; set; }
 }

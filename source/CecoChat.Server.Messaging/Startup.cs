@@ -84,11 +84,8 @@ public class Startup
         builder.RegisterHostedService<HandlePartitionsChanged>();
 
         // configuration
-        builder.RegisterModule(new ConfigDbAutofacModule
-        {
-            RedisConfiguration = Configuration.GetSection("ConfigDB"),
-            RegisterPartitioning = true
-        });
+        IConfiguration configDbConfig = Configuration.GetSection("ConfigDB");
+        builder.RegisterModule(new ConfigDbAutofacModule(configDbConfig, registerPartitioning: true));
         builder.RegisterOptions<ConfigOptions>(Configuration.GetSection("Config"));
 
         // clients
@@ -98,10 +95,8 @@ public class Startup
         builder.RegisterOptions<ClientOptions>(Configuration.GetSection("Clients"));
 
         // idgen
-        builder.RegisterModule(new IDGenAutofacModule
-        {
-            IDGenConfiguration = Configuration.GetSection("IDGen")
-        });
+        IConfiguration idGenConfiguration = Configuration.GetSection("IDGen");
+        builder.RegisterModule(new IDGenAutofacModule(idGenConfiguration));
 
         // backplane
         builder.RegisterModule(new PartitionUtilityAutofacModule());

@@ -4,7 +4,7 @@ namespace CecoChat.Otel;
 
 public sealed class JaegerOptions
 {
-    public string AgentHost { get; set; }
+    public string AgentHost { get; set; } = string.Empty;
 
     public int AgentPort { get; set; }
 

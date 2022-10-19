@@ -16,7 +16,7 @@ internal static class HistoryInstrumentation
 {
     private static readonly string ActivitySourceName = "OpenTelemetry.Instrumentation.CecoChatHistoryDB";
     private static readonly AssemblyName _assemblyName = typeof(HistoryInstrumentation).Assembly.GetName();
-    private static readonly Version _activitySourceVersion = _assemblyName.Version;
+    private static readonly Version _activitySourceVersion = _assemblyName.Version!;
 
     internal static readonly ActivitySource ActivitySource = new(ActivitySourceName, _activitySourceVersion.ToString());
 

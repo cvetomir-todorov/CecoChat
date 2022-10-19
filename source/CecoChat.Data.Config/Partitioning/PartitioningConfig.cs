@@ -14,9 +14,9 @@ internal sealed class PartitioningConfig : IPartitioningConfig
     private readonly IConfigUtility _configUtility;
     private readonly IEventSource<PartitionsChangedEventData> _partitionsChanged;
 
-    private PartitioningConfigUsage _usage;
-    private PartitioningConfigValues _values;
-    private PartitioningConfigValidator _validator;
+    private PartitioningConfigUsage? _usage;
+    private PartitioningConfigValidator? _validator;
+    private PartitioningConfigValues? _values;
 
     public PartitioningConfig(
         ILogger<PartitioningConfig> logger,
@@ -37,11 +37,20 @@ internal sealed class PartitioningConfig : IPartitioningConfig
         _redisContext.Dispose();
     }
 
-    public int PartitionCount => _values.PartitionCount;
+    public int PartitionCount
+    {
+        get
+        {
+            EnsureInitialized();
+            return _values!.PartitionCount;
+        }
+    }
 
     public PartitionRange GetServerPartitions(string server)
     {
-        if (!_values.ServerPartitionsMap.TryGetValue(server, out PartitionRange partitions))
+        EnsureInitialized();
+
+        if (!_values!.ServerPartitionsMap.TryGetValue(server, out PartitionRange partitions))
         {
             throw new InvalidOperationException($"No partitions configured for server {server}.");
         }
@@ -51,11 +60,13 @@ internal sealed class PartitioningConfig : IPartitioningConfig
 
     public string GetServerAddress(int partition)
     {
-        if (!_values.PartitionServerMap.TryGetValue(partition, out string server))
+        EnsureInitialized();
+
+        if (!_values!.PartitionServerMap.TryGetValue(partition, out string? server))
         {
             throw new InvalidOperationException($"No server configured for partition {partition}.");
         }
-        if (!_values.ServerAddressMap.TryGetValue(server, out string address))
+        if (!_values.ServerAddressMap.TryGetValue(server, out string? address))
         {
             throw new InvalidOperationException($"No address configured for server {server}.");
         }
@@ -100,7 +111,9 @@ internal sealed class PartitioningConfig : IPartitioningConfig
 
     private async Task HandleServerPartitions(ChannelMessage channelMessage)
     {
-        if (!_usage.UseServerPartitions && !_usage.UseServerAddresses)
+        EnsureInitialized();
+
+        if (!_usage!.UseServerPartitions && !_usage.UseServerAddresses)
         {
             return;
         }
@@ -108,7 +121,7 @@ internal sealed class PartitioningConfig : IPartitioningConfig
         bool areValid = await LoadValidateValues(_usage);
         if (areValid && !string.IsNullOrWhiteSpace(_usage.ServerPartitionChangesToWatch))
         {
-            PartitioningConfigValues values = _values;
+            PartitioningConfigValues values = _values!;
             if (values.ServerPartitionsMap.TryGetValue(_usage.ServerPartitionChangesToWatch, out PartitionRange partitions))
             {
                 PartitionsChangedEventData eventData = new()
@@ -129,7 +142,9 @@ internal sealed class PartitioningConfig : IPartitioningConfig
 
     private async Task HandleServerAddresses(ChannelMessage channelMessage)
     {
-        if (_usage.UseServerAddresses)
+        EnsureInitialized();
+
+        if (_usage!.UseServerAddresses)
         {
             await LoadValidateValues(_usage);
         }
@@ -137,10 +152,12 @@ internal sealed class PartitioningConfig : IPartitioningConfig
 
     private async Task<bool> LoadValidateValues(PartitioningConfigUsage usage)
     {
+        EnsureInitialized();
+
         PartitioningConfigValues values = await _repo.GetValues(usage);
         _logger.LogInformation("Loading partitioning configuration succeeded.");
 
-        bool areValid = _configUtility.ValidateValues("partitioning", values, _validator);
+        bool areValid = _configUtility.ValidateValues("partitioning", values, _validator!);
         if (areValid)
         {
             _values = values;
@@ -171,6 +188,14 @@ internal sealed class PartitioningConfig : IPartitioningConfig
                 string address = pair.Value;
                 _logger.LogInformation("Address {0} is assigned to server {1}.", address, server);
             }
+        }
+    }
+
+    private void EnsureInitialized()
+    {
+        if (_usage == null || _validator == null)
+        {
+            throw new InvalidOperationException($"Call '{nameof(Initialize)}' to initialize the config.");
         }
     }
 }

@@ -52,14 +52,14 @@ public sealed class GrpcSendService : Send.SendBase
 
     private UserClaims GetUserClaims(ServerCallContext context)
     {
-        if (!context.GetHttpContext().User.TryGetUserClaims(out UserClaims userClaims))
+        if (!context.GetHttpContext().User.TryGetUserClaims(out UserClaims? userClaims))
         {
             _logger.LogError("Client from {0} was authorized but has no parseable access token.", context.Peer);
             throw new RpcException(new Status(StatusCode.InvalidArgument, "Access token could not be parsed."));
         }
 
-        Activity.Current?.SetTag("user.id", userClaims.UserID);
-        return userClaims;
+        Activity.Current?.SetTag("user.id", userClaims!.UserID);
+        return userClaims!;
     }
 
     private async Task<long> GetMessageID(UserClaims userClaims, ServerCallContext context)

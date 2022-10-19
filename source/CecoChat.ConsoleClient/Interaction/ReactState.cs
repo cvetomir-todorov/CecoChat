@@ -10,7 +10,7 @@ public sealed class ReactState : State
     public override async Task<State> Execute()
     {
         Console.Write("Choose message ID ('0' to exit): ");
-        string messageIDString = Console.ReadLine();
+        string? messageIDString = Console.ReadLine();
 
         if (string.IsNullOrWhiteSpace(messageIDString) ||
             !long.TryParse(messageIDString, out long messageID) ||
@@ -20,7 +20,7 @@ public sealed class ReactState : State
             return States.OneChat;
         }
 
-        if (!Storage.TryGetMessage(Client.UserID, Context.UserID, messageID, out Message message))
+        if (!Storage.TryGetMessage(Client.UserID, Context.UserID, messageID, out Message? message))
         {
             Context.ReloadData = false;
             return States.OneChat;

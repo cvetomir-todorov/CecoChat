@@ -37,7 +37,7 @@ public static class SerilogConfig
             .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Information)
             .MinimumLevel.Override("Grpc", LogEventLevel.Warning)
             .Enrich.WithMachineName()
-            .Enrich.WithProperty("Application", entryAssembly.GetName().Name)
+            .Enrich.WithProperty("Application", entryAssembly.GetName().Name!)
             .Enrich.WithSpan()
             .Enrich.FromLogContext()
             .Destructure.ToMaximumDepth(4)
@@ -47,7 +47,7 @@ public static class SerilogConfig
 
     private static LoggerConfiguration ApplyDevelopmentConfiguration(Assembly entryAssembly, LoggerConfiguration configuration)
     {
-        string name = entryAssembly.GetName().Name;
+        string name = entryAssembly.GetName().Name!;
         string binPath = Path.GetDirectoryName(entryAssembly.Location) ?? Environment.CurrentDirectory;
         // going from /source/project/bin/debug/.net5.0/ to /source/logs/project.txt
         string filePath = Path.Combine(binPath, "..", "..", "..", "..", "logs", $"{name}.txt");

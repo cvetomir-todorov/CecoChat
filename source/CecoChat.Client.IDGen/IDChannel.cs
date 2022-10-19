@@ -31,8 +31,8 @@ internal sealed class IDChannel : IIDChannel
 
     public async ValueTask<(bool, long)> TryTakeID(TimeSpan timeout, CancellationToken ct)
     {
-        CancellationTokenSource timeoutCts = null;
-        CancellationTokenSource linkedCts = null;
+        CancellationTokenSource? timeoutCts = null;
+        CancellationTokenSource? linkedCts = null;
 
         try
         {

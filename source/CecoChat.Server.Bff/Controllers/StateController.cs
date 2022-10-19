@@ -41,46 +41,37 @@ public class StateController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetChats([FromQuery][BindRequired] GetChatsRequest request, CancellationToken ct)
     {
-        if (!TryGetUserClaims(HttpContext, out UserClaims userClaims))
+        if (!TryGetUserClaims(HttpContext, out UserClaims? userClaims))
         {
             return Unauthorized();
         }
-        if (!HttpContext.TryGetBearerAccessTokenValue(out string accessToken))
+        if (!HttpContext.TryGetBearerAccessTokenValue(out string? accessToken))
         {
             return Unauthorized();
         }
 
-        IReadOnlyCollection<Contracts.State.ChatState> serviceChats = await _client.GetChats(userClaims.UserID, request.NewerThan, accessToken, ct);
-        List<ChatState> clientChats = MapChats(serviceChats);
+        IReadOnlyCollection<Contracts.State.ChatState> serviceChats = await _client.GetChats(userClaims!.UserID, request.NewerThan, accessToken!, ct);
+        ChatState[] clientChats = serviceChats.Select(MapChat).ToArray();
 
-        _logger.LogTrace("Return {0} chats for user {1} and client {2}.", clientChats.Count, userClaims.UserID, userClaims.ClientID);
+        _logger.LogTrace("Return {0} chats for user {1} and client {2}.", clientChats.Length, userClaims.UserID, userClaims.ClientID);
         return Ok(new GetChatsResponse
         {
             Chats = clientChats
         });
     }
 
-    private static List<ChatState> MapChats(IReadOnlyCollection<Contracts.State.ChatState> serviceChats)
+    private static ChatState MapChat(Contracts.State.ChatState fromService)
     {
-        List<ChatState> clientChats = new();
-
-        foreach (Contracts.State.ChatState serviceChat in serviceChats)
+        return new ChatState
         {
-            ChatState clientChat = new()
-            {
-                ChatID = serviceChat.ChatId,
-                NewestMessage = serviceChat.NewestMessage,
-                OtherUserDelivered = serviceChat.OtherUserDelivered,
-                OtherUserSeen = serviceChat.OtherUserSeen
-            };
-
-            clientChats.Add(clientChat);
-        }
-
-        return clientChats;
+            ChatID = fromService.ChatId,
+            NewestMessage = fromService.NewestMessage,
+            OtherUserDelivered = fromService.OtherUserDelivered,
+            OtherUserSeen = fromService.OtherUserSeen
+        };
     }
 
-    private bool TryGetUserClaims(HttpContext context, out UserClaims userClaims)
+    private bool TryGetUserClaims(HttpContext context, out UserClaims? userClaims)
     {
         if (!context.User.TryGetUserClaims(out userClaims))
         {
@@ -88,7 +79,7 @@ public class StateController : ControllerBase
             return false;
         }
 
-        Activity.Current?.SetTag("user.id", userClaims.UserID);
+        Activity.Current?.SetTag("user.id", userClaims!.UserID);
         return true;
     }
 }

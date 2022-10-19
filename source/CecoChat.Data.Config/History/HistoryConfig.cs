@@ -11,9 +11,9 @@ internal sealed class HistoryConfig : IHistoryConfig
     private readonly IHistoryConfigRepo _repo;
     private readonly IConfigUtility _configUtility;
 
-    private HistoryConfigUsage _usage;
-    private HistoryConfigValues _values;
-    private HistoryConfigValidator _validator;
+    private HistoryConfigUsage? _usage;
+    private HistoryConfigValidator? _validator;
+    private HistoryConfigValues? _values;
 
     public HistoryConfig(
         ILogger<HistoryConfig> logger,
@@ -27,7 +27,14 @@ internal sealed class HistoryConfig : IHistoryConfig
         _configUtility = configUtility;
     }
 
-    public int ChatMessageCount => _values.ChatMessageCount;
+    public int ChatMessageCount
+    {
+        get
+        {
+            EnsureInitialized();
+            return _values!.ChatMessageCount;
+        }
+    }
 
     public async Task Initialize(HistoryConfigUsage usage)
     {
@@ -59,7 +66,9 @@ internal sealed class HistoryConfig : IHistoryConfig
 
     private async Task HandleMessageCount(ChannelMessage channelMessage)
     {
-        if (_usage.UseMessageCount)
+        EnsureInitialized();
+
+        if (_usage!.UseMessageCount)
         {
             await LoadValidateValues(_usage);
         }
@@ -67,10 +76,12 @@ internal sealed class HistoryConfig : IHistoryConfig
 
     private async Task LoadValidateValues(HistoryConfigUsage usage)
     {
+        EnsureInitialized();
+
         HistoryConfigValues values = await _repo.GetValues(usage);
         _logger.LogInformation("Loading history configuration succeeded.");
 
-        if (_configUtility.ValidateValues("history", values, _validator))
+        if (_configUtility.ValidateValues("history", values, _validator!))
         {
             _values = values;
             PrintValues(usage, values);
@@ -82,6 +93,14 @@ internal sealed class HistoryConfig : IHistoryConfig
         if (usage.UseMessageCount)
         {
             _logger.LogInformation("Chat message count set to {0}.", values.ChatMessageCount);
+        }
+    }
+
+    private void EnsureInitialized()
+    {
+        if (_usage == null || _validator == null)
+        {
+            throw new InvalidOperationException($"Call '{nameof(Initialize)}' to initialize the config.");
         }
     }
 }

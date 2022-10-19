@@ -93,24 +93,17 @@ public class Startup
         builder.RegisterHostedService<InitDynamicConfig>();
 
         // configuration
-        builder.RegisterModule(new ConfigDbAutofacModule
-        {
-            RedisConfiguration = Configuration.GetSection("ConfigDB"),
-            RegisterPartitioning = true
-        });
+        IConfiguration configDbConfig = Configuration.GetSection("ConfigDB");
+        builder.RegisterModule(new ConfigDbAutofacModule(configDbConfig, registerPartitioning: true));
 
         // backplane
         builder.RegisterModule(new PartitionUtilityAutofacModule());
 
         // downstream services
-        builder.RegisterModule(new HistoryClientAutofacModule
-        {
-            HistoryClientConfiguration = Configuration.GetSection("HistoryClient")
-        });
-        builder.RegisterModule(new StateClientAutofacModule
-        {
-            StateClientConfiguration = Configuration.GetSection("StateClient")
-        });
+        IConfiguration historyClientConfig = Configuration.GetSection("HistoryClient");
+        builder.RegisterModule(new HistoryClientAutofacModule(historyClientConfig));
+        IConfiguration stateClientConfig = Configuration.GetSection("StateClient");
+        builder.RegisterModule(new StateClientAutofacModule(stateClientConfig));
 
         // security
         builder.RegisterOptions<JwtOptions>(Configuration.GetSection("Jwt"));

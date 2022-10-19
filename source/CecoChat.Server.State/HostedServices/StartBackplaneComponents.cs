@@ -7,7 +7,7 @@ public sealed class StartBackplaneComponents : IHostedService, IDisposable
     private readonly ILogger _logger;
     private readonly IStateConsumer _stateConsumer;
     private readonly CancellationToken _appStoppingCt;
-    private CancellationTokenSource _stoppedCts;
+    private CancellationTokenSource? _stoppedCts;
 
     public StartBackplaneComponents(
         ILogger<StartBackplaneComponents> logger,

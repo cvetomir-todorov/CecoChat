@@ -64,7 +64,7 @@ public sealed class CassandraDbInitializer : ICassandraDbInitializer
         List<CqlScript> cqls = allOrdered
             .Select(resourceName =>
             {
-                using Stream resourceStream = scriptSource.GetManifestResourceStream(resourceName);
+                using Stream? resourceStream = scriptSource.GetManifestResourceStream(resourceName);
                 if (resourceStream == null)
                 {
                     throw new InvalidOperationException($"Failed to load CQL script {resourceName}.");

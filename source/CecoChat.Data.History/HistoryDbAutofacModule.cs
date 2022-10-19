@@ -10,14 +10,16 @@ namespace CecoChat.Data.History;
 
 public sealed class HistoryDbAutofacModule : Module
 {
-    public IConfiguration HistoryDbConfiguration { get; init; }
+    private readonly IConfiguration _historyDbConfiguration;
+
+    public HistoryDbAutofacModule(IConfiguration historyDbConfiguration)
+    {
+        _historyDbConfiguration = historyDbConfiguration;
+    }
 
     protected override void Load(ContainerBuilder builder)
     {
-        CassandraAutofacModule<HistoryDbContext, IHistoryDbContext> historyDbModule = new()
-        {
-            CassandraConfiguration = HistoryDbConfiguration
-        };
+        CassandraAutofacModule<HistoryDbContext, IHistoryDbContext> historyDbModule = new(_historyDbConfiguration);
         builder.RegisterModule(historyDbModule);
         builder.RegisterType<CassandraDbInitializer>().As<ICassandraDbInitializer>()
             .WithNamedParameter(typeof(ICassandraDbContext), historyDbModule.DbContextName)

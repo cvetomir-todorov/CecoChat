@@ -21,8 +21,8 @@ public sealed class KafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey, TValue>
     private readonly ILogger _logger;
     private readonly IKafkaActivityUtility _kafkaActivityUtility;
     private PartitionRange _assignedPartitions;
-    private IConsumer<TKey, TValue> _consumer;
-    private KafkaConsumerOptions _consumerOptions;
+    private IConsumer<TKey, TValue>? _consumer;
+    private KafkaConsumerOptions? _consumerOptions;
     private string _id;
     private bool _isDisposed;
 
@@ -34,6 +34,7 @@ public sealed class KafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey, TValue>
         _kafkaActivityUtility = kafkaActivityUtility;
 
         _assignedPartitions = PartitionRange.Empty;
+        _id = "non-initialized";
     }
 
     public void Dispose()
@@ -72,7 +73,7 @@ public sealed class KafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey, TValue>
     public void Subscribe(string topic)
     {
         EnsureInitialized();
-        _consumer.Subscribe(topic);
+        _consumer!.Subscribe(topic);
         _logger.LogDebug("Consumer {0} subscribed to topic {1}.", _id, topic);
     }
 
@@ -93,7 +94,7 @@ public sealed class KafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey, TValue>
             topicPartitions.Add(topicPartition);
         }
 
-        _consumer.Assign(topicPartitions);
+        _consumer!.Assign(topicPartitions);
         _assignedPartitions = partitions;
         _logger.LogDebug("Consumer {0} assigned partitions {1} from topic {2}.", _id, partitions, topic);
     }
@@ -106,13 +107,14 @@ public sealed class KafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey, TValue>
     public void Consume(Action<ConsumeResult<TKey, TValue>> messageHandler, CancellationToken ct)
     {
         EnsureInitialized();
+
         ConsumeStage stage = ConsumeStage.Initial;
-        ConsumeResult<TKey, TValue> consumeResult = default;
-        Activity activity = default;
+        ConsumeResult<TKey, TValue> consumeResult = new();
+        Activity? activity = default;
 
         try
         {
-            if (!DoConsume(messageHandler, out Exception messageHandlerException, out stage, out consumeResult, out activity, ct))
+            if (!DoConsume(messageHandler, out Exception? messageHandlerException, out stage, out consumeResult, out activity, ct))
             {
                 throw new InvalidOperationException("Message handler threw an exception.", messageHandlerException);
             }
@@ -142,9 +144,9 @@ public sealed class KafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey, TValue>
 
     private void EnsureInitialized()
     {
-        if (_consumer == null)
+        if (_consumer == null || _consumerOptions == null)
         {
-            throw new InvalidOperationException($"'{nameof(Initialize)}' needs to be called first.");
+            throw new InvalidOperationException($"Call '{nameof(Initialize)}' to initialize the consumer.");
         }
     }
 
@@ -158,16 +160,16 @@ public sealed class KafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey, TValue>
 
     private bool DoConsume(
         Action<ConsumeResult<TKey, TValue>> messageHandler,
-        out Exception messageHandlerException,
+        out Exception? messageHandlerException,
         out ConsumeStage stage,
         out ConsumeResult<TKey, TValue> consumeResult,
-        out Activity activity,
+        out Activity? activity,
         CancellationToken ct)
     {
         messageHandlerException = default;
-        consumeResult = _consumer.Consume(ct);
+        consumeResult = _consumer!.Consume(ct);
         // consume blocks until there is a message and it is read => start activity after that
-        activity = _kafkaActivityUtility.StartConsumer(consumeResult, _consumerOptions.ConsumerGroupID);
+        activity = _kafkaActivityUtility.StartConsumer(consumeResult, _consumerOptions!.ConsumerGroupID);
         stage = ConsumeStage.AfterConsume;
 
         try
@@ -213,7 +215,7 @@ public sealed class KafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey, TValue>
                 success = true;
                 break;
             default:
-                throw new InvalidOperationException($"{typeof(ConsumeStage).FullName} value {stage} is not supported.");
+                throw new EnumValueNotSupportedException(stage);
         }
 
         return success;

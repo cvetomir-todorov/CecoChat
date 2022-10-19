@@ -5,7 +5,7 @@ namespace CecoChat.Server.Bff.Controllers.Infrastructure;
 
 public class DateTimeModelBinderProvider : IModelBinderProvider
 {
-    public IModelBinder GetBinder(ModelBinderProviderContext context)
+    public IModelBinder? GetBinder(ModelBinderProviderContext context)
     {
         if (context == null)
         {

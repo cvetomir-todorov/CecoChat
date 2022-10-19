@@ -6,7 +6,7 @@ namespace CecoChat.Server.Identity;
 
 public static class SecurityExtensions
 {
-    public static bool TryGetBearerAccessTokenValue(this HttpContext context, out string accessToken)
+    public static bool TryGetBearerAccessTokenValue(this HttpContext context, out string? accessToken)
     {
         accessToken = null;
         if (!context.Request.Headers.TryGetValue(HeaderNames.Authorization, out StringValues values))

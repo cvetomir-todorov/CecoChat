@@ -6,11 +6,16 @@ namespace CecoChat.Client.State;
 
 public sealed class StateClientAutofacModule : Module
 {
-    public IConfiguration StateClientConfiguration { get; init; }
+    private readonly IConfiguration _stateClientConfiguration;
+
+    public StateClientAutofacModule(IConfiguration stateClientConfiguration)
+    {
+        _stateClientConfiguration = stateClientConfiguration;
+    }
 
     protected override void Load(ContainerBuilder builder)
     {
         builder.RegisterType<StateClient>().As<IStateClient>().SingleInstance();
-        builder.RegisterOptions<StateOptions>(StateClientConfiguration);
+        builder.RegisterOptions<StateOptions>(_stateClientConfiguration);
     }
 }

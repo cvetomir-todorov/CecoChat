@@ -46,8 +46,20 @@ public static class EntryPoint
 
     public static void CreateAndRunHost(IHostBuilder hostBuilder, Type loggerContext)
     {
-        string environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-        SerilogConfig.Setup(Assembly.GetEntryAssembly(), environment);
+        Assembly? entryAssembly = Assembly.GetEntryAssembly();
+        if (entryAssembly == null)
+        {
+            throw new InvalidOperationException("Entry assembly is null.");
+        }
+
+        const string aspnetEnvVarName = "ASPNETCORE_ENVIRONMENT";
+        string? environment = Environment.GetEnvironmentVariable(aspnetEnvVarName);
+        if (string.IsNullOrWhiteSpace(environment))
+        {
+            throw new InvalidOperationException($"Environment variable '{aspnetEnvVarName}' is not set or is whitespace.");
+        }
+
+        SerilogConfig.Setup(entryAssembly, environment);
         ILogger logger = Log.ForContext(loggerContext);
 
         try

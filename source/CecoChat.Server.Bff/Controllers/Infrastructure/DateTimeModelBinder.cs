@@ -18,7 +18,7 @@ public class DateTimeModelBinder : IModelBinder
             throw new ArgumentNullException(nameof(bindingContext));
         }
 
-        string textValue = bindingContext.ValueProvider.GetValue(bindingContext.ModelName).FirstValue;
+        string? textValue = bindingContext.ValueProvider.GetValue(bindingContext.ModelName).FirstValue;
         if (bindingContext.ModelType == typeof(DateTime?) && string.IsNullOrEmpty(textValue))
         {
             bindingContext.Result = ModelBindingResult.Success(null);

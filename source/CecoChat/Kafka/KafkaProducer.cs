@@ -9,9 +9,9 @@ public interface IKafkaProducer<TKey, TValue> : IDisposable
 {
     void Initialize(KafkaOptions options, KafkaProducerOptions producerOptions, ISerializer<TValue> valueSerializer);
 
-    void Produce(Message<TKey, TValue> message, TopicPartition topicPartition, DeliveryHandler<TKey, TValue> deliveryHandler = null);
+    void Produce(Message<TKey, TValue> message, TopicPartition topicPartition, DeliveryHandler<TKey, TValue>? deliveryHandler = null);
 
-    void Produce(Message<TKey, TValue> message, string topic, DeliveryHandler<TKey, TValue> deliveryHandler = null);
+    void Produce(Message<TKey, TValue> message, string topic, DeliveryHandler<TKey, TValue>? deliveryHandler = null);
 
     void FlushPendingMessages();
 }
@@ -22,8 +22,8 @@ public sealed class KafkaProducer<TKey, TValue> : IKafkaProducer<TKey, TValue>
 {
     private readonly ILogger _logger;
     private readonly IKafkaActivityUtility _kafkaActivityUtility;
-    private IProducer<TKey, TValue> _producer;
-    private KafkaProducerOptions _producerOptions;
+    private IProducer<TKey, TValue>? _producer;
+    private KafkaProducerOptions? _producerOptions;
     private string _id;
     private bool _isDisposed;
 
@@ -33,6 +33,7 @@ public sealed class KafkaProducer<TKey, TValue> : IKafkaProducer<TKey, TValue>
     {
         _logger = logger;
         _kafkaActivityUtility = kafkaActivityUtility;
+        _id = "non-initialized";
     }
 
     public void Dispose()
@@ -67,21 +68,33 @@ public sealed class KafkaProducer<TKey, TValue> : IKafkaProducer<TKey, TValue>
         _id = $"{producerOptions.ProducerID}_id{KafkaProducerIDGenerator.GetNextID()}";
     }
 
-    public void Produce(Message<TKey, TValue> message, TopicPartition topicPartition, DeliveryHandler<TKey, TValue> deliveryHandler = null)
+    public void Produce(Message<TKey, TValue> message, TopicPartition topicPartition, DeliveryHandler<TKey, TValue>? deliveryHandler = null)
     {
+        EnsureInitialized();
+
         string topic = topicPartition.Topic;
         int partition = topicPartition.Partition;
 
-        Activity activity = _kafkaActivityUtility.StartProducer(message, _producerOptions.ProducerID, topic, partition);
-        _producer.Produce(topicPartition, message, deliveryReport => HandleDeliveryReport(deliveryReport, activity, deliveryHandler));
+        Activity activity = _kafkaActivityUtility.StartProducer(message, _producerOptions!.ProducerID, topic, partition);
+        _producer!.Produce(topicPartition, message, deliveryReport => HandleDeliveryReport(deliveryReport, activity, deliveryHandler));
         _logger.LogTrace("Producer {0} produced message {1} in {2}[{3}].", _id, message.Value, topic, partition);
     }
 
-    public void Produce(Message<TKey, TValue> message, string topic, DeliveryHandler<TKey, TValue> deliveryHandler = null)
+    public void Produce(Message<TKey, TValue> message, string topic, DeliveryHandler<TKey, TValue>? deliveryHandler = null)
     {
-        Activity activity = _kafkaActivityUtility.StartProducer(message, _producerOptions.ProducerID, topic);
-        _producer.Produce(topic, message, deliveryReport => HandleDeliveryReport(deliveryReport, activity, deliveryHandler));
+        EnsureInitialized();
+
+        Activity activity = _kafkaActivityUtility.StartProducer(message, _producerOptions!.ProducerID, topic);
+        _producer!.Produce(topic, message, deliveryReport => HandleDeliveryReport(deliveryReport, activity, deliveryHandler));
         _logger.LogTrace("Producer {0} produced message {1} in {2}.", _id, message.Value, topic);
+    }
+
+    private void EnsureInitialized()
+    {
+        if (_producer == null || _producerOptions == null)
+        {
+            throw new InvalidOperationException($"Call '{nameof(Initialize)}' to initialize the producer.");
+        }
     }
 
     public void FlushPendingMessages()
@@ -103,7 +116,7 @@ public sealed class KafkaProducer<TKey, TValue> : IKafkaProducer<TKey, TValue>
         }
     }
 
-    private void HandleDeliveryReport(DeliveryReport<TKey, TValue> report, Activity activity, DeliveryHandler<TKey, TValue> deliveryHandler)
+    private void HandleDeliveryReport(DeliveryReport<TKey, TValue> report, Activity activity, DeliveryHandler<TKey, TValue>? deliveryHandler)
     {
         bool isDelivered = true;
         try

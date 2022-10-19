@@ -11,7 +11,7 @@ public sealed class StartBackplaneComponents : IHostedService, IDisposable
     private readonly IBackplaneComponents _backplaneComponents;
     private readonly IPartitioningConfig _partitioningConfig;
     private readonly CancellationToken _appStoppingCt;
-    private CancellationTokenSource _stoppedCts;
+    private CancellationTokenSource? _stoppedCts;
 
     public StartBackplaneComponents(
         IHostApplicationLifetime applicationLifetime,
