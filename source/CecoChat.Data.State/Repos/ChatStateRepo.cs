@@ -90,7 +90,7 @@ internal class ChatStateRepo : IChatStateRepo
             }
             success = true;
 
-            _logger.LogTrace("Returned {0} chats for user {1} which are newer than {2}.", chats.Count, userID, newerThan);
+            _logger.LogTrace("Returned {ChatCount} chats for user {UserId} which are newer than {NewerThan}", chats.Count, userID, newerThan);
             return chats;
         }
         finally
@@ -122,11 +122,11 @@ internal class ChatStateRepo : IChatStateRepo
                 chat.OtherUserDelivered = row.GetValue<long>("other_user_delivered");
                 chat.OtherUserSeen = row.GetValue<long>("other_user_seen");
 
-                _logger.LogTrace("Returned chat {0} for user {1}.", chatID, userID);
+                _logger.LogTrace("Returned chat {ChatId} for user {UserId}", chatID, userID);
             }
             else
             {
-                _logger.LogTrace("Failed to find chat {0} for user {1}.", chatID, userID);
+                _logger.LogTrace("Failed to find chat {ChatId} for user {UserId}", chatID, userID);
             }
 
             success = true;
@@ -151,7 +151,7 @@ internal class ChatStateRepo : IChatStateRepo
 
             _dbContext.Session.Execute(query);
             success = true;
-            _logger.LogTrace("Updated chat {0} for user {1}.", chat.ChatId, userID);
+            _logger.LogTrace("Updated chat {ChatId} for user {UserId}", chat.ChatId, userID);
         }
         finally
         {

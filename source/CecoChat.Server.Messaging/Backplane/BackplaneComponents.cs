@@ -48,7 +48,7 @@ public sealed class BackplaneComponents : IBackplaneComponents
         if (currentPartitionCount < partitionCount)
         {
             _topicPartitionFlyweight.AddOrUpdate(_backplaneOptions.TopicMessagesByReceiver, partitionCount);
-            _logger.LogInformation("Increase cached partitions for topic {0} from {1} to {2}.",
+            _logger.LogInformation("Increase cached partitions for topic {Topic} from {CurrentPartitionCount} to {NewPartitionCount}",
                 _backplaneOptions.TopicMessagesByReceiver, currentPartitionCount, partitionCount);
         }
 
@@ -56,7 +56,7 @@ public sealed class BackplaneComponents : IBackplaneComponents
         if (currentPartitionCount < partitionCount)
         {
             _topicPartitionFlyweight.AddOrUpdate(_backplaneOptions.TopicMessagesBySender, partitionCount);
-            _logger.LogInformation("Increase cached partitions for topic {0} from {1} to {2}.",
+            _logger.LogInformation("Increase cached partitions for topic {Topic} from {CurrentPartitionCount} to {NewPartitionCount}",
                 _backplaneOptions.TopicMessagesBySender, currentPartitionCount, partitionCount);
         }
 
@@ -65,7 +65,7 @@ public sealed class BackplaneComponents : IBackplaneComponents
         _messageReplicator.PartitionCount = partitionCount;
         _messageReplicator.Prepare(partitions);
 
-        _logger.LogInformation("Prepared backplane components for topics {0} and {1} to use partitions {2}.",
+        _logger.LogInformation("Prepared backplane components for topics {TopicMessagesByReceiver} and {TopicMessagesBySender} to use partitions {Partitions}",
             _backplaneOptions.TopicMessagesByReceiver, _backplaneOptions.TopicMessagesBySender, partitions);
     }
 
@@ -79,7 +79,7 @@ public sealed class BackplaneComponents : IBackplaneComponents
             }
             catch (Exception exception)
             {
-                _logger.LogCritical(exception, "Failure in consumer {0}.", _receiversConsumer.ConsumerID);
+                _logger.LogCritical(exception, "Failure in consumer {ConsumerId}", _receiversConsumer.ConsumerID);
             }
         }, ct, TaskCreationOptions.LongRunning, TaskScheduler.Current);
 
@@ -91,7 +91,7 @@ public sealed class BackplaneComponents : IBackplaneComponents
             }
             catch (Exception exception)
             {
-                _logger.LogCritical(exception, "Failure in consumer {0}.", _messageReplicator.ConsumerID);
+                _logger.LogCritical(exception, "Failure in consumer {ConsumerId}", _messageReplicator.ConsumerID);
             }
         }, ct, TaskCreationOptions.LongRunning, TaskScheduler.Current);
     }

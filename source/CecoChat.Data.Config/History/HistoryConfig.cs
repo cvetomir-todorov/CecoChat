@@ -47,7 +47,7 @@ internal sealed class HistoryConfig : IHistoryConfig
         }
         catch (Exception exception)
         {
-            _logger.LogError(exception, "Initializing history configuration failed.");
+            _logger.LogError(exception, "Initializing history configuration failed");
         }
     }
 
@@ -59,8 +59,7 @@ internal sealed class HistoryConfig : IHistoryConfig
         {
             ChannelMessageQueue chatMessageCountMQ = await subscriber.SubscribeAsync($"notify:{HistoryKeys.ChatMessageCount}");
             chatMessageCountMQ.OnMessage(channelMessage => _configUtility.HandleChange(channelMessage, HandleMessageCount));
-            _logger.LogInformation("Subscribed for changes about {0} from channel {1}.",
-                HistoryKeys.ChatMessageCount, chatMessageCountMQ.Channel);
+            _logger.LogInformation("Subscribed for changes about {ChatMessageCount} from channel {Channel}", HistoryKeys.ChatMessageCount, chatMessageCountMQ.Channel);
         }
     }
 
@@ -79,7 +78,7 @@ internal sealed class HistoryConfig : IHistoryConfig
         EnsureInitialized();
 
         HistoryConfigValues values = await _repo.GetValues(usage);
-        _logger.LogInformation("Loading history configuration succeeded.");
+        _logger.LogInformation("Loading history configuration succeeded");
 
         if (_configUtility.ValidateValues("history", values, _validator!))
         {
@@ -92,7 +91,7 @@ internal sealed class HistoryConfig : IHistoryConfig
     {
         if (usage.UseMessageCount)
         {
-            _logger.LogInformation("Chat message count set to {0}.", values.ChatMessageCount);
+            _logger.LogInformation("Chat message count set to {ChatMessageCount}", values.ChatMessageCount);
         }
     }
 

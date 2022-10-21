@@ -38,7 +38,7 @@ internal sealed class IDGenClient : IIDGenClient
         _client = client;
         _idChannel = idChannel;
 
-        _logger.LogInformation("IDGen address set to {0}.", _options.Address);
+        _logger.LogInformation("IDGen address set to {Address}", _options.Address);
         _invalidateIDsTimer = new(
             callback: _ => RefreshIDs(),
             state: null,
@@ -56,7 +56,7 @@ internal sealed class IDGenClient : IIDGenClient
         (bool success, long id) = await _idChannel.TryTakeID(_options.GetIDWaitInterval, ct);
         if (!success)
         {
-            _logger.LogWarning("Timed-out while waiting for new IDs to be generated.");
+            _logger.LogWarning("Timed-out while waiting for new IDs to be generated");
             return new GetIDResult();
         }
 
@@ -67,7 +67,7 @@ internal sealed class IDGenClient : IIDGenClient
     {
         if (True == Interlocked.CompareExchange(ref _isRefreshing, True, False))
         {
-            _logger.LogWarning("Failed to refresh IDs since previous refresh hasn't completed yet.");
+            _logger.LogWarning("Failed to refresh IDs since previous refresh hasn't completed yet");
             return;
         }
 
@@ -86,11 +86,11 @@ internal sealed class IDGenClient : IIDGenClient
         }
         catch (RpcException rpcException)
         {
-            _logger.LogError(rpcException, "Failed to refresh IDs due to error {0}.", rpcException.Status);
+            _logger.LogError(rpcException, "Failed to refresh IDs due to error {Error}", rpcException.Status);
         }
         catch (Exception exception)
         {
-            _logger.LogError(exception, "Failed to refresh IDs.");
+            _logger.LogError(exception, "Failed to refresh IDs");
         }
         finally
         {

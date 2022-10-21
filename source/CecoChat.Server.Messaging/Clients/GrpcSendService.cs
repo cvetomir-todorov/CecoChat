@@ -38,7 +38,7 @@ public sealed class GrpcSendService : Send.SendBase
         UserClaims userClaims = GetUserClaims(context);
         long messageID = await GetMessageID(userClaims, context);
 
-        _logger.LogTrace("User {0} sent message with generated ID {1}: {2}.", userClaims, messageID, request);
+        _logger.LogTrace("User {@User} sent message with generated ID {MessageId}: {@SendMessageRequest}", userClaims, messageID, request);
 
         BackplaneMessage backplaneMessage = _mapper.CreateBackplaneMessage(request, userClaims.ClientID, messageID);
         _sendersProducer.ProduceMessage(backplaneMessage);
@@ -54,7 +54,7 @@ public sealed class GrpcSendService : Send.SendBase
     {
         if (!context.GetHttpContext().User.TryGetUserClaims(out UserClaims? userClaims))
         {
-            _logger.LogError("Client from {0} was authorized but has no parseable access token.", context.Peer);
+            _logger.LogError("Client from {Address} was authorized but has no parseable access token", context.Peer);
             throw new RpcException(new Status(StatusCode.InvalidArgument, "Access token could not be parsed."));
         }
 
@@ -104,12 +104,12 @@ public sealed class GrpcSendService : Send.SendBase
     {
         if (successCount < allCount)
         {
-            _logger.LogWarning("Connected senders with ID {0} ({1} out of {2}) were queued message {3}.",
+            _logger.LogWarning("Connected senders with ID {SenderId} ({SuccessCount} out of {AllCount}) were queued message {MessageId}",
                 request.SenderId, successCount, allCount, messageID);
         }
         else if (allCount > 0)
         {
-            _logger.LogTrace("Connected senders with ID {0} (all {1}) were queued message {2}.",
+            _logger.LogTrace("Connected senders with ID {SenderId} (all {Count}) were queued message {MessageId}",
                 request.SenderId, successCount, messageID);
         }
     }

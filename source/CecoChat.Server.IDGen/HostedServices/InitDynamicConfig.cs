@@ -21,7 +21,7 @@ public sealed class InitDynamicConfig : IHostedService
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Configured server ID is '{0}'.", _configOptions.ServerID);
+        _logger.LogInformation("Configured server ID is {ServerId}", _configOptions.ServerID);
         await _snowflakeConfig.Initialize();
     }
 

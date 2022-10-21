@@ -29,7 +29,7 @@ public sealed class GrpcHistoryService : Contracts.History.History.HistoryBase
     {
         if (!context.GetHttpContext().User.TryGetUserID(out long userID))
         {
-            _logger.LogError("Client from {0} was authorized but has no parseable access token.", context.Peer);
+            _logger.LogError("Client from {ClientAddress} was authorized but has no parseable access token", context.Peer);
             return new GetHistoryResponse();
         }
         Activity.Current?.SetTag("user.id", userID);
@@ -40,7 +40,7 @@ public sealed class GrpcHistoryService : Contracts.History.History.HistoryBase
         GetHistoryResponse response = new();
         response.Messages.Add(historyMessages);
 
-        _logger.LogTrace("Responding with {0} messages for chat between [{1} <-> {2}].", response.Messages.Count, userID, request.OtherUserId);
+        _logger.LogTrace("Responding with {MessageCount} messages for chat between [{UserId} <-> {OtherUserId}]", response.Messages.Count, userID, request.OtherUserId);
         return response;
     }
 }

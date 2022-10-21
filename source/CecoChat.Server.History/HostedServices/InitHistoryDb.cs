@@ -30,11 +30,11 @@ public sealed class InitHistoryDb : IHostedService
             {
                 _logger.LogInformation("Start preparing queries...");
                 _messageRepo.Prepare();
-                _logger.LogInformation("Completed preparing queries.");
+                _logger.LogInformation("Completed preparing queries");
             }
             catch (Exception exception)
             {
-                _logger.LogCritical(exception, "Failed to prepare queries.");
+                _logger.LogCritical(exception, "Failed to prepare queries");
             }
         }, cancellationToken);
 

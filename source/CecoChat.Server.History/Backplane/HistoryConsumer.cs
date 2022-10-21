@@ -52,7 +52,7 @@ public sealed class HistoryConsumer : IHistoryConsumer
 
     public void Start(CancellationToken ct)
     {
-        _logger.LogInformation("Start creating history from messages.");
+        _logger.LogInformation("Start creating history from messages");
 
         while (!ct.IsCancellationRequested)
         {
@@ -62,7 +62,7 @@ public sealed class HistoryConsumer : IHistoryConsumer
             }, ct);
         }
 
-        _logger.LogInformation("Stopped creating history from messages.");
+        _logger.LogInformation("Stopped creating history from messages");
     }
 
     public string ConsumerID => _backplaneOptions.HistoryConsumer.ConsumerGroupID;

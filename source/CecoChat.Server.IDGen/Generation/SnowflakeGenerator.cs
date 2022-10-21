@@ -43,14 +43,14 @@ public sealed class SnowflakeGenerator : IIdentityGenerator
     public long GenerateOne(long originatorID)
     {
         long id = ChooseGenerator(originatorID, out int generatorIndex).CreateId();
-        _logger.LogTrace("Generated ID {0} for originator {1} using generator {2}.", id, originatorID, generatorIndex);
+        _logger.LogTrace("Generated ID {Id} for originator {OriginatorId} using generator {GeneratorIndex}", id, originatorID, generatorIndex);
         return id;
     }
 
     public IEnumerable<long> GenerateMany(long originatorID, int count)
     {
         IEnumerable<long> ids = ChooseGenerator(originatorID, out int generatorIndex).Take(count);
-        _logger.LogTrace("Generated {0} IDs for originator {1} using generator {2}.", count, originatorID, generatorIndex);
+        _logger.LogTrace("Generated {IdCount} IDs for originator {OriginatorId} using generator {GeneratorIndex}", count, originatorID, generatorIndex);
         return ids;
     }
 

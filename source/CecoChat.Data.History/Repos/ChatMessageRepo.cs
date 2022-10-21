@@ -92,7 +92,7 @@ internal class ChatMessageRepo : IChatMessageRepo
             ReadRows(rows, messages);
             success = true;
 
-            _logger.LogTrace("Returned {0} messages between for chat {1} which are older than {2}.", messages.Count, chatID, olderThan);
+            _logger.LogTrace("Returned {MessageCount} messages between for chat {Chat} which are older than {OlderThan}", messages.Count, chatID, olderThan);
             return messages;
         }
         finally
@@ -140,7 +140,7 @@ internal class ChatMessageRepo : IChatMessageRepo
 
             _dbContext.Session.Execute(query);
             success = true;
-            _logger.LogTrace("Persisted the message {0}.", message);
+            _logger.LogTrace("Persisted the message {@Message}", message);
         }
         finally
         {
@@ -162,7 +162,7 @@ internal class ChatMessageRepo : IChatMessageRepo
             _dbContext.Session.Execute(query);
 
             success = true;
-            _logger.LogTrace("User {0} reacted with {1} to message {2}.", message.ReactorId, message.Reaction, message.MessageId);
+            _logger.LogTrace("User {ReactorId} reacted with {Reaction} to message {MessageId}", message.ReactorId, message.Reaction, message.MessageId);
         }
         finally
         {
@@ -184,7 +184,7 @@ internal class ChatMessageRepo : IChatMessageRepo
             _dbContext.Session.Execute(query);
 
             success = true;
-            _logger.LogTrace("User {0} removed reaction to message {1}.", message.ReactorId, message.MessageId);
+            _logger.LogTrace("User {ReactorId} removed reaction to message {MessageId}", message.ReactorId, message.MessageId);
         }
         finally
         {

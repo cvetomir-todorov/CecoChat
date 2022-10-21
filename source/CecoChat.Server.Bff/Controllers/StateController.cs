@@ -53,7 +53,7 @@ public class StateController : ControllerBase
         IReadOnlyCollection<Contracts.State.ChatState> serviceChats = await _client.GetChats(userClaims!.UserID, request.NewerThan, accessToken!, ct);
         ChatState[] clientChats = serviceChats.Select(MapChat).ToArray();
 
-        _logger.LogTrace("Return {0} chats for user {1} and client {2}.", clientChats.Length, userClaims.UserID, userClaims.ClientID);
+        _logger.LogTrace("Return {ChatCount} chats for user {UserId} and client {ClientId}", clientChats.Length, userClaims.UserID, userClaims.ClientID);
         return Ok(new GetChatsResponse
         {
             Chats = clientChats
@@ -75,7 +75,7 @@ public class StateController : ControllerBase
     {
         if (!context.User.TryGetUserClaims(out userClaims))
         {
-            _logger.LogError("Client from was authorized but has no parseable access token.");
+            _logger.LogError("Client from was authorized but has no parseable access token");
             return false;
         }
 

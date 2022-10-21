@@ -26,13 +26,13 @@ public sealed class CassandraDbInitializer : ICassandraDbInitializer
     {
         if (_dbContext.ExistsKeyspace(keyspace))
         {
-            _logger.LogInformation("Keyspace {0} already initialized.", keyspace);
+            _logger.LogInformation("Keyspace {Keyspace} already initialized", keyspace);
             return;
         }
 
-        _logger.LogInformation("Keyspace {0} needs initialization.", keyspace);
+        _logger.LogInformation("Keyspace {Keyspace} needs initialization", keyspace);
         List<CqlScript> cqls = GetCqlScripts(keyspace, scriptSource);
-        _logger.LogInformation("Loaded {0} CQL scripts for keyspace {1} initialization.", cqls.Count, keyspace);
+        _logger.LogInformation("Loaded {CqlScriptCount} CQL scripts for keyspace {Keyspace} initialization", cqls.Count, keyspace);
         ISession session = _dbContext.GetSession();
 
         foreach (CqlScript cql in cqls)
@@ -89,11 +89,11 @@ public sealed class CassandraDbInitializer : ICassandraDbInitializer
         try
         {
             session.Execute(cql.Content, ConsistencyLevel.All);
-            _logger.LogDebug("Executed {0} CQL script: {1}{2}", cql.Name, Environment.NewLine, cql.Content);
+            _logger.LogDebug("Executed CQL script {CqlScriptName}: {NewLine}{CqlScriptContent}", cql.Name, Environment.NewLine, cql.Content);
         }
         catch (AlreadyExistsException alreadyExistsException)
         {
-            _logger.LogWarning("Creation error: {0}", alreadyExistsException.Message);
+            _logger.LogWarning("Creation error: {Error}", alreadyExistsException.Message);
         }
     }
 }

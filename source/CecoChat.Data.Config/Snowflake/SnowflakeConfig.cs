@@ -53,7 +53,7 @@ internal sealed class SnowflakeConfig : ISnowflakeConfig
         }
         catch (Exception exception)
         {
-            _logger.LogError(exception, "Initializing snowflake config failed.");
+            _logger.LogError(exception, "Initializing snowflake config failed");
         }
     }
 
@@ -63,8 +63,7 @@ internal sealed class SnowflakeConfig : ISnowflakeConfig
 
         ChannelMessageQueue generatorIDsMQ = await subscriber.SubscribeAsync($"notify:{SnowflakeKeys.ServerGeneratorIDs}");
         generatorIDsMQ.OnMessage(channelMessage => _configUtility.HandleChange(channelMessage, HandleGeneratorIDs));
-        _logger.LogInformation("Subscribed for changes about {0} from channel {1}.",
-            SnowflakeKeys.ServerGeneratorIDs, generatorIDsMQ.Channel);
+        _logger.LogInformation("Subscribed for changes about {ServerGeneratorIDs} from channel {Channel}", SnowflakeKeys.ServerGeneratorIDs, generatorIDsMQ.Channel);
     }
 
     private Task HandleGeneratorIDs(ChannelMessage channelMessage)
@@ -77,7 +76,7 @@ internal sealed class SnowflakeConfig : ISnowflakeConfig
         EnsureInitialized();
 
         SnowflakeConfigValues values = await _repo.GetValues();
-        _logger.LogInformation("Loading snowflake configuration succeeded.");
+        _logger.LogInformation("Loading snowflake configuration succeeded");
 
         bool areValid = _configUtility.ValidateValues("snowflake", values, _validator!);
         if (areValid)
@@ -89,10 +88,10 @@ internal sealed class SnowflakeConfig : ISnowflakeConfig
 
     private void PrintValues(SnowflakeConfigValues values)
     {
-        _logger.LogInformation("Total of {0} server(s) configured:", values.ServerGeneratorIDs.Count);
+        _logger.LogInformation("Total of {ServerCount} server(s) configured:", values.ServerGeneratorIDs.Count);
         foreach (KeyValuePair<string, List<short>> pair in values.ServerGeneratorIDs)
         {
-            _logger.LogInformation("Server {0} is assigned generator IDs: [{1}].", pair.Key, string.Join(separator: ", ", pair.Value));
+            _logger.LogInformation("Server {Server} is assigned generator IDs: [{GeneratorIds}]", pair.Key, string.Join(separator: ", ", pair.Value));
         }
     }
 
