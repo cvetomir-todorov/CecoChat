@@ -10,11 +10,11 @@ public static class StateRegistrations
     {
         if (options.SocketsHttpHandler == null)
         {
-            throw new ArgumentNullException(nameof(options.SocketsHttpHandler));
+            throw new ArgumentNullException(nameof(options), $"{nameof(options.SocketsHttpHandler)}");
         }
         if (options.Retry == null)
         {
-            throw new ArgumentNullException(nameof(options.Retry));
+            throw new ArgumentNullException(nameof(options), $"{nameof(options.Retry)}");
         }
 
         services.AddGrpcClient<Contracts.State.State.StateClient>(grpc =>
