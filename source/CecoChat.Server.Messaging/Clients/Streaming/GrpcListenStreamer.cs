@@ -115,7 +115,7 @@ public sealed class GrpcListenStreamer : IGrpcListenStreamer
             {
                 processedFinalMessage = messageContext.Message.Type == MessageType.Disconnect;
                 messageContext.Message.SequenceNumber = _sequenceNumber;
-                await _streamWriter!.WriteAsync(messageContext.Message);
+                await _streamWriter!.WriteAsync(messageContext.Message, ct);
                 success = true;
                 _logger.LogTrace("Sent client {ClientId} message {@Message}", _clientID, messageContext.Message);
             }
