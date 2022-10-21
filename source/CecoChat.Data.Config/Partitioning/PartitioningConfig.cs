@@ -85,7 +85,7 @@ internal sealed class PartitioningConfig : IPartitioningConfig
         }
         catch (Exception exception)
         {
-            _logger.LogError(exception, "Initializing partitioning configuration failed.");
+            _logger.LogError(exception, "Initializing partitioning configuration failed");
         }
     }
 
@@ -97,14 +97,14 @@ internal sealed class PartitioningConfig : IPartitioningConfig
         {
             ChannelMessageQueue partitionsMQ = await subscriber.SubscribeAsync($"notify:{PartitioningKeys.ServerPartitions}");
             partitionsMQ.OnMessage(channelMessage => _configUtility.HandleChange(channelMessage, HandleServerPartitions));
-            _logger.LogInformation("Subscribed for changes about {0}, {1} from channel {2}.",
+            _logger.LogInformation("Subscribed for changes about {PartitionCount}, {ServerPartitions} from channel {Channel}",
                 PartitioningKeys.PartitionCount, PartitioningKeys.ServerPartitions, partitionsMQ.Channel);
         }
         if (usage.UseServerAddresses)
         {
             ChannelMessageQueue serverAddressesMQ = await subscriber.SubscribeAsync($"notify:{PartitioningKeys.ServerAddresses}");
             serverAddressesMQ.OnMessage(channelMessage => _configUtility.HandleChange(channelMessage, HandleServerAddresses));
-            _logger.LogInformation("Subscribed for changes about {0} from channel {1}.",
+            _logger.LogInformation("Subscribed for changes about {ServerAddresses} from channel {Channel}",
                 PartitioningKeys.ServerAddresses, serverAddressesMQ.Channel);
         }
     }
@@ -134,8 +134,7 @@ internal sealed class PartitioningConfig : IPartitioningConfig
             }
             else
             {
-                _logger.LogError("After server partition changes there are no partitions for watched server {0}.",
-                    _usage.ServerPartitionChangesToWatch);
+                _logger.LogError("After server partition changes there are no partitions for watched server {Server}", _usage.ServerPartitionChangesToWatch);
             }
         }
     }
@@ -155,7 +154,7 @@ internal sealed class PartitioningConfig : IPartitioningConfig
         EnsureInitialized();
 
         PartitioningConfigValues values = await _repo.GetValues(usage);
-        _logger.LogInformation("Loading partitioning configuration succeeded.");
+        _logger.LogInformation("Loading partitioning configuration succeeded");
 
         bool areValid = _configUtility.ValidateValues("partitioning", values, _validator!);
         if (areValid)
@@ -169,7 +168,7 @@ internal sealed class PartitioningConfig : IPartitioningConfig
 
     private void PrintValues(PartitioningConfigUsage usage, PartitioningConfigValues values)
     {
-        _logger.LogInformation("Partition count set to {0}.", values.PartitionCount);
+        _logger.LogInformation("Partition count set to {PartitionCount}", values.PartitionCount);
 
         if (usage.UseServerPartitions || usage.UseServerAddresses)
         {
@@ -177,7 +176,7 @@ internal sealed class PartitioningConfig : IPartitioningConfig
             {
                 string server = pair.Key;
                 PartitionRange partitions = pair.Value;
-                _logger.LogInformation("Partitions {0} are assigned to server {1}.", partitions, server);
+                _logger.LogInformation("Partitions {Partitions} are assigned to server {Server}", partitions, server);
             }
         }
         if (usage.UseServerAddresses)
@@ -186,7 +185,7 @@ internal sealed class PartitioningConfig : IPartitioningConfig
             {
                 string server = pair.Key;
                 string address = pair.Value;
-                _logger.LogInformation("Address {0} is assigned to server {1}.", address, server);
+                _logger.LogInformation("Address {Address} is assigned to server {Server}", address, server);
             }
         }
     }

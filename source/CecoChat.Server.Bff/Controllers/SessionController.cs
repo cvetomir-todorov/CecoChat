@@ -69,11 +69,11 @@ public class SessionController : ControllerBase
         Activity.Current?.AddTag("user.id", userID);
 
         (Guid clientID, string accessToken) = CreateSession(userID);
-        _logger.LogInformation("User {0} authenticated and assigned user ID {1} and client ID {2}.", request.Username, userID, clientID);
+        _logger.LogInformation("User {Username} authenticated and assigned user ID {UserId} and client ID {ClientId}", request.Username, userID, clientID);
 
         int partition = _partitionUtility.ChoosePartition(userID, _partitioningConfig.PartitionCount);
         string messagingServerAddress = _partitioningConfig.GetServerAddress(partition);
-        _logger.LogInformation("User with ID {0} in partition {1} assigned to messaging server {2}.", userID, partition, messagingServerAddress);
+        _logger.LogInformation("User with ID {UserId} in partition {Partition} assigned to messaging server {MessagingServer}", userID, partition, messagingServerAddress);
 
         CreateSessionResponse response = new()
         {

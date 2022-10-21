@@ -64,7 +64,7 @@ public sealed class StateConsumer : IStateConsumer
 
     public void StartConsumingReceiverMessages(CancellationToken ct)
     {
-        _logger.LogInformation("Start creating receiver state from messages.");
+        _logger.LogInformation("Start creating receiver state from messages");
 
         while (!ct.IsCancellationRequested)
         {
@@ -74,12 +74,12 @@ public sealed class StateConsumer : IStateConsumer
             }, ct);
         }
 
-        _logger.LogInformation("Stopped creating receiver state from messages.");
+        _logger.LogInformation("Stopped creating receiver state from messages");
     }
 
     public void StartConsumingSenderMessages(CancellationToken ct)
     {
-        _logger.LogInformation("Start creating sender state from messages.");
+        _logger.LogInformation("Start creating sender state from messages");
 
         while (!ct.IsCancellationRequested)
         {
@@ -89,7 +89,7 @@ public sealed class StateConsumer : IStateConsumer
             }, ct);
         }
 
-        _logger.LogInformation("Stopped creating sender state from messages.");
+        _logger.LogInformation("Stopped creating sender state from messages");
     }
 
     public string ReceiverConsumerID => _backplaneOptions.ReceiversConsumer.ConsumerGroupID;
@@ -164,7 +164,7 @@ public sealed class StateConsumer : IStateConsumer
         if (needsUpdate)
         {
             _repo.UpdateChat(targetUserID, receiverChat);
-            _logger.LogTrace("Updated receiver state for user {0} chat {1} with message {2}.", targetUserID, chatID, backplaneMessage.MessageId);
+            _logger.LogTrace("Updated receiver state for user {TargetUserId} chat {ChatId} with message {MessageId}", targetUserID, chatID, backplaneMessage.MessageId);
         }
     }
 
@@ -184,7 +184,7 @@ public sealed class StateConsumer : IStateConsumer
         if (needsUpdate)
         {
             _repo.UpdateChat(targetUserID, senderChat);
-            _logger.LogTrace("Updated sender state for user {0} chat {1} with message {2}.", targetUserID, chatID, backplaneMessage.MessageId);
+            _logger.LogTrace("Updated sender state for user {TargetUserId} chat {ChatId} with message {MessageId}", targetUserID, chatID, backplaneMessage.MessageId);
         }
     }
 

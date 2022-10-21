@@ -77,7 +77,7 @@ public sealed class KafkaProducer<TKey, TValue> : IKafkaProducer<TKey, TValue>
 
         Activity activity = _kafkaActivityUtility.StartProducer(message, _producerOptions!.ProducerID, topic, partition);
         _producer!.Produce(topicPartition, message, deliveryReport => HandleDeliveryReport(deliveryReport, activity, deliveryHandler));
-        _logger.LogTrace("Producer {0} produced message {1} in {2}[{3}].", _id, message.Value, topic, partition);
+        _logger.LogTrace("Producer {ProducerId} produced message {@Message} in {Topic}[{Partition}]", _id, message.Value, topic, partition);
     }
 
     public void Produce(Message<TKey, TValue> message, string topic, DeliveryHandler<TKey, TValue>? deliveryHandler = null)
@@ -86,7 +86,7 @@ public sealed class KafkaProducer<TKey, TValue> : IKafkaProducer<TKey, TValue>
 
         Activity activity = _kafkaActivityUtility.StartProducer(message, _producerOptions!.ProducerID, topic);
         _producer!.Produce(topic, message, deliveryReport => HandleDeliveryReport(deliveryReport, activity, deliveryHandler));
-        _logger.LogTrace("Producer {0} produced message {1} in {2}.", _id, message.Value, topic);
+        _logger.LogTrace("Producer {ProducerId} produced message {@Message} in {Topic}", _id, message.Value, topic);
     }
 
     private void EnsureInitialized()
@@ -106,13 +106,13 @@ public sealed class KafkaProducer<TKey, TValue> : IKafkaProducer<TKey, TValue>
 
         try
         {
-            _logger.LogInformation("Producer {0} flushing pending messages...", _id);
+            _logger.LogInformation("Producer {ProducerId} flushing pending messages...", _id);
             _producer.Flush();
-            _logger.LogInformation("Producer {0} flushing pending messages succeeded.", _id);
+            _logger.LogInformation("Producer {ProducerId} flushing pending messages succeeded", _id);
         }
         catch (Exception exception)
         {
-            _logger.LogError(exception, "Producer {0} flushing pending messages failed.", _id);
+            _logger.LogError(exception, "Producer {ProducerId} flushing pending messages failed", _id);
         }
     }
 
@@ -125,17 +125,17 @@ public sealed class KafkaProducer<TKey, TValue> : IKafkaProducer<TKey, TValue>
 
             if (report.Status != PersistenceStatus.Persisted)
             {
-                _logger.LogError("Message {0} persistence status {1}.", value, report.Status);
+                _logger.LogError("Message {@Message} persistence status {Status}", value, report.Status);
                 isDelivered = false;
             }
             if (report.Error.IsError)
             {
-                _logger.LogError("Message {0} error code {1} reason '{2}'.", value, report.Error.Code, report.Error.Reason);
+                _logger.LogError("Message {@Message} error code {ErrorCode} reason '{ErrorReason}'", value, report.Error.Code, report.Error.Reason);
                 isDelivered = false;
             }
             if (report.TopicPartitionOffsetError.Error.IsError)
             {
-                _logger.LogError("Message {0} topic partition {1} error code {2} reason '{3}'.",
+                _logger.LogError("Message {@Message} topic partition {Partition} error code {ErrorCode} reason '{ErrorReason}'",
                     value, report.TopicPartitionOffsetError.Partition, report.Error.Code, report.TopicPartitionOffsetError.Error.Reason);
                 isDelivered = false;
             }

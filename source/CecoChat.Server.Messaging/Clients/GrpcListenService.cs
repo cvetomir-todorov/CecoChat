@@ -28,11 +28,11 @@ public sealed class GrpcListenService : Listen.ListenBase
         string address = context.Peer;
         if (!context.GetHttpContext().User.TryGetUserClaims(out UserClaims? userClaims))
         {
-            _logger.LogError("Client from {0} was authorized but has no parseable access token.", address);
+            _logger.LogError("Client from {ClientAddress} was authorized but has no parseable access token", address);
             throw new RpcException(new Status(StatusCode.InvalidArgument, "Access token could not be parsed."));
         }
 
-        _logger.LogInformation("{0} from {1} connected.", userClaims, address);
+        _logger.LogInformation("{@User} from {Address} connected", userClaims, address);
 
         IGrpcListenStreamer streamer = _streamerFactory.Create();
         streamer.Initialize(userClaims!.ClientID, notificationStream);
@@ -52,7 +52,7 @@ public sealed class GrpcListenService : Listen.ListenBase
             }
             else
             {
-                _logger.LogError("Failed to add {0} from {1}.", userClaims, address);
+                _logger.LogError("Failed to add {@User} from {Address}", userClaims, address);
             }
         }
         catch (OperationCanceledException operationCanceledException)
@@ -60,19 +60,19 @@ public sealed class GrpcListenService : Listen.ListenBase
             // thrown when client cancels the streaming call, when the deadline is exceeded or a network error
             if (operationCanceledException.InnerException != null)
             {
-                _logger.LogError(operationCanceledException.InnerException, "Listen for {0} from {1} failed.", userClaims, address);
+                _logger.LogError(operationCanceledException.InnerException, "Listen for {@User} from {Address} failed", userClaims, address);
             }
         }
         catch (Exception exception)
         {
-            _logger.LogError(exception, "Listen for {0} from {1} failed.", userClaims, address);
+            _logger.LogError(exception, "Listen for {@User} from {Address} failed", userClaims, address);
         }
         finally
         {
             if (isClientAdded)
             {
                 _clientContainer.RemoveClient(userClaims.UserID, streamer);
-                _logger.LogInformation("{0} from {1} disconnected.", userClaims, address);
+                _logger.LogInformation("{@User} from {Address} disconnected", userClaims, address);
             }
             streamer.Dispose();
         }

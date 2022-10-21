@@ -76,7 +76,7 @@ public sealed class TopicPartitionFlyweight : ITopicPartitionFlyweight
             _topicPartitionsMap.AddOrUpdate(topic, topicPartitions, (_, _) => topicPartitions);
         }
 
-        _logger.LogInformation("Set {0} topic {1} partitions flyweight.", topic, partitionCount);
+        _logger.LogInformation("Set {Topic} topic {PartitionCount} partitions flyweight", topic, partitionCount);
     }
 
     public TopicPartition GetTopicPartition(string topic, int partition)

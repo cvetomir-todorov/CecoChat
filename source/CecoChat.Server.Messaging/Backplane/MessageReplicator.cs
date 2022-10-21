@@ -77,7 +77,7 @@ public sealed class MessageReplicator : IMessageReplicator
 
     public void Start(CancellationToken ct)
     {
-        _logger.LogInformation("Start replicating messages from topic {0} to topic {1}.", _backplaneOptions.TopicMessagesByReceiver, _backplaneOptions.TopicMessagesBySender);
+        _logger.LogInformation("Start replicating messages from topic {FromTopic} to topic {ToTopic}", _backplaneOptions.TopicMessagesByReceiver, _backplaneOptions.TopicMessagesBySender);
 
         while (!ct.IsCancellationRequested)
         {
@@ -92,7 +92,7 @@ public sealed class MessageReplicator : IMessageReplicator
             }, ct);
         }
 
-        _logger.LogInformation("Stopped replicating messages from topic {0} to topic {1}.", _backplaneOptions.TopicMessagesByReceiver, _backplaneOptions.TopicMessagesBySender);
+        _logger.LogInformation("Stopped replicating messages from topic {FromTopic} to topic {ToTopic}", _backplaneOptions.TopicMessagesByReceiver, _backplaneOptions.TopicMessagesBySender);
     }
 
     public int PartitionCount { get; set; }

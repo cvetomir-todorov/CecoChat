@@ -26,7 +26,7 @@ internal sealed class StateClient : IStateClient
         _options = options.Value;
         _client = client;
 
-        _logger.LogInformation("State address set to {0}.", _options.Address);
+        _logger.LogInformation("State address set to {Address}", _options.Address);
     }
 
     public void Dispose()
@@ -46,7 +46,7 @@ internal sealed class StateClient : IStateClient
         DateTime deadline = DateTime.UtcNow.Add(_options.CallTimeout);
         GetChatsResponse response = await _client.GetChatsAsync(request, headers: grpcMetadata, deadline, cancellationToken: ct);
 
-        _logger.LogTrace("Returned {0} chats for user {1} which are newer than {2}.", response.Chats.Count, userID, newerThan);
+        _logger.LogTrace("Returned {ChatCount} chats for user {UserId} which are newer than {NewerThan}", response.Chats.Count, userID, newerThan);
         return response.Chats;
     }
 }

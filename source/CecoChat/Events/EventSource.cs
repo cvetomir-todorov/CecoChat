@@ -73,7 +73,7 @@ public class EventSource<TEventData> : IEventSource<TEventData>
             }
             catch (Exception exception)
             {
-                _logger.LogError(exception, "An error occurred while a subscriber was handling event.");
+                _logger.LogError(exception, "An error occurred while a subscriber was handling event");
             }
         }
     }

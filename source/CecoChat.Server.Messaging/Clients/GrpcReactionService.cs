@@ -28,7 +28,7 @@ public class GrpcReactionService : Reaction.ReactionBase
     public override Task<ReactResponse> React(ReactRequest request, ServerCallContext context)
     {
         UserClaims userClaims = GetUserClaims(context);
-        _logger.LogTrace("User {0} reacted {1}.", userClaims, request);
+        _logger.LogTrace("User {@User} reacted {@ReactRequest}", userClaims, request);
 
         BackplaneMessage backplaneMessage = _mapper.CreateBackplaneMessage(request, userClaims.ClientID, userClaims.UserID);
         _sendersProducer.ProduceMessage(backplaneMessage);
@@ -40,7 +40,7 @@ public class GrpcReactionService : Reaction.ReactionBase
     public override Task<UnReactResponse> UnReact(UnReactRequest request, ServerCallContext context)
     {
         UserClaims userClaims = GetUserClaims(context);
-        _logger.LogTrace("User {0} un-reacted {1}.", userClaims, request);
+        _logger.LogTrace("User {@User} un-reacted {@UnReactRequest}", userClaims, request);
 
         BackplaneMessage backplaneMessage = _mapper.CreateBackplaneMessage(request, userClaims.ClientID, userClaims.UserID);
         _sendersProducer.ProduceMessage(backplaneMessage);
@@ -52,7 +52,7 @@ public class GrpcReactionService : Reaction.ReactionBase
     {
         if (!context.GetHttpContext().User.TryGetUserClaims(out UserClaims? userClaims))
         {
-            _logger.LogError("Client from {0} was authorized but has no parseable access token.", context.Peer);
+            _logger.LogError("Client from {ClientAddress} was authorized but has no parseable access token", context.Peer);
             throw new RpcException(new Status(StatusCode.InvalidArgument, "Access token could not be parsed."));
         }
 

@@ -62,8 +62,7 @@ internal sealed class KafkaActivityUtility : IKafkaActivityUtility
     {
         if (!TryExtractTraceData(consumeResult, out ActivityContext parentContext))
         {
-            _logger.LogWarning("Message from topic {0} in partition {1} has missing trace ID data.",
-                consumeResult.Topic, consumeResult.Partition.Value);
+            _logger.LogWarning("Message from topic {Topic} in partition {Partition} has missing trace ID data", consumeResult.Topic, consumeResult.Partition.Value);
             return null;
         }
 

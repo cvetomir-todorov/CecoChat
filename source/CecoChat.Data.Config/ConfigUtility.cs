@@ -27,12 +27,12 @@ internal sealed class ConfigUtility : IConfigUtility
     {
         try
         {
-            _logger.LogInformation("Detected change {0}.", channelMessage);
+            _logger.LogInformation("Detected change {Change}", channelMessage);
             await handleAction(channelMessage);
         }
         catch (Exception exception)
         {
-            _logger.LogError(exception, "Error occurred while processing change {0}.", channelMessage);
+            _logger.LogError(exception, "Error occurred while processing change {Change}", channelMessage);
         }
     }
 
@@ -41,7 +41,7 @@ internal sealed class ConfigUtility : IConfigUtility
         ValidationResult validationResult = validator.Validate(values);
         if (validationResult.IsValid)
         {
-            _logger.LogInformation("Validating {0} configuration succeeded.", configurationContext);
+            _logger.LogInformation("Validating {ConfigContext} configuration succeeded", configurationContext);
         }
         else
         {
@@ -55,7 +55,7 @@ internal sealed class ConfigUtility : IConfigUtility
                 errorBuilder.AppendLine(validationFailure.ErrorMessage);
             }
 
-            _logger.LogError(errorBuilder.ToString());
+            _logger.LogError("{Error}", errorBuilder.ToString());
         }
 
         return validationResult.IsValid;

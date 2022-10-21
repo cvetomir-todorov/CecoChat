@@ -26,7 +26,7 @@ internal sealed class HistoryClient : IHistoryClient
         _options = options.Value;
         _client = client;
 
-        _logger.LogInformation("History address set to {0}.", _options.Address);
+        _logger.LogInformation("History address set to {Address}", _options.Address);
     }
 
     public void Dispose()
@@ -47,7 +47,7 @@ internal sealed class HistoryClient : IHistoryClient
         DateTime deadline = DateTime.UtcNow.Add(_options.CallTimeout);
         GetHistoryResponse response = await _client.GetHistoryAsync(request, headers: grpcMetadata, deadline, cancellationToken: ct);
 
-        _logger.LogTrace("Returned {0} messages for history between {1} and {2} older than {3}.", response.Messages.Count, userID, otherUserID, olderThan);
+        _logger.LogTrace("Returned {MessageCount} messages for history between {UserId} and {OtherUserId} older than {OlderThan}", response.Messages.Count, userID, otherUserID, olderThan);
         return response.Messages;
     }
 }

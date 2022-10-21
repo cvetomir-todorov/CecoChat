@@ -69,11 +69,11 @@ public static class EntryPoint
         }
         catch (Exception exception)
         {
-            logger.Fatal(exception, "Unexpected failure.");
+            logger.Fatal(exception, "Unexpected failure");
         }
         finally
         {
-            logger.Information("Ended.");
+            logger.Information("Ended");
             Log.CloseAndFlush();
         }
     }

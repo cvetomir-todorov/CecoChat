@@ -81,7 +81,7 @@ public sealed class SendersProducer : ISendersProducer
         foreach (IStreamer<ListenNotification> client in clients)
         {
             client.EnqueueMessage(deliveryNotification, parentActivity: activity);
-            _logger.LogTrace("Sent delivery notification to client {0} for message {1}.", clientID, deliveryNotification);
+            _logger.LogTrace("Sent delivery notification to client {ClientId} for message {@Message}", clientID, deliveryNotification);
         }
     }
 }

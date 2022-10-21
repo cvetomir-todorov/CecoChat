@@ -32,7 +32,7 @@ internal sealed class StateDbContext : CassandraDbContext, IStateDbContext
     public PreparedStatement PrepareQuery(string cql)
     {
         PreparedStatement preparedQuery = Session.Prepare(cql);
-        _logger.LogInformation("Prepared CQL '{0}'.", cql);
+        _logger.LogInformation("Prepared CQL '{Cql}'", cql);
         return preparedQuery;
     }
 }

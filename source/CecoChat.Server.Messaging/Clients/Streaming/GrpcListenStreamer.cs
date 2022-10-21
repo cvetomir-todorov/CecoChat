@@ -72,7 +72,7 @@ public sealed class GrpcListenStreamer : IGrpcListenStreamer
         }
         else
         {
-            _logger.LogWarning("Dropped message {0} since queue for {1} is full.", message, ClientID);
+            _logger.LogWarning("Dropped message {@Message} since queue for {ClientId} is full", message, ClientID);
         }
 
         return isAdded;
@@ -117,7 +117,7 @@ public sealed class GrpcListenStreamer : IGrpcListenStreamer
                 messageContext.Message.SequenceNumber = _sequenceNumber;
                 await _streamWriter!.WriteAsync(messageContext.Message);
                 success = true;
-                _logger.LogTrace("Sent {0} message {1}", _clientID, messageContext.Message);
+                _logger.LogTrace("Sent client {ClientId} message {@Message}", _clientID, messageContext.Message);
             }
             catch (InvalidOperationException invalidOperationException)
                 when (invalidOperationException.Message == "Can't write the message because the request is complete.")
@@ -128,7 +128,7 @@ public sealed class GrpcListenStreamer : IGrpcListenStreamer
             }
             catch (Exception exception)
             {
-                _logger.LogError(exception, "Failed to send {0} message {1}", _clientID, messageContext.Message);
+                _logger.LogError(exception, "Failed to send client {ClientId} message {@Message}", _clientID, messageContext.Message);
                 return new EmptyQueueResult { Stop = true };
             }
             finally

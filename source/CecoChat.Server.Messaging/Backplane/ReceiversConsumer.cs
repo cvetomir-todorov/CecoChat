@@ -72,7 +72,7 @@ public sealed class ReceiversConsumer : IReceiversConsumer
 
     public void Start(CancellationToken ct)
     {
-        _logger.LogInformation("Start sending messages to receivers.");
+        _logger.LogInformation("Start sending messages to receivers");
 
         while (!ct.IsCancellationRequested)
         {
@@ -82,7 +82,7 @@ public sealed class ReceiversConsumer : IReceiversConsumer
             }, ct);
         }
 
-        _logger.LogInformation("Stopped sending messages to receivers.");
+        _logger.LogInformation("Stopped sending messages to receivers");
     }
 
     public string ConsumerID => _backplaneOptions.ReceiversConsumer.ConsumerGroupID;
@@ -123,12 +123,12 @@ public sealed class ReceiversConsumer : IReceiversConsumer
     {
         if (successCount < allCount)
         {
-            _logger.LogWarning("Connected recipients with ID {0} ({1} out of {2}) were queued message {3}.",
+            _logger.LogWarning("Connected recipients with ID {ReceiverId} ({SuccessCount} out of {AllCount}) were queued message {MessageId}",
                 backplaneMessage.ReceiverId, successCount, allCount, backplaneMessage.MessageId);
         }
         else if (allCount > 0)
         {
-            _logger.LogTrace("Connected recipients with ID {0} (all {1}) were queued message {2}.",
+            _logger.LogTrace("Connected recipients with ID {ReceiverId} (all {Count}) were queued message {MessageId}",
                 backplaneMessage.ReceiverId, successCount, backplaneMessage.MessageId);
         }
     }

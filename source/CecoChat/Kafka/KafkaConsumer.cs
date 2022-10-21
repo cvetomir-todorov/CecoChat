@@ -74,7 +74,7 @@ public sealed class KafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey, TValue>
     {
         EnsureInitialized();
         _consumer!.Subscribe(topic);
-        _logger.LogDebug("Consumer {0} subscribed to topic {1}.", _id, topic);
+        _logger.LogDebug("Consumer {ConsumerId} subscribed to topic {Topic}", _id, topic);
     }
 
     public void Assign(string topic, PartitionRange partitions, ITopicPartitionFlyweight partitionFlyweight)
@@ -83,7 +83,7 @@ public sealed class KafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey, TValue>
 
         if (_assignedPartitions.Equals(partitions))
         {
-            _logger.LogDebug("Consumer {0} already assigned partitions {1}.", _id, _assignedPartitions);
+            _logger.LogDebug("Consumer {ConsumerId} already assigned partitions {Partitions}", _id, _assignedPartitions);
             return;
         }
 
@@ -96,7 +96,7 @@ public sealed class KafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey, TValue>
 
         _consumer!.Assign(topicPartitions);
         _assignedPartitions = partitions;
-        _logger.LogDebug("Consumer {0} assigned partitions {1} from topic {2}.", _id, partitions, topic);
+        _logger.LogDebug("Consumer {ConsumerId} assigned partitions {Partitions} from topic {Topic}", _id, partitions, topic);
     }
 
     private enum ConsumeStage
@@ -133,7 +133,7 @@ public sealed class KafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey, TValue>
         }
         catch (Exception exception)
         {
-            _logger.LogError(exception, "Consumer {0} error.", _id);
+            _logger.LogError(exception, "Consumer {ConsumerId} error", _id);
         }
         finally
         {
@@ -154,7 +154,7 @@ public sealed class KafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey, TValue>
     {
         if (!ct.IsCancellationRequested)
         {
-            _logger.LogError(exception, "Consumer {0} was disposed without cancellation being requested.", _id);
+            _logger.LogError(exception, "Consumer {ConsumerId} was disposed without cancellation being requested", _id);
         }
     }
 
@@ -202,13 +202,13 @@ public sealed class KafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey, TValue>
         switch (stage)
         {
             case ConsumeStage.Initial:
-                _logger.LogError("Consumer {0} failed to consume a message.", _id);
+                _logger.LogError("Consumer {ConsumerId} failed to consume a message", _id);
                 break;
             case ConsumeStage.AfterConsume:
-                _logger.LogError("Consumer {0} encountered a failing message handler.", _id);
+                _logger.LogError("Consumer {ConsumerId} encountered a failing message handler", _id);
                 break;
             case ConsumeStage.AfterMessageHandle:
-                _logger.LogError("Consumer {0} failed to commit to topic {1} partition {2} offset {3}.",
+                _logger.LogError("Consumer {ConsumerId} failed to commit to topic {Topic} partition {Partition} offset {Offset}",
                     _id, consumeResult.Topic, consumeResult.Partition.Value, consumeResult.Offset.Value);
                 break;
             case ConsumeStage.AfterCommit:

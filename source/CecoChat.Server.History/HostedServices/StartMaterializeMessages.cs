@@ -40,7 +40,7 @@ public sealed class StartMaterializeMessages : IHostedService, IDisposable
             }
             catch (Exception exception)
             {
-                _logger.LogCritical(exception, "Failure in consumer {0}.", _historyConsumer.ConsumerID);
+                _logger.LogCritical(exception, "Failure in consumer {ConsumerId}", _historyConsumer.ConsumerID);
             }
         }, _stoppedCts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Current);
 
