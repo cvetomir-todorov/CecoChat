@@ -57,7 +57,7 @@ public class Startup
             otel.AddAspNetCoreInstrumentation(aspnet => aspnet.EnableGrpcAspNetCoreSupport = true);
             otel.AddKafkaInstrumentation();
             otel.AddGrpcClientInstrumentation(grpc => grpc.SuppressDownstreamInstrumentation = false);
-            otel.AddGrpcInstrumentation();
+            otel.AddGrpcStreamingInstrumentation();
             otel.ConfigureSampling(_otelSamplingOptions);
             otel.ConfigureJaegerExporter(_jaegerOptions);
         });
@@ -89,7 +89,7 @@ public class Startup
         builder.RegisterOptions<ConfigOptions>(Configuration.GetSection("Config"));
 
         // clients
-        builder.RegisterModule(new GrpcInstrumentationAutofacModule());
+        builder.RegisterModule(new GrpcStreamingInstrumentationAutofacModule());
         builder.RegisterType<ClientContainer>().As<IClientContainer>().SingleInstance();
         builder.RegisterFactory<GrpcListenStreamer, IGrpcListenStreamer>();
         builder.RegisterOptions<ClientOptions>(Configuration.GetSection("Clients"));

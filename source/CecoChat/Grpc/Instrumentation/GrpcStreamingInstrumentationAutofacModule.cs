@@ -4,13 +4,13 @@ using CecoChat.Tracing;
 
 namespace CecoChat.Grpc.Instrumentation;
 
-public sealed class GrpcInstrumentationAutofacModule : Module
+public sealed class GrpcStreamingInstrumentationAutofacModule : Module
 {
     protected override void Load(ContainerBuilder builder)
     {
-        string utilityName = $"{nameof(GrpcActivityUtility)}.{nameof(IActivityUtility)}";
+        string utilityName = $"{nameof(GrpcStreamingActivityUtility)}.{nameof(IActivityUtility)}";
 
-        builder.RegisterType<GrpcActivityUtility>().As<IGrpcActivityUtility>()
+        builder.RegisterType<GrpcStreamingActivityUtility>().As<IGrpcStreamingActivityUtility>()
             .WithNamedParameter(typeof(IActivityUtility), utilityName)
             .SingleInstance();
         builder.RegisterType<ActivityUtility>().Named<IActivityUtility>(utilityName).SingleInstance();
