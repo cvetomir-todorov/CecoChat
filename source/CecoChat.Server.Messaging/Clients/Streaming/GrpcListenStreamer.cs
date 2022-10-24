@@ -144,7 +144,7 @@ public sealed class GrpcListenStreamer : IGrpcListenStreamer
     {
         const string service = nameof(GrpcListenService);
         const string method = nameof(GrpcListenService.Listen);
-        string name = $"{service}.{method}/StreamMessage.{message.Type}";
+        string name = $"{service}.{method}/Stream.{message.Type}";
 
         return _grpcActivityUtility.StartServiceMethod(name, service, method, parentActivity?.Context);
     }
