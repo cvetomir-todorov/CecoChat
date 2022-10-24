@@ -18,7 +18,7 @@ public interface IGrpcListenStreamer : IStreamer<ListenNotification>
 public sealed class GrpcListenStreamer : IGrpcListenStreamer
 {
     private readonly ILogger _logger;
-    private readonly IGrpcActivityUtility _grpcActivityUtility;
+    private readonly IGrpcStreamingActivityUtility _grpcStreamingActivityUtility;
     private readonly BlockingCollection<MessageContext> _messageQueue;
     private readonly SemaphoreSlim _signalProcessing;
 
@@ -28,11 +28,11 @@ public sealed class GrpcListenStreamer : IGrpcListenStreamer
 
     public GrpcListenStreamer(
         ILogger<GrpcListenStreamer> logger,
-        IGrpcActivityUtility grpcActivityUtility,
+        IGrpcStreamingActivityUtility grpcStreamingActivityUtility,
         IOptions<ClientOptions> options)
     {
         _logger = logger;
-        _grpcActivityUtility = grpcActivityUtility;
+        _grpcStreamingActivityUtility = grpcStreamingActivityUtility;
 
         ClientOptions clientOptions = options.Value;
         _messageQueue = new(
@@ -133,7 +133,7 @@ public sealed class GrpcListenStreamer : IGrpcListenStreamer
             }
             finally
             {
-                _grpcActivityUtility.Stop(activity, success);
+                _grpcStreamingActivityUtility.Stop(activity, success);
             }
         }
 
@@ -146,7 +146,7 @@ public sealed class GrpcListenStreamer : IGrpcListenStreamer
         const string method = nameof(GrpcListenService.Listen);
         string name = $"{service}.{method}/Stream.{message.Type}";
 
-        return _grpcActivityUtility.StartServiceMethod(name, service, method, parentActivity?.Context);
+        return _grpcStreamingActivityUtility.StartStreaming(name, service, method, parentActivity?.Context);
     }
 
     private sealed record MessageContext
