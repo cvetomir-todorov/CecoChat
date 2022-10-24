@@ -24,7 +24,7 @@ On the server I am using gRPC services hosted by ASP.NET Core which utilize .NET
 
 The `Clients succeeded` is the number of clients that were able to connect. That number is a result of port exhaustion limits hit on both OS-es which **ran the clients**, not the servers. The Windows error was `An operation on a socket could not be performed because the system lacked sufficient buffer space or because a queue was full`. The Ubuntu Server one was `Cannot assign requested address`.
 
-Strangely when clients were on the weaker machine the client time required in order to complete the requests is considerably higher while it was obvious that the server could handle more load. One of these could be the issue: the client code could be improved to manually schedule the tasks instead of relying on the .NET async programming model, the weaker machine is really weak, Windows 10 has some limits which prohibit it from handling a high number of concurrent clients, there is a concurrency issue with .NET 5 on Ubuntu Server.
+Strangely when clients were on the weaker machine the client time required in order to complete the requests is considerably higher while it was obvious that the server could handle more load. One of these could be the issue: the client code could be improved to manually schedule the tasks instead of relying on the .NET async programming model, the weaker machine is really weak, Windows 10 has some limits which prohibit it from handling a high number of concurrent clients, there is a concurrency issue with .NET on Ubuntu Server.
 
 ## Conclusion
 
