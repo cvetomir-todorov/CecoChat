@@ -74,12 +74,11 @@ Configuration is based on Redis:
 ![.NET](tech-images/dotnet.png)
 ![ASP.NET](tech-images/aspnet.png)
 
-The services use ASP.NET/.NET 5 which are the heirs of ASP.NET/.NET Core:
+The services use ASP.NET/.NET 6 which are the heirs of ASP.NET/.NET Core:
 * open-source software backed by Microsoft
 * very mature, feature-rich, lots of tools
 * widely-used with a big community
 * well supported
-* should be updated to ASP.NET/.NET 6 and regularly to the expected upcoming next versions
 
 ![Autofac](tech-images/autofac.png)
 ![Serilog](tech-images/serilog.png)
@@ -89,7 +88,7 @@ The services use ASP.NET/.NET 5 which are the heirs of ASP.NET/.NET Core:
 
 Additional libraries which are all **open-source**:
 * Autofac is the most popular DI container
-* Serilog is one of the most popular logging .NET frameworks
+* Serilog is one of the most popular .NET logging frameworks
 * FluentValidation is the most popular data validation library
 * Refit is one of the most popular REST clients
 * Polly is a popular HTTP client policies library
