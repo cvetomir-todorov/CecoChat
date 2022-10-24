@@ -14,6 +14,10 @@ public static class OtelInstrumentation
         public const string MessagingDestinationKind = "messaging.destination_kind";
         public const string MessagingKafkaPartition = "messaging.kafka.partition";
 
+        public const string RpcSystem = "rpc.system";
+        public const string RpcService = "rpc.service";
+        public const string RpcMethod = "rpc.method";
+
         public const string HeaderTraceId = "otel.trace_id";
         public const string HeaderSpanId = "otel.span_id";
         public const string HeaderTraceFlags = "otel.trace_flags";
@@ -29,5 +33,7 @@ public static class OtelInstrumentation
 
         public const string MessagingSystemKafka = "kafka";
         public const string MessagingDestinationKindTopic = "topic";
+
+        public const string RpcSystemGrpc = "grpc";
     }
 }

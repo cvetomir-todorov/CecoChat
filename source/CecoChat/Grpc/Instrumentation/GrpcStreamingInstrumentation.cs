@@ -10,16 +10,4 @@ internal static class GrpcStreamingInstrumentation
     private static readonly Version _activitySourceVersion = _assemblyName.Version!;
 
     internal static readonly ActivitySource ActivitySource = new(ActivitySourceName, _activitySourceVersion.ToString());
-
-    public static class Keys
-    {
-        public const string TagRpcSystem = "rpc.system";
-        public const string TagRpcService = "rpc.service";
-        public const string TagRpcMethod = "rpc.method";
-    }
-
-    public static class Values
-    {
-        public const string TagRpcSystemGrpc = "grpc";
-    }
 }

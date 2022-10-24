@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using CecoChat.Otel;
 using CecoChat.Tracing;
 
 namespace CecoChat.Grpc.Instrumentation;
@@ -29,9 +30,9 @@ internal sealed class GrpcStreamingActivityUtility : IGrpcStreamingActivityUtili
 
         if (activity.IsAllDataRequested)
         {
-            activity.SetTag(GrpcStreamingInstrumentation.Keys.TagRpcSystem, GrpcStreamingInstrumentation.Values.TagRpcSystemGrpc);
-            activity.SetTag(GrpcStreamingInstrumentation.Keys.TagRpcService, service);
-            activity.SetTag(GrpcStreamingInstrumentation.Keys.TagRpcMethod, method);
+            activity.SetTag(OtelInstrumentation.Keys.RpcSystem, OtelInstrumentation.Values.RpcSystemGrpc);
+            activity.SetTag(OtelInstrumentation.Keys.RpcService, service);
+            activity.SetTag(OtelInstrumentation.Keys.RpcMethod, method);
         }
 
         return activity;
