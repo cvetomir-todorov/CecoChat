@@ -1,4 +1,5 @@
-﻿using CecoChat.Contracts.IDGen;
+﻿using System.Diagnostics;
+using CecoChat.Contracts.IDGen;
 using Grpc.Core;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -80,6 +81,7 @@ internal sealed class IDGenClient : IIDGenClient
             };
             DateTime deadline = DateTime.UtcNow.Add(_options.CallTimeout);
 
+            Activity.Current = null;
             _idChannel.ClearIDs();
             GenerateManyResponse response = _client.GenerateMany(request, deadline: deadline);
             _idChannel.AddNewIDs(response.Ids);
