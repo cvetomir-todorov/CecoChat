@@ -72,7 +72,7 @@ internal sealed class KafkaActivityUtility : IKafkaActivityUtility
             ActivityKind.Consumer,
             parentContext);
 
-        string displayName = $"{activity.OperationName}/Topic:{consumeResult.Topic} -> Consumer:{consumerID}";
+        string displayName = $"{activity.OperationName}/Consumer:{consumerID} <- Topic:{consumeResult.Topic}";
         EnrichActivity(consumeResult.Topic, consumeResult.Partition, displayName, activity);
 
         return activity;
