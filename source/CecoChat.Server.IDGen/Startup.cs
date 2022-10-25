@@ -1,17 +1,29 @@
 using Autofac;
 using CecoChat.Autofac;
 using CecoChat.Data.Config;
+using CecoChat.Otel;
 using CecoChat.Server.IDGen.Generation;
 using CecoChat.Server.IDGen.HostedServices;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 
 namespace CecoChat.Server.IDGen;
 
 public class Startup
 {
+    private readonly OtelSamplingOptions _otelSamplingOptions;
+    private readonly JaegerOptions _jaegerOptions;
+
     public Startup(IConfiguration configuration, IWebHostEnvironment environment)
     {
         Configuration = configuration;
         Environment = environment;
+
+        _otelSamplingOptions = new();
+        Configuration.GetSection("OtelSampling").Bind(_otelSamplingOptions);
+
+        _jaegerOptions = new();
+        Configuration.GetSection("Jaeger").Bind(_jaegerOptions);
     }
 
     public IConfiguration Configuration { get; }
@@ -20,6 +32,20 @@ public class Startup
 
     public void ConfigureServices(IServiceCollection services)
     {
+        // telemetry
+        ResourceBuilder serviceResourceBuilder = ResourceBuilder
+            .CreateEmpty()
+            .AddService(serviceName: "IDGen", serviceNamespace: "CecoChat", serviceVersion: "0.1")
+            .AddEnvironmentVariableDetector();
+
+        services.AddOpenTelemetryTracing(otel =>
+        {
+            otel.SetResourceBuilder(serviceResourceBuilder);
+            otel.AddAspNetCoreInstrumentation(aspnet => aspnet.EnableGrpcAspNetCoreSupport = true);
+            otel.ConfigureSampling(_otelSamplingOptions);
+            otel.ConfigureJaegerExporter(_jaegerOptions);
+        });
+
         // clients
         services.AddGrpc(rpc => rpc.EnableDetailedErrors = Environment.IsDevelopment());
 
