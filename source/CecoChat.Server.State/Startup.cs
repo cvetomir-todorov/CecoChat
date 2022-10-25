@@ -12,6 +12,7 @@ using CecoChat.Server.State.Backplane;
 using CecoChat.Server.State.Clients;
 using CecoChat.Server.State.HostedServices;
 using Confluent.Kafka;
+using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 
 namespace CecoChat.Server.State;
@@ -44,9 +45,14 @@ public class Startup
     public void ConfigureServices(IServiceCollection services)
     {
         // telemetry
+        ResourceBuilder serviceResourceBuilder = ResourceBuilder
+            .CreateEmpty()
+            .AddService(serviceName: "State", serviceNamespace: "CecoChat", serviceVersion: "0.1")
+            .AddEnvironmentVariableDetector();
+
         services.AddOpenTelemetryTracing(otel =>
         {
-            otel.AddServiceResource(new OtelServiceResource { Namespace = "CecoChat", Name = "State", Version = "0.1" });
+            otel.SetResourceBuilder(serviceResourceBuilder);
             otel.AddAspNetCoreInstrumentation(aspnet => aspnet.EnableGrpcAspNetCoreSupport = true);
             otel.AddKafkaInstrumentation();
             otel.AddStateInstrumentation();
