@@ -1,13 +1,12 @@
 ﻿using System.Diagnostics;
 using System.Text;
 using CecoChat.Otel;
-using CecoChat.Tracing;
 using Confluent.Kafka;
 using Microsoft.Extensions.Logging;
 
-namespace CecoChat.Kafka.Instrumentation;
+namespace CecoChat.Kafka.Telemetry;
 
-public interface IKafkaActivityUtility
+public interface IKafkaTelemetry
 {
     Activity StartProducer<TKey, TValue>(Message<TKey, TValue> message, string producerID, string topic, int? partition = null);
 
@@ -18,23 +17,23 @@ public interface IKafkaActivityUtility
     void StopConsumer(Activity? activity, bool operationSuccess);
 }
 
-internal sealed class KafkaActivityUtility : IKafkaActivityUtility
+internal sealed class KafkaTelemetry : IKafkaTelemetry
 {
     private readonly ILogger _logger;
-    private readonly IActivityUtility _activityUtility;
+    private readonly ITelemetry _telemetry;
 
-    public KafkaActivityUtility(
-        ILogger<KafkaActivityUtility> logger,
-        IActivityUtility activityUtility)
+    public KafkaTelemetry(
+        ILogger<KafkaTelemetry> logger,
+        ITelemetry telemetry)
     {
         _logger = logger;
-        _activityUtility = activityUtility;
+        _telemetry = telemetry;
     }
 
     public Activity StartProducer<TKey, TValue>(Message<TKey, TValue> message, string producerID, string topic, int? partition = null)
     {
         Activity? parent = Activity.Current;
-        Activity activity = _activityUtility.Start(
+        Activity activity = _telemetry.Start(
             KafkaInstrumentation.Operations.Production,
             KafkaInstrumentation.ActivitySource,
             ActivityKind.Producer,
@@ -55,7 +54,7 @@ internal sealed class KafkaActivityUtility : IKafkaActivityUtility
     public void StopProducer(Activity activity, bool operationSuccess)
     {
         // do not change the Activity.Current
-        _activityUtility.Stop(activity, operationSuccess, relyOnDefaultPolicyOfSettingCurrentActivity: false);
+        _telemetry.Stop(activity, operationSuccess, relyOnDefaultPolicyOfSettingCurrentActivity: false);
     }
 
     public Activity? StartConsumer<TKey, TValue>(ConsumeResult<TKey, TValue> consumeResult, string consumerID)
@@ -66,7 +65,7 @@ internal sealed class KafkaActivityUtility : IKafkaActivityUtility
             return null;
         }
 
-        Activity activity = _activityUtility.Start(
+        Activity activity = _telemetry.Start(
             KafkaInstrumentation.Operations.Consumption,
             KafkaInstrumentation.ActivitySource,
             ActivityKind.Consumer,
@@ -81,7 +80,7 @@ internal sealed class KafkaActivityUtility : IKafkaActivityUtility
     public void StopConsumer(Activity? activity, bool operationSuccess)
     {
         // do not change the Activity.Current
-        _activityUtility.Stop(activity, operationSuccess, relyOnDefaultPolicyOfSettingCurrentActivity: false);
+        _telemetry.Stop(activity, operationSuccess, relyOnDefaultPolicyOfSettingCurrentActivity: false);
     }
 
     private static void InjectTraceData<TKey, TValue>(ActivityContext activityContext, Message<TKey, TValue> message)

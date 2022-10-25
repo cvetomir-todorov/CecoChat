@@ -1,9 +1,9 @@
 using Autofac;
 using CecoChat.Autofac;
 using CecoChat.Cassandra;
-using CecoChat.Data.State.Instrumentation;
 using CecoChat.Data.State.Repos;
-using CecoChat.Tracing;
+using CecoChat.Data.State.Telemetry;
+using CecoChat.Otel;
 using Microsoft.Extensions.Configuration;
 
 namespace CecoChat.Data.State;
@@ -27,10 +27,10 @@ public class StateDbAutofacModule : Module
 
         builder.RegisterType<ChatStateRepo>().As<IChatStateRepo>().SingleInstance();
 
-        string utilityName = $"{nameof(StateActivityUtility)}.{nameof(IActivityUtility)}";
-        builder.RegisterType<StateActivityUtility>().As<IStateActivityUtility>()
-            .WithNamedParameter(typeof(IActivityUtility), utilityName)
+        string telemetryName = $"{nameof(StateTelemetry)}.{nameof(ITelemetry)}";
+        builder.RegisterType<StateTelemetry>().As<IStateTelemetry>()
+            .WithNamedParameter(typeof(ITelemetry), telemetryName)
             .SingleInstance();
-        builder.RegisterType<ActivityUtility>().Named<IActivityUtility>(utilityName).SingleInstance();
+        builder.RegisterType<OtelTelemetry>().Named<ITelemetry>(telemetryName).SingleInstance();
     }
 }

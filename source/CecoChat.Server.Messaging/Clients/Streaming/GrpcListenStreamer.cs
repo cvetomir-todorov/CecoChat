@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Diagnostics;
 using CecoChat.Contracts.Messaging;
-using CecoChat.Grpc.Instrumentation;
+using CecoChat.Grpc.Telemetry;
 using Grpc.Core;
 using Microsoft.Extensions.Options;
 
@@ -18,7 +18,7 @@ public interface IGrpcListenStreamer : IStreamer<ListenNotification>
 public sealed class GrpcListenStreamer : IGrpcListenStreamer
 {
     private readonly ILogger _logger;
-    private readonly IGrpcStreamingActivityUtility _grpcStreamingActivityUtility;
+    private readonly IGrpcStreamTelemetry _grpcStreamTelemetry;
     private readonly BlockingCollection<MessageContext> _messageQueue;
     private readonly SemaphoreSlim _signalProcessing;
 
@@ -28,11 +28,11 @@ public sealed class GrpcListenStreamer : IGrpcListenStreamer
 
     public GrpcListenStreamer(
         ILogger<GrpcListenStreamer> logger,
-        IGrpcStreamingActivityUtility grpcStreamingActivityUtility,
+        IGrpcStreamTelemetry grpcStreamTelemetry,
         IOptions<ClientOptions> options)
     {
         _logger = logger;
-        _grpcStreamingActivityUtility = grpcStreamingActivityUtility;
+        _grpcStreamTelemetry = grpcStreamTelemetry;
 
         ClientOptions clientOptions = options.Value;
         _messageQueue = new(
@@ -133,7 +133,7 @@ public sealed class GrpcListenStreamer : IGrpcListenStreamer
             }
             finally
             {
-                _grpcStreamingActivityUtility.Stop(activity, success);
+                _grpcStreamTelemetry.StopStream(activity, success);
             }
         }
 
@@ -146,10 +146,10 @@ public sealed class GrpcListenStreamer : IGrpcListenStreamer
         const string method = nameof(GrpcListenService.Listen);
         string name = $"{service}.{method}/Stream.{message.Type}";
 
-        return _grpcStreamingActivityUtility.StartStreaming(name, service, method, parentActivity?.Context);
+        return _grpcStreamTelemetry.StartStream(name, service, method, parentActivity?.Context);
     }
 
-    private sealed record MessageContext
+    private sealed class MessageContext
     {
         public MessageContext(ListenNotification message, Activity? parentActivity)
         {

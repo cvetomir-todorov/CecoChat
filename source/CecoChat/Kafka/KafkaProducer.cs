@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics;
-using CecoChat.Kafka.Instrumentation;
+using CecoChat.Kafka.Telemetry;
 using Confluent.Kafka;
 using Microsoft.Extensions.Logging;
 
@@ -21,7 +21,7 @@ public delegate void DeliveryHandler<TKey, TValue>(bool isDelivered, DeliveryRep
 public sealed class KafkaProducer<TKey, TValue> : IKafkaProducer<TKey, TValue>
 {
     private readonly ILogger _logger;
-    private readonly IKafkaActivityUtility _kafkaActivityUtility;
+    private readonly IKafkaTelemetry _kafkaTelemetry;
     private IProducer<TKey, TValue>? _producer;
     private KafkaProducerOptions? _producerOptions;
     private string _id;
@@ -29,10 +29,10 @@ public sealed class KafkaProducer<TKey, TValue> : IKafkaProducer<TKey, TValue>
 
     public KafkaProducer(
         ILogger<KafkaProducer<TKey, TValue>> logger,
-        IKafkaActivityUtility kafkaActivityUtility)
+        IKafkaTelemetry kafkaTelemetry)
     {
         _logger = logger;
-        _kafkaActivityUtility = kafkaActivityUtility;
+        _kafkaTelemetry = kafkaTelemetry;
         _id = "non-initialized";
     }
 
@@ -75,7 +75,7 @@ public sealed class KafkaProducer<TKey, TValue> : IKafkaProducer<TKey, TValue>
         string topic = topicPartition.Topic;
         int partition = topicPartition.Partition;
 
-        Activity activity = _kafkaActivityUtility.StartProducer(message, _producerOptions!.ProducerID, topic, partition);
+        Activity activity = _kafkaTelemetry.StartProducer(message, _producerOptions!.ProducerID, topic, partition);
         _producer!.Produce(topicPartition, message, deliveryReport => HandleDeliveryReport(deliveryReport, activity, deliveryHandler));
         _logger.LogTrace("Producer {ProducerId} produced message {@Message} in {Topic}[{Partition}]", _id, message.Value, topic, partition);
     }
@@ -84,7 +84,7 @@ public sealed class KafkaProducer<TKey, TValue> : IKafkaProducer<TKey, TValue>
     {
         EnsureInitialized();
 
-        Activity activity = _kafkaActivityUtility.StartProducer(message, _producerOptions!.ProducerID, topic);
+        Activity activity = _kafkaTelemetry.StartProducer(message, _producerOptions!.ProducerID, topic);
         _producer!.Produce(topic, message, deliveryReport => HandleDeliveryReport(deliveryReport, activity, deliveryHandler));
         _logger.LogTrace("Producer {ProducerId} produced message {@Message} in {Topic}", _id, message.Value, topic);
     }
@@ -144,7 +144,7 @@ public sealed class KafkaProducer<TKey, TValue> : IKafkaProducer<TKey, TValue>
         }
         finally
         {
-            _kafkaActivityUtility.StopProducer(activity, isDelivered);
+            _kafkaTelemetry.StopProducer(activity, isDelivered);
         }
     }
 }

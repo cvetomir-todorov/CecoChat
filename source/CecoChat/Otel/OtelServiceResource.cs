@@ -1,6 +1,6 @@
 ﻿namespace CecoChat.Otel;
 
-public record OtelServiceResource
+public sealed class OtelServiceResource
 {
     public string Namespace { get; init; } = string.Empty;
 

@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics;
-using CecoChat.Kafka.Instrumentation;
+using CecoChat.Kafka.Telemetry;
 using Confluent.Kafka;
 using Microsoft.Extensions.Logging;
 
@@ -19,7 +19,7 @@ public interface IKafkaConsumer<TKey, TValue> : IDisposable
 public sealed class KafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey, TValue>
 {
     private readonly ILogger _logger;
-    private readonly IKafkaActivityUtility _kafkaActivityUtility;
+    private readonly IKafkaTelemetry _kafkaTelemetry;
     private PartitionRange _assignedPartitions;
     private IConsumer<TKey, TValue>? _consumer;
     private KafkaConsumerOptions? _consumerOptions;
@@ -28,10 +28,10 @@ public sealed class KafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey, TValue>
 
     public KafkaConsumer(
         ILogger<KafkaConsumer<TKey, TValue>> logger,
-        IKafkaActivityUtility kafkaActivityUtility)
+        IKafkaTelemetry kafkaTelemetry)
     {
         _logger = logger;
-        _kafkaActivityUtility = kafkaActivityUtility;
+        _kafkaTelemetry = kafkaTelemetry;
 
         _assignedPartitions = PartitionRange.Empty;
         _id = "non-initialized";
@@ -138,7 +138,7 @@ public sealed class KafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey, TValue>
         finally
         {
             bool success = InspectStage(stage, consumeResult);
-            _kafkaActivityUtility.StopConsumer(activity, success);
+            _kafkaTelemetry.StopConsumer(activity, success);
         }
     }
 
@@ -169,7 +169,7 @@ public sealed class KafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey, TValue>
         messageHandlerException = default;
         consumeResult = _consumer!.Consume(ct);
         // consume blocks until there is a message and it is read => start activity after that
-        activity = _kafkaActivityUtility.StartConsumer(consumeResult, _consumerOptions!.ConsumerGroupID);
+        activity = _kafkaTelemetry.StartConsumer(consumeResult, _consumerOptions!.ConsumerGroupID);
         stage = ConsumeStage.AfterConsume;
 
         try

@@ -3,10 +3,10 @@ using CecoChat.Autofac;
 using CecoChat.Contracts.Backplane;
 using CecoChat.Data.Config;
 using CecoChat.Data.History;
-using CecoChat.Data.History.Instrumentation;
+using CecoChat.Data.History.Telemetry;
 using CecoChat.Jwt;
 using CecoChat.Kafka;
-using CecoChat.Kafka.Instrumentation;
+using CecoChat.Kafka.Telemetry;
 using CecoChat.Otel;
 using CecoChat.Server.History.Backplane;
 using CecoChat.Server.History.Clients;
@@ -84,7 +84,7 @@ public class Startup
         // backplane
         builder.RegisterType<HistoryConsumer>().As<IHistoryConsumer>().SingleInstance();
         builder.RegisterFactory<KafkaConsumer<Null, BackplaneMessage>, IKafkaConsumer<Null, BackplaneMessage>>();
-        builder.RegisterModule(new KafkaInstrumentationAutofacModule());
+        builder.RegisterModule(new KafkaAutofacModule());
         builder.RegisterOptions<BackplaneOptions>(Configuration.GetSection("Backplane"));
 
         // shared

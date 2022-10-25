@@ -1,20 +1,11 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
-using OpenTelemetry.Trace;
 
-namespace CecoChat.Kafka.Instrumentation;
-
-public static class KafkaInstrumentationRegistrations
-{
-    public static TracerProviderBuilder AddKafkaInstrumentation(this TracerProviderBuilder builder)
-    {
-        return builder.AddSource(KafkaInstrumentation.ActivitySource.Name);
-    }
-}
+namespace CecoChat.Kafka.Telemetry;
 
 internal static class KafkaInstrumentation
 {
-    private static readonly string ActivitySourceName = "OpenTelemetry.Instrumentation.CecoChatKafka";
+    private static readonly string ActivitySourceName = "OpenTelemetry.Instrumentation.Kafka";
     private static readonly AssemblyName _assemblyName = typeof(KafkaInstrumentation).Assembly.GetName();
     private static readonly Version _activitySourceVersion = _assemblyName.Version!;
 

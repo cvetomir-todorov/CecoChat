@@ -1,20 +1,11 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
-using OpenTelemetry.Trace;
 
-namespace CecoChat.Data.History.Instrumentation;
-
-public static class HistoryInstrumentationRegistrations
-{
-    public static TracerProviderBuilder AddHistoryInstrumentation(this TracerProviderBuilder builder)
-    {
-        return builder.AddSource(HistoryInstrumentation.ActivitySource.Name);
-    }
-}
+namespace CecoChat.Data.History.Telemetry;
 
 internal static class HistoryInstrumentation
 {
-    private static readonly string ActivitySourceName = "OpenTelemetry.Instrumentation.CecoChatHistoryDB";
+    private static readonly string ActivitySourceName = "OpenTelemetry.Instrumentation.CecoChat.HistoryDB";
     private static readonly AssemblyName _assemblyName = typeof(HistoryInstrumentation).Assembly.GetName();
     private static readonly Version _activitySourceVersion = _assemblyName.Version!;
 

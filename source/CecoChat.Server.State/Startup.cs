@@ -2,10 +2,10 @@ using Autofac;
 using CecoChat.Autofac;
 using CecoChat.Contracts.Backplane;
 using CecoChat.Data.State;
-using CecoChat.Data.State.Instrumentation;
+using CecoChat.Data.State.Telemetry;
 using CecoChat.Jwt;
 using CecoChat.Kafka;
-using CecoChat.Kafka.Instrumentation;
+using CecoChat.Kafka.Telemetry;
 using CecoChat.Otel;
 using CecoChat.Server.Identity;
 using CecoChat.Server.State.Backplane;
@@ -80,7 +80,7 @@ public class Startup
         // backplane
         builder.RegisterType<StateConsumer>().As<IStateConsumer>().SingleInstance();
         builder.RegisterFactory<KafkaConsumer<Null, BackplaneMessage>, IKafkaConsumer<Null, BackplaneMessage>>();
-        builder.RegisterModule(new KafkaInstrumentationAutofacModule());
+        builder.RegisterModule(new KafkaAutofacModule());
         builder.RegisterOptions<BackplaneOptions>(Configuration.GetSection("Backplane"));
     }
 
