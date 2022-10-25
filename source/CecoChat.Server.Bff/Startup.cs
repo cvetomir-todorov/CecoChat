@@ -13,6 +13,7 @@ using CecoChat.Server.Identity;
 using CecoChat.Swagger;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 
 namespace CecoChat.Server.Bff;
@@ -54,9 +55,14 @@ public class Startup
     public void ConfigureServices(IServiceCollection services)
     {
         // telemetry
+        ResourceBuilder serviceResourceBuilder = ResourceBuilder
+            .CreateEmpty()
+            .AddService(serviceName: "Bff", serviceNamespace: "CecoChat", serviceVersion: "0.1")
+            .AddEnvironmentVariableDetector();
+
         services.AddOpenTelemetryTracing(otel =>
         {
-            otel.AddServiceResource(new OtelServiceResource { Namespace = "CecoChat", Name = "Bff", Version = "0.1" });
+            otel.SetResourceBuilder(serviceResourceBuilder);
             otel.AddAspNetCoreInstrumentation();
             otel.AddGrpcClientInstrumentation(grpc => grpc.SuppressDownstreamInstrumentation = false);
             otel.ConfigureSampling(_otelSamplingOptions);

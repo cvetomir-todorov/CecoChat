@@ -15,6 +15,7 @@ using CecoChat.Server.Messaging.Clients;
 using CecoChat.Server.Messaging.Clients.Streaming;
 using CecoChat.Server.Messaging.HostedServices;
 using Confluent.Kafka;
+using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 
 namespace CecoChat.Server.Messaging;
@@ -51,9 +52,14 @@ public class Startup
     public void ConfigureServices(IServiceCollection services)
     {
         // telemetry
+        ResourceBuilder serviceResourceBuilder = ResourceBuilder
+            .CreateEmpty()
+            .AddService(serviceName: "Messaging", serviceNamespace: "CecoChat", serviceVersion: "0.1")
+            .AddEnvironmentVariableDetector();
+
         services.AddOpenTelemetryTracing(otel =>
         {
-            otel.AddServiceResource(new OtelServiceResource { Namespace = "CecoChat", Name = "Messaging", Version = "0.1" });
+            otel.SetResourceBuilder(serviceResourceBuilder);
             otel.AddAspNetCoreInstrumentation(aspnet => aspnet.EnableGrpcAspNetCoreSupport = true);
             otel.AddKafkaInstrumentation();
             otel.AddGrpcClientInstrumentation(grpc => grpc.SuppressDownstreamInstrumentation = false);
