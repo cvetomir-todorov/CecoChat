@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using Cassandra;
 using CecoChat.Contracts.History;
-using CecoChat.Data.History.Instrumentation;
+using CecoChat.Data.History.Telemetry;
 using Microsoft.Extensions.Logging;
 
 namespace CecoChat.Data.History.Repos;
@@ -22,7 +22,7 @@ public interface IChatMessageRepo
 internal class ChatMessageRepo : IChatMessageRepo
 {
     private readonly ILogger _logger;
-    private readonly IHistoryActivityUtility _historyActivityUtility;
+    private readonly IHistoryTelemetry _historyTelemetry;
     private readonly IHistoryDbContext _dbContext;
     private readonly IDataMapper _mapper;
     private readonly Lazy<PreparedStatement> _historyQuery;
@@ -32,12 +32,12 @@ internal class ChatMessageRepo : IChatMessageRepo
 
     public ChatMessageRepo(
         ILogger<ChatMessageRepo> logger,
-        IHistoryActivityUtility historyActivityUtility,
+        IHistoryTelemetry historyTelemetry,
         IHistoryDbContext dbContext,
         IDataMapper mapper)
     {
         _logger = logger;
-        _historyActivityUtility = historyActivityUtility;
+        _historyTelemetry = historyTelemetry;
         _dbContext = dbContext;
         _mapper = mapper;
 
@@ -76,7 +76,7 @@ internal class ChatMessageRepo : IChatMessageRepo
 
     public async Task<IReadOnlyCollection<HistoryMessage>> GetHistory(long userID, long otherUserID, DateTime olderThan, int countLimit)
     {
-        Activity activity = _historyActivityUtility.StartGetHistory(_dbContext.Session, userID);
+        Activity activity = _historyTelemetry.StartGetHistory(_dbContext.Session, userID);
         bool success = false;
 
         try
@@ -97,7 +97,7 @@ internal class ChatMessageRepo : IChatMessageRepo
         }
         finally
         {
-            _historyActivityUtility.Stop(activity, success);
+            _historyTelemetry.Stop(activity, success);
         }
     }
 
@@ -125,7 +125,7 @@ internal class ChatMessageRepo : IChatMessageRepo
 
     public void AddMessage(DataMessage message)
     {
-        Activity activity = _historyActivityUtility.StartAddDataMessage(_dbContext.Session, message.MessageId);
+        Activity activity = _historyTelemetry.StartAddDataMessage(_dbContext.Session, message.MessageId);
         bool success = false;
 
         try
@@ -144,13 +144,13 @@ internal class ChatMessageRepo : IChatMessageRepo
         }
         finally
         {
-            _historyActivityUtility.Stop(activity, success);
+            _historyTelemetry.Stop(activity, success);
         }
     }
 
     public void SetReaction(ReactionMessage message)
     {
-        Activity activity = _historyActivityUtility.StartSetReaction(_dbContext.Session, message.ReactorId);
+        Activity activity = _historyTelemetry.StartSetReaction(_dbContext.Session, message.ReactorId);
         bool success = false;
 
         try
@@ -166,13 +166,13 @@ internal class ChatMessageRepo : IChatMessageRepo
         }
         finally
         {
-            _historyActivityUtility.Stop(activity, success);
+            _historyTelemetry.Stop(activity, success);
         }
     }
 
     public void UnsetReaction(ReactionMessage message)
     {
-        Activity activity = _historyActivityUtility.StartUnsetReaction(_dbContext.Session, message.ReactorId);
+        Activity activity = _historyTelemetry.StartUnsetReaction(_dbContext.Session, message.ReactorId);
         bool success = false;
 
         try
@@ -188,7 +188,7 @@ internal class ChatMessageRepo : IChatMessageRepo
         }
         finally
         {
-            _historyActivityUtility.Stop(activity, success);
+            _historyTelemetry.Stop(activity, success);
         }
     }
 }

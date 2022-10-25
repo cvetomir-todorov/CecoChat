@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using Cassandra;
 using CecoChat.Contracts.State;
-using CecoChat.Data.State.Instrumentation;
+using CecoChat.Data.State.Telemetry;
 using Microsoft.Extensions.Logging;
 
 namespace CecoChat.Data.State.Repos;
@@ -20,7 +20,7 @@ public interface IChatStateRepo
 internal class ChatStateRepo : IChatStateRepo
 {
     private readonly ILogger _logger;
-    private readonly IStateActivityUtility _stateActivityUtility;
+    private readonly IStateTelemetry _stateTelemetry;
     private readonly IStateDbContext _dbContext;
     private readonly Lazy<PreparedStatement> _chatsQuery;
     private readonly Lazy<PreparedStatement> _chatQuery;
@@ -28,11 +28,11 @@ internal class ChatStateRepo : IChatStateRepo
 
     public ChatStateRepo(
         ILogger<ChatStateRepo> logger,
-        IStateActivityUtility stateActivityUtility,
+        IStateTelemetry stateTelemetry,
         IStateDbContext dbContext)
     {
         _logger = logger;
-        _stateActivityUtility = stateActivityUtility;
+        _stateTelemetry = stateTelemetry;
         _dbContext = dbContext;
 
         _chatsQuery = new Lazy<PreparedStatement>(() => _dbContext.PrepareQuery(SelectNewerChatsForUser));
@@ -64,7 +64,7 @@ internal class ChatStateRepo : IChatStateRepo
 
     public async Task<IReadOnlyCollection<ChatState>> GetChats(long userID, DateTime newerThan)
     {
-        Activity activity = _stateActivityUtility.StartGetChats(_dbContext.Session, userID);
+        Activity activity = _stateTelemetry.StartGetChats(_dbContext.Session, userID);
         bool success = false;
 
         try
@@ -95,13 +95,13 @@ internal class ChatStateRepo : IChatStateRepo
         }
         finally
         {
-            _stateActivityUtility.Stop(activity, success);
+            _stateTelemetry.Stop(activity, success);
         }
     }
 
     public ChatState? GetChat(long userID, string chatID)
     {
-        Activity activity = _stateActivityUtility.StartGetChat(_dbContext.Session, userID, chatID);
+        Activity activity = _stateTelemetry.StartGetChat(_dbContext.Session, userID, chatID);
         bool success = false;
 
         try
@@ -134,13 +134,13 @@ internal class ChatStateRepo : IChatStateRepo
         }
         finally
         {
-            _stateActivityUtility.Stop(activity, success);
+            _stateTelemetry.Stop(activity, success);
         }
     }
 
     public void UpdateChat(long userID, ChatState chat)
     {
-        Activity activity = _stateActivityUtility.StartUpdateChat(_dbContext.Session, userID, chat.ChatId);
+        Activity activity = _stateTelemetry.StartUpdateChat(_dbContext.Session, userID, chat.ChatId);
         bool success = false;
 
         try
@@ -155,7 +155,7 @@ internal class ChatStateRepo : IChatStateRepo
         }
         finally
         {
-            _stateActivityUtility.Stop(activity, success);
+            _stateTelemetry.Stop(activity, success);
         }
     }
 }

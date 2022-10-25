@@ -1,11 +1,10 @@
 using System.Diagnostics;
 using Cassandra;
 using CecoChat.Otel;
-using CecoChat.Tracing;
 
-namespace CecoChat.Data.State.Instrumentation;
+namespace CecoChat.Data.State.Telemetry;
 
-internal interface IStateActivityUtility
+internal interface IStateTelemetry
 {
     Activity StartGetChats(ISession session, long userID);
 
@@ -16,18 +15,18 @@ internal interface IStateActivityUtility
     void Stop(Activity activity, bool operationSuccess);
 }
 
-internal sealed class StateActivityUtility : IStateActivityUtility
+internal sealed class StateTelemetry : IStateTelemetry
 {
-    private readonly IActivityUtility _activityUtility;
+    private readonly ITelemetry _telemetry;
 
-    public StateActivityUtility(IActivityUtility activityUtility)
+    public StateTelemetry(ITelemetry telemetry)
     {
-        _activityUtility = activityUtility;
+        _telemetry = telemetry;
     }
 
     public Activity StartGetChats(ISession session, long userID)
     {
-        Activity activity = _activityUtility.Start(
+        Activity activity = _telemetry.Start(
             StateInstrumentation.Operations.GetChats,
             StateInstrumentation.ActivitySource,
             ActivityKind.Client,
@@ -44,7 +43,7 @@ internal sealed class StateActivityUtility : IStateActivityUtility
 
     public Activity StartGetChat(ISession session, long userID, string chatID)
     {
-        Activity activity = _activityUtility.Start(
+        Activity activity = _telemetry.Start(
             StateInstrumentation.Operations.GetChat,
             StateInstrumentation.ActivitySource,
             ActivityKind.Client,
@@ -62,7 +61,7 @@ internal sealed class StateActivityUtility : IStateActivityUtility
 
     public Activity StartUpdateChat(ISession session, long userID, string chatID)
     {
-        Activity activity = _activityUtility.Start(
+        Activity activity = _telemetry.Start(
             StateInstrumentation.Operations.UpdateChat,
             StateInstrumentation.ActivitySource,
             ActivityKind.Client,
@@ -80,7 +79,7 @@ internal sealed class StateActivityUtility : IStateActivityUtility
 
     public void Stop(Activity activity, bool operationSuccess)
     {
-        _activityUtility.Stop(activity, operationSuccess);
+        _telemetry.Stop(activity, operationSuccess);
     }
 
     private static void Enrich(string operation, ISession session, Activity activity)

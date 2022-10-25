@@ -2,9 +2,9 @@
 using System.Linq.Expressions;
 using OpenTelemetry.Trace;
 
-namespace CecoChat.Tracing;
+namespace CecoChat.Otel;
 
-public interface IActivityUtility
+public interface ITelemetry
 {
     Activity Start(string operationName, ActivitySource source, ActivityKind kind, ActivityContext? parentContext);
 
@@ -15,7 +15,7 @@ public interface IActivityUtility
     void Stop(Activity? activity, bool success, bool relyOnDefaultPolicyOfSettingCurrentActivity = true);
 }
 
-public sealed class ActivityUtility : IActivityUtility
+public sealed class OtelTelemetry : ITelemetry
 {
     public Activity Start(string operationName, ActivitySource source, ActivityKind kind, ActivityContext? parentContext)
     {

@@ -3,10 +3,10 @@ using CecoChat.Autofac;
 using CecoChat.Client.IDGen;
 using CecoChat.Contracts.Backplane;
 using CecoChat.Data.Config;
-using CecoChat.Grpc.Instrumentation;
+using CecoChat.Grpc.Telemetry;
 using CecoChat.Jwt;
 using CecoChat.Kafka;
-using CecoChat.Kafka.Instrumentation;
+using CecoChat.Kafka.Telemetry;
 using CecoChat.Otel;
 using CecoChat.Server.Backplane;
 using CecoChat.Server.Identity;
@@ -57,7 +57,7 @@ public class Startup
             otel.AddAspNetCoreInstrumentation(aspnet => aspnet.EnableGrpcAspNetCoreSupport = true);
             otel.AddKafkaInstrumentation();
             otel.AddGrpcClientInstrumentation(grpc => grpc.SuppressDownstreamInstrumentation = false);
-            otel.AddGrpcStreamingInstrumentation();
+            otel.AddGrpcStreamInstrumentation();
             otel.ConfigureSampling(_otelSamplingOptions);
             otel.ConfigureJaegerExporter(_jaegerOptions);
         });
@@ -89,7 +89,7 @@ public class Startup
         builder.RegisterOptions<ConfigOptions>(Configuration.GetSection("Config"));
 
         // clients
-        builder.RegisterModule(new GrpcStreamingInstrumentationAutofacModule());
+        builder.RegisterModule(new GrpcStreamAutofacModule());
         builder.RegisterType<ClientContainer>().As<IClientContainer>().SingleInstance();
         builder.RegisterFactory<GrpcListenStreamer, IGrpcListenStreamer>();
         builder.RegisterOptions<ClientOptions>(Configuration.GetSection("Clients"));
@@ -107,7 +107,7 @@ public class Startup
         builder.RegisterType<MessageReplicator>().As<IMessageReplicator>().SingleInstance();
         builder.RegisterFactory<KafkaProducer<Null, BackplaneMessage>, IKafkaProducer<Null, BackplaneMessage>>();
         builder.RegisterFactory<KafkaConsumer<Null, BackplaneMessage>, IKafkaConsumer<Null, BackplaneMessage>>();
-        builder.RegisterModule(new KafkaInstrumentationAutofacModule());
+        builder.RegisterModule(new KafkaAutofacModule());
         builder.RegisterOptions<BackplaneOptions>(Configuration.GetSection("Backplane"));
 
         // shared
