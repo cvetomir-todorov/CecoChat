@@ -1,21 +1,9 @@
-﻿using OpenTelemetry.Resources;
-using OpenTelemetry.Trace;
+﻿using OpenTelemetry.Trace;
 
 namespace CecoChat.Otel;
 
 public static class OtelRegistrations
 {
-    public static TracerProviderBuilder AddServiceResource(this TracerProviderBuilder otel, OtelServiceResource serviceResource)
-    {
-        ResourceBuilder resourceBuilder = ResourceBuilder.CreateDefault()
-            .AddService(
-                serviceNamespace: serviceResource.Namespace,
-                serviceName: serviceResource.Name,
-                serviceVersion: serviceResource.Version);
-
-        return otel.SetResourceBuilder(resourceBuilder);
-    }
-
     public static TracerProviderBuilder ConfigureSampling(this TracerProviderBuilder otel, OtelSamplingOptions samplingOptions)
     {
         Sampler sampler;
