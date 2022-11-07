@@ -64,7 +64,7 @@ public static class EntryPoint
 
         try
         {
-            logger.Information("Starting...");
+            logger.Information("Starting in {Environment} environment...", environment);
             hostBuilder.Build().Run();
         }
         catch (Exception exception)
