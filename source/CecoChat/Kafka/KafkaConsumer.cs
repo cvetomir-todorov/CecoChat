@@ -74,7 +74,7 @@ public sealed class KafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey, TValue>
     {
         EnsureInitialized();
         _consumer!.Subscribe(topic);
-        _logger.LogDebug("Consumer {ConsumerId} subscribed to topic {Topic}", _id, topic);
+        _logger.LogInformation("Consumer {ConsumerId} subscribed to topic {Topic}", _id, topic);
     }
 
     public void Assign(string topic, PartitionRange partitions, ITopicPartitionFlyweight partitionFlyweight)
@@ -83,7 +83,7 @@ public sealed class KafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey, TValue>
 
         if (_assignedPartitions.Equals(partitions))
         {
-            _logger.LogDebug("Consumer {ConsumerId} already assigned partitions {Partitions}", _id, _assignedPartitions);
+            _logger.LogInformation("Consumer {ConsumerId} already assigned partitions {Partitions} from topic {Topic}", _id, _assignedPartitions, topic);
             return;
         }
 
@@ -96,7 +96,7 @@ public sealed class KafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey, TValue>
 
         _consumer!.Assign(topicPartitions);
         _assignedPartitions = partitions;
-        _logger.LogDebug("Consumer {ConsumerId} assigned partitions {Partitions} from topic {Topic}", _id, partitions, topic);
+        _logger.LogInformation("Consumer {ConsumerId} assigned partitions {Partitions} from topic {Topic}", _id, partitions, topic);
     }
 
     private enum ConsumeStage
