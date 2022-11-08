@@ -6,7 +6,7 @@
       "dotnetRunMessages": "true",
       "launchBrowser": false,
       "launchUrl": "",
-      "applicationUrl": "https://localhost:31001",
+      "applicationUrl": "https://+:31001",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "CECOCHAT_Config__ServerID": "1"
@@ -17,7 +17,7 @@
       "dotnetRunMessages": "true",
       "launchBrowser": false,
       "launchUrl": "",
-      "applicationUrl": "https://localhost:31011",
+      "applicationUrl": "https://+:31011",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "CECOCHAT_Config__ServerID": "2"
