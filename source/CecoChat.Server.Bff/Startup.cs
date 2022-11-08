@@ -13,6 +13,7 @@ using CecoChat.Server.Identity;
 using CecoChat.Swagger;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 
@@ -26,6 +27,7 @@ public class Startup
     private readonly SwaggerOptions _swaggerOptions;
     private readonly OtelSamplingOptions _otelSamplingOptions;
     private readonly JaegerOptions _jaegerOptions;
+    private readonly PrometheusOptions _prometheusOptions;
 
     public Startup(IConfiguration configuration)
     {
@@ -48,6 +50,9 @@ public class Startup
 
         _jaegerOptions = new();
         Configuration.GetSection("Jaeger").Bind(_jaegerOptions);
+
+        _prometheusOptions = new();
+        Configuration.GetSection("Prometheus").Bind(_prometheusOptions);
     }
 
     public IConfiguration Configuration { get; }
@@ -60,13 +65,19 @@ public class Startup
             .AddService(serviceName: "Bff", serviceNamespace: "CecoChat", serviceVersion: "0.1")
             .AddEnvironmentVariableDetector();
 
-        services.AddOpenTelemetryTracing(otel =>
+        services.AddOpenTelemetryTracing(tracing =>
         {
-            otel.SetResourceBuilder(serviceResourceBuilder);
-            otel.AddAspNetCoreInstrumentation();
-            otel.AddGrpcClientInstrumentation(grpc => grpc.SuppressDownstreamInstrumentation = false);
-            otel.ConfigureSampling(_otelSamplingOptions);
-            otel.ConfigureJaegerExporter(_jaegerOptions);
+            tracing.SetResourceBuilder(serviceResourceBuilder);
+            tracing.AddAspNetCoreInstrumentation();
+            tracing.AddGrpcClientInstrumentation(grpc => grpc.SuppressDownstreamInstrumentation = false);
+            tracing.ConfigureSampling(_otelSamplingOptions);
+            tracing.ConfigureJaegerExporter(_jaegerOptions);
+        });
+        services.AddOpenTelemetryMetrics(metrics =>
+        {
+            metrics.SetResourceBuilder(serviceResourceBuilder);
+            metrics.AddAspNetCoreInstrumentation();
+            metrics.ConfigurePrometheusAspNetExporter(_prometheusOptions);
         });
 
         // security
@@ -126,10 +137,6 @@ public class Startup
         }
 
         app.UseHttpsRedirection();
-        app.MapWhen(context => context.Request.Path.StartsWithSegments("/swagger"), _ =>
-        {
-            app.UseSwaggerMiddlewares(_swaggerOptions);
-        });
 
         app.UseRouting();
         app.UseAuthentication();
@@ -137,6 +144,12 @@ public class Startup
         app.UseEndpoints(endpoints =>
         {
             endpoints.MapControllers();
+        });
+
+        app.UseOpenTelemetryPrometheusScrapingEndpoint(context => context.Request.Path == _prometheusOptions.ScrapeEndpointPath);
+        app.MapWhen(context => context.Request.Path.StartsWithSegments("/swagger"), _ =>
+        {
+            app.UseSwaggerMiddlewares(_swaggerOptions);
         });
     }
 }
