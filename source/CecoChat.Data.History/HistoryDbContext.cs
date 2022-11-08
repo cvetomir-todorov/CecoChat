@@ -32,7 +32,7 @@ internal sealed class HistoryDbContext : CassandraDbContext, IHistoryDbContext
     public PreparedStatement PrepareQuery(string cql)
     {
         PreparedStatement preparedQuery = Session.Prepare(cql);
-        _logger.LogDebug("Prepared CQL '{Cql}'", cql);
+        _logger.LogInformation("Prepared CQL '{Cql}'", cql);
         return preparedQuery;
     }
 }

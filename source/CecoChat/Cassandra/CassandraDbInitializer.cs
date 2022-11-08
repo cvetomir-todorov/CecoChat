@@ -89,7 +89,7 @@ public sealed class CassandraDbInitializer : ICassandraDbInitializer
         try
         {
             session.Execute(cql.Content, ConsistencyLevel.All);
-            _logger.LogDebug("Executed CQL script {CqlScriptName}: {NewLine}{CqlScriptContent}", cql.Name, Environment.NewLine, cql.Content);
+            _logger.LogInformation("Executed CQL script {CqlScriptName}: {NewLine}{CqlScriptContent}", cql.Name, Environment.NewLine, cql.Content);
         }
         catch (AlreadyExistsException alreadyExistsException)
         {
