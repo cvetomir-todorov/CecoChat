@@ -13,6 +13,7 @@ using CecoChat.Server.History.Clients;
 using CecoChat.Server.History.HostedServices;
 using CecoChat.Server.Identity;
 using Confluent.Kafka;
+using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 
@@ -23,6 +24,7 @@ public class Startup
     private readonly JwtOptions _jwtOptions;
     private readonly OtelSamplingOptions _otelSamplingOptions;
     private readonly JaegerOptions _jaegerOptions;
+    private readonly PrometheusOptions _prometheusOptions;
 
     public Startup(IConfiguration configuration, IWebHostEnvironment environment)
     {
@@ -37,6 +39,9 @@ public class Startup
 
         _jaegerOptions = new();
         Configuration.GetSection("Jaeger").Bind(_jaegerOptions);
+
+        _prometheusOptions = new();
+        Configuration.GetSection("Prometheus").Bind(_prometheusOptions);
     }
 
     public IConfiguration Configuration { get; }
@@ -51,14 +56,20 @@ public class Startup
             .AddService(serviceName: "History", serviceNamespace: "CecoChat", serviceVersion: "0.1")
             .AddEnvironmentVariableDetector();
 
-        services.AddOpenTelemetryTracing(otel =>
+        services.AddOpenTelemetryTracing(tracing =>
         {
-            otel.SetResourceBuilder(serviceResourceBuilder);
-            otel.AddAspNetCoreInstrumentation(aspnet => aspnet.EnableGrpcAspNetCoreSupport = true);
-            otel.AddKafkaInstrumentation();
-            otel.AddHistoryInstrumentation();
-            otel.ConfigureSampling(_otelSamplingOptions);
-            otel.ConfigureJaegerExporter(_jaegerOptions);
+            tracing.SetResourceBuilder(serviceResourceBuilder);
+            tracing.AddAspNetCoreInstrumentation(aspnet => aspnet.EnableGrpcAspNetCoreSupport = true);
+            tracing.AddKafkaInstrumentation();
+            tracing.AddHistoryInstrumentation();
+            tracing.ConfigureSampling(_otelSamplingOptions);
+            tracing.ConfigureJaegerExporter(_jaegerOptions);
+        });
+        services.AddOpenTelemetryMetrics(metrics =>
+        {
+            metrics.SetResourceBuilder(serviceResourceBuilder);
+            metrics.AddAspNetCoreInstrumentation();
+            metrics.ConfigurePrometheusAspNetExporter(_prometheusOptions);
         });
 
         // security
@@ -112,5 +123,7 @@ public class Startup
         {
             endpoints.MapGrpcService<GrpcHistoryService>();
         });
+
+        app.UseOpenTelemetryPrometheusScrapingEndpoint(context => context.Request.Path == _prometheusOptions.ScrapeEndpointPath);
     }
 }
