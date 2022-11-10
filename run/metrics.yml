@@ -37,3 +37,16 @@ services:
       - /var/lib/docker/:/var/lib/docker:ro
       - /dev/disk:/dev/disk/:ro
     privileged: true
+  grafana:
+    image: grafana/grafana:9.2.4
+    container_name: cecochat-grafana
+    hostname: grafana
+    networks: *networks
+    ports:
+      - "3000:3000"
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: pass
