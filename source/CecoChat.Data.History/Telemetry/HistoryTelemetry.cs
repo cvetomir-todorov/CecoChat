@@ -6,15 +6,13 @@ namespace CecoChat.Data.History.Telemetry;
 
 internal interface IHistoryTelemetry
 {
-    Activity StartAddDataMessage(ISession session, long messageID);
+    void AddDataMessage(ISession session, IStatement statement, long messageId);
 
-    Activity StartGetHistory(ISession session, long userID);
+    Task<RowSet> GetHistoryAsync(ISession session, IStatement statement, long userId);
 
-    Activity StartSetReaction(ISession session, long reactorID);
+    void SetReaction(ISession session, IStatement statement, long reactorId);
 
-    Activity StartUnsetReaction(ISession session, long reactorID);
-
-    void Stop(Activity activity, bool operationSuccess);
+    void UnsetReaction(ISession session, IStatement statement, long reactorId);
 }
 
 internal sealed class HistoryTelemetry : IHistoryTelemetry
@@ -26,7 +24,7 @@ internal sealed class HistoryTelemetry : IHistoryTelemetry
         _telemetry = telemetry;
     }
 
-    public Activity StartAddDataMessage(ISession session, long messageID)
+    public void AddDataMessage(ISession session, IStatement statement, long messageId)
     {
         Activity activity = _telemetry.Start(
             HistoryInstrumentation.Operations.AddDataMessage,
@@ -37,13 +35,13 @@ internal sealed class HistoryTelemetry : IHistoryTelemetry
         if (activity.IsAllDataRequested)
         {
             Enrich(OtelInstrumentation.Values.DbOperationBatchWrite, session, activity);
-            activity.SetTag("message.id", messageID);
+            activity.SetTag("message.id", messageId);
         }
 
-        return activity;
+        ExecuteStatement(session, statement, activity);
     }
 
-    public Activity StartGetHistory(ISession session, long userID)
+    public Task<RowSet> GetHistoryAsync(ISession session, IStatement statement, long userId)
     {
         Activity activity = _telemetry.Start(
             HistoryInstrumentation.Operations.GetHistory,
@@ -54,13 +52,13 @@ internal sealed class HistoryTelemetry : IHistoryTelemetry
         if (activity.IsAllDataRequested)
         {
             Enrich(OtelInstrumentation.Values.DbOperationOneRead, session, activity);
-            activity.SetTag("user.id", userID);
+            activity.SetTag("user.id", userId);
         }
 
-        return activity;
+        return ExecuteStatementAsync(session, statement, activity);
     }
 
-    public Activity StartSetReaction(ISession session, long reactorID)
+    public void SetReaction(ISession session, IStatement statement, long reactorId)
     {
         Activity activity = _telemetry.Start(
             HistoryInstrumentation.Operations.SetReaction,
@@ -71,13 +69,13 @@ internal sealed class HistoryTelemetry : IHistoryTelemetry
         if (activity.IsAllDataRequested)
         {
             Enrich(OtelInstrumentation.Values.DbOperationOneWrite, session, activity);
-            activity.SetTag("reaction.reactor_id", reactorID);
+            activity.SetTag("reaction.reactor_id", reactorId);
         }
 
-        return activity;
+        ExecuteStatement(session, statement, activity);
     }
 
-    public Activity StartUnsetReaction(ISession session, long reactorID)
+    public void UnsetReaction(ISession session, IStatement statement, long reactorId)
     {
         Activity activity = _telemetry.Start(
             HistoryInstrumentation.Operations.UnsetReaction,
@@ -88,15 +86,10 @@ internal sealed class HistoryTelemetry : IHistoryTelemetry
         if (activity.IsAllDataRequested)
         {
             Enrich(OtelInstrumentation.Values.DbOperationOneWrite, session, activity);
-            activity.SetTag("reaction.reactor_id", reactorID);
+            activity.SetTag("reaction.reactor_id", reactorId);
         }
 
-        return activity;
-    }
-
-    public void Stop(Activity activity, bool operationSuccess)
-    {
-        _telemetry.Stop(activity, operationSuccess);
+        ExecuteStatement(session, statement, activity);
     }
 
     private static void Enrich(string operation, ISession session, Activity activity)
@@ -105,5 +98,42 @@ internal sealed class HistoryTelemetry : IHistoryTelemetry
         activity.SetTag(OtelInstrumentation.Keys.DbSystem, OtelInstrumentation.Values.DbSystemCassandra);
         activity.SetTag(OtelInstrumentation.Keys.DbName, session.Keyspace);
         activity.SetTag(OtelInstrumentation.Keys.DbSessionName, session.SessionName);
+    }
+
+    private void ExecuteStatement(ISession session, IStatement statement, Activity activity)
+    {
+        try
+        {
+            session.Execute(statement);
+            activity.SetStatus(ActivityStatusCode.Ok);
+        }
+        catch
+        {
+            activity.SetStatus(ActivityStatusCode.Error);
+            throw;
+        }
+        finally
+        {
+            activity.Stop();
+        }
+    }
+
+    private async Task<RowSet> ExecuteStatementAsync(ISession session, IStatement statement, Activity activity)
+    {
+        try
+        {
+            RowSet rowSet = await session.ExecuteAsync(statement);
+            activity.SetStatus(ActivityStatusCode.Ok);
+            return rowSet;
+        }
+        catch
+        {
+            activity.SetStatus(ActivityStatusCode.Error);
+            throw;
+        }
+        finally
+        {
+            activity.Stop();
+        }
     }
 }

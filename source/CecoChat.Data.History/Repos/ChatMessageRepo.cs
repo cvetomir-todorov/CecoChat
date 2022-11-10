@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Cassandra;
 using CecoChat.Contracts.History;
 using CecoChat.Data.History.Telemetry;
@@ -10,7 +9,7 @@ public interface IChatMessageRepo
 {
     void Prepare();
 
-    Task<IReadOnlyCollection<HistoryMessage>> GetHistory(long userID, long otherUserID, DateTime olderThan, int countLimit);
+    Task<IReadOnlyCollection<HistoryMessage>> GetHistory(long userId, long otherUserId, DateTime olderThan, int countLimit);
 
     void AddMessage(DataMessage message);
 
@@ -74,31 +73,20 @@ internal class ChatMessageRepo : IChatMessageRepo
 #pragma warning restore IDE0059
     }
 
-    public async Task<IReadOnlyCollection<HistoryMessage>> GetHistory(long userID, long otherUserID, DateTime olderThan, int countLimit)
+    public async Task<IReadOnlyCollection<HistoryMessage>> GetHistory(long userId, long otherUserId, DateTime olderThan, int countLimit)
     {
-        Activity activity = _historyTelemetry.StartGetHistory(_dbContext.Session, userID);
-        bool success = false;
+        string chatId = DataUtility.CreateChatID(userId, otherUserId);
+        long olderThanSnowflake = olderThan.ToSnowflakeCeiling();
+        BoundStatement query = _historyQuery.Value.Bind(chatId, olderThanSnowflake, countLimit);
+        query.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
+        query.SetIdempotence(true);
 
-        try
-        {
-            string chatID = DataUtility.CreateChatID(userID, otherUserID);
-            long olderThanSnowflake = olderThan.ToSnowflakeCeiling();
-            BoundStatement query = _historyQuery.Value.Bind(chatID, olderThanSnowflake, countLimit);
-            query.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
-            query.SetIdempotence(true);
+        RowSet rows = await _historyTelemetry.GetHistoryAsync(_dbContext.Session, query, userId);
+        List<HistoryMessage> messages = new(capacity: countLimit);
+        ReadRows(rows, messages);
 
-            RowSet rows = await _dbContext.Session.ExecuteAsync(query);
-            List<HistoryMessage> messages = new(capacity: countLimit);
-            ReadRows(rows, messages);
-            success = true;
-
-            _logger.LogTrace("Returned {MessageCount} messages between for chat {Chat} which are older than {OlderThan}", messages.Count, chatID, olderThan);
-            return messages;
-        }
-        finally
-        {
-            _historyTelemetry.Stop(activity, success);
-        }
+        _logger.LogTrace("Returned {MessageCount} messages between for chat {Chat} which are older than {OlderThan}", messages.Count, chatId, olderThan);
+        return messages;
     }
 
     private void ReadRows(RowSet rows, ICollection<HistoryMessage> messages)
@@ -125,70 +113,37 @@ internal class ChatMessageRepo : IChatMessageRepo
 
     public void AddMessage(DataMessage message)
     {
-        Activity activity = _historyTelemetry.StartAddDataMessage(_dbContext.Session, message.MessageId);
-        bool success = false;
+        sbyte dbMessageType = _mapper.MapHistoryToDbDataType(message.DataType);
+        string chatId = DataUtility.CreateChatID(message.SenderId, message.ReceiverId);
 
-        try
-        {
-            sbyte dbMessageType = _mapper.MapHistoryToDbDataType(message.DataType);
-            string chatID = DataUtility.CreateChatID(message.SenderId, message.ReceiverId);
-
-            BoundStatement query = _messagesForChatQuery.Value.Bind(
-                chatID, message.MessageId, message.SenderId, message.ReceiverId, dbMessageType, message.Data);
-            query.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
-            query.SetIdempotence(false);
-
-            _dbContext.Session.Execute(query);
-            success = true;
-            _logger.LogTrace("Persisted the message {@Message}", message);
-        }
-        finally
-        {
-            _historyTelemetry.Stop(activity, success);
-        }
+        BoundStatement query = _messagesForChatQuery.Value.Bind(
+            chatId, message.MessageId, message.SenderId, message.ReceiverId, dbMessageType, message.Data);
+        query.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
+        query.SetIdempotence(false);
+        
+        _historyTelemetry.AddDataMessage(_dbContext.Session, query, message.MessageId);
+        _logger.LogTrace("Persisted the message {@Message}", message);
     }
 
     public void SetReaction(ReactionMessage message)
     {
-        Activity activity = _historyTelemetry.StartSetReaction(_dbContext.Session, message.ReactorId);
-        bool success = false;
+        string chatId = DataUtility.CreateChatID(message.SenderId, message.ReceiverId);
+        BoundStatement query = _setReactionQuery.Value.Bind(message.ReactorId, message.Reaction, chatId, message.MessageId);
+        query.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
+        query.SetIdempotence(false);
 
-        try
-        {
-            string chatID = DataUtility.CreateChatID(message.SenderId, message.ReceiverId);
-            BoundStatement query = _setReactionQuery.Value.Bind(message.ReactorId, message.Reaction, chatID, message.MessageId);
-            query.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
-            query.SetIdempotence(false);
-            _dbContext.Session.Execute(query);
-
-            success = true;
-            _logger.LogTrace("User {ReactorId} reacted with {Reaction} to message {MessageId}", message.ReactorId, message.Reaction, message.MessageId);
-        }
-        finally
-        {
-            _historyTelemetry.Stop(activity, success);
-        }
+        _historyTelemetry.SetReaction(_dbContext.Session, query, message.ReactorId);
+        _logger.LogTrace("User {ReactorId} reacted with {Reaction} to message {MessageId}", message.ReactorId, message.Reaction, message.MessageId);
     }
 
     public void UnsetReaction(ReactionMessage message)
     {
-        Activity activity = _historyTelemetry.StartUnsetReaction(_dbContext.Session, message.ReactorId);
-        bool success = false;
+        string chatId = DataUtility.CreateChatID(message.SenderId, message.ReceiverId);
+        BoundStatement query = _unsetReactionQuery.Value.Bind(message.ReactorId, chatId, message.MessageId);
+        query.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
+        query.SetIdempotence(false);
 
-        try
-        {
-            string chatID = DataUtility.CreateChatID(message.SenderId, message.ReceiverId);
-            BoundStatement query = _unsetReactionQuery.Value.Bind(message.ReactorId, chatID, message.MessageId);
-            query.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
-            query.SetIdempotence(false);
-            _dbContext.Session.Execute(query);
-
-            success = true;
-            _logger.LogTrace("User {ReactorId} removed reaction to message {MessageId}", message.ReactorId, message.MessageId);
-        }
-        finally
-        {
-            _historyTelemetry.Stop(activity, success);
-        }
+        _historyTelemetry.UnsetReaction(_dbContext.Session, query, message.ReactorId);
+        _logger.LogTrace("User {ReactorId} removed reaction to message {MessageId}", message.ReactorId, message.MessageId);
     }
 }
