@@ -6,13 +6,11 @@ namespace CecoChat.Data.State.Telemetry;
 
 internal interface IStateTelemetry
 {
-    Activity StartGetChats(ISession session, long userID);
+    Task<RowSet> GetChatsAsync(ISession session, IStatement statement, long userId);
 
-    Activity StartGetChat(ISession session, long userID, string chatID);
+    RowSet GetChat(ISession session, IStatement statement, long userId, string chatId);
 
-    Activity StartUpdateChat(ISession session, long userID, string chatID);
-
-    void Stop(Activity activity, bool operationSuccess);
+    void UpdateChat(ISession session, IStatement statement, long userId, string chatId);
 }
 
 internal sealed class StateTelemetry : IStateTelemetry
@@ -24,7 +22,7 @@ internal sealed class StateTelemetry : IStateTelemetry
         _telemetry = telemetry;
     }
 
-    public Activity StartGetChats(ISession session, long userID)
+    public Task<RowSet> GetChatsAsync(ISession session, IStatement statement, long userId)
     {
         Activity activity = _telemetry.Start(
             StateInstrumentation.Operations.GetChats,
@@ -35,13 +33,13 @@ internal sealed class StateTelemetry : IStateTelemetry
         if (activity.IsAllDataRequested)
         {
             Enrich(OtelInstrumentation.Values.DbOperationOneRead, session, activity);
-            activity.SetTag("user.id", userID);
+            activity.SetTag("user.id", userId);
         }
 
-        return activity;
+        return ExecuteStatementAsync(session, statement, activity);
     }
 
-    public Activity StartGetChat(ISession session, long userID, string chatID)
+    public RowSet GetChat(ISession session, IStatement statement, long userId, string chatId)
     {
         Activity activity = _telemetry.Start(
             StateInstrumentation.Operations.GetChat,
@@ -52,14 +50,14 @@ internal sealed class StateTelemetry : IStateTelemetry
         if (activity.IsAllDataRequested)
         {
             Enrich(OtelInstrumentation.Values.DbOperationOneRead, session, activity);
-            activity.SetTag("user.id", userID);
-            activity.SetTag("chat.id", chatID);
+            activity.SetTag("user.id", userId);
+            activity.SetTag("chat.id", chatId);
         }
 
-        return activity;
+        return ExecuteStatement(session, statement, activity);
     }
 
-    public Activity StartUpdateChat(ISession session, long userID, string chatID)
+    public void UpdateChat(ISession session, IStatement statement, long userId, string chatId)
     {
         Activity activity = _telemetry.Start(
             StateInstrumentation.Operations.UpdateChat,
@@ -70,16 +68,11 @@ internal sealed class StateTelemetry : IStateTelemetry
         if (activity.IsAllDataRequested)
         {
             Enrich(OtelInstrumentation.Values.DbOperationOneWrite, session, activity);
-            activity.SetTag("user.id", userID);
-            activity.SetTag("chat.id", chatID);
+            activity.SetTag("user.id", userId);
+            activity.SetTag("chat.id", chatId);
         }
 
-        return activity;
-    }
-
-    public void Stop(Activity activity, bool operationSuccess)
-    {
-        _telemetry.Stop(activity, operationSuccess);
+        ExecuteStatement(session, statement, activity);
     }
 
     private static void Enrich(string operation, ISession session, Activity activity)
@@ -88,5 +81,43 @@ internal sealed class StateTelemetry : IStateTelemetry
         activity.SetTag(OtelInstrumentation.Keys.DbSystem, OtelInstrumentation.Values.DbSystemCassandra);
         activity.SetTag(OtelInstrumentation.Keys.DbName, session.Keyspace);
         activity.SetTag(OtelInstrumentation.Keys.DbSessionName, session.SessionName);
+    }
+
+    private RowSet ExecuteStatement(ISession session, IStatement statement, Activity activity)
+    {
+        try
+        {
+            RowSet rows = session.Execute(statement);
+            activity.SetStatus(ActivityStatusCode.Ok);
+            return rows;
+        }
+        catch
+        {
+            activity.SetStatus(ActivityStatusCode.Error);
+            throw;
+        }
+        finally
+        {
+            activity.Stop();
+        }
+    }
+
+    private async Task<RowSet> ExecuteStatementAsync(ISession session, IStatement statement, Activity activity)
+    {
+        try
+        {
+            RowSet rowSet = await session.ExecuteAsync(statement);
+            activity.SetStatus(ActivityStatusCode.Ok);
+            return rowSet;
+        }
+        catch
+        {
+            activity.SetStatus(ActivityStatusCode.Error);
+            throw;
+        }
+        finally
+        {
+            activity.Stop();
+        }
     }
 }
