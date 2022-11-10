@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Cassandra;
 using CecoChat.Contracts.State;
 using CecoChat.Data.State.Telemetry;
@@ -10,11 +9,11 @@ public interface IChatStateRepo
 {
     void Prepare();
 
-    Task<IReadOnlyCollection<ChatState>> GetChats(long userID, DateTime newerThan);
+    Task<IReadOnlyCollection<ChatState>> GetChats(long userId, DateTime newerThan);
 
-    ChatState? GetChat(long userID, string chatID);
+    ChatState? GetChat(long userId, string chatId);
 
-    void UpdateChat(long userID, ChatState chat);
+    void UpdateChat(long userId, ChatState chat);
 }
 
 internal class ChatStateRepo : IChatStateRepo
@@ -62,100 +61,67 @@ internal class ChatStateRepo : IChatStateRepo
 #pragma warning restore IDE0059
     }
 
-    public async Task<IReadOnlyCollection<ChatState>> GetChats(long userID, DateTime newerThan)
+    public async Task<IReadOnlyCollection<ChatState>> GetChats(long userId, DateTime newerThan)
     {
-        Activity activity = _stateTelemetry.StartGetChats(_dbContext.Session, userID);
-        bool success = false;
+        long newerThanSnowflake = newerThan.ToSnowflakeFloor();
+        BoundStatement query = _chatsQuery.Value.Bind(userId, newerThanSnowflake);
+        query.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
+        query.SetIdempotence(true);
 
-        try
+        RowSet rows = await _stateTelemetry.GetChatsAsync(_dbContext.Session, query, userId);
+        List<ChatState> chats = new();
+
+        foreach (Row row in rows)
         {
-            long newerThanSnowflake = newerThan.ToSnowflakeFloor();
-            BoundStatement query = _chatsQuery.Value.Bind(userID, newerThanSnowflake);
-            query.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
-            query.SetIdempotence(true);
+            ChatState chat = new();
 
-            RowSet rows = await _dbContext.Session.ExecuteAsync(query);
-            List<ChatState> chats = new();
+            chat.ChatId = row.GetValue<string>("chat_id");
+            chat.NewestMessage = row.GetValue<long>("newest_message");
+            chat.OtherUserDelivered = row.GetValue<long>("other_user_delivered");
+            chat.OtherUserSeen = row.GetValue<long>("other_user_seen");
 
-            foreach (Row row in rows)
-            {
-                ChatState chat = new();
-
-                chat.ChatId = row.GetValue<string>("chat_id");
-                chat.NewestMessage = row.GetValue<long>("newest_message");
-                chat.OtherUserDelivered = row.GetValue<long>("other_user_delivered");
-                chat.OtherUserSeen = row.GetValue<long>("other_user_seen");
-
-                chats.Add(chat);
-            }
-            success = true;
-
-            _logger.LogTrace("Returned {ChatCount} chats for user {UserId} which are newer than {NewerThan}", chats.Count, userID, newerThan);
-            return chats;
+            chats.Add(chat);
         }
-        finally
-        {
-            _stateTelemetry.Stop(activity, success);
-        }
+
+        _logger.LogTrace("Returned {ChatCount} chats for user {UserId} which are newer than {NewerThan}", chats.Count, userId, newerThan);
+        return chats;
     }
 
-    public ChatState? GetChat(long userID, string chatID)
+    public ChatState? GetChat(long userId, string chatId)
     {
-        Activity activity = _stateTelemetry.StartGetChat(_dbContext.Session, userID, chatID);
-        bool success = false;
+        BoundStatement query = _chatQuery.Value.Bind(userId, chatId);
+        query.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
+        query.SetIdempotence(true);
 
-        try
+        RowSet rows = _stateTelemetry.GetChat(_dbContext.Session, query, userId, chatId);
+        Row? row = rows.FirstOrDefault();
+        ChatState? chat = null;
+        if (row != null)
         {
-            BoundStatement query = _chatQuery.Value.Bind(userID, chatID);
-            query.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
-            query.SetIdempotence(true);
+            chat = new();
 
-            RowSet rows = _dbContext.Session.Execute(query);
-            Row? row = rows.FirstOrDefault();
-            ChatState? chat = null;
-            if (row != null)
-            {
-                chat = new();
+            chat.ChatId = chatId;
+            chat.NewestMessage = row.GetValue<long>("newest_message");
+            chat.OtherUserDelivered = row.GetValue<long>("other_user_delivered");
+            chat.OtherUserSeen = row.GetValue<long>("other_user_seen");
 
-                chat.ChatId = chatID;
-                chat.NewestMessage = row.GetValue<long>("newest_message");
-                chat.OtherUserDelivered = row.GetValue<long>("other_user_delivered");
-                chat.OtherUserSeen = row.GetValue<long>("other_user_seen");
-
-                _logger.LogTrace("Returned chat {ChatId} for user {UserId}", chatID, userID);
-            }
-            else
-            {
-                _logger.LogTrace("Failed to find chat {ChatId} for user {UserId}", chatID, userID);
-            }
-
-            success = true;
-            return chat;
+            _logger.LogTrace("Returned chat {ChatId} for user {UserId}", chatId, userId);
         }
-        finally
+        else
         {
-            _stateTelemetry.Stop(activity, success);
+            _logger.LogTrace("Failed to find chat {ChatId} for user {UserId}", chatId, userId);
         }
+
+        return chat;
     }
 
-    public void UpdateChat(long userID, ChatState chat)
+    public void UpdateChat(long userId, ChatState chat)
     {
-        Activity activity = _stateTelemetry.StartUpdateChat(_dbContext.Session, userID, chat.ChatId);
-        bool success = false;
+        BoundStatement query = _updateQuery.Value.Bind(userId, chat.ChatId, chat.NewestMessage, chat.OtherUserDelivered, chat.OtherUserSeen);
+        query.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
+        query.SetIdempotence(false);
 
-        try
-        {
-            BoundStatement query = _updateQuery.Value.Bind(userID, chat.ChatId, chat.NewestMessage, chat.OtherUserDelivered, chat.OtherUserSeen);
-            query.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
-            query.SetIdempotence(false);
-
-            _dbContext.Session.Execute(query);
-            success = true;
-            _logger.LogTrace("Updated chat {ChatId} for user {UserId}", chat.ChatId, userID);
-        }
-        finally
-        {
-            _stateTelemetry.Stop(activity, success);
-        }
+        _stateTelemetry.UpdateChat(_dbContext.Session, query, userId, chat.ChatId);
+        _logger.LogTrace("Updated chat {ChatId} for user {UserId}", chat.ChatId, userId);
     }
 }
