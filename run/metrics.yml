@@ -19,3 +19,21 @@ services:
     volumes:
       - ./metrics/prometheus.yml:/etc/prometheus/prometheus.yml
     command: --config.file=/etc/prometheus/prometheus.yml --log.level=debug
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.46.0
+    container_name: cecochat-cadvisor
+    hostname: cadvisor
+    networks: *networks
+    ports:
+      - "8081:8080"
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk:/dev/disk/:ro
+    privileged: true
