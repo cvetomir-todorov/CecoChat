@@ -27,9 +27,6 @@ public static class OtelInstrumentation
     public static class Values
     {
         public const string DbSystemCassandra = "cassandra";
-        public const string DbOperationBatchWrite = "batch_write";
-        public const string DbOperationOneWrite = "one_write";
-        public const string DbOperationOneRead = "one_read";
 
         public const string MessagingSystemKafka = "kafka";
         public const string MessagingDestinationKindTopic = "topic";

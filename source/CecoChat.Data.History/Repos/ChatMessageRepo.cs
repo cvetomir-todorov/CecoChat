@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace CecoChat.Data.History.Repos;
 
-public interface IChatMessageRepo
+public interface IChatMessageRepo : IDisposable
 {
     void Prepare();
 
@@ -18,7 +18,7 @@ public interface IChatMessageRepo
     void UnsetReaction(ReactionMessage message);
 }
 
-internal class ChatMessageRepo : IChatMessageRepo
+internal sealed class ChatMessageRepo : IChatMessageRepo
 {
     private readonly ILogger _logger;
     private readonly IHistoryTelemetry _historyTelemetry;
@@ -44,6 +44,11 @@ internal class ChatMessageRepo : IChatMessageRepo
         _messagesForChatQuery = new Lazy<PreparedStatement>(() => _dbContext.PrepareQuery(InsertIntoMessagesForChat));
         _setReactionQuery = new Lazy<PreparedStatement>(() => _dbContext.PrepareQuery(SetReactionCommand));
         _unsetReactionQuery = new Lazy<PreparedStatement>(() => _dbContext.PrepareQuery(UnsetReactionCommand));
+    }
+
+    public void Dispose()
+    {
+        _historyTelemetry.Dispose();
     }
 
     private const string SelectMessagesForChat =

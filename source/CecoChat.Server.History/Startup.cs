@@ -69,6 +69,7 @@ public class Startup
         {
             metrics.SetResourceBuilder(serviceResourceBuilder);
             metrics.AddAspNetCoreInstrumentation();
+            metrics.AddHistoryInstrumentation();
             metrics.ConfigurePrometheusAspNetExporter(_prometheusOptions);
         });
 
