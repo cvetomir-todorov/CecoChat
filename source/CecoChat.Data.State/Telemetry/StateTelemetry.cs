@@ -5,7 +5,7 @@ using CecoChat.Otel;
 
 namespace CecoChat.Data.State.Telemetry;
 
-internal interface IStateTelemetry
+internal interface IStateTelemetry : IDisposable
 {
     Task<RowSet> GetChatsAsync(ISession session, IStatement statement, long userId);
 
@@ -21,13 +21,19 @@ internal sealed class StateTelemetry : IStateTelemetry
     public StateTelemetry(ICassandraTelemetry cassandraTelemetry)
     {
         _cassandraTelemetry = cassandraTelemetry;
+        _cassandraTelemetry.EnableMetrics(StateInstrumentation.ActivitySource, "statedb.query.duration");
+    }
+
+    public void Dispose()
+    {
+        _cassandraTelemetry.Dispose();
     }
 
     public Task<RowSet> GetChatsAsync(ISession session, IStatement statement, long userId)
     {
         return _cassandraTelemetry.ExecuteStatementAsync(session, statement, StateInstrumentation.ActivitySource, StateInstrumentation.Operations.GetChats, activity =>
         {
-            Enrich(OtelInstrumentation.Values.DbOperationOneRead, session, activity);
+            Enrich(StateInstrumentation.Operations.GetChats, session, activity);
             activity.SetTag("user.id", userId);
         });
     }
@@ -36,7 +42,7 @@ internal sealed class StateTelemetry : IStateTelemetry
     {
         return _cassandraTelemetry.ExecuteStatement(session, statement, StateInstrumentation.ActivitySource, StateInstrumentation.Operations.GetChat, activity =>
         {
-            Enrich(OtelInstrumentation.Values.DbOperationOneRead, session, activity);
+            Enrich(StateInstrumentation.Operations.GetChat, session, activity);
             activity.SetTag("user.id", userId);
             activity.SetTag("chat.id", chatId);
         });
@@ -46,7 +52,7 @@ internal sealed class StateTelemetry : IStateTelemetry
     {
         _cassandraTelemetry.ExecuteStatement(session, statement, StateInstrumentation.ActivitySource, StateInstrumentation.Operations.UpdateChat, activity =>
         {
-            Enrich(OtelInstrumentation.Values.DbOperationOneWrite, session, activity);
+            Enrich(StateInstrumentation.Operations.UpdateChat, session, activity);
             activity.SetTag("user.id", userId);
             activity.SetTag("chat.id", chatId);
         });

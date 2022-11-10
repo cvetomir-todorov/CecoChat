@@ -5,7 +5,7 @@ using CecoChat.Otel;
 
 namespace CecoChat.Data.History.Telemetry;
 
-internal interface IHistoryTelemetry
+internal interface IHistoryTelemetry : IDisposable
 {
     void AddDataMessage(ISession session, IStatement statement, long messageId);
 
@@ -23,13 +23,19 @@ internal sealed class HistoryTelemetry : IHistoryTelemetry
     public HistoryTelemetry(ICassandraTelemetry cassandraTelemetry)
     {
         _cassandraTelemetry = cassandraTelemetry;
+        _cassandraTelemetry.EnableMetrics(HistoryInstrumentation.ActivitySource, "historydb.query.duration");
+    }
+
+    public void Dispose()
+    {
+        _cassandraTelemetry.Dispose();
     }
 
     public void AddDataMessage(ISession session, IStatement statement, long messageId)
     {
         _cassandraTelemetry.ExecuteStatement(session, statement, HistoryInstrumentation.ActivitySource, HistoryInstrumentation.Operations.AddDataMessage, activity =>
         {
-            Enrich(OtelInstrumentation.Values.DbOperationBatchWrite, session, activity);
+            Enrich(HistoryInstrumentation.Operations.AddDataMessage, session, activity);
             activity.SetTag("message.id", messageId);
         });
     }
@@ -38,7 +44,7 @@ internal sealed class HistoryTelemetry : IHistoryTelemetry
     {
         return _cassandraTelemetry.ExecuteStatementAsync(session, statement, HistoryInstrumentation.ActivitySource, HistoryInstrumentation.Operations.GetHistory, activity =>
         {
-            Enrich(OtelInstrumentation.Values.DbOperationOneRead, session, activity);
+            Enrich(HistoryInstrumentation.Operations.GetHistory, session, activity);
             activity.SetTag("user.id", userId);
         });
     }
@@ -47,7 +53,7 @@ internal sealed class HistoryTelemetry : IHistoryTelemetry
     {
         _cassandraTelemetry.ExecuteStatement(session, statement, HistoryInstrumentation.ActivitySource, HistoryInstrumentation.Operations.SetReaction, activity =>
         {
-            Enrich(OtelInstrumentation.Values.DbOperationOneWrite, session, activity);
+            Enrich(HistoryInstrumentation.Operations.SetReaction, session, activity);
             activity.SetTag("reaction.reactor_id", reactorId);
         });
     }
@@ -56,7 +62,7 @@ internal sealed class HistoryTelemetry : IHistoryTelemetry
     {
         _cassandraTelemetry.ExecuteStatement(session, statement, HistoryInstrumentation.ActivitySource, HistoryInstrumentation.Operations.UnsetReaction, activity =>
         {
-            Enrich(OtelInstrumentation.Values.DbOperationOneWrite, session, activity);
+            Enrich(HistoryInstrumentation.Operations.UnsetReaction, session, activity);
             activity.SetTag("reaction.reactor_id", reactorId);
         });
     }

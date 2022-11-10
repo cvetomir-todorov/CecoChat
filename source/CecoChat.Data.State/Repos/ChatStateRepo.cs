@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 
 namespace CecoChat.Data.State.Repos;
 
-public interface IChatStateRepo
+public interface IChatStateRepo : IDisposable
 {
     void Prepare();
 
@@ -16,7 +16,7 @@ public interface IChatStateRepo
     void UpdateChat(long userId, ChatState chat);
 }
 
-internal class ChatStateRepo : IChatStateRepo
+internal sealed class ChatStateRepo : IChatStateRepo
 {
     private readonly ILogger _logger;
     private readonly IStateTelemetry _stateTelemetry;
@@ -37,6 +37,11 @@ internal class ChatStateRepo : IChatStateRepo
         _chatsQuery = new Lazy<PreparedStatement>(() => _dbContext.PrepareQuery(SelectNewerChatsForUser));
         _chatQuery = new Lazy<PreparedStatement>(() => _dbContext.PrepareQuery(SelectChatForUser));
         _updateQuery = new Lazy<PreparedStatement>(() => _dbContext.PrepareQuery(UpdateChatForUser));
+    }
+
+    public void Dispose()
+    {
+        _stateTelemetry.Dispose();
     }
 
     private const string SelectNewerChatsForUser =
