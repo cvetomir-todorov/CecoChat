@@ -1,6 +1,7 @@
 ﻿using Autofac;
 using CecoChat.Autofac;
 using CecoChat.Cassandra;
+using CecoChat.Cassandra.Telemetry;
 using CecoChat.Data.History.Repos;
 using CecoChat.Data.History.Telemetry;
 using CecoChat.Otel;
@@ -27,11 +28,8 @@ public sealed class HistoryDbAutofacModule : Module
 
         builder.RegisterType<DataMapper>().As<IDataMapper>().SingleInstance();
         builder.RegisterType<ChatMessageRepo>().As<IChatMessageRepo>().SingleInstance();
-
-        string telemetryName = $"{nameof(HistoryTelemetry)}.{nameof(ITelemetry)}";
-        builder.RegisterType<HistoryTelemetry>().As<IHistoryTelemetry>()
-            .WithNamedParameter(typeof(ITelemetry), telemetryName)
-            .SingleInstance();
-        builder.RegisterType<OtelTelemetry>().Named<ITelemetry>(telemetryName).SingleInstance();
+        builder.RegisterType<HistoryTelemetry>().As<IHistoryTelemetry>().SingleInstance();
+        builder.RegisterType<CassandraTelemetry>().As<ICassandraTelemetry>().SingleInstance();
+        builder.RegisterType<OtelTelemetry>().As<ITelemetry>().SingleInstance();
     }
 }

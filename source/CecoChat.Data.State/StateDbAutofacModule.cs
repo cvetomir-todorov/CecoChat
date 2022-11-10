@@ -1,6 +1,7 @@
 using Autofac;
 using CecoChat.Autofac;
 using CecoChat.Cassandra;
+using CecoChat.Cassandra.Telemetry;
 using CecoChat.Data.State.Repos;
 using CecoChat.Data.State.Telemetry;
 using CecoChat.Otel;
@@ -26,11 +27,8 @@ public class StateDbAutofacModule : Module
             .SingleInstance();
 
         builder.RegisterType<ChatStateRepo>().As<IChatStateRepo>().SingleInstance();
-
-        string telemetryName = $"{nameof(StateTelemetry)}.{nameof(ITelemetry)}";
-        builder.RegisterType<StateTelemetry>().As<IStateTelemetry>()
-            .WithNamedParameter(typeof(ITelemetry), telemetryName)
-            .SingleInstance();
-        builder.RegisterType<OtelTelemetry>().Named<ITelemetry>(telemetryName).SingleInstance();
+        builder.RegisterType<StateTelemetry>().As<IStateTelemetry>().SingleInstance();
+        builder.RegisterType<CassandraTelemetry>().As<ICassandraTelemetry>().SingleInstance();
+        builder.RegisterType<OtelTelemetry>().As<ITelemetry>().SingleInstance();
     }
 }
