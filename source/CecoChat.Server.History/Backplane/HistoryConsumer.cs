@@ -42,6 +42,7 @@ public sealed class HistoryConsumer : IHistoryConsumer
     public void Dispose()
     {
         _consumer.Dispose();
+        _messageRepo.Dispose();
     }
 
     public void Prepare()

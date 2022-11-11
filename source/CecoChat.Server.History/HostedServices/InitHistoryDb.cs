@@ -4,7 +4,7 @@ using CecoChat.Data.History.Repos;
 
 namespace CecoChat.Server.History.HostedServices;
 
-public sealed class InitHistoryDb : IHostedService
+public sealed class InitHistoryDb : IHostedService, IDisposable
 {
     private readonly ILogger _logger;
     private readonly ICassandraDbInitializer _dbInitializer;
@@ -18,6 +18,11 @@ public sealed class InitHistoryDb : IHostedService
         _logger = logger;
         _dbInitializer = dbInitializer;
         _messageRepo = messageRepo;
+    }
+
+    public void Dispose()
+    {
+        _messageRepo.Dispose();
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
