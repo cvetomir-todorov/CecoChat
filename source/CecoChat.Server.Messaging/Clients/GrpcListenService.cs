@@ -1,6 +1,7 @@
 ﻿using CecoChat.Contracts.Messaging;
 using CecoChat.Server.Identity;
 using CecoChat.Server.Messaging.Clients.Streaming;
+using CecoChat.Server.Messaging.Telemetry;
 using Grpc.Core;
 using Microsoft.AspNetCore.Authorization;
 
@@ -11,15 +12,18 @@ public sealed class GrpcListenService : Listen.ListenBase
     private readonly ILogger _logger;
     private readonly IClientContainer _clientContainer;
     private readonly IFactory<IGrpcListenStreamer> _streamerFactory;
+    private readonly IMessagingTelemetry _messagingTelemetry;
 
     public GrpcListenService(
         ILogger<GrpcListenService> logger,
         IClientContainer clientContainer,
-        IFactory<IGrpcListenStreamer> streamerFactory)
+        IFactory<IGrpcListenStreamer> streamerFactory,
+        IMessagingTelemetry messagingTelemetry)
     {
         _logger = logger;
         _clientContainer = clientContainer;
         _streamerFactory = streamerFactory;
+        _messagingTelemetry = messagingTelemetry;
     }
 
     [Authorize(Roles = "user")]
@@ -48,6 +52,7 @@ public sealed class GrpcListenService : Listen.ListenBase
             isClientAdded = _clientContainer.AddClient(userClaims.UserID, streamer);
             if (isClientAdded)
             {
+                _messagingTelemetry.AddOnlineClient();
                 await streamer.ProcessMessages(ct);
             }
             else
@@ -72,6 +77,7 @@ public sealed class GrpcListenService : Listen.ListenBase
             if (isClientAdded)
             {
                 _clientContainer.RemoveClient(userClaims.UserID, streamer);
+                _messagingTelemetry.RemoveOnlineClient();
                 _logger.LogInformation("{@User} from {Address} disconnected", userClaims, address);
             }
             streamer.Dispose();

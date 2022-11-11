@@ -5,6 +5,7 @@ using CecoChat.Contracts.Messaging;
 using CecoChat.Server.Identity;
 using CecoChat.Server.Messaging.Backplane;
 using CecoChat.Server.Messaging.Clients.Streaming;
+using CecoChat.Server.Messaging.Telemetry;
 using Grpc.Core;
 using Microsoft.AspNetCore.Authorization;
 
@@ -17,36 +18,40 @@ public sealed class GrpcSendService : Send.SendBase
     private readonly ISendersProducer _sendersProducer;
     private readonly IClientContainer _clientContainer;
     private readonly IContractDataMapper _mapper;
+    private readonly IMessagingTelemetry _messagingTelemetry;
 
     public GrpcSendService(
         ILogger<GrpcSendService> logger,
         IIDGenClient idGenClient,
         ISendersProducer sendersProducer,
         IClientContainer clientContainer,
-        IContractDataMapper mapper)
+        IContractDataMapper mapper,
+        IMessagingTelemetry messagingTelemetry)
     {
         _logger = logger;
         _idGenClient = idGenClient;
         _sendersProducer = sendersProducer;
         _clientContainer = clientContainer;
         _mapper = mapper;
+        _messagingTelemetry = messagingTelemetry;
     }
 
     [Authorize(Roles = "user")]
     public override async Task<SendMessageResponse> SendMessage(SendMessageRequest request, ServerCallContext context)
     {
         UserClaims userClaims = GetUserClaims(context);
-        long messageID = await GetMessageID(userClaims, context);
+        long messageId = await GetMessageId(userClaims, context);
 
-        _logger.LogTrace("User {@User} sent message with generated ID {MessageId}: {@SendMessageRequest}", userClaims, messageID, request);
+        _messagingTelemetry.NotifyMessageReceived();
+        _logger.LogTrace("User {@User} sent message with generated ID {MessageId}: {@SendMessageRequest}", userClaims, messageId, request);
 
-        BackplaneMessage backplaneMessage = _mapper.CreateBackplaneMessage(request, userClaims.ClientID, messageID);
+        BackplaneMessage backplaneMessage = _mapper.CreateBackplaneMessage(request, userClaims.ClientID, messageId);
         _sendersProducer.ProduceMessage(backplaneMessage);
 
-        (int successCount, int allCount) = EnqueueMessagesForSenders(request, messageID, userClaims.ClientID);
-        LogResults(request, messageID, successCount, allCount);
+        (int successCount, int allCount) = EnqueueMessagesForSenders(request, messageId, userClaims.ClientID);
+        LogResults(request, messageId, successCount, allCount);
 
-        SendMessageResponse response = new() { MessageId = messageID };
+        SendMessageResponse response = new() { MessageId = messageId };
         return response;
     }
 
@@ -62,7 +67,7 @@ public sealed class GrpcSendService : Send.SendBase
         return userClaims!;
     }
 
-    private async Task<long> GetMessageID(UserClaims userClaims, ServerCallContext context)
+    private async Task<long> GetMessageId(UserClaims userClaims, ServerCallContext context)
     {
         GetIDResult result = await _idGenClient.GetID(context.CancellationToken);
         if (!result.Success)
@@ -75,18 +80,18 @@ public sealed class GrpcSendService : Send.SendBase
         return result.ID;
     }
 
-    private (int successCount, int allCount) EnqueueMessagesForSenders(SendMessageRequest request, long messageID, Guid senderClientID)
+    private (int successCount, int allCount) EnqueueMessagesForSenders(SendMessageRequest request, long messageId, Guid senderClientId)
     {
         // do not call clients.Count since it is expensive and uses locks
         int successCount = 0;
         int allCount = 0;
 
         IEnumerable<IStreamer<ListenNotification>> senderClients = _clientContainer.EnumerateClients(request.SenderId);
-        ListenNotification notification = _mapper.CreateListenNotification(request, messageID);
+        ListenNotification notification = _mapper.CreateListenNotification(request, messageId);
 
         foreach (IStreamer<ListenNotification> senderClient in senderClients)
         {
-            if (senderClient.ClientID != senderClientID)
+            if (senderClient.ClientID != senderClientId)
             {
                 if (senderClient.EnqueueMessage(notification, parentActivity: Activity.Current))
                 {
@@ -100,17 +105,17 @@ public sealed class GrpcSendService : Send.SendBase
         return (successCount, allCount);
     }
 
-    private void LogResults(SendMessageRequest request, long messageID, int successCount, int allCount)
+    private void LogResults(SendMessageRequest request, long messageId, int successCount, int allCount)
     {
         if (successCount < allCount)
         {
             _logger.LogWarning("Connected senders with ID {SenderId} ({SuccessCount} out of {AllCount}) were queued message {MessageId}",
-                request.SenderId, successCount, allCount, messageID);
+                request.SenderId, successCount, allCount, messageId);
         }
         else if (allCount > 0)
         {
             _logger.LogTrace("Connected senders with ID {SenderId} (all {Count}) were queued message {MessageId}",
-                request.SenderId, successCount, messageID);
+                request.SenderId, successCount, messageId);
         }
     }
 }

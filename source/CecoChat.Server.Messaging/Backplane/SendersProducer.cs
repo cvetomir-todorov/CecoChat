@@ -5,6 +5,7 @@ using CecoChat.Contracts.Messaging;
 using CecoChat.Kafka;
 using CecoChat.Server.Backplane;
 using CecoChat.Server.Messaging.Clients.Streaming;
+using CecoChat.Server.Messaging.Telemetry;
 using Confluent.Kafka;
 using Microsoft.Extensions.Options;
 
@@ -25,6 +26,7 @@ public sealed class SendersProducer : ISendersProducer
     private readonly ITopicPartitionFlyweight _partitionFlyweight;
     private readonly IKafkaProducer<Null, BackplaneMessage> _producer;
     private readonly IClientContainer _clientContainer;
+    private readonly IMessagingTelemetry _messagingTelemetry;
 
     public SendersProducer(
         ILogger<SendersProducer> logger,
@@ -33,7 +35,8 @@ public sealed class SendersProducer : ISendersProducer
         IPartitionUtility partitionUtility,
         ITopicPartitionFlyweight partitionFlyweight,
         IFactory<IKafkaProducer<Null, BackplaneMessage>> producerFactory,
-        IClientContainer clientContainer)
+        IClientContainer clientContainer,
+        IMessagingTelemetry messagingTelemetry)
     {
         _logger = logger;
         _backplaneOptions = backplaneOptions.Value;
@@ -41,6 +44,7 @@ public sealed class SendersProducer : ISendersProducer
         _partitionFlyweight = partitionFlyweight;
         _producer = producerFactory.Create();
         _clientContainer = clientContainer;
+        _messagingTelemetry = messagingTelemetry;
 
         _producer.Initialize(_backplaneOptions.Kafka, _backplaneOptions.SendProducer, new BackplaneMessageSerializer());
         applicationLifetime.ApplicationStopping.Register(_producer.FlushPendingMessages);
@@ -75,13 +79,18 @@ public sealed class SendersProducer : ISendersProducer
             Type = Contracts.Messaging.MessageType.Delivery,
             Status = status
         };
-        Guid clientID = backplaneMessage.ClientId.ToGuid();
+        Guid clientId = backplaneMessage.ClientId.ToGuid();
         IEnumerable<IStreamer<ListenNotification>> clients = _clientContainer.EnumerateClients(backplaneMessage.SenderId);
 
         foreach (IStreamer<ListenNotification> client in clients)
         {
             client.EnqueueMessage(deliveryNotification, parentActivity: activity);
-            _logger.LogTrace("Sent delivery notification to client {ClientId} for message {@Message}", clientID, deliveryNotification);
+            _logger.LogTrace("Sent delivery notification to client {ClientId} for message {@Message}", clientId, deliveryNotification);
+        }
+
+        if (isDelivered)
+        {
+            _messagingTelemetry.NotifyMessageProcessed();
         }
     }
 }

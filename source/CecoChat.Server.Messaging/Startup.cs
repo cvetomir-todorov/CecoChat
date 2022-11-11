@@ -14,6 +14,7 @@ using CecoChat.Server.Messaging.Backplane;
 using CecoChat.Server.Messaging.Clients;
 using CecoChat.Server.Messaging.Clients.Streaming;
 using CecoChat.Server.Messaging.HostedServices;
+using CecoChat.Server.Messaging.Telemetry;
 using Confluent.Kafka;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
@@ -76,6 +77,7 @@ public class Startup
         {
             metrics.SetResourceBuilder(serviceResourceBuilder);
             metrics.AddAspNetCoreInstrumentation();
+            metrics.AddMessagingInstrumentation();
             metrics.ConfigurePrometheusAspNetExporter(_prometheusOptions);
         });
 
@@ -128,6 +130,7 @@ public class Startup
         builder.RegisterOptions<BackplaneOptions>(Configuration.GetSection("Backplane"));
 
         // shared
+        builder.RegisterType<MessagingTelemetry>().As<IMessagingTelemetry>().SingleInstance();
         builder.RegisterType<MonotonicClock>().As<IClock>().SingleInstance();
         builder.RegisterType<ContractDataMapper>().As<IContractDataMapper>().SingleInstance();
     }
