@@ -6,10 +6,10 @@ namespace CecoChat.Server.Messaging.Telemetry;
 public static class MessagingInstrumentation
 {
     private static readonly string ActivitySourceName = "OpenTelemetry.Instrumentation.CecoChat.Messaging";
-    private static readonly AssemblyName _assemblyName = typeof(MessagingInstrumentation).Assembly.GetName();
-    private static readonly Version _activitySourceVersion = _assemblyName.Version!;
+    private static readonly AssemblyName AssemblyName = typeof(MessagingInstrumentation).Assembly.GetName();
+    private static readonly Version ActivitySourceVersion = AssemblyName.Version!;
 
-    internal static readonly ActivitySource ActivitySource = new(ActivitySourceName, _activitySourceVersion.ToString());
+    internal static readonly ActivitySource ActivitySource = new(ActivitySourceName, ActivitySourceVersion.ToString());
 
     public static class Metrics
     {
