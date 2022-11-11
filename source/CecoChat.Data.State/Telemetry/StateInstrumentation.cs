@@ -6,10 +6,10 @@ namespace CecoChat.Data.State.Telemetry;
 internal static class StateInstrumentation
 {
     private static readonly string ActivitySourceName = "OpenTelemetry.Instrumentation.CecoChat.StateDB";
-    private static readonly AssemblyName _assemblyName = typeof(StateInstrumentation).Assembly.GetName();
-    private static readonly Version _activitySourceVersion = _assemblyName.Version!;
+    private static readonly AssemblyName AssemblyName = typeof(StateInstrumentation).Assembly.GetName();
+    private static readonly Version ActivitySourceVersion = AssemblyName.Version!;
 
-    internal static readonly ActivitySource ActivitySource = new(ActivitySourceName, _activitySourceVersion.ToString());
+    internal static readonly ActivitySource ActivitySource = new(ActivitySourceName, ActivitySourceVersion.ToString());
 
     public static class Operations
     {

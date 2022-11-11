@@ -6,10 +6,10 @@ namespace CecoChat.Kafka.Telemetry;
 internal static class KafkaInstrumentation
 {
     private static readonly string ActivitySourceName = "OpenTelemetry.Instrumentation.Kafka";
-    private static readonly AssemblyName _assemblyName = typeof(KafkaInstrumentation).Assembly.GetName();
-    private static readonly Version _activitySourceVersion = _assemblyName.Version!;
+    private static readonly AssemblyName AssemblyName = typeof(KafkaInstrumentation).Assembly.GetName();
+    private static readonly Version ActivitySourceVersion = AssemblyName.Version!;
 
-    internal static readonly ActivitySource ActivitySource = new(ActivitySourceName, _activitySourceVersion.ToString());
+    internal static readonly ActivitySource ActivitySource = new(ActivitySourceName, ActivitySourceVersion.ToString());
 
     public static class Operations
     {
