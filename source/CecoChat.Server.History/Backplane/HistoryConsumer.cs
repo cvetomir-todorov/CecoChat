@@ -14,7 +14,7 @@ public interface IHistoryConsumer : IDisposable
 
     void Start(CancellationToken ct);
 
-    string ConsumerID { get; }
+    string ConsumerId { get; }
 }
 
 public sealed class HistoryConsumer : IHistoryConsumer
@@ -66,7 +66,7 @@ public sealed class HistoryConsumer : IHistoryConsumer
         _logger.LogInformation("Stopped creating history from messages");
     }
 
-    public string ConsumerID => _backplaneOptions.HistoryConsumer.ConsumerGroupID;
+    public string ConsumerId => _backplaneOptions.HistoryConsumer.ConsumerGroupID;
 
     private void Process(BackplaneMessage backplaneMessage)
     {
