@@ -51,6 +51,7 @@ public sealed class StateConsumer : IStateConsumer
     {
         _receiversConsumer.Dispose();
         _sendersConsumer.Dispose();
+        _repo.Dispose();
     }
 
     public void Prepare()
