@@ -39,7 +39,7 @@ public sealed class StartBackplaneComponents : IHostedService, IDisposable
             }
             catch (Exception exception)
             {
-                _logger.LogCritical(exception, "Failure in consumer {ConsumerId}", _stateConsumer.ReceiverConsumerID);
+                _logger.LogCritical(exception, "Failure in consumer {ConsumerId}", _stateConsumer.ReceiverConsumerId);
             }
         }, _stoppedCts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Current);
 
@@ -51,7 +51,7 @@ public sealed class StartBackplaneComponents : IHostedService, IDisposable
             }
             catch (Exception exception)
             {
-                _logger.LogCritical(exception, "Failure in consumer {ConsumerId}", _stateConsumer.SenderConsumerID);
+                _logger.LogCritical(exception, "Failure in consumer {ConsumerId}", _stateConsumer.SenderConsumerId);
             }
         }, _stoppedCts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Current);
 

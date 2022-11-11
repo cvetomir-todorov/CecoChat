@@ -18,9 +18,9 @@ public interface IStateConsumer : IDisposable
 
     void StartConsumingSenderMessages(CancellationToken ct);
 
-    string ReceiverConsumerID { get; }
+    string ReceiverConsumerId { get; }
 
-    string SenderConsumerID { get; }
+    string SenderConsumerId { get; }
 }
 
 public sealed class StateConsumer : IStateConsumer
@@ -93,9 +93,9 @@ public sealed class StateConsumer : IStateConsumer
         _logger.LogInformation("Stopped creating sender state from messages");
     }
 
-    public string ReceiverConsumerID => _backplaneOptions.ReceiversConsumer.ConsumerGroupID;
+    public string ReceiverConsumerId => _backplaneOptions.ReceiversConsumer.ConsumerGroupID;
 
-    public string SenderConsumerID => _backplaneOptions.SendersConsumer.ConsumerGroupID;
+    public string SenderConsumerId => _backplaneOptions.SendersConsumer.ConsumerGroupID;
 
     private void ProcessMessageForReceivers(BackplaneMessage backplaneMessage)
     {
@@ -141,9 +141,9 @@ public sealed class StateConsumer : IStateConsumer
 
     private void UpdateReceiverState(BackplaneMessage backplaneMessage)
     {
-        long targetUserID = backplaneMessage.ReceiverId;
-        string chatID = DataUtility.CreateChatID(backplaneMessage.SenderId, backplaneMessage.ReceiverId);
-        ChatState receiverChat = GetChatFromDBIntoCache(targetUserID, chatID);
+        long targetUserId = backplaneMessage.ReceiverId;
+        string chatId = DataUtility.CreateChatID(backplaneMessage.SenderId, backplaneMessage.ReceiverId);
+        ChatState receiverChat = GetChatFromDdIntoCache(targetUserId, chatId);
 
         bool needsUpdate = false;
         if (backplaneMessage.MessageId > receiverChat.NewestMessage)
@@ -164,16 +164,16 @@ public sealed class StateConsumer : IStateConsumer
 
         if (needsUpdate)
         {
-            _repo.UpdateChat(targetUserID, receiverChat);
-            _logger.LogTrace("Updated receiver state for user {TargetUserId} chat {ChatId} with message {MessageId}", targetUserID, chatID, backplaneMessage.MessageId);
+            _repo.UpdateChat(targetUserId, receiverChat);
+            _logger.LogTrace("Updated receiver state for user {TargetUserId} chat {ChatId} with message {MessageId}", targetUserId, chatId, backplaneMessage.MessageId);
         }
     }
 
     private void UpdateSenderState(BackplaneMessage backplaneMessage)
     {
-        long targetUserID = backplaneMessage.SenderId;
-        string chatID = DataUtility.CreateChatID(backplaneMessage.SenderId, backplaneMessage.ReceiverId);
-        ChatState senderChat = GetChatFromDBIntoCache(targetUserID, chatID);
+        long targetUserId = backplaneMessage.SenderId;
+        string chatId = DataUtility.CreateChatID(backplaneMessage.SenderId, backplaneMessage.ReceiverId);
+        ChatState senderChat = GetChatFromDdIntoCache(targetUserId, chatId);
 
         bool needsUpdate = false;
         if (backplaneMessage.MessageId > senderChat.NewestMessage)
@@ -184,18 +184,18 @@ public sealed class StateConsumer : IStateConsumer
 
         if (needsUpdate)
         {
-            _repo.UpdateChat(targetUserID, senderChat);
-            _logger.LogTrace("Updated sender state for user {TargetUserId} chat {ChatId} with message {MessageId}", targetUserID, chatID, backplaneMessage.MessageId);
+            _repo.UpdateChat(targetUserId, senderChat);
+            _logger.LogTrace("Updated sender state for user {TargetUserId} chat {ChatId} with message {MessageId}", targetUserId, chatId, backplaneMessage.MessageId);
         }
     }
 
-    private ChatState GetChatFromDBIntoCache(long userID, string chatID)
+    private ChatState GetChatFromDdIntoCache(long userId, string chatId)
     {
-        if (!_cache.TryGetUserChat(userID, chatID, out ChatState? chat))
+        if (!_cache.TryGetUserChat(userId, chatId, out ChatState? chat))
         {
-            chat = _repo.GetChat(userID, chatID);
-            chat ??= new ChatState { ChatId = chatID };
-            _cache.AddUserChat(userID, chat);
+            chat = _repo.GetChat(userId, chatId);
+            chat ??= new ChatState { ChatId = chatId };
+            _cache.AddUserChat(userId, chat);
         }
 
         return chat;
