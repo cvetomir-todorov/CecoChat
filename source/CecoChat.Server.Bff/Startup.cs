@@ -68,7 +68,10 @@ public class Startup
         services.AddOpenTelemetryTracing(tracing =>
         {
             tracing.SetResourceBuilder(serviceResourceBuilder);
-            tracing.AddAspNetCoreInstrumentation();
+            tracing.AddAspNetCoreInstrumentation(aspnet =>
+            {
+                aspnet.Filter = httpContext => httpContext.Request.Path != _prometheusOptions.ScrapeEndpointPath;
+            });
             tracing.AddGrpcClientInstrumentation(grpc => grpc.SuppressDownstreamInstrumentation = false);
             tracing.ConfigureSampling(_otelSamplingOptions);
             tracing.ConfigureJaegerExporter(_jaegerOptions);
