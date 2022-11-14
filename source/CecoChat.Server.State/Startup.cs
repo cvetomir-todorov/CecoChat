@@ -58,7 +58,11 @@ public class Startup
         services.AddOpenTelemetryTracing(tracing =>
         {
             tracing.SetResourceBuilder(serviceResourceBuilder);
-            tracing.AddAspNetCoreInstrumentation(aspnet => aspnet.EnableGrpcAspNetCoreSupport = true);
+            tracing.AddAspNetCoreInstrumentation(aspnet =>
+            {
+                aspnet.EnableGrpcAspNetCoreSupport = true;
+                aspnet.Filter = httpContext => httpContext.Request.Path != _prometheusOptions.ScrapeEndpointPath;
+            });
             tracing.AddKafkaInstrumentation();
             tracing.AddStateInstrumentation();
             tracing.ConfigureSampling(_otelSamplingOptions);
