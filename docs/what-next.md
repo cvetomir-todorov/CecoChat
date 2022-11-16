@@ -41,9 +41,9 @@
   - Rate limiting
   - Use secure transports and protocols on communication level
 * Observability
-  - Metrics for system resources, communication/db, app-specific
-  - Monitoring
+  - Metrics for system resources
   - Health checks
+  - Alerting
 * Deployment
   - Infrastructure as code
   - Load balancing

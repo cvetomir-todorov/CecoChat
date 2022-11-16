@@ -1,4 +1,8 @@
-[System design](docs/design-overall.md) of a chat for 10-100 millions active users. [Partial implementation](source/) based on Kafka, Cassandra, HTTP, gRPC, Redis, .NET 6, ASP.NET. [Configurable](docs/design-configuration.md) and [partially-observable](docs/design-observability.md) environment with containerized components which can be [ran locally](docs/infrastructure-main.md#Run-locally) and is based on Docker, OpenTelemetry, Jaeger, ElasticSearch, Fluentd, Kibana. I appreciate all comments so feel free to use the `Discussions` tab.
+[System design](docs/design-overall.md) of a chat for 10-100 millions active users with [limited-for-now capabilities](docs/intro-main.md).
+
+[Partial implementation](source/) based on Kafka, Cassandra, HTTP, gRPC, Redis, .NET 6, ASP.NET. [Configurable](docs/design-configuration.md) and [observable](docs/design-observability.md) environment with containerized components which can be [ran locally](docs/infrastructure-main.md#Run-locally) and is based on Docker, OpenTelemetry, Jaeger, Prometheus, Grafana, ElasticSearch, Fluentd, Kibana.
+
+I appreciate all comments so feel free to use the `Discussions` tab.
 
 # Code
 
@@ -28,6 +32,8 @@
 ![Docker](docs/tech-images/docker.png)
 ![OpenTelemetry](docs/tech-images/open-telemetry.png)
 ![Jaeger](docs/tech-images/jaeger.png)
+![Prometheus](docs/tech-images/prometheus.png)
+![Grafana](docs/tech-images/grafana.png)
 ![ElasticSearch](docs/tech-images/elasticsearch.png)
 ![Fluentd](docs/tech-images/fluentd.png)
 ![Kibana](docs/tech-images/kibana.png)
