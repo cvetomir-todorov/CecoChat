@@ -125,7 +125,7 @@ internal sealed class ChatMessageRepo : IChatMessageRepo
             chatId, message.MessageId, message.SenderId, message.ReceiverId, dbMessageType, message.Data);
         query.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
         query.SetIdempotence(false);
-        
+
         _historyTelemetry.AddDataMessage(_dbContext.Session, query, message.MessageId);
         _logger.LogTrace("Persisted the message {@Message}", message);
     }
