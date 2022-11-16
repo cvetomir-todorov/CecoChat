@@ -127,7 +127,7 @@
       },
       "gridPos": {
         "h": 6,
-        "w": 8,
+        "w": 14,
         "x": 0,
         "y": 0
       },
@@ -177,7 +177,7 @@
           "refId": "processed"
         }
       ],
-      "title": "messages total",
+      "title": "messages all",
       "type": "timeseries"
     },
     {
@@ -205,8 +205,8 @@
       },
       "gridPos": {
         "h": 6,
-        "w": 16,
-        "x": 8,
+        "w": 5,
+        "x": 14,
         "y": 0
       },
       "id": 2,
@@ -239,10 +239,62 @@
           "format": "time_series",
           "instant": false,
           "interval": "",
-          "legendFormat": "received (server {{messaging_server_id}})",
+          "legendFormat": "server {{messaging_server_id}}",
           "range": true,
           "refId": "received"
+        }
+      ],
+      "title": "messages received per instance",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "vRPHnEDVk"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
         },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 5,
+        "x": 19,
+        "y": 0
+      },
+      "id": 14,
+      "interval": "1s",
+      "maxDataPoints": 1500,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "9.2.4",
+      "targets": [
         {
           "datasource": {
             "type": "prometheus",
@@ -251,12 +303,12 @@
           "editorMode": "builder",
           "expr": "messaging_messages_processed",
           "hide": false,
-          "legendFormat": "processed (server {{messaging_server_id}})",
+          "legendFormat": "server {{messaging_server_id}}",
           "range": true,
           "refId": "processed"
         }
       ],
-      "title": "messages per instance",
+      "title": "messages processed per instance",
       "type": "stat"
     },
     {
@@ -314,7 +366,7 @@
       },
       "gridPos": {
         "h": 6,
-        "w": 8,
+        "w": 14,
         "x": 0,
         "y": 6
       },
@@ -379,8 +431,8 @@
       },
       "gridPos": {
         "h": 6,
-        "w": 16,
-        "x": 8,
+        "w": 10,
+        "x": 14,
         "y": 6
       },
       "id": 5,
@@ -456,13 +508,13 @@
       },
       "gridPos": {
         "h": 6,
-        "w": 13,
+        "w": 12,
         "x": 0,
         "y": 12
       },
       "id": 7,
       "options": {
-        "bucketOffset": 0,
+        "combine": false,
         "legend": {
           "calcs": [],
           "displayMode": "list",
@@ -521,8 +573,8 @@
       },
       "gridPos": {
         "h": 6,
-        "w": 11,
-        "x": 13,
+        "w": 12,
+        "x": 12,
         "y": 12
       },
       "id": 11,
@@ -587,7 +639,7 @@
       },
       "gridPos": {
         "h": 6,
-        "w": 13,
+        "w": 12,
         "x": 0,
         "y": 18
       },
@@ -652,8 +704,8 @@
       },
       "gridPos": {
         "h": 6,
-        "w": 11,
-        "x": 13,
+        "w": 12,
+        "x": 12,
         "y": 18
       },
       "id": 12,
@@ -718,7 +770,7 @@
       },
       "gridPos": {
         "h": 6,
-        "w": 13,
+        "w": 12,
         "x": 0,
         "y": 24
       },
@@ -783,8 +835,8 @@
       },
       "gridPos": {
         "h": 6,
-        "w": 11,
-        "x": 13,
+        "w": 12,
+        "x": 12,
         "y": 24
       },
       "id": 13,
@@ -842,6 +894,6 @@
   "timezone": "",
   "title": "main",
   "uid": "v1slmqvVk",
-  "version": 46,
+  "version": 51,
   "weekStart": ""
 }
