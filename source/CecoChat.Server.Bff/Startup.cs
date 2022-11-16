@@ -72,7 +72,7 @@ public class Startup
             {
                 aspnet.Filter = httpContext => httpContext.Request.Path != _prometheusOptions.ScrapeEndpointPath;
             });
-            tracing.AddGrpcClientInstrumentation(grpc => grpc.SuppressDownstreamInstrumentation = false);
+            tracing.AddGrpcClientInstrumentation(grpc => grpc.SuppressDownstreamInstrumentation = true);
             tracing.ConfigureSampling(_otelSamplingOptions);
             tracing.ConfigureJaegerExporter(_jaegerOptions);
         });
