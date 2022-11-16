@@ -21,13 +21,16 @@
   - Eventual consistency guarantees - once the sent message is processed it will eventually be persisted and delivered
 * Scalability
   - Designed for 10-100 mln of active users, which unfortunately is expensive to validate due to the infrastructure required
-  - Numbers from the [back-of-the-envelope calculation](design-back-of-the-envelope.md) and the linear scalability of the main technologies show that the solution is realistic
+  - Supported by numbers from the [back-of-the-envelope calculation](design-back-of-the-envelope.md)
+  - Linear scalability of the main technologies (Kafka, Cassandra) 
 * Security
   - TLS used on communication level
   - Access tokens for authn and authz
 * Observability
   - Distributed tracing
   - Log aggregation
+  - Metrics
+  - Monitoring
 * Deployment
   - Containerization
 * Maintainability
