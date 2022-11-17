@@ -46,7 +46,7 @@ internal sealed class StateClient : IStateClient
         DateTime deadline = DateTime.UtcNow.Add(_options.CallTimeout);
         GetChatsResponse response = await _client.GetChatsAsync(request, headers: grpcMetadata, deadline, cancellationToken: ct);
 
-        _logger.LogTrace("Returned {ChatCount} chats for user {UserId} which are newer than {NewerThan}", response.Chats.Count, userID, newerThan);
+        _logger.LogTrace("Received {ChatCount} chats for user {UserId} which are newer than {NewerThan}", response.Chats.Count, userID, newerThan);
         return response.Chats;
     }
 }

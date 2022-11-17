@@ -9,7 +9,7 @@ public interface IChatMessageRepo : IDisposable
 {
     void Prepare();
 
-    Task<IReadOnlyCollection<HistoryMessage>> GetHistory(long userId, long otherUserId, DateTime olderThan, int countLimit);
+    Task<IReadOnlyCollection<HistoryMessage>> GetHistory(long userId, string chatId, DateTime olderThan, int countLimit);
 
     void AddMessage(DataMessage message);
 
@@ -78,9 +78,8 @@ internal sealed class ChatMessageRepo : IChatMessageRepo
 #pragma warning restore IDE0059
     }
 
-    public async Task<IReadOnlyCollection<HistoryMessage>> GetHistory(long userId, long otherUserId, DateTime olderThan, int countLimit)
+    public async Task<IReadOnlyCollection<HistoryMessage>> GetHistory(long userId, string chatId, DateTime olderThan, int countLimit)
     {
-        string chatId = DataUtility.CreateChatID(userId, otherUserId);
         long olderThanSnowflake = olderThan.ToSnowflakeCeiling();
         BoundStatement query = _historyQuery.Value.Bind(chatId, olderThanSnowflake, countLimit);
         query.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
@@ -90,7 +89,7 @@ internal sealed class ChatMessageRepo : IChatMessageRepo
         List<HistoryMessage> messages = new(capacity: countLimit);
         ReadRows(rows, messages);
 
-        _logger.LogTrace("Returned {MessageCount} messages between for chat {Chat} which are older than {OlderThan}", messages.Count, chatId, olderThan);
+        _logger.LogTrace("Fetched {MessageCount} messages for chat {Chat} which are older than {OlderThan}", messages.Count, chatId, olderThan);
         return messages;
     }
 
@@ -127,7 +126,7 @@ internal sealed class ChatMessageRepo : IChatMessageRepo
         query.SetIdempotence(false);
 
         _historyTelemetry.AddDataMessage(_dbContext.Session, query, message.MessageId);
-        _logger.LogTrace("Persisted the message {@Message}", message);
+        _logger.LogTrace("Persisted the message {MessageId} type {MessageType} for chat {ChatId}", message.MessageId, message.DataType, chatId);
     }
 
     public void SetReaction(ReactionMessage message)
@@ -138,7 +137,7 @@ internal sealed class ChatMessageRepo : IChatMessageRepo
         query.SetIdempotence(false);
 
         _historyTelemetry.SetReaction(_dbContext.Session, query, message.ReactorId);
-        _logger.LogTrace("User {ReactorId} reacted with {Reaction} to message {MessageId}", message.ReactorId, message.Reaction, message.MessageId);
+        _logger.LogTrace("Persisted user {ReactorId} reaction {Reaction} to message {MessageId}", message.ReactorId, message.Reaction, message.MessageId);
     }
 
     public void UnsetReaction(ReactionMessage message)
@@ -149,6 +148,6 @@ internal sealed class ChatMessageRepo : IChatMessageRepo
         query.SetIdempotence(false);
 
         _historyTelemetry.UnsetReaction(_dbContext.Session, query, message.ReactorId);
-        _logger.LogTrace("User {ReactorId} removed reaction to message {MessageId}", message.ReactorId, message.MessageId);
+        _logger.LogTrace("Persisted user {ReactorId} un-reaction to message {MessageId}", message.ReactorId, message.MessageId);
     }
 }

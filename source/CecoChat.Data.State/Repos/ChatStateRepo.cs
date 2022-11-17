@@ -88,7 +88,7 @@ internal sealed class ChatStateRepo : IChatStateRepo
             chats.Add(chat);
         }
 
-        _logger.LogTrace("Returned {ChatCount} chats for user {UserId} which are newer than {NewerThan}", chats.Count, userId, newerThan);
+        _logger.LogTrace("Fetched {ChatCount} chats for user {UserId} which are newer than {NewerThan}", chats.Count, userId, newerThan);
         return chats;
     }
 
@@ -110,7 +110,7 @@ internal sealed class ChatStateRepo : IChatStateRepo
             chat.OtherUserDelivered = row.GetValue<long>("other_user_delivered");
             chat.OtherUserSeen = row.GetValue<long>("other_user_seen");
 
-            _logger.LogTrace("Returned chat {ChatId} for user {UserId}", chatId, userId);
+            _logger.LogTrace("Fetched chat {ChatId} for user {UserId}", chatId, userId);
         }
         else
         {
@@ -127,6 +127,6 @@ internal sealed class ChatStateRepo : IChatStateRepo
         query.SetIdempotence(false);
 
         _stateTelemetry.UpdateChat(_dbContext.Session, query, userId, chat.ChatId);
-        _logger.LogTrace("Updated chat {ChatId} for user {UserId}", chat.ChatId, userId);
+        _logger.LogTrace("Persisted changes about chat {ChatId} for user {UserId}", chat.ChatId, userId);
     }
 }
