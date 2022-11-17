@@ -11,43 +11,36 @@ public class GrpcStateService : Contracts.State.State.StateBase
 {
     private readonly ILogger _logger;
     private readonly IChatStateRepo _repo;
-    private readonly IStateCache _cache;
 
     public GrpcStateService(
         ILogger<GrpcStateService> logger,
-        IChatStateRepo repo,
-        IStateCache cache)
+        IChatStateRepo repo)
     {
         _logger = logger;
         _repo = repo;
-        _cache = cache;
     }
 
     [Authorize(Roles = "user")]
     public override async Task<GetChatsResponse> GetChats(GetChatsRequest request, ServerCallContext context)
     {
-        long userID = GetUserID(context);
+        long userId = GetUserId(context);
         DateTime newerThan = request.NewerThan.ToDateTime();
-        IReadOnlyCollection<ChatState> chats = await _repo.GetChats(userID, newerThan);
-        foreach (ChatState chat in chats)
-        {
-            _cache.AddUserChat(userID, chat);
-        }
+        IReadOnlyCollection<ChatState> chats = await _repo.GetChats(userId, newerThan);
 
         GetChatsResponse response = new();
         response.Chats.Add(chats);
 
-        _logger.LogTrace("Responding with {ChatCount} chats for user {UserId}", chats.Count, userID);
+        _logger.LogTrace("Responding with {ChatCount} chats for user {UserId}", chats.Count, userId);
         return response;
     }
 
-    private static long GetUserID(ServerCallContext context)
+    private static long GetUserId(ServerCallContext context)
     {
-        if (!context.GetHttpContext().User.TryGetUserID(out long userID))
+        if (!context.GetHttpContext().User.TryGetUserID(out long userId))
         {
             throw new RpcException(new Status(StatusCode.Unauthenticated, "Client has no parseable access token."));
         }
-        Activity.Current?.SetTag("user.id", userID);
-        return userID;
+        Activity.Current?.SetTag("user.id", userId);
+        return userId;
     }
 }

@@ -4,7 +4,6 @@ using CecoChat.Data;
 using CecoChat.Data.State.Repos;
 using CecoChat.Kafka;
 using CecoChat.Server.Backplane;
-using CecoChat.Server.State.Clients;
 using Confluent.Kafka;
 using Microsoft.Extensions.Options;
 
@@ -30,21 +29,18 @@ public sealed class StateConsumer : IStateConsumer
     private readonly IKafkaConsumer<Null, BackplaneMessage> _receiversConsumer;
     private readonly IKafkaConsumer<Null, BackplaneMessage> _sendersConsumer;
     private readonly IChatStateRepo _repo;
-    private readonly IStateCache _cache;
 
     public StateConsumer(
         ILogger<StateConsumer> logger,
         IOptions<BackplaneOptions> backplaneOptions,
         IFactory<IKafkaConsumer<Null, BackplaneMessage>> consumerFactory,
-        IChatStateRepo repo,
-        IStateCache cache)
+        IChatStateRepo repo)
     {
         _logger = logger;
         _backplaneOptions = backplaneOptions.Value;
         _receiversConsumer = consumerFactory.Create();
         _sendersConsumer = consumerFactory.Create();
         _repo = repo;
-        _cache = cache;
     }
 
     public void Dispose()
@@ -60,7 +56,7 @@ public sealed class StateConsumer : IStateConsumer
         _sendersConsumer.Initialize(_backplaneOptions.Kafka, _backplaneOptions.SendersConsumer, new BackplaneMessageDeserializer());
 
         _receiversConsumer.Subscribe(_backplaneOptions.TopicMessagesByReceiver);
-        _sendersConsumer.Subscribe(_backplaneOptions.TopicMessagesBySender);
+        _sendersConsumer.Subscribe(_backplaneOptions.TopicMessagesByReceiver);
     }
 
     public void StartConsumingReceiverMessages(CancellationToken ct)
@@ -143,7 +139,7 @@ public sealed class StateConsumer : IStateConsumer
     {
         long targetUserId = backplaneMessage.ReceiverId;
         string chatId = DataUtility.CreateChatID(backplaneMessage.SenderId, backplaneMessage.ReceiverId);
-        ChatState receiverChat = GetChatFromDdIntoCache(targetUserId, chatId);
+        ChatState receiverChat = GetChatFromDb(targetUserId, chatId);
 
         bool needsUpdate = false;
         if (backplaneMessage.MessageId > receiverChat.NewestMessage)
@@ -173,7 +169,7 @@ public sealed class StateConsumer : IStateConsumer
     {
         long targetUserId = backplaneMessage.SenderId;
         string chatId = DataUtility.CreateChatID(backplaneMessage.SenderId, backplaneMessage.ReceiverId);
-        ChatState senderChat = GetChatFromDdIntoCache(targetUserId, chatId);
+        ChatState senderChat = GetChatFromDb(targetUserId, chatId);
 
         bool needsUpdate = false;
         if (backplaneMessage.MessageId > senderChat.NewestMessage)
@@ -189,14 +185,10 @@ public sealed class StateConsumer : IStateConsumer
         }
     }
 
-    private ChatState GetChatFromDdIntoCache(long userId, string chatId)
+    private ChatState GetChatFromDb(long userId, string chatId)
     {
-        if (!_cache.TryGetUserChat(userId, chatId, out ChatState? chat))
-        {
-            chat = _repo.GetChat(userId, chatId);
-            chat ??= new ChatState { ChatId = chatId };
-            _cache.AddUserChat(userId, chat);
-        }
+        ChatState? chat = _repo.GetChat(userId, chatId);
+        chat ??= new ChatState { ChatId = chatId };
 
         return chat;
     }

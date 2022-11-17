@@ -96,8 +96,6 @@ public class Startup
         // state
         IConfiguration stateDbConfig = Configuration.GetSection("StateDB");
         builder.RegisterModule(new StateDbAutofacModule(stateDbConfig));
-        builder.RegisterType<LruStateCache>().As<IStateCache>().SingleInstance();
-        builder.RegisterOptions<StateCacheOptions>(Configuration.GetSection("StateCache"));
 
         // backplane
         builder.RegisterType<StateConsumer>().As<IStateConsumer>().SingleInstance();
