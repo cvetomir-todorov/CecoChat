@@ -10,11 +10,5 @@ public sealed class BackplaneOptions
 
     public KafkaConsumerOptions ReceiversConsumer { get; set; } = new();
 
-    public KafkaConsumerOptions ReplicatingConsumer { get; set; } = new();
-
-    public KafkaProducerOptions ReplicatingProducer { get; set; } = new();
-
     public string TopicMessagesByReceiver { get; set; } = string.Empty;
-
-    public string TopicMessagesBySender { get; set; } = string.Empty;
 }
