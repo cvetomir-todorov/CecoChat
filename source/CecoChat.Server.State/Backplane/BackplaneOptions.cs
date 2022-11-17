@@ -11,6 +11,4 @@ public sealed class BackplaneOptions
     public KafkaConsumerOptions SendersConsumer { get; set; } = new();
 
     public string TopicMessagesByReceiver { get; set; } = string.Empty;
-
-    public string TopicMessagesBySender { get; set; } = string.Empty;
 }
