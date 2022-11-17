@@ -50,3 +50,5 @@ services:
           memory: 512M
     environment:
       GF_SECURITY_ADMIN_PASSWORD: pass
+    depends_on:
+      - prometheus
