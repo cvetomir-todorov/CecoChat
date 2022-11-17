@@ -54,7 +54,8 @@ public class HistoryController : ControllerBase
         IReadOnlyCollection<Contracts.History.HistoryMessage> serviceMessages = await _historyClient.GetHistory(userClaims!.UserID, request.OtherUserID, request.OlderThan, accessToken!, ct);
         HistoryMessage[] clientMessages = serviceMessages.Select(MapMessage).ToArray();
 
-        _logger.LogTrace("Return {MessageCount} messages for user {UserId} and client {ClientId}", clientMessages.Length, userClaims.UserID, userClaims.ClientID);
+        _logger.LogTrace("Responding with {MessageCount} messages for chat between user {UserId} with client {ClientId} and other user {OtherUserId}",
+            clientMessages.Length, userClaims.UserID, userClaims.ClientID, request.OtherUserID);
         return Ok(new GetHistoryResponse
         {
             Messages = clientMessages

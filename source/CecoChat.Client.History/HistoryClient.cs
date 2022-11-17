@@ -47,7 +47,7 @@ internal sealed class HistoryClient : IHistoryClient
         DateTime deadline = DateTime.UtcNow.Add(_options.CallTimeout);
         GetHistoryResponse response = await _client.GetHistoryAsync(request, headers: grpcMetadata, deadline, cancellationToken: ct);
 
-        _logger.LogTrace("Returned {MessageCount} messages for history between {UserId} and {OtherUserId} older than {OlderThan}", response.Messages.Count, userID, otherUserID, olderThan);
+        _logger.LogTrace("Received {MessageCount} messages for history between {UserId} and {OtherUserId} older than {OlderThan}", response.Messages.Count, userID, otherUserID, olderThan);
         return response.Messages;
     }
 }

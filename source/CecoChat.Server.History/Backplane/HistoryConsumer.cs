@@ -91,6 +91,8 @@ public sealed class HistoryConsumer : IHistoryConsumer
     {
         DataMessage dataMessage = _mapper.CreateDataMessage(backplaneMessage);
         _messageRepo.AddMessage(dataMessage);
+        _logger.LogTrace("Added message {MessageId} type {MessageType} between sender {SenderId} and receiver {ReceiverId}",
+            backplaneMessage.MessageId, backplaneMessage.Data.Type, backplaneMessage.SenderId, backplaneMessage.ReceiverId);
     }
 
     private void AddReaction(BackplaneMessage backplaneMessage)
@@ -99,10 +101,14 @@ public sealed class HistoryConsumer : IHistoryConsumer
         if (reactionMessage.Type == NewReactionType.Set)
         {
             _messageRepo.SetReaction(reactionMessage);
+            _logger.LogTrace("Added user {ReactorId} reaction {Reaction} to message {MessageId}",
+                reactionMessage.ReactorId, reactionMessage.Reaction, reactionMessage.MessageId);
         }
         else
         {
             _messageRepo.UnsetReaction(reactionMessage);
+            _logger.LogTrace("Removed user {ReactorId} reaction to message {MessageId}",
+                reactionMessage.ReactorId, reactionMessage.MessageId);
         }
     }
 }
