@@ -53,8 +53,8 @@ public class StateController : ControllerBase
         IReadOnlyCollection<Contracts.State.ChatState> serviceChats = await _client.GetChats(userClaims!.UserID, request.NewerThan, accessToken!, ct);
         ChatState[] clientChats = serviceChats.Select(MapChat).ToArray();
 
-        _logger.LogTrace("Responding with {ChatCount} chats for user {UserId} with client {ClientId} which are newer than {NewerThan}",
-            clientChats.Length, userClaims.UserID, userClaims.ClientID, request.NewerThan);
+        _logger.LogTrace("Responding with {ChatCount} chats for user {UserId} which are newer than {NewerThan}",
+            clientChats.Length, userClaims.UserID, request.NewerThan);
         return Ok(new GetChatsResponse
         {
             Chats = clientChats

@@ -30,7 +30,7 @@ public class GrpcStateService : Contracts.State.State.StateBase
         GetChatsResponse response = new();
         response.Chats.Add(chats);
 
-        _logger.LogTrace("Responding with {ChatCount} chats for user {UserId}", chats.Count, userId);
+        _logger.LogTrace("Responding with {ChatCount} chats for user {UserId} which are newer than {NewerThan}", chats.Count, userId, newerThan);
         return response;
     }
 
