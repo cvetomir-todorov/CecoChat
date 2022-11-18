@@ -66,7 +66,7 @@ public sealed class HistoryConsumer : IHistoryConsumer
         _logger.LogInformation("Stopped creating history from messages");
     }
 
-    public string ConsumerId => _backplaneOptions.HistoryConsumer.ConsumerGroupID;
+    public string ConsumerId => _backplaneOptions.HistoryConsumer.ConsumerGroupId;
 
     private void Process(BackplaneMessage backplaneMessage)
     {

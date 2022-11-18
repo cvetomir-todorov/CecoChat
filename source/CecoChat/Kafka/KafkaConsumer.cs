@@ -56,7 +56,7 @@ public sealed class KafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey, TValue>
         ConsumerConfig configuration = new()
         {
             BootstrapServers = string.Join(separator: ',', options.BootstrapServers),
-            GroupId = consumerOptions.ConsumerGroupID,
+            GroupId = consumerOptions.ConsumerGroupId,
             AutoOffsetReset = consumerOptions.AutoOffsetReset,
             EnablePartitionEof = consumerOptions.EnablePartitionEof,
             AllowAutoCreateTopics = consumerOptions.AllowAutoCreateTopics,
@@ -67,7 +67,7 @@ public sealed class KafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey, TValue>
             .SetValueDeserializer(valueDeserializer)
             .Build();
         _consumerOptions = consumerOptions;
-        _id = $"{consumerOptions.ConsumerGroupID}_id{KafkaConsumerIDGenerator.GetNextID()}";
+        _id = $"{consumerOptions.ConsumerGroupId}_id{KafkaConsumerIdGenerator.GetNextId()}";
     }
 
     public void Subscribe(string topic)
@@ -169,7 +169,7 @@ public sealed class KafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey, TValue>
         messageHandlerException = default;
         consumeResult = _consumer!.Consume(ct);
         // consume blocks until there is a message and it is read => start activity after that
-        activity = _kafkaTelemetry.StartConsumer(consumeResult, _consumerOptions!.ConsumerGroupID);
+        activity = _kafkaTelemetry.StartConsumer(consumeResult, _consumerOptions!.ConsumerGroupId);
         stage = ConsumeStage.AfterConsume;
 
         try
@@ -219,18 +219,5 @@ public sealed class KafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey, TValue>
         }
 
         return success;
-    }
-}
-
-/// <summary>
-/// Not inside the <see cref="KafkaConsumer{TKey,TValue}"/> class which uses it since it is generic.
-/// </summary>
-internal static class KafkaConsumerIDGenerator
-{
-    private static int _nextIDCounter;
-
-    public static int GetNextID()
-    {
-        return Interlocked.Increment(ref _nextIDCounter);
     }
 }
