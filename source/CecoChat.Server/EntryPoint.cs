@@ -16,18 +16,16 @@ public static class EntryPoint
         bool useSerilog = true,
         string environmentVariablesPrefix = "CECOCHAT_")
     {
-        IHostBuilder hostBuilder = Host.CreateDefaultBuilder(args);
+        IHostBuilder hostBuilder = Host
+            .CreateDefaultBuilder(args)
+            .ConfigureWebHostDefaults(webBuilder =>
+            {
+                webBuilder.UseStartup(startupContext);
+            });
 
         if (useAutofac)
         {
             hostBuilder = hostBuilder.UseServiceProviderFactory(new AutofacServiceProviderFactory());
-        }
-        if (startupContext != null)
-        {
-            hostBuilder = hostBuilder.ConfigureWebHostDefaults(webBuilder =>
-            {
-                webBuilder.UseStartup(startupContext);
-            });
         }
         if (useSerilog)
         {
