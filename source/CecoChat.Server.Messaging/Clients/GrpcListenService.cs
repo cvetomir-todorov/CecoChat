@@ -36,10 +36,10 @@ public sealed class GrpcListenService : Listen.ListenBase
             throw new RpcException(new Status(StatusCode.InvalidArgument, "Access token could not be parsed."));
         }
 
-        _logger.LogInformation("{@User} from {Address} connected", userClaims, address);
+        _logger.LogInformation("Connect for user {UserId} with client {ClientId} from {Address}", userClaims.UserID, userClaims.ClientID, address);
 
         IGrpcListenStreamer streamer = _streamerFactory.Create();
-        streamer.Initialize(userClaims!.ClientID, notificationStream);
+        streamer.Initialize(userClaims.ClientID, notificationStream);
         await ProcessMessages(streamer, userClaims, address, context.CancellationToken);
     }
 
@@ -57,7 +57,7 @@ public sealed class GrpcListenService : Listen.ListenBase
             }
             else
             {
-                _logger.LogError("Failed to add {@User} from {Address}", userClaims, address);
+                _logger.LogError("Failure to add user {UserId} with client {ClientId} from {Address}", userClaims.UserID, userClaims.ClientID, address);
             }
         }
         catch (OperationCanceledException operationCanceledException)
@@ -65,12 +65,12 @@ public sealed class GrpcListenService : Listen.ListenBase
             // thrown when client cancels the streaming call, when the deadline is exceeded or a network error
             if (operationCanceledException.InnerException != null)
             {
-                _logger.LogError(operationCanceledException.InnerException, "Listen for {@User} from {Address} failed", userClaims, address);
+                _logger.LogError(operationCanceledException.InnerException, "Failure to listen to user {UserId} with client {ClientId} from {Address}", userClaims.UserID, userClaims.ClientID, address);
             }
         }
         catch (Exception exception)
         {
-            _logger.LogError(exception, "Listen for {@User} from {Address} failed", userClaims, address);
+            _logger.LogError(exception, "Failure to listen to user {UserId} with client {ClientId} from {Address}", userClaims.UserID, userClaims.ClientID, address);
         }
         finally
         {
@@ -78,7 +78,7 @@ public sealed class GrpcListenService : Listen.ListenBase
             {
                 _clientContainer.RemoveClient(userClaims.UserID, streamer);
                 _messagingTelemetry.RemoveOnlineClient();
-                _logger.LogInformation("{@User} from {Address} disconnected", userClaims, address);
+                _logger.LogInformation("Disconnect for user {UserId} with client {ClientId} from {Address}", userClaims.UserID, userClaims.ClientID, address);
             }
             streamer.Dispose();
         }
