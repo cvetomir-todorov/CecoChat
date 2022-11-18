@@ -43,13 +43,12 @@ public sealed class GrpcSendService : Send.SendBase
         long messageId = await GetMessageId(userClaims, context);
 
         _messagingTelemetry.NotifyMessageReceived();
-        _logger.LogTrace("User {@User} sent message with generated ID {MessageId}: {@SendMessageRequest}", userClaims, messageId, request);
+        _logger.LogTrace("User {UserId} with client {ClientId} sent message {MessageId} with data {DataType} to user {ReceiverId}",
+            userClaims.UserId, userClaims.ClientId, messageId, request.DataType, request.ReceiverId);
 
         BackplaneMessage backplaneMessage = _mapper.CreateBackplaneMessage(request, userClaims.ClientId, messageId);
         _sendersProducer.ProduceMessage(backplaneMessage);
-
-        (int successCount, int allCount) = EnqueueMessagesForSenders(request, messageId, userClaims.ClientId);
-        LogResults(request, messageId, successCount, allCount);
+        EnqueueMessagesForSenders(request, messageId, userClaims.ClientId);
 
         SendMessageResponse response = new() { MessageId = messageId };
         return response;
@@ -73,14 +72,14 @@ public sealed class GrpcSendService : Send.SendBase
         if (!result.Success)
         {
             Metadata metadata = new();
-            metadata.Add("UserID", userClaims.UserId.ToString());
+            metadata.Add("UserId", userClaims.UserId.ToString());
             throw new RpcException(new Status(StatusCode.Unavailable, "Failed to get a message ID."), metadata);
         }
 
         return result.ID;
     }
 
-    private (int successCount, int allCount) EnqueueMessagesForSenders(SendMessageRequest request, long messageId, Guid senderClientId)
+    private void EnqueueMessagesForSenders(SendMessageRequest request, long messageId, Guid senderClientId)
     {
         // do not call clients.Count since it is expensive and uses locks
         int successCount = 0;
@@ -102,20 +101,8 @@ public sealed class GrpcSendService : Send.SendBase
             }
         }
 
-        return (successCount, allCount);
-    }
-
-    private void LogResults(SendMessageRequest request, long messageId, int successCount, int allCount)
-    {
-        if (successCount < allCount)
-        {
-            _logger.LogWarning("Connected senders with ID {SenderId} ({SuccessCount} out of {AllCount}) were queued message {MessageId}",
-                request.SenderId, successCount, allCount, messageId);
-        }
-        else if (allCount > 0)
-        {
-            _logger.LogTrace("Connected senders with ID {SenderId} (all {Count}) were queued message {MessageId}",
-                request.SenderId, successCount, messageId);
-        }
+        LogLevel logLevel = successCount < allCount ? LogLevel.Warning : LogLevel.Trace;
+        _logger.Log(logLevel, "Connected senders with ID {SenderId} ({SuccessCount} out of {AllCount}) were queued message {MessageId} with data {DataType} to user {ReceiverId}",
+            request.SenderId, successCount, allCount, messageId, request.DataType, request.ReceiverId);
     }
 }

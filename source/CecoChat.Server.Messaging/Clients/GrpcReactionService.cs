@@ -28,7 +28,8 @@ public class GrpcReactionService : Reaction.ReactionBase
     public override Task<ReactResponse> React(ReactRequest request, ServerCallContext context)
     {
         UserClaims userClaims = GetUserClaims(context);
-        _logger.LogTrace("User {@User} reacted {@ReactRequest}", userClaims, request);
+        _logger.LogTrace("User {UserId} with client {ClientId} reacted with {Reaction} to message {MessageId} sent by user {SenderId}",
+            userClaims.UserId, userClaims.ClientId, request.Reaction, request.MessageId, request.SenderId);
 
         BackplaneMessage backplaneMessage = _mapper.CreateBackplaneMessage(request, userClaims.ClientId, userClaims.UserId);
         _sendersProducer.ProduceMessage(backplaneMessage);
@@ -40,7 +41,8 @@ public class GrpcReactionService : Reaction.ReactionBase
     public override Task<UnReactResponse> UnReact(UnReactRequest request, ServerCallContext context)
     {
         UserClaims userClaims = GetUserClaims(context);
-        _logger.LogTrace("User {@User} un-reacted {@UnReactRequest}", userClaims, request);
+        _logger.LogTrace("User {UserId} with client {ClientId} un-reacted to message {MessageId} sent by user {SenderId}",
+            userClaims.UserId, userClaims.ClientId, request.MessageId, request.SenderId);
 
         BackplaneMessage backplaneMessage = _mapper.CreateBackplaneMessage(request, userClaims.ClientId, userClaims.UserId);
         _sendersProducer.ProduceMessage(backplaneMessage);
@@ -57,6 +59,6 @@ public class GrpcReactionService : Reaction.ReactionBase
         }
 
         Activity.Current?.SetTag("reactor.id", userClaims.UserId);
-        return userClaims!;
+        return userClaims;
     }
 }

@@ -65,7 +65,7 @@ public sealed class BackplaneComponents : IBackplaneComponents
             }
             catch (Exception exception)
             {
-                _logger.LogCritical(exception, "Failure in consumer {ConsumerId}", _receiversConsumer.ConsumerID);
+                _logger.LogCritical(exception, "Failure in consumer {ConsumerId}", _receiversConsumer.ConsumerId);
             }
         }, ct, TaskCreationOptions.LongRunning, TaskScheduler.Current);
     }
