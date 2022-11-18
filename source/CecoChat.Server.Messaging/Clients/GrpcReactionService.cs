@@ -30,7 +30,7 @@ public class GrpcReactionService : Reaction.ReactionBase
         UserClaims userClaims = GetUserClaims(context);
         _logger.LogTrace("User {@User} reacted {@ReactRequest}", userClaims, request);
 
-        BackplaneMessage backplaneMessage = _mapper.CreateBackplaneMessage(request, userClaims.ClientID, userClaims.UserID);
+        BackplaneMessage backplaneMessage = _mapper.CreateBackplaneMessage(request, userClaims.ClientId, userClaims.UserId);
         _sendersProducer.ProduceMessage(backplaneMessage);
 
         return Task.FromResult(new ReactResponse());
@@ -42,7 +42,7 @@ public class GrpcReactionService : Reaction.ReactionBase
         UserClaims userClaims = GetUserClaims(context);
         _logger.LogTrace("User {@User} un-reacted {@UnReactRequest}", userClaims, request);
 
-        BackplaneMessage backplaneMessage = _mapper.CreateBackplaneMessage(request, userClaims.ClientID, userClaims.UserID);
+        BackplaneMessage backplaneMessage = _mapper.CreateBackplaneMessage(request, userClaims.ClientId, userClaims.UserId);
         _sendersProducer.ProduceMessage(backplaneMessage);
 
         return Task.FromResult(new UnReactResponse());
@@ -56,7 +56,7 @@ public class GrpcReactionService : Reaction.ReactionBase
             throw new RpcException(new Status(StatusCode.InvalidArgument, "Access token could not be parsed."));
         }
 
-        Activity.Current?.SetTag("reactor.id", userClaims!.UserID);
+        Activity.Current?.SetTag("reactor.id", userClaims.UserId);
         return userClaims!;
     }
 }

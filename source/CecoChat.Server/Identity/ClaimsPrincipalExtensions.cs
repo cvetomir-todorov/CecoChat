@@ -6,13 +6,13 @@ namespace CecoChat.Server.Identity;
 
 public sealed class UserClaims
 {
-    public long UserID { get; set; }
+    public long UserId { get; set; }
 
-    public Guid ClientID { get; set; }
+    public Guid ClientId { get; set; }
 
     public override string ToString()
     {
-        return $"{nameof(UserID)}:{UserID} {nameof(ClientID)}:{ClientID}";
+        return $"{nameof(UserId)}:{UserId} {nameof(ClientId)}:{ClientId}";
     }
 }
 
@@ -20,13 +20,13 @@ public static class ClaimsPrincipalExtensions
 {
     public static bool TryGetUserClaims(this ClaimsPrincipal user, [NotNullWhen(true)] out UserClaims? userClaims)
     {
-        if (!user.TryGetUserID(out long userID))
+        if (!user.TryGetUserId(out long userId))
         {
             userClaims = default;
             return false;
         }
 
-        if (!user.TryGetClientID(out Guid clientID))
+        if (!user.TryGetClientId(out Guid clientId))
         {
             userClaims = default;
             return false;
@@ -34,22 +34,22 @@ public static class ClaimsPrincipalExtensions
 
         userClaims = new()
         {
-            UserID = userID,
-            ClientID = clientID
+            UserId = userId,
+            ClientId = clientId
         };
         return true;
     }
 
-    public static bool TryGetUserID(this ClaimsPrincipal user, out long userID)
+    public static bool TryGetUserId(this ClaimsPrincipal user, out long userId)
     {
         string subject = user.FindFirstValue(JwtRegisteredClaimNames.Sub);
         if (string.IsNullOrWhiteSpace(subject))
         {
-            userID = default;
+            userId = default;
             return false;
         }
 
-        if (!long.TryParse(subject, out userID))
+        if (!long.TryParse(subject, out userId))
         {
             return false;
         }
@@ -57,16 +57,16 @@ public static class ClaimsPrincipalExtensions
         return true;
     }
 
-    public static bool TryGetClientID(this ClaimsPrincipal user, out Guid clientID)
+    public static bool TryGetClientId(this ClaimsPrincipal user, out Guid clientId)
     {
         string actor = user.FindFirstValue(ClaimTypes.Actor);
         if (string.IsNullOrWhiteSpace(actor))
         {
-            clientID = Guid.Empty;
+            clientId = Guid.Empty;
             return false;
         }
 
-        if (!Guid.TryParse(actor, out clientID))
+        if (!Guid.TryParse(actor, out clientId))
         {
             return false;
         }

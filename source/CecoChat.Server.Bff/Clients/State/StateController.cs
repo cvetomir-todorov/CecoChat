@@ -41,11 +41,11 @@ public class StateController : ControllerBase
             return Unauthorized();
         }
 
-        IReadOnlyCollection<Contracts.State.ChatState> serviceChats = await _client.GetChats(userClaims!.UserID, request.NewerThan, accessToken!, ct);
+        IReadOnlyCollection<Contracts.State.ChatState> serviceChats = await _client.GetChats(userClaims!.UserId, request.NewerThan, accessToken!, ct);
         ChatState[] clientChats = serviceChats.Select(MapChat).ToArray();
 
         _logger.LogTrace("Responding with {ChatCount} chats for user {UserId} which are newer than {NewerThan}",
-            clientChats.Length, userClaims.UserID, request.NewerThan);
+            clientChats.Length, userClaims.UserId, request.NewerThan);
         return Ok(new GetChatsResponse
         {
             Chats = clientChats
@@ -71,7 +71,7 @@ public class StateController : ControllerBase
             return false;
         }
 
-        Activity.Current?.SetTag("user.id", userClaims!.UserID);
+        Activity.Current?.SetTag("user.id", userClaims.UserId);
         return true;
     }
 }

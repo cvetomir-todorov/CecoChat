@@ -28,7 +28,7 @@ public sealed class GrpcHistoryService : Contracts.History.History.HistoryBase
     [Authorize(Roles = "user")]
     public override async Task<GetHistoryResponse> GetHistory(GetHistoryRequest request, ServerCallContext context)
     {
-        if (!context.GetHttpContext().User.TryGetUserID(out long userId))
+        if (!context.GetHttpContext().User.TryGetUserId(out long userId))
         {
             _logger.LogError("Client from {ClientAddress} was authorized but has no parseable access token", context.Peer);
             return new GetHistoryResponse();

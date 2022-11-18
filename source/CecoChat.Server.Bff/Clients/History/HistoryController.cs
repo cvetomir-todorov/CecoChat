@@ -41,11 +41,11 @@ public class HistoryController : ControllerBase
             return Unauthorized();
         }
 
-        IReadOnlyCollection<Contracts.History.HistoryMessage> serviceMessages = await _historyClient.GetHistory(userClaims!.UserID, request.OtherUserID, request.OlderThan, accessToken!, ct);
+        IReadOnlyCollection<Contracts.History.HistoryMessage> serviceMessages = await _historyClient.GetHistory(userClaims!.UserId, request.OtherUserID, request.OlderThan, accessToken!, ct);
         HistoryMessage[] clientMessages = serviceMessages.Select(MapMessage).ToArray();
 
         _logger.LogTrace("Responding with {MessageCount} messages for chat between {UserId} and {OtherUserId} older than {OlderThan}",
-            clientMessages.Length, userClaims.UserID, request.OtherUserID, request.OlderThan);
+            clientMessages.Length, userClaims.UserId, request.OtherUserID, request.OlderThan);
         return Ok(new GetHistoryResponse
         {
             Messages = clientMessages
@@ -92,7 +92,7 @@ public class HistoryController : ControllerBase
             return false;
         }
 
-        Activity.Current?.SetTag("user.id", userClaims!.UserID);
+        Activity.Current?.SetTag("user.id", userClaims.UserId);
         return true;
     }
 }
