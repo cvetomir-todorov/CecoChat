@@ -89,9 +89,9 @@ public sealed class StateConsumer : IStateConsumer
         _logger.LogInformation("Stopped creating sender state from messages");
     }
 
-    public string ReceiverConsumerId => _backplaneOptions.ReceiversConsumer.ConsumerGroupID;
+    public string ReceiverConsumerId => _backplaneOptions.ReceiversConsumer.ConsumerGroupId;
 
-    public string SenderConsumerId => _backplaneOptions.SendersConsumer.ConsumerGroupID;
+    public string SenderConsumerId => _backplaneOptions.SendersConsumer.ConsumerGroupId;
 
     private void ProcessMessageForReceivers(BackplaneMessage backplaneMessage)
     {

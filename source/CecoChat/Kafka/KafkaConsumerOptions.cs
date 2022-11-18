@@ -4,7 +4,7 @@ namespace CecoChat.Kafka;
 
 public sealed class KafkaConsumerOptions
 {
-    public string ConsumerGroupID { get; set; } = string.Empty;
+    public string ConsumerGroupId { get; set; } = string.Empty;
 
     public AutoOffsetReset AutoOffsetReset { get; set; }
 

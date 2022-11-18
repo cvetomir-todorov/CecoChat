@@ -65,7 +65,7 @@ public sealed class KafkaProducer<TKey, TValue> : IKafkaProducer<TKey, TValue>
             .SetValueSerializer(valueSerializer)
             .Build();
         _producerOptions = producerOptions;
-        _id = $"{producerOptions.ProducerID}_id{KafkaProducerIDGenerator.GetNextID()}";
+        _id = $"{producerOptions.ProducerId}_id{KafkaProducerIdGenerator.GetNextId()}";
     }
 
     public void Produce(Message<TKey, TValue> message, TopicPartition topicPartition, DeliveryHandler<TKey, TValue>? deliveryHandler = null)
@@ -75,7 +75,7 @@ public sealed class KafkaProducer<TKey, TValue> : IKafkaProducer<TKey, TValue>
         string topic = topicPartition.Topic;
         int partition = topicPartition.Partition;
 
-        Activity activity = _kafkaTelemetry.StartProducer(message, _producerOptions!.ProducerID, topic, partition);
+        Activity activity = _kafkaTelemetry.StartProducer(message, _producerOptions!.ProducerId, topic, partition);
         _producer!.Produce(topicPartition, message, deliveryReport => HandleDeliveryReport(deliveryReport, activity, deliveryHandler));
         _logger.LogTrace("Producer {ProducerId} produced message {@Message} in {Topic}[{Partition}]", _id, message.Value, topic, partition);
     }
@@ -84,7 +84,7 @@ public sealed class KafkaProducer<TKey, TValue> : IKafkaProducer<TKey, TValue>
     {
         EnsureInitialized();
 
-        Activity activity = _kafkaTelemetry.StartProducer(message, _producerOptions!.ProducerID, topic);
+        Activity activity = _kafkaTelemetry.StartProducer(message, _producerOptions!.ProducerId, topic);
         _producer!.Produce(topic, message, deliveryReport => HandleDeliveryReport(deliveryReport, activity, deliveryHandler));
         _logger.LogTrace("Producer {ProducerId} produced message {@Message} in {Topic}", _id, message.Value, topic);
     }
@@ -146,18 +146,5 @@ public sealed class KafkaProducer<TKey, TValue> : IKafkaProducer<TKey, TValue>
         {
             _kafkaTelemetry.StopProducer(activity, isDelivered);
         }
-    }
-}
-
-/// <summary>
-/// Not inside the <see cref="KafkaProducer{TKey,TValue}"/> class which uses it since it is generic.
-/// </summary>
-internal static class KafkaProducerIDGenerator
-{
-    private static int _nextIDCounter;
-
-    public static int GetNextID()
-    {
-        return Interlocked.Increment(ref _nextIDCounter);
     }
 }

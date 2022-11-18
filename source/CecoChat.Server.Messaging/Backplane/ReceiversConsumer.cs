@@ -85,7 +85,7 @@ public sealed class ReceiversConsumer : IReceiversConsumer
         _logger.LogInformation("Stopped sending messages to receivers");
     }
 
-    public string ConsumerId => _backplaneOptions.ReceiversConsumer.ConsumerGroupID;
+    public string ConsumerId => _backplaneOptions.ReceiversConsumer.ConsumerGroupId;
 
     private void ProcessMessage(BackplaneMessage backplaneMessage)
     {
