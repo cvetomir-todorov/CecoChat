@@ -49,12 +49,13 @@ public static class SerilogConfig
     {
         string name = entryAssembly.GetName().Name!;
         string binPath = Path.GetDirectoryName(entryAssembly.Location) ?? Environment.CurrentDirectory;
-        // going from /source/project/bin/debug/.net5.0/ to /source/logs/project.txt
+        // going from /source/project/bin/debug/.net6.0/ to /source/logs/project.txt
         string filePath = Path.Combine(binPath, "..", "..", "..", "..", "logs", $"{name}.txt");
 
         return configuration
             .MinimumLevel.Override("CecoChat", LogEventLevel.Verbose)
-            .WriteTo.Console()
+            .WriteTo.Console(
+                outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext} | {Message:lj}{NewLine}{Exception}")
             .WriteTo.Elasticsearch(new ElasticsearchSinkOptions
             {
                 CustomFormatter = new ElasticsearchJsonFormatter(renderMessageTemplate: false),
@@ -63,7 +64,7 @@ public static class SerilogConfig
             .WriteTo.File(
                 path: filePath,
                 rollingInterval: RollingInterval.Day,
-                outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss zzz} | {Level:u3} | {SourceContext} | {Message:lj}{NewLine}{Exception}");
+                outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext} | {Message:lj}{NewLine}{Exception}");
     }
 
     private static LoggerConfiguration ApplyProductionConfiguration(LoggerConfiguration configuration)
