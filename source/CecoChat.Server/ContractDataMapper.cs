@@ -7,13 +7,13 @@ namespace CecoChat.Server;
 
 public interface IContractDataMapper
 {
-    BackplaneMessage CreateBackplaneMessage(SendMessageRequest request, Guid senderClientID, long messageID);
+    BackplaneMessage CreateBackplaneMessage(SendMessageRequest request, Guid senderClientId, long messageId);
 
-    BackplaneMessage CreateBackplaneMessage(ReactRequest request, Guid senderClientID, long reactorID);
+    BackplaneMessage CreateBackplaneMessage(ReactRequest request, Guid senderClientId, long reactorId);
 
-    BackplaneMessage CreateBackplaneMessage(UnReactRequest request, Guid senderClientID, long reactorID);
+    BackplaneMessage CreateBackplaneMessage(UnReactRequest request, Guid senderClientId, long reactorId);
 
-    ListenNotification CreateListenNotification(SendMessageRequest request, long messageID);
+    ListenNotification CreateListenNotification(SendMessageRequest request, long messageId);
 
     ListenNotification CreateListenNotification(BackplaneMessage backplaneMessage);
 
@@ -24,14 +24,14 @@ public interface IContractDataMapper
 
 public class ContractDataMapper : IContractDataMapper
 {
-    public BackplaneMessage CreateBackplaneMessage(SendMessageRequest request, Guid senderClientID, long messageID)
+    public BackplaneMessage CreateBackplaneMessage(SendMessageRequest request, Guid senderClientId, long messageId)
     {
         BackplaneMessage message = new()
         {
-            MessageId = messageID,
+            MessageId = messageId,
             SenderId = request.SenderId,
             ReceiverId = request.ReceiverId,
-            ClientId = senderClientID.ToUuid(),
+            ClientId = senderClientId.ToUuid(),
             Type = Contracts.Backplane.MessageType.Data,
             Status = Contracts.Backplane.DeliveryStatus.Processed
         };
@@ -52,18 +52,18 @@ public class ContractDataMapper : IContractDataMapper
         return message;
     }
 
-    public BackplaneMessage CreateBackplaneMessage(ReactRequest request, Guid senderClientID, long reactorID)
+    public BackplaneMessage CreateBackplaneMessage(ReactRequest request, Guid senderClientId, long reactorId)
     {
         BackplaneMessage message = new()
         {
             MessageId = request.MessageId,
             SenderId = request.SenderId,
             ReceiverId = request.ReceiverId,
-            ClientId = senderClientID.ToUuid(),
+            ClientId = senderClientId.ToUuid(),
             Type = Contracts.Backplane.MessageType.Reaction,
             Reaction = new BackplaneReaction
             {
-                ReactorId = reactorID,
+                ReactorId = reactorId,
                 Reaction = request.Reaction
             }
         };
@@ -71,29 +71,29 @@ public class ContractDataMapper : IContractDataMapper
         return message;
     }
 
-    public BackplaneMessage CreateBackplaneMessage(UnReactRequest request, Guid senderClientID, long reactorID)
+    public BackplaneMessage CreateBackplaneMessage(UnReactRequest request, Guid senderClientId, long reactorId)
     {
         BackplaneMessage message = new()
         {
             MessageId = request.MessageId,
             SenderId = request.SenderId,
             ReceiverId = request.ReceiverId,
-            ClientId = senderClientID.ToUuid(),
+            ClientId = senderClientId.ToUuid(),
             Type = Contracts.Backplane.MessageType.Reaction,
             Reaction = new BackplaneReaction
             {
-                ReactorId = reactorID
+                ReactorId = reactorId
             }
         };
 
         return message;
     }
 
-    public ListenNotification CreateListenNotification(SendMessageRequest request, long messageID)
+    public ListenNotification CreateListenNotification(SendMessageRequest request, long messageId)
     {
         ListenNotification notification = new()
         {
-            MessageId = messageID,
+            MessageId = messageId,
             SenderId = request.SenderId,
             ReceiverId = request.ReceiverId,
             Type = Contracts.Messaging.MessageType.Data
