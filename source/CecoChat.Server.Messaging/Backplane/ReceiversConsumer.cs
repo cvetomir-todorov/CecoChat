@@ -19,7 +19,7 @@ public interface IReceiversConsumer : IDisposable
 
     void Start(CancellationToken ct);
 
-    string ConsumerID { get; }
+    string ConsumerId { get; }
 }
 
 public sealed class ReceiversConsumer : IReceiversConsumer
@@ -85,29 +85,26 @@ public sealed class ReceiversConsumer : IReceiversConsumer
         _logger.LogInformation("Stopped sending messages to receivers");
     }
 
-    public string ConsumerID => _backplaneOptions.ReceiversConsumer.ConsumerGroupID;
+    public string ConsumerId => _backplaneOptions.ReceiversConsumer.ConsumerGroupID;
 
     private void ProcessMessage(BackplaneMessage backplaneMessage)
     {
-        Guid senderClientID = backplaneMessage.ClientId.ToGuid();
+        Guid senderClientId = backplaneMessage.ClientId.ToGuid();
         IEnumerable<IStreamer<ListenNotification>> receiverClients = _clientContainer.EnumerateClients(backplaneMessage.ReceiverId);
 
         ListenNotification notification = _mapper.CreateListenNotification(backplaneMessage);
-        EnqueueMessage(senderClientID, notification, receiverClients, out int successCount, out int allCount);
-        LogResults(backplaneMessage, successCount, allCount);
+        EnqueueMessage(senderClientId, notification, receiverClients);
     }
 
-    private static void EnqueueMessage(
-        Guid senderClientID, ListenNotification notification, IEnumerable<IStreamer<ListenNotification>> receiverClients,
-        out int successCount, out int allCount)
+    private void EnqueueMessage(Guid senderClientId, ListenNotification notification, IEnumerable<IStreamer<ListenNotification>> receiverClients)
     {
         // do not call clients.Count since it is expensive and uses locks
-        successCount = 0;
-        allCount = 0;
+        int successCount = 0;
+        int allCount = 0;
 
         foreach (IStreamer<ListenNotification> receiverClient in receiverClients)
         {
-            if (receiverClient.ClientID != senderClientID)
+            if (receiverClient.ClientID != senderClientId)
             {
                 if (receiverClient.EnqueueMessage(notification, parentActivity: Activity.Current))
                 {
@@ -117,19 +114,9 @@ public sealed class ReceiversConsumer : IReceiversConsumer
                 allCount++;
             }
         }
-    }
 
-    private void LogResults(BackplaneMessage backplaneMessage, int successCount, int allCount)
-    {
-        if (successCount < allCount)
-        {
-            _logger.LogWarning("Connected recipients with ID {ReceiverId} ({SuccessCount} out of {AllCount}) were queued message {MessageId}",
-                backplaneMessage.ReceiverId, successCount, allCount, backplaneMessage.MessageId);
-        }
-        else if (allCount > 0)
-        {
-            _logger.LogTrace("Connected recipients with ID {ReceiverId} (all {Count}) were queued message {MessageId}",
-                backplaneMessage.ReceiverId, successCount, backplaneMessage.MessageId);
-        }
+        LogLevel logLevel = successCount < allCount ? LogLevel.Warning : LogLevel.Trace;
+        _logger.Log(logLevel, "Connected recipients with ID {ReceiverId} ({SuccessCount} out of {AllCount}) were queued message {MessageId} of type {MessageType} from user {SenderId}",
+            notification.ReceiverId, successCount, allCount, notification.MessageId, notification.Type, notification.SenderId);
     }
 }

@@ -9,7 +9,7 @@ namespace CecoChat.Server.Messaging.Clients.Streaming;
 
 public interface IGrpcListenStreamer : IStreamer<ListenNotification>
 {
-    void Initialize(Guid clientID, IServerStreamWriter<ListenNotification> streamWriter);
+    void Initialize(Guid clientId, IServerStreamWriter<ListenNotification> streamWriter);
 }
 
 /// <summary>
@@ -23,7 +23,7 @@ public sealed class GrpcListenStreamer : IGrpcListenStreamer
     private readonly SemaphoreSlim _signalProcessing;
 
     private IServerStreamWriter<ListenNotification>? _streamWriter;
-    private Guid _clientID;
+    private Guid _clientId;
     private int _sequenceNumber;
 
     public GrpcListenStreamer(
@@ -39,7 +39,7 @@ public sealed class GrpcListenStreamer : IGrpcListenStreamer
             collection: new ConcurrentQueue<MessageContext>(),
             boundedCapacity: clientOptions.SendMessagesHighWatermark);
         _signalProcessing = new SemaphoreSlim(initialCount: 0, maxCount: 1);
-        _clientID = Guid.Empty;
+        _clientId = Guid.Empty;
     }
 
     public void Dispose()
@@ -48,18 +48,18 @@ public sealed class GrpcListenStreamer : IGrpcListenStreamer
         _messageQueue.Dispose();
     }
 
-    public void Initialize(Guid clientID, IServerStreamWriter<ListenNotification> streamWriter)
+    public void Initialize(Guid clientId, IServerStreamWriter<ListenNotification> streamWriter)
     {
-        if (clientID == Guid.Empty)
+        if (clientId == Guid.Empty)
         {
-            throw new ArgumentException($"{nameof(clientID)} should not be an empty GUID.", nameof(clientID));
+            throw new ArgumentException($"{nameof(clientId)} should not be an empty GUID.", nameof(clientId));
         }
 
-        _clientID = clientID;
+        _clientId = clientId;
         _streamWriter = streamWriter;
     }
 
-    public Guid ClientID => _clientID;
+    public Guid ClientID => _clientId;
 
     public bool EnqueueMessage(ListenNotification message, Activity? parentActivity = null)
     {
@@ -72,7 +72,7 @@ public sealed class GrpcListenStreamer : IGrpcListenStreamer
         }
         else
         {
-            _logger.LogWarning("Dropped message {@Message} since queue for {ClientId} is full", message, ClientID);
+            _logger.LogWarning("Dropped message {MessageId} of type {MessageType} since queue for client {ClientId} is full", message.MessageId, message.Type, ClientID);
         }
 
         return isAdded;
@@ -80,7 +80,7 @@ public sealed class GrpcListenStreamer : IGrpcListenStreamer
 
     public async Task ProcessMessages(CancellationToken ct)
     {
-        if (_clientID == Guid.Empty || _streamWriter == null)
+        if (_clientId == Guid.Empty || _streamWriter == null)
         {
             throw new InvalidOperationException($"Call '{nameof(Initialize)}' before '{nameof(ProcessMessages)}'.");
         }
@@ -117,7 +117,8 @@ public sealed class GrpcListenStreamer : IGrpcListenStreamer
                 messageContext.Message.SequenceNumber = _sequenceNumber;
                 await _streamWriter!.WriteAsync(messageContext.Message, ct);
                 success = true;
-                _logger.LogTrace("Sent client {ClientId} message {@Message}", _clientID, messageContext.Message);
+                _logger.LogTrace("Sent client {ClientId} message {MessageId} of type {MessageType}",
+          _clientId, messageContext.Message.MessageId, messageContext.Message.Type);
             }
             catch (InvalidOperationException invalidOperationException)
                 when (invalidOperationException.Message == "Can't write the message because the request is complete.")
@@ -128,7 +129,8 @@ public sealed class GrpcListenStreamer : IGrpcListenStreamer
             }
             catch (Exception exception)
             {
-                _logger.LogError(exception, "Failed to send client {ClientId} message {@Message}", _clientID, messageContext.Message);
+                _logger.LogError(exception, "Failed to send client {ClientId} message {MessageId} of type {MessageType}",
+          _clientId, messageContext.Message.MessageId, messageContext.Message.Type);
                 return new EmptyQueueResult { Stop = true };
             }
             finally

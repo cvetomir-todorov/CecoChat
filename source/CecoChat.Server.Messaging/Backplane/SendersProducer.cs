@@ -68,6 +68,11 @@ public sealed class SendersProducer : ISendersProducer
 
     private void DeliveryHandler(bool isDelivered, DeliveryReport<Null, BackplaneMessage> report, Activity activity)
     {
+        if (isDelivered)
+        {
+            _messagingTelemetry.NotifyMessageProcessed();
+        }
+
         BackplaneMessage backplaneMessage = report.Message.Value;
 
         Contracts.Messaging.DeliveryStatus status = isDelivered ? Contracts.Messaging.DeliveryStatus.Processed : Contracts.Messaging.DeliveryStatus.Lost;
@@ -85,12 +90,8 @@ public sealed class SendersProducer : ISendersProducer
         foreach (IStreamer<ListenNotification> client in clients)
         {
             client.EnqueueMessage(deliveryNotification, parentActivity: activity);
-            _logger.LogTrace("Sent delivery notification to client {ClientId} for message {@Message}", clientId, deliveryNotification);
-        }
-
-        if (isDelivered)
-        {
-            _messagingTelemetry.NotifyMessageProcessed();
+            _logger.LogTrace("Notified client {ClientId} that message {MessageId} of type {MessageType} has been processed",
+                clientId, backplaneMessage.MessageId, backplaneMessage.Type);
         }
     }
 }
