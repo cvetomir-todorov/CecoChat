@@ -2,20 +2,11 @@ using System.Diagnostics;
 using CecoChat.Client.State;
 using CecoChat.Contracts.Bff;
 using CecoChat.Server.Identity;
-using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
-namespace CecoChat.Server.Bff.Controllers;
-
-public sealed class GetChatsRequestValidator : AbstractValidator<GetChatsRequest>
-{
-    public GetChatsRequestValidator()
-    {
-        RuleFor(x => x.NewerThan).GreaterThanOrEqualTo(Snowflake.Epoch);
-    }
-}
+namespace CecoChat.Server.Bff.Clients.State;
 
 [ApiController]
 [Route("api/state")]

@@ -2,21 +2,11 @@ using System.Diagnostics;
 using CecoChat.Client.History;
 using CecoChat.Contracts.Bff;
 using CecoChat.Server.Identity;
-using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
-namespace CecoChat.Server.Bff.Controllers;
-
-public sealed class GetHistoryRequestValidator : AbstractValidator<GetHistoryRequest>
-{
-    public GetHistoryRequestValidator()
-    {
-        RuleFor(x => x.OtherUserID).GreaterThan(0);
-        RuleFor(x => x.OlderThan).GreaterThan(Snowflake.Epoch);
-    }
-}
+namespace CecoChat.Server.Bff.Clients.History;
 
 [ApiController]
 [Route("api/history")]
