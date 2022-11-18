@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 
-namespace CecoChat.Server.Bff.Controllers.Infrastructure;
+namespace CecoChat.Server.Bff.Infra;
 
 public class DateTimeModelBinderProvider : IModelBinderProvider
 {
