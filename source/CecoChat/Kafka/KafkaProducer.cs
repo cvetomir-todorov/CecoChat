@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using CecoChat.Kafka.Telemetry;
 using Confluent.Kafka;
 using Microsoft.Extensions.Logging;
@@ -76,8 +77,7 @@ public sealed class KafkaProducer<TKey, TValue> : IKafkaProducer<TKey, TValue>
         int partition = topicPartition.Partition;
 
         Activity activity = _kafkaTelemetry.StartProducer(message, _producerOptions!.ProducerId, topic, partition);
-        _producer!.Produce(topicPartition, message, deliveryReport => HandleDeliveryReport(deliveryReport, activity, deliveryHandler));
-        _logger.LogTrace("Producer {ProducerId} produced message {@Message} in {Topic}[{Partition}]", _id, message.Value, topic, partition);
+        _producer.Produce(topicPartition, message, deliveryReport => HandleDeliveryReport(deliveryReport, activity, deliveryHandler));
     }
 
     public void Produce(Message<TKey, TValue> message, string topic, DeliveryHandler<TKey, TValue>? deliveryHandler = null)
@@ -85,10 +85,10 @@ public sealed class KafkaProducer<TKey, TValue> : IKafkaProducer<TKey, TValue>
         EnsureInitialized();
 
         Activity activity = _kafkaTelemetry.StartProducer(message, _producerOptions!.ProducerId, topic);
-        _producer!.Produce(topic, message, deliveryReport => HandleDeliveryReport(deliveryReport, activity, deliveryHandler));
-        _logger.LogTrace("Producer {ProducerId} produced message {@Message} in {Topic}", _id, message.Value, topic);
+        _producer.Produce(topic, message, deliveryReport => HandleDeliveryReport(deliveryReport, activity, deliveryHandler));
     }
 
+    [MemberNotNull(nameof(_producer))]
     private void EnsureInitialized()
     {
         if (_producer == null || _producerOptions == null)
@@ -121,22 +121,22 @@ public sealed class KafkaProducer<TKey, TValue> : IKafkaProducer<TKey, TValue>
         bool isDelivered = true;
         try
         {
-            TValue value = report.Message.Value;
+            DateTime timestamp = report.Message.Timestamp.UtcDateTime;
 
             if (report.Status != PersistenceStatus.Persisted)
             {
-                _logger.LogError("Message {@Message} persistence status {Status}", value, report.Status);
+                _logger.LogError("Message with timestamp {MessageTimestamp} has persistence status {Status}", timestamp, report.Status);
                 isDelivered = false;
             }
             if (report.Error.IsError)
             {
-                _logger.LogError("Message {@Message} error code {ErrorCode} reason '{ErrorReason}'", value, report.Error.Code, report.Error.Reason);
+                _logger.LogError("Message with timestamp {MessageTimestamp} has error code {ErrorCode} with reason '{ErrorReason}'", timestamp, report.Error.Code, report.Error.Reason);
                 isDelivered = false;
             }
             if (report.TopicPartitionOffsetError.Error.IsError)
             {
-                _logger.LogError("Message {@Message} topic partition {Partition} error code {ErrorCode} reason '{ErrorReason}'",
-                    value, report.TopicPartitionOffsetError.Partition, report.Error.Code, report.TopicPartitionOffsetError.Error.Reason);
+                _logger.LogError("Message with timestamp {MessageTimestamp} in topic partition {Partition} has error code {ErrorCode} with reason '{ErrorReason}'",
+                    timestamp, report.TopicPartitionOffsetError.Partition, report.Error.Code, report.TopicPartitionOffsetError.Error.Reason);
                 isDelivered = false;
             }
 
