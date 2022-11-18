@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
@@ -6,7 +7,7 @@ namespace CecoChat.Server.Identity;
 
 public static class SecurityExtensions
 {
-    public static bool TryGetBearerAccessTokenValue(this HttpContext context, out string? accessToken)
+    public static bool TryGetBearerAccessTokenValue(this HttpContext context, [NotNullWhen(true)] out string? accessToken)
     {
         accessToken = null;
         if (!context.Request.Headers.TryGetValue(HeaderNames.Authorization, out StringValues values))

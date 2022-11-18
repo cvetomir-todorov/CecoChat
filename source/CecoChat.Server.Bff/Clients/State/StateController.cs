@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using CecoChat.Client.State;
 using CecoChat.Contracts.Bff;
 using CecoChat.Server.Identity;
@@ -41,7 +42,7 @@ public class StateController : ControllerBase
             return Unauthorized();
         }
 
-        IReadOnlyCollection<Contracts.State.ChatState> serviceChats = await _client.GetChats(userClaims!.UserId, request.NewerThan, accessToken!, ct);
+        IReadOnlyCollection<Contracts.State.ChatState> serviceChats = await _client.GetChats(userClaims.UserId, request.NewerThan, accessToken, ct);
         ChatState[] clientChats = serviceChats.Select(MapChat).ToArray();
 
         _logger.LogTrace("Responding with {ChatCount} chats for user {UserId} which are newer than {NewerThan}",
@@ -63,7 +64,7 @@ public class StateController : ControllerBase
         };
     }
 
-    private bool TryGetUserClaims(HttpContext context, out UserClaims? userClaims)
+    private bool TryGetUserClaims(HttpContext context, [NotNullWhen(true)] out UserClaims? userClaims)
     {
         if (!context.User.TryGetUserClaims(out userClaims))
         {

@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using CecoChat.Client.History;
 using CecoChat.Contracts.Bff;
 using CecoChat.Server.Identity;
@@ -41,7 +42,7 @@ public class HistoryController : ControllerBase
             return Unauthorized();
         }
 
-        IReadOnlyCollection<Contracts.History.HistoryMessage> serviceMessages = await _historyClient.GetHistory(userClaims!.UserId, request.OtherUserID, request.OlderThan, accessToken!, ct);
+        IReadOnlyCollection<Contracts.History.HistoryMessage> serviceMessages = await _historyClient.GetHistory(userClaims.UserId, request.OtherUserID, request.OlderThan, accessToken, ct);
         HistoryMessage[] clientMessages = serviceMessages.Select(MapMessage).ToArray();
 
         _logger.LogTrace("Responding with {MessageCount} messages for chat between {UserId} and {OtherUserId} older than {OlderThan}",
@@ -84,7 +85,7 @@ public class HistoryController : ControllerBase
         return toClient;
     }
 
-    private bool TryGetUserClaims(HttpContext context, out UserClaims? userClaims)
+    private bool TryGetUserClaims(HttpContext context, [NotNullWhen(true)] out UserClaims? userClaims)
     {
         if (!context.User.TryGetUserClaims(out userClaims))
         {
