@@ -36,10 +36,10 @@ public sealed class GrpcListenService : Listen.ListenBase
             throw new RpcException(new Status(StatusCode.InvalidArgument, "Access token could not be parsed."));
         }
 
-        _logger.LogInformation("Connect for user {UserId} with client {ClientId} from {Address}", userClaims.UserID, userClaims.ClientID, address);
+        _logger.LogInformation("Connect for user {UserId} with client {ClientId} from {Address}", userClaims.UserId, userClaims.ClientId, address);
 
         IGrpcListenStreamer streamer = _streamerFactory.Create();
-        streamer.Initialize(userClaims.ClientID, notificationStream);
+        streamer.Initialize(userClaims.ClientId, notificationStream);
         await ProcessMessages(streamer, userClaims, address, context.CancellationToken);
     }
 
@@ -49,7 +49,7 @@ public sealed class GrpcListenService : Listen.ListenBase
 
         try
         {
-            isClientAdded = _clientContainer.AddClient(userClaims.UserID, streamer);
+            isClientAdded = _clientContainer.AddClient(userClaims.UserId, streamer);
             if (isClientAdded)
             {
                 _messagingTelemetry.AddOnlineClient();
@@ -57,7 +57,7 @@ public sealed class GrpcListenService : Listen.ListenBase
             }
             else
             {
-                _logger.LogError("Failure to add user {UserId} with client {ClientId} from {Address}", userClaims.UserID, userClaims.ClientID, address);
+                _logger.LogError("Failure to add user {UserId} with client {ClientId} from {Address}", userClaims.UserId, userClaims.ClientId, address);
             }
         }
         catch (OperationCanceledException operationCanceledException)
@@ -65,20 +65,20 @@ public sealed class GrpcListenService : Listen.ListenBase
             // thrown when client cancels the streaming call, when the deadline is exceeded or a network error
             if (operationCanceledException.InnerException != null)
             {
-                _logger.LogError(operationCanceledException.InnerException, "Failure to listen to user {UserId} with client {ClientId} from {Address}", userClaims.UserID, userClaims.ClientID, address);
+                _logger.LogError(operationCanceledException.InnerException, "Failure to listen to user {UserId} with client {ClientId} from {Address}", userClaims.UserId, userClaims.ClientId, address);
             }
         }
         catch (Exception exception)
         {
-            _logger.LogError(exception, "Failure to listen to user {UserId} with client {ClientId} from {Address}", userClaims.UserID, userClaims.ClientID, address);
+            _logger.LogError(exception, "Failure to listen to user {UserId} with client {ClientId} from {Address}", userClaims.UserId, userClaims.ClientId, address);
         }
         finally
         {
             if (isClientAdded)
             {
-                _clientContainer.RemoveClient(userClaims.UserID, streamer);
+                _clientContainer.RemoveClient(userClaims.UserId, streamer);
                 _messagingTelemetry.RemoveOnlineClient();
-                _logger.LogInformation("Disconnect for user {UserId} with client {ClientId} from {Address}", userClaims.UserID, userClaims.ClientID, address);
+                _logger.LogInformation("Disconnect for user {UserId} with client {ClientId} from {Address}", userClaims.UserId, userClaims.ClientId, address);
             }
             streamer.Dispose();
         }

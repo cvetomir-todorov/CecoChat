@@ -36,7 +36,7 @@ public class GrpcStateService : Contracts.State.State.StateBase
 
     private static long GetUserId(ServerCallContext context)
     {
-        if (!context.GetHttpContext().User.TryGetUserID(out long userId))
+        if (!context.GetHttpContext().User.TryGetUserId(out long userId))
         {
             throw new RpcException(new Status(StatusCode.Unauthenticated, "Client has no parseable access token."));
         }

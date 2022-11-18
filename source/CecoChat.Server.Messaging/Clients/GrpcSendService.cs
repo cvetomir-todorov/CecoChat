@@ -45,10 +45,10 @@ public sealed class GrpcSendService : Send.SendBase
         _messagingTelemetry.NotifyMessageReceived();
         _logger.LogTrace("User {@User} sent message with generated ID {MessageId}: {@SendMessageRequest}", userClaims, messageId, request);
 
-        BackplaneMessage backplaneMessage = _mapper.CreateBackplaneMessage(request, userClaims.ClientID, messageId);
+        BackplaneMessage backplaneMessage = _mapper.CreateBackplaneMessage(request, userClaims.ClientId, messageId);
         _sendersProducer.ProduceMessage(backplaneMessage);
 
-        (int successCount, int allCount) = EnqueueMessagesForSenders(request, messageId, userClaims.ClientID);
+        (int successCount, int allCount) = EnqueueMessagesForSenders(request, messageId, userClaims.ClientId);
         LogResults(request, messageId, successCount, allCount);
 
         SendMessageResponse response = new() { MessageId = messageId };
@@ -63,8 +63,8 @@ public sealed class GrpcSendService : Send.SendBase
             throw new RpcException(new Status(StatusCode.InvalidArgument, "Access token could not be parsed."));
         }
 
-        Activity.Current?.SetTag("user.id", userClaims!.UserID);
-        return userClaims!;
+        Activity.Current?.SetTag("user.id", userClaims.UserId);
+        return userClaims;
     }
 
     private async Task<long> GetMessageId(UserClaims userClaims, ServerCallContext context)
@@ -73,7 +73,7 @@ public sealed class GrpcSendService : Send.SendBase
         if (!result.Success)
         {
             Metadata metadata = new();
-            metadata.Add("UserID", userClaims.UserID.ToString());
+            metadata.Add("UserID", userClaims.UserId.ToString());
             throw new RpcException(new Status(StatusCode.Unavailable, "Failed to get a message ID."), metadata);
         }
 
