@@ -126,7 +126,7 @@ internal sealed class ChatMessageRepo : IChatMessageRepo
         query.SetIdempotence(false);
 
         _historyTelemetry.AddDataMessage(_dbContext.Session, query, message.MessageId);
-        _logger.LogTrace("Persisted the message {MessageId} type {MessageType} for chat {ChatId}", message.MessageId, message.DataType, chatId);
+        _logger.LogTrace("Persisted message {MessageId} type {MessageType} for chat {ChatId}", message.MessageId, message.DataType, chatId);
     }
 
     public void SetReaction(ReactionMessage message)

@@ -62,29 +62,29 @@ public class SessionController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public IActionResult CreateSession([FromBody][BindRequired] CreateSessionRequest request)
     {
-        if (!_userIDMap.TryGetValue(request.Username, out long userID))
+        if (!_userIdMap.TryGetValue(request.Username, out long userId))
         {
             return Unauthorized();
         }
-        Activity.Current?.AddTag("user.id", userID);
+        Activity.Current?.AddTag("user.id", userId);
 
-        (Guid clientID, string accessToken) = CreateSession(userID);
-        _logger.LogInformation("User {Username} authenticated and assigned user ID {UserId} and client ID {ClientId}", request.Username, userID, clientID);
+        (Guid clientId, string accessToken) = CreateSession(userId);
+        _logger.LogInformation("User {Username} authenticated and assigned user ID {UserId} and client ID {ClientId}", request.Username, userId, clientId);
 
-        int partition = _partitionUtility.ChoosePartition(userID, _partitioningConfig.PartitionCount);
+        int partition = _partitionUtility.ChoosePartition(userId, _partitioningConfig.PartitionCount);
         string messagingServerAddress = _partitioningConfig.GetServerAddress(partition);
-        _logger.LogInformation("User with ID {UserId} in partition {Partition} assigned to messaging server {MessagingServer}", userID, partition, messagingServerAddress);
+        _logger.LogInformation("User {UserId} in partition {Partition} assigned to messaging server {MessagingServer}", userId, partition, messagingServerAddress);
 
         CreateSessionResponse response = new()
         {
-            ClientID = clientID,
+            ClientID = clientId,
             AccessToken = accessToken,
             MessagingServerAddress = messagingServerAddress
         };
         return Ok(response);
     }
 
-    private readonly Dictionary<string, long> _userIDMap = new()
+    private readonly Dictionary<string, long> _userIdMap = new()
     {
         { "bob", 1 },
         { "alice", 2 },
@@ -92,13 +92,13 @@ public class SessionController : ControllerBase
         { "peter", 1200 }
     };
 
-    private (Guid, string) CreateSession(long userID)
+    private (Guid, string) CreateSession(long userId)
     {
-        Guid clientID = Guid.NewGuid();
+        Guid clientId = Guid.NewGuid();
         Claim[] claims =
         {
-            new(JwtRegisteredClaimNames.Sub, userID.ToString(), ClaimValueTypes.Integer64),
-            new(ClaimTypes.Actor, clientID.ToString()),
+            new(JwtRegisteredClaimNames.Sub, userId.ToString(), ClaimValueTypes.Integer64),
+            new(ClaimTypes.Actor, clientId.ToString()),
             new(ClaimTypes.Role, "user")
         };
 
@@ -106,6 +106,6 @@ public class SessionController : ControllerBase
         JwtSecurityToken jwtToken = new(_jwtOptions.Issuer, _jwtOptions.Audience, claims, null, expiration, _signingCredentials);
         string accessToken = _jwtTokenHandler.WriteToken(jwtToken);
 
-        return (clientID, accessToken);
+        return (clientId, accessToken);
     }
 }
