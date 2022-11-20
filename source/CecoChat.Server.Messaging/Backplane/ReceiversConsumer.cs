@@ -104,7 +104,7 @@ public sealed class ReceiversConsumer : IReceiversConsumer
 
         foreach (IStreamer<ListenNotification> receiverClient in receiverClients)
         {
-            if (receiverClient.ClientID != senderClientId)
+            if (receiverClient.ClientId != senderClientId)
             {
                 if (receiverClient.EnqueueMessage(notification, parentActivity: Activity.Current))
                 {

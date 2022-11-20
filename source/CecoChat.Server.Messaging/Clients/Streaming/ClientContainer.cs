@@ -6,11 +6,11 @@ namespace CecoChat.Server.Messaging.Clients.Streaming;
 
 public interface IClientContainer
 {
-    bool AddClient(in long userID, IStreamer<ListenNotification> client);
+    bool AddClient(in long userId, IStreamer<ListenNotification> client);
 
-    void RemoveClient(in long userID, IStreamer<ListenNotification> client);
+    void RemoveClient(in long userId, IStreamer<ListenNotification> client);
 
-    IEnumerable<IStreamer<ListenNotification>> EnumerateClients(in long userID);
+    IEnumerable<IStreamer<ListenNotification>> EnumerateClients(in long userId);
 
     IEnumerable<KeyValuePair<long, IEnumerable<IStreamer<ListenNotification>>>> EnumerateAllClients();
 }
@@ -18,7 +18,7 @@ public interface IClientContainer
 public sealed class ClientContainer : IClientContainer
 {
     // ReSharper disable once CollectionNeverUpdated.Local
-    private static readonly List<IStreamer<ListenNotification>> _emptyClientList = new(capacity: 0);
+    private static readonly List<IStreamer<ListenNotification>> EmptyClientList = new(capacity: 0);
     private readonly ConcurrentDictionary<long, UserClients> _userMap;
 
     public ClientContainer()
@@ -26,34 +26,34 @@ public sealed class ClientContainer : IClientContainer
         _userMap = new ConcurrentDictionary<long, UserClients>();
     }
 
-    public bool AddClient(in long userID, IStreamer<ListenNotification> client)
+    public bool AddClient(in long userId, IStreamer<ListenNotification> client)
     {
-        UserClients userClients = _userMap.GetOrAdd(userID, _ => new UserClients());
-        bool isAdded = userClients.Clients.TryAdd(client.ClientID, client);
+        UserClients userClients = _userMap.GetOrAdd(userId, _ => new UserClients());
+        bool isAdded = userClients.Clients.TryAdd(client.ClientId, client);
         return isAdded;
     }
 
-    public void RemoveClient(in long userID, IStreamer<ListenNotification> client)
+    public void RemoveClient(in long userId, IStreamer<ListenNotification> client)
     {
-        if (_userMap.TryGetValue(userID, out UserClients? userClients))
+        if (_userMap.TryGetValue(userId, out UserClients? userClients))
         {
-            bool isRemoved = userClients.Clients.TryRemove(client.ClientID, out _);
+            bool isRemoved = userClients.Clients.TryRemove(client.ClientId, out _);
             if (!isRemoved)
             {
-                throw new InvalidOperationException($"Client {client.ClientID} for user {userID} has already been removed.");
+                throw new InvalidOperationException($"Client {client.ClientId} for user {userId} has already been removed.");
             }
         }
     }
 
-    public IEnumerable<IStreamer<ListenNotification>> EnumerateClients(in long userID)
+    public IEnumerable<IStreamer<ListenNotification>> EnumerateClients(in long userId)
     {
-        if (_userMap.TryGetValue(userID, out UserClients? userClients))
+        if (_userMap.TryGetValue(userId, out UserClients? userClients))
         {
             return userClients;
         }
         else
         {
-            return _emptyClientList;
+            return EmptyClientList;
         }
     }
 
@@ -61,10 +61,10 @@ public sealed class ClientContainer : IClientContainer
     {
         foreach (KeyValuePair<long, UserClients> pair in _userMap)
         {
-            long userID = pair.Key;
+            long userId = pair.Key;
             IEnumerable<IStreamer<ListenNotification>> clients = pair.Value;
 
-            yield return new KeyValuePair<long, IEnumerable<IStreamer<ListenNotification>>>(userID, clients);
+            yield return new KeyValuePair<long, IEnumerable<IStreamer<ListenNotification>>>(userId, clients);
         }
     }
 

@@ -59,7 +59,7 @@ public sealed class ListenStreamer : IListenStreamer
         _streamWriter = streamWriter;
     }
 
-    public Guid ClientID => _clientId;
+    public Guid ClientId => _clientId;
 
     public bool EnqueueMessage(ListenNotification message, Activity? parentActivity = null)
     {
@@ -72,7 +72,7 @@ public sealed class ListenStreamer : IListenStreamer
         }
         else
         {
-            _logger.LogWarning("Dropped message {MessageId} of type {MessageType} since queue for client {ClientId} is full", message.MessageId, message.Type, ClientID);
+            _logger.LogWarning("Dropped message {MessageId} of type {MessageType} since queue for client {ClientId} is full", message.MessageId, message.Type, ClientId);
         }
 
         return isAdded;
