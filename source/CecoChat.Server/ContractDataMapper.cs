@@ -15,6 +15,10 @@ public interface IContractDataMapper
 
     ListenNotification CreateListenNotification(SendMessageRequest request, long messageId);
 
+    ListenNotification CreateListenNotification(ReactRequest request, long reactorId);
+
+    ListenNotification CreateListenNotification(UnReactRequest request, long reactorId);
+
     ListenNotification CreateListenNotification(BackplaneMessage backplaneMessage);
 
     DataMessage CreateDataMessage(BackplaneMessage backplaneMessage);
@@ -111,6 +115,41 @@ public class ContractDataMapper : IContractDataMapper
             default:
                 throw new EnumValueNotSupportedException(request.DataType);
         }
+
+        return notification;
+    }
+
+    public ListenNotification CreateListenNotification(ReactRequest request, long reactorId)
+    {
+        ListenNotification notification = new()
+        {
+            MessageId = request.MessageId,
+            SenderId = request.SenderId,
+            ReceiverId = request.ReceiverId,
+            Type = Contracts.Messaging.MessageType.Reaction,
+            Reaction = new NotificationReaction
+            {
+                ReactorId = reactorId,
+                Reaction = request.Reaction
+            }
+        };
+
+        return notification;
+    }
+
+    public ListenNotification CreateListenNotification(UnReactRequest request, long reactorId)
+    {
+        ListenNotification notification = new()
+        {
+            MessageId = request.MessageId,
+            SenderId = request.SenderId,
+            ReceiverId = request.ReceiverId,
+            Type = Contracts.Messaging.MessageType.Reaction,
+            Reaction = new NotificationReaction
+            {
+                ReactorId = reactorId
+            }
+        };
 
         return notification;
     }
