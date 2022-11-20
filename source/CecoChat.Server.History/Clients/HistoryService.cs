@@ -9,14 +9,14 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace CecoChat.Server.History.Clients;
 
-public sealed class GrpcHistoryService : Contracts.History.History.HistoryBase
+public sealed class HistoryService : Contracts.History.History.HistoryBase
 {
     private readonly ILogger _logger;
     private readonly IHistoryConfig _historyConfig;
     private readonly IChatMessageRepo _messageRepo;
 
-    public GrpcHistoryService(
-        ILogger<GrpcHistoryService> logger,
+    public HistoryService(
+        ILogger<HistoryService> logger,
         IHistoryConfig historyConfig,
         IChatMessageRepo messageRepo)
     {

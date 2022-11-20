@@ -7,7 +7,7 @@ using Microsoft.Extensions.Options;
 
 namespace CecoChat.Server.Messaging.Clients.Streaming;
 
-public interface IGrpcListenStreamer : IStreamer<ListenNotification>
+public interface IListenStreamer : IStreamer<ListenNotification>
 {
     void Initialize(Guid clientId, IServerStreamWriter<ListenNotification> streamWriter);
 }
@@ -15,7 +15,7 @@ public interface IGrpcListenStreamer : IStreamer<ListenNotification>
 /// <summary>
 /// Streams <see cref="ListenNotification"/> instances to a connected client.
 /// </summary>
-public sealed class GrpcListenStreamer : IGrpcListenStreamer
+public sealed class ListenStreamer : IListenStreamer
 {
     private readonly ILogger _logger;
     private readonly IGrpcStreamTelemetry _grpcStreamTelemetry;
@@ -26,8 +26,8 @@ public sealed class GrpcListenStreamer : IGrpcListenStreamer
     private Guid _clientId;
     private int _sequenceNumber;
 
-    public GrpcListenStreamer(
-        ILogger<GrpcListenStreamer> logger,
+    public ListenStreamer(
+        ILogger<ListenStreamer> logger,
         IGrpcStreamTelemetry grpcStreamTelemetry,
         IOptions<ClientOptions> options)
     {
@@ -144,8 +144,8 @@ public sealed class GrpcListenStreamer : IGrpcListenStreamer
 
     private Activity StartActivity(ListenNotification message, Activity? parentActivity)
     {
-        const string service = nameof(GrpcListenService);
-        const string method = nameof(GrpcListenService.Listen);
+        const string service = nameof(ListenService);
+        const string method = nameof(ListenService.Listen);
         string name = $"{service}.{method}/Stream.{message.Type}";
 
         return _grpcStreamTelemetry.StartStream(name, service, method, parentActivity?.Context);

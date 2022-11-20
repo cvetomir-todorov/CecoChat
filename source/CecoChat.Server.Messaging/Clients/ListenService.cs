@@ -7,17 +7,17 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace CecoChat.Server.Messaging.Clients;
 
-public sealed class GrpcListenService : Listen.ListenBase
+public sealed class ListenService : Listen.ListenBase
 {
     private readonly ILogger _logger;
     private readonly IClientContainer _clientContainer;
-    private readonly IFactory<IGrpcListenStreamer> _streamerFactory;
+    private readonly IFactory<IListenStreamer> _streamerFactory;
     private readonly IMessagingTelemetry _messagingTelemetry;
 
-    public GrpcListenService(
-        ILogger<GrpcListenService> logger,
+    public ListenService(
+        ILogger<ListenService> logger,
         IClientContainer clientContainer,
-        IFactory<IGrpcListenStreamer> streamerFactory,
+        IFactory<IListenStreamer> streamerFactory,
         IMessagingTelemetry messagingTelemetry)
     {
         _logger = logger;
@@ -38,12 +38,12 @@ public sealed class GrpcListenService : Listen.ListenBase
 
         _logger.LogInformation("Connect for user {UserId} with client {ClientId} from {Address}", userClaims.UserId, userClaims.ClientId, address);
 
-        IGrpcListenStreamer streamer = _streamerFactory.Create();
+        IListenStreamer streamer = _streamerFactory.Create();
         streamer.Initialize(userClaims.ClientId, notificationStream);
         await ProcessMessages(streamer, userClaims, address, context.CancellationToken);
     }
 
-    private async Task ProcessMessages(IGrpcListenStreamer streamer, UserClaims userClaims, string address, CancellationToken ct)
+    private async Task ProcessMessages(IListenStreamer streamer, UserClaims userClaims, string address, CancellationToken ct)
     {
         bool isClientAdded = false;
 

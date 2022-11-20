@@ -7,13 +7,13 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace CecoChat.Server.State.Clients;
 
-public class GrpcStateService : Contracts.State.State.StateBase
+public class StateService : Contracts.State.State.StateBase
 {
     private readonly ILogger _logger;
     private readonly IChatStateRepo _repo;
 
-    public GrpcStateService(
-        ILogger<GrpcStateService> logger,
+    public StateService(
+        ILogger<StateService> logger,
         IChatStateRepo repo)
     {
         _logger = logger;
