@@ -31,7 +31,7 @@ public sealed class MessagingTelemetry : IMessagingTelemetry
         _messagesProcessed = _meter.CreateCounter<long>(MessagingInstrumentation.Metrics.MessagesProcessed, description: MessagingInstrumentation.Metrics.MessagesProcessedDescription);
         _onlineClients = _meter.CreateUpDownCounter<int>(MessagingInstrumentation.Metrics.OnlineClients, description: MessagingInstrumentation.Metrics.OnlineClientsDescription);
 
-        _serverIdTag = new KeyValuePair<string, object?>(MessagingInstrumentation.Tags.ServerId, configOptions.Value.ServerID);
+        _serverIdTag = new KeyValuePair<string, object?>(MessagingInstrumentation.Tags.ServerId, configOptions.Value.ServerId);
     }
 
     public void Dispose()

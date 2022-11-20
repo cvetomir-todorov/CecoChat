@@ -58,10 +58,10 @@ public sealed class HandlePartitionsChanged : IHostedService, ISubscriber<Partit
 
         foreach (KeyValuePair<long, IEnumerable<IStreamer<ListenNotification>>> pair in _clientContainer.EnumerateAllClients())
         {
-            long userID = pair.Key;
+            long userId = pair.Key;
             IEnumerable<IStreamer<ListenNotification>> clients = pair.Value;
 
-            int userPartition = _partitionUtility.ChoosePartition(userID, partitionCount);
+            int userPartition = _partitionUtility.ChoosePartition(userId, partitionCount);
             if (!partitions.Contains(userPartition))
             {
                 foreach (IStreamer<ListenNotification> client in clients)

@@ -21,12 +21,12 @@ public sealed class InitDynamicConfig : IHostedService
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Configured server ID is {ServerId}", _configOptions.ServerID);
+        _logger.LogInformation("Configured server ID is {ServerId}", _configOptions.ServerId);
 
         await _partitioningConfig.Initialize(new PartitioningConfigUsage
         {
             UseServerPartitions = true,
-            ServerPartitionChangesToWatch = _configOptions.ServerID
+            ServerPartitionChangesToWatch = _configOptions.ServerId
         });
     }
 

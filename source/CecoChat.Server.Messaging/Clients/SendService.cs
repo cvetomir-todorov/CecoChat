@@ -90,7 +90,7 @@ public sealed class SendService : Send.SendBase
 
         foreach (IStreamer<ListenNotification> senderClient in senderClients)
         {
-            if (senderClient.ClientID != senderClientId)
+            if (senderClient.ClientId != senderClientId)
             {
                 if (senderClient.EnqueueMessage(notification, parentActivity: Activity.Current))
                 {
