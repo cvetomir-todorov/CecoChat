@@ -89,23 +89,25 @@ public sealed class ReceiversConsumer : IReceiversConsumer
 
     private void ProcessMessage(BackplaneMessage backplaneMessage)
     {
-        Guid senderClientId = backplaneMessage.ClientId.ToGuid();
-        IEnumerable<IStreamer<ListenNotification>> receiverClients = _clientContainer.EnumerateClients(backplaneMessage.ReceiverId);
-
-        ListenNotification notification = _mapper.CreateListenNotification(backplaneMessage);
-        EnqueueMessage(senderClientId, notification, receiverClients);
+        EnqueueMessageForReceiverClients(backplaneMessage);
     }
 
-    private void EnqueueMessage(Guid senderClientId, ListenNotification notification, IEnumerable<IStreamer<ListenNotification>> receiverClients)
+    private void EnqueueMessageForReceiverClients(BackplaneMessage backplaneMessage)
     {
         // do not call clients.Count since it is expensive and uses locks
         int successCount = 0;
         int allCount = 0;
 
+        Guid senderClientId = backplaneMessage.ClientId.ToGuid();
+        IEnumerable<IStreamer<ListenNotification>> receiverClients = _clientContainer.EnumerateClients(backplaneMessage.ReceiverId);
+        ListenNotification? notification = null;
+
         foreach (IStreamer<ListenNotification> receiverClient in receiverClients)
         {
             if (receiverClient.ClientId != senderClientId)
             {
+                notification ??= _mapper.CreateListenNotification(backplaneMessage);
+
                 if (receiverClient.EnqueueMessage(notification, parentActivity: Activity.Current))
                 {
                     successCount++;
@@ -117,6 +119,6 @@ public sealed class ReceiversConsumer : IReceiversConsumer
 
         LogLevel logLevel = successCount < allCount ? LogLevel.Warning : LogLevel.Trace;
         _logger.Log(logLevel, "Connected recipients with ID {ReceiverId} ({SuccessCount} out of {AllCount}) were queued message {MessageId} of type {MessageType} from user {SenderId}",
-            notification.ReceiverId, successCount, allCount, notification.MessageId, notification.Type, notification.SenderId);
+            backplaneMessage.ReceiverId, successCount, allCount, backplaneMessage.MessageId, backplaneMessage.Type, backplaneMessage.SenderId);
     }
 }

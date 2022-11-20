@@ -37,9 +37,9 @@ public class ReactService : Reaction.ReactionBase
 
         BackplaneMessage backplaneMessage = _mapper.CreateBackplaneMessage(request, userClaims.ClientId, userClaims.UserId);
         _sendersProducer.ProduceMessage(backplaneMessage);
-
-        ListenNotification notification = _mapper.CreateListenNotification(request, userClaims.UserId);
-        EnqueueReactionForSenders(notification, userClaims.ClientId);
+        EnqueueReactionForReactorClients(
+            userClaims.UserId, userClaims.ClientId, request.MessageId,
+            () => _mapper.CreateListenNotification(request, userClaims.UserId));
 
         return Task.FromResult(new ReactResponse());
     }
@@ -53,9 +53,9 @@ public class ReactService : Reaction.ReactionBase
 
         BackplaneMessage backplaneMessage = _mapper.CreateBackplaneMessage(request, userClaims.ClientId, userClaims.UserId);
         _sendersProducer.ProduceMessage(backplaneMessage);
-
-        ListenNotification notification = _mapper.CreateListenNotification(request, userClaims.UserId);
-        EnqueueReactionForSenders(notification, userClaims.ClientId);
+        EnqueueReactionForReactorClients(
+            userClaims.UserId, userClaims.ClientId, request.MessageId,
+            () => _mapper.CreateListenNotification(request, userClaims.UserId));
 
         return Task.FromResult(new UnReactResponse());
     }
@@ -72,19 +72,22 @@ public class ReactService : Reaction.ReactionBase
         return userClaims;
     }
 
-    private void EnqueueReactionForSenders(ListenNotification notification, Guid senderClientId)
+    private void EnqueueReactionForReactorClients(long reactorId, Guid reactorClientId, long messageId, Func<ListenNotification> notificationFactory)
     {
         // do not call clients.Count since it is expensive and uses locks
         int successCount = 0;
         int allCount = 0;
 
-        IEnumerable<IStreamer<ListenNotification>> senderClients = _clientContainer.EnumerateClients(notification.SenderId);
+        IEnumerable<IStreamer<ListenNotification>> reactorClients = _clientContainer.EnumerateClients(reactorId);
+        ListenNotification? notification = null;
 
-        foreach (IStreamer<ListenNotification> senderClient in senderClients)
+        foreach (IStreamer<ListenNotification> reactorClient in reactorClients)
         {
-            if (senderClient.ClientId != senderClientId)
+            if (reactorClient.ClientId != reactorClientId)
             {
-                if (senderClient.EnqueueMessage(notification, parentActivity: Activity.Current))
+                notification ??= notificationFactory();
+
+                if (reactorClient.EnqueueMessage(notification, parentActivity: Activity.Current))
                 {
                     successCount++;
                 }
@@ -94,7 +97,7 @@ public class ReactService : Reaction.ReactionBase
         }
 
         LogLevel logLevel = successCount < allCount ? LogLevel.Warning : LogLevel.Trace;
-        _logger.Log(logLevel, "Connected senders with ID {SenderId} ({SuccessCount} out of {AllCount}) were queued (un)reaction '{Reaction}' by {ReactorId} to {MessageId}",
-            notification.SenderId, successCount, allCount, notification.Reaction.Reaction ?? string.Empty, notification.Reaction.ReactorId, notification.MessageId);
+        _logger.Log(logLevel, "Connected senders with ID {SenderId} ({SuccessCount} out of {AllCount}) were queued (un)reaction by {ReactorId} to {MessageId}",
+            reactorId, successCount, allCount, reactorId, messageId);
     }
 }

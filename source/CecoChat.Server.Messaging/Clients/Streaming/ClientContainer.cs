@@ -17,8 +17,6 @@ public interface IClientContainer
 
 public sealed class ClientContainer : IClientContainer
 {
-    // ReSharper disable once CollectionNeverUpdated.Local
-    private static readonly List<IStreamer<ListenNotification>> EmptyClientList = new(capacity: 0);
     private readonly ConcurrentDictionary<long, UserClients> _userMap;
 
     public ClientContainer()
@@ -53,7 +51,7 @@ public sealed class ClientContainer : IClientContainer
         }
         else
         {
-            return EmptyClientList;
+            return Array.Empty<IStreamer<ListenNotification>>();
         }
     }
 

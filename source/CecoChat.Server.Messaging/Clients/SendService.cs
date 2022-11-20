@@ -48,7 +48,7 @@ public sealed class SendService : Send.SendBase
 
         BackplaneMessage backplaneMessage = _mapper.CreateBackplaneMessage(request, userClaims.ClientId, messageId);
         _sendersProducer.ProduceMessage(backplaneMessage);
-        EnqueueMessagesForSenders(request, messageId, userClaims.ClientId);
+        EnqueueMessageForSenderClients(request, messageId, userClaims.ClientId);
 
         SendMessageResponse response = new() { MessageId = messageId };
         return response;
@@ -79,19 +79,21 @@ public sealed class SendService : Send.SendBase
         return result.ID;
     }
 
-    private void EnqueueMessagesForSenders(SendMessageRequest request, long messageId, Guid senderClientId)
+    private void EnqueueMessageForSenderClients(SendMessageRequest request, long messageId, Guid senderClientId)
     {
         // do not call clients.Count since it is expensive and uses locks
         int successCount = 0;
         int allCount = 0;
 
         IEnumerable<IStreamer<ListenNotification>> senderClients = _clientContainer.EnumerateClients(request.SenderId);
-        ListenNotification notification = _mapper.CreateListenNotification(request, messageId);
+        ListenNotification? notification = null;
 
         foreach (IStreamer<ListenNotification> senderClient in senderClients)
         {
             if (senderClient.ClientId != senderClientId)
             {
+                notification ??= _mapper.CreateListenNotification(request, messageId);
+
                 if (senderClient.EnqueueMessage(notification, parentActivity: Activity.Current))
                 {
                     successCount++;
