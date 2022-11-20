@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using CecoChat.Contracts;
 using CecoChat.Contracts.Backplane;
 using CecoChat.Contracts.Messaging;
 using CecoChat.Kafka;
@@ -84,14 +83,16 @@ public sealed class SendersProducer : ISendersProducer
             Type = Contracts.Messaging.MessageType.Delivery,
             Status = status
         };
-        Guid clientId = backplaneMessage.ClientId.ToGuid();
+
         IEnumerable<IStreamer<ListenNotification>> clients = _clientContainer.EnumerateClients(backplaneMessage.SenderId);
 
         foreach (IStreamer<ListenNotification> client in clients)
         {
-            client.EnqueueMessage(deliveryNotification, parentActivity: activity);
-            _logger.LogTrace("Notified client {ClientId} that message {MessageId} of type {MessageType} has been processed",
-                clientId, backplaneMessage.MessageId, backplaneMessage.Type);
+            bool enqueued = client.EnqueueMessage(deliveryNotification, parentActivity: activity);
+
+            LogLevel logLevel = enqueued ? LogLevel.Trace : LogLevel.Warning;
+            _logger.Log(logLevel, "{Status} client {ClientId} that message {MessageId} of type {MessageType} has been processed",
+                enqueued ? "Notified": "Failed to notify", client.ClientId, backplaneMessage.MessageId, backplaneMessage.Type);
         }
     }
 }
