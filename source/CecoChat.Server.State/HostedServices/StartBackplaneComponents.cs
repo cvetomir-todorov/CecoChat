@@ -1,4 +1,5 @@
 using CecoChat.Server.State.Backplane;
+using CecoChat.Threading;
 
 namespace CecoChat.Server.State.HostedServices;
 
@@ -8,6 +9,8 @@ public sealed class StartBackplaneComponents : IHostedService, IDisposable
     private readonly IStateConsumer _stateConsumer;
     private readonly CancellationToken _appStoppingCt;
     private CancellationTokenSource? _stoppedCts;
+    private DedicatedThreadTaskScheduler? _receiverMessagesTaskScheduler;
+    private DedicatedThreadTaskScheduler? _senderMessagesTaskScheduler;
 
     public StartBackplaneComponents(
         ILogger<StartBackplaneComponents> logger,
@@ -22,6 +25,8 @@ public sealed class StartBackplaneComponents : IHostedService, IDisposable
 
     public void Dispose()
     {
+        _senderMessagesTaskScheduler?.Dispose();
+        _receiverMessagesTaskScheduler?.Dispose();
         _stoppedCts?.Dispose();
         _stateConsumer.Dispose();
     }
@@ -31,6 +36,7 @@ public sealed class StartBackplaneComponents : IHostedService, IDisposable
         _stoppedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _appStoppingCt);
         _stateConsumer.Prepare();
 
+        _receiverMessagesTaskScheduler = new DedicatedThreadTaskScheduler();
         Task.Factory.StartNew(() =>
         {
             try
@@ -41,8 +47,9 @@ public sealed class StartBackplaneComponents : IHostedService, IDisposable
             {
                 _logger.LogCritical(exception, "Failure in consumer {ConsumerId}", _stateConsumer.ReceiverConsumerId);
             }
-        }, _stoppedCts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+        }, _stoppedCts.Token, TaskCreationOptions.LongRunning, _receiverMessagesTaskScheduler);
 
+        _senderMessagesTaskScheduler = new DedicatedThreadTaskScheduler();
         Task.Factory.StartNew(() =>
         {
             try
@@ -53,7 +60,7 @@ public sealed class StartBackplaneComponents : IHostedService, IDisposable
             {
                 _logger.LogCritical(exception, "Failure in consumer {ConsumerId}", _stateConsumer.SenderConsumerId);
             }
-        }, _stoppedCts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+        }, _stoppedCts.Token, TaskCreationOptions.LongRunning, _senderMessagesTaskScheduler);
 
         return Task.CompletedTask;
     }

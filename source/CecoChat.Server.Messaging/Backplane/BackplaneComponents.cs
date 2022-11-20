@@ -1,4 +1,5 @@
 ﻿using CecoChat.Kafka;
+using CecoChat.Threading;
 using Microsoft.Extensions.Options;
 
 namespace CecoChat.Server.Messaging.Backplane;
@@ -17,6 +18,7 @@ public sealed class BackplaneComponents : IBackplaneComponents
     private readonly ITopicPartitionFlyweight _topicPartitionFlyweight;
     private readonly ISendersProducer _sendersProducer;
     private readonly IReceiversConsumer _receiversConsumer;
+    private DedicatedThreadTaskScheduler? _receiversConsumerTaskScheduler;
 
     public BackplaneComponents(
         ILogger<BackplaneComponents> logger,
@@ -34,6 +36,7 @@ public sealed class BackplaneComponents : IBackplaneComponents
 
     public void Dispose()
     {
+        _receiversConsumerTaskScheduler?.Dispose();
         _sendersProducer.Dispose();
         _receiversConsumer.Dispose();
     }
@@ -57,6 +60,7 @@ public sealed class BackplaneComponents : IBackplaneComponents
 
     public void StartConsumption(CancellationToken ct)
     {
+        _receiversConsumerTaskScheduler = new DedicatedThreadTaskScheduler();
         Task.Factory.StartNew(() =>
         {
             try
@@ -67,6 +71,6 @@ public sealed class BackplaneComponents : IBackplaneComponents
             {
                 _logger.LogCritical(exception, "Failure in consumer {ConsumerId}", _receiversConsumer.ConsumerId);
             }
-        }, ct, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+        }, ct, TaskCreationOptions.LongRunning, _receiversConsumerTaskScheduler);
     }
 }
