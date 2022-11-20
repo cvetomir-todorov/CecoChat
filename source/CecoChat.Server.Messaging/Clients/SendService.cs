@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace CecoChat.Server.Messaging.Clients;
 
-public sealed class GrpcSendService : Send.SendBase
+public sealed class SendService : Send.SendBase
 {
     private readonly ILogger _logger;
     private readonly IIDGenClient _idGenClient;
@@ -20,8 +20,8 @@ public sealed class GrpcSendService : Send.SendBase
     private readonly IContractDataMapper _mapper;
     private readonly IMessagingTelemetry _messagingTelemetry;
 
-    public GrpcSendService(
-        ILogger<GrpcSendService> logger,
+    public SendService(
+        ILogger<SendService> logger,
         IIDGenClient idGenClient,
         ISendersProducer sendersProducer,
         IClientContainer clientContainer,

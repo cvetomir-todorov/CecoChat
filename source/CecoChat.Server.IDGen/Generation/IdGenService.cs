@@ -3,11 +3,11 @@ using Grpc.Core;
 
 namespace CecoChat.Server.IDGen.Generation;
 
-public sealed class GrpcIDGenService : Contracts.IDGen.IDGen.IDGenBase
+public sealed class IdGenService : Contracts.IDGen.IDGen.IDGenBase
 {
     private readonly IIdentityGenerator _generator;
 
-    public GrpcIDGenService(
+    public IdGenService(
         IIdentityGenerator generator)
     {
         _generator = generator;

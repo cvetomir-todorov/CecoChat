@@ -126,7 +126,7 @@ public class Startup
         app.UseAuthorization();
         app.UseEndpoints(endpoints =>
         {
-            endpoints.MapGrpcService<GrpcHistoryService>();
+            endpoints.MapGrpcService<HistoryService>();
         });
 
         app.UseOpenTelemetryPrometheusScrapingEndpoint(context => context.Request.Path == _prometheusOptions.ScrapeEndpointPath);

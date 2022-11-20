@@ -94,7 +94,7 @@ public class Startup
         app.UseRouting();
         app.UseEndpoints(endpoints =>
         {
-            endpoints.MapGrpcService<GrpcIDGenService>();
+            endpoints.MapGrpcService<IdGenService>();
         });
 
         app.UseOpenTelemetryPrometheusScrapingEndpoint(context => context.Request.Path == _prometheusOptions.ScrapeEndpointPath);

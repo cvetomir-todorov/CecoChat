@@ -8,14 +8,14 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace CecoChat.Server.Messaging.Clients;
 
-public class GrpcReactionService : Reaction.ReactionBase
+public class ReactService : Reaction.ReactionBase
 {
     private readonly ILogger _logger;
     private readonly ISendersProducer _sendersProducer;
     private readonly IContractDataMapper _mapper;
 
-    public GrpcReactionService(
-        ILogger<GrpcReactionService> logger,
+    public ReactService(
+        ILogger<ReactService> logger,
         ISendersProducer sendersProducer,
         IContractDataMapper mapper)
     {

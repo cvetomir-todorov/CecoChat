@@ -114,7 +114,7 @@ public class Startup
         // clients
         builder.RegisterModule(new GrpcStreamAutofacModule());
         builder.RegisterType<ClientContainer>().As<IClientContainer>().SingleInstance();
-        builder.RegisterFactory<GrpcListenStreamer, IGrpcListenStreamer>();
+        builder.RegisterFactory<ListenStreamer, IListenStreamer>();
         builder.RegisterOptions<ClientOptions>(Configuration.GetSection("Clients"));
 
         // idgen
@@ -151,9 +151,9 @@ public class Startup
         app.UseAuthorization();
         app.UseEndpoints(endpoints =>
         {
-            endpoints.MapGrpcService<GrpcListenService>();
-            endpoints.MapGrpcService<GrpcSendService>();
-            endpoints.MapGrpcService<GrpcReactionService>();
+            endpoints.MapGrpcService<ListenService>();
+            endpoints.MapGrpcService<SendService>();
+            endpoints.MapGrpcService<ReactService>();
         });
 
         app.UseOpenTelemetryPrometheusScrapingEndpoint(context => context.Request.Path == _prometheusOptions.ScrapeEndpointPath);
