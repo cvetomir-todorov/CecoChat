@@ -1,4 +1,5 @@
 ﻿using CecoChat.Server.History.Backplane;
+using CecoChat.Threading;
 
 namespace CecoChat.Server.History.HostedServices;
 
@@ -8,6 +9,7 @@ public sealed class StartMaterializeMessages : IHostedService, IDisposable
     private readonly IHistoryConsumer _historyConsumer;
     private readonly CancellationToken _appStoppingCt;
     private CancellationTokenSource? _stoppedCts;
+    private DedicatedThreadTaskScheduler? _historyConsumerTaskScheduler;
 
     public StartMaterializeMessages(
         ILogger<StartMaterializeMessages> logger,
@@ -22,6 +24,7 @@ public sealed class StartMaterializeMessages : IHostedService, IDisposable
 
     public void Dispose()
     {
+        _historyConsumerTaskScheduler?.Dispose();
         _stoppedCts?.Dispose();
         _historyConsumer.Dispose();
     }
@@ -31,6 +34,7 @@ public sealed class StartMaterializeMessages : IHostedService, IDisposable
         _stoppedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _appStoppingCt);
 
         _historyConsumer.Prepare();
+        _historyConsumerTaskScheduler = new DedicatedThreadTaskScheduler();
 
         Task.Factory.StartNew(() =>
         {
@@ -42,7 +46,7 @@ public sealed class StartMaterializeMessages : IHostedService, IDisposable
             {
                 _logger.LogCritical(exception, "Failure in consumer {ConsumerId}", _historyConsumer.ConsumerId);
             }
-        }, _stoppedCts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+        }, _stoppedCts.Token, TaskCreationOptions.LongRunning, _historyConsumerTaskScheduler);
 
         return Task.CompletedTask;
     }
