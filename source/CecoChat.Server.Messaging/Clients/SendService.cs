@@ -40,9 +40,8 @@ public sealed class SendService : Send.SendBase
     public override async Task<SendMessageResponse> SendMessage(SendMessageRequest request, ServerCallContext context)
     {
         UserClaims userClaims = GetUserClaims(context);
+        _messagingTelemetry.NotifyPlainTextReceived();
         long messageId = await GetMessageId(userClaims, context);
-
-        _messagingTelemetry.NotifyMessageReceived();
         _logger.LogTrace("User {UserId} with client {ClientId} sent message {MessageId} with data {DataType} to user {ReceiverId}",
             userClaims.UserId, userClaims.ClientId, messageId, request.DataType, request.ReceiverId);
 

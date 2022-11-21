@@ -6,9 +6,17 @@ namespace CecoChat.Server.Messaging.Telemetry;
 
 public interface IMessagingTelemetry : IDisposable
 {
-    void NotifyMessageReceived();
+    void NotifyPlainTextReceived();
 
-    void NotifyMessageProcessed();
+    void NotifyPlainTextProcessed();
+
+    void NotifyReactionReceived();
+
+    void NotifyReactionProcessed();
+
+    void NotifyUnreactionReceived();
+
+    void NotifyUnreactionProcessed();
 
     void AddOnlineClient();
 
@@ -18,8 +26,12 @@ public interface IMessagingTelemetry : IDisposable
 public sealed class MessagingTelemetry : IMessagingTelemetry
 {
     private readonly Meter _meter;
-    private readonly Counter<long> _messagesReceived;
-    private readonly Counter<long> _messagesProcessed;
+    private readonly Counter<long> _plainTextsReceived;
+    private readonly Counter<long> _plainTextsProcessed;
+    private readonly Counter<long> _reactionsReceived;
+    private readonly Counter<long> _reactionsProcessed;
+    private readonly Counter<long> _unreactionsReceived;
+    private readonly Counter<long> _unreactionsProcessed;
     private readonly UpDownCounter<int> _onlineClients;
     private readonly KeyValuePair<string, object?> _serverIdTag;
 
@@ -27,8 +39,15 @@ public sealed class MessagingTelemetry : IMessagingTelemetry
     {
         _meter = new Meter(MessagingInstrumentation.ActivitySource.Name);
 
-        _messagesReceived = _meter.CreateCounter<long>(MessagingInstrumentation.Metrics.MessagesReceived, description: MessagingInstrumentation.Metrics.MessagesReceivedDescription);
-        _messagesProcessed = _meter.CreateCounter<long>(MessagingInstrumentation.Metrics.MessagesProcessed, description: MessagingInstrumentation.Metrics.MessagesProcessedDescription);
+        _plainTextsReceived = _meter.CreateCounter<long>(MessagingInstrumentation.Metrics.PlainTextsReceived, description: MessagingInstrumentation.Metrics.PlainTextsReceivedDescription);
+        _plainTextsProcessed = _meter.CreateCounter<long>(MessagingInstrumentation.Metrics.MessagesProcessed, description: MessagingInstrumentation.Metrics.MessagesProcessedDescription);
+
+        _reactionsReceived = _meter.CreateCounter<long>(MessagingInstrumentation.Metrics.ReactionsReceived, description: MessagingInstrumentation.Metrics.ReactionsReceivedDescription);
+        _reactionsProcessed = _meter.CreateCounter<long>(MessagingInstrumentation.Metrics.ReactionsProcessed, description: MessagingInstrumentation.Metrics.ReactionsProcessedDescription);
+
+        _unreactionsReceived = _meter.CreateCounter<long>(MessagingInstrumentation.Metrics.UnReactionsReceived, description: MessagingInstrumentation.Metrics.UnReactionsReceivedDescription);
+        _unreactionsProcessed = _meter.CreateCounter<long>(MessagingInstrumentation.Metrics.UnReactionsProcessed, description: MessagingInstrumentation.Metrics.UnReactionsProcessedDescription);
+
         _onlineClients = _meter.CreateUpDownCounter<int>(MessagingInstrumentation.Metrics.OnlineClients, description: MessagingInstrumentation.Metrics.OnlineClientsDescription);
 
         _serverIdTag = new KeyValuePair<string, object?>(MessagingInstrumentation.Tags.ServerId, configOptions.Value.ServerId);
@@ -39,14 +58,34 @@ public sealed class MessagingTelemetry : IMessagingTelemetry
         _meter.Dispose();
     }
 
-    public void NotifyMessageReceived()
+    public void NotifyPlainTextReceived()
     {
-        _messagesReceived.Add(1, _serverIdTag);
+        _plainTextsReceived.Add(1, _serverIdTag);
     }
 
-    public void NotifyMessageProcessed()
+    public void NotifyPlainTextProcessed()
     {
-        _messagesProcessed.Add(1, _serverIdTag);
+        _plainTextsProcessed.Add(1, _serverIdTag);
+    }
+
+    public void NotifyReactionReceived()
+    {
+        _reactionsReceived.Add(1, _serverIdTag);
+    }
+
+    public void NotifyReactionProcessed()
+    {
+        _reactionsProcessed.Add(1, _serverIdTag);
+    }
+
+    public void NotifyUnreactionReceived()
+    {
+        _unreactionsReceived.Add(1, _serverIdTag);
+    }
+
+    public void NotifyUnreactionProcessed()
+    {
+        _unreactionsProcessed.Add(1, _serverIdTag);
     }
 
     public void AddOnlineClient()
