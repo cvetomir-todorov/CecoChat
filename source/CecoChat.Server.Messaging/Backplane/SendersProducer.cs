@@ -67,12 +67,11 @@ public sealed class SendersProducer : ISendersProducer
 
     private void DeliveryHandler(bool isDelivered, DeliveryReport<Null, BackplaneMessage> report, Activity activity)
     {
+        BackplaneMessage backplaneMessage = report.Message.Value;
         if (isDelivered)
         {
-            _messagingTelemetry.NotifyMessageProcessed();
+            UpdateMetrics(backplaneMessage);
         }
-
-        BackplaneMessage backplaneMessage = report.Message.Value;
 
         Contracts.Messaging.DeliveryStatus status = isDelivered ? Contracts.Messaging.DeliveryStatus.Processed : Contracts.Messaging.DeliveryStatus.Lost;
         ListenNotification deliveryNotification = new()
@@ -93,6 +92,29 @@ public sealed class SendersProducer : ISendersProducer
             LogLevel logLevel = enqueued ? LogLevel.Trace : LogLevel.Warning;
             _logger.Log(logLevel, "{Status} client {ClientId} that message {MessageId} of type {MessageType} has been processed",
                 enqueued ? "Notified": "Failed to notify", client.ClientId, backplaneMessage.MessageId, backplaneMessage.Type);
+        }
+    }
+
+    private void UpdateMetrics(BackplaneMessage backplaneMessage)
+    {
+        switch (backplaneMessage.Type)
+        {
+            case Contracts.Backplane.MessageType.Data:
+                if (backplaneMessage.Data.Type == Contracts.Backplane.DataType.PlainText)
+                {
+                    _messagingTelemetry.NotifyPlainTextProcessed();
+                }
+                break;
+            case Contracts.Backplane.MessageType.Reaction:
+                if (!string.IsNullOrWhiteSpace(backplaneMessage.Reaction.Reaction))
+                {
+                    _messagingTelemetry.NotifyReactionProcessed();
+                }
+                else
+                {
+                    _messagingTelemetry.NotifyUnreactionProcessed();
+                }
+                break;
         }
     }
 }

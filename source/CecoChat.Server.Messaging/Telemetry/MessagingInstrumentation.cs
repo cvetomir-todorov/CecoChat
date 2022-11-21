@@ -13,11 +13,23 @@ public static class MessagingInstrumentation
 
     public static class Metrics
     {
-        public const string MessagesReceived = "messaging.messages.received";
-        public const string MessagesReceivedDescription = "measures how many messages are received";
+        public const string PlainTextsReceived = "messaging.plain_texts.received";
+        public const string PlainTextsReceivedDescription = "measures how many plain text messages are received";
 
-        public const string MessagesProcessed = "messaging.messages.processed";
-        public const string MessagesProcessedDescription = "measures how many messages are processed";
+        public const string MessagesProcessed = "messaging.plain_texts.processed";
+        public const string MessagesProcessedDescription = "measures how many plain text messages are processed";
+
+        public const string ReactionsReceived = "messaging.reactions.received";
+        public const string ReactionsReceivedDescription = "measures how many reactions are received";
+
+        public const string ReactionsProcessed = "messaging.reactions.processed";
+        public const string ReactionsProcessedDescription = "measures how many reactions are processed";
+
+        public const string UnReactionsReceived = "messaging.unreactions.received";
+        public const string UnReactionsReceivedDescription = "measures how many un-reactions are received";
+
+        public const string UnReactionsProcessed = "messaging.unreactions.processed";
+        public const string UnReactionsProcessedDescription = "measures how many un-reactions are processed";
 
         public const string OnlineClients = "messaging.online_clients";
         public const string OnlineClientsDescription = "measures how many clients are online";
