@@ -89,7 +89,7 @@ public sealed class SendersProducer : ISendersProducer
         {
             bool enqueued = client.EnqueueMessage(deliveryNotification, parentActivity: activity);
             _logger.LogTrace("{Status} client {ClientId} that message {MessageId} of type {MessageType} has been processed",
-                enqueued ? "Notified": "Failed to notify", client.ClientId, backplaneMessage.MessageId, backplaneMessage.Type);
+                enqueued ? "Notified" : "Failed to notify", client.ClientId, backplaneMessage.MessageId, backplaneMessage.Type);
         }
     }
 
