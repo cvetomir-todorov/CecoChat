@@ -88,9 +88,7 @@ public sealed class SendersProducer : ISendersProducer
         foreach (IStreamer<ListenNotification> client in clients)
         {
             bool enqueued = client.EnqueueMessage(deliveryNotification, parentActivity: activity);
-
-            LogLevel logLevel = enqueued ? LogLevel.Trace : LogLevel.Warning;
-            _logger.Log(logLevel, "{Status} client {ClientId} that message {MessageId} of type {MessageType} has been processed",
+            _logger.LogTrace("{Status} client {ClientId} that message {MessageId} of type {MessageType} has been processed",
                 enqueued ? "Notified": "Failed to notify", client.ClientId, backplaneMessage.MessageId, backplaneMessage.Type);
         }
     }
