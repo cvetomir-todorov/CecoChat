@@ -9,6 +9,7 @@ using CecoChat.Kafka;
 using CecoChat.Kafka.Telemetry;
 using CecoChat.Otel;
 using CecoChat.Server.Backplane;
+using CecoChat.Server.Health;
 using CecoChat.Server.Identity;
 using CecoChat.Server.Messaging.Backplane;
 using CecoChat.Server.Messaging.Clients;
@@ -85,6 +86,9 @@ public class Startup
             metrics.ConfigurePrometheusAspNetExporter(_prometheusOptions);
         });
 
+        // health
+        services.AddHealthChecks();
+
         // security
         services.AddJwtAuthentication(_jwtOptions);
         services.AddAuthorization();
@@ -154,6 +158,8 @@ public class Startup
             endpoints.MapGrpcService<ListenService>();
             endpoints.MapGrpcService<SendService>();
             endpoints.MapGrpcService<ReactService>();
+
+            endpoints.MapHttpHealthEndpoint(serviceName: "messaging");
         });
 
         app.UseOpenTelemetryPrometheusScrapingEndpoint(context => context.Request.Path == _prometheusOptions.ScrapeEndpointPath);

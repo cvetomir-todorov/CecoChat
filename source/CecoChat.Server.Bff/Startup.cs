@@ -9,6 +9,7 @@ using CecoChat.Otel;
 using CecoChat.Server.Backplane;
 using CecoChat.Server.Bff.HostedServices;
 using CecoChat.Server.Bff.Infra;
+using CecoChat.Server.Health;
 using CecoChat.Server.Identity;
 using CecoChat.Swagger;
 using FluentValidation;
@@ -83,6 +84,9 @@ public class Startup
             metrics.ConfigurePrometheusAspNetExporter(_prometheusOptions);
         });
 
+        // health
+        services.AddHealthChecks();
+
         // security
         services.AddJwtAuthentication(_jwtOptions);
 
@@ -147,6 +151,7 @@ public class Startup
         app.UseEndpoints(endpoints =>
         {
             endpoints.MapControllers();
+            endpoints.MapHttpHealthEndpoint(serviceName: "bff");
         });
 
         app.UseOpenTelemetryPrometheusScrapingEndpoint(context => context.Request.Path == _prometheusOptions.ScrapeEndpointPath);
