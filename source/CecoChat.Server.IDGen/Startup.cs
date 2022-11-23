@@ -2,6 +2,7 @@ using Autofac;
 using CecoChat.Autofac;
 using CecoChat.Data.Config;
 using CecoChat.Otel;
+using CecoChat.Server.Health;
 using CecoChat.Server.IDGen.Generation;
 using CecoChat.Server.IDGen.HostedServices;
 using OpenTelemetry.Metrics;
@@ -61,6 +62,9 @@ public class Startup
             metrics.ConfigurePrometheusAspNetExporter(_prometheusOptions);
         });
 
+        // health
+        services.AddHealthChecks();
+
         // clients
         services.AddGrpc(rpc => rpc.EnableDetailedErrors = Environment.IsDevelopment());
 
@@ -95,6 +99,7 @@ public class Startup
         app.UseEndpoints(endpoints =>
         {
             endpoints.MapGrpcService<IdGenService>();
+            endpoints.MapHttpHealthEndpoint(serviceName: "idgen");
         });
 
         app.UseOpenTelemetryPrometheusScrapingEndpoint(context => context.Request.Path == _prometheusOptions.ScrapeEndpointPath);

@@ -77,6 +77,9 @@ public class Startup
             metrics.ConfigurePrometheusAspNetExporter(_prometheusOptions);
         });
 
+        // health
+        services.AddHealthChecks();
+
         // security
         services.AddJwtAuthentication(_jwtOptions);
         services.AddAuthorization();
@@ -127,6 +130,7 @@ public class Startup
         app.UseEndpoints(endpoints =>
         {
             endpoints.MapGrpcService<HistoryService>();
+            endpoints.MapHttpHealthEndpoint(serviceName: "history");
         });
 
         app.UseOpenTelemetryPrometheusScrapingEndpoint(context => context.Request.Path == _prometheusOptions.ScrapeEndpointPath);
