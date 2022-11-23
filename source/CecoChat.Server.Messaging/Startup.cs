@@ -25,6 +25,7 @@ namespace CecoChat.Server.Messaging;
 
 public class Startup
 {
+    private readonly BackplaneOptions _backplaneOptions;
     private readonly JwtOptions _jwtOptions;
     private readonly OtelSamplingOptions _otelSamplingOptions;
     private readonly JaegerOptions _jaegerOptions;
@@ -35,6 +36,9 @@ public class Startup
     {
         Configuration = configuration;
         Environment = environment;
+
+        _backplaneOptions = new();
+        Configuration.GetSection("Backplane").Bind(_backplaneOptions);
 
         _jwtOptions = new();
         Configuration.GetSection("Jwt").Bind(_jwtOptions);
@@ -87,7 +91,9 @@ public class Startup
         });
 
         // health
-        services.AddHealthChecks();
+        services
+            .AddHealthChecks()
+            .AddKafkaBackplane(_backplaneOptions.Kafka, _backplaneOptions.HealthProducer, _backplaneOptions.TopicHealth, timeout: _backplaneOptions.HealthTimeout, tags: new[] { "health" });
 
         // security
         services.AddJwtAuthentication(_jwtOptions);
