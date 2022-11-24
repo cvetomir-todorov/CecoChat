@@ -68,7 +68,11 @@ public class Startup
             tracing.AddAspNetCoreInstrumentation(aspnet =>
             {
                 aspnet.EnableGrpcAspNetCoreSupport = true;
-                aspnet.Filter = httpContext => httpContext.Request.Path != _prometheusOptions.ScrapeEndpointPath;
+                HashSet<string> excludedPaths = new()
+                {
+                    _prometheusOptions.ScrapeEndpointPath, HealthPaths.Health, HealthPaths.Startup, HealthPaths.Live, HealthPaths.Ready
+                };
+                aspnet.Filter = httpContext => !excludedPaths.Contains(httpContext.Request.Path);
             });
             tracing.AddKafkaInstrumentation();
             tracing.AddHistoryInstrumentation();
