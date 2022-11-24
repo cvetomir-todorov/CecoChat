@@ -71,7 +71,11 @@ public class Startup
             tracing.SetResourceBuilder(serviceResourceBuilder);
             tracing.AddAspNetCoreInstrumentation(aspnet =>
             {
-                aspnet.Filter = httpContext => httpContext.Request.Path != _prometheusOptions.ScrapeEndpointPath;
+                HashSet<string> excludedPaths = new()
+                {
+                    _prometheusOptions.ScrapeEndpointPath, HealthPaths.Health, HealthPaths.Startup, HealthPaths.Live, HealthPaths.Ready
+                };
+                aspnet.Filter = httpContext => !excludedPaths.Contains(httpContext.Request.Path);
             });
             tracing.AddGrpcClientInstrumentation(grpc => grpc.SuppressDownstreamInstrumentation = true);
             tracing.ConfigureSampling(_otelSamplingOptions);
