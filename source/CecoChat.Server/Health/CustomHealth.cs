@@ -53,6 +53,7 @@ public static class CustomHealth
                     Status = entry.Value.Status,
                     Duration = entry.Value.Duration
                 };
+                index++;
             }
         }
     }
