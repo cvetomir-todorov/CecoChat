@@ -1,5 +1,7 @@
 using Autofac;
 using CecoChat.Autofac;
+using CecoChat.Cassandra;
+using CecoChat.Cassandra.Health;
 using CecoChat.Contracts.Backplane;
 using CecoChat.Data.State;
 using CecoChat.Data.State.Telemetry;
@@ -23,6 +25,7 @@ namespace CecoChat.Server.State;
 public class Startup
 {
     private readonly BackplaneOptions _backplaneOptions;
+    private readonly CassandraOptions _stateDbOptions;
     private readonly JwtOptions _jwtOptions;
     private readonly OtelSamplingOptions _otelSamplingOptions;
     private readonly JaegerOptions _jaegerOptions;
@@ -35,6 +38,9 @@ public class Startup
 
         _backplaneOptions = new();
         configuration.GetSection("Backplane").Bind(_backplaneOptions);
+
+        _stateDbOptions = new();
+        configuration.GetSection("StateDB").Bind(_stateDbOptions);
 
         _jwtOptions = new();
         configuration.GetSection("Jwt").Bind(_jwtOptions);
@@ -94,7 +100,11 @@ public class Startup
                 _backplaneOptions.HealthProducer,
                 _backplaneOptions.TopicHealth,
                 timeout: _backplaneOptions.HealthTimeout,
-                tags: new[] { HealthTags.Health });
+                tags: new[] { HealthTags.Health })
+            .AddCassandra(
+                name: "state-db",
+                timeout: _stateDbOptions.HealthTimeout,
+                tags: new[] { HealthTags.Health, HealthTags.Ready });
 
         // security
         services.AddJwtAuthentication(_jwtOptions);
@@ -113,9 +123,10 @@ public class Startup
         builder.RegisterHostedService<InitStateDb>();
         builder.RegisterHostedService<StartBackplaneComponents>();
 
-        // state
+        // state db
         IConfiguration stateDbConfig = Configuration.GetSection("StateDB");
         builder.RegisterModule(new StateDbAutofacModule(stateDbConfig));
+        builder.RegisterModule(new CassandraHealthAutofacModule(stateDbConfig));
 
         // backplane
         builder.RegisterType<StateConsumer>().As<IStateConsumer>().SingleInstance();

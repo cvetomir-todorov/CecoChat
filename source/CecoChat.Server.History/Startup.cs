@@ -1,5 +1,7 @@
 using Autofac;
 using CecoChat.Autofac;
+using CecoChat.Cassandra;
+using CecoChat.Cassandra.Health;
 using CecoChat.Contracts.Backplane;
 using CecoChat.Data.Config;
 using CecoChat.Data.History;
@@ -24,6 +26,7 @@ namespace CecoChat.Server.History;
 public class Startup
 {
     private readonly BackplaneOptions _backplaneOptions;
+    private readonly CassandraOptions _historyDbOptions;
     private readonly JwtOptions _jwtOptions;
     private readonly OtelSamplingOptions _otelSamplingOptions;
     private readonly JaegerOptions _jaegerOptions;
@@ -36,6 +39,9 @@ public class Startup
 
         _backplaneOptions = new();
         Configuration.GetSection("Backplane").Bind(_backplaneOptions);
+
+        _historyDbOptions = new();
+        Configuration.GetSection("HistoryDB").Bind(_historyDbOptions);
 
         _jwtOptions = new();
         Configuration.GetSection("Jwt").Bind(_jwtOptions);
@@ -95,7 +101,11 @@ public class Startup
                 _backplaneOptions.HealthProducer,
                 _backplaneOptions.TopicHealth,
                 timeout: _backplaneOptions.HealthTimeout,
-                tags: new[] { HealthTags.Health });
+                tags: new[] { HealthTags.Health })
+            .AddCassandra(
+                name: "history-db",
+                timeout: _historyDbOptions.HealthTimeout,
+                tags: new[] { HealthTags.Health, HealthTags.Ready });
 
         // security
         services.AddJwtAuthentication(_jwtOptions);
@@ -119,9 +129,10 @@ public class Startup
         IConfiguration configDbConfig = Configuration.GetSection("ConfigDB");
         builder.RegisterModule(new ConfigDbAutofacModule(configDbConfig, registerHistory: true));
 
-        // history
+        // history db
         IConfiguration historyDbConfig = Configuration.GetSection("HistoryDB");
         builder.RegisterModule(new HistoryDbAutofacModule(historyDbConfig));
+        builder.RegisterModule(new CassandraHealthAutofacModule(historyDbConfig));
 
         // backplane
         builder.RegisterType<HistoryConsumer>().As<IHistoryConsumer>().SingleInstance();
