@@ -13,4 +13,6 @@ public sealed class CassandraOptions
     public TimeSpan ExponentialReconnectPolicyBaseDelay { get; set; }
 
     public TimeSpan ExponentialReconnectPolicyMaxDelay { get; set; }
+
+    public TimeSpan HealthTimeout { get; set; }
 }
