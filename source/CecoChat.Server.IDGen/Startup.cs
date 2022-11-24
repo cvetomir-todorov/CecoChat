@@ -99,7 +99,10 @@ public class Startup
         app.UseEndpoints(endpoints =>
         {
             endpoints.MapGrpcService<IdGenService>();
-            endpoints.MapHttpHealthEndpoint(serviceName: "idgen");
+            endpoints.MapHttpHealthEndpoints(setup =>
+            {
+                setup.Health.ResponseWriter = (context, report) => CustomHealth.Writer(serviceName: "idgen", context, report);
+            });
         });
 
         app.UseOpenTelemetryPrometheusScrapingEndpoint(context => context.Request.Path == _prometheusOptions.ScrapeEndpointPath);

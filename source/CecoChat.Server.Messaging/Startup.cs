@@ -93,7 +93,12 @@ public class Startup
         // health
         services
             .AddHealthChecks()
-            .AddKafkaBackplane(_backplaneOptions.Kafka, _backplaneOptions.HealthProducer, _backplaneOptions.TopicHealth, timeout: _backplaneOptions.HealthTimeout, tags: new[] { "health" });
+            .AddKafkaBackplane(
+                _backplaneOptions.Kafka,
+                _backplaneOptions.HealthProducer,
+                _backplaneOptions.TopicHealth,
+                timeout: _backplaneOptions.HealthTimeout,
+                tags: new[] { HealthTags.Health });
 
         // security
         services.AddJwtAuthentication(_jwtOptions);
@@ -165,7 +170,10 @@ public class Startup
             endpoints.MapGrpcService<SendService>();
             endpoints.MapGrpcService<ReactService>();
 
-            endpoints.MapHttpHealthEndpoint(serviceName: "messaging");
+            endpoints.MapHttpHealthEndpoints(setup =>
+            {
+                setup.Health.ResponseWriter = (context, report) => CustomHealth.Writer(serviceName: "messaging", context, report);
+            });
         });
 
         app.UseOpenTelemetryPrometheusScrapingEndpoint(context => context.Request.Path == _prometheusOptions.ScrapeEndpointPath);
