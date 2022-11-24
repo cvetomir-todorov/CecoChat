@@ -98,7 +98,7 @@ public class Startup
                 _backplaneOptions.HealthProducer,
                 _backplaneOptions.TopicHealth,
                 timeout: _backplaneOptions.HealthTimeout,
-                tags: new[] { HealthTags.Health });
+                tags: new[] { HealthTags.Health, HealthTags.Ready });
 
         // security
         services.AddJwtAuthentication(_jwtOptions);
