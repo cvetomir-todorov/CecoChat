@@ -1,34 +1,28 @@
-using System.Net;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Diagnostics.HealthChecks;
-using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
-
 namespace CecoChat.Server.Health;
 
-public static class HttpHealthEndpoints
+public sealed class HttpHealthEndpoints
 {
-    public static IEndpointConventionBuilder MapHttpHealthEndpoint(
-        this IEndpointRouteBuilder endpoints,
-        string serviceName,
-        string pattern = "/health",
-        string targetTag = "health",
-        Func<HealthCheckRegistration, bool>? predicate = default,
-        Dictionary<HealthStatus, int>? resultStatusCodes = default)
+    public HttpHealthEndpoint Health { get; } = new()
     {
-        predicate ??= healthCheck => healthCheck.Tags.Contains(targetTag);
-        resultStatusCodes ??= new Dictionary<HealthStatus, int>
-        {
-            { HealthStatus.Healthy, (int)HttpStatusCode.OK },
-            { HealthStatus.Degraded, (int)HttpStatusCode.OK },
-            { HealthStatus.Unhealthy, (int)HttpStatusCode.ServiceUnavailable }
-        };
+        Pattern = HealthPaths.Health,
+        Predicate = healthCheck => healthCheck.Tags.Contains(HealthTags.Health)
+    };
 
-        return endpoints.MapHealthChecks(pattern, new HealthCheckOptions
-        {
-            Predicate = predicate,
-            ResultStatusCodes = resultStatusCodes,
-            ResponseWriter = (context, report) => CustomHealth.Writer(serviceName, context, report)
-        });
-    }
+    public HttpHealthEndpoint Startup { get; } = new()
+    {
+        Pattern = HealthPaths.Startup,
+        Predicate = healthCheck => healthCheck.Tags.Contains(HealthTags.Startup)
+    };
+
+    public HttpHealthEndpoint Live { get; } = new()
+    {
+        Pattern = HealthPaths.Live,
+        Predicate = healthCheck => healthCheck.Tags.Contains(HealthTags.Live)
+    };
+
+    public HttpHealthEndpoint Ready { get; } = new()
+    {
+        Pattern = HealthPaths.Ready,
+        Predicate = healthCheck => healthCheck.Tags.Contains(HealthTags.Ready)
+    };
 }

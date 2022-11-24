@@ -151,7 +151,10 @@ public class Startup
         app.UseEndpoints(endpoints =>
         {
             endpoints.MapControllers();
-            endpoints.MapHttpHealthEndpoint(serviceName: "bff");
+            endpoints.MapHttpHealthEndpoints(setup =>
+            {
+                setup.Health.ResponseWriter = (context, report) => CustomHealth.Writer(serviceName: "bff", context, report);
+            });
         });
 
         app.UseOpenTelemetryPrometheusScrapingEndpoint(context => context.Request.Path == _prometheusOptions.ScrapeEndpointPath);
