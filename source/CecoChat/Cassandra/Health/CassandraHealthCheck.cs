@@ -10,7 +10,7 @@ public class CassandraHealthCheck : IHealthCheck
     private readonly ICassandraHealthDbContext _dbContext;
     private readonly Lazy<BoundStatement> _query;
 
-    public CassandraHealthCheck(ILogger<CassandraHealthCheck> logger, ICassandraHealthDbContext dbContext)
+    public CassandraHealthCheck(ILogger<CassandraHealthCheck> logger, ICassandraHealthDbContext dbContext, TimeSpan? timeout)
     {
         _logger = logger;
         _dbContext = dbContext;
@@ -22,6 +22,10 @@ public class CassandraHealthCheck : IHealthCheck
             BoundStatement bound = prepared.Bind();
             bound.SetIdempotence(true);
             bound.SetConsistencyLevel(ConsistencyLevel.Quorum);
+            if (timeout.HasValue)
+            {
+                bound.SetReadTimeoutMillis(Convert.ToInt32(Math.Ceiling(timeout.Value.TotalMilliseconds)));
+            }
 
             return bound;
         });

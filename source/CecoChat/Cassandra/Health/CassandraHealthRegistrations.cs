@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Logging;
 
 namespace CecoChat.Cassandra.Health;
 
@@ -19,9 +20,17 @@ public static class CassandraHealthRegistrations
 
         return builder.Add(new HealthCheckRegistration(
             name,
-            serviceProvider => serviceProvider.GetRequiredService<CassandraHealthCheck>(),
+            serviceProvider => CreateHealthCheck(serviceProvider, timeout),
             failureStatus,
             tags,
             timeout));
+    }
+
+    private static IHealthCheck CreateHealthCheck(IServiceProvider serviceProvider, TimeSpan? timeout)
+    {
+        return new CassandraHealthCheck(
+            serviceProvider.GetRequiredService<ILogger<CassandraHealthCheck>>(),
+            serviceProvider.GetRequiredService<ICassandraHealthDbContext>(),
+            timeout);
     }
 }

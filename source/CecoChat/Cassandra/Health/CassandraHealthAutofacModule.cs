@@ -16,7 +16,5 @@ public class CassandraHealthAutofacModule : Module
     {
         CassandraAutofacModule<CassandraHealthDbContext, ICassandraHealthDbContext> dbContextModule = new(_healthConfiguration);
         builder.RegisterModule(dbContextModule);
-
-        builder.RegisterType<CassandraHealthCheck>().As<CassandraHealthCheck>().SingleInstance();
     }
 }
