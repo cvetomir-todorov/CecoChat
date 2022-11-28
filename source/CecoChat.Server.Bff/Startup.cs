@@ -7,9 +7,11 @@ using CecoChat.Data.Config;
 using CecoChat.Http.Health;
 using CecoChat.Jwt;
 using CecoChat.Otel;
+using CecoChat.Redis;
 using CecoChat.Server.Backplane;
 using CecoChat.Server.Bff.HostedServices;
 using CecoChat.Server.Bff.Infra;
+using CecoChat.Server.Config;
 using CecoChat.Server.Health;
 using CecoChat.Server.Identity;
 using CecoChat.Swagger;
@@ -23,6 +25,7 @@ namespace CecoChat.Server.Bff;
 
 public class Startup
 {
+    private readonly RedisOptions _configDbOptions;
     private readonly HistoryOptions _historyOptions;
     private readonly StateOptions _stateOptions;
     private readonly JwtOptions _jwtOptions;
@@ -34,6 +37,9 @@ public class Startup
     public Startup(IConfiguration configuration)
     {
         Configuration = configuration;
+
+        _configDbOptions = new();
+        Configuration.GetSection("ConfigDB").Bind(_configDbOptions);
 
         _historyOptions = new();
         Configuration.GetSection("HistoryClient").Bind(_historyOptions);
@@ -91,6 +97,9 @@ public class Startup
 
         // health
         services.AddHealthChecks()
+            .AddConfigDb(
+                _configDbOptions,
+                tags: new[] { HealthTags.Health, HealthTags.Ready })
             .AddUri(
                 new Uri(_historyOptions.Address!, _historyOptions.HealthPath),
                 configureHttpClient: (_, client) => client.DefaultRequestVersion = new Version(2, 0),

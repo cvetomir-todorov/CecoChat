@@ -9,7 +9,9 @@ using CecoChat.Jwt;
 using CecoChat.Kafka;
 using CecoChat.Kafka.Telemetry;
 using CecoChat.Otel;
+using CecoChat.Redis;
 using CecoChat.Server.Backplane;
+using CecoChat.Server.Config;
 using CecoChat.Server.Health;
 using CecoChat.Server.Identity;
 using CecoChat.Server.Messaging.Backplane;
@@ -26,6 +28,7 @@ namespace CecoChat.Server.Messaging;
 
 public class Startup
 {
+    private readonly RedisOptions _configDbOptions;
     private readonly BackplaneOptions _backplaneOptions;
     private readonly IDGenOptions _idGenOptions;
     private readonly JwtOptions _jwtOptions;
@@ -37,6 +40,9 @@ public class Startup
     {
         Configuration = configuration;
         Environment = environment;
+
+        _configDbOptions = new();
+        Configuration.GetSection("ConfigDB").Bind(_configDbOptions);
 
         _backplaneOptions = new();
         Configuration.GetSection("Backplane").Bind(_backplaneOptions);
@@ -98,6 +104,9 @@ public class Startup
         // health
         services
             .AddHealthChecks()
+            .AddConfigDb(
+                _configDbOptions,
+                tags: new[] { HealthTags.Health, HealthTags.Ready })
             .AddKafkaBackplane(
                 _backplaneOptions.Kafka,
                 _backplaneOptions.HealthProducer,

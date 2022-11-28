@@ -2,6 +2,8 @@ using Autofac;
 using CecoChat.Autofac;
 using CecoChat.Data.Config;
 using CecoChat.Otel;
+using CecoChat.Redis;
+using CecoChat.Server.Config;
 using CecoChat.Server.Health;
 using CecoChat.Server.IDGen.Generation;
 using CecoChat.Server.IDGen.HostedServices;
@@ -13,6 +15,7 @@ namespace CecoChat.Server.IDGen;
 
 public class Startup
 {
+    private readonly RedisOptions _configDbOptions;
     private readonly OtelSamplingOptions _otelSamplingOptions;
     private readonly JaegerOptions _jaegerOptions;
     private readonly PrometheusOptions _prometheusOptions;
@@ -21,6 +24,9 @@ public class Startup
     {
         Configuration = configuration;
         Environment = environment;
+
+        _configDbOptions = new();
+        Configuration.GetSection("ConfigDB").Bind(_configDbOptions);
 
         _otelSamplingOptions = new();
         Configuration.GetSection("OtelSampling").Bind(_otelSamplingOptions);
@@ -67,7 +73,11 @@ public class Startup
         });
 
         // health
-        services.AddHealthChecks();
+        services
+            .AddHealthChecks()
+            .AddConfigDb(
+                _configDbOptions,
+                tags: new[] { HealthTags.Health, HealthTags.Ready });
 
         // clients
         services.AddGrpc(rpc => rpc.EnableDetailedErrors = Environment.IsDevelopment());
