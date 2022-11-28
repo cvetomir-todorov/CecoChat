@@ -9,4 +9,6 @@ public sealed class RedisOptions
     public int ConnectTimeout { get; set; }
 
     public int KeepAlive { get; set; }
+
+    public TimeSpan HealthTimeout { get; set; }
 }
