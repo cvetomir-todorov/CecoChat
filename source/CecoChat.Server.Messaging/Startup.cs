@@ -4,6 +4,7 @@ using CecoChat.Client.IDGen;
 using CecoChat.Contracts.Backplane;
 using CecoChat.Data.Config;
 using CecoChat.Grpc.Telemetry;
+using CecoChat.Http.Health;
 using CecoChat.Jwt;
 using CecoChat.Kafka;
 using CecoChat.Kafka.Telemetry;
@@ -26,11 +27,11 @@ namespace CecoChat.Server.Messaging;
 public class Startup
 {
     private readonly BackplaneOptions _backplaneOptions;
+    private readonly IDGenOptions _idGenOptions;
     private readonly JwtOptions _jwtOptions;
     private readonly OtelSamplingOptions _otelSamplingOptions;
     private readonly JaegerOptions _jaegerOptions;
     private readonly PrometheusOptions _prometheusOptions;
-    private readonly IDGenOptions _idGenOptions;
 
     public Startup(IConfiguration configuration, IWebHostEnvironment environment)
     {
@@ -39,6 +40,9 @@ public class Startup
 
         _backplaneOptions = new();
         Configuration.GetSection("Backplane").Bind(_backplaneOptions);
+
+        _idGenOptions = new();
+        Configuration.GetSection("IDGen").Bind(_idGenOptions);
 
         _jwtOptions = new();
         Configuration.GetSection("Jwt").Bind(_jwtOptions);
@@ -51,9 +55,6 @@ public class Startup
 
         _prometheusOptions = new();
         Configuration.GetSection("Prometheus").Bind(_prometheusOptions);
-
-        _idGenOptions = new();
-        Configuration.GetSection("IDGen").Bind(_idGenOptions);
     }
 
     public IConfiguration Configuration { get; }
@@ -102,6 +103,12 @@ public class Startup
                 _backplaneOptions.HealthProducer,
                 _backplaneOptions.TopicHealth,
                 timeout: _backplaneOptions.HealthTimeout,
+                tags: new[] { HealthTags.Health, HealthTags.Ready })
+            .AddUri(
+                new Uri(_idGenOptions.Address!, "readyz"),
+                configureHttpClient: (_, client) => client.DefaultRequestVersion = new Version(2, 0),
+                name: "idgen",
+                timeout: TimeSpan.FromSeconds(5),
                 tags: new[] { HealthTags.Health, HealthTags.Ready });
 
         // security

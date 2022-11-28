@@ -4,6 +4,7 @@ using CecoChat.Autofac;
 using CecoChat.Client.History;
 using CecoChat.Client.State;
 using CecoChat.Data.Config;
+using CecoChat.Http.Health;
 using CecoChat.Jwt;
 using CecoChat.Otel;
 using CecoChat.Server.Backplane;
@@ -89,7 +90,19 @@ public class Startup
         });
 
         // health
-        services.AddHealthChecks();
+        services.AddHealthChecks()
+            .AddUri(
+                new Uri(_historyOptions.Address!, "readyz"),
+                configureHttpClient: (_, client) => client.DefaultRequestVersion = new Version(2, 0),
+                name: "history",
+                timeout: TimeSpan.FromSeconds(5),
+                tags: new[] { HealthTags.Health, HealthTags.Ready })
+            .AddUri(
+                new Uri(_stateOptions.Address!, "readyz"),
+                configureHttpClient: (_, client) => client.DefaultRequestVersion = new Version(2, 0),
+                name: "state",
+                timeout: TimeSpan.FromSeconds(5),
+                tags: new[] { HealthTags.Health, HealthTags.Ready });
 
         // security
         services.AddJwtAuthentication(_jwtOptions);
