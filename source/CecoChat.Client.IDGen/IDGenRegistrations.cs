@@ -1,4 +1,4 @@
-﻿using CecoChat.HttpClient;
+﻿using CecoChat.Http.Client;
 using CecoChat.Polly;
 using Microsoft.Extensions.DependencyInjection;
 
