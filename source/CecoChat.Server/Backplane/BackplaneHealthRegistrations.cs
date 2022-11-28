@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace CecoChat.Server.Backplane;
 
-public static class HealthChecking
+public static class BackplaneHealthRegistrations
 {
     /// <summary>
     /// Adds a health check for Kafka backplane with a default name and a default <paramref name="timeout"/> set to 5 seconds.
@@ -14,8 +14,8 @@ public static class HealthChecking
         KafkaProducerOptions producerOptions,
         string topic,
         string name = "backplane",
-        string[]? tags = default,
-        TimeSpan? timeout = default)
+        string[]? tags = null,
+        TimeSpan? timeout = null)
     {
         return healthChecks.AddKafka(config =>
             {
