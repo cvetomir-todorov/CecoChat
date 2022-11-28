@@ -92,16 +92,16 @@ public class Startup
         // health
         services.AddHealthChecks()
             .AddUri(
-                new Uri(_historyOptions.Address!, "readyz"),
+                new Uri(_historyOptions.Address!, _historyOptions.HealthPath),
                 configureHttpClient: (_, client) => client.DefaultRequestVersion = new Version(2, 0),
                 name: "history",
-                timeout: TimeSpan.FromSeconds(5),
+                timeout: _historyOptions.HealthTimeout,
                 tags: new[] { HealthTags.Health, HealthTags.Ready })
             .AddUri(
-                new Uri(_stateOptions.Address!, "readyz"),
+                new Uri(_stateOptions.Address!, _stateOptions.HealthPath),
                 configureHttpClient: (_, client) => client.DefaultRequestVersion = new Version(2, 0),
                 name: "state",
-                timeout: TimeSpan.FromSeconds(5),
+                timeout: _stateOptions.HealthTimeout,
                 tags: new[] { HealthTags.Health, HealthTags.Ready });
 
         // security

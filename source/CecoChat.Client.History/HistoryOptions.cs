@@ -10,4 +10,7 @@ public sealed class HistoryOptions
 
     public SocketsHttpHandlerOptions? SocketsHttpHandler { get; set; }
     public RetryOptions? Retry { get; set; }
+
+    public string HealthPath { get; set; } = string.Empty;
+    public TimeSpan HealthTimeout { get; set; }
 }
