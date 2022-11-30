@@ -69,7 +69,25 @@ public class Startup
 
     public void ConfigureServices(IServiceCollection services)
     {
-        // telemetry
+        AddTelemetryServices(services);
+        AddHealthServices(services);
+
+        // security
+        services.AddJwtAuthentication(_jwtOptions);
+        services.AddAuthorization();
+
+        // idgen
+        services.AddIDGenClient(_idGenOptions);
+
+        // clients
+        services.AddGrpc(rpc => rpc.EnableDetailedErrors = Environment.IsDevelopment());
+
+        // required
+        services.AddOptions();
+    }
+
+    private void AddTelemetryServices(IServiceCollection services)
+    {
         ResourceBuilder serviceResourceBuilder = ResourceBuilder
             .CreateEmpty()
             .AddService(serviceName: "Messaging", serviceNamespace: "CecoChat", serviceVersion: "0.1")
@@ -100,8 +118,10 @@ public class Startup
             metrics.AddMessagingInstrumentation();
             metrics.ConfigurePrometheusAspNetExporter(_prometheusOptions);
         });
+    }
 
-        // health
+    private void AddHealthServices(IServiceCollection services)
+    {
         services
             .AddHealthChecks()
             .AddConfigDb(
@@ -119,19 +139,6 @@ public class Startup
                 name: "idgen",
                 timeout: _idGenOptions.HealthTimeout,
                 tags: new[] { HealthTags.Health, HealthTags.Ready });
-
-        // security
-        services.AddJwtAuthentication(_jwtOptions);
-        services.AddAuthorization();
-
-        // idgen
-        services.AddIDGenClient(_idGenOptions);
-
-        // clients
-        services.AddGrpc(rpc => rpc.EnableDetailedErrors = Environment.IsDevelopment());
-
-        // required
-        services.AddOptions();
     }
 
     public void ConfigureContainer(ContainerBuilder builder)

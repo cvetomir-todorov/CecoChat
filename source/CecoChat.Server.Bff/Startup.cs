@@ -67,7 +67,35 @@ public class Startup
 
     public void ConfigureServices(IServiceCollection services)
     {
-        // telemetry
+        AddTelemetryServices(services);
+        AddHealthServices(services);
+
+        // security
+        services.AddJwtAuthentication(_jwtOptions);
+
+        // web
+        services.AddControllers(mvc =>
+        {
+            // insert it before the default one so that it takes effect
+            mvc.ModelBinderProviders.Insert(0, new DateTimeModelBinderProvider());
+        });
+        services.AddFluentValidationAutoValidation(fluentValidation =>
+        {
+            fluentValidation.DisableDataAnnotationsValidation = true;
+        });
+        services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+        services.AddSwaggerServices(_swaggerOptions);
+
+        // downstream services
+        services.AddHistoryClient(_historyOptions);
+        services.AddStateClient(_stateOptions);
+
+        // required
+        services.AddOptions();
+    }
+
+    private void AddTelemetryServices(IServiceCollection services)
+    {
         ResourceBuilder serviceResourceBuilder = ResourceBuilder
             .CreateEmpty()
             .AddService(serviceName: "Bff", serviceNamespace: "CecoChat", serviceVersion: "0.1")
@@ -94,8 +122,10 @@ public class Startup
             metrics.AddAspNetCoreInstrumentation();
             metrics.ConfigurePrometheusAspNetExporter(_prometheusOptions);
         });
+    }
 
-        // health
+    private void AddHealthServices(IServiceCollection services)
+    {
         services.AddHealthChecks()
             .AddConfigDb(
                 _configDbOptions,
@@ -112,29 +142,6 @@ public class Startup
                 name: "state",
                 timeout: _stateOptions.HealthTimeout,
                 tags: new[] { HealthTags.Health, HealthTags.Ready });
-
-        // security
-        services.AddJwtAuthentication(_jwtOptions);
-
-        // web
-        services.AddControllers(mvc =>
-        {
-            // insert it before the default one so that it takes effect
-            mvc.ModelBinderProviders.Insert(0, new DateTimeModelBinderProvider());
-        });
-        services.AddFluentValidationAutoValidation(fluentValidation =>
-        {
-            fluentValidation.DisableDataAnnotationsValidation = true;
-        });
-        services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
-        services.AddSwaggerServices(_swaggerOptions);
-
-        // downstream services
-        services.AddHistoryClient(_historyOptions);
-        services.AddStateClient(_stateOptions);
-
-        // required
-        services.AddOptions();
     }
 
     public void ConfigureContainer(ContainerBuilder builder)
