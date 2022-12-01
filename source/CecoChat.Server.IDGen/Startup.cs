@@ -7,6 +7,7 @@ using CecoChat.Server.Config;
 using CecoChat.Server.Health;
 using CecoChat.Server.IDGen.Generation;
 using CecoChat.Server.IDGen.HostedServices;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
@@ -127,7 +128,15 @@ public class Startup
             endpoints.MapGrpcService<IdGenService>();
             endpoints.MapHttpHealthEndpoints(setup =>
             {
-                setup.Health.ResponseWriter = (context, report) => CustomHealth.Writer(serviceName: "idgen", context, report);
+                Func<HttpContext, HealthReport, Task> responseWriter = (context, report) => CustomHealth.Writer(serviceName: "idgen", context, report);
+                setup.Health.ResponseWriter = responseWriter;
+
+                if (env.IsDevelopment())
+                {
+                    setup.Startup.ResponseWriter = responseWriter;
+                    setup.Live.ResponseWriter = responseWriter;
+                    setup.Ready.ResponseWriter = responseWriter;
+                }
             });
         });
 
