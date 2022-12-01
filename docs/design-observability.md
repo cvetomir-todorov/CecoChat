@@ -1,5 +1,31 @@
 # Observability
 
+## Health
+
+Various health checks are exposed via HTTP health endpoints:
+
+| endpoint    | output   | executed by | purpose                |
+|-------------|----------|-------------|------------------------|
+| `/healthz`  | detailed | human       | manual troubleshooting |
+| `/startupz` | minimal  | Kubernetes  | startup probe          |
+| `/livez`    | minimal  | Kubernetes  | liveness probe         |
+| `/readyz`   | minimal  | Kubernetes  | readiness probe        |
+
+Note: in Development mode all endpoints use detailed output
+
+* `/healthz`
+  - All health checks
+* `/startupz`
+  - Initialization of databases
+  - Starting consumers
+* `/livez`
+  - Checking if consumers are working
+* `/readyz`
+  - Healthy connection to
+    - Databases
+    - Message brokers
+    - Downstream services
+
 ## Distributed tracing
 
 OpenTelemetry is utilized to make flow of communication and data exchange observable and help resolve production issues.
