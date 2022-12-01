@@ -124,6 +124,12 @@ public class Startup
     {
         services
             .AddHealthChecks()
+            .AddCheck<ConfigDbInitHealthCheck>(
+                "config-db-init",
+                tags: new[] { HealthTags.Health, HealthTags.Startup })
+            .AddCheck<ReceiversConsumerHealthCheck>(
+                "receivers-consumer",
+                tags: new[] { HealthTags.Health, HealthTags.Startup, HealthTags.Live })
             .AddConfigDb(
                 _configDbOptions,
                 tags: new[] { HealthTags.Health, HealthTags.Ready })
@@ -139,6 +145,9 @@ public class Startup
                 name: "idgen",
                 timeout: _idGenOptions.HealthTimeout,
                 tags: new[] { HealthTags.Health, HealthTags.Ready });
+
+        services.AddSingleton<ConfigDbInitHealthCheck>();
+        services.AddSingleton<ReceiversConsumerHealthCheck>();
     }
 
     public void ConfigureContainer(ContainerBuilder builder)
