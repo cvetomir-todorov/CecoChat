@@ -7,17 +7,20 @@ public sealed class StartMaterializeMessages : IHostedService, IDisposable
 {
     private readonly ILogger _logger;
     private readonly IHistoryConsumer _historyConsumer;
+    private readonly HistoryConsumerHealthCheck _historyConsumerHealthCheck;
     private readonly CancellationToken _appStoppingCt;
     private CancellationTokenSource? _stoppedCts;
     private DedicatedThreadTaskScheduler? _historyConsumerTaskScheduler;
 
     public StartMaterializeMessages(
         ILogger<StartMaterializeMessages> logger,
-        IHostApplicationLifetime applicationLifetime,
-        IHistoryConsumer historyConsumer)
+        IHistoryConsumer historyConsumer,
+        HistoryConsumerHealthCheck historyConsumerHealthCheck,
+        IHostApplicationLifetime applicationLifetime)
     {
         _logger = logger;
         _historyConsumer = historyConsumer;
+        _historyConsumerHealthCheck = historyConsumerHealthCheck;
 
         _appStoppingCt = applicationLifetime.ApplicationStopping;
     }
@@ -40,11 +43,16 @@ public sealed class StartMaterializeMessages : IHostedService, IDisposable
         {
             try
             {
+                _historyConsumerHealthCheck.IsReady = true;
                 _historyConsumer.Start(_stoppedCts.Token);
             }
             catch (Exception exception)
             {
                 _logger.LogCritical(exception, "Failure in consumer {ConsumerId}", _historyConsumer.ConsumerId);
+            }
+            finally
+            {
+                _historyConsumerHealthCheck.IsReady = false;
             }
         }, _stoppedCts.Token, TaskCreationOptions.LongRunning, _historyConsumerTaskScheduler);
 

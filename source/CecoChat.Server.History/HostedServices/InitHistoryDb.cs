@@ -9,15 +9,18 @@ public sealed class InitHistoryDb : IHostedService, IDisposable
     private readonly ILogger _logger;
     private readonly ICassandraDbInitializer _dbInitializer;
     private readonly IChatMessageRepo _messageRepo;
+    private readonly HistoryDbInitHealthCheck _historyDbInitHealthCheck;
 
     public InitHistoryDb(
         ILogger<InitHistoryDb> logger,
         ICassandraDbInitializer dbInitializer,
-        IChatMessageRepo messageRepo)
+        IChatMessageRepo messageRepo,
+        HistoryDbInitHealthCheck historyDbInitHealthCheck)
     {
         _logger = logger;
         _dbInitializer = dbInitializer;
         _messageRepo = messageRepo;
+        _historyDbInitHealthCheck = historyDbInitHealthCheck;
     }
 
     public void Dispose()
@@ -35,6 +38,7 @@ public sealed class InitHistoryDb : IHostedService, IDisposable
             {
                 _logger.LogInformation("Start preparing queries...");
                 _messageRepo.Prepare();
+                _historyDbInitHealthCheck.IsReady = true;
                 _logger.LogInformation("Completed preparing queries");
             }
             catch (Exception exception)
