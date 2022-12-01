@@ -8,7 +8,7 @@ public static class BackplaneHealthRegistrations
     /// <summary>
     /// Adds a health check for Kafka backplane with a default name and a default <paramref name="timeout"/> set to 5 seconds.
     /// </summary>
-    public static IHealthChecksBuilder AddKafkaBackplane(
+    public static IHealthChecksBuilder AddBackplane(
         this IHealthChecksBuilder healthChecks,
         KafkaOptions options,
         KafkaProducerOptions producerOptions,

@@ -133,7 +133,7 @@ public class Startup
             .AddConfigDb(
                 _configDbOptions,
                 tags: new[] { HealthTags.Health, HealthTags.Ready })
-            .AddKafkaBackplane(
+            .AddBackplane(
                 _backplaneOptions.Kafka,
                 _backplaneOptions.HealthProducer,
                 _backplaneOptions.TopicHealth,
