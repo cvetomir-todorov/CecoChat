@@ -1,6 +1,6 @@
-[System design](docs/design-overall.md) of a chat for 10-100 millions active users with [limited-for-now capabilities](docs/intro-main.md).
+Chat for millions of users with [limited-for-now capabilities](docs/intro-main.md).
 
-[Partial implementation](source/) based on Kafka, Cassandra, HTTP, gRPC, Redis, .NET 6, ASP.NET. [Configurable](docs/design-configuration.md) and [observable](docs/design-observability.md) environment with containerized components which can be [ran locally](docs/infrastructure-main.md#Run-locally) and is based on Docker, OpenTelemetry, Jaeger, Prometheus, Grafana, ElasticSearch, Fluentd, Kibana.
+[System design](docs/design-overall.md) and [partial implementation](source/) based on Kafka, Cassandra, HTTP, gRPC, Redis, .NET 6, ASP.NET. [Configurable](docs/design-configuration.md) and [observable](docs/design-observability.md) environment based on OpenTelemetry, Jaeger, Prometheus, Grafana, ElasticSearch, Fluentd, Kibana. Containerized components based on Docker which can be [ran locally](docs/infrastructure-main.md#Run-locally).
 
 I appreciate all comments so feel free to use the `Discussions` tab.
 
