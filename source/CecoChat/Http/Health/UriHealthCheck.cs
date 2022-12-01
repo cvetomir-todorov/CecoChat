@@ -8,10 +8,10 @@ public class UriHealthCheck : IHealthCheck
     private readonly TimeSpan _timeout;
     private readonly Func<HttpClient> _httpClientFactory;
 
-    public UriHealthCheck(Uri uri, TimeSpan? timeout, Func<HttpClient> httpClientFactory)
+    public UriHealthCheck(Uri uri, TimeSpan timeout, Func<HttpClient> httpClientFactory)
     {
         _uri = uri;
-        _timeout = timeout ?? TimeSpan.FromSeconds(10);
+        _timeout = timeout;
         _httpClientFactory = httpClientFactory;
     }
 
