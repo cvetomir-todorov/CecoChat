@@ -18,6 +18,7 @@ public sealed class BackplaneComponents : IBackplaneComponents
     private readonly ITopicPartitionFlyweight _topicPartitionFlyweight;
     private readonly ISendersProducer _sendersProducer;
     private readonly IReceiversConsumer _receiversConsumer;
+    private readonly ReceiversConsumerHealthCheck _receiversConsumerHealthCheck;
     private DedicatedThreadTaskScheduler? _receiversConsumerTaskScheduler;
 
     public BackplaneComponents(
@@ -25,13 +26,15 @@ public sealed class BackplaneComponents : IBackplaneComponents
         IOptions<BackplaneOptions> backplaneOptions,
         ITopicPartitionFlyweight topicPartitionFlyweight,
         ISendersProducer sendersProducer,
-        IReceiversConsumer receiversConsumer)
+        IReceiversConsumer receiversConsumer,
+        ReceiversConsumerHealthCheck receiversConsumerHealthCheck)
     {
         _logger = logger;
         _backplaneOptions = backplaneOptions.Value;
         _topicPartitionFlyweight = topicPartitionFlyweight;
         _sendersProducer = sendersProducer;
         _receiversConsumer = receiversConsumer;
+        _receiversConsumerHealthCheck = receiversConsumerHealthCheck;
     }
 
     public void Dispose()
@@ -65,11 +68,16 @@ public sealed class BackplaneComponents : IBackplaneComponents
         {
             try
             {
+                _receiversConsumerHealthCheck.IsReady = true;
                 _receiversConsumer.Start(ct);
             }
             catch (Exception exception)
             {
                 _logger.LogCritical(exception, "Failure in consumer {ConsumerId}", _receiversConsumer.ConsumerId);
+            }
+            finally
+            {
+                _receiversConsumerHealthCheck.IsReady = false;
             }
         }, ct, TaskCreationOptions.LongRunning, _receiversConsumerTaskScheduler);
     }
