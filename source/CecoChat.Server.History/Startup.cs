@@ -119,19 +119,32 @@ public class Startup
     {
         services
             .AddHealthChecks()
+            .AddCheck<ConfigDbInitHealthCheck>(
+                "config-db-init",
+                tags: new[] { HealthTags.Health, HealthTags.Startup })
+            .AddCheck<HistoryDbInitHealthCheck>(
+                "history-db-init",
+                tags: new[] { HealthTags.Health, HealthTags.Startup })
+            .AddCheck<HistoryConsumerHealthCheck>(
+                "history-consumer",
+                tags: new[] { HealthTags.Health, HealthTags.Startup, HealthTags.Live })
             .AddConfigDb(
                 _configDbOptions,
+                tags: new[] { HealthTags.Health, HealthTags.Ready })
+            .AddCassandra(
+                name: "history-db",
+                timeout: _historyDbOptions.HealthTimeout,
                 tags: new[] { HealthTags.Health, HealthTags.Ready })
             .AddKafkaBackplane(
                 _backplaneOptions.Kafka,
                 _backplaneOptions.HealthProducer,
                 _backplaneOptions.TopicHealth,
                 timeout: _backplaneOptions.HealthTimeout,
-                tags: new[] { HealthTags.Health })
-            .AddCassandra(
-                name: "history-db",
-                timeout: _historyDbOptions.HealthTimeout,
-                tags: new[] { HealthTags.Health, HealthTags.Ready });
+                tags: new[] { HealthTags.Health });
+
+        services.AddSingleton<ConfigDbInitHealthCheck>();
+        services.AddSingleton<HistoryDbInitHealthCheck>();
+        services.AddSingleton<HistoryConsumerHealthCheck>();
     }
 
     public void ConfigureContainer(ContainerBuilder builder)
