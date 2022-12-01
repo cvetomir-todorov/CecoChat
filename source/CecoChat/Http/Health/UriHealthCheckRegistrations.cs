@@ -5,6 +5,8 @@ namespace CecoChat.Http.Health;
 
 public static class UriHealthCheckRegistrations
 {
+    public static readonly TimeSpan DefaultTimeout = TimeSpan.FromSeconds(10);
+
     public static IHealthChecksBuilder AddUri(
         this IHealthChecksBuilder builder,
         Uri uri,
@@ -18,12 +20,16 @@ public static class UriHealthCheckRegistrations
         {
             throw new ArgumentException($"Argument {nameof(name)} should not be null or whitespace.", nameof(name));
         }
+        if (timeout == null)
+        {
+            timeout = DefaultTimeout;
+        }
 
         RegisterConfigureHttpClient(builder, name, configureHttpClient);
 
         return builder.Add(new HealthCheckRegistration(
             name,
-            serviceProvider => CreateHealthCheck(serviceProvider, name, uri, timeout),
+            serviceProvider => CreateHealthCheck(serviceProvider, name, uri, timeout.Value),
             failureStatus,
             tags,
             timeout));
@@ -36,7 +42,7 @@ public static class UriHealthCheckRegistrations
             .ConfigureHttpClient(configureHttpClient ?? ((_, _) => { }));
     }
 
-    private static IHealthCheck CreateHealthCheck(IServiceProvider serviceProvider, string registrationName, Uri uri, TimeSpan? timeout)
+    private static IHealthCheck CreateHealthCheck(IServiceProvider serviceProvider, string registrationName, Uri uri, TimeSpan timeout)
     {
         return new UriHealthCheck(uri, timeout, () =>
         {
