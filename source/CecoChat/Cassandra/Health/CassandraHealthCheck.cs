@@ -17,7 +17,7 @@ public class CassandraHealthCheck : IHealthCheck
         _query = new Lazy<BoundStatement>(() =>
         {
             const string query = "SELECT now() FROM system.local";
-            PreparedStatement prepared =_dbContext.GetSession().Prepare(query);
+            PreparedStatement prepared = _dbContext.GetSession().Prepare(query);
 
             BoundStatement bound = prepared.Bind();
             bound.SetIdempotence(true);

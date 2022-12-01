@@ -194,7 +194,7 @@ public class Startup
             {
                 Func<HttpContext, HealthReport, Task> responseWriter = (context, report) => CustomHealth.Writer(serviceName: "bff", context, report);
                 setup.Health.ResponseWriter = responseWriter;
-                
+
                 if (env.IsDevelopment())
                 {
                     setup.Startup.ResponseWriter = responseWriter;

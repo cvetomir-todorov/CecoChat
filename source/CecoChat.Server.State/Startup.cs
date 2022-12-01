@@ -121,7 +121,7 @@ public class Startup
             .AddHealthChecks()
             .AddCheck<StateDbInitHealthCheck>(
                 "state-db-init",
-                tags: new [] { HealthTags.Health, HealthTags.Startup })
+                tags: new[] { HealthTags.Health, HealthTags.Startup })
             .AddCheck<ReceiversConsumerHealthCheck>(
                 "receivers-consumer",
                 tags: new[] { HealthTags.Health, HealthTags.Startup, HealthTags.Live })
@@ -182,7 +182,7 @@ public class Startup
             {
                 Func<HttpContext, HealthReport, Task> responseWriter = (context, report) => CustomHealth.Writer(serviceName: "state", context, report);
                 setup.Health.ResponseWriter = responseWriter;
-                
+
                 if (env.IsDevelopment())
                 {
                     setup.Startup.ResponseWriter = responseWriter;
