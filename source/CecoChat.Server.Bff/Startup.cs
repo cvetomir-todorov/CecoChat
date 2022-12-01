@@ -127,6 +127,9 @@ public class Startup
     private void AddHealthServices(IServiceCollection services)
     {
         services.AddHealthChecks()
+            .AddCheck<ConfigDbInitHealthCheck>(
+                "config-db-init",
+                tags: new[] { HealthTags.Health, HealthTags.Startup })
             .AddConfigDb(
                 _configDbOptions,
                 tags: new[] { HealthTags.Health, HealthTags.Ready })
@@ -142,6 +145,8 @@ public class Startup
                 name: "state",
                 timeout: _stateOptions.HealthTimeout,
                 tags: new[] { HealthTags.Health, HealthTags.Ready });
+
+        services.AddSingleton<ConfigDbInitHealthCheck>();
     }
 
     public void ConfigureContainer(ContainerBuilder builder)
