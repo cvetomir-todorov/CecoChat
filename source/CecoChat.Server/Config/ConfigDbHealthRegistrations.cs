@@ -9,7 +9,7 @@ public static class ConfigDbHealthRegistrations
     public static IHealthChecksBuilder AddConfigDb(
         this IHealthChecksBuilder builder,
         RedisOptions configOptions,
-        string name = "config",
+        string name = "config-db",
         string[]? tags = null)
     {
         ConfigurationOptions configConfig = CreateRedisConfiguration(configOptions);
