@@ -88,9 +88,14 @@ public class Startup
     {
         services
             .AddHealthChecks()
+            .AddCheck<ConfigDbInitHealthCheck>(
+                "config-db-init",
+                tags: new[] { HealthTags.Health, HealthTags.Startup })
             .AddConfigDb(
                 _configDbOptions,
                 tags: new[] { HealthTags.Health, HealthTags.Ready });
+
+        services.AddSingleton<ConfigDbInitHealthCheck>();
     }
 
     public void ConfigureContainer(ContainerBuilder builder)
