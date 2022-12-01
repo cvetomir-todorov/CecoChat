@@ -17,6 +17,7 @@ using CecoChat.Server.Identity;
 using CecoChat.Swagger;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
@@ -191,7 +192,15 @@ public class Startup
             endpoints.MapControllers();
             endpoints.MapHttpHealthEndpoints(setup =>
             {
-                setup.Health.ResponseWriter = (context, report) => CustomHealth.Writer(serviceName: "bff", context, report);
+                Func<HttpContext, HealthReport, Task> responseWriter = (context, report) => CustomHealth.Writer(serviceName: "bff", context, report);
+                setup.Health.ResponseWriter = responseWriter;
+                
+                if (env.IsDevelopment())
+                {
+                    setup.Startup.ResponseWriter = responseWriter;
+                    setup.Live.ResponseWriter = responseWriter;
+                    setup.Ready.ResponseWriter = responseWriter;
+                }
             });
         });
 

@@ -18,6 +18,7 @@ using CecoChat.Server.State.Backplane;
 using CecoChat.Server.State.Clients;
 using CecoChat.Server.State.HostedServices;
 using Confluent.Kafka;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
@@ -179,7 +180,15 @@ public class Startup
             endpoints.MapGrpcService<StateService>();
             endpoints.MapHttpHealthEndpoints(setup =>
             {
-                setup.Health.ResponseWriter = (context, report) => CustomHealth.Writer(serviceName: "state", context, report);
+                Func<HttpContext, HealthReport, Task> responseWriter = (context, report) => CustomHealth.Writer(serviceName: "state", context, report);
+                setup.Health.ResponseWriter = responseWriter;
+                
+                if (env.IsDevelopment())
+                {
+                    setup.Startup.ResponseWriter = responseWriter;
+                    setup.Live.ResponseWriter = responseWriter;
+                    setup.Ready.ResponseWriter = responseWriter;
+                }
             });
         });
 
