@@ -36,13 +36,11 @@
 
 * Architecture
   - Design cross-region communication
-  - Partition data for State service
 * Security
   - Rate limiting
   - Use secure transports and protocols on communication level
 * Observability
   - Metrics for system resources
-  - Health checks
   - Alerting
 * Deployment
   - Infrastructure as code

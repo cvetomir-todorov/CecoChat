@@ -27,6 +27,7 @@
   - TLS used on communication level
   - Access tokens for authn and authz
 * Observability
+  - Health
   - Distributed tracing
   - Log aggregation
   - Metrics
