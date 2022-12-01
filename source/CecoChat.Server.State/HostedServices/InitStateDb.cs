@@ -9,15 +9,18 @@ public sealed class InitStateDb : IHostedService, IDisposable
     private readonly ILogger _logger;
     private readonly ICassandraDbInitializer _dbInitializer;
     private readonly IChatStateRepo _chatStateRepo;
+    private readonly StateDbInitHealthCheck _stateDbInitHealthCheck;
 
     public InitStateDb(
         ILogger<InitStateDb> logger,
         ICassandraDbInitializer dbInitializer,
-        IChatStateRepo chatStateRepo)
+        IChatStateRepo chatStateRepo,
+        StateDbInitHealthCheck stateDbInitHealthCheck)
     {
         _logger = logger;
         _dbInitializer = dbInitializer;
         _chatStateRepo = chatStateRepo;
+        _stateDbInitHealthCheck = stateDbInitHealthCheck;
     }
 
     public void Dispose()
@@ -35,6 +38,7 @@ public sealed class InitStateDb : IHostedService, IDisposable
             {
                 _logger.LogInformation("Start preparing queries...");
                 _chatStateRepo.Prepare();
+                _stateDbInitHealthCheck.IsReady = true;
                 _logger.LogInformation("Completed preparing queries");
             }
             catch (Exception exception)
