@@ -118,19 +118,32 @@ public class Startup
     {
         services
             .AddHealthChecks()
+            .AddCheck<StateDbInitHealthCheck>(
+                "state-db-init",
+                tags: new [] { HealthTags.Health, HealthTags.Startup })
+            .AddCheck<ReceiversConsumerHealthCheck>(
+                "receivers-consumer",
+                tags: new[] { HealthTags.Health, HealthTags.Startup, HealthTags.Live })
+            .AddCheck<SendersConsumerHealthCheck>(
+                "senders-consumer",
+                tags: new[] { HealthTags.Health, HealthTags.Startup, HealthTags.Live })
             .AddConfigDb(
                 _configDbOptions,
+                tags: new[] { HealthTags.Health, HealthTags.Ready })
+            .AddCassandra(
+                name: "state-db",
+                timeout: _stateDbOptions.HealthTimeout,
                 tags: new[] { HealthTags.Health, HealthTags.Ready })
             .AddKafkaBackplane(
                 _backplaneOptions.Kafka,
                 _backplaneOptions.HealthProducer,
                 _backplaneOptions.TopicHealth,
                 timeout: _backplaneOptions.HealthTimeout,
-                tags: new[] { HealthTags.Health })
-            .AddCassandra(
-                name: "state-db",
-                timeout: _stateDbOptions.HealthTimeout,
-                tags: new[] { HealthTags.Health, HealthTags.Ready });
+                tags: new[] { HealthTags.Health });
+
+        services.AddSingleton<StateDbInitHealthCheck>();
+        services.AddSingleton<ReceiversConsumerHealthCheck>();
+        services.AddSingleton<SendersConsumerHealthCheck>();
     }
 
     public void ConfigureContainer(ContainerBuilder builder)

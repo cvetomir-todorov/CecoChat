@@ -8,6 +8,8 @@ public sealed class StartBackplaneComponents : IHostedService, IDisposable
     private readonly ILogger _logger;
     private readonly IStateConsumer _stateConsumer;
     private readonly CancellationToken _appStoppingCt;
+    private readonly ReceiversConsumerHealthCheck _receiversConsumerHealthCheck;
+    private readonly SendersConsumerHealthCheck _sendersConsumerHealthCheck;
     private CancellationTokenSource? _stoppedCts;
     private DedicatedThreadTaskScheduler? _receiverMessagesTaskScheduler;
     private DedicatedThreadTaskScheduler? _senderMessagesTaskScheduler;
@@ -15,10 +17,14 @@ public sealed class StartBackplaneComponents : IHostedService, IDisposable
     public StartBackplaneComponents(
         ILogger<StartBackplaneComponents> logger,
         IStateConsumer stateConsumer,
+        ReceiversConsumerHealthCheck receiversConsumerHealthCheck,
+        SendersConsumerHealthCheck sendersConsumerHealthCheck,
         IHostApplicationLifetime applicationLifetime)
     {
         _logger = logger;
         _stateConsumer = stateConsumer;
+        _receiversConsumerHealthCheck = receiversConsumerHealthCheck;
+        _sendersConsumerHealthCheck = sendersConsumerHealthCheck;
 
         _appStoppingCt = applicationLifetime.ApplicationStopping;
     }
@@ -41,11 +47,16 @@ public sealed class StartBackplaneComponents : IHostedService, IDisposable
         {
             try
             {
+                _receiversConsumerHealthCheck.IsReady = true;
                 _stateConsumer.StartConsumingReceiverMessages(_stoppedCts.Token);
             }
             catch (Exception exception)
             {
                 _logger.LogCritical(exception, "Failure in consumer {ConsumerId}", _stateConsumer.ReceiverConsumerId);
+            }
+            finally
+            {
+                _receiversConsumerHealthCheck.IsReady = false;
             }
         }, _stoppedCts.Token, TaskCreationOptions.LongRunning, _receiverMessagesTaskScheduler);
 
@@ -54,11 +65,16 @@ public sealed class StartBackplaneComponents : IHostedService, IDisposable
         {
             try
             {
+                _sendersConsumerHealthCheck.IsReady = true;
                 _stateConsumer.StartConsumingSenderMessages(_stoppedCts.Token);
             }
             catch (Exception exception)
             {
                 _logger.LogCritical(exception, "Failure in consumer {ConsumerId}", _stateConsumer.SenderConsumerId);
+            }
+            finally
+            {
+                _sendersConsumerHealthCheck.IsReady = false;
             }
         }, _stoppedCts.Token, TaskCreationOptions.LongRunning, _senderMessagesTaskScheduler);
 
