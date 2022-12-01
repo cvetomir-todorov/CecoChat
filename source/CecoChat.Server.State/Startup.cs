@@ -134,7 +134,7 @@ public class Startup
                 name: "state-db",
                 timeout: _stateDbOptions.HealthTimeout,
                 tags: new[] { HealthTags.Health, HealthTags.Ready })
-            .AddKafkaBackplane(
+            .AddBackplane(
                 _backplaneOptions.Kafka,
                 _backplaneOptions.HealthProducer,
                 _backplaneOptions.TopicHealth,

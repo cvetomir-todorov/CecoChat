@@ -135,7 +135,7 @@ public class Startup
                 name: "history-db",
                 timeout: _historyDbOptions.HealthTimeout,
                 tags: new[] { HealthTags.Health, HealthTags.Ready })
-            .AddKafkaBackplane(
+            .AddBackplane(
                 _backplaneOptions.Kafka,
                 _backplaneOptions.HealthProducer,
                 _backplaneOptions.TopicHealth,
