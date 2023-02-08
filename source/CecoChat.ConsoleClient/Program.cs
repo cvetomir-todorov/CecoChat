@@ -8,11 +8,11 @@ public static class Program
 {
     public static async Task Main()
     {
-        Console.Write("Username bob (ID=1), alice (ID=2), john (ID=3), peter (ID=1200): ");
+        Console.Write("Select a username: 'bob' (ID=1), 'alice' (ID=2), 'john' (ID=3), 'peter' (ID=1200): ");
         string username = Console.ReadLine() ?? string.Empty;
         ChatClient client = new("https://localhost:31000");
         await client.CreateSession(username, password: "not-empty");
-        MessageStorage storage = new(client.UserID);
+        MessageStorage storage = new(client.UserId);
         ChangeHandler changeHandler = new(storage);
 
         client.ExceptionOccurred += ShowException;

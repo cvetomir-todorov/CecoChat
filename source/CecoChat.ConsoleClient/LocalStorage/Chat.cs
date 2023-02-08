@@ -7,13 +7,13 @@ public sealed class Chat
 {
     private readonly ConcurrentDictionary<long, Message> _messageMap;
 
-    public Chat(long otherUserID)
+    public Chat(long otherUserId)
     {
-        OtherUserID = otherUserID;
+        OtherUserId = otherUserId;
         _messageMap = new();
     }
 
-    public long OtherUserID { get; }
+    public long OtherUserId { get; }
 
     // The ID of the newest message in the chat.
     public long NewestMessage { get; set; }
@@ -29,9 +29,9 @@ public sealed class Chat
 
     public void AddNew(Message message)
     {
-        if (!_messageMap.TryGetValue(message.MessageID, out _))
+        if (!_messageMap.TryGetValue(message.MessageId, out _))
         {
-            _messageMap.TryAdd(message.MessageID, message);
+            _messageMap.TryAdd(message.MessageId, message);
         }
     }
 

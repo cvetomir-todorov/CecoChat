@@ -26,7 +26,7 @@ public abstract class State
         }
 
         Console.WriteLine("You: {0} | ID={1} | user name={2} | email={3} | phone={4} | avatar={5}",
-            Client.UserProfile.DisplayName, Client.UserID, Client.UserProfile.UserName,
+            Client.UserProfile.DisplayName, Client.UserId, Client.UserProfile.UserName,
             Client.UserProfile.Email, Client.UserProfile.Phone, Client.UserProfile.AvatarUrl);
     }
 }

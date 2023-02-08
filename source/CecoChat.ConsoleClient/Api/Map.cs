@@ -2,9 +2,9 @@ namespace CecoChat.ConsoleClient.Api;
 
 public static class Map
 {
-    public static LocalStorage.Chat BffChat(Contracts.Bff.ChatState bffChat, long otherUserID)
+    public static LocalStorage.Chat BffChat(Contracts.Bff.ChatState bffChat, long otherUserId)
     {
-        return new LocalStorage.Chat(otherUserID)
+        return new LocalStorage.Chat(otherUserId)
         {
             NewestMessage = bffChat.NewestMessage,
             OtherUserDelivered = bffChat.OtherUserDelivered,
@@ -16,9 +16,9 @@ public static class Map
     {
         LocalStorage.Message message = new()
         {
-            MessageID = bffHistoryMessage.MessageID,
-            SenderID = bffHistoryMessage.SenderID,
-            ReceiverID = bffHistoryMessage.ReceiverID
+            MessageId = bffHistoryMessage.MessageID,
+            SenderId = bffHistoryMessage.SenderID,
+            ReceiverId = bffHistoryMessage.ReceiverID
         };
 
         switch (bffHistoryMessage.DataType)
@@ -31,7 +31,7 @@ public static class Map
                 throw new EnumValueNotSupportedException(bffHistoryMessage.DataType);
         }
 
-        if (bffHistoryMessage.Reactions != null && bffHistoryMessage.Reactions.Count > 0)
+        if (bffHistoryMessage.Reactions.Count > 0)
         {
             foreach (KeyValuePair<long, string> reaction in bffHistoryMessage.Reactions)
             {

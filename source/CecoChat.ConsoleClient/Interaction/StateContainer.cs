@@ -34,5 +34,5 @@ public sealed class StateContainer
 public sealed class StateContext
 {
     public bool ReloadData { get; set; }
-    public long UserID { get; set; }
+    public long UserId { get; set; }
 }

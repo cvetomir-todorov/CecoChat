@@ -12,15 +12,15 @@ public sealed class OneChatState : State
     {
         if (Context.ReloadData)
         {
-            await GetHistory(Context.UserID);
+            await GetHistory(Context.UserId);
         }
 
-        List<Message> messages = Storage.GetChatMessages(Context.UserID);
-        messages.Sort((left, right) => left.MessageID.CompareTo(right.MessageID));
+        List<Message> messages = Storage.GetChatMessages(Context.UserId);
+        messages.Sort((left, right) => left.MessageId.CompareTo(right.MessageId));
 
         Console.Clear();
         DisplayUserData();
-        ProfilePublic profile = await Client.GetPublicProfile(Context.UserID);
+        ProfilePublic profile = await Client.GetPublicProfile(Context.UserId);
         Console.WriteLine("Chatting with: {0} | ID={1} | user name={2} | avatar={3}", profile.DisplayName, profile.UserId, profile.UserName, profile.AvatarUrl);
 
         foreach (Message message in messages)
@@ -58,9 +58,9 @@ public sealed class OneChatState : State
         }
     }
 
-    private async Task GetHistory(long userID)
+    private async Task GetHistory(long userId)
     {
-        IList<Message> history = await Client.GetHistory(userID, DateTime.UtcNow);
+        IList<Message> history = await Client.GetHistory(userId, DateTime.UtcNow);
         foreach (Message message in history)
         {
             Storage.AddMessage(message);
@@ -69,7 +69,7 @@ public sealed class OneChatState : State
 
     private void DisplayMessage(Message message, ProfilePublic profilePublic)
     {
-        string sender = message.SenderID == Client.UserID ? "You" : profilePublic.DisplayName;
+        string sender = message.SenderId == Client.UserId ? "You" : profilePublic.DisplayName;
         string reactions = string.Empty;
         if (message.Reactions.Count > 0)
         {
@@ -83,8 +83,8 @@ public sealed class OneChatState : State
         }
 
         Console.WriteLine("[{0:F}] {1}: {2} (#{3}|ID: {4} |{5} reaction(s):{6})",
-            message.MessageID.ToTimestamp(), sender, message.Data,
-            message.SequenceNumber, message.MessageID,
+            message.MessageId.ToTimestamp(), sender, message.Data,
+            message.SequenceNumber, message.MessageId,
             message.Reactions.Count, reactions);
     }
 }
