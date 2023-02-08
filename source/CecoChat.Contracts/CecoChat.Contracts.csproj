@@ -35,6 +35,7 @@
     <Protobuf Include="State\StateService.proto" GrpcServices="All" />
     <Protobuf Include="User\ProfileFull.proto" />
     <Protobuf Include="User\ProfilePublic.proto" />
+    <Protobuf Include="User\ProfileService.proto" GrpcServices="All" />
     <Protobuf Include="Uuid.proto" />
   </ItemGroup>
 
