@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Grpc.Net.ClientFactory" Version="2.49.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CecoChat.Contracts\CecoChat.Contracts.csproj" />
+    <ProjectReference Include="..\CecoChat\CecoChat.csproj" />
+  </ItemGroup>
+
+</Project>
