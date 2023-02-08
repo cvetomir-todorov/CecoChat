@@ -49,6 +49,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CecoChat.Data.User", "CecoC
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CecoChat.Server.User", "CecoChat.Server.User\CecoChat.Server.User.csproj", "{1429EA0D-FB1C-4F74-91CF-4D8BB75D5F82}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CecoChat.Client.User", "CecoChat.Client.User\CecoChat.Client.User.csproj", "{81CFDD61-DFD5-481B-A149-760A87BDE944}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -127,6 +129,10 @@ Global
 		{1429EA0D-FB1C-4F74-91CF-4D8BB75D5F82}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1429EA0D-FB1C-4F74-91CF-4D8BB75D5F82}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1429EA0D-FB1C-4F74-91CF-4D8BB75D5F82}.Release|Any CPU.Build.0 = Release|Any CPU
+		{81CFDD61-DFD5-481B-A149-760A87BDE944}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81CFDD61-DFD5-481B-A149-760A87BDE944}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81CFDD61-DFD5-481B-A149-760A87BDE944}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81CFDD61-DFD5-481B-A149-760A87BDE944}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -150,6 +156,7 @@ Global
 		{334205C5-C10A-4918-858D-E5974FFDA6F1} = {44AE3E31-FA07-4616-9F29-3D2EACF18A68}
 		{673F68FD-8828-4E56-ACD3-990BAB164F97} = {AFB9809C-E9BA-4CB1-93B5-2C95EA5A391C}
 		{1429EA0D-FB1C-4F74-91CF-4D8BB75D5F82} = {8A833F6F-10A3-4A3B-9B83-90F03DF415E4}
+		{81CFDD61-DFD5-481B-A149-760A87BDE944} = {44AE3E31-FA07-4616-9F29-3D2EACF18A68}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B5EAA668-8419-44F5-8BE5-9175A9B20BF8}
