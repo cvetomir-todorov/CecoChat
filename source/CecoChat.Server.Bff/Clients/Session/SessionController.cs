@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using CecoChat.Client.User;
 using CecoChat.Contracts.Bff;
 using CecoChat.Data.Config.Partitioning;
 using CecoChat.Jwt;
@@ -20,6 +21,7 @@ public class SessionController : ControllerBase
     private readonly ILogger _logger;
     private readonly JwtOptions _jwtOptions;
     private readonly IClock _clock;
+    private readonly IUserClient _userClient;
     private readonly IPartitionUtility _partitionUtility;
     private readonly IPartitioningConfig _partitioningConfig;
 
@@ -30,12 +32,14 @@ public class SessionController : ControllerBase
         ILogger<SessionController> logger,
         IOptions<JwtOptions> jwtOptions,
         IClock clock,
+        IUserClient userClient,
         IPartitionUtility partitionUtility,
         IPartitioningConfig partitioningConfig)
     {
         _logger = logger;
         _jwtOptions = jwtOptions.Value;
         _clock = clock;
+        _userClient = userClient;
         _partitionUtility = partitionUtility;
         _partitioningConfig = partitioningConfig;
 
@@ -50,7 +54,7 @@ public class SessionController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public IActionResult CreateSession([FromBody][BindRequired] CreateSessionRequest request)
+    public async Task<IActionResult> CreateSession([FromBody][BindRequired] CreateSessionRequest request)
     {
         if (!_userIdMap.TryGetValue(request.Username, out long userId))
         {
@@ -61,14 +65,26 @@ public class SessionController : ControllerBase
         (Guid clientId, string accessToken) = CreateSession(userId);
         _logger.LogInformation("User {Username} authenticated and assigned user ID {UserId} and client ID {ClientId}", request.Username, userId, clientId);
 
+        Contracts.User.ProfileFull internalProfile = await _userClient.GetFullProfile(accessToken);
+        // TODO: consider using AutoMapper
+        ProfileFull externalProfile = new()
+        {
+            UserName = internalProfile.UserName,
+            DisplayName = internalProfile.DisplayName,
+            AvatarUrl = internalProfile.AvatarUrl,
+            Phone = internalProfile.Phone,
+            Email = internalProfile.Email
+        };
+
         int partition = _partitionUtility.ChoosePartition(userId, _partitioningConfig.PartitionCount);
         string messagingServerAddress = _partitioningConfig.GetServerAddress(partition);
         _logger.LogInformation("User {UserId} in partition {Partition} assigned to messaging server {MessagingServer}", userId, partition, messagingServerAddress);
 
         CreateSessionResponse response = new()
         {
-            ClientID = clientId,
+            ClientId = clientId,
             AccessToken = accessToken,
+            Profile = externalProfile,
             MessagingServerAddress = messagingServerAddress
         };
         return Ok(response);
