@@ -29,7 +29,7 @@ public sealed class OtelTelemetry : ITelemetry
             activity.TraceStateString = parentContext.Value.TraceState;
         }
 
-        SetKindProperty(activity, ActivityKind.Consumer);
+        SetKindProperty(activity, kind);
         SetSourceProperty(activity, source);
 
         activity.Start();
