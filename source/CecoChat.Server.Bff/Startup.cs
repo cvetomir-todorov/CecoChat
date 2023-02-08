@@ -3,6 +3,7 @@ using Autofac;
 using CecoChat.Autofac;
 using CecoChat.Client.History;
 using CecoChat.Client.State;
+using CecoChat.Client.User;
 using CecoChat.Data.Config;
 using CecoChat.Http.Health;
 using CecoChat.Jwt;
@@ -29,6 +30,7 @@ public class Startup
     private readonly RedisOptions _configDbOptions;
     private readonly HistoryOptions _historyOptions;
     private readonly StateOptions _stateOptions;
+    private readonly UserOptions _userOptions;
     private readonly JwtOptions _jwtOptions;
     private readonly SwaggerOptions _swaggerOptions;
     private readonly OtelSamplingOptions _otelSamplingOptions;
@@ -47,6 +49,9 @@ public class Startup
 
         _stateOptions = new();
         Configuration.GetSection("StateClient").Bind(_stateOptions);
+
+        _userOptions = new();
+        Configuration.GetSection("UserClient").Bind(_userOptions);
 
         _jwtOptions = new();
         Configuration.GetSection("Jwt").Bind(_jwtOptions);
@@ -90,6 +95,7 @@ public class Startup
         // downstream services
         services.AddHistoryClient(_historyOptions);
         services.AddStateClient(_stateOptions);
+        services.AddUserClient(_userOptions);
 
         // required
         services.AddOptions();
@@ -167,6 +173,8 @@ public class Startup
         builder.RegisterModule(new HistoryClientAutofacModule(historyClientConfig));
         IConfiguration stateClientConfig = Configuration.GetSection("StateClient");
         builder.RegisterModule(new StateClientAutofacModule(stateClientConfig));
+        IConfiguration userClientConfig = Configuration.GetSection("UserClient");
+        builder.RegisterModule(new UserClientAutofacModule(userClientConfig));
 
         // security
         builder.RegisterOptions<JwtOptions>(Configuration.GetSection("Jwt"));
