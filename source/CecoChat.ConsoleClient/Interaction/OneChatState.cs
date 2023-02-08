@@ -19,9 +19,13 @@ public sealed class OneChatState : State
         messages.Sort((left, right) => left.MessageID.CompareTo(right.MessageID));
 
         Console.Clear();
+        DisplayUserData();
+        ProfilePublic profile = await Client.GetPublicProfile(Context.UserID);
+        Console.WriteLine("Chatting with: {0} | ID={1} | user name={2} | avatar={3}", profile.DisplayName, profile.UserId, profile.UserName, profile.AvatarUrl);
+
         foreach (Message message in messages)
         {
-            DisplayMessage(message);
+            DisplayMessage(message, profile);
         }
         Console.WriteLine("Write (press 'w') | React (press 'r') | Refresh (press 'f') | Local refresh (press 'l') | Return (press 'x')");
 
@@ -63,9 +67,9 @@ public sealed class OneChatState : State
         }
     }
 
-    private void DisplayMessage(Message message)
+    private void DisplayMessage(Message message, ProfilePublic profilePublic)
     {
-        string sender = message.SenderID == Client.UserID ? "You" : message.SenderID.ToString();
+        string sender = message.SenderID == Client.UserID ? "You" : profilePublic.DisplayName;
         string reactions = string.Empty;
         if (message.Reactions.Count > 0)
         {

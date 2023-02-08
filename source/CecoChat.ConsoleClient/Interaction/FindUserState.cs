@@ -8,6 +8,7 @@ public sealed class FindUserState : State
     public override Task<State> Execute()
     {
         Console.Clear();
+        DisplayUserData();
         Console.Write("Enter user ID ('0' to exit): ");
 
         string? userIDString = Console.ReadLine();

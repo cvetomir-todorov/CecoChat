@@ -12,6 +12,7 @@ public sealed class ChatClient : IDisposable
 {
     private readonly IBffClient _bffClient;
     private long _userID;
+    private ProfileFull? _userProfile;
     private string? _accessToken;
     private string? _messagingServerAddress;
     private Metadata? _grpcMetadata;
@@ -33,6 +34,8 @@ public sealed class ChatClient : IDisposable
 
     public long UserID => _userID;
 
+    public ProfileFull? UserProfile => _userProfile;
+
     public async Task CreateSession(string username, string password)
     {
         CreateSessionRequest request = new()
@@ -42,6 +45,7 @@ public sealed class ChatClient : IDisposable
         };
         CreateSessionResponse response = await _bffClient.CreateSession(request);
         ProcessAccessToken(response.AccessToken);
+        _userProfile = response.Profile;
         _messagingServerAddress = response.MessagingServerAddress;
     }
 
@@ -187,5 +191,26 @@ public sealed class ChatClient : IDisposable
             ReceiverId = otherUserID
         };
         await _reactionClient!.UnReactAsync(request, _grpcMetadata);
+    }
+
+    public async Task<LocalStorage.ProfilePublic> GetPublicProfile(long userId)
+    {
+        GetPublicProfileResponse response = await _bffClient.GetPublicProfile(userId, _accessToken!);
+        LocalStorage.ProfilePublic profile = Map.PublicProfile(response.Profile);
+
+        return profile;
+    }
+
+    public async Task<List<LocalStorage.ProfilePublic>> GetPublicProfiles(IEnumerable<long> userIds)
+    {
+        GetPublicProfilesResponse response = await _bffClient.GetPublicProfiles(userIds.ToArray(), _accessToken!);
+        List<LocalStorage.ProfilePublic> profiles = new(capacity: response.Profiles.Length);
+
+        foreach (ProfilePublic profile in response.Profiles)
+        {
+            profiles.Add(Map.PublicProfile(profile));
+        }
+
+        return profiles;
     }
 }

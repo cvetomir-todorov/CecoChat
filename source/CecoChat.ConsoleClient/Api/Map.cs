@@ -41,4 +41,15 @@ public static class Map
 
         return message;
     }
+
+    public static LocalStorage.ProfilePublic PublicProfile(Contracts.Bff.ProfilePublic bffProfile)
+    {
+        return new LocalStorage.ProfilePublic
+        {
+            UserId = bffProfile.UserId,
+            UserName = bffProfile.UserName,
+            DisplayName = bffProfile.DisplayName,
+            AvatarUrl = bffProfile.AvatarUrl
+        };
+    }
 }
