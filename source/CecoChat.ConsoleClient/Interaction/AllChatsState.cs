@@ -22,21 +22,21 @@ public sealed class AllChatsState : State
         DisplayUserData();
         Console.WriteLine("Choose user to chat (press '0'...'9') | New (press 'n') | Refresh (press 'f') | Exit (press 'x'):");
         Console.WriteLine("=================================================================================================");
-        List<long> userIDs = Storage.GetUsers();
-        List<ProfilePublic> profiles = await Client.GetPublicProfiles(userIDs);
+        List<long> userIds = Storage.GetUsers();
+        List<ProfilePublic> profiles = await Client.GetPublicProfiles(userIds);
         Dictionary<long, ProfilePublic> profilesMap = profiles.ToDictionary(profile => profile.UserId);
 
         int key = 0;
-        foreach (long userID in userIDs)
+        foreach (long userId in userIds)
         {
-            ProfilePublic profile = profilesMap[userID];
+            ProfilePublic profile = profilesMap[userId];
             Console.WriteLine("Press '{0}' for: {1,-24} | {2,-8} | {3,-24} | {4,-48}", key++, profile.DisplayName, $"ID={profile.UserId}", $"user name={profile.UserName}", $"avatar={profile.AvatarUrl}");
         }
 
         ConsoleKeyInfo keyInfo = Console.ReadKey(intercept: true);
         if (char.IsNumber(keyInfo.KeyChar))
         {
-            return ProcessNumberKey(keyInfo, userIDs);
+            return ProcessNumberKey(keyInfo, userIds);
         }
         else if (keyInfo.KeyChar == 'n' || keyInfo.KeyChar == 'N')
         {
@@ -82,7 +82,7 @@ public sealed class AllChatsState : State
         }
         else
         {
-            Context.UserID = userIDs[index];
+            Context.UserId = userIDs[index];
             Context.ReloadData = true;
             return States.OneChat;
         }

@@ -9,7 +9,7 @@ public sealed class SendMessageState : State
 
     public override async Task<State> Execute()
     {
-        Console.Write("Message to ID={0}: ", Context.UserID);
+        Console.Write("Message to ID={0}: ", Context.UserId);
         string? plainText = Console.ReadLine();
         if (string.IsNullOrWhiteSpace(plainText))
         {
@@ -17,12 +17,12 @@ public sealed class SendMessageState : State
             return States.OneChat;
         }
 
-        long messageID = await Client.SendPlainTextMessage(Context.UserID, plainText);
+        long messageId = await Client.SendPlainTextMessage(Context.UserId, plainText);
         Message message = new()
         {
-            MessageID = messageID,
-            SenderID = Client.UserID,
-            ReceiverID = Context.UserID,
+            MessageId = messageId,
+            SenderId = Client.UserId,
+            ReceiverId = Context.UserId,
             DataType = DataType.PlainText,
             Data = plainText,
         };

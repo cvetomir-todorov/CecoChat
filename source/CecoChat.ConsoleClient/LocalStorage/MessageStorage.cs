@@ -5,18 +5,18 @@ namespace CecoChat.ConsoleClient.LocalStorage;
 
 public sealed class MessageStorage
 {
-    private readonly long _userID;
+    private readonly long _userId;
     private readonly ConcurrentDictionary<long, Chat> _chatMap;
 
-    public MessageStorage(long userID)
+    public MessageStorage(long userId)
     {
-        _userID = userID;
+        _userId = userId;
         _chatMap = new();
     }
 
     public void AddOrUpdateChat(Chat chat)
     {
-        Chat targetChat = _chatMap.GetOrAdd(chat.OtherUserID, _ => chat);
+        Chat targetChat = _chatMap.GetOrAdd(chat.OtherUserId, _ => chat);
         if (!ReferenceEquals(chat, targetChat))
         {
             targetChat.NewestMessage = chat.NewestMessage;
@@ -27,7 +27,7 @@ public sealed class MessageStorage
 
     public void AddMessage(Message message)
     {
-        long otherUserId = GetOtherUserID(message.SenderID, message.ReceiverID);
+        long otherUserId = GetOtherUserId(message.SenderId, message.ReceiverId);
         Chat chat = _chatMap.GetOrAdd(otherUserId, _ => new Chat(otherUserId));
         chat.AddNew(message);
     }
@@ -37,11 +37,11 @@ public sealed class MessageStorage
         return _chatMap.Keys.ToList();
     }
 
-    public List<Message> GetChatMessages(long userID)
+    public List<Message> GetChatMessages(long userId)
     {
         List<Message> messages = new();
 
-        if (_chatMap.TryGetValue(userID, out Chat? chat))
+        if (_chatMap.TryGetValue(userId, out Chat? chat))
         {
             messages.AddRange(chat.GetMessages());
         }
@@ -49,36 +49,36 @@ public sealed class MessageStorage
         return messages;
     }
 
-    public bool TryGetMessage(long userID1, long userID2, long messageID, [NotNullWhen(returnValue: true)] out Message? message)
+    public bool TryGetMessage(long userId1, long userId2, long messageId, [NotNullWhen(returnValue: true)] out Message? message)
     {
-        long otherUserID = GetOtherUserID(userID1, userID2);
+        long otherUserId = GetOtherUserId(userId1, userId2);
 
         message = null;
-        if (!_chatMap.TryGetValue(otherUserID, out Chat? dialog))
+        if (!_chatMap.TryGetValue(otherUserId, out Chat? dialog))
         {
             return false;
         }
 
-        return dialog.TryGetMessage(messageID, out message);
+        return dialog.TryGetMessage(messageId, out message);
     }
 
-    public bool TryGetChat(long userID1, long userID2, [NotNullWhen(returnValue: true)] out Chat? chat)
+    public bool TryGetChat(long userId1, long userId2, [NotNullWhen(returnValue: true)] out Chat? chat)
     {
-        long otherUserID = GetOtherUserID(userID1, userID2);
-        return _chatMap.TryGetValue(otherUserID, out chat);
+        long otherUserId = GetOtherUserId(userId1, userId2);
+        return _chatMap.TryGetValue(otherUserId, out chat);
     }
 
-    public long GetOtherUserID(long userID1, long userID2)
+    public long GetOtherUserId(long userId1, long userId2)
     {
-        if (userID1 != _userID)
+        if (userId1 != _userId)
         {
-            return userID1;
+            return userId1;
         }
-        if (userID2 != _userID)
+        if (userId2 != _userId)
         {
-            return userID2;
+            return userId2;
         }
 
-        throw new InvalidOperationException($"Message is from current user {_userID} to himself.");
+        throw new InvalidOperationException($"Message is from current user {_userId} to himself.");
     }
 }

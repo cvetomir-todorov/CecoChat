@@ -11,7 +11,7 @@ namespace CecoChat.ConsoleClient.Api;
 public sealed class ChatClient : IDisposable
 {
     private readonly IBffClient _bffClient;
-    private long _userID;
+    private long _userId;
     private ProfileFull? _userProfile;
     private string? _accessToken;
     private string? _messagingServerAddress;
@@ -32,7 +32,7 @@ public sealed class ChatClient : IDisposable
         _messagingChannel?.Dispose();
     }
 
-    public long UserID => _userID;
+    public long UserId => _userId;
 
     public ProfileFull? UserProfile => _userProfile;
 
@@ -57,7 +57,7 @@ public sealed class ChatClient : IDisposable
         _grpcMetadata.Add("Authorization", $"Bearer {accessToken}");
 
         JwtSecurityToken jwt = new(accessToken);
-        _userID = long.Parse(jwt.Subject);
+        _userId = long.Parse(jwt.Subject);
     }
 
     public void StartMessaging(CancellationToken ct)
@@ -129,19 +129,19 @@ public sealed class ChatClient : IDisposable
         List<LocalStorage.Chat> chats = new(capacity: response.Chats.Length);
         foreach (ChatState bffChat in response.Chats)
         {
-            long otherUserID = DataUtility.GetOtherUsedID(bffChat.ChatID, UserID);
-            LocalStorage.Chat chat = Map.BffChat(bffChat, otherUserID);
+            long otherUserId = DataUtility.GetOtherUsedID(bffChat.ChatID, UserId);
+            LocalStorage.Chat chat = Map.BffChat(bffChat, otherUserId);
             chats.Add(chat);
         }
 
         return chats;
     }
 
-    public async Task<IList<LocalStorage.Message>> GetHistory(long otherUserID, DateTime olderThan)
+    public async Task<IList<LocalStorage.Message>> GetHistory(long otherUserId, DateTime olderThan)
     {
         GetHistoryRequest request = new()
         {
-            OtherUserID = otherUserID,
+            OtherUserID = otherUserId,
             OlderThan = olderThan
         };
         GetHistoryResponse response = await _bffClient.GetHistoryMessages(request, _accessToken!);
@@ -156,12 +156,12 @@ public sealed class ChatClient : IDisposable
         return messages;
     }
 
-    public async Task<long> SendPlainTextMessage(long receiverID, string text)
+    public async Task<long> SendPlainTextMessage(long receiverId, string text)
     {
         SendMessageRequest request = new()
         {
-            SenderId = _userID,
-            ReceiverId = receiverID,
+            SenderId = _userId,
+            ReceiverId = receiverId,
             DataType = Contracts.Messaging.DataType.PlainText,
             Data = text
         };
@@ -170,25 +170,25 @@ public sealed class ChatClient : IDisposable
         return response.MessageId;
     }
 
-    public async Task React(long messageID, long otherUserID, string reaction)
+    public async Task React(long messageId, long otherUserId, string reaction)
     {
         ReactRequest request = new()
         {
-            MessageId = messageID,
-            SenderId = _userID,
-            ReceiverId = otherUserID,
+            MessageId = messageId,
+            SenderId = _userId,
+            ReceiverId = otherUserId,
             Reaction = reaction
         };
         await _reactionClient!.ReactAsync(request, _grpcMetadata);
     }
 
-    public async Task UnReact(long messageID, long otherUserID)
+    public async Task UnReact(long messageId, long otherUserId)
     {
         UnReactRequest request = new()
         {
-            MessageId = messageID,
-            SenderId = _userID,
-            ReceiverId = otherUserID
+            MessageId = messageId,
+            SenderId = _userId,
+            ReceiverId = otherUserId
         };
         await _reactionClient!.UnReactAsync(request, _grpcMetadata);
     }

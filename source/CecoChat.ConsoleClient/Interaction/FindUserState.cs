@@ -11,10 +11,10 @@ public sealed class FindUserState : State
         DisplayUserData();
         Console.Write("Enter user ID ('0' to exit): ");
 
-        string? userIDString = Console.ReadLine();
-        if (string.IsNullOrWhiteSpace(userIDString) ||
-            !long.TryParse(userIDString, out long userID) ||
-            userID == 0)
+        string? userIdString = Console.ReadLine();
+        if (string.IsNullOrWhiteSpace(userIdString) ||
+            !long.TryParse(userIdString, out long userId) ||
+            userId == 0)
         {
             Context.ReloadData = true;
             return Task.FromResult(States.AllChats);
@@ -22,7 +22,7 @@ public sealed class FindUserState : State
         else
         {
             Context.ReloadData = true;
-            Context.UserID = userID;
+            Context.UserId = userId;
             return Task.FromResult(States.OneChat);
         }
     }

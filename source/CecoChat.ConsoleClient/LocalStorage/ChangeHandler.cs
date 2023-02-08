@@ -20,9 +20,9 @@ public class ChangeHandler
 
         Message message = new()
         {
-            MessageID = notification.MessageId,
-            SenderID = notification.SenderId,
-            ReceiverID = notification.ReceiverId,
+            MessageId = notification.MessageId,
+            SenderId = notification.SenderId,
+            ReceiverId = notification.ReceiverId,
             SequenceNumber = notification.SequenceNumber,
         };
 
@@ -48,8 +48,8 @@ public class ChangeHandler
 
         if (!_storage.TryGetChat(notification.SenderId, notification.ReceiverId, out Chat? chat))
         {
-            long otherUserID = _storage.GetOtherUserID(notification.SenderId, notification.ReceiverId);
-            chat = new Chat(otherUserID)
+            long otherUserId = _storage.GetOtherUserId(notification.SenderId, notification.ReceiverId);
+            chat = new Chat(otherUserId)
             {
                 NewestMessage = notification.MessageId
             };
