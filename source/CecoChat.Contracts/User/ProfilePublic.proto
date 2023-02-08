@@ -1,0 +1,10 @@
+syntax = "proto3";
+option csharp_namespace = "CecoChat.Contracts.User";
+package CecoChat.Contracts.User;
+
+message ProfilePublic {
+  int64 user_id = 1;
+  string user_name = 2;
+  string display_name = 3;
+  string avatar_url = 4;
+}

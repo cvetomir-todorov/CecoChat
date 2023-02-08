@@ -33,6 +33,8 @@
     <Protobuf Include="Messaging\ListenService.proto" GrpcServices="All" />
     <Protobuf Include="State\ChatState.proto" />
     <Protobuf Include="State\StateService.proto" GrpcServices="All" />
+    <Protobuf Include="User\ProfileFull.proto" />
+    <Protobuf Include="User\ProfilePublic.proto" />
     <Protobuf Include="Uuid.proto" />
   </ItemGroup>
 
