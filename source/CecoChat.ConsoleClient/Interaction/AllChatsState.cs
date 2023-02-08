@@ -19,12 +19,18 @@ public sealed class AllChatsState : State
         }
 
         Console.Clear();
+        DisplayUserData();
         Console.WriteLine("Choose user to chat (press '0'...'9') | New (press 'n') | Refresh (press 'f') | Exit (press 'x'):");
+        Console.WriteLine("=================================================================================================");
         List<long> userIDs = Storage.GetUsers();
+        List<ProfilePublic> profiles = await Client.GetPublicProfiles(userIDs);
+        Dictionary<long, ProfilePublic> profilesMap = profiles.ToDictionary(profile => profile.UserId);
+
         int key = 0;
         foreach (long userID in userIDs)
         {
-            Console.WriteLine("ID={0} (press '{1}')", userID, key++);
+            ProfilePublic profile = profilesMap[userID];
+            Console.WriteLine("Press '{0}' for: {1,-24} | {2,-8} | {3,-24} | {4,-48}", key++, profile.DisplayName, $"ID={profile.UserId}", $"user name={profile.UserName}", $"avatar={profile.AvatarUrl}");
         }
 
         ConsoleKeyInfo keyInfo = Console.ReadKey(intercept: true);
