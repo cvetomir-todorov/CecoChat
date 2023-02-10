@@ -1,5 +1,3 @@
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using CecoChat.Client.State;
 using CecoChat.Contracts.Bff;
 using CecoChat.Server.Identity;
@@ -33,7 +31,7 @@ public class StateController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetChats([FromQuery][BindRequired] GetChatsRequest request, CancellationToken ct)
     {
-        if (!TryGetUserClaims(HttpContext, out UserClaims? userClaims))
+        if (!HttpContext.TryGetUserClaims(_logger, out UserClaims? userClaims))
         {
             return Unauthorized();
         }
@@ -62,17 +60,5 @@ public class StateController : ControllerBase
             OtherUserDelivered = fromService.OtherUserDelivered,
             OtherUserSeen = fromService.OtherUserSeen
         };
-    }
-
-    private bool TryGetUserClaims(HttpContext context, [NotNullWhen(true)] out UserClaims? userClaims)
-    {
-        if (!context.User.TryGetUserClaims(out userClaims))
-        {
-            _logger.LogError("Client from was authorized but has no parseable access token");
-            return false;
-        }
-
-        Activity.Current?.SetTag("user.id", userClaims.UserId);
-        return true;
     }
 }
