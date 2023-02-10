@@ -1,6 +1,6 @@
-using System.Diagnostics;
 using CecoChat.Contracts.User;
 using CecoChat.Data.User.Repos;
+using CecoChat.Server.Grpc;
 using CecoChat.Server.Identity;
 using Grpc.Core;
 
@@ -19,50 +19,39 @@ public class ProfileService : Profile.ProfileBase
 
     public override async Task<GetFullProfileResponse> GetFullProfile(GetFullProfileRequest request, ServerCallContext context)
     {
-        long userId = GetUserId(context);
-        ProfileFull? profile = await _repo.GetFullProfile(userId);
+        UserClaims userClaims = context.GetUserClaims(_logger);
+        ProfileFull? profile = await _repo.GetFullProfile(userClaims.UserId);
         if (profile == null)
         {
-            throw new RpcException(new Status(StatusCode.NotFound, $"There is no profile for user ID {userId}."));
+            throw new RpcException(new Status(StatusCode.NotFound, $"There is no profile for user ID {userClaims.UserId}."));
         }
 
-        _logger.LogTrace("Responding with full profile {ProfileUserName} for user {UserId}", profile.UserName, userId);
+        _logger.LogTrace("Responding with full profile {ProfileUserName} for user {UserId}", profile.UserName, userClaims.UserId);
         return new GetFullProfileResponse { Profile = profile };
     }
 
     public override async Task<GetPublicProfileResponse> GetPublicProfile(GetPublicProfileRequest request, ServerCallContext context)
     {
-        long userId = GetUserId(context);
-        ProfilePublic? profile = await _repo.GetPublicProfile(request.UserId, userId);
+        UserClaims userClaims = context.GetUserClaims(_logger);
+        ProfilePublic? profile = await _repo.GetPublicProfile(request.UserId, userClaims.UserId);
         if (profile == null)
         {
             throw new RpcException(new Status(StatusCode.NotFound, $"There is no profile for user ID {request.UserId}."));
         }
 
-        _logger.LogTrace("Responding with public profile {RequestedUserId} requested by user {UserId}", profile.UserId, userId);
+        _logger.LogTrace("Responding with public profile {RequestedUserId} requested by user {UserId}", profile.UserId, userClaims.UserId);
         return new GetPublicProfileResponse { Profile = profile };
     }
 
     public override Task<GetPublicProfilesResponse> GetPublicProfiles(GetPublicProfilesRequest request, ServerCallContext context)
     {
-        long userId = GetUserId(context);
-        IEnumerable<ProfilePublic> profiles = _repo.GetPublicProfiles(request.UserIds, userId);
+        UserClaims userClaims = context.GetUserClaims(_logger);
+        IEnumerable<ProfilePublic> profiles = _repo.GetPublicProfiles(request.UserIds, userClaims.UserId);
 
         GetPublicProfilesResponse response = new();
         response.Profiles.Add(profiles);
 
-        _logger.LogTrace("Responding with {PublicProfileCount} public profiles requested by user {UserId}", response.Profiles.Count, userId);
+        _logger.LogTrace("Responding with {PublicProfileCount} public profiles requested by user {UserId}", response.Profiles.Count, userClaims.UserId);
         return Task.FromResult(response);
-    }
-
-    // TODO: reuse this across all grpc services
-    private static long GetUserId(ServerCallContext context)
-    {
-        if (!context.GetHttpContext().User.TryGetUserId(out long userId))
-        {
-            throw new RpcException(new Status(StatusCode.Unauthenticated, "Client has no parseable access token."));
-        }
-        Activity.Current?.SetTag("user.id", userId);
-        return userId;
     }
 }
