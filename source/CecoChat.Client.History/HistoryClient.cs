@@ -1,4 +1,5 @@
 using CecoChat.Contracts.History;
+using CecoChat.Grpc;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Microsoft.Extensions.Logging;
@@ -8,7 +9,7 @@ namespace CecoChat.Client.History;
 
 public interface IHistoryClient : IDisposable
 {
-    Task<IReadOnlyCollection<HistoryMessage>> GetHistory(long userID, long otherUserID, DateTime olderThan, string accessToken, CancellationToken ct);
+    Task<IReadOnlyCollection<HistoryMessage>> GetHistory(long userId, long otherUserId, DateTime olderThan, string accessToken, CancellationToken ct);
 }
 
 internal sealed class HistoryClient : IHistoryClient
@@ -34,20 +35,20 @@ internal sealed class HistoryClient : IHistoryClient
         // nothing to dispose for now, but keep the IDisposable as part of the contract
     }
 
-    public async Task<IReadOnlyCollection<HistoryMessage>> GetHistory(long userID, long otherUserID, DateTime olderThan, string accessToken, CancellationToken ct)
+    public async Task<IReadOnlyCollection<HistoryMessage>> GetHistory(long userId, long otherUserId, DateTime olderThan, string accessToken, CancellationToken ct)
     {
         GetHistoryRequest request = new()
         {
-            OtherUserId = otherUserID,
+            OtherUserId = otherUserId,
             OlderThan = olderThan.ToTimestamp()
         };
 
-        Metadata grpcMetadata = new();
-        grpcMetadata.Add("Authorization", $"Bearer {accessToken}");
+        Metadata headers = new();
+        headers.AddAuthorization(accessToken);
         DateTime deadline = DateTime.UtcNow.Add(_options.CallTimeout);
-        GetHistoryResponse response = await _client.GetHistoryAsync(request, headers: grpcMetadata, deadline, cancellationToken: ct);
+        GetHistoryResponse response = await _client.GetHistoryAsync(request, headers, deadline, ct);
 
-        _logger.LogTrace("Received {MessageCount} messages for history between {UserId} and {OtherUserId} older than {OlderThan}", response.Messages.Count, userID, otherUserID, olderThan);
+        _logger.LogTrace("Received {MessageCount} messages for history between {UserId} and {OtherUserId} older than {OlderThan}", response.Messages.Count, userId, otherUserId, olderThan);
         return response.Messages;
     }
 }

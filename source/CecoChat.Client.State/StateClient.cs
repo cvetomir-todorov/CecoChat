@@ -1,4 +1,5 @@
 using CecoChat.Contracts.State;
+using CecoChat.Grpc;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Microsoft.Extensions.Logging;
@@ -8,7 +9,7 @@ namespace CecoChat.Client.State;
 
 public interface IStateClient : IDisposable
 {
-    Task<IReadOnlyCollection<ChatState>> GetChats(long userID, DateTime newerThan, string accessToken, CancellationToken ct);
+    Task<IReadOnlyCollection<ChatState>> GetChats(long userId, DateTime newerThan, string accessToken, CancellationToken ct);
 }
 
 internal sealed class StateClient : IStateClient
@@ -34,19 +35,19 @@ internal sealed class StateClient : IStateClient
         // nothing to dispose for now, but keep the IDisposable as part of the contract
     }
 
-    public async Task<IReadOnlyCollection<ChatState>> GetChats(long userID, DateTime newerThan, string accessToken, CancellationToken ct)
+    public async Task<IReadOnlyCollection<ChatState>> GetChats(long userId, DateTime newerThan, string accessToken, CancellationToken ct)
     {
         GetChatsRequest request = new()
         {
             NewerThan = newerThan.ToTimestamp()
         };
 
-        Metadata grpcMetadata = new();
-        grpcMetadata.Add("Authorization", $"Bearer {accessToken}");
+        Metadata headers = new();
+        headers.AddAuthorization(accessToken);
         DateTime deadline = DateTime.UtcNow.Add(_options.CallTimeout);
-        GetChatsResponse response = await _client.GetChatsAsync(request, headers: grpcMetadata, deadline, cancellationToken: ct);
+        GetChatsResponse response = await _client.GetChatsAsync(request, headers, deadline, ct);
 
-        _logger.LogTrace("Received {ChatCount} chats for user {UserId} which are newer than {NewerThan}", response.Chats.Count, userID, newerThan);
+        _logger.LogTrace("Received {ChatCount} chats for user {UserId} which are newer than {NewerThan}", response.Chats.Count, userId, newerThan);
         return response.Chats;
     }
 }

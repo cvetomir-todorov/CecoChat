@@ -54,7 +54,7 @@ public class SessionController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> CreateSession([FromBody][BindRequired] CreateSessionRequest request)
+    public async Task<IActionResult> CreateSession([FromBody][BindRequired] CreateSessionRequest request, CancellationToken ct)
     {
         if (!_userIdMap.TryGetValue(request.Username, out long userId))
         {
@@ -65,7 +65,7 @@ public class SessionController : ControllerBase
         (Guid clientId, string accessToken) = CreateSession(userId);
         _logger.LogInformation("User {Username} authenticated and assigned user ID {UserId} and client ID {ClientId}", request.Username, userId, clientId);
 
-        Contracts.User.ProfileFull internalProfile = await _userClient.GetFullProfile(accessToken);
+        Contracts.User.ProfileFull internalProfile = await _userClient.GetFullProfile(accessToken, ct);
         // TODO: consider using AutoMapper
         ProfileFull externalProfile = new()
         {
