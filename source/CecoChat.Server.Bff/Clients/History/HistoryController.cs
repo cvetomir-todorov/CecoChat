@@ -1,5 +1,3 @@
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using CecoChat.Client.History;
 using CecoChat.Contracts.Bff;
 using CecoChat.Server.Identity;
@@ -33,7 +31,7 @@ public class HistoryController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetMessages([FromQuery][BindRequired] GetHistoryRequest request, CancellationToken ct)
     {
-        if (!TryGetUserClaims(HttpContext, out UserClaims? userClaims))
+        if (!HttpContext.TryGetUserClaims(_logger, out UserClaims? userClaims))
         {
             return Unauthorized();
         }
@@ -83,17 +81,5 @@ public class HistoryController : ControllerBase
         }
 
         return toClient;
-    }
-
-    private bool TryGetUserClaims(HttpContext context, [NotNullWhen(true)] out UserClaims? userClaims)
-    {
-        if (!context.User.TryGetUserClaims(out userClaims))
-        {
-            _logger.LogError("Client from was authorized but has no parseable access token");
-            return false;
-        }
-
-        Activity.Current?.SetTag("user.id", userClaims.UserId);
-        return true;
     }
 }

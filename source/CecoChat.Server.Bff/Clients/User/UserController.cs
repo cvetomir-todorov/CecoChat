@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using AutoMapper;
 using CecoChat.Client.User;
@@ -31,7 +30,7 @@ public class UserController : ControllerBase
     [HttpGet("user/profile/{id}", Name = "GetPublicProfile")]
     public async Task<IActionResult> GetPublicProfile([FromRoute(Name = "id")] long requestedUserId, CancellationToken ct)
     {
-        if (!TryGetUserClaims(HttpContext, out UserClaims? userClaims))
+        if (!HttpContext.TryGetUserClaims(_logger, out UserClaims? userClaims))
         {
             return Unauthorized();
         }
@@ -51,7 +50,7 @@ public class UserController : ControllerBase
     [HttpGet("user/profile", Name = "GetPublicProfiles")]
     public async Task<IActionResult> GetPublicProfiles(CancellationToken ct)
     {
-        if (!TryGetUserClaims(HttpContext, out UserClaims? userClaims))
+        if (!HttpContext.TryGetUserClaims(_logger, out UserClaims? userClaims))
         {
             return Unauthorized();
         }
@@ -71,18 +70,6 @@ public class UserController : ControllerBase
 
         _logger.LogTrace("Responding with {PublicProfileCount} public profiles requested by user {UserId}", response.Profiles.Length, userClaims.UserId);
         return Ok(response);
-    }
-
-    private bool TryGetUserClaims(HttpContext context, [NotNullWhen(true)] out UserClaims? userClaims)
-    {
-        if (!context.User.TryGetUserClaims(out userClaims))
-        {
-            _logger.LogError("Client from was authorized but has no parseable access token");
-            return false;
-        }
-
-        Activity.Current?.SetTag("user.id", userClaims.UserId);
-        return true;
     }
 
     // TODO: consider creating an MVC value provider and a factory for it
