@@ -2,6 +2,7 @@
 using CecoChat.Client.IDGen;
 using CecoChat.Contracts.Backplane;
 using CecoChat.Contracts.Messaging;
+using CecoChat.Server.Grpc;
 using CecoChat.Server.Identity;
 using CecoChat.Server.Messaging.Backplane;
 using CecoChat.Server.Messaging.Clients.Streaming;
@@ -39,7 +40,7 @@ public sealed class SendService : Send.SendBase
     [Authorize(Roles = "user")]
     public override async Task<SendMessageResponse> SendMessage(SendMessageRequest request, ServerCallContext context)
     {
-        UserClaims userClaims = GetUserClaims(context);
+        UserClaims userClaims = context.GetUserClaims(_logger);
         _messagingTelemetry.NotifyPlainTextReceived();
         long messageId = await GetMessageId(userClaims, context);
         _logger.LogTrace("User {UserId} with client {ClientId} sent message {MessageId} with data {DataType} to user {ReceiverId}",
@@ -51,18 +52,6 @@ public sealed class SendService : Send.SendBase
 
         SendMessageResponse response = new() { MessageId = messageId };
         return response;
-    }
-
-    private UserClaims GetUserClaims(ServerCallContext context)
-    {
-        if (!context.GetHttpContext().User.TryGetUserClaims(out UserClaims? userClaims))
-        {
-            _logger.LogError("Client from {Address} was authorized but has no parseable access token", context.Peer);
-            throw new RpcException(new Status(StatusCode.InvalidArgument, "Access token could not be parsed."));
-        }
-
-        Activity.Current?.SetTag("user.id", userClaims.UserId);
-        return userClaims;
     }
 
     private async Task<long> GetMessageId(UserClaims userClaims, ServerCallContext context)

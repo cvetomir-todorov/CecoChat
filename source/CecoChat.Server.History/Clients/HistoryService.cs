@@ -1,8 +1,8 @@
-﻿using System.Diagnostics;
-using CecoChat.Contracts.History;
+﻿using CecoChat.Contracts.History;
 using CecoChat.Data;
 using CecoChat.Data.Config.History;
 using CecoChat.Data.History.Repos;
+using CecoChat.Server.Grpc;
 using CecoChat.Server.Identity;
 using Grpc.Core;
 using Microsoft.AspNetCore.Authorization;
@@ -28,17 +28,11 @@ public sealed class HistoryService : Contracts.History.History.HistoryBase
     [Authorize(Roles = "user")]
     public override async Task<GetHistoryResponse> GetHistory(GetHistoryRequest request, ServerCallContext context)
     {
-        if (!context.GetHttpContext().User.TryGetUserId(out long userId))
-        {
-            _logger.LogError("Client from {ClientAddress} was authorized but has no parseable access token", context.Peer);
-            return new GetHistoryResponse();
-        }
-        Activity.Current?.SetTag("user.id", userId);
-
-        string chatId = DataUtility.CreateChatID(userId, request.OtherUserId);
+        UserClaims userClaims = context.GetUserClaims(_logger);
+        string chatId = DataUtility.CreateChatID(userClaims.UserId, request.OtherUserId);
         DateTime olderThan = request.OlderThan.ToDateTime();
-        IReadOnlyCollection<HistoryMessage> historyMessages = await _messageRepo
-            .GetHistory(userId, chatId, olderThan, _historyConfig.ChatMessageCount);
+        IReadOnlyCollection<HistoryMessage> historyMessages = await _messageRepo.GetHistory(
+            userClaims.UserId, chatId, olderThan, _historyConfig.ChatMessageCount);
 
         GetHistoryResponse response = new();
         response.Messages.Add(historyMessages);

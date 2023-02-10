@@ -1,4 +1,5 @@
 ﻿using CecoChat.Contracts.Messaging;
+using CecoChat.Server.Grpc;
 using CecoChat.Server.Identity;
 using CecoChat.Server.Messaging.Clients.Streaming;
 using CecoChat.Server.Messaging.Telemetry;
@@ -29,13 +30,8 @@ public sealed class ListenService : Listen.ListenBase
     [Authorize(Roles = "user")]
     public override async Task Listen(ListenSubscription subscription, IServerStreamWriter<ListenNotification> notificationStream, ServerCallContext context)
     {
+        UserClaims userClaims = context.GetUserClaims(_logger);
         string address = context.Peer;
-        if (!context.GetHttpContext().User.TryGetUserClaims(out UserClaims? userClaims))
-        {
-            _logger.LogError("Client from {ClientAddress} was authorized but has no parseable access token", address);
-            throw new RpcException(new Status(StatusCode.InvalidArgument, "Access token could not be parsed."));
-        }
-
         _logger.LogInformation("Connect for user {UserId} with client {ClientId} from {Address}", userClaims.UserId, userClaims.ClientId, address);
 
         IListenStreamer streamer = _streamerFactory.Create();

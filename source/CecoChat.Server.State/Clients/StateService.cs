@@ -1,6 +1,6 @@
-using System.Diagnostics;
 using CecoChat.Contracts.State;
 using CecoChat.Data.State.Repos;
+using CecoChat.Server.Grpc;
 using CecoChat.Server.Identity;
 using Grpc.Core;
 using Microsoft.AspNetCore.Authorization;
@@ -23,24 +23,14 @@ public class StateService : Contracts.State.State.StateBase
     [Authorize(Roles = "user")]
     public override async Task<GetChatsResponse> GetChats(GetChatsRequest request, ServerCallContext context)
     {
-        long userId = GetUserId(context);
+        UserClaims userClaims = context.GetUserClaims(_logger);
         DateTime newerThan = request.NewerThan.ToDateTime();
-        IReadOnlyCollection<ChatState> chats = await _repo.GetChats(userId, newerThan);
+        IReadOnlyCollection<ChatState> chats = await _repo.GetChats(userClaims.UserId, newerThan);
 
         GetChatsResponse response = new();
         response.Chats.Add(chats);
 
-        _logger.LogTrace("Responding with {ChatCount} chats for user {UserId} which are newer than {NewerThan}", chats.Count, userId, newerThan);
+        _logger.LogTrace("Responding with {ChatCount} chats for user {UserId} which are newer than {NewerThan}", chats.Count, userClaims.UserId, newerThan);
         return response;
-    }
-
-    private static long GetUserId(ServerCallContext context)
-    {
-        if (!context.GetHttpContext().User.TryGetUserId(out long userId))
-        {
-            throw new RpcException(new Status(StatusCode.Unauthenticated, "Client has no parseable access token."));
-        }
-        Activity.Current?.SetTag("user.id", userId);
-        return userId;
     }
 }
