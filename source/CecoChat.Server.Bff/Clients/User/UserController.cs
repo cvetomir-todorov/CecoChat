@@ -28,6 +28,11 @@ public class UserController : ControllerBase
 
     [Authorize(Roles = "user")]
     [HttpGet("user/profile/{id}", Name = "GetPublicProfile")]
+    [ProducesResponseType(typeof(GetPublicProfileResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetPublicProfile([FromRoute(Name = "id")] long requestedUserId, CancellationToken ct)
     {
         if (!HttpContext.TryGetUserClaims(_logger, out UserClaims? userClaims))
@@ -48,6 +53,11 @@ public class UserController : ControllerBase
 
     [Authorize(Roles = "user")]
     [HttpGet("user/profile", Name = "GetPublicProfiles")]
+    [ProducesResponseType(typeof(GetPublicProfilesResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetPublicProfiles(CancellationToken ct)
     {
         if (!HttpContext.TryGetUserClaims(_logger, out UserClaims? userClaims))
