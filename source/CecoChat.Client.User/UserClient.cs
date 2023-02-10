@@ -1,4 +1,5 @@
 using CecoChat.Contracts.User;
+using CecoChat.Grpc;
 using Grpc.Core;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -7,7 +8,7 @@ namespace CecoChat.Client.User;
 
 public interface IUserClient : IDisposable
 {
-    Task<ProfileFull> GetFullProfile(string accessToken);
+    Task<ProfileFull> GetFullProfile(string accessToken, CancellationToken ct);
 
     Task<ProfilePublic> GetPublicProfile(long userId, long requestedUserId, string accessToken, CancellationToken ct);
 
@@ -35,15 +36,14 @@ internal sealed class UserClient : IUserClient
         // nothing to dispose for now, but keep the IDisposable as part of the contract
     }
 
-    public async Task<ProfileFull> GetFullProfile(string accessToken)
+    public async Task<ProfileFull> GetFullProfile(string accessToken, CancellationToken ct)
     {
         GetFullProfileRequest request = new();
 
-        Metadata grpcMetadata = new();
-        grpcMetadata.Add("Authorization", $"Bearer {accessToken}");
+        Metadata headers = new();
+        headers.AddAuthorization(accessToken);
         DateTime deadline = DateTime.UtcNow.Add(_options.CallTimeout);
-
-        GetFullProfileResponse response = await _profileClient.GetFullProfileAsync(request, grpcMetadata, deadline);
+        GetFullProfileResponse response = await _profileClient.GetFullProfileAsync(request, headers, deadline, ct);
 
         _logger.LogTrace("Received full profile {ProfileUserName} for user {UserId}", response.Profile.UserName, response.Profile.UserId);
         return response.Profile;
@@ -54,11 +54,10 @@ internal sealed class UserClient : IUserClient
         GetPublicProfileRequest request = new();
         request.UserId = requestedUserId;
 
-        Metadata grpcMetadata = new();
-        grpcMetadata.Add("Authorization", $"Bearer {accessToken}");
+        Metadata headers = new();
+        headers.AddAuthorization(accessToken);
         DateTime deadline = DateTime.UtcNow.Add(_options.CallTimeout);
-
-        GetPublicProfileResponse response = await _profileClient.GetPublicProfileAsync(request, grpcMetadata, deadline);
+        GetPublicProfileResponse response = await _profileClient.GetPublicProfileAsync(request, headers, deadline, ct);
 
         _logger.LogTrace("Received {RequestedUserId} requested by user {UserId}", requestedUserId, userId);
         return response.Profile;
@@ -69,12 +68,10 @@ internal sealed class UserClient : IUserClient
         GetPublicProfilesRequest request = new();
         request.UserIds.Add(requestedUserIds);
 
-        // TODO: reuse this across all clients  
-        Metadata grpcMetadata = new();
-        grpcMetadata.Add("Authorization", $"Bearer {accessToken}");
+        Metadata headers = new();
+        headers.AddAuthorization(accessToken);
         DateTime deadline = DateTime.UtcNow.Add(_options.CallTimeout);
-
-        GetPublicProfilesResponse response = await _profileClient.GetPublicProfilesAsync(request, grpcMetadata, deadline);
+        GetPublicProfilesResponse response = await _profileClient.GetPublicProfilesAsync(request, headers, deadline, ct);
 
         _logger.LogTrace("Received {PublicProfileCount} public profiles requested by user {UserId}", response.Profiles.Count, userId);
         return response.Profiles;
