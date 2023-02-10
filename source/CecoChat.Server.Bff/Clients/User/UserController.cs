@@ -39,6 +39,7 @@ public class UserController : ControllerBase
         Contracts.User.ProfilePublic profile = await _userClient.GetPublicProfile(userClaims.UserId, requestedUserId, accessToken, ct);
         GetPublicProfileResponse response = new() { Profile = MapPublicProfile(profile) };
 
+        _logger.LogTrace("Responding with profile for user {RequestedUserId} requested by user {UserId}", requestedUserId, userClaims.UserId);
         return Ok(response);
     }
 
@@ -64,6 +65,7 @@ public class UserController : ControllerBase
         GetPublicProfilesResponse response = new();
         response.Profiles = profiles.Select(MapPublicProfile).ToArray();
 
+        _logger.LogTrace("Responding with {PublicProfileCount} public profiles requested by user {UserId}", response.Profiles.Length, userClaims.UserId);
         return Ok(response);
     }
 

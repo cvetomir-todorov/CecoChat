@@ -80,6 +80,8 @@ public class SessionController : ControllerBase
         string messagingServerAddress = _partitioningConfig.GetServerAddress(partition);
         _logger.LogInformation("User {UserId} in partition {Partition} assigned to messaging server {MessagingServer}", userId, partition, messagingServerAddress);
 
+        _logger.LogTrace("Responding with new session having client ID {ClientId}, full profile {ProfileUserName} for user {UserId}, using messaging server {MessagingServer}",
+            clientId, externalProfile.UserName, userId, messagingServerAddress);
         CreateSessionResponse response = new()
         {
             ClientId = clientId,

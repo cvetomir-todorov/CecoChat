@@ -59,7 +59,7 @@ internal sealed class UserClient : IUserClient
         DateTime deadline = DateTime.UtcNow.Add(_options.CallTimeout);
         GetPublicProfileResponse response = await _profileClient.GetPublicProfileAsync(request, headers, deadline, ct);
 
-        _logger.LogTrace("Received {RequestedUserId} requested by user {UserId}", requestedUserId, userId);
+        _logger.LogTrace("Received profile for user {RequestedUserId} requested by user {UserId}", requestedUserId, userId);
         return response.Profile;
     }
 
