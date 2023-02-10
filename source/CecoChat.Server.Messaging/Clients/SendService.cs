@@ -2,7 +2,6 @@
 using CecoChat.Client.IDGen;
 using CecoChat.Contracts.Backplane;
 using CecoChat.Contracts.Messaging;
-using CecoChat.Server.Grpc;
 using CecoChat.Server.Identity;
 using CecoChat.Server.Messaging.Backplane;
 using CecoChat.Server.Messaging.Clients.Streaming;
@@ -40,7 +39,11 @@ public sealed class SendService : Send.SendBase
     [Authorize(Roles = "user")]
     public override async Task<SendMessageResponse> SendMessage(SendMessageRequest request, ServerCallContext context)
     {
-        UserClaims userClaims = context.GetUserClaims(_logger);
+        if (!context.GetHttpContext().TryGetUserClaims(_logger, out UserClaims? userClaims))
+        {
+            throw new RpcException(new Status(StatusCode.Unauthenticated, string.Empty));
+        }
+
         _messagingTelemetry.NotifyPlainTextReceived();
         long messageId = await GetMessageId(userClaims, context);
         _logger.LogTrace("User {UserId} with client {ClientId} sent message {MessageId} with data {DataType} to user {ReceiverId}",

@@ -1,6 +1,5 @@
 using CecoChat.Contracts.User;
 using CecoChat.Data.User.Repos;
-using CecoChat.Server.Grpc;
 using CecoChat.Server.Identity;
 using Grpc.Core;
 
@@ -19,7 +18,11 @@ public class ProfileService : Profile.ProfileBase
 
     public override async Task<GetFullProfileResponse> GetFullProfile(GetFullProfileRequest request, ServerCallContext context)
     {
-        UserClaims userClaims = context.GetUserClaims(_logger);
+        if (!context.GetHttpContext().TryGetUserClaims(_logger, out UserClaims? userClaims))
+        {
+            throw new RpcException(new Status(StatusCode.Unauthenticated, string.Empty));
+        }
+
         ProfileFull? profile = await _repo.GetFullProfile(userClaims.UserId);
         if (profile == null)
         {
@@ -32,7 +35,11 @@ public class ProfileService : Profile.ProfileBase
 
     public override async Task<GetPublicProfileResponse> GetPublicProfile(GetPublicProfileRequest request, ServerCallContext context)
     {
-        UserClaims userClaims = context.GetUserClaims(_logger);
+        if (!context.GetHttpContext().TryGetUserClaims(_logger, out UserClaims? userClaims))
+        {
+            throw new RpcException(new Status(StatusCode.Unauthenticated, string.Empty));
+        }
+
         ProfilePublic? profile = await _repo.GetPublicProfile(request.UserId, userClaims.UserId);
         if (profile == null)
         {
@@ -45,7 +52,11 @@ public class ProfileService : Profile.ProfileBase
 
     public override Task<GetPublicProfilesResponse> GetPublicProfiles(GetPublicProfilesRequest request, ServerCallContext context)
     {
-        UserClaims userClaims = context.GetUserClaims(_logger);
+        if (!context.GetHttpContext().TryGetUserClaims(_logger, out UserClaims? userClaims))
+        {
+            throw new RpcException(new Status(StatusCode.Unauthenticated, string.Empty));
+        }
+
         IEnumerable<ProfilePublic> profiles = _repo.GetPublicProfiles(request.UserIds, userClaims.UserId);
 
         GetPublicProfilesResponse response = new();

@@ -2,7 +2,6 @@
 using CecoChat.Data;
 using CecoChat.Data.Config.History;
 using CecoChat.Data.History.Repos;
-using CecoChat.Server.Grpc;
 using CecoChat.Server.Identity;
 using Grpc.Core;
 using Microsoft.AspNetCore.Authorization;
@@ -28,7 +27,11 @@ public sealed class HistoryService : Contracts.History.History.HistoryBase
     [Authorize(Roles = "user")]
     public override async Task<GetHistoryResponse> GetHistory(GetHistoryRequest request, ServerCallContext context)
     {
-        UserClaims userClaims = context.GetUserClaims(_logger);
+        if (!context.GetHttpContext().TryGetUserClaims(_logger, out UserClaims? userClaims))
+        {
+            throw new RpcException(new Status(StatusCode.Unauthenticated, string.Empty));
+        }
+
         string chatId = DataUtility.CreateChatID(userClaims.UserId, request.OtherUserId);
         DateTime olderThan = request.OlderThan.ToDateTime();
         IReadOnlyCollection<HistoryMessage> historyMessages = await _messageRepo.GetHistory(

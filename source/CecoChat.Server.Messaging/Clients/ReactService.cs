@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using CecoChat.Contracts.Backplane;
 using CecoChat.Contracts.Messaging;
-using CecoChat.Server.Grpc;
 using CecoChat.Server.Identity;
 using CecoChat.Server.Messaging.Backplane;
 using CecoChat.Server.Messaging.Clients.Streaming;
@@ -36,7 +35,11 @@ public class ReactService : Reaction.ReactionBase
     [Authorize(Roles = "user")]
     public override Task<ReactResponse> React(ReactRequest request, ServerCallContext context)
     {
-        UserClaims userClaims = context.GetUserClaims(_logger);
+        if (!context.GetHttpContext().TryGetUserClaims(_logger, out UserClaims? userClaims))
+        {
+            throw new RpcException(new Status(StatusCode.Unauthenticated, string.Empty));
+        }
+
         _messagingTelemetry.NotifyReactionReceived();
         _logger.LogTrace("User {UserId} with client {ClientId} reacted with {Reaction} to message {MessageId} sent by user {SenderId}",
             userClaims.UserId, userClaims.ClientId, request.Reaction, request.MessageId, request.SenderId);
@@ -53,7 +56,11 @@ public class ReactService : Reaction.ReactionBase
     [Authorize(Roles = "user")]
     public override Task<UnReactResponse> UnReact(UnReactRequest request, ServerCallContext context)
     {
-        UserClaims userClaims = context.GetUserClaims(_logger);
+        if (!context.GetHttpContext().TryGetUserClaims(_logger, out UserClaims? userClaims))
+        {
+            throw new RpcException(new Status(StatusCode.Unauthenticated, string.Empty));
+        }
+
         _messagingTelemetry.NotifyUnreactionReceived();
         _logger.LogTrace("User {UserId} with client {ClientId} un-reacted to message {MessageId} sent by user {SenderId}",
             userClaims.UserId, userClaims.ClientId, request.MessageId, request.SenderId);
