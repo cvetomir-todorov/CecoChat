@@ -98,6 +98,10 @@ public class Startup
         services.AddUserClient(_userOptions);
 
         // required
+        services.AddAutoMapper(config =>
+        {
+            config.AddMaps(typeof(AutoMapperProfile));
+        });
         services.AddOptions();
     }
 

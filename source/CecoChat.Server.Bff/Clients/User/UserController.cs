@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using AutoMapper;
 using CecoChat.Client.User;
 using CecoChat.Contracts.Bff;
 using CecoChat.Server.Identity;
@@ -14,13 +15,16 @@ public class UserController : ControllerBase
 {
     private readonly ILogger _logger;
     private readonly IUserClient _userClient;
+    private readonly IMapper _mapper;
 
     public UserController(
         ILogger<UserController> logger,
-        IUserClient userClient)
+        IUserClient userClient,
+        IMapper mapper)
     {
         _logger = logger;
         _userClient = userClient;
+        _mapper = mapper;
     }
 
     [Authorize(Roles = "user")]
@@ -37,7 +41,7 @@ public class UserController : ControllerBase
         }
 
         Contracts.User.ProfilePublic profile = await _userClient.GetPublicProfile(userClaims.UserId, requestedUserId, accessToken, ct);
-        GetPublicProfileResponse response = new() { Profile = MapPublicProfile(profile) };
+        GetPublicProfileResponse response = new() { Profile = _mapper.Map<ProfilePublic>(profile) };
 
         _logger.LogTrace("Responding with profile for user {RequestedUserId} requested by user {UserId}", requestedUserId, userClaims.UserId);
         return Ok(response);
@@ -63,7 +67,7 @@ public class UserController : ControllerBase
 
         IEnumerable<Contracts.User.ProfilePublic> profiles = await _userClient.GetPublicProfiles(userClaims.UserId, requestedUserIds, accessToken, ct);
         GetPublicProfilesResponse response = new();
-        response.Profiles = profiles.Select(MapPublicProfile).ToArray();
+        response.Profiles = profiles.Select(profile => _mapper.Map<ProfilePublic>(profile)).ToArray();
 
         _logger.LogTrace("Responding with {PublicProfileCount} public profiles requested by user {UserId}", response.Profiles.Length, userClaims.UserId);
         return Ok(response);
@@ -79,17 +83,6 @@ public class UserController : ControllerBase
 
         Activity.Current?.SetTag("user.id", userClaims.UserId);
         return true;
-    }
-
-    private static ProfilePublic MapPublicProfile(Contracts.User.ProfilePublic profile)
-    {
-        return new ProfilePublic
-        {
-            UserId = profile.UserId,
-            UserName = profile.UserName,
-            DisplayName = profile.DisplayName,
-            AvatarUrl = profile.AvatarUrl
-        };
     }
 
     // TODO: consider creating an MVC value provider and a factory for it
