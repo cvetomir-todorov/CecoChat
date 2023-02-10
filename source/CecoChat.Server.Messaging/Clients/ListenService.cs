@@ -1,5 +1,4 @@
 ﻿using CecoChat.Contracts.Messaging;
-using CecoChat.Server.Grpc;
 using CecoChat.Server.Identity;
 using CecoChat.Server.Messaging.Clients.Streaming;
 using CecoChat.Server.Messaging.Telemetry;
@@ -30,7 +29,11 @@ public sealed class ListenService : Listen.ListenBase
     [Authorize(Roles = "user")]
     public override async Task Listen(ListenSubscription subscription, IServerStreamWriter<ListenNotification> notificationStream, ServerCallContext context)
     {
-        UserClaims userClaims = context.GetUserClaims(_logger);
+        if (!context.GetHttpContext().TryGetUserClaims(_logger, out UserClaims? userClaims))
+        {
+            throw new RpcException(new Status(StatusCode.Unauthenticated, string.Empty));
+        }
+
         string address = context.Peer;
         _logger.LogInformation("Connect for user {UserId} with client {ClientId} from {Address}", userClaims.UserId, userClaims.ClientId, address);
 
