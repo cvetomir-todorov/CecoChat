@@ -43,6 +43,10 @@ public class Startup
         services.AddUserDb(_userDbOptions);
 
         // required
+        services.AddAutoMapper(config =>
+        {
+            config.AddMaps(typeof(AutoMapperProfile));
+        });
         services.AddOptions();
     }
 

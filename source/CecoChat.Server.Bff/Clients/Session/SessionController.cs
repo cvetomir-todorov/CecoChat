@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using AutoMapper;
 using CecoChat.Client.User;
 using CecoChat.Contracts.Bff;
 using CecoChat.Data.Config.Partitioning;
@@ -20,6 +21,7 @@ public class SessionController : ControllerBase
 {
     private readonly ILogger _logger;
     private readonly JwtOptions _jwtOptions;
+    private readonly IMapper _mapper;
     private readonly IClock _clock;
     private readonly IUserClient _userClient;
     private readonly IPartitionUtility _partitionUtility;
@@ -31,6 +33,7 @@ public class SessionController : ControllerBase
     public SessionController(
         ILogger<SessionController> logger,
         IOptions<JwtOptions> jwtOptions,
+        IMapper mapper,
         IClock clock,
         IUserClient userClient,
         IPartitionUtility partitionUtility,
@@ -38,6 +41,7 @@ public class SessionController : ControllerBase
     {
         _logger = logger;
         _jwtOptions = jwtOptions.Value;
+        _mapper = mapper;
         _clock = clock;
         _userClient = userClient;
         _partitionUtility = partitionUtility;
@@ -66,27 +70,19 @@ public class SessionController : ControllerBase
         _logger.LogInformation("User {Username} authenticated and assigned user ID {UserId} and client ID {ClientId}", request.Username, userId, clientId);
 
         Contracts.User.ProfileFull internalProfile = await _userClient.GetFullProfile(accessToken, ct);
-        // TODO: consider using AutoMapper
-        ProfileFull externalProfile = new()
-        {
-            UserName = internalProfile.UserName,
-            DisplayName = internalProfile.DisplayName,
-            AvatarUrl = internalProfile.AvatarUrl,
-            Phone = internalProfile.Phone,
-            Email = internalProfile.Email
-        };
+        ProfileFull profile = _mapper.Map<ProfileFull>(internalProfile);
 
         int partition = _partitionUtility.ChoosePartition(userId, _partitioningConfig.PartitionCount);
         string messagingServerAddress = _partitioningConfig.GetServerAddress(partition);
         _logger.LogInformation("User {UserId} in partition {Partition} assigned to messaging server {MessagingServer}", userId, partition, messagingServerAddress);
 
         _logger.LogTrace("Responding with new session having client ID {ClientId}, full profile {ProfileUserName} for user {UserId}, using messaging server {MessagingServer}",
-            clientId, externalProfile.UserName, userId, messagingServerAddress);
+            clientId, profile.UserName, userId, messagingServerAddress);
         CreateSessionResponse response = new()
         {
             ClientId = clientId,
             AccessToken = accessToken,
-            Profile = externalProfile,
+            Profile = profile,
             MessagingServerAddress = messagingServerAddress
         };
         return Ok(response);

@@ -1,3 +1,4 @@
+using AutoMapper;
 using CecoChat.Contracts.User;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -17,11 +18,13 @@ internal class ProfileRepo : IProfileRepo
 {
     private readonly ILogger _logger;
     private readonly UserDbContext _dbContext;
+    private readonly IMapper _mapper;
 
-    public ProfileRepo(ILogger<ProfileRepo> logger, UserDbContext dbContext)
+    public ProfileRepo(ILogger<ProfileRepo> logger, UserDbContext dbContext, IMapper mapper)
     {
         _logger = logger;
         _dbContext = dbContext;
+        _mapper = mapper;
     }
 
     public async Task<ProfileFull?> GetFullProfile(long requestedUserId)
@@ -35,16 +38,8 @@ internal class ProfileRepo : IProfileRepo
 
         _logger.LogTrace("Fetched full profile {ProfileUserName} for user {UserId}", entity.UserName, entity.UserId);
 
-        // TODO: consider using AutoMapper
-        return new ProfileFull
-        {
-            UserId = entity.UserId,
-            UserName = entity.UserName,
-            DisplayName = entity.DisplayName,
-            AvatarUrl = entity.AvatarUrl,
-            Phone = entity.Phone,
-            Email = entity.Email
-        };
+        ProfileFull profile = _mapper.Map<ProfileFull>(entity);
+        return profile;
     }
 
     public async Task<ProfilePublic?> GetPublicProfile(long requestedUserId, long userId)
@@ -56,7 +51,7 @@ internal class ProfileRepo : IProfileRepo
             return null;
         }
 
-        ProfilePublic profile = MapEntityToPublicProfile(entity);
+        ProfilePublic profile = _mapper.Map<ProfilePublic>(entity);
         _logger.LogTrace("Fetched public profile {RequestedUserId} requested by {UserId}", requestedUserId, userId);
 
         return profile;
@@ -68,17 +63,6 @@ internal class ProfileRepo : IProfileRepo
 
         return _dbContext.Profiles
             .Where(entity => requestedUserIds.Contains(entity.UserId))
-            .Select(entity => MapEntityToPublicProfile(entity));
-    }
-
-    private static ProfilePublic MapEntityToPublicProfile(ProfileEntity entity)
-    {
-        return new ProfilePublic
-        {
-            UserId = entity.UserId,
-            UserName = entity.UserName,
-            DisplayName = entity.DisplayName,
-            AvatarUrl = entity.AvatarUrl
-        };
+            .Select(entity => _mapper.Map<ProfilePublic>(entity));
     }
 }
