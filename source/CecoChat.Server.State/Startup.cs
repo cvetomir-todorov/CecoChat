@@ -1,4 +1,6 @@
+using System.Reflection;
 using Autofac;
+using Calzolari.Grpc.AspNetCore.Validation;
 using CecoChat.Autofac;
 using CecoChat.Cassandra;
 using CecoChat.Cassandra.Health;
@@ -18,6 +20,7 @@ using CecoChat.Server.State.Backplane;
 using CecoChat.Server.State.Clients;
 using CecoChat.Server.State.HostedServices;
 using Confluent.Kafka;
+using FluentValidation;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
@@ -76,9 +79,15 @@ public class Startup
         services.AddAuthorization();
 
         // clients
-        services.AddGrpc(rpc => rpc.EnableDetailedErrors = Environment.IsDevelopment());
+        services.AddGrpc(grpc =>
+        {
+            grpc.EnableDetailedErrors = Environment.IsDevelopment();
+            grpc.EnableMessageValidation();
+        });
+        services.AddGrpcValidation();
 
-        // required
+        // common
+        services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
         services.AddOptions();
     }
 
