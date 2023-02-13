@@ -6,7 +6,7 @@ using CecoChat.Server.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CecoChat.Server.Bff.Clients.User;
+namespace CecoChat.Server.Bff.Clients;
 
 [ApiController]
 [Route("api")]
