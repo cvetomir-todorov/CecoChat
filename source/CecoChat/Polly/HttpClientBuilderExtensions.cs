@@ -1,6 +1,3 @@
-using System.Net;
-using System.Net.Http.Headers;
-using Grpc.Core;
 using Microsoft.Extensions.DependencyInjection;
 using Polly;
 
@@ -21,12 +18,9 @@ public static class HttpClientBuilderExtensions
             .Handle<HttpRequestException>()
             .OrResult<HttpResponseMessage>(response =>
             {
-                StatusCode? grpcStatus = GetGrpcStatusCode(response);
-
-                bool isHttpError = grpcStatus == null && !response.IsSuccessStatusCode;
-                bool isGrpcError = response.IsSuccessStatusCode && grpcStatus == StatusCode.OK;
-
-                return !isHttpError && !isGrpcError;
+                // ignore redirects 3xx and client errors 4xx
+                bool isHttpError = (int)response.StatusCode >= 500;
+                return isHttpError;
             })
             .WaitAndRetryAsync(
                 retryOptions.RetryCount,
@@ -35,23 +29,6 @@ public static class HttpClientBuilderExtensions
                 {
                     // if needed we can obtain new tokens and do other per-call stuff here
                 });
-    }
-
-    private static StatusCode? GetGrpcStatusCode(HttpResponseMessage response)
-    {
-        HttpResponseHeaders headers = response.Headers;
-        const string grpcStatusHeader = "grpc-status";
-
-        if (!headers.Contains(grpcStatusHeader) && response.StatusCode == HttpStatusCode.OK)
-        {
-            return StatusCode.OK;
-        }
-        if (headers.TryGetValues(grpcStatusHeader, out IEnumerable<string>? values))
-        {
-            return (StatusCode)int.Parse(values.First());
-        }
-
-        return null;
     }
 
     private static TimeSpan SleepDurationProvider(int retryAttempt, Random jitterGenerator, RetryOptions retryOptions)
