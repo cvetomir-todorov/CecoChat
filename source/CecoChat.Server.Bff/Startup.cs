@@ -85,11 +85,6 @@ public class Startup
             // insert it before the default one so that it takes effect
             mvc.ModelBinderProviders.Insert(0, new DateTimeModelBinderProvider());
         });
-        services.AddFluentValidationAutoValidation(fluentValidation =>
-        {
-            fluentValidation.DisableDataAnnotationsValidation = true;
-        });
-        services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
         services.AddSwaggerServices(_swaggerOptions);
 
         // downstream services
@@ -97,11 +92,16 @@ public class Startup
         services.AddStateClient(_stateOptions);
         services.AddUserClient(_userOptions);
 
-        // required
+        // common
         services.AddAutoMapper(config =>
         {
             config.AddMaps(typeof(AutoMapperProfile));
         });
+        services.AddFluentValidationAutoValidation(fluentValidation =>
+        {
+            fluentValidation.DisableDataAnnotationsValidation = true;
+        });
+        services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
         services.AddOptions();
     }
 

@@ -1,4 +1,6 @@
+using System.Reflection;
 using Autofac;
+using Calzolari.Grpc.AspNetCore.Validation;
 using CecoChat.Autofac;
 using CecoChat.Data.User;
 using CecoChat.Jwt;
@@ -6,6 +8,7 @@ using CecoChat.Npgsql;
 using CecoChat.Server.Identity;
 using CecoChat.Server.User.Clients;
 using CecoChat.Server.User.HostedServices;
+using FluentValidation;
 
 namespace CecoChat.Server.User;
 
@@ -37,16 +40,22 @@ public class Startup
         services.AddAuthorization();
 
         // clients
-        services.AddGrpc(rpc => rpc.EnableDetailedErrors = Environment.IsDevelopment());
+        services.AddGrpc(grpc =>
+        {
+            grpc.EnableDetailedErrors = Environment.IsDevelopment();
+            grpc.EnableMessageValidation();
+        });
+        services.AddGrpcValidation();
 
         // user db
         services.AddUserDb(_userDbOptions);
 
-        // required
+        // common
         services.AddAutoMapper(config =>
         {
             config.AddMaps(typeof(AutoMapperProfile));
         });
+        services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
         services.AddOptions();
     }
 
