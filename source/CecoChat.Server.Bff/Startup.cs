@@ -13,6 +13,7 @@ using CecoChat.Server.Backplane;
 using CecoChat.Server.Bff.HostedServices;
 using CecoChat.Server.Bff.Infra;
 using CecoChat.Server.Config;
+using CecoChat.Server.ExceptionHandling;
 using CecoChat.Server.Health;
 using CecoChat.Server.Identity;
 using CecoChat.Swagger;
@@ -194,6 +195,7 @@ public class Startup
             app.UseDeveloperExceptionPage();
         }
 
+        app.UseCustomExceptionHandler();
         app.UseHttpsRedirection();
 
         app.UseRouting();
