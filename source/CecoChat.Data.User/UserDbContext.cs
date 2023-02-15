@@ -12,7 +12,7 @@ public class UserDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.HasDefaultSchema("cecochat");
+        modelBuilder.HasDefaultSchema("public");
         base.OnModelCreating(modelBuilder);
     }
 }
