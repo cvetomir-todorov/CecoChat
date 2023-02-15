@@ -4,7 +4,6 @@ using Calzolari.Grpc.AspNetCore.Validation;
 using CecoChat.Autofac;
 using CecoChat.Data.User;
 using CecoChat.Jwt;
-using CecoChat.Npgsql;
 using CecoChat.Server.Identity;
 using CecoChat.Server.User.Clients;
 using CecoChat.Server.User.HostedServices;
@@ -14,7 +13,7 @@ namespace CecoChat.Server.User;
 
 public class Startup
 {
-    private readonly NpgsqlOptions _userDbOptions;
+    private readonly UserDbOptions _userDbOptions;
     private readonly JwtOptions _jwtOptions;
 
     public Startup(IConfiguration configuration, IWebHostEnvironment environment)
@@ -48,7 +47,7 @@ public class Startup
         services.AddGrpcValidation();
 
         // user db
-        services.AddUserDb(_userDbOptions);
+        services.AddUserDb(_userDbOptions.Connect);
 
         // common
         services.AddAutoMapper(config =>
@@ -66,6 +65,7 @@ public class Startup
 
         // user db
         builder.RegisterModule(new UserDbAutofacModule());
+        builder.RegisterOptions<UserDbOptions>(Configuration.GetSection("UserDB"));
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

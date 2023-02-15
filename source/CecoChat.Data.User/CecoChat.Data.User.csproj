@@ -5,6 +5,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Scripts\cecochat_dev-user.sql" />
+    <EmbeddedResource Include="Scripts\users-database.sql" />
+    <EmbeddedResource Include="Scripts\profiles-table.sql" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AutoMapper" Version="12.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.12">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
