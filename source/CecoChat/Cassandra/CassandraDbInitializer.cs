@@ -41,7 +41,7 @@ public sealed class CassandraDbInitializer : ICassandraDbInitializer
         }
     }
 
-    private struct CqlScript
+    private readonly struct CqlScript
     {
         public string Name { get; init; }
         public string Content { get; init; }
@@ -70,7 +70,7 @@ public sealed class CassandraDbInitializer : ICassandraDbInitializer
                     throw new InvalidOperationException($"Failed to load CQL script {resourceName}.");
                 }
 
-                using StreamReader reader = new StreamReader(resourceStream);
+                using StreamReader reader = new(resourceStream);
                 string cql = reader.ReadToEnd();
 
                 return new CqlScript
@@ -93,7 +93,7 @@ public sealed class CassandraDbInitializer : ICassandraDbInitializer
         }
         catch (AlreadyExistsException alreadyExistsException)
         {
-            _logger.LogWarning("Creation error: {Error}", alreadyExistsException.Message);
+            _logger.LogWarning(alreadyExistsException, "Creation error: {Error}", alreadyExistsException.Message);
         }
     }
 }
