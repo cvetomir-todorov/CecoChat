@@ -17,3 +17,4 @@ scrape_configs:
           - "host.docker.internal:31002" # state
           - "host.docker.internal:31003" # history
           - "host.docker.internal:31004" # idgen
+          - "host.docker.internal:31005" # user
