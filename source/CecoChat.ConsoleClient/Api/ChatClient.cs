@@ -160,7 +160,6 @@ public sealed class ChatClient : IDisposable
     {
         SendMessageRequest request = new()
         {
-            SenderId = _userId,
             ReceiverId = receiverId,
             DataType = Contracts.Messaging.DataType.PlainText,
             Data = text
@@ -170,25 +169,25 @@ public sealed class ChatClient : IDisposable
         return response.MessageId;
     }
 
-    public async Task React(long messageId, long otherUserId, string reaction)
+    public async Task React(long messageId, long senderId, long receiverId, string reaction)
     {
         ReactRequest request = new()
         {
             MessageId = messageId,
-            SenderId = _userId,
-            ReceiverId = otherUserId,
+            SenderId = senderId,
+            ReceiverId = receiverId,
             Reaction = reaction
         };
         await _reactionClient!.ReactAsync(request, _grpcMetadata);
     }
 
-    public async Task UnReact(long messageId, long otherUserId)
+    public async Task UnReact(long messageId, long senderId, long receiverId)
     {
         UnReactRequest request = new()
         {
             MessageId = messageId,
-            SenderId = _userId,
-            ReceiverId = otherUserId
+            SenderId = senderId,
+            ReceiverId = receiverId
         };
         await _reactionClient!.UnReactAsync(request, _grpcMetadata);
     }
