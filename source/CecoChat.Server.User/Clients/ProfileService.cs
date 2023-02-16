@@ -50,19 +50,19 @@ public class ProfileService : Profile.ProfileBase
         return new GetPublicProfileResponse { Profile = profile };
     }
 
-    public override Task<GetPublicProfilesResponse> GetPublicProfiles(GetPublicProfilesRequest request, ServerCallContext context)
+    public override async Task<GetPublicProfilesResponse> GetPublicProfiles(GetPublicProfilesRequest request, ServerCallContext context)
     {
         if (!context.GetHttpContext().TryGetUserClaims(_logger, out UserClaims? userClaims))
         {
             throw new RpcException(new Status(StatusCode.Unauthenticated, string.Empty));
         }
 
-        IEnumerable<ProfilePublic> profiles = _repo.GetPublicProfiles(request.UserIds, userClaims.UserId);
+        IEnumerable<ProfilePublic> profiles = await _repo.GetPublicProfiles(request.UserIds, userClaims.UserId);
 
         GetPublicProfilesResponse response = new();
         response.Profiles.Add(profiles);
 
         _logger.LogTrace("Responding with {PublicProfileCount} public profiles requested by user {UserId}", response.Profiles.Count, userClaims.UserId);
-        return Task.FromResult(response);
+        return response;
     }
 }

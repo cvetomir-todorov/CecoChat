@@ -11,7 +11,7 @@ public interface IProfileRepo
 
     Task<ProfilePublic?> GetPublicProfile(long requestedUserId, long userId);
 
-    IQueryable<ProfilePublic> GetPublicProfiles(IEnumerable<long> requestedUserIds, long userId);
+    Task<IEnumerable<ProfilePublic>> GetPublicProfiles(IEnumerable<long> requestedUserIds, long userId);
 }
 
 internal class ProfileRepo : IProfileRepo
@@ -57,12 +57,13 @@ internal class ProfileRepo : IProfileRepo
         return profile;
     }
 
-    public IQueryable<ProfilePublic> GetPublicProfiles(IEnumerable<long> requestedUserIds, long userId)
+    public async Task<IEnumerable<ProfilePublic>> GetPublicProfiles(IEnumerable<long> requestedUserIds, long userId)
     {
         _logger.LogTrace("Fetched (count here unknown) public profiles requested by user {UserId}", userId);
 
-        return _dbContext.Profiles
+        return await _dbContext.Profiles
             .Where(entity => requestedUserIds.Contains(entity.UserId))
-            .Select(entity => _mapper.Map<ProfilePublic>(entity));
+            .Select(entity => _mapper.Map<ProfilePublic>(entity))
+            .ToListAsync();
     }
 }
