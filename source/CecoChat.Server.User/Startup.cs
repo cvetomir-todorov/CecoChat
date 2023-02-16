@@ -4,10 +4,13 @@ using Calzolari.Grpc.AspNetCore.Validation;
 using CecoChat.Autofac;
 using CecoChat.Data.User;
 using CecoChat.Jwt;
+using CecoChat.Npgsql.Health;
+using CecoChat.Server.Health;
 using CecoChat.Server.Identity;
 using CecoChat.Server.User.Clients;
 using CecoChat.Server.User.HostedServices;
 using FluentValidation;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace CecoChat.Server.User;
 
@@ -34,6 +37,8 @@ public class Startup
 
     public void ConfigureServices(IServiceCollection services)
     {
+        AddHealthServices(services);
+
         // security
         services.AddJwtAuthentication(_jwtOptions);
         services.AddAuthorization();
@@ -56,6 +61,22 @@ public class Startup
         });
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
         services.AddOptions();
+    }
+
+    private void AddHealthServices(IServiceCollection services)
+    {
+        services
+            .AddHealthChecks()
+            .AddCheck<UserDbInitHealthCheck>(
+                "user-db-init",
+                tags: new[] { HealthTags.Health, HealthTags.Startup })
+            .AddNpgsql(
+                _userDbOptions.Connect,
+                "user-db",
+                tags: new[] { HealthTags.Health, HealthTags.Ready },
+                timeout: _userDbOptions.HealthTimeout);
+
+        services.AddSingleton<UserDbInitHealthCheck>();
     }
 
     public void ConfigureContainer(ContainerBuilder builder)
@@ -81,6 +102,18 @@ public class Startup
         app.UseEndpoints(endpoints =>
         {
             endpoints.MapGrpcService<ProfileService>();
+            endpoints.MapHttpHealthEndpoints(setup =>
+            {
+                Func<HttpContext, HealthReport, Task> responseWriter = (context, report) => CustomHealth.Writer(serviceName: "user", context, report);
+                setup.Health.ResponseWriter = responseWriter;
+
+                if (env.IsDevelopment())
+                {
+                    setup.Startup.ResponseWriter = responseWriter;
+                    setup.Live.ResponseWriter = responseWriter;
+                    setup.Ready.ResponseWriter = responseWriter;
+                }
+            });
         });
     }
 }

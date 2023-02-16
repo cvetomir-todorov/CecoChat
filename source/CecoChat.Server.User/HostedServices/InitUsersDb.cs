@@ -11,17 +11,20 @@ public sealed class InitUsersDb : IHostedService
     private readonly UserDbOptions _options;
     private readonly INpgsqlDbInitializer _initializer;
     private readonly UserDbContext _dbContext;
+    private readonly UserDbInitHealthCheck _userDbInitHealthCheck;
 
     public InitUsersDb(
         ILogger<InitUsersDb> logger,
         IOptions<UserDbOptions> options,
         INpgsqlDbInitializer initializer,
-        UserDbContext dbContext)
+        UserDbContext dbContext,
+        UserDbInitHealthCheck userDbInitHealthCheck)
     {
         _logger = logger;
         _options = options.Value;
         _initializer = initializer;
         _dbContext = dbContext;
+        _userDbInitHealthCheck = userDbInitHealthCheck;
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)
@@ -34,6 +37,8 @@ public sealed class InitUsersDb : IHostedService
             await SeedDb(cancellationToken);
             _logger.LogInformation("Seeded database");
         }
+
+        _userDbInitHealthCheck.IsReady = true;
     }
 
     private Task SeedDb(CancellationToken cancellationToken)
