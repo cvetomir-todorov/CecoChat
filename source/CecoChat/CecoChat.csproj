@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AspNetCore.HealthChecks.NpgSql" Version="6.0.2" />
     <PackageReference Include="Autofac" Version="6.4.0" />
     <PackageReference Include="CassandraCSharpDriver" Version="3.18.0" />
     <PackageReference Include="Confluent.Kafka" Version="1.9.3" />
