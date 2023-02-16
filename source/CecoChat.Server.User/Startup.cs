@@ -13,6 +13,7 @@ using CecoChat.Server.User.HostedServices;
 using FluentValidation;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Npgsql;
+using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 
@@ -24,6 +25,7 @@ public class Startup
     private readonly JwtOptions _jwtOptions;
     private readonly OtelSamplingOptions _otelSamplingOptions;
     private readonly JaegerOptions _jaegerOptions;
+    private readonly PrometheusOptions _prometheusOptions;
 
     public Startup(IConfiguration configuration, IWebHostEnvironment environment)
     {
@@ -41,6 +43,9 @@ public class Startup
 
         _jaegerOptions = new();
         Configuration.GetSection("Jaeger").Bind(_jaegerOptions);
+
+        _prometheusOptions = new();
+        Configuration.GetSection("Prometheus").Bind(_prometheusOptions);
     }
 
     public IConfiguration Configuration { get; }
@@ -91,13 +96,19 @@ public class Startup
                 aspnet.EnableGrpcAspNetCoreSupport = true;
                 HashSet<string> excludedPaths = new()
                 {
-                    HealthPaths.Health, HealthPaths.Startup, HealthPaths.Live, HealthPaths.Ready
+                    _prometheusOptions.ScrapeEndpointPath, HealthPaths.Health, HealthPaths.Startup, HealthPaths.Live, HealthPaths.Ready
                 };
                 aspnet.Filter = httpContext => !excludedPaths.Contains(httpContext.Request.Path);
             });
             tracing.AddNpgsql();
             tracing.ConfigureSampling(_otelSamplingOptions);
             tracing.ConfigureJaegerExporter(_jaegerOptions);
+        });
+        services.AddOpenTelemetryMetrics(metrics =>
+        {
+            metrics.SetResourceBuilder(serviceResourceBuilder);
+            metrics.AddAspNetCoreInstrumentation();
+            metrics.ConfigurePrometheusAspNetExporter(_prometheusOptions);
         });
     }
 
@@ -153,5 +164,7 @@ public class Startup
                 }
             });
         });
+
+        app.UseOpenTelemetryPrometheusScrapingEndpoint(context => context.Request.Path == _prometheusOptions.ScrapeEndpointPath);
     }
 }
