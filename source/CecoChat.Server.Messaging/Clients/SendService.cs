@@ -11,7 +11,6 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace CecoChat.Server.Messaging.Clients;
 
-// TODO: consider removing sender ID from endpoint request object, since it is contained in the access token
 public sealed class SendService : Send.SendBase
 {
     private readonly ILogger _logger;
@@ -50,9 +49,9 @@ public sealed class SendService : Send.SendBase
         _logger.LogTrace("User {UserId} with client {ClientId} sent message {MessageId} with data {DataType} to user {ReceiverId}",
             userClaims.UserId, userClaims.ClientId, messageId, request.DataType, request.ReceiverId);
 
-        BackplaneMessage backplaneMessage = _mapper.CreateBackplaneMessage(request, userClaims.ClientId, messageId);
+        BackplaneMessage backplaneMessage = _mapper.CreateBackplaneMessage(request, userClaims.UserId, userClaims.ClientId, messageId);
         _sendersProducer.ProduceMessage(backplaneMessage);
-        EnqueueMessageForSenderClients(request, messageId, userClaims.ClientId);
+        EnqueueMessageForSenderClients(request, messageId, userClaims);
 
         SendMessageResponse response = new() { MessageId = messageId };
         return response;
@@ -71,20 +70,20 @@ public sealed class SendService : Send.SendBase
         return result.ID;
     }
 
-    private void EnqueueMessageForSenderClients(SendMessageRequest request, long messageId, Guid senderClientId)
+    private void EnqueueMessageForSenderClients(SendMessageRequest request, long messageId, UserClaims userClaims)
     {
         // do not call clients.Count since it is expensive and uses locks
         int successCount = 0;
         int allCount = 0;
 
-        IEnumerable<IStreamer<ListenNotification>> senderClients = _clientContainer.EnumerateClients(request.SenderId);
+        IEnumerable<IStreamer<ListenNotification>> senderClients = _clientContainer.EnumerateClients(userClaims.UserId);
         ListenNotification? notification = null;
 
         foreach (IStreamer<ListenNotification> senderClient in senderClients)
         {
-            if (senderClient.ClientId != senderClientId)
+            if (senderClient.ClientId != userClaims.ClientId)
             {
-                notification ??= _mapper.CreateListenNotification(request, messageId);
+                notification ??= _mapper.CreateListenNotification(request, userClaims.UserId, messageId);
 
                 if (senderClient.EnqueueMessage(notification, parentActivity: Activity.Current))
                 {
@@ -97,6 +96,6 @@ public sealed class SendService : Send.SendBase
 
         LogLevel logLevel = successCount < allCount ? LogLevel.Warning : LogLevel.Trace;
         _logger.Log(logLevel, "Connected senders with ID {SenderId} ({SuccessCount} out of {AllCount}) were queued message {MessageId} with data {DataType} to user {ReceiverId}",
-            request.SenderId, successCount, allCount, messageId, request.DataType, request.ReceiverId);
+            userClaims.UserId, successCount, allCount, messageId, request.DataType, request.ReceiverId);
     }
 }

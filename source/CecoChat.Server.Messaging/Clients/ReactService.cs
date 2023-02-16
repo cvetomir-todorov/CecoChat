@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace CecoChat.Server.Messaging.Clients;
 
-// TODO: consider removing sender ID from endpoint request object, since it is contained in the access token
 public class ReactService : Reaction.ReactionBase
 {
     private readonly ILogger _logger;

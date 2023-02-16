@@ -7,13 +7,13 @@ namespace CecoChat.Server;
 
 public interface IContractDataMapper
 {
-    BackplaneMessage CreateBackplaneMessage(SendMessageRequest request, Guid senderClientId, long messageId);
+    BackplaneMessage CreateBackplaneMessage(SendMessageRequest request, long senderId, Guid senderClientId, long messageId);
 
     BackplaneMessage CreateBackplaneMessage(ReactRequest request, Guid senderClientId, long reactorId);
 
     BackplaneMessage CreateBackplaneMessage(UnReactRequest request, Guid senderClientId, long reactorId);
 
-    ListenNotification CreateListenNotification(SendMessageRequest request, long messageId);
+    ListenNotification CreateListenNotification(SendMessageRequest request, long senderId, long messageId);
 
     ListenNotification CreateListenNotification(ReactRequest request, long reactorId);
 
@@ -28,12 +28,12 @@ public interface IContractDataMapper
 
 public class ContractDataMapper : IContractDataMapper
 {
-    public BackplaneMessage CreateBackplaneMessage(SendMessageRequest request, Guid senderClientId, long messageId)
+    public BackplaneMessage CreateBackplaneMessage(SendMessageRequest request, long senderId, Guid senderClientId, long messageId)
     {
         BackplaneMessage message = new()
         {
             MessageId = messageId,
-            SenderId = request.SenderId,
+            SenderId = senderId,
             ReceiverId = request.ReceiverId,
             ClientId = senderClientId.ToUuid(),
             Type = Contracts.Backplane.MessageType.Data,
@@ -93,12 +93,12 @@ public class ContractDataMapper : IContractDataMapper
         return message;
     }
 
-    public ListenNotification CreateListenNotification(SendMessageRequest request, long messageId)
+    public ListenNotification CreateListenNotification(SendMessageRequest request, long senderId, long messageId)
     {
         ListenNotification notification = new()
         {
             MessageId = messageId,
-            SenderId = request.SenderId,
+            SenderId = senderId,
             ReceiverId = request.ReceiverId,
             Type = Contracts.Messaging.MessageType.Data
         };
