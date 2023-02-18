@@ -75,8 +75,9 @@ Configuration is based on Redis:
 
 ![.NET](tech-images/dotnet.png)
 ![ASP.NET](tech-images/aspnet.png)
+![EFCore](tech-images/efcore.png)
 
-The services use ASP.NET/.NET 6 which are the heirs of ASP.NET/.NET Core:
+The services use ASP.NET/.NET 6 which are the heirs of ASP.NET/.NET Core and Entity Framework Core:
 * open-source software backed by Microsoft
 * very mature, feature-rich, lots of tools
 * widely-used with a big community
@@ -86,16 +87,16 @@ The services use ASP.NET/.NET 6 which are the heirs of ASP.NET/.NET Core:
 ![Serilog](tech-images/serilog.png)
 ![AutoMapper](tech-images/automapper.webp)
 ![FluentValidation](tech-images/fluent-validation.png)
-![Refit](tech-images/refit.png)
 ![Polly](tech-images/polly.png)
+![Refit](tech-images/refit.png)
 
-Additional libraries which are all **open-source**:
+Additional libraries which are all open-source and created, supported and developed by the community:
 * Autofac is the most popular DI container
 * Serilog is one of the most popular logging frameworks
 * AutoMapper is the most popular mapping library
 * FluentValidation is the most popular data validation library
-* Refit is one of the most popular REST clients
 * Polly is a popular HTTP client policies library
+* Refit is one of the most popular REST clients
 
 ## Observability
 

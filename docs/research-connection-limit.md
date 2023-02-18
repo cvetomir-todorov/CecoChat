@@ -6,17 +6,17 @@ Below is a benchmark for the number of concurrent connections per messaging serv
 
 I used two machines connected via 100Mbps router.
 
-| Machine     | CPU         | Frequency | Cores | RAM  | OS                      |
-| :---------- | :---------  | :-------- | :---- | :--- | :---------------------- |
-| Weaker      | Core 2 Duo  | 2133MHz   | 2     | 4GB  | Ubuntu Server 20.04 LTS |
-| Moderate    | QuadCore i5 | 3533MHz   | 4     | 16GB | Windows 10 20H2         |
+| Machine  | CPU         | Frequency | Cores | RAM  | OS                      |
+|:---------|:------------|:----------|:------|:-----|:------------------------|
+| Weaker   | Core 2 Duo  | 2133MHz   | 2     | 4GB  | Ubuntu Server 20.04 LTS |
+| Moderate | QuadCore i5 | 3533MHz   | 4     | 16GB | Windows 10 20H2         |
 
 ## Scenario and results
 
 On the server I am using gRPC services hosted by ASP.NET Core which utilize .NET async programming model. The clients connect first and then simultaneously start sending 20 messages at a rate of 1 per second. Below are the results specifying which machine ran the client and what are the server process resources allocated.
 
 | Client machine | Clients succeeded | Client time | Server machine | Server CPU | Server threads | Server RAM |
-| :------------- | :---------------- | :---------- | :------------- | :--------- | :------------- | :--------- |
+|:---------------|:------------------|:------------|:---------------|:-----------|:---------------|:-----------|
 | Moderate       | 15869             | 21 seconds  | Weaker         | 150%-200%  | ?              | 1.3GB      |
 | Weaker         | 28232             | 145 seconds | Moderate       | 40-50%     | 67             | 3.55GB     |
 

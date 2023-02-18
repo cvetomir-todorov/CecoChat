@@ -7,19 +7,19 @@
 
 # Calculations
 
-The [calculations](research-calculations.md) file contains the detailed data. They are based on the [concurrent connections limit](research-connection-limit.md) showing that a messaging server is limited to **64 k connections**. The calculation tells us that **1.6 k messaging servers** are needed in order to support **100 mln active users**. We would consider **256 bytes message size**.
+The [calculations](research-calculations.md) file contains the detailed data. They are based on the [concurrent connections limit](research-connection-limit.md) showing that a messaging server is limited to **64 k connections**. The calculation tells us that **160 messaging servers** are needed in order to support **10 mln active users**. We would consider **256 bytes message size**.
 
 ## Daily 24 hour usage
 
-Calculating the daily usage with **640 mln users** spread throughout the day each of which sends **128 messages per day** gives us **950 000 messages/s for the cell** and **232 MB/s for the cell** with **0.15 MB/s per messaging server**.
+Calculating the daily usage with **64 mln users** spread throughout the day each of which sends **128 messages per day** gives us **95 000 messages/s for the cell** and **23 MB/s for the cell** with **0.15 MB/s per messaging server**.
 
 ## Peak 1 hour usage
 
-Calculating a peak usage for **1 hour** daily where **80%** of the maximum users - **80 mln active users** send **50%** of their daily messages - **64 messages** we get **1 423 000 messages/s for the cell** and **348 MB/s for the cell** with **0.22 MB/s per messaging server**.
+Calculating a peak usage for **1 hour** daily where **80%** of the maximum users - **8 mln active users** send **50%** of their daily messages - **64 messages** we get **142 200 messages/s for the cell** and **35 MB/s for the cell** with **0.22 MB/s per messaging server**.
 
 ## Conclusion
 
-These numbers do not take into account the security and transport data overhead. Additionally, this traffic would be multiplied. For example sending a message would require that data to be passed between different layers, possibly to multiple recipients. Numbers are not small when we look at the system as a whole. But for a single messaging server the throughput is tiny. The system is limited by how many concurrent connections a messaging server can handle. That means we would need a lot of messaging servers and linearly scalable technologies and we need to support a high level of concurrency. The usage of Kafka, Cassandra and the .NET async programming model make a good start.
+These numbers do not take into account the security and transport data overhead. Additionally, this traffic would be multiplied. For example sending a message would require that data to be passed between different layers, possibly to multiple recipients. Numbers are not small when we look at the system as a whole. But for a single messaging server the throughput is tiny. The system is limited by how many concurrent connections a messaging server can handle. That means we would need a lot of messaging servers, linearly scalable technologies and we need to support a high level of concurrency. The usage of Kafka, Cassandra and the .NET async programming model make a good start.
 
 # Exchange messages between different messaging servers
 
@@ -36,8 +36,8 @@ Pros
 * Standard load-balancing when a user connects initially to a single messaging server
 
 Cons
-* Each messaging server needs to know which other messaging server the recepient of the message is connected to:
-  - One option is each messaging server to keep an in-memory data structure for the up to 100 mln clients. It's a challenge to implement one considering thread-safety. Additionally it is expensive in terms of memory.
+* Each messaging server needs to know which other messaging server the recipient of the message is connected to:
+  - One option is each messaging server to keep an in-memory data structure for the up to 10 mln clients. It's a challenge to implement one considering thread-safety. Additionally it is expensive in terms of memory.
   - Another option is to offload the storage of this knowledge to a data store. This would increase the latency a bit and add an additional element in the architecture.
 * When a user connects or disconnects the storage which maps the user with its messaging server needs to be updated.
 * Messaging servers need to keep open connections between each other. This does not play well with the concurrent connection limits.
@@ -46,7 +46,7 @@ Cons
   - Sending the message to its recipient(s) by calling one (or multiple for group chats) messaging server(s)
   - Persisting the message into the history database
 
-## Aproach #2 - indirect communication
+## Approach #2 - indirect communication
 
 Messaging servers exchange messages via a PUB/SUB backplane via a message broker.
 
@@ -95,7 +95,7 @@ If we generated message IDs in messaging service we would need a lot of generato
 
 ## Sending messages
 
-Kafka provides a delivery handler callback which is used to send an ACK to clients indicating the persistance status. In order to guarantee durability the replication factor needs to be increased to 2 or 3. There needs to be at least 1 in-sync replica. Using this configuration once the message gets into the Kafka cluster then the small likelyhood of 2 brokers failing will mean a very small percentage of messages will be lost. If the ACK is negative then automatic retry would not be used in order to avoid self-inflicted DDoS. The client UI would simply present the user with indication that the message hasn't been processed and interactive means for it to be re-sent.
+Kafka provides a delivery handler callback which is used to send an ACK to clients indicating the persistence status. In order to guarantee durability the replication factor needs to be increased to 2 or 3. There needs to be at least 1 in-sync replica. Using this configuration once the message gets into the Kafka cluster then the small likelihood of 2 brokers failing will mean a very small percentage of messages will be lost. If the ACK is negative then automatic retry would not be used in order to avoid self-inflicted DDoS. The client UI would simply present the user with indication that the message hasn't been processed and interactive means for it to be re-sent.
 
 ## Receiving messages
 

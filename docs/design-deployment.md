@@ -14,7 +14,7 @@ Example with messaging servers:
 * When the load on them is too big some partitions could be redistributed to a new messaging server s3
 * Now the distribution is `s1 -> [0-119]`, `s2 -> [180-299]`, `s3 -> [120-179, 300-359]`
 
-The number of partitions can be big. Kafka clusters are known to work with 10 000 or 20 000 partitions. Which means their distribution can be made even with the appropriate number. Additionally the partitions can be split into smaller partition ranges in order to make it more conventient to create an algorithm for even distribution between the instances.
+The number of partitions can be big. Kafka clusters are known to work with 10 000 or 20 000 partitions. Which means their distribution can be made even with the appropriate number. Additionally the partitions can be split into smaller partition ranges in order to make it more convenient to create an algorithm for even distribution between the instances.
 
 ## Failover
 
