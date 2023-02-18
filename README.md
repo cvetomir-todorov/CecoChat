@@ -20,7 +20,6 @@ I appreciate all comments so feel free to use the `Discussions` tab.
 
 # Technologies
 
-### Integration
 ![Kafka](docs/tech-images/kafka.png)
 ![gRPC](docs/tech-images/grpc.png)
 ![Protocol buffers](docs/tech-images/protocol-buffers.png)
@@ -28,13 +27,11 @@ I appreciate all comments so feel free to use the `Discussions` tab.
 ![JSON](docs/tech-images/json.png)
 ![Swagger](docs/tech-images/swagger.png)
 
-### Data
 ![Cassandra](docs/tech-images/cassandra.png)
 ![Yugabyte](docs/tech-images/yugabyte.png)
 ![Postgres](docs/tech-images/postgres.webp)
 ![Redis](docs/tech-images/redis.png)
 
-### Internal implementation
 ![.NET](docs/tech-images/dotnet.png)
 ![ASP.NET](docs/tech-images/aspnet.png)
 ![EFCore](docs/tech-images/efcore.png)
@@ -45,7 +42,6 @@ I appreciate all comments so feel free to use the `Discussions` tab.
 ![Refit](docs/tech-images/refit.png)
 ![Polly](docs/tech-images/polly.png)
 
-### Observability
 ![OpenTelemetry](docs/tech-images/open-telemetry.png)
 ![Jaeger](docs/tech-images/jaeger.png)
 ![Prometheus](docs/tech-images/prometheus.png)
@@ -54,7 +50,6 @@ I appreciate all comments so feel free to use the `Discussions` tab.
 ![Fluentd](docs/tech-images/fluentd.png)
 ![Kibana](docs/tech-images/kibana.png)
 
-### Deployment
 ![Docker](docs/tech-images/docker.png)
 
 # Documentation
