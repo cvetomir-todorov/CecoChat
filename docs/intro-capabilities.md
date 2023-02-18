@@ -21,7 +21,7 @@
   - Eventual consistency guarantees - once the sent message is processed it will eventually be persisted and delivered
 * Scalability
   - Designed for 10-100 mln of active users, which unfortunately is expensive to validate due to the infrastructure required
-  - Supported by numbers from the [back-of-the-envelope calculation](design-back-of-the-envelope.md)
+  - Supported by numbers from the [calculations](research-calculations.md)
   - Linear scalability of the main technologies (Kafka, Cassandra) 
 * Security
   - TLS used on communication level

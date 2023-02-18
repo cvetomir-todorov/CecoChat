@@ -1,6 +1,6 @@
 Chat for millions of users with [limited-for-now capabilities](docs/intro-main.md).
 
-[System design](docs/design-overall.md) and [partial implementation](source/) based on Kafka, Cassandra, HTTP, gRPC, Redis, .NET 6, ASP.NET. [Configurable](docs/design-configuration.md) and [observable](docs/design-observability.md) environment based on OpenTelemetry, Jaeger, Prometheus, Grafana, ElasticSearch, Fluentd, Kibana. Containerized components based on Docker which can be [ran locally](docs/infrastructure-main.md#Run-locally).
+[System design](docs/intro-design.md) and [partial implementation](source/) based on Kafka, Cassandra, HTTP, gRPC, Redis, .NET 6, ASP.NET. [Configurable](docs/design-configuration.md) and [observable](docs/design-observability.md) environment based on OpenTelemetry, Jaeger, Prometheus, Grafana, ElasticSearch, Fluentd, Kibana. Containerized components based on Docker which can be [ran locally](docs/infrastructure-main.md#Run-locally).
 
 I appreciate all comments so feel free to use the `Discussions` tab.
 
@@ -60,13 +60,14 @@ I appreciate all comments so feel free to use the `Discussions` tab.
 # Documentation
 
 * Intro
-  - [Capabilities](docs/intro-main.md)
+  - [Capabilities](docs/intro-capabilities.md)
+  - [Overall design](docs/intro-design.md)
+  - [Technologies](docs/intro-technologies.md)
+* Research
+  - [Concurrent connections limit](docs/research-connection-limit.md)
+  - [Calculations](docs/research-calculations.md)
+  - [Main problems](docs/research-main-problems.md)
 * Design
-  - [Overall design](docs/design-overall.md)
-  - [Technologies](docs/design-technologies.md)
-  - [Concurrent connections limit](docs/design-connection-limit.md)
-  - [Back of the envelope calculations](docs/design-back-of-the-envelope.md)
-  - [Main problems](docs/design-main-problems.md)
   - [Messaging](docs/design-messaging.md)
   - [User chats, chat history](docs/design-state-history.md)
   - [Clients](docs/design-clients.md)

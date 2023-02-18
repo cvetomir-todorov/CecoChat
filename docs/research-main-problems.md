@@ -1,13 +1,13 @@
 # Main problems
 
-* Back of the envelope calculations
+* Calculations
 * Exchange messages between different messaging servers
 * Message IDs
 * Reliable messaging and consistency
 
-# Back of the envelope calculations
+# Calculations
 
-The [back-of-the-envelope](design-back-of-the-envelope.md) file contains the detailed calculations. They are based on the [concurrent connections limit](design-connection-limit.md) showing that a messaging server is limited to **64 k connections**. The calculation tells us that **1.6 k messaging servers** are needed in order to support **100 mln active users**. We would consider **256 bytes message size**.
+The [calculations](research-calculations.md) file contains the detailed data. They are based on the [concurrent connections limit](research-connection-limit.md) showing that a messaging server is limited to **64 k connections**. The calculation tells us that **1.6 k messaging servers** are needed in order to support **100 mln active users**. We would consider **256 bytes message size**.
 
 ## Daily 24 hour usage
 
