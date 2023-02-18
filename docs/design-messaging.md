@@ -13,7 +13,7 @@ The hash function from the formula needs to be stable because it would be run on
 
 ![Send messages](images/cecochat-02-message-send.png)
 
-The Kafka producer doesn't use the default auto-partitioning when sending messages. Instead it is choosing a partiotion for the sent message manually. It is required since each messaging server is stateful - the clients connected to it are assigned to specific partitions. Fortunately the Kafka .NET client API has these capabilities.
+The Kafka producer doesn't use the default auto-partitioning when sending messages. Instead it is choosing a partition for the sent message manually. It is required since each messaging server is stateful - the clients connected to it are assigned to specific partitions. Fortunately the Kafka .NET client API has these capabilities.
 
 Additionally we use the Kafka delivery handler in order to send the client a positive or negative ACK. It is used by the client to know whether the message has been processed.
 

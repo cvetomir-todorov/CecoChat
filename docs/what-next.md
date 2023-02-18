@@ -3,8 +3,7 @@
 ## Essential features
 
 * Add user/profile features
-  - User authentication and authorization
-  - Store user profile data
+  - User register/login/identity
   - Handle friendship between users
 * Add clients
   - Web-based
@@ -12,6 +11,8 @@
 
 ## Additional features
 
+* Add user/profile features
+  - Edit user profiles
 * Privacy
   - Add end-to-end encryption for messages
 * Media messages
@@ -64,6 +65,7 @@
 * Performance
   - Benchmark Kafka and improve its configuration
 * Observability
+  - Add Open Telemetry metrics in UserDB when Npgsql adds support
   - Improve existing distributed tracing - baggage propagation, custom instrumentation implementation
   - Improve existing log aggregation - performance of Fluentd, ElasticSearch index customizations
 * Misc

@@ -1,6 +1,6 @@
-Chat for millions of users with [limited-for-now capabilities](docs/intro-main.md).
+[Chat engine](docs/intro-capabilities.md) for millions of users. Cloud agnostic, containerized, based on microservice architecture.
 
-[System design](docs/intro-design.md) and [partial implementation](source/) based on Kafka, Cassandra, HTTP, gRPC, Redis, .NET 6, ASP.NET. [Configurable](docs/design-configuration.md) and [observable](docs/design-observability.md) environment based on OpenTelemetry, Jaeger, Prometheus, Grafana, ElasticSearch, Fluentd, Kibana. Containerized components based on Docker which can be [ran locally](docs/infrastructure-main.md#Run-locally).
+[System design](docs/intro-design.md) and [implementation](source/) based on Kafka, YugabyteDB, Cassandra, HTTP, gRPC, Redis, .NET 6, ASP.NET. [Configurable](docs/design-configuration.md) and [observable](docs/design-observability.md) environment based on OpenTelemetry, Jaeger, Prometheus, Grafana, ElasticSearch, Fluentd, Kibana. Containerized components based on Docker which can be [ran locally](docs/infrastructure-main.md#Run-locally).
 
 I appreciate all comments so feel free to use the `Discussions` tab.
 
@@ -27,9 +27,9 @@ I appreciate all comments so feel free to use the `Discussions` tab.
 ![JSON](docs/tech-images/json.png)
 ![Swagger](docs/tech-images/swagger.png)
 
-![Cassandra](docs/tech-images/cassandra.png)
 ![Yugabyte](docs/tech-images/yugabyte.png)
 ![Postgres](docs/tech-images/postgres.webp)
+![Cassandra](docs/tech-images/cassandra.png)
 ![Redis](docs/tech-images/redis.png)
 
 ![.NET](docs/tech-images/dotnet.png)
@@ -39,8 +39,8 @@ I appreciate all comments so feel free to use the `Discussions` tab.
 ![Serilog](docs/tech-images/serilog.png)
 ![AutoMapper](docs/tech-images/automapper.webp)
 ![FluentValidation](docs/tech-images/fluent-validation.png)
-![Refit](docs/tech-images/refit.png)
 ![Polly](docs/tech-images/polly.png)
+![Refit](docs/tech-images/refit.png)
 
 ![OpenTelemetry](docs/tech-images/open-telemetry.png)
 ![Jaeger](docs/tech-images/jaeger.png)
