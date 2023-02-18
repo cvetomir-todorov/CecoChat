@@ -9,6 +9,8 @@ containerize/Messaging
 containerize/History
 containerize/Materialize
 containerize/Profile
+*drawio.bkp
+*drawio.dtmp
 
 # User-specific files
 *.rsuser
