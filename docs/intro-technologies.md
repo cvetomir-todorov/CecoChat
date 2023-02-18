@@ -1,10 +1,12 @@
 # Technologies
 
+![Technologies](images/cecochat-08-technologies.png)
+
 ## Client communication
 
 ![HTTP](tech-images/http.png)
-![Swagger](tech-images/swagger.png)
 ![JSON](tech-images/json.png)
+![Swagger](tech-images/swagger.png)
 ![gRPC](tech-images/grpc.png)
 ![Protocol Buffers](tech-images/protocol-buffers.png)
 
@@ -82,13 +84,15 @@ The services use ASP.NET/.NET 6 which are the heirs of ASP.NET/.NET Core:
 
 ![Autofac](tech-images/autofac.png)
 ![Serilog](tech-images/serilog.png)
+![AutoMapper](tech-images/automapper.webp)
 ![FluentValidation](tech-images/fluent-validation.png)
 ![Refit](tech-images/refit.png)
 ![Polly](tech-images/polly.png)
 
 Additional libraries which are all **open-source**:
 * Autofac is the most popular DI container
-* Serilog is one of the most popular .NET logging frameworks
+* Serilog is one of the most popular logging frameworks
+* AutoMapper is the most popular mapping library
 * FluentValidation is the most popular data validation library
 * Refit is one of the most popular REST clients
 * Polly is a popular HTTP client policies library
@@ -97,13 +101,15 @@ Additional libraries which are all **open-source**:
 
 ![OpenTelemetry](tech-images/open-telemetry.png)
 ![Jaeger](tech-images/jaeger.png)
+![Prometheus](tech-images/prometheus.png)
+![Grafana](tech-images/grafana.png)
 ![ElasticSearch](tech-images/elasticsearch.png)
 ![Fluentd](tech-images/fluentd.png)
 ![Kibana](tech-images/kibana.png)
 
 * distributed tracing is based on OpenTelemetry and Jaeger is configured for viewing traces and spans
-* log aggregation is based on the EFK stack consisting of ElasticSearch, Fluentd and Kibana
-* monitoring and metrics - TBD
+* metrics and monitoring is based on OpenTelemetry, Prometheus and Grafana
+* log aggregation is based on the EFK stack (ElasticSearch, Fluentd, Kibana)
 
 ## Deployment
 

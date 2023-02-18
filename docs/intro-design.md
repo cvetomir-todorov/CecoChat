@@ -3,6 +3,7 @@
 ![Overall design](images/cecochat-01-overall.png)
 
 * Clients initially connect to a Backend for frontend (BFF) service in order to create their session
+* Clients acquire their full profile and other users public profiles from the User service via the BFF
 * Clients acquire user chats and chat history from the State and History services via the BFF
 * Clients connect to Messaging service in order to chat with each other
 * Messaging servers exchange data between each other indirectly using a PUB/SUB backplane
