@@ -6,7 +6,7 @@ namespace CecoChat.Data.User;
 public class UserDbContext : DbContext
 {
     public UserDbContext(DbContextOptions<UserDbContext> options) : base(options)
-    {}
+    { }
 
     public DbSet<ProfileEntity> Profiles { get; set; } = null!;
 
