@@ -106,7 +106,6 @@ public static class Program
             {
                 SendMessageRequest request = new()
                 {
-                    SenderId = 1,
                     ReceiverId = 2,
                     DataType = DataType.PlainText,
                     Data = "dummy"
