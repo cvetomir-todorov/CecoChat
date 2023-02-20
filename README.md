@@ -1,6 +1,6 @@
 [Chat engine](docs/intro-capabilities.md) for millions of users.
 
-[System design](docs/intro-design.md) based on microservice architecture. [Implementation](source/) based on cloud agnostic technologies - Kafka, YugabyteDB, Cassandra, HTTP, gRPC, Redis, .NET 6, ASP.NET. Dynamically and statically [configurable](docs/design-configuration.md) microservices. [Observable](docs/design-observability.md) environment based on OpenTelemetry, Jaeger, Prometheus, Grafana, ElasticSearch, Fluentd, Kibana. Containerized components based on Docker which can be [ran locally](docs/infrastructure-main.md#Run-locally).
+[System design](docs/intro-design.md) based on microservice architecture. [Implementation](source/) based on cloud agnostic technologies - Kafka, YugabyteDB, Cassandra, HTTP, gRPC, Redis, .NET 6, ASP.NET. Dynamically and statically [configurable](docs/design-configuration.md) microservices. [Observable](docs/design-observability.md) environment based on OpenTelemetry, Jaeger, Prometheus, Grafana, ElasticSearch, Fluentd, Kibana. Containerized components based on Docker which can be [ran locally](docs/dev-run-locally.md).
 
 Check out [what next](docs/what-next.md) needs to be implemented. I appreciate all comments so feel free to use the `Discussions` tab.
 
@@ -69,9 +69,9 @@ Check out [what next](docs/what-next.md) needs to be implemented. I appreciate a
   - [Configuration](docs/design-configuration.md)
   - [Observability](docs/design-observability.md)
   - [Deployment](docs/design-deployment.md)
-* Infrastructure
-  - [CI pipeline](docs/infrastructure-main.md#CI-pipeline)
-  - [Run locally](docs/infrastructure-main.md#Run-locally)
+* Development
+  - [CI pipeline](docs/dev-ci.md)
+  - [Run locally](docs/dev-run-locally.md)
 * [What next](docs/what-next.md)
 
 # Design
