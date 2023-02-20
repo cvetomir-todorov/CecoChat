@@ -1,8 +1,8 @@
-[Chat engine](docs/intro-capabilities.md) for millions of users. Cloud agnostic, containerized, based on microservice architecture.
+[Chat engine](docs/intro-capabilities.md) for millions of users.
 
-[System design](docs/intro-design.md) and [implementation](source/) based on Kafka, YugabyteDB, Cassandra, HTTP, gRPC, Redis, .NET 6, ASP.NET. [Configurable](docs/design-configuration.md) and [observable](docs/design-observability.md) environment based on OpenTelemetry, Jaeger, Prometheus, Grafana, ElasticSearch, Fluentd, Kibana. Containerized components based on Docker which can be [ran locally](docs/infrastructure-main.md#Run-locally).
+[System design](docs/intro-design.md) based on microservice architecture. [Implementation](source/) based on cloud agnostic technologies - Kafka, YugabyteDB, Cassandra, HTTP, gRPC, Redis, .NET 6, ASP.NET. Dynamically and statically [configurable](docs/design-configuration.md) microservices. [Observable](docs/design-observability.md) environment based on OpenTelemetry, Jaeger, Prometheus, Grafana, ElasticSearch, Fluentd, Kibana. Containerized components based on Docker which can be [ran locally](docs/infrastructure-main.md#Run-locally).
 
-I appreciate all comments so feel free to use the `Discussions` tab.
+Check out [what next](docs/what-next.md) needs to be implemented. I appreciate all comments so feel free to use the `Discussions` tab.
 
 # Code
 
@@ -76,4 +76,8 @@ I appreciate all comments so feel free to use the `Discussions` tab.
 
 # Design
 
+Overall design
 ![Design](docs/images/cecochat-01-overall.png)
+
+Technologies
+![Technologies](docs/images/cecochat-08-technologies.png)
