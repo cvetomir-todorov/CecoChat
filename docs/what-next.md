@@ -2,16 +2,17 @@
 
 ## Essential features
 
-* Add user/profile features
-  - User register/login/identity
+* User/profile
+  - User identity/register/login
   - Handle friendship between users
 * Add clients
   - Web-based
   - Mobile
+* Setup versioning
 
 ## Additional features
 
-* Add user/profile features
+* User/profile
   - Edit user profiles
 * Privacy
   - Add end-to-end encryption for messages
@@ -52,8 +53,6 @@
 
 ## Development
 
-* Infrastructure
-  - Setup versioning
 * Automated testing
   - Setup infrastructure for test running
   - Add system tests

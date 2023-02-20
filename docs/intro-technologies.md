@@ -98,7 +98,7 @@ Configuration is based on Redis:
 ![ASP.NET](tech-images/aspnet.png)
 ![EFCore](tech-images/efcore.png)
 
-The services use ASP.NET, .NET 6 and Entity Framework Core:
+The services use .NET 6, ASP.NET and Entity Framework Core:
 * open-source software backed by Microsoft
 * very mature, feature-rich, lots of tools
 * widely-used with a big community
