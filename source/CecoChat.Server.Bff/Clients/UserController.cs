@@ -82,7 +82,6 @@ public class UserController : ControllerBase
         return Ok(response);
     }
 
-    // TODO: consider creating an MVC value provider and a factory for it
     private bool TryParseUserIds(string paramName, [NotNullWhen(true)] out long[]? userIds)
     {
         string? paramValue = Request.Query[paramName].FirstOrDefault();
