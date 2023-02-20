@@ -63,3 +63,11 @@ jobs:
         context: ./source
         push: true
         tags: cvetomirtodorov/cecochat-idgen:0.1
+
+    - name: User image
+      uses: docker/build-push-action@v2
+      with:
+        file: run/cecochat/User.Dockerfile
+        context: ./source
+        push: true
+        tags: cvetomirtodorov/cecochat-user:0.1

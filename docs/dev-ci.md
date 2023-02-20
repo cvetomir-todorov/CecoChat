@@ -13,3 +13,4 @@ A Github Actions workflow is set up to:
     - [State](https://hub.docker.com/repository/docker/cvetomirtodorov/cecochat-state)
     - [History](https://hub.docker.com/repository/docker/cvetomirtodorov/cecochat-history)
     - [ID Gen](https://hub.docker.com/repository/docker/cvetomirtodorov/cecochat-idgen)
+    - [User](https://hub.docker.com/repository/docker/cvetomirtodorov/cecochat-user)
