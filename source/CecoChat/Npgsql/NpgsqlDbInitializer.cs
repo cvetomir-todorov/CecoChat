@@ -29,6 +29,8 @@ public sealed class NpgsqlDbInitializer : INpgsqlDbInitializer
             return false;
         }
 
+        _logger.LogInformation("Initializing database {Database}...", database);
+
         List<SqlScript> genericSqlScripts = GetGenericSqlScripts(scriptSource);
         _logger.LogInformation("Loaded {SqlScriptCount} generic SQL scripts for {Database} database initialization", genericSqlScripts.Count, database);
         foreach (SqlScript sql in genericSqlScripts)
@@ -48,13 +50,16 @@ public sealed class NpgsqlDbInitializer : INpgsqlDbInitializer
             ExecuteSqlScript(dbSpecificConnection, sql);
         }
 
+        _logger.LogInformation("Initialized database {Database}", database);
         return true;
     }
 
     private static bool CheckIfDatabaseExists(NpgsqlConnection connection, string database)
     {
         using NpgsqlCommand command = connection.CreateCommand();
-        command.CommandText = $"SELECT COUNT(datname) FROM pg_catalog.pg_database WHERE lower(datname) = lower('{database}');";
+        command.CommandText = "SELECT COUNT(datname) FROM pg_catalog.pg_database WHERE lower(datname) = lower(@Database);";
+        NpgsqlParameter databaseParameter = new("@Database", database);
+        command.Parameters.Add(databaseParameter);
 
         int matchingDbs = Convert.ToInt32(command.ExecuteScalar());
         bool exists = matchingDbs > 0;
