@@ -64,6 +64,7 @@ In order to containerize CecoChat you can use the folder which contains the [Doc
 * 1 History
 * 1 State
 * 1 ID Gen
+* 1 User
 
 It uses `ASPNETCORE_ENVIRONMENT=Production` and overrides tracing options to persists all traces.
 

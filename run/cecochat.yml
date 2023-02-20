@@ -153,3 +153,26 @@ services:
       CECOCHAT_OtelSampling__Strategy: "AlwaysOn"
       CECOCHAT_Jaeger__AgentHost: jaeger
     logging: *fluentd-logging
+  cecochat-user:
+    image: ceco.com/cecochat/user:0.1
+    container_name: cecochat-user
+    hostname: user
+    networks: *networks
+    ports:
+      - "31005:443"
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: https://+
+      ASPNETCORE_HTTPS_PORT: 443
+      ASPNETCORE_Kestrel__Certificates__Default__Path: "/app/cecochat-dev.pfx"
+      ASPNETCORE_Kestrel__Certificates__Default__Password: "cecochat"
+      CECOCHAT_UserDB__Init__ConnectionString: "Host=yb-tserver;Port=5433;Database=postgres;Username=yugabyte;Password=yugabyte;"
+      CECOCHAT_UserDB__Seed: "true"
+      CECOCHAT_UserDB__Connect__ConnectionString: "Host=yb-tserver;Port=5433;Database=users;Username=cecochat_dev;Password=secret;"
+      CECOCHAT_OtelSampling__Strategy: "AlwaysOn"
+      CECOCHAT_Jaeger__AgentHost: jaeger
+    logging: *fluentd-logging
