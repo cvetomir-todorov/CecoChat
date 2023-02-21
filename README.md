@@ -76,8 +76,8 @@ Check out [what next](docs/what-next.md) needs to be implemented. I appreciate a
 
 # Design
 
-Overall design
+### Overall
 ![Design](docs/images/cecochat-01-overall.png)
 
-Technologies
+### Technologies
 ![Technologies](docs/images/cecochat-08-technologies.png)
