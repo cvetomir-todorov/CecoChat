@@ -29,7 +29,7 @@ public sealed class ReceiversConsumer : IReceiversConsumer
     private readonly ITopicPartitionFlyweight _partitionFlyweight;
     private readonly IKafkaConsumer<Null, BackplaneMessage> _consumer;
     private readonly IClientContainer _clientContainer;
-    private readonly IContractDataMapper _mapper;
+    private readonly IContractMapper _mapper;
     private bool _isInitialized;
     private readonly object _initializationLock;
 
@@ -39,7 +39,7 @@ public sealed class ReceiversConsumer : IReceiversConsumer
         ITopicPartitionFlyweight partitionFlyweight,
         IFactory<IKafkaConsumer<Null, BackplaneMessage>> consumerFactory,
         IClientContainer clientContainer,
-        IContractDataMapper mapper)
+        IContractMapper mapper)
     {
         _logger = logger;
         _backplaneOptions = backplaneOptions.Value;

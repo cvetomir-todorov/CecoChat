@@ -196,7 +196,7 @@ public class Startup
         // shared
         builder.RegisterType<MessagingTelemetry>().As<IMessagingTelemetry>().SingleInstance();
         builder.RegisterType<MonotonicClock>().As<IClock>().SingleInstance();
-        builder.RegisterType<ContractDataMapper>().As<IContractDataMapper>().SingleInstance();
+        builder.RegisterType<ContractMapper>().As<IContractMapper>().SingleInstance();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

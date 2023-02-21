@@ -22,14 +22,14 @@ public sealed class HistoryConsumer : IHistoryConsumer
     private readonly ILogger _logger;
     private readonly BackplaneOptions _backplaneOptions;
     private readonly IKafkaConsumer<Null, BackplaneMessage> _consumer;
-    private readonly IContractDataMapper _mapper;
+    private readonly IContractMapper _mapper;
     private readonly IChatMessageRepo _messageRepo;
 
     public HistoryConsumer(
         ILogger<HistoryConsumer> logger,
         IOptions<BackplaneOptions> backplaneOptions,
         IFactory<IKafkaConsumer<Null, BackplaneMessage>> consumerFactory,
-        IContractDataMapper mapper,
+        IContractMapper mapper,
         IChatMessageRepo messageRepo)
     {
         _logger = logger;

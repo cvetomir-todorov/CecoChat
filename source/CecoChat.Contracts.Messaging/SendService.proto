@@ -1,7 +1,7 @@
 syntax = "proto3";
 option csharp_namespace = "CecoChat.Contracts.Messaging";
 package CecoChat.Contracts.Messaging;
-import "Messaging/DataType.proto";
+import "DataType.proto";
 
 service Send {
   rpc SendMessage(SendMessageRequest) returns (SendMessageResponse);

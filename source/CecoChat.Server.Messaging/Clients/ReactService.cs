@@ -15,14 +15,14 @@ public class ReactService : Reaction.ReactionBase
     private readonly ILogger _logger;
     private readonly ISendersProducer _sendersProducer;
     private readonly IClientContainer _clientContainer;
-    private readonly IContractDataMapper _mapper;
+    private readonly IContractMapper _mapper;
     private readonly IMessagingTelemetry _messagingTelemetry;
 
     public ReactService(
         ILogger<ReactService> logger,
         ISendersProducer sendersProducer,
         IClientContainer clientContainer,
-        IContractDataMapper mapper,
+        IContractMapper mapper,
         IMessagingTelemetry messagingTelemetry)
     {
         _logger = logger;
