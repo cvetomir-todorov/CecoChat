@@ -1,5 +1,7 @@
 using System.Reflection;
 using Autofac;
+using CecoChat.AspNet.Otel;
+using CecoChat.AspNet.Swagger;
 using CecoChat.Autofac;
 using CecoChat.Client.History;
 using CecoChat.Client.State;
@@ -16,7 +18,6 @@ using CecoChat.Server.Config;
 using CecoChat.Server.ExceptionHandling;
 using CecoChat.Server.Health;
 using CecoChat.Server.Identity;
-using CecoChat.Swagger;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;

@@ -1,5 +1,4 @@
-﻿using OpenTelemetry.Metrics;
-using OpenTelemetry.Trace;
+﻿using OpenTelemetry.Trace;
 
 namespace CecoChat.Otel;
 
@@ -35,16 +34,6 @@ public static class OtelRegistrations
                 jaeger.AgentPort = options.AgentPort;
                 jaeger.ExportProcessorType = options.ExportProcessorType;
                 jaeger.BatchExportProcessorOptions.ScheduledDelayMilliseconds = options.BatchExportScheduledDelayMillis;
-            });
-    }
-
-    public static MeterProviderBuilder ConfigurePrometheusAspNetExporter(this MeterProviderBuilder metrics, PrometheusOptions options)
-    {
-        return metrics
-            .AddPrometheusExporter(prometheus =>
-            {
-                prometheus.ScrapeEndpointPath = options.ScrapeEndpointPath;
-                prometheus.ScrapeResponseCacheDurationMilliseconds = options.ScrapeResponseCacheDurationMilliseconds;
             });
     }
 }

@@ -1,6 +1,6 @@
 ﻿using Microsoft.OpenApi.Models;
 
-namespace CecoChat.Swagger;
+namespace CecoChat.AspNet.Swagger;
 
 public sealed class SwaggerOptions
 {
