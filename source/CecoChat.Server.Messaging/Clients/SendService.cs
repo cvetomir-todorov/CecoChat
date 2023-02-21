@@ -17,7 +17,7 @@ public sealed class SendService : Send.SendBase
     private readonly IIDGenClient _idGenClient;
     private readonly ISendersProducer _sendersProducer;
     private readonly IClientContainer _clientContainer;
-    private readonly IContractDataMapper _mapper;
+    private readonly IContractMapper _mapper;
     private readonly IMessagingTelemetry _messagingTelemetry;
 
     public SendService(
@@ -25,7 +25,7 @@ public sealed class SendService : Send.SendBase
         IIDGenClient idGenClient,
         ISendersProducer sendersProducer,
         IClientContainer clientContainer,
-        IContractDataMapper mapper,
+        IContractMapper mapper,
         IMessagingTelemetry messagingTelemetry)
     {
         _logger = logger;

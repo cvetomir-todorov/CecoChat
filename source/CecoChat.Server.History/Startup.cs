@@ -180,7 +180,7 @@ public class Startup
         builder.RegisterOptions<BackplaneOptions>(Configuration.GetSection("Backplane"));
 
         // shared
-        builder.RegisterType<ContractDataMapper>().As<IContractDataMapper>().SingleInstance();
+        builder.RegisterType<ContractMapper>().As<IContractMapper>().SingleInstance();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
