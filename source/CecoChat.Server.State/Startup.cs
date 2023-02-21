@@ -1,6 +1,7 @@
 using System.Reflection;
 using Autofac;
 using Calzolari.Grpc.AspNetCore.Validation;
+using CecoChat.AspNet.Otel;
 using CecoChat.Autofac;
 using CecoChat.Cassandra;
 using CecoChat.Cassandra.Health;

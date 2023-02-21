@@ -55,6 +55,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CecoChat.Contracts.Bff", "C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CecoChat.Contracts.Messaging", "CecoChat.Contracts.Messaging\CecoChat.Contracts.Messaging.csproj", "{F795F112-0CE1-4F94-8665-C0F7FDDA3D3A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CecoChat.AspNet", "CecoChat.AspNet\CecoChat.AspNet.csproj", "{FEF5F628-618A-4EAB-AD5D-386D566BA181}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -145,6 +147,10 @@ Global
 		{F795F112-0CE1-4F94-8665-C0F7FDDA3D3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F795F112-0CE1-4F94-8665-C0F7FDDA3D3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F795F112-0CE1-4F94-8665-C0F7FDDA3D3A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FEF5F628-618A-4EAB-AD5D-386D566BA181}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FEF5F628-618A-4EAB-AD5D-386D566BA181}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FEF5F628-618A-4EAB-AD5D-386D566BA181}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FEF5F628-618A-4EAB-AD5D-386D566BA181}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -171,6 +177,7 @@ Global
 		{81CFDD61-DFD5-481B-A149-760A87BDE944} = {44AE3E31-FA07-4616-9F29-3D2EACF18A68}
 		{B12102CE-6270-494E-A50C-A72538060CB7} = {C320D788-140F-4A46-A3A8-7A91FD43290B}
 		{F795F112-0CE1-4F94-8665-C0F7FDDA3D3A} = {C320D788-140F-4A46-A3A8-7A91FD43290B}
+		{FEF5F628-618A-4EAB-AD5D-386D566BA181} = {C320D788-140F-4A46-A3A8-7A91FD43290B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B5EAA668-8419-44F5-8BE5-9175A9B20BF8}
