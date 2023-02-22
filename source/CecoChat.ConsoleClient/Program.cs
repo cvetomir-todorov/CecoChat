@@ -15,22 +15,16 @@ public static class Program
         MessageStorage storage = new(client.UserId);
         ChangeHandler changeHandler = new(storage);
 
-        client.ExceptionOccurred += ShowException;
+        client.Disconnected += (_, _) => Console.WriteLine("Disconnected.");
         client.MessageReceived += (_, notification) => changeHandler.AddReceivedMessage(notification);
         client.MessageDelivered += (_, notification) => changeHandler.UpdateDeliveryStatus(notification);
         client.ReactionReceived += (_, notification) => changeHandler.UpdateReaction(notification);
-        client.StartMessaging(CancellationToken.None);
+        await client.StartMessaging(CancellationToken.None);
 
         await RunStateMachine(client, storage);
 
-        client.ExceptionOccurred -= ShowException;
         client.Dispose();
         Console.WriteLine("Bye!");
-    }
-
-    private static void ShowException(object? _, Exception exception)
-    {
-        Console.WriteLine(exception);
     }
 
     private static async Task RunStateMachine(ChatClient client, MessageStorage storage)

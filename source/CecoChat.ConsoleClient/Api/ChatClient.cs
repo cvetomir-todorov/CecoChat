@@ -2,8 +2,6 @@
 using CecoChat.Contracts.Bff;
 using CecoChat.Contracts.Messaging;
 using CecoChat.Data;
-using Grpc.Core;
-using Grpc.Net.Client;
 using Refit;
 
 namespace CecoChat.ConsoleClient.Api;
@@ -11,25 +9,22 @@ namespace CecoChat.ConsoleClient.Api;
 public sealed class ChatClient : IDisposable
 {
     private readonly IBffClient _bffClient;
+    private readonly MessagingClient _messagingClient;
     private long _userId;
     private ProfileFull? _userProfile;
     private string? _accessToken;
     private string? _messagingServerAddress;
-    private Metadata? _grpcMetadata;
-    private GrpcChannel? _messagingChannel;
-    private Send.SendClient? _sendClient;
-    private Reaction.ReactionClient? _reactionClient;
 
     public ChatClient(string bffAddress)
     {
         _bffClient = RestService.For<IBffClient>(bffAddress);
+        _messagingClient = new MessagingClient();
     }
 
     public void Dispose()
     {
         _bffClient.Dispose();
-        _messagingChannel?.ShutdownAsync().Wait();
-        _messagingChannel?.Dispose();
+        _messagingClient.DisposeAsync().GetAwaiter().GetResult();
     }
 
     public long UserId => _userId;
@@ -53,59 +48,23 @@ public sealed class ChatClient : IDisposable
     {
         _accessToken = accessToken;
 
-        _grpcMetadata = new();
-        _grpcMetadata.Add("Authorization", $"Bearer {accessToken}");
-
         JwtSecurityToken jwt = new(accessToken);
         _userId = long.Parse(jwt.Subject);
     }
 
-    public void StartMessaging(CancellationToken ct)
+    public async Task StartMessaging(CancellationToken ct)
     {
-        _messagingChannel?.Dispose();
-        _messagingChannel = GrpcChannel.ForAddress(_messagingServerAddress!);
-
-        Listen.ListenClient listenClient = new(_messagingChannel);
-        _sendClient = new Send.SendClient(_messagingChannel);
-        _reactionClient = new Reaction.ReactionClient(_messagingChannel);
-
-        ListenSubscription subscription = new();
-        AsyncServerStreamingCall<ListenNotification> serverStream = listenClient.Listen(subscription, _grpcMetadata, cancellationToken: ct);
-        Task.Factory.StartNew(
-            async () => await ListenForNewMessages(serverStream, ct),
-            TaskCreationOptions.LongRunning);
-    }
-
-    private async Task ListenForNewMessages(AsyncServerStreamingCall<ListenNotification> serverStream, CancellationToken ct)
-    {
-        try
+        if (_messagingServerAddress == null || _accessToken == null)
         {
-            while (!ct.IsCancellationRequested && await serverStream.ResponseStream.MoveNext())
-            {
-                ListenNotification notification = serverStream.ResponseStream.Current;
-                switch (notification.Type)
-                {
-                    case MessageType.Data:
-                        MessageReceived?.Invoke(this, notification);
-                        break;
-                    case MessageType.Disconnect:
-                        Disconnected?.Invoke(this, EventArgs.Empty);
-                        break;
-                    case MessageType.Delivery:
-                        MessageDelivered?.Invoke(this, notification);
-                        break;
-                    case MessageType.Reaction:
-                        ReactionReceived?.Invoke(this, notification);
-                        break;
-                    default:
-                        throw new EnumValueNotSupportedException(notification.Type);
-                }
-            }
+            throw new InvalidOperationException("Session should be created first.");
         }
-        catch (Exception exception)
-        {
-            ExceptionOccurred?.Invoke(this, exception);
-        }
+
+        _messagingClient.MessageReceived += (sender, notification) => MessageReceived?.Invoke(sender, notification);
+        _messagingClient.ReactionReceived += (sender, notification) => ReactionReceived?.Invoke(sender, notification);
+        _messagingClient.MessageDelivered += (sender, notification) => MessageDelivered?.Invoke(sender, notification);
+        _messagingClient.Disconnected += (sender, e) => Disconnected?.Invoke(sender, e);
+
+        await _messagingClient.Connect(_messagingServerAddress, _accessToken, ct);
     }
 
     public event EventHandler<ListenNotification>? MessageReceived;
@@ -115,8 +74,6 @@ public sealed class ChatClient : IDisposable
     public event EventHandler<ListenNotification>? MessageDelivered;
 
     public event EventHandler? Disconnected;
-
-    public event EventHandler<Exception>? ExceptionOccurred;
 
     public async Task<IList<LocalStorage.Chat>> GetChats(DateTime newerThan)
     {
@@ -165,11 +122,11 @@ public sealed class ChatClient : IDisposable
             Data = text
         };
 
-        SendMessageResponse response = await _sendClient!.SendMessageAsync(request, _grpcMetadata);
+        SendMessageResponse response = await _messagingClient.SendMessage(request);
         return response.MessageId;
     }
 
-    public async Task React(long messageId, long senderId, long receiverId, string reaction)
+    public Task React(long messageId, long senderId, long receiverId, string reaction)
     {
         ReactRequest request = new()
         {
@@ -178,10 +135,10 @@ public sealed class ChatClient : IDisposable
             ReceiverId = receiverId,
             Reaction = reaction
         };
-        await _reactionClient!.ReactAsync(request, _grpcMetadata);
+        return _messagingClient.React(request);
     }
 
-    public async Task UnReact(long messageId, long senderId, long receiverId)
+    public Task UnReact(long messageId, long senderId, long receiverId)
     {
         UnReactRequest request = new()
         {
@@ -189,7 +146,7 @@ public sealed class ChatClient : IDisposable
             SenderId = senderId,
             ReceiverId = receiverId
         };
-        await _reactionClient!.UnReactAsync(request, _grpcMetadata);
+        return _messagingClient.UnReact(request);
     }
 
     public async Task<LocalStorage.ProfilePublic> GetPublicProfile(long userId)
