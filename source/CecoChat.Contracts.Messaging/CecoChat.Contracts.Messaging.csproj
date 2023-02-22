@@ -4,22 +4,4 @@
     <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Google.Protobuf" Version="3.21.7" />
-    <PackageReference Include="Grpc.Net.Client" Version="2.49.0" />
-    <PackageReference Include="Grpc.Tools" Version="2.50.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Protobuf Include="MessageType.proto" />
-    <Protobuf Include="DataType.proto" />
-    <Protobuf Include="DeliveryStatus.proto" />
-    <Protobuf Include="SendService.proto" GrpcServices="All" />
-    <Protobuf Include="ReactionService.proto" GrpcServices="All" />
-    <Protobuf Include="ListenService.proto" GrpcServices="All" />
-  </ItemGroup>
-
 </Project>
