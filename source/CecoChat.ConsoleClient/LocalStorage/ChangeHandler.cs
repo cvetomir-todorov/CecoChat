@@ -17,6 +17,10 @@ public class ChangeHandler
         {
             throw new InvalidOperationException($"Notification {notification} should have type {MessageType.Data}.");
         }
+        if (notification.Data == null)
+        {
+            throw new InvalidOperationException($"Notification {notification} should have its {nameof(ListenNotification.Data)} property not null.");
+        }
 
         Message message = new()
         {
@@ -41,9 +45,9 @@ public class ChangeHandler
 
     public void UpdateDeliveryStatus(ListenNotification notification)
     {
-        if (notification.Type != MessageType.Delivery)
+        if (notification.Type != MessageType.DeliveryStatus)
         {
-            throw new InvalidOperationException($"Notification {notification} should have type {MessageType.Delivery}.");
+            throw new InvalidOperationException($"Notification {notification} should have type {MessageType.DeliveryStatus}.");
         }
 
         if (!_storage.TryGetChat(notification.SenderId, notification.ReceiverId, out Chat? chat))
@@ -56,7 +60,7 @@ public class ChangeHandler
             _storage.AddOrUpdateChat(chat);
         }
 
-        switch (notification.Status)
+        switch (notification.DeliveryStatus)
         {
             case DeliveryStatus.Processed:
                 chat.Processed = notification.MessageId;
@@ -68,7 +72,7 @@ public class ChangeHandler
                 chat.OtherUserSeen = notification.MessageId;
                 break;
             default:
-                throw new EnumValueNotSupportedException(notification.Status);
+                throw new EnumValueNotSupportedException(notification.DeliveryStatus);
         }
     }
 
@@ -77,6 +81,10 @@ public class ChangeHandler
         if (notification.Type != MessageType.Reaction)
         {
             throw new InvalidOperationException($"Notification {notification} should have type {MessageType.Reaction}.");
+        }
+        if (notification.Reaction == null)
+        {
+            throw new InvalidOperationException($"Notification {notification} should have its {nameof(ListenNotification.Reaction)} property not null.");
         }
 
         if (!_storage.TryGetMessage(notification.SenderId, notification.ReceiverId, notification.MessageId, out Message? message))
