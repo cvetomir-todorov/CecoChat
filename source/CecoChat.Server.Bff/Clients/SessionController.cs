@@ -67,7 +67,8 @@ public class SessionController : ControllerBase
         Activity.Current?.AddTag("user.id", userId);
 
         (Guid clientId, string accessToken) = CreateSession(userId);
-        _logger.LogInformation("User {Username} authenticated and assigned user ID {UserId} and client ID {ClientId}", request.Username, userId, clientId);
+        _logger.LogInformation("User {Username} from {UserIP}:{UserPort} authenticated and assigned user ID {UserId} and client ID {ClientId}",
+            request.Username, HttpContext.Connection.RemoteIpAddress, HttpContext.Connection.RemotePort, userId, clientId);
 
         Contracts.User.ProfileFull internalProfile = await _userClient.GetFullProfile(accessToken, ct);
         ProfileFull profile = _mapper.Map<ProfileFull>(internalProfile);

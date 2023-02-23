@@ -3,9 +3,10 @@ using CecoChat.Contracts.Backplane;
 using CecoChat.Contracts.Messaging;
 using CecoChat.Kafka;
 using CecoChat.Server.Backplane;
-using CecoChat.Server.Messaging.Clients.Streaming;
+using CecoChat.Server.Messaging.Clients;
 using CecoChat.Server.Messaging.Telemetry;
 using Confluent.Kafka;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Options;
 
 namespace CecoChat.Server.Messaging.Backplane;
@@ -19,30 +20,30 @@ public interface ISendersProducer : IDisposable
 
 public sealed class SendersProducer : ISendersProducer
 {
-    private readonly ILogger _logger;
     private readonly BackplaneOptions _backplaneOptions;
     private readonly IPartitionUtility _partitionUtility;
     private readonly ITopicPartitionFlyweight _partitionFlyweight;
     private readonly IKafkaProducer<Null, BackplaneMessage> _producer;
     private readonly IClientContainer _clientContainer;
+    private readonly IHubContext<ChatHub, IChatListener> _chatHubContext;
     private readonly IMessagingTelemetry _messagingTelemetry;
 
     public SendersProducer(
-        ILogger<SendersProducer> logger,
         IOptions<BackplaneOptions> backplaneOptions,
         IHostApplicationLifetime applicationLifetime,
         IPartitionUtility partitionUtility,
         ITopicPartitionFlyweight partitionFlyweight,
         IFactory<IKafkaProducer<Null, BackplaneMessage>> producerFactory,
         IClientContainer clientContainer,
+        IHubContext<ChatHub, IChatListener> chatHubContext,
         IMessagingTelemetry messagingTelemetry)
     {
-        _logger = logger;
         _backplaneOptions = backplaneOptions.Value;
         _partitionUtility = partitionUtility;
         _partitionFlyweight = partitionFlyweight;
         _producer = producerFactory.Create();
         _clientContainer = clientContainer;
+        _chatHubContext = chatHubContext;
         _messagingTelemetry = messagingTelemetry;
 
         _producer.Initialize(_backplaneOptions.Kafka, _backplaneOptions.SendProducer, new BackplaneMessageSerializer());
@@ -73,24 +74,17 @@ public sealed class SendersProducer : ISendersProducer
             UpdateMetrics(backplaneMessage);
         }
 
-        Contracts.Messaging.DeliveryStatus status = isDelivered ? Contracts.Messaging.DeliveryStatus.Processed : Contracts.Messaging.DeliveryStatus.Lost;
+        Contracts.Messaging.DeliveryStatus deliveryStatus = isDelivered ? Contracts.Messaging.DeliveryStatus.Processed : Contracts.Messaging.DeliveryStatus.Lost;
         ListenNotification deliveryNotification = new()
         {
             MessageId = backplaneMessage.MessageId,
             SenderId = backplaneMessage.SenderId,
             ReceiverId = backplaneMessage.ReceiverId,
-            Type = Contracts.Messaging.MessageType.Delivery,
-            Status = status
+            Type = Contracts.Messaging.MessageType.DeliveryStatus,
+            DeliveryStatus = deliveryStatus
         };
 
-        IEnumerable<IStreamer<ListenNotification>> clients = _clientContainer.EnumerateClients(backplaneMessage.SenderId);
-
-        foreach (IStreamer<ListenNotification> client in clients)
-        {
-            bool enqueued = client.EnqueueMessage(deliveryNotification, parentActivity: activity);
-            _logger.LogTrace("{Status} client {ClientId} that message {MessageId} of type {MessageType} has been processed",
-                enqueued ? "Notified" : "Failed to notify", client.ClientId, backplaneMessage.MessageId, backplaneMessage.Type);
-        }
+        _chatHubContext.Clients.Group(_clientContainer.GetGroupName(backplaneMessage.SenderId)).Notify(deliveryNotification);
     }
 
     private void UpdateMetrics(BackplaneMessage backplaneMessage)

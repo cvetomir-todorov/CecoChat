@@ -1,12 +1,9 @@
-using System.Reflection;
 using Autofac;
-using Calzolari.Grpc.AspNetCore.Validation;
 using CecoChat.AspNet.Otel;
 using CecoChat.Autofac;
 using CecoChat.Client.IDGen;
 using CecoChat.Contracts.Backplane;
 using CecoChat.Data.Config;
-using CecoChat.Grpc.Telemetry;
 using CecoChat.Http.Health;
 using CecoChat.Jwt;
 using CecoChat.Kafka;
@@ -19,11 +16,9 @@ using CecoChat.Server.Health;
 using CecoChat.Server.Identity;
 using CecoChat.Server.Messaging.Backplane;
 using CecoChat.Server.Messaging.Clients;
-using CecoChat.Server.Messaging.Clients.Streaming;
 using CecoChat.Server.Messaging.HostedServices;
 using CecoChat.Server.Messaging.Telemetry;
 using Confluent.Kafka;
-using FluentValidation;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
@@ -34,6 +29,7 @@ namespace CecoChat.Server.Messaging;
 public class Startup
 {
     private readonly RedisOptions _configDbOptions;
+    private readonly ClientOptions _clientOptions;
     private readonly BackplaneOptions _backplaneOptions;
     private readonly IDGenOptions _idGenOptions;
     private readonly JwtOptions _jwtOptions;
@@ -48,6 +44,9 @@ public class Startup
 
         _configDbOptions = new();
         Configuration.GetSection("ConfigDB").Bind(_configDbOptions);
+
+        _clientOptions = new();
+        Configuration.GetSection("Clients").Bind(_clientOptions);
 
         _backplaneOptions = new();
         Configuration.GetSection("Backplane").Bind(_backplaneOptions);
@@ -85,15 +84,16 @@ public class Startup
         services.AddIDGenClient(_idGenOptions);
 
         // clients
-        services.AddGrpc(grpc =>
-        {
-            grpc.EnableDetailedErrors = Environment.IsDevelopment();
-            grpc.EnableMessageValidation();
-        });
-        services.AddGrpcValidation();
+        services
+            .AddSignalR(signalr =>
+            {
+                signalr.EnableDetailedErrors = Environment.IsDevelopment();
+                signalr.ClientTimeoutInterval = _clientOptions.TimeoutInterval;
+                signalr.KeepAliveInterval = _clientOptions.KeepAliveInterval;
+            })
+            .AddMessagePackProtocol();
 
         // common
-        services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
         services.AddOptions();
     }
 
@@ -109,7 +109,6 @@ public class Startup
             tracing.SetResourceBuilder(serviceResourceBuilder);
             tracing.AddAspNetCoreInstrumentation(aspnet =>
             {
-                aspnet.EnableGrpcAspNetCoreSupport = true;
                 HashSet<string> excludedPaths = new()
                 {
                     _prometheusOptions.ScrapeEndpointPath, HealthPaths.Health, HealthPaths.Startup, HealthPaths.Live, HealthPaths.Ready
@@ -118,7 +117,6 @@ public class Startup
             });
             tracing.AddKafkaInstrumentation();
             tracing.AddGrpcClientInstrumentation(grpc => grpc.SuppressDownstreamInstrumentation = true);
-            tracing.AddGrpcStreamInstrumentation();
             tracing.ConfigureSampling(_otelSamplingOptions);
             tracing.ConfigureJaegerExporter(_jaegerOptions);
         });
@@ -174,10 +172,8 @@ public class Startup
         builder.RegisterOptions<ConfigOptions>(Configuration.GetSection("Config"));
 
         // clients
-        builder.RegisterModule(new GrpcStreamAutofacModule());
         builder.RegisterType<ClientContainer>().As<IClientContainer>().SingleInstance();
-        builder.RegisterFactory<ListenStreamer, IListenStreamer>();
-        builder.RegisterOptions<ClientOptions>(Configuration.GetSection("Clients"));
+        builder.RegisterType<InputValidator>().As<IInputValidator>().SingleInstance();
 
         // idgen
         IConfiguration idGenConfiguration = Configuration.GetSection("IDGen");
@@ -213,9 +209,7 @@ public class Startup
         app.UseAuthorization();
         app.UseEndpoints(endpoints =>
         {
-            endpoints.MapGrpcService<ListenService>();
-            endpoints.MapGrpcService<SendService>();
-            endpoints.MapGrpcService<ReactService>();
+            endpoints.MapHub<ChatHub>("/chat");
 
             endpoints.MapHttpHealthEndpoints(setup =>
             {
