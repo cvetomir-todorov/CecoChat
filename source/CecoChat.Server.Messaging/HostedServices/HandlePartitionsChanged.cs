@@ -4,7 +4,8 @@ using CecoChat.Events;
 using CecoChat.Kafka;
 using CecoChat.Server.Backplane;
 using CecoChat.Server.Messaging.Backplane;
-using CecoChat.Server.Messaging.Clients.Streaming;
+using CecoChat.Server.Messaging.Clients;
+using Microsoft.AspNetCore.SignalR;
 
 namespace CecoChat.Server.Messaging.HostedServices;
 
@@ -13,6 +14,7 @@ public sealed class HandlePartitionsChanged : IHostedService, ISubscriber<Partit
     private readonly IBackplaneComponents _backplaneComponents;
     private readonly IPartitionUtility _partitionUtility;
     private readonly IClientContainer _clientContainer;
+    private readonly IHubContext<ChatHub, IChatListener> _chatHubContext;
     private readonly IEvent<PartitionsChangedEventData> _partitionsChanged;
     private readonly Guid _partitionsChangedToken;
 
@@ -20,11 +22,13 @@ public sealed class HandlePartitionsChanged : IHostedService, ISubscriber<Partit
         IBackplaneComponents backplaneComponents,
         IPartitionUtility partitionUtility,
         IClientContainer clientContainer,
+        IHubContext<ChatHub, IChatListener> chatHubContext,
         IEvent<PartitionsChangedEventData> partitionsChanged)
     {
         _backplaneComponents = backplaneComponents;
         _partitionUtility = partitionUtility;
         _clientContainer = clientContainer;
+        _chatHubContext = chatHubContext;
         _partitionsChanged = partitionsChanged;
 
         _partitionsChangedToken = _partitionsChanged.Subscribe(this);
@@ -56,18 +60,12 @@ public sealed class HandlePartitionsChanged : IHostedService, ISubscriber<Partit
     {
         ListenNotification notification = new() { Type = MessageType.Disconnect };
 
-        foreach (KeyValuePair<long, IEnumerable<IStreamer<ListenNotification>>> pair in _clientContainer.EnumerateAllClients())
+        foreach (long userId in _clientContainer.EnumerateUsers())
         {
-            long userId = pair.Key;
-            IEnumerable<IStreamer<ListenNotification>> clients = pair.Value;
-
             int userPartition = _partitionUtility.ChoosePartition(userId, partitionCount);
             if (!partitions.Contains(userPartition))
             {
-                foreach (IStreamer<ListenNotification> client in clients)
-                {
-                    client.EnqueueMessage(notification);
-                }
+                _chatHubContext.Clients.Group(_clientContainer.GetGroupName(userId)).Notify(notification);
             }
         }
     }

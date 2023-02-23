@@ -1,11 +1,10 @@
-﻿using System.Diagnostics;
-using CecoChat.Contracts;
-using CecoChat.Contracts.Backplane;
+﻿using CecoChat.Contracts.Backplane;
 using CecoChat.Contracts.Messaging;
 using CecoChat.Kafka;
 using CecoChat.Server.Backplane;
-using CecoChat.Server.Messaging.Clients.Streaming;
+using CecoChat.Server.Messaging.Clients;
 using Confluent.Kafka;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Options;
 
 namespace CecoChat.Server.Messaging.Backplane;
@@ -29,6 +28,7 @@ public sealed class ReceiversConsumer : IReceiversConsumer
     private readonly ITopicPartitionFlyweight _partitionFlyweight;
     private readonly IKafkaConsumer<Null, BackplaneMessage> _consumer;
     private readonly IClientContainer _clientContainer;
+    private readonly IHubContext<ChatHub, IChatListener> _chatHubContext;
     private readonly IContractMapper _mapper;
     private bool _isInitialized;
     private readonly object _initializationLock;
@@ -39,6 +39,7 @@ public sealed class ReceiversConsumer : IReceiversConsumer
         ITopicPartitionFlyweight partitionFlyweight,
         IFactory<IKafkaConsumer<Null, BackplaneMessage>> consumerFactory,
         IClientContainer clientContainer,
+        IHubContext<ChatHub, IChatListener> chatHubContext,
         IContractMapper mapper)
     {
         _logger = logger;
@@ -46,6 +47,7 @@ public sealed class ReceiversConsumer : IReceiversConsumer
         _partitionFlyweight = partitionFlyweight;
         _consumer = consumerFactory.Create();
         _clientContainer = clientContainer;
+        _chatHubContext = chatHubContext;
         _mapper = mapper;
 
         _initializationLock = new object();
@@ -89,36 +91,7 @@ public sealed class ReceiversConsumer : IReceiversConsumer
 
     private void ProcessMessage(BackplaneMessage backplaneMessage)
     {
-        EnqueueMessageForReceiverClients(backplaneMessage);
-    }
-
-    private void EnqueueMessageForReceiverClients(BackplaneMessage backplaneMessage)
-    {
-        // do not call clients.Count since it is expensive and uses locks
-        int successCount = 0;
-        int allCount = 0;
-
-        Guid senderClientId = backplaneMessage.ClientId.ToGuid();
-        IEnumerable<IStreamer<ListenNotification>> receiverClients = _clientContainer.EnumerateClients(backplaneMessage.ReceiverId);
-        ListenNotification? notification = null;
-
-        foreach (IStreamer<ListenNotification> receiverClient in receiverClients)
-        {
-            if (receiverClient.ClientId != senderClientId)
-            {
-                notification ??= _mapper.CreateListenNotification(backplaneMessage);
-
-                if (receiverClient.EnqueueMessage(notification, parentActivity: Activity.Current))
-                {
-                    successCount++;
-                }
-
-                allCount++;
-            }
-        }
-
-        LogLevel logLevel = successCount < allCount ? LogLevel.Warning : LogLevel.Trace;
-        _logger.Log(logLevel, "Connected recipients with ID {ReceiverId} ({SuccessCount} out of {AllCount}) were queued message {MessageId} of type {MessageType} from user {SenderId}",
-            backplaneMessage.ReceiverId, successCount, allCount, backplaneMessage.MessageId, backplaneMessage.Type, backplaneMessage.SenderId);
+        ListenNotification notification = _mapper.CreateListenNotification(backplaneMessage);
+        _chatHubContext.Clients.GroupExcept(_clientContainer.GetGroupName(backplaneMessage.ReceiverId), backplaneMessage.SenderConnectionId).Notify(notification);
     }
 }

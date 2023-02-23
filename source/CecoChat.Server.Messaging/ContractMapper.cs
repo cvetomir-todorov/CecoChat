@@ -1,4 +1,3 @@
-using CecoChat.Contracts;
 using CecoChat.Contracts.Backplane;
 using CecoChat.Contracts.Messaging;
 
@@ -6,11 +5,11 @@ namespace CecoChat.Server.Messaging;
 
 public interface IContractMapper
 {
-    BackplaneMessage CreateBackplaneMessage(SendMessageRequest request, long senderId, Guid senderClientId, long messageId);
+    BackplaneMessage CreateBackplaneMessage(SendMessageRequest request, long senderId, string senderConnectionId, long messageId);
 
-    BackplaneMessage CreateBackplaneMessage(ReactRequest request, Guid senderClientId, long reactorId);
+    BackplaneMessage CreateBackplaneMessage(ReactRequest request, string senderConnectionId, long reactorId);
 
-    BackplaneMessage CreateBackplaneMessage(UnReactRequest request, Guid senderClientId, long reactorId);
+    BackplaneMessage CreateBackplaneMessage(UnReactRequest request, string senderConnectionId, long reactorId);
 
     ListenNotification CreateListenNotification(SendMessageRequest request, long senderId, long messageId);
 
@@ -23,14 +22,14 @@ public interface IContractMapper
 
 public class ContractMapper : IContractMapper
 {
-    public BackplaneMessage CreateBackplaneMessage(SendMessageRequest request, long senderId, Guid senderClientId, long messageId)
+    public BackplaneMessage CreateBackplaneMessage(SendMessageRequest request, long senderId, string senderConnectionId, long messageId)
     {
         BackplaneMessage message = new()
         {
             MessageId = messageId,
             SenderId = senderId,
             ReceiverId = request.ReceiverId,
-            ClientId = senderClientId.ToUuid(),
+            SenderConnectionId = senderConnectionId,
             Type = Contracts.Backplane.MessageType.Data,
             Status = Contracts.Backplane.DeliveryStatus.Processed
         };
@@ -51,14 +50,14 @@ public class ContractMapper : IContractMapper
         return message;
     }
 
-    public BackplaneMessage CreateBackplaneMessage(ReactRequest request, Guid senderClientId, long reactorId)
+    public BackplaneMessage CreateBackplaneMessage(ReactRequest request, string senderConnectionId, long reactorId)
     {
         BackplaneMessage message = new()
         {
             MessageId = request.MessageId,
             SenderId = request.SenderId,
             ReceiverId = request.ReceiverId,
-            ClientId = senderClientId.ToUuid(),
+            SenderConnectionId = senderConnectionId,
             Type = Contracts.Backplane.MessageType.Reaction,
             Reaction = new BackplaneReaction
             {
@@ -70,14 +69,14 @@ public class ContractMapper : IContractMapper
         return message;
     }
 
-    public BackplaneMessage CreateBackplaneMessage(UnReactRequest request, Guid senderClientId, long reactorId)
+    public BackplaneMessage CreateBackplaneMessage(UnReactRequest request, string senderConnectionId, long reactorId)
     {
         BackplaneMessage message = new()
         {
             MessageId = request.MessageId,
             SenderId = request.SenderId,
             ReceiverId = request.ReceiverId,
-            ClientId = senderClientId.ToUuid(),
+            SenderConnectionId = senderConnectionId,
             Type = Contracts.Backplane.MessageType.Reaction,
             Reaction = new BackplaneReaction
             {
