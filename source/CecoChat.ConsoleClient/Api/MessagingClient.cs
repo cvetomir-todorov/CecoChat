@@ -16,7 +16,7 @@ public class MessagingClient : IAsyncDisposable
         {
             return _messagingClient.DisposeAsync();
         }
-        
+
         return ValueTask.CompletedTask;
     }
 
@@ -34,6 +34,15 @@ public class MessagingClient : IAsyncDisposable
             .AddMessagePackProtocol()
             .Build();
 
+        // client times out when there is nothing from the server within the interval
+        // potentially reconnects automatically if enabled
+        // we don't want the test console client to time out 
+        _messagingClient.ServerTimeout = TimeSpan.FromDays(1);
+
+        // interval during which client sends ping to the server
+        // we don't want the test console client to keep server resources
+        _messagingClient.KeepAliveInterval = TimeSpan.FromDays(1);
+        
         _messagingClient.On<ListenNotification>(nameof(IChatListener.Notify), notification =>
         {
             switch (notification.Type)
@@ -54,8 +63,6 @@ public class MessagingClient : IAsyncDisposable
                     throw new EnumValueNotSupportedException(notification.Type);
             }
         });
-
-        // TODO: consider subscribing to events regarding conn lifetime
 
         await _messagingClient.StartAsync(ct);
     }
