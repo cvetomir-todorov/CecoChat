@@ -88,7 +88,9 @@ public class Startup
             .AddSignalR(signalr =>
             {
                 signalr.EnableDetailedErrors = Environment.IsDevelopment();
+                // when clients don't send anything within this interval, server disconnects them in order to save resources
                 signalr.ClientTimeoutInterval = _clientOptions.TimeoutInterval;
+                // the server sends data to keep the connection alive
                 signalr.KeepAliveInterval = _clientOptions.KeepAliveInterval;
             })
             .AddMessagePackProtocol();
