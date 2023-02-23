@@ -44,12 +44,9 @@ public partial class ChatHub : Hub<IChatListener>, IChatHub
             throw new HubException(MissingUserDataExMsg);
         }
 
-        _messagingTelemetry.AddOnlineClient();
-        _clientContainer.AddClient(userClaims.UserId);
-        await Groups.AddToGroupAsync(Context.ConnectionId, _clientContainer.GetGroupName(userClaims.UserId));
-
+        await _clientContainer.AddClient(userClaims.UserId, Context.ConnectionId);
         await base.OnConnectedAsync();
-        _logger.LogInformation("Connect for user {UserId} with client {ClientId} with connection {ConnectionId}", userClaims.UserId, userClaims.ClientId, Context.ConnectionId);
+        _logger.LogTrace("Connect for user {UserId} with client {ClientId} with connection {ConnectionId}", userClaims.UserId, userClaims.ClientId, Context.ConnectionId);
     }
 
     public override async Task OnDisconnectedAsync(Exception? exception)
@@ -59,14 +56,11 @@ public partial class ChatHub : Hub<IChatListener>, IChatHub
             throw new HubException(MissingUserDataExMsg);
         }
 
-        _messagingTelemetry.RemoveOnlineClient();
-        _clientContainer.RemoveClient(userClaims.UserId);
-        await Groups.RemoveFromGroupAsync(Context.ConnectionId, _clientContainer.GetGroupName(userClaims.UserId));
-
+        await _clientContainer.RemoveClient(userClaims.UserId, Context.ConnectionId);
         await base.OnDisconnectedAsync(exception);
         if (exception == null)
         {
-            _logger.LogInformation("Disconnect for user {UserId} with client {ClientId} with connection {ConnectionId}", userClaims.UserId, userClaims.ClientId, Context.ConnectionId);
+            _logger.LogTrace("Disconnect for user {UserId} with client {ClientId} with connection {ConnectionId}", userClaims.UserId, userClaims.ClientId, Context.ConnectionId);
         }
         else
         {

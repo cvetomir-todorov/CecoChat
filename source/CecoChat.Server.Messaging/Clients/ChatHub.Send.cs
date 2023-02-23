@@ -32,7 +32,7 @@ public partial class ChatHub
         _sendersProducer.ProduceMessage(backplaneMessage);
 
         ListenNotification notification = _mapper.CreateListenNotification(request, userClaims.UserId, messageId);
-        await Clients.OthersInGroup(_clientContainer.GetGroupName(userClaims.UserId)).Notify(notification);
+        await _clientContainer.NotifyInGroup(notification, userClaims.UserId, excluding: Context.ConnectionId);
 
         SendMessageResponse response = new() { MessageId = messageId };
         return response;

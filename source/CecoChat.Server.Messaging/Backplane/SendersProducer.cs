@@ -6,7 +6,6 @@ using CecoChat.Server.Backplane;
 using CecoChat.Server.Messaging.Clients;
 using CecoChat.Server.Messaging.Telemetry;
 using Confluent.Kafka;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Options;
 
 namespace CecoChat.Server.Messaging.Backplane;
@@ -25,7 +24,6 @@ public sealed class SendersProducer : ISendersProducer
     private readonly ITopicPartitionFlyweight _partitionFlyweight;
     private readonly IKafkaProducer<Null, BackplaneMessage> _producer;
     private readonly IClientContainer _clientContainer;
-    private readonly IHubContext<ChatHub, IChatListener> _chatHubContext;
     private readonly IMessagingTelemetry _messagingTelemetry;
 
     public SendersProducer(
@@ -35,7 +33,6 @@ public sealed class SendersProducer : ISendersProducer
         ITopicPartitionFlyweight partitionFlyweight,
         IFactory<IKafkaProducer<Null, BackplaneMessage>> producerFactory,
         IClientContainer clientContainer,
-        IHubContext<ChatHub, IChatListener> chatHubContext,
         IMessagingTelemetry messagingTelemetry)
     {
         _backplaneOptions = backplaneOptions.Value;
@@ -43,7 +40,6 @@ public sealed class SendersProducer : ISendersProducer
         _partitionFlyweight = partitionFlyweight;
         _producer = producerFactory.Create();
         _clientContainer = clientContainer;
-        _chatHubContext = chatHubContext;
         _messagingTelemetry = messagingTelemetry;
 
         _producer.Initialize(_backplaneOptions.Kafka, _backplaneOptions.SendProducer, new BackplaneMessageSerializer());
@@ -84,7 +80,7 @@ public sealed class SendersProducer : ISendersProducer
             DeliveryStatus = deliveryStatus
         };
 
-        _chatHubContext.Clients.Group(_clientContainer.GetGroupName(backplaneMessage.SenderId)).Notify(deliveryNotification);
+        _clientContainer.NotifyInGroup(deliveryNotification, backplaneMessage.SenderId);
     }
 
     private void UpdateMetrics(BackplaneMessage backplaneMessage)

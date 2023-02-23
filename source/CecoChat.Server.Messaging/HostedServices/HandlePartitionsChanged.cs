@@ -5,30 +5,29 @@ using CecoChat.Kafka;
 using CecoChat.Server.Backplane;
 using CecoChat.Server.Messaging.Backplane;
 using CecoChat.Server.Messaging.Clients;
-using Microsoft.AspNetCore.SignalR;
 
 namespace CecoChat.Server.Messaging.HostedServices;
 
 public sealed class HandlePartitionsChanged : IHostedService, ISubscriber<PartitionsChangedEventData>
 {
+    private readonly ILogger _logger;
     private readonly IBackplaneComponents _backplaneComponents;
     private readonly IPartitionUtility _partitionUtility;
     private readonly IClientContainer _clientContainer;
-    private readonly IHubContext<ChatHub, IChatListener> _chatHubContext;
     private readonly IEvent<PartitionsChangedEventData> _partitionsChanged;
     private readonly Guid _partitionsChangedToken;
 
     public HandlePartitionsChanged(
+        ILogger<HandlePartitionsChanged> logger,
         IBackplaneComponents backplaneComponents,
         IPartitionUtility partitionUtility,
         IClientContainer clientContainer,
-        IHubContext<ChatHub, IChatListener> chatHubContext,
         IEvent<PartitionsChangedEventData> partitionsChanged)
     {
+        _logger = logger;
         _backplaneComponents = backplaneComponents;
         _partitionUtility = partitionUtility;
         _clientContainer = clientContainer;
-        _chatHubContext = chatHubContext;
         _partitionsChanged = partitionsChanged;
 
         _partitionsChangedToken = _partitionsChanged.Subscribe(this);
@@ -45,28 +44,30 @@ public sealed class HandlePartitionsChanged : IHostedService, ISubscriber<Partit
         return Task.CompletedTask;
     }
 
-    public ValueTask Handle(PartitionsChangedEventData eventData)
+    public async ValueTask Handle(PartitionsChangedEventData eventData)
     {
         int partitionCount = eventData.PartitionCount;
         PartitionRange partitions = eventData.Partitions;
 
-        DisconnectClients(partitionCount, partitions);
+        await DisconnectClients(partitionCount, partitions);
         _backplaneComponents.ConfigurePartitioning(partitionCount, partitions);
-
-        return ValueTask.CompletedTask;
     }
 
-    private void DisconnectClients(int partitionCount, PartitionRange partitions)
+    private async ValueTask DisconnectClients(int partitionCount, PartitionRange partitions)
     {
         ListenNotification notification = new() { Type = MessageType.Disconnect };
+        int userCount = 0;
 
         foreach (long userId in _clientContainer.EnumerateUsers())
         {
             int userPartition = _partitionUtility.ChoosePartition(userId, partitionCount);
             if (!partitions.Contains(userPartition))
             {
-                _chatHubContext.Clients.Group(_clientContainer.GetGroupName(userId)).Notify(notification);
+                await _clientContainer.NotifyInGroup(notification, userId);
+                userCount++;
             }
         }
+
+        _logger.LogInformation("Disconnected {UserCount} users", userCount);
     }
 }

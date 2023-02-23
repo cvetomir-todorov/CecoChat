@@ -4,7 +4,6 @@ using CecoChat.Kafka;
 using CecoChat.Server.Backplane;
 using CecoChat.Server.Messaging.Clients;
 using Confluent.Kafka;
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Options;
 
 namespace CecoChat.Server.Messaging.Backplane;
@@ -28,7 +27,6 @@ public sealed class ReceiversConsumer : IReceiversConsumer
     private readonly ITopicPartitionFlyweight _partitionFlyweight;
     private readonly IKafkaConsumer<Null, BackplaneMessage> _consumer;
     private readonly IClientContainer _clientContainer;
-    private readonly IHubContext<ChatHub, IChatListener> _chatHubContext;
     private readonly IContractMapper _mapper;
     private bool _isInitialized;
     private readonly object _initializationLock;
@@ -39,7 +37,6 @@ public sealed class ReceiversConsumer : IReceiversConsumer
         ITopicPartitionFlyweight partitionFlyweight,
         IFactory<IKafkaConsumer<Null, BackplaneMessage>> consumerFactory,
         IClientContainer clientContainer,
-        IHubContext<ChatHub, IChatListener> chatHubContext,
         IContractMapper mapper)
     {
         _logger = logger;
@@ -47,7 +44,6 @@ public sealed class ReceiversConsumer : IReceiversConsumer
         _partitionFlyweight = partitionFlyweight;
         _consumer = consumerFactory.Create();
         _clientContainer = clientContainer;
-        _chatHubContext = chatHubContext;
         _mapper = mapper;
 
         _initializationLock = new object();
@@ -92,6 +88,6 @@ public sealed class ReceiversConsumer : IReceiversConsumer
     private void ProcessMessage(BackplaneMessage backplaneMessage)
     {
         ListenNotification notification = _mapper.CreateListenNotification(backplaneMessage);
-        _chatHubContext.Clients.GroupExcept(_clientContainer.GetGroupName(backplaneMessage.ReceiverId), backplaneMessage.SenderConnectionId).Notify(notification);
+        _clientContainer.NotifyInGroup(notification, backplaneMessage.ReceiverId, excluding: backplaneMessage.SenderConnectionId);
     }
 }
