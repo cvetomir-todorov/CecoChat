@@ -58,7 +58,6 @@ public class MessagingClient : IAsyncDisposable
         // TODO: consider subscribing to events regarding conn lifetime
 
         await _messagingClient.StartAsync(ct);
-        await _messagingClient.SendAsync(nameof(IChatHub.Listen), new ListenSubscription(), cancellationToken: ct);
     }
 
     public event EventHandler<ListenNotification>? MessageReceived;

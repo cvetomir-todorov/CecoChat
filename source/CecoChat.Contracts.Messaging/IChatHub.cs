@@ -2,17 +2,12 @@ namespace CecoChat.Contracts.Messaging;
 
 public interface IChatHub
 {
-    Task Listen(ListenSubscription subscription);
-
     Task<SendMessageResponse> SendMessage(SendMessageRequest request);
 
     Task<ReactResponse> React(ReactRequest request);
 
     Task<UnReactResponse> UnReact(UnReactRequest request);
 }
-
-public sealed class ListenSubscription
-{ }
 
 public sealed class SendMessageRequest
 {
