@@ -30,7 +30,7 @@ public partial class ChatHub
         _sendersProducer.ProduceMessage(backplaneMessage);
 
         ListenNotification notification = _mapper.CreateListenNotification(request, userClaims.UserId);
-        await Clients.OthersInGroup(_clientContainer.GetGroupName(userClaims.UserId)).Notify(notification);
+        await _clientContainer.NotifyInGroup(notification, userClaims.UserId, excluding: Context.ConnectionId);
 
         return new ReactResponse();
     }
@@ -56,7 +56,7 @@ public partial class ChatHub
         _sendersProducer.ProduceMessage(backplaneMessage);
 
         ListenNotification notification = _mapper.CreateListenNotification(request, userClaims.UserId);
-        await Clients.OthersInGroup(_clientContainer.GetGroupName(userClaims.UserId)).Notify(notification);
+        await _clientContainer.NotifyInGroup(notification, userClaims.UserId, excluding: Context.ConnectionId);
 
         return new UnReactResponse();
     }
