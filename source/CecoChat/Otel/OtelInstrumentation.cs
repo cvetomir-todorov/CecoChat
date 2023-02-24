@@ -31,6 +31,6 @@ public static class OtelInstrumentation
         public const string MessagingSystemKafka = "kafka";
         public const string MessagingDestinationKindTopic = "topic";
 
-        public const string RpcSystemGrpc = "grpc";
+        public const string RpcSystemSignalR = "signalr";
     }
 }

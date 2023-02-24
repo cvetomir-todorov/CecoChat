@@ -1,5 +1,6 @@
 using Autofac;
 using CecoChat.AspNet.Otel;
+using CecoChat.AspNet.SignalR.Telemetry;
 using CecoChat.Autofac;
 using CecoChat.Client.IDGen;
 using CecoChat.Contracts.Backplane;
@@ -19,6 +20,7 @@ using CecoChat.Server.Messaging.Clients;
 using CecoChat.Server.Messaging.HostedServices;
 using CecoChat.Server.Messaging.Telemetry;
 using Confluent.Kafka;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
@@ -93,7 +95,11 @@ public class Startup
                 // the server sends data to keep the connection alive
                 signalr.KeepAliveInterval = _clientOptions.KeepAliveInterval;
             })
-            .AddMessagePackProtocol();
+            .AddMessagePackProtocol()
+            .AddHubOptions<ChatHub>(chatHub =>
+            {
+                chatHub.AddFilter<SignalRTelemetryFilter>();
+            });
 
         // common
         services.AddOptions();
@@ -109,23 +115,15 @@ public class Startup
         services.AddOpenTelemetryTracing(tracing =>
         {
             tracing.SetResourceBuilder(serviceResourceBuilder);
-            tracing.AddAspNetCoreInstrumentation(aspnet =>
-            {
-                HashSet<string> excludedPaths = new()
-                {
-                    _prometheusOptions.ScrapeEndpointPath, HealthPaths.Health, HealthPaths.Startup, HealthPaths.Live, HealthPaths.Ready
-                };
-                aspnet.Filter = httpContext => !excludedPaths.Contains(httpContext.Request.Path);
-            });
+            tracing.AddSignalRInstrumentation();
             tracing.AddKafkaInstrumentation();
-            tracing.AddGrpcClientInstrumentation(grpc => grpc.SuppressDownstreamInstrumentation = true);
             tracing.ConfigureSampling(_otelSamplingOptions);
             tracing.ConfigureJaegerExporter(_jaegerOptions);
         });
         services.AddOpenTelemetryMetrics(metrics =>
         {
             metrics.SetResourceBuilder(serviceResourceBuilder);
-            metrics.AddAspNetCoreInstrumentation();
+            metrics.AddSignalRInstrumentation();
             metrics.AddMessagingInstrumentation();
             metrics.ConfigurePrometheusAspNetExporter(_prometheusOptions);
         });
@@ -176,6 +174,7 @@ public class Startup
         // clients
         builder.RegisterType<ClientContainer>().As<IClientContainer>().SingleInstance();
         builder.RegisterType<InputValidator>().As<IInputValidator>().SingleInstance();
+        builder.RegisterModule(new SignalRTelemetryAutofacModule());
 
         // idgen
         IConfiguration idGenConfiguration = Configuration.GetSection("IDGen");
