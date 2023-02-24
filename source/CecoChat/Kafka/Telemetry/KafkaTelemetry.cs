@@ -8,11 +8,11 @@ namespace CecoChat.Kafka.Telemetry;
 
 public interface IKafkaTelemetry
 {
-    Activity StartProducer<TKey, TValue>(Message<TKey, TValue> message, string producerID, string topic, int? partition = null);
+    Activity StartProducer<TKey, TValue>(Message<TKey, TValue> message, string producerId, string topic, int? partition = null);
 
     void StopProducer(Activity activity, bool operationSuccess);
 
-    Activity? StartConsumer<TKey, TValue>(ConsumeResult<TKey, TValue> consumeResult, string consumerID);
+    Activity? StartConsumer<TKey, TValue>(ConsumeResult<TKey, TValue> consumeResult, string consumerId);
 
     void StopConsumer(Activity? activity, bool operationSuccess);
 }
@@ -30,7 +30,7 @@ internal sealed class KafkaTelemetry : IKafkaTelemetry
         _telemetry = telemetry;
     }
 
-    public Activity StartProducer<TKey, TValue>(Message<TKey, TValue> message, string producerID, string topic, int? partition = null)
+    public Activity StartProducer<TKey, TValue>(Message<TKey, TValue> message, string producerId, string topic, int? partition = null)
     {
         Activity? parent = Activity.Current;
         Activity activity = _telemetry.Start(
@@ -44,7 +44,7 @@ internal sealed class KafkaTelemetry : IKafkaTelemetry
         // so we set the current activity to the previous one
         Activity.Current = parent;
 
-        string displayName = $"Producer:{producerID} -> Topic:{topic}";
+        string displayName = $"Producer:{producerId} -> Topic:{topic}";
         EnrichActivity(topic, partition, displayName, activity);
         InjectTraceData(activity.Context, message);
 
@@ -57,7 +57,7 @@ internal sealed class KafkaTelemetry : IKafkaTelemetry
         _telemetry.Stop(activity, operationSuccess, relyOnDefaultPolicyOfSettingCurrentActivity: false);
     }
 
-    public Activity? StartConsumer<TKey, TValue>(ConsumeResult<TKey, TValue> consumeResult, string consumerID)
+    public Activity? StartConsumer<TKey, TValue>(ConsumeResult<TKey, TValue> consumeResult, string consumerId)
     {
         if (!TryExtractTraceData(consumeResult, out ActivityContext parentContext))
         {
@@ -71,7 +71,7 @@ internal sealed class KafkaTelemetry : IKafkaTelemetry
             ActivityKind.Consumer,
             parentContext);
 
-        string displayName = $"Consumer:{consumerID} <- Topic:{consumeResult.Topic}";
+        string displayName = $"Consumer:{consumerId} <- Topic:{consumeResult.Topic}";
         EnrichActivity(consumeResult.Topic, consumeResult.Partition, displayName, activity);
 
         return activity;
