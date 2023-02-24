@@ -31,6 +31,9 @@ public static class OtelInstrumentation
         public const string MessagingSystemKafka = "kafka";
         public const string MessagingDestinationKindTopic = "topic";
 
+        public const string MessagingSystemSignalR = "signalr";
+        public const string MessagingDestinationKindClientGroup = "client_group";
+
         public const string RpcSystemSignalR = "signalr";
     }
 }

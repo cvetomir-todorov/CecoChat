@@ -1,5 +1,7 @@
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Globalization;
+using CecoChat.AspNet.SignalR.Telemetry;
 using CecoChat.Contracts.Messaging;
 using CecoChat.Server.Messaging.Telemetry;
 using Microsoft.AspNetCore.SignalR;
@@ -19,16 +21,23 @@ public interface IClientContainer
 
 public class ClientContainer : IClientContainer
 {
+    private readonly ILogger _logger;
     private readonly IHubContext<ChatHub, IChatListener> _hubContext;
     private readonly IMessagingTelemetry _messagingTelemetry;
+    private readonly ISignalRTelemetry _signalRTelemetry;
     private readonly ConcurrentDictionary<long, ClientContext> _clients;
 
     public ClientContainer(
+        ILogger<ClientContainer> logger,
+        IHubContext<ChatHub, IChatListener> hubContext,
         IMessagingTelemetry messagingTelemetry,
-        IHubContext<ChatHub, IChatListener> hubContext)
+        ISignalRTelemetry signalRTelemetry)
     {
-        _messagingTelemetry = messagingTelemetry;
+        _logger = logger;
         _hubContext = hubContext;
+        _messagingTelemetry = messagingTelemetry;
+        _signalRTelemetry = signalRTelemetry;
+
         // max 64 000 clients per server
         _clients = new(capacity: 8000, concurrencyLevel: Environment.ProcessorCount);
     }
@@ -59,13 +68,32 @@ public class ClientContainer : IClientContainer
     public async ValueTask NotifyInGroup(ListenNotification notification, long groupUserId, string? excluding = null)
     {
         string group = GetGroupName(groupUserId);
+        Activity? activity = _signalRTelemetry.StartGroupSendActivity(nameof(ChatHub), group, activity =>
+        {
+            activity.SetTag("cecochat.messaging.notification_type", notification.Type);
+        });
+
+        try
+        {
+            await DoNotifyInGroup(notification, group, excluding);
+            _signalRTelemetry.Succeed(activity);
+        }
+        catch (Exception exception)
+        {
+            _logger.LogError(exception, "Failed to send notification {NotificationType} to clients in group {ClientGroup}", notification.Type, group);
+            _signalRTelemetry.Fail(activity, exception);
+        }
+    }
+
+    private Task DoNotifyInGroup(ListenNotification notification, string group, string? excluding)
+    {
         if (excluding == null)
         {
-            await _hubContext.Clients.Group(group).Notify(notification);
+            return _hubContext.Clients.Group(group).Notify(notification);
         }
         else
         {
-            await _hubContext.Clients.GroupExcept(group, excludedConnectionId1: excluding).Notify(notification);
+            return _hubContext.Clients.GroupExcept(group, excludedConnectionId1: excluding).Notify(notification);
         }
     }
 
