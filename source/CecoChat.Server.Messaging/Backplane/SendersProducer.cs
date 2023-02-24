@@ -64,6 +64,21 @@ public sealed class SendersProducer : ISendersProducer
 
     private void DeliveryHandler(bool isDelivered, DeliveryReport<Null, BackplaneMessage> report, Activity activity)
     {
+        Activity? previousActivity = Activity.Current;
+        Activity.Current = activity;
+
+        try
+        {
+            NotifyDelivery(isDelivered, report);
+        }
+        finally
+        {
+            Activity.Current = previousActivity;
+        }
+    }
+
+    private void NotifyDelivery(bool isDelivered, DeliveryReport<Null, BackplaneMessage> report)
+    {
         BackplaneMessage backplaneMessage = report.Message.Value;
         if (isDelivered)
         {

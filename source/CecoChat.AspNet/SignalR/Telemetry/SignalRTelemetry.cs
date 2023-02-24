@@ -8,7 +8,15 @@ namespace CecoChat.AspNet.SignalR.Telemetry;
 
 public interface ISignalRTelemetry : IDisposable
 {
-    Activity? Start(HubInvocationContext context, Action<Activity>? enrich = null);
+    /// <summary>
+    /// Used when a client is invoking a hub method.
+    /// </summary>
+    Activity? StartHubInvocationActivity(HubInvocationContext context, Action<Activity>? enrich = null);
+
+    /// <summary>
+    /// Used when a server is sending messages to clients in a group.
+    /// </summary>
+    Activity? StartGroupSendActivity(string hubName, string clientGroupName, Action<Activity>? enrich = null);
 
     void Succeed(Activity? activity);
 
@@ -31,7 +39,7 @@ public sealed class SignalRTelemetry : ISignalRTelemetry
         _meter.Dispose();
     }
 
-    public Activity? Start(HubInvocationContext context, Action<Activity>? enrich = null)
+    public Activity? StartHubInvocationActivity(HubInvocationContext context, Action<Activity>? enrich = null)
     {
         // we want this to be a root span for a new trace
         Activity.Current = null;
@@ -39,8 +47,8 @@ public sealed class SignalRTelemetry : ISignalRTelemetry
         Activity? activity = SignalRInstrumentation.ActivitySource.StartActivity(SignalRInstrumentation.ActivityName, ActivityKind.Server);
         if (activity != null)
         {
-            string rpcService = context.HubMethod.DeclaringType!.Name.ToLowerInvariant();
-            string rpcMethod = context.HubMethodName.ToLowerInvariant();
+            string rpcService = context.HubMethod.DeclaringType!.Name;
+            string rpcMethod = context.HubMethodName;
             activity.DisplayName = $"{rpcService}/{rpcMethod}";
 
             activity.SetTag(OtelInstrumentation.Keys.RpcSystem, OtelInstrumentation.Values.RpcSystemSignalR);
@@ -56,7 +64,27 @@ public sealed class SignalRTelemetry : ISignalRTelemetry
 
         return activity;
     }
-    
+
+    public Activity? StartGroupSendActivity(string hubName, string clientGroupName, Action<Activity>? enrich = null)
+    {
+        Activity? activity = SignalRInstrumentation.ActivitySource.StartActivity(SignalRInstrumentation.ActivityName, ActivityKind.Producer);
+        if (activity != null)
+        {
+            activity.DisplayName = $"Producer:{hubName} -> Client group:{clientGroupName}";
+
+            activity.SetTag(OtelInstrumentation.Keys.MessagingSystem, OtelInstrumentation.Values.MessagingSystemSignalR);
+            activity.SetTag(OtelInstrumentation.Keys.MessagingDestinationKind, OtelInstrumentation.Values.MessagingDestinationKindClientGroup);
+            activity.SetTag(OtelInstrumentation.Keys.MessagingDestination, clientGroupName);
+
+            if (activity.IsAllDataRequested)
+            {
+                enrich?.Invoke(activity);
+            }
+        }
+
+        return activity;
+    }
+
     public void Succeed(Activity? activity)
     {
         if (activity == null)

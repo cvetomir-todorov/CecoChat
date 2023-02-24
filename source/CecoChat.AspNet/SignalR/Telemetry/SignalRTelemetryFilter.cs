@@ -14,7 +14,7 @@ public class SignalRTelemetryFilter : IHubFilter
 
     public ValueTask<object?> InvokeMethodAsync(HubInvocationContext invocationContext, Func<HubInvocationContext, ValueTask<object?>> next)
     {
-        Activity? activity = _signalRTelemetry.Start(invocationContext);
+        Activity? activity = _signalRTelemetry.StartHubInvocationActivity(invocationContext);
 
         try
         {
