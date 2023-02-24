@@ -44,7 +44,7 @@ internal sealed class KafkaTelemetry : IKafkaTelemetry
         // so we set the current activity to the previous one
         Activity.Current = parent;
 
-        string displayName = $"{activity.OperationName}/Producer:{producerID} -> Topic:{topic}";
+        string displayName = $"Producer:{producerID} -> Topic:{topic}";
         EnrichActivity(topic, partition, displayName, activity);
         InjectTraceData(activity.Context, message);
 
@@ -71,7 +71,7 @@ internal sealed class KafkaTelemetry : IKafkaTelemetry
             ActivityKind.Consumer,
             parentContext);
 
-        string displayName = $"{activity.OperationName}/Consumer:{consumerID} <- Topic:{consumeResult.Topic}";
+        string displayName = $"Consumer:{consumerID} <- Topic:{consumeResult.Topic}";
         EnrichActivity(consumeResult.Topic, consumeResult.Partition, displayName, activity);
 
         return activity;

@@ -13,8 +13,8 @@ internal static class StateInstrumentation
 
     public static class Operations
     {
-        public const string GetChats = "StateDB.GetChats";
-        public const string GetChat = "StateDB.GetChat";
-        public const string UpdateChat = "StateDB.UpdateChat";
+        public const string GetChats = "StateDB/GetChats";
+        public const string GetChat = "StateDB/GetChat";
+        public const string UpdateChat = "StateDB/UpdateChat";
     }
 }
