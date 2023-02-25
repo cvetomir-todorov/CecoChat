@@ -28,7 +28,7 @@ public partial class ChatHub
         _logger.LogTrace("User {UserId} with client {ClientId} and connection {ConnectionId} sent message {MessageId} with data {DataType} to user {ReceiverId}",
             userClaims.UserId, userClaims.ClientId, Context.ConnectionId, messageId, request.DataType, request.ReceiverId);
 
-        BackplaneMessage backplaneMessage = _mapper.CreateBackplaneMessage(request, senderId: userClaims.UserId, senderConnectionId: Context.ConnectionId, messageId);
+        BackplaneMessage backplaneMessage = _mapper.CreateBackplaneMessage(request, senderId: userClaims.UserId, initiatorConnection: Context.ConnectionId, messageId);
         _sendersProducer.ProduceMessage(backplaneMessage);
 
         ListenNotification notification = _mapper.CreateListenNotification(request, userClaims.UserId, messageId);
