@@ -4,7 +4,6 @@ using CecoChat.Cassandra;
 using CecoChat.Cassandra.Telemetry;
 using CecoChat.Data.History.Repos;
 using CecoChat.Data.History.Telemetry;
-using CecoChat.Otel;
 using Microsoft.Extensions.Configuration;
 
 namespace CecoChat.Data.History;
@@ -30,6 +29,5 @@ public sealed class HistoryDbAutofacModule : Module
         builder.RegisterType<ChatMessageRepo>().As<IChatMessageRepo>().SingleInstance();
         builder.RegisterType<HistoryTelemetry>().As<IHistoryTelemetry>().SingleInstance();
         builder.RegisterType<CassandraTelemetry>().As<ICassandraTelemetry>().SingleInstance();
-        builder.RegisterType<OtelTelemetry>().As<ITelemetry>().SingleInstance();
     }
 }

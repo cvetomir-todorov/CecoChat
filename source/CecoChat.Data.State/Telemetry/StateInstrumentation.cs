@@ -10,11 +10,12 @@ internal static class StateInstrumentation
     private static readonly Version ActivitySourceVersion = AssemblyName.Version!;
 
     internal static readonly ActivitySource ActivitySource = new(ActivitySourceName, ActivitySourceVersion.ToString());
+    internal static readonly string ActivityName = ActivitySourceName + ".Execute";
 
     public static class Operations
     {
-        public const string GetChats = "StateDB/GetChats";
-        public const string GetChat = "StateDB/GetChat";
-        public const string UpdateChat = "StateDB/UpdateChat";
+        public const string GetChats = "GetChats";
+        public const string GetChat = "GetChat";
+        public const string UpdateChat = "UpdateChat";
     }
 }

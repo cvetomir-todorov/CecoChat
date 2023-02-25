@@ -2,7 +2,7 @@ using System.Diagnostics;
 using System.Diagnostics.Metrics;
 using Cassandra;
 using CecoChat.Otel;
-using Microsoft.Extensions.Logging;
+using OpenTelemetry.Trace;
 
 namespace CecoChat.Cassandra.Telemetry;
 
@@ -10,23 +10,15 @@ public interface ICassandraTelemetry : IDisposable
 {
     void EnableMetrics(ActivitySource activitySource, string queryDurationHistogramName);
 
-    RowSet ExecuteStatement(ISession session, IStatement statement, ActivitySource activitySource, string operationName, Action<Activity>? enrich = null);
+    RowSet ExecuteStatement(ISession session, IStatement statement, ActivitySource activitySource, string activityName, string operationName, Action<Activity>? enrich = null);
 
-    Task<RowSet> ExecuteStatementAsync(ISession session, IStatement statement, ActivitySource activitySource, string operationName, Action<Activity>? enrich = null);
+    Task<RowSet> ExecuteStatementAsync(ISession session, IStatement statement, ActivitySource activitySource, string activityName, string operationName, Action<Activity>? enrich = null);
 }
 
 public sealed class CassandraTelemetry : ICassandraTelemetry
 {
-    private readonly ILogger _logger;
-    private readonly ITelemetry _telemetry;
     private Meter? _meter;
     private Histogram<double>? _queryDuration;
-
-    public CassandraTelemetry(ILogger<CassandraTelemetry> logger, ITelemetry telemetry)
-    {
-        _logger = logger;
-        _telemetry = telemetry;
-    }
 
     public void Dispose()
     {
@@ -39,69 +31,104 @@ public sealed class CassandraTelemetry : ICassandraTelemetry
         _queryDuration = _meter.CreateHistogram<double>(queryDurationHistogramName, "ms", "measures the duration of the outbound Cassandra query");
     }
 
-    public RowSet ExecuteStatement(ISession session, IStatement statement, ActivitySource activitySource, string operationName, Action<Activity>? enrich = null)
+    public RowSet ExecuteStatement(ISession session, IStatement statement, ActivitySource activitySource, string activityName, string operationName, Action<Activity>? enrich = null)
     {
-        Activity activity = StartClientActivity(activitySource, operationName, enrich);
+        Activity? activity = StartActivity(session, activitySource, activityName, operationName, enrich);
 
         try
         {
             RowSet rows = session.Execute(statement);
-            activity.SetStatus(ActivityStatusCode.Ok);
+            Succeed(activity);
+
             return rows;
         }
-        catch
+        catch (Exception exception)
         {
-            activity.SetStatus(ActivityStatusCode.Error);
+            Fail(activity, exception);
             throw;
-        }
-        finally
-        {
-            activity.Stop();
-            RecordMetrics(activity);
         }
     }
 
-    public async Task<RowSet> ExecuteStatementAsync(ISession session, IStatement statement, ActivitySource activitySource, string operationName, Action<Activity>? enrich = null)
+    public async Task<RowSet> ExecuteStatementAsync(ISession session, IStatement statement, ActivitySource activitySource, string activityName, string operationName, Action<Activity>? enrich = null)
     {
-        Activity activity = StartClientActivity(activitySource, operationName, enrich);
+        Activity? activity = StartActivity(session, activitySource, activityName, operationName, enrich);
 
         try
         {
             RowSet rowSet = await session.ExecuteAsync(statement);
-            activity.SetStatus(ActivityStatusCode.Ok);
+            Succeed(activity);
+
             return rowSet;
         }
-        catch
+        catch (Exception exception)
         {
-            activity.SetStatus(ActivityStatusCode.Error);
+            Fail(activity, exception);
             throw;
-        }
-        finally
-        {
-            activity.Stop();
-            RecordMetrics(activity);
         }
     }
 
-    private Activity StartClientActivity(ActivitySource activitySource, string operationName, Action<Activity>? enrich)
+    private static Activity? StartActivity(ISession session, ActivitySource activitySource, string activityName, string operationName, Action<Activity>? enrich)
     {
-        Activity activity = _telemetry.Start(operationName, activitySource, ActivityKind.Client, Activity.Current?.Context);
+        Activity? activity = activitySource.StartActivity(activityName, ActivityKind.Client);
 
-        if (activity.IsAllDataRequested && enrich != null)
+        if (activity != null)
         {
-            enrich(activity);
+            activity.DisplayName = $"{session.Keyspace}/{operationName}";
+
+            activity.SetTag(OtelInstrumentation.Keys.DbSystem, OtelInstrumentation.Values.DbSystemCassandra);
+            activity.SetTag(OtelInstrumentation.Keys.DbName, session.Keyspace);
+            activity.SetTag(OtelInstrumentation.Keys.DbSessionName, session.SessionName);
+            activity.SetTag(OtelInstrumentation.Keys.DbOperation, operationName);
+
+            if (activity.IsAllDataRequested)
+            {
+                enrich?.Invoke(activity);
+            }
         }
 
         return activity;
     }
 
-    private void RecordMetrics(Activity activity)
+    private void Succeed(Activity? activity)
+    {
+        if (activity == null)
+        {
+            return;
+        }
+
+        activity.Stop();
+        activity.SetStatus(ActivityStatusCode.Ok);
+        Record(activity);
+    }
+
+    private void Fail(Activity? activity, Exception? exception)
+    {
+        if (activity == null)
+        {
+            return;
+        }
+
+        activity.Stop();
+
+        if (activity.IsAllDataRequested && exception != null)
+        {
+            activity.SetStatus(Status.Error.WithDescription(exception.Message));
+        }
+        else
+        {
+            activity.SetStatus(ActivityStatusCode.Error);
+        }
+
+        Record(activity);
+    }
+
+    private void Record(Activity activity)
     {
         if (!activity.IsStopped)
         {
-            _logger.LogWarning("Logging metrics for activity that is not stopped");
-            return;
+            throw new InvalidOperationException("Activity should have already been stopped");
         }
+
         if (_queryDuration != null)
         {
             TagList tags = new();

@@ -1,7 +1,5 @@
-﻿using System.Diagnostics;
-using Cassandra;
+﻿using Cassandra;
 using CecoChat.Cassandra.Telemetry;
-using CecoChat.Otel;
 
 namespace CecoChat.Data.History.Telemetry;
 
@@ -33,45 +31,56 @@ internal sealed class HistoryTelemetry : IHistoryTelemetry
 
     public void AddDataMessage(ISession session, IStatement statement, long messageId)
     {
-        _cassandraTelemetry.ExecuteStatement(session, statement, HistoryInstrumentation.ActivitySource, HistoryInstrumentation.Operations.AddDataMessage, activity =>
-        {
-            Enrich(HistoryInstrumentation.Operations.AddDataMessage, session, activity);
-            activity.SetTag("message.id", messageId);
-        });
+        _cassandraTelemetry.ExecuteStatement(
+            session,
+            statement,
+            HistoryInstrumentation.ActivitySource,
+            HistoryInstrumentation.ActivityName,
+            operationName: HistoryInstrumentation.Operations.AddDataMessage,
+            enrich: activity =>
+            {
+                activity.SetTag("cecochat.message_id", messageId);
+            });
     }
 
     public Task<RowSet> GetHistoryAsync(ISession session, IStatement statement, long userId)
     {
-        return _cassandraTelemetry.ExecuteStatementAsync(session, statement, HistoryInstrumentation.ActivitySource, HistoryInstrumentation.Operations.GetHistory, activity =>
-        {
-            Enrich(HistoryInstrumentation.Operations.GetHistory, session, activity);
-            activity.SetTag("user.id", userId);
-        });
+        return _cassandraTelemetry.ExecuteStatementAsync(
+            session,
+            statement,
+            HistoryInstrumentation.ActivitySource,
+            HistoryInstrumentation.ActivityName,
+            operationName: HistoryInstrumentation.Operations.GetHistory,
+            enrich: activity =>
+            {
+                activity.SetTag("cecochat.user_id", userId);
+            });
     }
 
     public void SetReaction(ISession session, IStatement statement, long reactorId)
     {
-        _cassandraTelemetry.ExecuteStatement(session, statement, HistoryInstrumentation.ActivitySource, HistoryInstrumentation.Operations.SetReaction, activity =>
-        {
-            Enrich(HistoryInstrumentation.Operations.SetReaction, session, activity);
-            activity.SetTag("reaction.reactor_id", reactorId);
-        });
+        _cassandraTelemetry.ExecuteStatement(
+            session,
+            statement,
+            HistoryInstrumentation.ActivitySource,
+            HistoryInstrumentation.ActivityName,
+            operationName: HistoryInstrumentation.Operations.SetReaction,
+            enrich: activity =>
+            {
+                activity.SetTag("cecochat.reactor_id", reactorId);
+            });
     }
 
     public void UnsetReaction(ISession session, IStatement statement, long reactorId)
     {
-        _cassandraTelemetry.ExecuteStatement(session, statement, HistoryInstrumentation.ActivitySource, HistoryInstrumentation.Operations.UnsetReaction, activity =>
-        {
-            Enrich(HistoryInstrumentation.Operations.UnsetReaction, session, activity);
-            activity.SetTag("reaction.reactor_id", reactorId);
-        });
-    }
-
-    private static void Enrich(string operation, ISession session, Activity activity)
-    {
-        activity.SetTag(OtelInstrumentation.Keys.DbOperation, operation);
-        activity.SetTag(OtelInstrumentation.Keys.DbSystem, OtelInstrumentation.Values.DbSystemCassandra);
-        activity.SetTag(OtelInstrumentation.Keys.DbName, session.Keyspace);
-        activity.SetTag(OtelInstrumentation.Keys.DbSessionName, session.SessionName);
+        _cassandraTelemetry.ExecuteStatement(session,
+            statement,
+            HistoryInstrumentation.ActivitySource,
+            HistoryInstrumentation.ActivityName,
+            operationName: HistoryInstrumentation.Operations.UnsetReaction,
+            enrich: activity =>
+            {
+                activity.SetTag("cecochat.reactor_id", reactorId);
+            });
     }
 }
