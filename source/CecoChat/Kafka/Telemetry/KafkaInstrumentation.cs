@@ -10,10 +10,5 @@ internal static class KafkaInstrumentation
     private static readonly Version ActivitySourceVersion = AssemblyName.Version!;
 
     internal static readonly ActivitySource ActivitySource = new(ActivitySourceName, ActivitySourceVersion.ToString());
-
-    public static class Operations
-    {
-        public const string Production = "Kafka.Production";
-        public const string Consumption = "Kafka.Consumption";
-    }
+    internal static readonly string ActivityName = ActivitySourceName + ".Execute";
 }

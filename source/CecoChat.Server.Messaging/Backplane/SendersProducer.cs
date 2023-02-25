@@ -62,10 +62,12 @@ public sealed class SendersProducer : ISendersProducer
         _producer.Produce(kafkaMessage, topicPartition, DeliveryHandler);
     }
 
-    private void DeliveryHandler(bool isDelivered, DeliveryReport<Null, BackplaneMessage> report, Activity activity)
+    private void DeliveryHandler(bool isDelivered, DeliveryReport<Null, BackplaneMessage> report, Activity? produceActivity)
     {
+        // add any child activities of the delivery handler to the active activity when the message was produced
+        // and restore the previous activity afterwards
         Activity? previousActivity = Activity.Current;
-        Activity.Current = activity;
+        Activity.Current = produceActivity;
 
         try
         {

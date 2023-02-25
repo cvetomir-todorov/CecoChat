@@ -2,85 +2,69 @@
 using System.Text;
 using CecoChat.Otel;
 using Confluent.Kafka;
-using Microsoft.Extensions.Logging;
+using OpenTelemetry.Trace;
 
 namespace CecoChat.Kafka.Telemetry;
 
 public interface IKafkaTelemetry
 {
-    Activity StartProducer<TKey, TValue>(Message<TKey, TValue> message, string producerId, string topic, int? partition = null);
+    Activity? StartProducer<TKey, TValue>(Message<TKey, TValue> message, string producerId, string topic, int? partition = null);
 
-    void StopProducer(Activity activity, bool operationSuccess);
+    void StopProducer(Activity? activity, bool success, Exception? exception);
 
     Activity? StartConsumer<TKey, TValue>(ConsumeResult<TKey, TValue> consumeResult, string consumerId);
 
-    void StopConsumer(Activity? activity, bool operationSuccess);
+    void StopConsumer(Activity? activity, bool success, Exception? exception);
 }
 
 internal sealed class KafkaTelemetry : IKafkaTelemetry
 {
-    private readonly ILogger _logger;
-    private readonly ITelemetry _telemetry;
-
-    public KafkaTelemetry(
-        ILogger<KafkaTelemetry> logger,
-        ITelemetry telemetry)
-    {
-        _logger = logger;
-        _telemetry = telemetry;
-    }
-
-    public Activity StartProducer<TKey, TValue>(Message<TKey, TValue> message, string producerId, string topic, int? partition = null)
+    public Activity? StartProducer<TKey, TValue>(Message<TKey, TValue> message, string producerId, string topic, int? partition = null)
     {
         Activity? parent = Activity.Current;
-        Activity activity = _telemetry.Start(
-            KafkaInstrumentation.Operations.Production,
-            KafkaInstrumentation.ActivitySource,
-            ActivityKind.Producer,
-            parent?.Context);
+        Activity? activity = KafkaInstrumentation.ActivitySource.StartActivity(KafkaInstrumentation.ActivityName, ActivityKind.Producer);
 
         // activity will be completed in the delivery handler thread
         // and we don't want to pollute the execution context
         // so we set the current activity to the previous one
         Activity.Current = parent;
 
-        string displayName = $"Producer:{producerId} -> Topic:{topic}";
-        EnrichActivity(topic, partition, displayName, activity);
-        InjectTraceData(activity.Context, message);
+        if (activity != null)
+        {
+            string displayName = $"Producer:{producerId} -> Topic:{topic}";
+            EnrichActivity(topic, partition, displayName, activity);
+            InjectTraceData(activity.Context, message);
+        }
 
         return activity;
     }
 
-    public void StopProducer(Activity activity, bool operationSuccess)
+    public void StopProducer(Activity? activity, bool success, Exception? exception)
     {
-        // do not change the Activity.Current
-        _telemetry.Stop(activity, operationSuccess, relyOnDefaultPolicyOfSettingCurrentActivity: false);
+        StopActivity(activity, success, exception);
     }
 
     public Activity? StartConsumer<TKey, TValue>(ConsumeResult<TKey, TValue> consumeResult, string consumerId)
     {
         if (!TryExtractTraceData(consumeResult, out ActivityContext parentContext))
         {
-            _logger.LogWarning("Message from topic {Topic} in partition {Partition} has missing trace ID data", consumeResult.Topic, consumeResult.Partition.Value);
+            // the trace isn't sampled, so we don't need to start a new activity
             return null;
         }
 
-        Activity activity = _telemetry.Start(
-            KafkaInstrumentation.Operations.Consumption,
-            KafkaInstrumentation.ActivitySource,
-            ActivityKind.Consumer,
-            parentContext);
-
-        string displayName = $"Consumer:{consumerId} <- Topic:{consumeResult.Topic}";
-        EnrichActivity(consumeResult.Topic, consumeResult.Partition, displayName, activity);
+        Activity? activity = KafkaInstrumentation.ActivitySource.StartActivity(KafkaInstrumentation.ActivityName, ActivityKind.Consumer, parentContext);
+        if (activity != null)
+        {
+            string displayName = $"Consumer:{consumerId} <- Topic:{consumeResult.Topic}";
+            EnrichActivity(consumeResult.Topic, consumeResult.Partition, displayName, activity);
+        }
 
         return activity;
     }
 
-    public void StopConsumer(Activity? activity, bool operationSuccess)
+    public void StopConsumer(Activity? activity, bool success, Exception? exception)
     {
-        // do not change the Activity.Current
-        _telemetry.Stop(activity, operationSuccess, relyOnDefaultPolicyOfSettingCurrentActivity: false);
+        StopActivity(activity, success, exception);
     }
 
     private static void InjectTraceData<TKey, TValue>(ActivityContext activityContext, Message<TKey, TValue> message)
@@ -137,18 +121,41 @@ internal sealed class KafkaTelemetry : IKafkaTelemetry
 
     private static void EnrichActivity(string topic, int? partition, string displayName, Activity activity)
     {
-        if (activity.IsAllDataRequested)
+        activity.DisplayName = displayName;
+
+        activity.SetTag(OtelInstrumentation.Keys.MessagingSystem, OtelInstrumentation.Values.MessagingSystemKafka);
+        activity.SetTag(OtelInstrumentation.Keys.MessagingDestinationKind, OtelInstrumentation.Values.MessagingDestinationKindTopic);
+        activity.SetTag(OtelInstrumentation.Keys.MessagingDestination, topic);
+
+        if (partition.HasValue)
         {
-            activity.DisplayName = displayName;
+            activity.SetTag(OtelInstrumentation.Keys.MessagingKafkaPartition, partition.Value);
+        }
+    }
 
-            activity.SetTag(OtelInstrumentation.Keys.MessagingSystem, OtelInstrumentation.Values.MessagingSystemKafka);
-            activity.SetTag(OtelInstrumentation.Keys.MessagingDestinationKind, OtelInstrumentation.Values.MessagingDestinationKindTopic);
-            activity.SetTag(OtelInstrumentation.Keys.MessagingDestination, topic);
-
-            if (partition.HasValue)
+    private void StopActivity(Activity? activity, bool success, Exception? exception)
+    {
+        if (activity != null)
+        {
+            Status status;
+            if (success)
             {
-                activity.SetTag(OtelInstrumentation.Keys.MessagingKafkaPartition, partition.Value);
+                status = Status.Ok;
             }
+            else
+            {
+                if (exception != null)
+                {
+                    status = Status.Error.WithDescription(exception.Message);
+                }
+                else
+                {
+                    status = Status.Error;
+                }
+            }
+
+            activity.SetStatus(status);
+            activity.Stop();
         }
     }
 }
