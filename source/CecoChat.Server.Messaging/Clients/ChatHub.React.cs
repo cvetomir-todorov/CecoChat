@@ -26,7 +26,7 @@ public partial class ChatHub
         _logger.LogTrace("User {UserId} with client {ClientId} and connection {ConnectionId} reacted with {Reaction} to message {MessageId} sent by user {SenderId}",
             userClaims.UserId, userClaims.ClientId, Context.ConnectionId, request.Reaction, request.MessageId, request.SenderId);
 
-        BackplaneMessage backplaneMessage = _mapper.CreateBackplaneMessage(request, senderConnectionId: Context.ConnectionId, reactorId: userClaims.UserId);
+        BackplaneMessage backplaneMessage = _mapper.CreateBackplaneMessage(request, initiatorConnection: Context.ConnectionId, reactorId: userClaims.UserId);
         _sendersProducer.ProduceMessage(backplaneMessage);
 
         ListenNotification notification = _mapper.CreateListenNotification(request, userClaims.UserId);
@@ -52,7 +52,7 @@ public partial class ChatHub
         _logger.LogTrace("User {UserId} with client {ClientId} and connection {ConnectionId} un-reacted to message {MessageId} sent by user {SenderId}",
             userClaims.UserId, userClaims.ClientId, Context.ConnectionId, request.MessageId, request.SenderId);
 
-        BackplaneMessage backplaneMessage = _mapper.CreateBackplaneMessage(request, senderConnectionId: Context.ConnectionId, reactorId: userClaims.UserId);
+        BackplaneMessage backplaneMessage = _mapper.CreateBackplaneMessage(request, initiatorConnection: Context.ConnectionId, reactorId: userClaims.UserId);
         _sendersProducer.ProduceMessage(backplaneMessage);
 
         ListenNotification notification = _mapper.CreateListenNotification(request, userClaims.UserId);

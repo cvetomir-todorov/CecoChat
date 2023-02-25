@@ -9,7 +9,7 @@ message BackplaneMessage {
   int64 message_id = 1;
   int64 sender_id = 2;
   int64 receiver_id = 3;
-  string sender_connection_id = 4;
+  string initiator_connection = 4;
   int64 target_user_id = 5;
   MessageType type = 6;
   oneof message_data {
