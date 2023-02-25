@@ -1,4 +1,4 @@
-namespace CecoChat.AspNet.Otel;
+namespace CecoChat.AspNet.Prometheus;
 
 public sealed class PrometheusOptions
 {

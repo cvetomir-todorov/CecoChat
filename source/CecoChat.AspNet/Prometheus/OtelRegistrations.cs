@@ -1,6 +1,6 @@
 ﻿using OpenTelemetry.Metrics;
 
-namespace CecoChat.AspNet.Otel;
+namespace CecoChat.AspNet.Prometheus;
 
 public static class OtelRegistrations
 {

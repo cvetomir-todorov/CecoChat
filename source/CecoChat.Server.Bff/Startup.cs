@@ -1,6 +1,6 @@
 using System.Reflection;
 using Autofac;
-using CecoChat.AspNet.Otel;
+using CecoChat.AspNet.Prometheus;
 using CecoChat.AspNet.Swagger;
 using CecoChat.Autofac;
 using CecoChat.Client.History;
