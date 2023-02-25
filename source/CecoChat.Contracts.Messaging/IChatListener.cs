@@ -10,7 +10,6 @@ public sealed class ListenNotification
     public long MessageId { get; set; }
     public long SenderId { get; set; }
     public long ReceiverId { get; set; }
-    public int SequenceNumber { get; set; }
     public MessageType Type { get; set; }
     public DeliveryStatus DeliveryStatus { get; set; }
     public NotificationData? Data { get; set; }

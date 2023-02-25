@@ -26,8 +26,7 @@ public class ChangeHandler
         {
             MessageId = notification.MessageId,
             SenderId = notification.SenderId,
-            ReceiverId = notification.ReceiverId,
-            SequenceNumber = notification.SequenceNumber,
+            ReceiverId = notification.ReceiverId
         };
 
         switch (notification.Data.Type)

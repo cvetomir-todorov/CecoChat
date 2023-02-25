@@ -8,7 +8,6 @@ public sealed class Message
     public DataType DataType { get; set; }
     public string Data { get; set; } = string.Empty;
     public IDictionary<long, string> Reactions { get; }
-    public int SequenceNumber { get; set; }
 
     public Message()
     {

@@ -82,9 +82,7 @@ public sealed class OneChatState : State
             reactions = reactionsBuilder.ToString();
         }
 
-        Console.WriteLine("[{0:F}] {1}: {2} (#{3}|ID: {4} |{5} reaction(s):{6})",
-            message.MessageId.ToTimestamp(), sender, message.Data,
-            message.SequenceNumber, message.MessageId,
-            message.Reactions.Count, reactions);
+        Console.WriteLine("[{0:F}] {1}: {2} (ID: {3} |{4} reaction(s):{5})",
+            message.MessageId.ToTimestamp(), sender, message.Data, message.MessageId, message.Reactions.Count, reactions);
     }
 }
