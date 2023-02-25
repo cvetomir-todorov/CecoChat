@@ -1,5 +1,5 @@
 using Autofac;
-using CecoChat.AspNet.Otel;
+using CecoChat.AspNet.Prometheus;
 using CecoChat.AspNet.SignalR.Telemetry;
 using CecoChat.Autofac;
 using CecoChat.Client.IDGen;
