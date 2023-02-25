@@ -10,12 +10,13 @@ internal static class HistoryInstrumentation
     private static readonly Version ActivitySourceVersion = AssemblyName.Version!;
 
     internal static readonly ActivitySource ActivitySource = new(ActivitySourceName, ActivitySourceVersion.ToString());
+    internal static readonly string ActivityName = ActivitySourceName + ".Execute";
 
-    public static class Operations
+    internal static class Operations
     {
-        public const string AddDataMessage = "HistoryDB/AddDataMessage";
-        public const string GetHistory = "HistoryDB/GetHistory";
-        public const string SetReaction = "HistoryDB/SetReaction";
-        public const string UnsetReaction = "HistoryDB/UnsetReaction";
+        public const string AddDataMessage = "AddDataMessage";
+        public const string GetHistory = "GetHistory";
+        public const string SetReaction = "SetReaction";
+        public const string UnsetReaction = "UnsetReaction";
     }
 }
