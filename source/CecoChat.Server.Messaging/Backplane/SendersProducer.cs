@@ -55,7 +55,7 @@ public sealed class SendersProducer : ISendersProducer
 
     public void ProduceMessage(BackplaneMessage message)
     {
-        int partition = _partitionUtility.ChoosePartition(message.ReceiverId, PartitionCount);
+        int partition = _partitionUtility.ChoosePartition(message.TargetUserId, PartitionCount);
         TopicPartition topicPartition = _partitionFlyweight.GetTopicPartition(_backplaneOptions.TopicMessagesByReceiver, partition);
         Message<Null, BackplaneMessage> kafkaMessage = new() { Value = message };
 
