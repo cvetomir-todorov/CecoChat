@@ -17,7 +17,7 @@ public interface IKafkaProducer<TKey, TValue> : IDisposable
     void FlushPendingMessages();
 }
 
-public delegate void DeliveryHandler<TKey, TValue>(bool isDelivered, DeliveryReport<TKey, TValue> report, Activity activity);
+public delegate void DeliveryHandler<TKey, TValue>(bool isDelivered, DeliveryReport<TKey, TValue> report, Activity? produceActivity);
 
 public sealed class KafkaProducer<TKey, TValue> : IKafkaProducer<TKey, TValue>
 {
@@ -76,15 +76,23 @@ public sealed class KafkaProducer<TKey, TValue> : IKafkaProducer<TKey, TValue>
         string topic = topicPartition.Topic;
         int partition = topicPartition.Partition;
 
-        Activity activity = _kafkaTelemetry.StartProducer(message, _producerOptions!.ProducerId, topic, partition);
-        _producer.Produce(topicPartition, message, deliveryReport => HandleDeliveryReport(deliveryReport, activity, deliveryHandler));
+        Activity? activity = _kafkaTelemetry.StartProducer(message, _producerOptions!.ProducerId, topic, partition);
+        try
+        {
+            _producer.Produce(topicPartition, message, deliveryReport => HandleDeliveryReport(deliveryReport, activity, deliveryHandler));
+        }
+        catch (Exception exception)
+        {
+            _kafkaTelemetry.StopProducer(activity, success: false, exception);
+            throw;
+        }
     }
 
     public void Produce(Message<TKey, TValue> message, string topic, DeliveryHandler<TKey, TValue>? deliveryHandler = null)
     {
         EnsureInitialized();
 
-        Activity activity = _kafkaTelemetry.StartProducer(message, _producerOptions!.ProducerId, topic);
+        Activity? activity = _kafkaTelemetry.StartProducer(message, _producerOptions!.ProducerId, topic);
         _producer.Produce(topic, message, deliveryReport => HandleDeliveryReport(deliveryReport, activity, deliveryHandler));
     }
 
@@ -116,7 +124,7 @@ public sealed class KafkaProducer<TKey, TValue> : IKafkaProducer<TKey, TValue>
         }
     }
 
-    private void HandleDeliveryReport(DeliveryReport<TKey, TValue> report, Activity activity, DeliveryHandler<TKey, TValue>? deliveryHandler)
+    private void HandleDeliveryReport(DeliveryReport<TKey, TValue> report, Activity? activity, DeliveryHandler<TKey, TValue>? deliveryHandler)
     {
         bool isDelivered = true;
         try
@@ -142,9 +150,13 @@ public sealed class KafkaProducer<TKey, TValue> : IKafkaProducer<TKey, TValue>
 
             deliveryHandler?.Invoke(isDelivered, report, activity);
         }
+        catch (Exception exception)
+        {
+            _logger.LogError(exception, "Failed to handle delivery report for message {MessageKey}->{MessageValue}", report.Message.Key, report.Message.Value);
+        }
         finally
         {
-            _kafkaTelemetry.StopProducer(activity, isDelivered);
+            _kafkaTelemetry.StopProducer(activity, isDelivered, exception: null);
         }
     }
 }

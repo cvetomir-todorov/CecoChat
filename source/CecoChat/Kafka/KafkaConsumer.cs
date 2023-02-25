@@ -111,6 +111,7 @@ public sealed class KafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey, TValue>
         ConsumeStage stage = ConsumeStage.Initial;
         ConsumeResult<TKey, TValue> consumeResult = new();
         Activity? activity = default;
+        Exception? activityException = default;
 
         try
         {
@@ -133,12 +134,13 @@ public sealed class KafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey, TValue>
         }
         catch (Exception exception)
         {
+            activityException = exception;
             _logger.LogError(exception, "Consumer {ConsumerId} error", _id);
         }
         finally
         {
             bool success = InspectStage(stage, consumeResult);
-            _kafkaTelemetry.StopConsumer(activity, success);
+            _kafkaTelemetry.StopConsumer(activity, success, activityException);
         }
     }
 
