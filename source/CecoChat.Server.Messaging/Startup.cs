@@ -6,6 +6,7 @@ using CecoChat.Client.IDGen;
 using CecoChat.Contracts.Backplane;
 using CecoChat.Data.Config;
 using CecoChat.Http.Health;
+using CecoChat.Jaeger;
 using CecoChat.Jwt;
 using CecoChat.Kafka;
 using CecoChat.Kafka.Telemetry;

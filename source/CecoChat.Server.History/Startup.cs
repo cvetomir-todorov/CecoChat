@@ -9,6 +9,7 @@ using CecoChat.Contracts.Backplane;
 using CecoChat.Data.Config;
 using CecoChat.Data.History;
 using CecoChat.Data.History.Telemetry;
+using CecoChat.Jaeger;
 using CecoChat.Jwt;
 using CecoChat.Kafka;
 using CecoChat.Kafka.Telemetry;

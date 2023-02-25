@@ -1,6 +1,6 @@
 ﻿using OpenTelemetry;
 
-namespace CecoChat.Otel;
+namespace CecoChat.Jaeger;
 
 public sealed class JaegerOptions
 {
