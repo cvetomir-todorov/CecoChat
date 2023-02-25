@@ -88,6 +88,6 @@ public sealed class ReceiversConsumer : IReceiversConsumer
     private void ProcessMessage(BackplaneMessage backplaneMessage)
     {
         ListenNotification notification = _mapper.CreateListenNotification(backplaneMessage);
-        _clientContainer.NotifyInGroup(notification, backplaneMessage.ReceiverId, excluding: backplaneMessage.SenderConnectionId);
+        _clientContainer.NotifyInGroup(notification, backplaneMessage.TargetUserId);
     }
 }

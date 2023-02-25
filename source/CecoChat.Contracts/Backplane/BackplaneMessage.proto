@@ -10,11 +10,12 @@ message BackplaneMessage {
   int64 sender_id = 2;
   int64 receiver_id = 3;
   string sender_connection_id = 4;
-  MessageType type = 5;
+  int64 target_user_id = 5;
+  MessageType type = 6;
   oneof message_data {
-    BackplaneData data = 6;
-    DeliveryStatus status = 7;
-    BackplaneReaction reaction = 8;
+    BackplaneData data = 7;
+    DeliveryStatus status = 8;
+    BackplaneReaction reaction = 9;
   }
 }
 

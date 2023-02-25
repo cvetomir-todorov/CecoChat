@@ -30,6 +30,7 @@ public class ContractMapper : IContractMapper
             SenderId = senderId,
             ReceiverId = request.ReceiverId,
             SenderConnectionId = senderConnectionId,
+            TargetUserId = request.ReceiverId,
             Type = Contracts.Backplane.MessageType.Data,
             Status = Contracts.Backplane.DeliveryStatus.Processed
         };
@@ -58,6 +59,7 @@ public class ContractMapper : IContractMapper
             SenderId = request.SenderId,
             ReceiverId = request.ReceiverId,
             SenderConnectionId = senderConnectionId,
+            TargetUserId = GetReactionTargetUserId(reactorId, request.MessageId, request.SenderId, request.ReceiverId),
             Type = Contracts.Backplane.MessageType.Reaction,
             Reaction = new BackplaneReaction
             {
@@ -77,6 +79,7 @@ public class ContractMapper : IContractMapper
             SenderId = request.SenderId,
             ReceiverId = request.ReceiverId,
             SenderConnectionId = senderConnectionId,
+            TargetUserId = GetReactionTargetUserId(reactorId, request.MessageId, request.SenderId, request.ReceiverId),
             Type = Contracts.Backplane.MessageType.Reaction,
             Reaction = new BackplaneReaction
             {
@@ -85,6 +88,26 @@ public class ContractMapper : IContractMapper
         };
 
         return message;
+    }
+
+    private static long GetReactionTargetUserId(long reactorId, long messageId, long senderId, long receiverId)
+    {
+        long targetUserId;
+
+        if (reactorId == senderId)
+        {
+            targetUserId = receiverId;
+        }
+        else if (reactorId == receiverId)
+        {
+            targetUserId = senderId;
+        }
+        else
+        {
+            throw new InvalidOperationException($"Reactor {reactorId} to message {messageId} between {senderId}->{receiverId} should be one of the participants.");
+        }
+
+        return targetUserId;
     }
 
     public ListenNotification CreateListenNotification(SendMessageRequest request, long senderId, long messageId)

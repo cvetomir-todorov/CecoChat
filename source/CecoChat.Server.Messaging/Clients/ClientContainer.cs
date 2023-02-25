@@ -87,14 +87,19 @@ public class ClientContainer : IClientContainer
 
     private Task DoNotifyInGroup(ListenNotification notification, string group, string? excluding)
     {
+        Task result;
         if (excluding == null)
         {
-            return _hubContext.Clients.Group(group).Notify(notification);
+            result = _hubContext.Clients.Group(group).Notify(notification);
         }
         else
         {
-            return _hubContext.Clients.GroupExcept(group, excludedConnectionId1: excluding).Notify(notification);
+            result = _hubContext.Clients.GroupExcept(group, excludedConnectionId1: excluding).Notify(notification);
         }
+
+        _logger.LogTrace("Sent notification for message {MessageId} from sender {SenderId} to receiver {Receiver} of type {NotificationType} to group {Group} (excluding {Excluding})",
+            notification.MessageId, notification.SenderId, notification.ReceiverId, notification.Type, group, excluding);
+        return result;
     }
 
     public IEnumerable<long> EnumerateUsers()
