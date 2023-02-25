@@ -24,16 +24,4 @@ public static class OtelRegistrations
 
         return tracing.SetSampler(sampler);
     }
-
-    public static TracerProviderBuilder ConfigureJaegerExporter(this TracerProviderBuilder tracing, JaegerOptions options)
-    {
-        return tracing
-            .AddJaegerExporter(jaeger =>
-            {
-                jaeger.AgentHost = options.AgentHost;
-                jaeger.AgentPort = options.AgentPort;
-                jaeger.ExportProcessorType = options.ExportProcessorType;
-                jaeger.BatchExportProcessorOptions.ScheduledDelayMilliseconds = options.BatchExportScheduledDelayMillis;
-            });
-    }
 }

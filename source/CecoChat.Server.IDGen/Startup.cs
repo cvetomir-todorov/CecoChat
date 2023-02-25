@@ -4,6 +4,7 @@ using Calzolari.Grpc.AspNetCore.Validation;
 using CecoChat.AspNet.Prometheus;
 using CecoChat.Autofac;
 using CecoChat.Data.Config;
+using CecoChat.Jaeger;
 using CecoChat.Otel;
 using CecoChat.Redis;
 using CecoChat.Server.Config;

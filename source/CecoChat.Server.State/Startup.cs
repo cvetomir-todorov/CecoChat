@@ -8,6 +8,7 @@ using CecoChat.Cassandra.Health;
 using CecoChat.Contracts.Backplane;
 using CecoChat.Data.State;
 using CecoChat.Data.State.Telemetry;
+using CecoChat.Jaeger;
 using CecoChat.Jwt;
 using CecoChat.Kafka;
 using CecoChat.Kafka.Telemetry;

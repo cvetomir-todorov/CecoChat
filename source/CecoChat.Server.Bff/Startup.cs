@@ -8,6 +8,7 @@ using CecoChat.Client.State;
 using CecoChat.Client.User;
 using CecoChat.Data.Config;
 using CecoChat.Http.Health;
+using CecoChat.Jaeger;
 using CecoChat.Jwt;
 using CecoChat.Otel;
 using CecoChat.Redis;
