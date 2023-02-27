@@ -104,7 +104,7 @@ public class ClientContainer : IClientContainer
 
     public IEnumerable<long> EnumerateUsers()
     {
-        foreach (KeyValuePair<long,ClientContext> pair in _clients)
+        foreach (KeyValuePair<long, ClientContext> pair in _clients)
         {
             long userId = pair.Key;
             ClientContext context = pair.Value;

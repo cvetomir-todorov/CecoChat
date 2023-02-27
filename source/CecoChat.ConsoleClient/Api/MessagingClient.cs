@@ -42,7 +42,7 @@ public class MessagingClient : IAsyncDisposable
         // interval during which client sends ping to the server
         // we don't want the test console client to keep server resources
         _messagingClient.KeepAliveInterval = TimeSpan.FromDays(1);
-        
+
         _messagingClient.On<ListenNotification>(nameof(IChatListener.Notify), notification =>
         {
             switch (notification.Type)
