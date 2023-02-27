@@ -6,7 +6,7 @@ using Refit;
 
 namespace CecoChat.ConsoleClient.Api;
 
-public sealed class ChatClient : IDisposable
+public sealed class ChatClient : IAsyncDisposable
 {
     private readonly IBffClient _bffClient;
     private readonly MessagingClient _messagingClient;
@@ -21,10 +21,10 @@ public sealed class ChatClient : IDisposable
         _messagingClient = new MessagingClient();
     }
 
-    public void Dispose()
+    public ValueTask DisposeAsync()
     {
         _bffClient.Dispose();
-        _messagingClient.DisposeAsync().GetAwaiter().GetResult();
+        return _messagingClient.DisposeAsync();
     }
 
     public long UserId => _userId;

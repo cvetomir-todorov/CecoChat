@@ -23,7 +23,7 @@ public static class Program
 
         await RunStateMachine(client, storage);
 
-        client.Dispose();
+        await client.DisposeAsync();
         Console.WriteLine("Bye!");
     }
 

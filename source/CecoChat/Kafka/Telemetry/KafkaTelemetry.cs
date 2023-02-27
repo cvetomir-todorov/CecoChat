@@ -133,7 +133,7 @@ internal sealed class KafkaTelemetry : IKafkaTelemetry
         }
     }
 
-    private void StopActivity(Activity? activity, bool success, Exception? exception)
+    private static void StopActivity(Activity? activity, bool success, Exception? exception)
     {
         if (activity != null)
         {
