@@ -14,7 +14,7 @@ public interface IClientContainer
 
     ValueTask RemoveClient(long userId, string connectionId);
 
-    ValueTask NotifyInGroup(ListenNotification notification, long groupUserId, string? excluding = null);
+    Task NotifyInGroup(ListenNotification notification, long groupUserId, string? excluding = null);
 
     IEnumerable<long> EnumerateUsers();
 }
@@ -65,7 +65,7 @@ public class ClientContainer : IClientContainer
         }
     }
 
-    public async ValueTask NotifyInGroup(ListenNotification notification, long groupUserId, string? excluding = null)
+    public async Task NotifyInGroup(ListenNotification notification, long groupUserId, string? excluding = null)
     {
         string group = GetGroupName(groupUserId);
         Activity? activity = _signalRTelemetry.StartGroupSendActivity(nameof(ChatHub), group, activity =>

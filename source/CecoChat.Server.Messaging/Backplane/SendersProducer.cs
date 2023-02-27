@@ -19,6 +19,7 @@ public interface ISendersProducer : IDisposable
 
 public sealed class SendersProducer : ISendersProducer
 {
+    private readonly ILogger _logger;
     private readonly BackplaneOptions _backplaneOptions;
     private readonly IPartitionUtility _partitionUtility;
     private readonly ITopicPartitionFlyweight _partitionFlyweight;
@@ -27,6 +28,7 @@ public sealed class SendersProducer : ISendersProducer
     private readonly IMessagingTelemetry _messagingTelemetry;
 
     public SendersProducer(
+        ILogger<SendersProducer> logger,
         IOptions<BackplaneOptions> backplaneOptions,
         IHostApplicationLifetime applicationLifetime,
         IPartitionUtility partitionUtility,
@@ -35,6 +37,7 @@ public sealed class SendersProducer : ISendersProducer
         IClientContainer clientContainer,
         IMessagingTelemetry messagingTelemetry)
     {
+        _logger = logger;
         _backplaneOptions = backplaneOptions.Value;
         _partitionUtility = partitionUtility;
         _partitionFlyweight = partitionFlyweight;
@@ -88,7 +91,7 @@ public sealed class SendersProducer : ISendersProducer
         }
 
         Contracts.Messaging.DeliveryStatus deliveryStatus = isDelivered ? Contracts.Messaging.DeliveryStatus.Processed : Contracts.Messaging.DeliveryStatus.Lost;
-        ListenNotification deliveryNotification = new()
+        ListenNotification notification = new()
         {
             MessageId = backplaneMessage.MessageId,
             SenderId = backplaneMessage.SenderId,
@@ -97,7 +100,14 @@ public sealed class SendersProducer : ISendersProducer
             DeliveryStatus = deliveryStatus
         };
 
-        _clientContainer.NotifyInGroup(deliveryNotification, backplaneMessage.SenderId);
+        long groupUserId = backplaneMessage.SenderId;
+        _clientContainer
+            .NotifyInGroup(notification, groupUserId)
+            .ContinueWith(task =>
+            {
+                _logger.LogError(task.Exception, "Failed to send a delivery notification to clients in group {GroupId} about message {MessageId}",
+                    groupUserId, notification.MessageId);
+            }, TaskContinuationOptions.OnlyOnFaulted);
     }
 
     private void UpdateMetrics(BackplaneMessage backplaneMessage)

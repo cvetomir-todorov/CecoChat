@@ -88,6 +88,13 @@ public sealed class ReceiversConsumer : IReceiversConsumer
     private void ProcessMessage(BackplaneMessage backplaneMessage)
     {
         ListenNotification notification = _mapper.CreateListenNotification(backplaneMessage);
-        _clientContainer.NotifyInGroup(notification, backplaneMessage.TargetUserId);
+        long groupUserId = backplaneMessage.TargetUserId;
+        _clientContainer
+            .NotifyInGroup(notification, groupUserId)
+            .ContinueWith(task =>
+            {
+                _logger.LogError(task.Exception, "Failed to send message {MessageId} of type {MessageType} to clients in group {ClientGroup}",
+                    notification.MessageId, notification.Type, groupUserId);
+            }, TaskContinuationOptions.OnlyOnFaulted);
     }
 }
