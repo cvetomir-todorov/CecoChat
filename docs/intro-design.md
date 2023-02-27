@@ -13,7 +13,7 @@
 * History service transform messages and reactions from the PUB/SUB backplane into a History database which is the source of truth
 * Splitting the different responsibilities between separate services allows for independent scaling
 * The services use dynamic configuration which is updated centrally
-* Observability is achieved via distributed tracing, log aggregation and monitoring with metrics
+* Observability is achieved via health checks, distributed tracing, log aggregation and metrics with monitoring
 * Deployment infrastructure takes care of failover, growth/shrinkage of the different services based on load and predictive analytics
 
 All the diagrams are in the [diagrams](diagrams/) folder and [draw.io](https://app.diagrams.net/) is needed in order to view them. From the `Help` item in the menu a desktop tool could be downloaded, if preferred. Currently this is the [link with the releases](https://github.com/jgraph/drawio-desktop/releases).
