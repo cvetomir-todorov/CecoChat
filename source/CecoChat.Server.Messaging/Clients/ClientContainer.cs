@@ -116,7 +116,7 @@ public class ClientContainer : IClientContainer
         }
     }
 
-    private string GetGroupName(long userId)
+    private static string GetGroupName(long userId)
     {
         return userId.ToString(CultureInfo.InvariantCulture);
     }

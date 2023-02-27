@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace CecoChat.ConsoleClient.Api;
 
-public class MessagingClient : IAsyncDisposable
+public sealed class MessagingClient : IAsyncDisposable
 {
     private HubConnection? _messagingClient;
 
