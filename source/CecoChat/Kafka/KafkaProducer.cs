@@ -93,7 +93,15 @@ public sealed class KafkaProducer<TKey, TValue> : IKafkaProducer<TKey, TValue>
         EnsureInitialized();
 
         Activity? activity = _kafkaTelemetry.StartProducer(message, _producerOptions!.ProducerId, topic);
-        _producer.Produce(topic, message, deliveryReport => HandleDeliveryReport(deliveryReport, activity, deliveryHandler));
+        try
+        {
+            _producer.Produce(topic, message, deliveryReport => HandleDeliveryReport(deliveryReport, activity, deliveryHandler));
+        }
+        catch (Exception exception)
+        {
+            _kafkaTelemetry.StopProducer(activity, success: false, exception);
+            throw;
+        }
     }
 
     [MemberNotNull(nameof(_producer))]
