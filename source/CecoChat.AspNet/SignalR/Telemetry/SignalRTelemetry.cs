@@ -70,7 +70,7 @@ public sealed class SignalRTelemetry : ISignalRTelemetry
         Activity? activity = SignalRInstrumentation.ActivitySource.StartActivity(SignalRInstrumentation.ActivityName, ActivityKind.Producer);
         if (activity != null)
         {
-            activity.DisplayName = $"Producer:{hubName} -> Client group:{clientGroupName}";
+            activity.DisplayName = $"{hubName} > Client group:{clientGroupName}";
 
             activity.SetTag(OtelInstrumentation.Keys.MessagingSystem, OtelInstrumentation.Values.MessagingSystemSignalR);
             activity.SetTag(OtelInstrumentation.Keys.MessagingDestinationKind, OtelInstrumentation.Values.MessagingDestinationKindClientGroup);

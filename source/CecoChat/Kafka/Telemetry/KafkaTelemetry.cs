@@ -31,7 +31,7 @@ internal sealed class KafkaTelemetry : IKafkaTelemetry
 
         if (activity != null)
         {
-            string displayName = $"Producer:{producerId} -> Topic:{topic}";
+            string displayName = $"{producerId} > Topic:{topic}";
             EnrichActivity(topic, partition, displayName, activity);
             InjectTraceData(activity.Context, message);
         }
@@ -55,7 +55,7 @@ internal sealed class KafkaTelemetry : IKafkaTelemetry
         Activity? activity = KafkaInstrumentation.ActivitySource.StartActivity(KafkaInstrumentation.ActivityName, ActivityKind.Consumer, parentContext);
         if (activity != null)
         {
-            string displayName = $"Consumer:{consumerId} <- Topic:{consumeResult.Topic}";
+            string displayName = $"{consumerId} < Topic:{consumeResult.Topic}";
             EnrichActivity(consumeResult.Topic, consumeResult.Partition, displayName, activity);
         }
 
