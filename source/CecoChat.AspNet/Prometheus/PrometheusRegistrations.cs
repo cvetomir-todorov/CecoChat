@@ -2,7 +2,7 @@
 
 namespace CecoChat.AspNet.Prometheus;
 
-public static class OtelRegistrations
+public static class PrometheusRegistrations
 {
     public static MeterProviderBuilder ConfigurePrometheusAspNetExporter(this MeterProviderBuilder metrics, PrometheusOptions options)
     {
