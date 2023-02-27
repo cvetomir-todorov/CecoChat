@@ -6,17 +6,14 @@ The technologies chosen are [cloud agnostic](https://codersociety.com/blog/artic
 
 # Client communication
 
+![WebSocket](tech-images/websocket.webp)
+![MessagePack](tech-images/messagepack.webp)
 ![HTTP](tech-images/http.png)
 ![JSON](tech-images/json.png)
 ![Swagger](tech-images/swagger.png)
-![gRPC](tech-images/grpc.png)
-![Protocol Buffers](tech-images/protocol-buffers.png)
 
-* Clients use HTTP to communicate with the BFF service
-* Clients use gRPC to communicate with the Messaging service
-* If web browser support is needed it is worth considering replacing gRPC with HTTP and WebSockets because HTTP/2 doesn't allow it to be used easily in the browser
-* [gRPC-web](https://github.com/grpc/grpc-web) uses an [Envoy proxy](https://www.envoyproxy.io/) which supports server-side streaming but that would be expensive to implement
-* Alternatively, HTTP and WebSocket could replace the gRPC interface of the Messaging service in order to improve interoperability
+* Clients use WebSocket transport with MessagePack message format to communicate with the Messaging service
+* Clients use HTTP transport with JSON message format to communicate with the BFF service
 
 # Service synchronous communication
 
@@ -97,6 +94,7 @@ Configuration is based on Redis:
 ![.NET](tech-images/dotnet.png)
 ![ASP.NET](tech-images/aspnet.png)
 ![EFCore](tech-images/efcore.png)
+![SignalR](tech-images/signalr.webp)
 
 The services use .NET 6, ASP.NET and Entity Framework Core:
 * open-source software backed by Microsoft

@@ -23,6 +23,8 @@ Check out [what next](docs/what-next.md) needs to be implemented. I appreciate a
 ![Kafka](docs/tech-images/kafka.png)
 ![gRPC](docs/tech-images/grpc.png)
 ![Protocol buffers](docs/tech-images/protocol-buffers.png)
+![WebSocket](docs/tech-images/websocket.webp)
+![MessagePack](docs/tech-images/messagepack.webp)
 ![HTTP](docs/tech-images/http.png)
 ![JSON](docs/tech-images/json.png)
 ![Swagger](docs/tech-images/swagger.png)
@@ -35,6 +37,8 @@ Check out [what next](docs/what-next.md) needs to be implemented. I appreciate a
 ![.NET](docs/tech-images/dotnet.png)
 ![ASP.NET](docs/tech-images/aspnet.png)
 ![EFCore](docs/tech-images/efcore.png)
+![SignalR](docs/tech-images/signalr.webp)
+
 ![Autofac](docs/tech-images/autofac.png)
 ![Serilog](docs/tech-images/serilog.png)
 ![AutoMapper](docs/tech-images/automapper.webp)
