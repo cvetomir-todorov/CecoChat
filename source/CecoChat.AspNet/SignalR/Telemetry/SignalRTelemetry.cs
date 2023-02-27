@@ -126,7 +126,7 @@ public sealed class SignalRTelemetry : ISignalRTelemetry
         }
 
         TagList tags = new();
-        foreach (KeyValuePair<string,string?> tag in activity.Tags)
+        foreach (KeyValuePair<string, string?> tag in activity.Tags)
         {
             tags.Add(tag.Key, tag.Value);
         }
