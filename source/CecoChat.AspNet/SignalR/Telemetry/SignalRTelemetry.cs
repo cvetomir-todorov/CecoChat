@@ -51,7 +51,7 @@ public sealed class SignalRTelemetry : ISignalRTelemetry
             string rpcMethod = context.HubMethodName;
             activity.DisplayName = $"{rpcService}/{rpcMethod}";
 
-            activity.SetTag(OtelInstrumentation.Keys.RpcSystem, OtelInstrumentation.Values.RpcSystemSignalR);
+            activity.SetTag(OtelInstrumentation.Keys.RpcSystem, SignalRInstrumentation.Values.RpcSystemSignalR);
             activity.SetTag(OtelInstrumentation.Keys.RpcService, rpcService);
             activity.SetTag(OtelInstrumentation.Keys.RpcMethod, rpcMethod);
 
@@ -72,8 +72,8 @@ public sealed class SignalRTelemetry : ISignalRTelemetry
         {
             activity.DisplayName = $"{hubName} > Client group:{clientGroupName}";
 
-            activity.SetTag(OtelInstrumentation.Keys.MessagingSystem, OtelInstrumentation.Values.MessagingSystemSignalR);
-            activity.SetTag(OtelInstrumentation.Keys.MessagingDestinationKind, OtelInstrumentation.Values.MessagingDestinationKindClientGroup);
+            activity.SetTag(OtelInstrumentation.Keys.MessagingSystem, SignalRInstrumentation.Values.MessagingSystemSignalR);
+            activity.SetTag(OtelInstrumentation.Keys.MessagingDestinationKind, SignalRInstrumentation.Values.MessagingDestinationKindClientGroup);
             activity.SetTag(OtelInstrumentation.Keys.MessagingDestination, clientGroupName);
 
             if (activity.IsAllDataRequested)

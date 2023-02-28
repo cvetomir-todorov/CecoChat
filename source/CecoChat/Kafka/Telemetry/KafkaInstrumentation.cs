@@ -11,4 +11,15 @@ internal static class KafkaInstrumentation
 
     internal static readonly ActivitySource ActivitySource = new(ActivitySourceName, ActivitySourceVersion.ToString());
     internal static readonly string ActivityName = ActivitySourceName + ".Execute";
+
+    public static class Keys
+    {
+        public const string MessagingKafkaPartition = "messaging.kafka.partition";
+    }
+
+    public static class Values
+    {
+        public const string MessagingSystemKafka = "kafka";
+        public const string MessagingDestinationKindTopic = "topic";
+    }
 }

@@ -12,7 +12,6 @@ public static class OtelInstrumentation
         public const string MessagingSystem = "messaging.system";
         public const string MessagingDestination = "messaging.destination";
         public const string MessagingDestinationKind = "messaging.destination_kind";
-        public const string MessagingKafkaPartition = "messaging.kafka.partition";
 
         public const string RpcSystem = "rpc.system";
         public const string RpcService = "rpc.service";
@@ -22,18 +21,5 @@ public static class OtelInstrumentation
         public const string HeaderSpanId = "otel.span_id";
         public const string HeaderTraceFlags = "otel.trace_flags";
         public const string HeaderTraceState = "otel.trace_state";
-    }
-
-    public static class Values
-    {
-        public const string DbSystemCassandra = "cassandra";
-
-        public const string MessagingSystemKafka = "kafka";
-        public const string MessagingDestinationKindTopic = "topic";
-
-        public const string MessagingSystemSignalR = "signalr";
-        public const string MessagingDestinationKindClientGroup = "client_group";
-
-        public const string RpcSystemSignalR = "signalr";
     }
 }

@@ -75,7 +75,7 @@ public sealed class CassandraTelemetry : ICassandraTelemetry
         {
             activity.DisplayName = $"{session.Keyspace}/{operationName}";
 
-            activity.SetTag(OtelInstrumentation.Keys.DbSystem, OtelInstrumentation.Values.DbSystemCassandra);
+            activity.SetTag(OtelInstrumentation.Keys.DbSystem, CassandraInstrumentation.Values.DbSystemCassandra);
             activity.SetTag(OtelInstrumentation.Keys.DbName, session.Keyspace);
             activity.SetTag(OtelInstrumentation.Keys.DbSessionName, session.SessionName);
             activity.SetTag(OtelInstrumentation.Keys.DbOperation, operationName);

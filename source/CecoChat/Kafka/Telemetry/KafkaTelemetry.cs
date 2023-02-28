@@ -123,13 +123,13 @@ internal sealed class KafkaTelemetry : IKafkaTelemetry
     {
         activity.DisplayName = displayName;
 
-        activity.SetTag(OtelInstrumentation.Keys.MessagingSystem, OtelInstrumentation.Values.MessagingSystemKafka);
-        activity.SetTag(OtelInstrumentation.Keys.MessagingDestinationKind, OtelInstrumentation.Values.MessagingDestinationKindTopic);
+        activity.SetTag(OtelInstrumentation.Keys.MessagingSystem, KafkaInstrumentation.Values.MessagingSystemKafka);
+        activity.SetTag(OtelInstrumentation.Keys.MessagingDestinationKind, KafkaInstrumentation.Values.MessagingDestinationKindTopic);
         activity.SetTag(OtelInstrumentation.Keys.MessagingDestination, topic);
 
         if (partition.HasValue)
         {
-            activity.SetTag(OtelInstrumentation.Keys.MessagingKafkaPartition, partition.Value);
+            activity.SetTag(KafkaInstrumentation.Keys.MessagingKafkaPartition, partition.Value);
         }
     }
 

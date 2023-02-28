@@ -11,4 +11,12 @@ public static class SignalRInstrumentation
 
     internal static readonly ActivitySource ActivitySource = new(ActivitySourceName, ActivitySourceVersion.ToString());
     internal static readonly string ActivityName = ActivitySourceName + ".Execute";
+
+    public static class Values
+    {
+        public const string MessagingSystemSignalR = "signalr";
+        public const string MessagingDestinationKindClientGroup = "client_group";
+
+        public const string RpcSystemSignalR = "signalr";
+    }
 }
