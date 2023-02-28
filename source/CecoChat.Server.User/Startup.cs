@@ -90,28 +90,30 @@ public class Startup
             .AddService(serviceName: "User", serviceNamespace: "CecoChat", serviceVersion: "0.1")
             .AddEnvironmentVariableDetector();
 
-        services.AddOpenTelemetryTracing(tracing =>
-        {
-            tracing.SetResourceBuilder(serviceResourceBuilder);
-            tracing.AddAspNetCoreInstrumentation(aspnet =>
+        services
+            .AddOpenTelemetry()
+            .WithTracing(tracing =>
             {
-                aspnet.EnableGrpcAspNetCoreSupport = true;
-                HashSet<string> excludedPaths = new()
+                tracing.SetResourceBuilder(serviceResourceBuilder);
+                tracing.AddAspNetCoreInstrumentation(aspnet =>
                 {
-                    _prometheusOptions.ScrapeEndpointPath, HealthPaths.Health, HealthPaths.Startup, HealthPaths.Live, HealthPaths.Ready
-                };
-                aspnet.Filter = httpContext => !excludedPaths.Contains(httpContext.Request.Path);
+                    aspnet.EnableGrpcAspNetCoreSupport = true;
+                    HashSet<string> excludedPaths = new()
+                    {
+                        _prometheusOptions.ScrapeEndpointPath, HealthPaths.Health, HealthPaths.Startup, HealthPaths.Live, HealthPaths.Ready
+                    };
+                    aspnet.Filter = httpContext => !excludedPaths.Contains(httpContext.Request.Path);
+                });
+                tracing.AddNpgsql();
+                tracing.ConfigureSampling(_otelSamplingOptions);
+                tracing.ConfigureJaegerExporter(_jaegerOptions);
+            })
+            .WithMetrics(metrics =>
+            {
+                metrics.SetResourceBuilder(serviceResourceBuilder);
+                metrics.AddAspNetCoreInstrumentation();
+                metrics.ConfigurePrometheusAspNetExporter(_prometheusOptions);
             });
-            tracing.AddNpgsql();
-            tracing.ConfigureSampling(_otelSamplingOptions);
-            tracing.ConfigureJaegerExporter(_jaegerOptions);
-        });
-        services.AddOpenTelemetryMetrics(metrics =>
-        {
-            metrics.SetResourceBuilder(serviceResourceBuilder);
-            metrics.AddAspNetCoreInstrumentation();
-            metrics.ConfigurePrometheusAspNetExporter(_prometheusOptions);
-        });
     }
 
     private void AddHealthServices(IServiceCollection services)

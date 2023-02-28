@@ -113,21 +113,23 @@ public class Startup
             .AddService(serviceName: "Messaging", serviceNamespace: "CecoChat", serviceVersion: "0.1")
             .AddEnvironmentVariableDetector();
 
-        services.AddOpenTelemetryTracing(tracing =>
-        {
-            tracing.SetResourceBuilder(serviceResourceBuilder);
-            tracing.AddSignalRInstrumentation();
-            tracing.AddKafkaInstrumentation();
-            tracing.ConfigureSampling(_otelSamplingOptions);
-            tracing.ConfigureJaegerExporter(_jaegerOptions);
-        });
-        services.AddOpenTelemetryMetrics(metrics =>
-        {
-            metrics.SetResourceBuilder(serviceResourceBuilder);
-            metrics.AddSignalRInstrumentation();
-            metrics.AddMessagingInstrumentation();
-            metrics.ConfigurePrometheusAspNetExporter(_prometheusOptions);
-        });
+        services
+            .AddOpenTelemetry()
+            .WithTracing(tracing =>
+            {
+                tracing.SetResourceBuilder(serviceResourceBuilder);
+                tracing.AddSignalRInstrumentation();
+                tracing.AddKafkaInstrumentation();
+                tracing.ConfigureSampling(_otelSamplingOptions);
+                tracing.ConfigureJaegerExporter(_jaegerOptions);
+            })
+            .WithMetrics(metrics =>
+            {
+                metrics.SetResourceBuilder(serviceResourceBuilder);
+                metrics.AddSignalRInstrumentation();
+                metrics.AddMessagingInstrumentation();
+                metrics.ConfigurePrometheusAspNetExporter(_prometheusOptions);
+            });
     }
 
     private void AddHealthServices(IServiceCollection services)
