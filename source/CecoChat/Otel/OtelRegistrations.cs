@@ -16,7 +16,7 @@ public static class OtelRegistrations
                 sampler = new AlwaysOnSampler();
                 break;
             case OtelSamplingStrategy.Probability:
-                sampler = new CustomSampler(samplingOptions.Probability);
+                sampler = new TraceIdRatioBasedSampler(samplingOptions.Probability);
                 break;
             default:
                 throw new EnumValueNotSupportedException(samplingOptions.Strategy);
