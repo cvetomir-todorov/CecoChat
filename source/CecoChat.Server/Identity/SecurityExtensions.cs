@@ -19,9 +19,9 @@ public static class SecurityExtensions
             return false;
         }
 
-        string value = values.First();
+        string? value = values.First();
         const string bearerPrefix = "Bearer ";
-        if (!value.StartsWith(bearerPrefix, StringComparison.CurrentCultureIgnoreCase))
+        if (value == null || !value.StartsWith(bearerPrefix, StringComparison.CurrentCultureIgnoreCase))
         {
             return false;
         }
