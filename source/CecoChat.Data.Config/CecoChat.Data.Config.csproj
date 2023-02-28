@@ -6,7 +6,6 @@
 
   <ItemGroup>
     <PackageReference Include="FluentValidation" Version="11.5.1" />
-    <PackageReference Include="StackExchange.Redis" Version="2.6.96" />
   </ItemGroup>
 
   <ItemGroup>
