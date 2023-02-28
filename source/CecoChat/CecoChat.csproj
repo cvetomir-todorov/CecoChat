@@ -23,7 +23,7 @@
     <PackageReference Include="OpenTelemetry.Exporter.Jaeger" Version="1.4.0-beta.2" />
     <PackageReference Include="Polly" Version="7.2.3" />
     <PackageReference Include="Polly.Extensions.Http" Version="3.0.0" />
-    <PackageReference Include="StackExchange.Redis" Version="2.6.70" />
+    <PackageReference Include="StackExchange.Redis" Version="2.6.96" />
   </ItemGroup>
 
 </Project>
