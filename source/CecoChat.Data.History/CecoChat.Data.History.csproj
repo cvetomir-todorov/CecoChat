@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CecoChat\CecoChat.csproj" />
+    <ProjectReference Include="..\CecoChat.Cassandra\CecoChat.Cassandra.csproj" />
     <ProjectReference Include="..\CecoChat.Contracts\CecoChat.Contracts.csproj" />
     <ProjectReference Include="..\CecoChat.Data\CecoChat.Data.csproj" />
   </ItemGroup>
