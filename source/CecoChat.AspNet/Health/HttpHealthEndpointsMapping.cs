@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Routing;
 
-namespace CecoChat.Server.Health;
+namespace CecoChat.AspNet.Health;
 
 public static class HttpHealthEndpointsMapping
 {

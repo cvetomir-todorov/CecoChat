@@ -1,5 +1,6 @@
 using System.Reflection;
 using Autofac;
+using CecoChat.AspNet.Health;
 using CecoChat.AspNet.Prometheus;
 using CecoChat.AspNet.Swagger;
 using CecoChat.Autofac;
@@ -17,7 +18,6 @@ using CecoChat.Server.Bff.HostedServices;
 using CecoChat.Server.Bff.Infra;
 using CecoChat.Server.Config;
 using CecoChat.Server.ExceptionHandling;
-using CecoChat.Server.Health;
 using CecoChat.Server.Identity;
 using FluentValidation;
 using FluentValidation.AspNetCore;

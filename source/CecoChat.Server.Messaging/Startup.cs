@@ -1,4 +1,5 @@
 using Autofac;
+using CecoChat.AspNet.Health;
 using CecoChat.AspNet.Prometheus;
 using CecoChat.AspNet.SignalR.Telemetry;
 using CecoChat.Autofac;
@@ -14,7 +15,6 @@ using CecoChat.Otel;
 using CecoChat.Redis;
 using CecoChat.Server.Backplane;
 using CecoChat.Server.Config;
-using CecoChat.Server.Health;
 using CecoChat.Server.Identity;
 using CecoChat.Server.Messaging.Backplane;
 using CecoChat.Server.Messaging.Clients;
