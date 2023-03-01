@@ -59,6 +59,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CecoChat.AspNet", "CecoChat
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CecoChat.Cassandra", "CecoChat.Cassandra\CecoChat.Cassandra.csproj", "{B39148B8-4539-4A4A-843A-57D543FE8F03}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CecoChat.Kafka", "CecoChat.Kafka\CecoChat.Kafka.csproj", "{1AB035D7-3B0E-4EEC-A843-1672F9757A68}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -157,6 +159,10 @@ Global
 		{B39148B8-4539-4A4A-843A-57D543FE8F03}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B39148B8-4539-4A4A-843A-57D543FE8F03}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B39148B8-4539-4A4A-843A-57D543FE8F03}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1AB035D7-3B0E-4EEC-A843-1672F9757A68}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1AB035D7-3B0E-4EEC-A843-1672F9757A68}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1AB035D7-3B0E-4EEC-A843-1672F9757A68}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1AB035D7-3B0E-4EEC-A843-1672F9757A68}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -185,6 +191,7 @@ Global
 		{F795F112-0CE1-4F94-8665-C0F7FDDA3D3A} = {C320D788-140F-4A46-A3A8-7A91FD43290B}
 		{FEF5F628-618A-4EAB-AD5D-386D566BA181} = {C320D788-140F-4A46-A3A8-7A91FD43290B}
 		{B39148B8-4539-4A4A-843A-57D543FE8F03} = {C320D788-140F-4A46-A3A8-7A91FD43290B}
+		{1AB035D7-3B0E-4EEC-A843-1672F9757A68} = {C320D788-140F-4A46-A3A8-7A91FD43290B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B5EAA668-8419-44F5-8BE5-9175A9B20BF8}
