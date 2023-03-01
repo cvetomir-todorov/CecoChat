@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CecoChat.Data.Config\CecoChat.Data.Config.csproj" />
     <ProjectReference Include="..\CecoChat.Data.State\CecoChat.Data.State.csproj" />
     <ProjectReference Include="..\CecoChat.Server\CecoChat.Server.csproj" />
   </ItemGroup>
