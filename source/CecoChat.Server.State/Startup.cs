@@ -1,6 +1,7 @@
 using System.Reflection;
 using Autofac;
 using Calzolari.Grpc.AspNetCore.Validation;
+using CecoChat.AspNet.Health;
 using CecoChat.AspNet.Prometheus;
 using CecoChat.Autofac;
 using CecoChat.Cassandra;
@@ -16,7 +17,6 @@ using CecoChat.Otel;
 using CecoChat.Redis;
 using CecoChat.Server.Backplane;
 using CecoChat.Server.Config;
-using CecoChat.Server.Health;
 using CecoChat.Server.Identity;
 using CecoChat.Server.State.Backplane;
 using CecoChat.Server.State.Clients;

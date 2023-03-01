@@ -2,7 +2,7 @@ using System.Net;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
-namespace CecoChat.Server.Health;
+namespace CecoChat.AspNet.Health;
 
 public sealed class HttpHealthEndpoint
 {

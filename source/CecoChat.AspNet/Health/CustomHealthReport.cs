@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
-namespace CecoChat.Server.Health;
+namespace CecoChat.AspNet.Health;
 
 /// <summary>
 /// End result:

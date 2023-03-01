@@ -1,4 +1,4 @@
-namespace CecoChat.Server.Health;
+namespace CecoChat.AspNet.Health;
 
 public sealed class HttpHealthEndpoints
 {

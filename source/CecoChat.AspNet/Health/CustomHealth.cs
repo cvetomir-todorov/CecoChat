@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
-namespace CecoChat.Server.Health;
+namespace CecoChat.AspNet.Health;
 
 public static class CustomHealth
 {
