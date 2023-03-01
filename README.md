@@ -18,44 +18,6 @@ Check out [what next](docs/what-next.md) needs to be implemented. I appreciate a
 [![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=cvetomir-todorov_CecoChat&metric=duplicated_lines_density)](https://sonarcloud.io/dashboard?id=cvetomir-todorov_CecoChat)
 [![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=cvetomir-todorov_CecoChat&metric=sqale_index)](https://sonarcloud.io/dashboard?id=cvetomir-todorov_CecoChat)
 
-# Technologies
-
-![Kafka](docs/tech-images/kafka.png)
-![gRPC](docs/tech-images/grpc.png)
-![Protocol buffers](docs/tech-images/protocol-buffers.png)
-![WebSocket](docs/tech-images/websocket.webp)
-![MessagePack](docs/tech-images/messagepack.webp)
-![HTTP](docs/tech-images/http.png)
-![JSON](docs/tech-images/json.png)
-![Swagger](docs/tech-images/swagger.png)
-
-![Yugabyte](docs/tech-images/yugabyte.png)
-![Postgres](docs/tech-images/postgres.webp)
-![Cassandra](docs/tech-images/cassandra.png)
-![Redis](docs/tech-images/redis.png)
-
-![.NET](docs/tech-images/dotnet.png)
-![ASP.NET](docs/tech-images/aspnet.png)
-![EFCore](docs/tech-images/efcore.png)
-![SignalR](docs/tech-images/signalr.webp)
-
-![Autofac](docs/tech-images/autofac.png)
-![Serilog](docs/tech-images/serilog.png)
-![AutoMapper](docs/tech-images/automapper.webp)
-![FluentValidation](docs/tech-images/fluent-validation.png)
-![Polly](docs/tech-images/polly.png)
-![Refit](docs/tech-images/refit.png)
-
-![OpenTelemetry](docs/tech-images/open-telemetry.png)
-![Jaeger](docs/tech-images/jaeger.png)
-![Prometheus](docs/tech-images/prometheus.png)
-![Grafana](docs/tech-images/grafana.png)
-![ElasticSearch](docs/tech-images/elasticsearch.png)
-![Fluentd](docs/tech-images/fluentd.png)
-![Kibana](docs/tech-images/kibana.png)
-
-![Docker](docs/tech-images/docker.png)
-
 # Documentation
 
 * Intro
@@ -80,8 +42,52 @@ Check out [what next](docs/what-next.md) needs to be implemented. I appreciate a
 
 # Design
 
-### Overall
 ![Design](docs/images/cecochat-01-overall.png)
 
-### Technologies
-![Technologies](docs/images/cecochat-08-technologies.png)
+# Technologies
+
+## Integration
+
+![Kafka](docs/tech-images/kafka.png)
+![gRPC](docs/tech-images/grpc.png)
+![Protocol buffers](docs/tech-images/protocol-buffers.png)
+![WebSocket](docs/tech-images/websocket.webp)
+![MessagePack](docs/tech-images/messagepack.webp)
+![HTTP](docs/tech-images/http.png)
+![JSON](docs/tech-images/json.png)
+![Swagger](docs/tech-images/swagger.png)
+
+## Data storage
+
+![Yugabyte](docs/tech-images/yugabyte.png)
+![Postgres](docs/tech-images/postgres.webp)
+![Cassandra](docs/tech-images/cassandra.png)
+![Redis](docs/tech-images/redis.png)
+
+## Internal
+
+![.NET](docs/tech-images/dotnet.png)
+![ASP.NET](docs/tech-images/aspnet.png)
+![EFCore](docs/tech-images/efcore.png)
+![SignalR](docs/tech-images/signalr.webp)
+
+![Autofac](docs/tech-images/autofac.png)
+![Serilog](docs/tech-images/serilog.png)
+![AutoMapper](docs/tech-images/automapper.webp)
+![FluentValidation](docs/tech-images/fluent-validation.png)
+![Polly](docs/tech-images/polly.png)
+![Refit](docs/tech-images/refit.png)
+
+## Observability
+
+![OpenTelemetry](docs/tech-images/open-telemetry.png)
+![Jaeger](docs/tech-images/jaeger.png)
+![Prometheus](docs/tech-images/prometheus.png)
+![Grafana](docs/tech-images/grafana.png)
+![ElasticSearch](docs/tech-images/elasticsearch.png)
+![Fluentd](docs/tech-images/fluentd.png)
+![Kibana](docs/tech-images/kibana.png)
+
+## Deployment
+
+![Docker](docs/tech-images/docker.png)
