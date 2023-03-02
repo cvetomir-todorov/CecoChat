@@ -14,8 +14,8 @@ using CecoChat.Kafka.Health;
 using CecoChat.Kafka.Telemetry;
 using CecoChat.Otel;
 using CecoChat.Redis;
+using CecoChat.Redis.Health;
 using CecoChat.Server.Backplane;
-using CecoChat.Server.Config;
 using CecoChat.Server.Identity;
 using CecoChat.Server.Messaging.Backplane;
 using CecoChat.Server.Messaging.Clients;
@@ -143,7 +143,8 @@ public class Startup
             .AddCheck<ReceiversConsumerHealthCheck>(
                 "receivers-consumer",
                 tags: new[] { HealthTags.Health, HealthTags.Startup, HealthTags.Live })
-            .AddConfigDb(
+            .AddRedis(
+                "config-db",
                 _configDbOptions,
                 tags: new[] { HealthTags.Health, HealthTags.Ready })
             .AddKafka(

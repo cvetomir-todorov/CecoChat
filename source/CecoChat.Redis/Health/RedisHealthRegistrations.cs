@@ -1,17 +1,21 @@
-using CecoChat.Redis;
 using Microsoft.Extensions.DependencyInjection;
 using StackExchange.Redis;
 
-namespace CecoChat.Server.Config;
+namespace CecoChat.Redis.Health;
 
-public static class ConfigDbHealthRegistrations
+public static class RedisHealthRegistrations
 {
-    public static IHealthChecksBuilder AddConfigDb(
+    public static IHealthChecksBuilder AddRedis(
         this IHealthChecksBuilder builder,
+        string name,
         RedisOptions configOptions,
-        string name = "config-db",
         string[]? tags = null)
     {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new ArgumentException($"Argument {nameof(name)} should not be null or whitespace.", nameof(name));
+        }
+
         ConfigurationOptions configConfig = CreateRedisConfiguration(configOptions);
         string connectionString = configConfig.ToString(includePassword: true);
 

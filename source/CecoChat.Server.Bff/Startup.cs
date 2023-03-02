@@ -13,10 +13,10 @@ using CecoChat.Jaeger;
 using CecoChat.Jwt;
 using CecoChat.Otel;
 using CecoChat.Redis;
+using CecoChat.Redis.Health;
 using CecoChat.Server.Backplane;
 using CecoChat.Server.Bff.HostedServices;
 using CecoChat.Server.Bff.Infra;
-using CecoChat.Server.Config;
 using CecoChat.Server.ExceptionHandling;
 using CecoChat.Server.Identity;
 using FluentValidation;
@@ -146,7 +146,8 @@ public class Startup
             .AddCheck<ConfigDbInitHealthCheck>(
                 "config-db-init",
                 tags: new[] { HealthTags.Health, HealthTags.Startup })
-            .AddConfigDb(
+            .AddRedis(
+                "config-db",
                 _configDbOptions,
                 tags: new[] { HealthTags.Health, HealthTags.Ready })
             .AddUri(
