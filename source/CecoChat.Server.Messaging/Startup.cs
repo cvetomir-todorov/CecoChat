@@ -152,9 +152,9 @@ public class Startup
                 _backplaneOptions.Health,
                 tags: new[] { HealthTags.Health, HealthTags.Ready })
             .AddUri(
+                "idgen",
                 new Uri(_idGenOptions.Address!, _idGenOptions.HealthPath),
                 configureHttpClient: (_, client) => client.DefaultRequestVersion = new Version(2, 0),
-                name: "idgen",
                 timeout: _idGenOptions.HealthTimeout,
                 tags: new[] { HealthTags.Health, HealthTags.Ready });
 

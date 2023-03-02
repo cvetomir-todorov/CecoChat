@@ -150,21 +150,21 @@ public class Startup
                 _configDbOptions,
                 tags: new[] { HealthTags.Health, HealthTags.Ready })
             .AddUri(
+                "history",
                 new Uri(_historyOptions.Address!, _historyOptions.HealthPath),
                 configureHttpClient: (_, client) => client.DefaultRequestVersion = new Version(2, 0),
-                name: "history",
                 timeout: _historyOptions.HealthTimeout,
                 tags: new[] { HealthTags.Health, HealthTags.Ready })
             .AddUri(
+                "state",
                 new Uri(_stateOptions.Address!, _stateOptions.HealthPath),
                 configureHttpClient: (_, client) => client.DefaultRequestVersion = new Version(2, 0),
-                name: "state",
                 timeout: _stateOptions.HealthTimeout,
                 tags: new[] { HealthTags.Health, HealthTags.Ready })
             .AddUri(
+                "user",
                 new Uri(_userOptions.Address!, _userOptions.HealthPath),
                 configureHttpClient: (_, client) => client.DefaultRequestVersion = new Version(2, 0),
-                name: "user",
                 timeout: _userOptions.HealthTimeout,
                 tags: new[] { HealthTags.Health, HealthTags.Ready });
 

@@ -9,9 +9,9 @@ public static class UriHealthCheckRegistrations
 
     public static IHealthChecksBuilder AddUri(
         this IHealthChecksBuilder builder,
+        string name,
         Uri uri,
         Action<IServiceProvider, HttpClient>? configureHttpClient = null,
-        string name = "uri-health-check",
         HealthStatus failureStatus = HealthStatus.Unhealthy,
         IEnumerable<string>? tags = null,
         TimeSpan? timeout = null)
