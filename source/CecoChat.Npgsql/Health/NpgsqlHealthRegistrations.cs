@@ -6,15 +6,14 @@ public static class NpgsqlHealthRegistrations
 {
     public static IHealthChecksBuilder AddNpgsql(
         this IHealthChecksBuilder builder,
-        NpgsqlOptions npgsqlOptions,
         string name,
-        string[]? tags = null,
-        TimeSpan? timeout = null)
+        NpgsqlOptions npgsqlOptions,
+        string[]? tags = null)
     {
         return builder.AddNpgSql(
             npgsqlConnectionString: npgsqlOptions.ConnectionString,
             name: name,
             tags: tags,
-            timeout: timeout);
+            timeout: npgsqlOptions.HealthTimeout);
     }
 }
