@@ -10,7 +10,7 @@ using CecoChat.Jwt;
 using CecoChat.Npgsql.Health;
 using CecoChat.Otel;
 using CecoChat.Server.Identity;
-using CecoChat.Server.User.Clients;
+using CecoChat.Server.User.Endpoints;
 using CecoChat.Server.User.HostedServices;
 using FluentValidation;
 using Microsoft.Extensions.Diagnostics.HealthChecks;

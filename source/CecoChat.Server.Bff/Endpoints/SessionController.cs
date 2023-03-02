@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
-namespace CecoChat.Server.Bff.Clients;
+namespace CecoChat.Server.Bff.Endpoints;
 
 [ApiController]
 [Route("api")]

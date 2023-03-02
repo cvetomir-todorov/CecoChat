@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
-namespace CecoChat.Server.Bff.Clients;
+namespace CecoChat.Server.Bff.Endpoints;
 
 [ApiController]
 [Route("api/state")]

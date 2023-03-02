@@ -1,7 +1,7 @@
 using CecoChat.Contracts.Messaging;
 using FluentValidation;
 
-namespace CecoChat.Server.Messaging.Clients;
+namespace CecoChat.Server.Messaging.Endpoints;
 
 public interface IInputValidator
 {

@@ -6,7 +6,7 @@ using CecoChat.Server.Identity;
 using Grpc.Core;
 using Microsoft.AspNetCore.Authorization;
 
-namespace CecoChat.Server.History.Clients;
+namespace CecoChat.Server.History.Endpoints;
 
 public sealed class HistoryService : Contracts.History.History.HistoryBase
 {

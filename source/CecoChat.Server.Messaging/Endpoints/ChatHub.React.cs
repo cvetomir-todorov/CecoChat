@@ -5,7 +5,7 @@ using FluentValidation.Results;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
-namespace CecoChat.Server.Messaging.Clients;
+namespace CecoChat.Server.Messaging.Endpoints;
 
 public partial class ChatHub
 {

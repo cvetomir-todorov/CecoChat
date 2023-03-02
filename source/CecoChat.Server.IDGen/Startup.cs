@@ -9,7 +9,7 @@ using CecoChat.Jaeger;
 using CecoChat.Otel;
 using CecoChat.Redis;
 using CecoChat.Redis.Health;
-using CecoChat.Server.IDGen.Generation;
+using CecoChat.Server.IDGen.Endpoints;
 using CecoChat.Server.IDGen.HostedServices;
 using FluentValidation;
 using Microsoft.Extensions.Diagnostics.HealthChecks;

@@ -2,7 +2,7 @@ using System.Runtime.Serialization;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.SignalR;
 
-namespace CecoChat.Server.Messaging.Clients;
+namespace CecoChat.Server.Messaging.Endpoints;
 
 [Serializable]
 public class ValidationHubException : HubException

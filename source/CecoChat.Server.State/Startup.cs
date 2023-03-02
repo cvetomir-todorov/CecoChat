@@ -19,7 +19,7 @@ using CecoChat.Redis;
 using CecoChat.Redis.Health;
 using CecoChat.Server.Identity;
 using CecoChat.Server.State.Backplane;
-using CecoChat.Server.State.Clients;
+using CecoChat.Server.State.Endpoints;
 using CecoChat.Server.State.HostedServices;
 using Confluent.Kafka;
 using FluentValidation;

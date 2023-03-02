@@ -19,7 +19,7 @@ using CecoChat.Otel;
 using CecoChat.Redis;
 using CecoChat.Redis.Health;
 using CecoChat.Server.History.Backplane;
-using CecoChat.Server.History.Clients;
+using CecoChat.Server.History.Endpoints;
 using CecoChat.Server.History.HostedServices;
 using CecoChat.Server.Identity;
 using Confluent.Kafka;
