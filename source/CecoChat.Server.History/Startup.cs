@@ -17,7 +17,7 @@ using CecoChat.Kafka.Health;
 using CecoChat.Kafka.Telemetry;
 using CecoChat.Otel;
 using CecoChat.Redis;
-using CecoChat.Server.Config;
+using CecoChat.Redis.Health;
 using CecoChat.Server.History.Backplane;
 using CecoChat.Server.History.Clients;
 using CecoChat.Server.History.HostedServices;
@@ -142,7 +142,8 @@ public class Startup
             .AddCheck<HistoryConsumerHealthCheck>(
                 "history-consumer",
                 tags: new[] { HealthTags.Health, HealthTags.Startup, HealthTags.Live })
-            .AddConfigDb(
+            .AddRedis(
+                "config-db",
                 _configDbOptions,
                 tags: new[] { HealthTags.Health, HealthTags.Ready })
             .AddCassandra(

@@ -16,7 +16,7 @@ using CecoChat.Kafka.Health;
 using CecoChat.Kafka.Telemetry;
 using CecoChat.Otel;
 using CecoChat.Redis;
-using CecoChat.Server.Config;
+using CecoChat.Redis.Health;
 using CecoChat.Server.Identity;
 using CecoChat.Server.State.Backplane;
 using CecoChat.Server.State.Clients;
@@ -141,7 +141,8 @@ public class Startup
             .AddCheck<SendersConsumerHealthCheck>(
                 "senders-consumer",
                 tags: new[] { HealthTags.Health, HealthTags.Startup, HealthTags.Live })
-            .AddConfigDb(
+            .AddRedis(
+                "config-db",
                 _configDbOptions,
                 tags: new[] { HealthTags.Health, HealthTags.Ready })
             .AddCassandra(

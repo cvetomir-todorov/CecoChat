@@ -8,7 +8,7 @@ using CecoChat.Data.Config;
 using CecoChat.Jaeger;
 using CecoChat.Otel;
 using CecoChat.Redis;
-using CecoChat.Server.Config;
+using CecoChat.Redis.Health;
 using CecoChat.Server.IDGen.Generation;
 using CecoChat.Server.IDGen.HostedServices;
 using FluentValidation;
@@ -105,7 +105,8 @@ public class Startup
             .AddCheck<ConfigDbInitHealthCheck>(
                 "config-db-init",
                 tags: new[] { HealthTags.Health, HealthTags.Startup })
-            .AddConfigDb(
+            .AddRedis(
+                "config-db",
                 _configDbOptions,
                 tags: new[] { HealthTags.Health, HealthTags.Ready });
 
