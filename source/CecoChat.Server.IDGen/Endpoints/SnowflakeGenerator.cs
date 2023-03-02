@@ -3,7 +3,7 @@ using CecoChat.Server.IDGen.HostedServices;
 using IdGen;
 using Microsoft.Extensions.Options;
 
-namespace CecoChat.Server.IDGen.Generation;
+namespace CecoChat.Server.IDGen.Endpoints;
 
 public interface IIdentityGenerator
 {

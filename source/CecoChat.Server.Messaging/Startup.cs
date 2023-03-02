@@ -19,6 +19,7 @@ using CecoChat.Server.Backplane;
 using CecoChat.Server.Identity;
 using CecoChat.Server.Messaging.Backplane;
 using CecoChat.Server.Messaging.Clients;
+using CecoChat.Server.Messaging.Endpoints;
 using CecoChat.Server.Messaging.HostedServices;
 using CecoChat.Server.Messaging.Telemetry;
 using Confluent.Kafka;

@@ -2,10 +2,11 @@ using CecoChat.Client.IDGen;
 using CecoChat.Contracts.Messaging;
 using CecoChat.Server.Identity;
 using CecoChat.Server.Messaging.Backplane;
+using CecoChat.Server.Messaging.Clients;
 using CecoChat.Server.Messaging.Telemetry;
 using Microsoft.AspNetCore.SignalR;
 
-namespace CecoChat.Server.Messaging.Clients;
+namespace CecoChat.Server.Messaging.Endpoints;
 
 public partial class ChatHub : Hub<IChatListener>, IChatHub
 {

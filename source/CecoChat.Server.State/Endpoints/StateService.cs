@@ -4,7 +4,7 @@ using CecoChat.Server.Identity;
 using Grpc.Core;
 using Microsoft.AspNetCore.Authorization;
 
-namespace CecoChat.Server.State.Clients;
+namespace CecoChat.Server.State.Endpoints;
 
 public class StateService : Contracts.State.State.StateBase
 {

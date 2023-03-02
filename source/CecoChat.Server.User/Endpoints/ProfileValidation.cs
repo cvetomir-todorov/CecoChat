@@ -1,7 +1,7 @@
 using CecoChat.Contracts.User;
 using FluentValidation;
 
-namespace CecoChat.Server.User.Clients;
+namespace CecoChat.Server.User.Endpoints;
 
 public sealed class GetPublicProfileRequestValidator : AbstractValidator<GetPublicProfileRequest>
 {

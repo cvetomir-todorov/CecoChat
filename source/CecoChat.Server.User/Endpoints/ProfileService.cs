@@ -3,7 +3,7 @@ using CecoChat.Data.User.Repos;
 using CecoChat.Server.Identity;
 using Grpc.Core;
 
-namespace CecoChat.Server.User.Clients;
+namespace CecoChat.Server.User.Endpoints;
 
 public class ProfileService : Profile.ProfileBase
 {
