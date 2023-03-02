@@ -1,4 +1,5 @@
 ﻿using CecoChat.Kafka;
+using CecoChat.Kafka.Health;
 
 namespace CecoChat.Server.History.Backplane;
 
@@ -8,11 +9,7 @@ public sealed class BackplaneOptions
 
     public KafkaConsumerOptions HistoryConsumer { get; set; } = new();
 
-    public KafkaProducerOptions HealthProducer { get; set; } = new();
-
     public string TopicMessagesByReceiver { get; set; } = string.Empty;
 
-    public string TopicHealth { get; set; } = string.Empty;
-
-    public TimeSpan HealthTimeout { get; set; }
+    public KafkaHealthOptions Health { get; set; } = new();
 }
