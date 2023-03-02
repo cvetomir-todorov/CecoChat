@@ -124,10 +124,9 @@ public class Startup
                 "user-db-init",
                 tags: new[] { HealthTags.Health, HealthTags.Startup })
             .AddNpgsql(
-                _userDbOptions.Connect,
                 "user-db",
-                tags: new[] { HealthTags.Health, HealthTags.Ready },
-                timeout: _userDbOptions.HealthTimeout);
+                _userDbOptions.Connect,
+                tags: new[] { HealthTags.Health, HealthTags.Ready });
 
         services.AddSingleton<UserDbInitHealthCheck>();
     }
