@@ -12,10 +12,10 @@ using CecoChat.Data.State.Telemetry;
 using CecoChat.Jaeger;
 using CecoChat.Jwt;
 using CecoChat.Kafka;
+using CecoChat.Kafka.Health;
 using CecoChat.Kafka.Telemetry;
 using CecoChat.Otel;
 using CecoChat.Redis;
-using CecoChat.Server.Backplane;
 using CecoChat.Server.Config;
 using CecoChat.Server.Identity;
 using CecoChat.Server.State.Backplane;
@@ -148,7 +148,8 @@ public class Startup
                 name: "state-db",
                 timeout: _stateDbOptions.HealthTimeout,
                 tags: new[] { HealthTags.Health, HealthTags.Ready })
-            .AddBackplane(
+            .AddKafka(
+                "backplane",
                 _backplaneOptions.Kafka,
                 _backplaneOptions.HealthProducer,
                 _backplaneOptions.TopicHealth,

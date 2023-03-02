@@ -13,10 +13,10 @@ using CecoChat.Data.History.Telemetry;
 using CecoChat.Jaeger;
 using CecoChat.Jwt;
 using CecoChat.Kafka;
+using CecoChat.Kafka.Health;
 using CecoChat.Kafka.Telemetry;
 using CecoChat.Otel;
 using CecoChat.Redis;
-using CecoChat.Server.Backplane;
 using CecoChat.Server.Config;
 using CecoChat.Server.History.Backplane;
 using CecoChat.Server.History.Clients;
@@ -149,7 +149,8 @@ public class Startup
                 name: "history-db",
                 timeout: _historyDbOptions.HealthTimeout,
                 tags: new[] { HealthTags.Health, HealthTags.Ready })
-            .AddBackplane(
+            .AddKafka(
+                "backplane",
                 _backplaneOptions.Kafka,
                 _backplaneOptions.HealthProducer,
                 _backplaneOptions.TopicHealth,
