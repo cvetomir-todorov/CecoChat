@@ -149,9 +149,7 @@ public class Startup
             .AddKafka(
                 "backplane",
                 _backplaneOptions.Kafka,
-                _backplaneOptions.HealthProducer,
-                _backplaneOptions.TopicHealth,
-                timeout: _backplaneOptions.HealthTimeout,
+                _backplaneOptions.Health,
                 tags: new[] { HealthTags.Health, HealthTags.Ready })
             .AddUri(
                 new Uri(_idGenOptions.Address!, _idGenOptions.HealthPath),

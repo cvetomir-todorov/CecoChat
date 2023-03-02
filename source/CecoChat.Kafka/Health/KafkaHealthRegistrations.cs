@@ -9,16 +9,10 @@ public static class KafkaHealthRegistrations
         this IHealthChecksBuilder healthChecks,
         string name,
         KafkaOptions options,
-        KafkaProducerOptions producerOptions,
-        string topic,
+        KafkaHealthOptions healthOptions,
         string[]? tags = null,
-        TimeSpan? timeout = null,
         HealthStatus failureStatus = HealthStatus.Unhealthy)
     {
-        if (string.IsNullOrWhiteSpace(topic))
-        {
-            throw new ArgumentException($"Argument {nameof(topic)} should not be null or whitespace.", nameof(topic));
-        }
         if (string.IsNullOrWhiteSpace(name))
         {
             throw new ArgumentException($"Argument {nameof(name)} should not be null or whitespace.", nameof(name));
@@ -27,15 +21,15 @@ public static class KafkaHealthRegistrations
         return healthChecks.AddKafka(config =>
             {
                 config.BootstrapServers = string.Join(separator: ',', options.BootstrapServers);
-                config.Acks = producerOptions.Acks;
-                config.LingerMs = producerOptions.LingerMs;
-                config.MessageSendMaxRetries = producerOptions.MessageSendMaxRetries;
-                config.MessageTimeoutMs = producerOptions.MessageTimeoutMs;
+                config.Acks = healthOptions.Producer.Acks;
+                config.LingerMs = healthOptions.Producer.LingerMs;
+                config.MessageSendMaxRetries = healthOptions.Producer.MessageSendMaxRetries;
+                config.MessageTimeoutMs = healthOptions.Producer.MessageTimeoutMs;
             },
             name: name,
-            topic: topic,
+            topic: healthOptions.Topic,
             tags: tags,
-            timeout: timeout,
+            timeout: healthOptions.Timeout,
             failureStatus: failureStatus);
     }
 }
