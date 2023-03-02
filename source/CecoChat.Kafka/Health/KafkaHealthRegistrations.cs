@@ -1,22 +1,29 @@
-using CecoChat.Kafka;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 
-namespace CecoChat.Server.Backplane;
+namespace CecoChat.Kafka.Health;
 
-public static class BackplaneHealthRegistrations
+public static class KafkaHealthRegistrations
 {
-    /// <summary>
-    /// Adds a health check for Kafka backplane with a default name and a default <paramref name="timeout"/> set to 5 seconds.
-    /// </summary>
-    public static IHealthChecksBuilder AddBackplane(
+    public static IHealthChecksBuilder AddKafka(
         this IHealthChecksBuilder healthChecks,
+        string name,
         KafkaOptions options,
         KafkaProducerOptions producerOptions,
         string topic,
-        string name = "backplane",
         string[]? tags = null,
-        TimeSpan? timeout = null)
+        TimeSpan? timeout = null,
+        HealthStatus failureStatus = HealthStatus.Unhealthy)
     {
+        if (string.IsNullOrWhiteSpace(topic))
+        {
+            throw new ArgumentException($"Argument {nameof(topic)} should not be null or whitespace.", nameof(topic));
+        }
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new ArgumentException($"Argument {nameof(name)} should not be null or whitespace.", nameof(name));
+        }
+
         return healthChecks.AddKafka(config =>
             {
                 config.BootstrapServers = string.Join(separator: ',', options.BootstrapServers);
@@ -28,6 +35,7 @@ public static class BackplaneHealthRegistrations
             name: name,
             topic: topic,
             tags: tags,
-            timeout: timeout);
+            timeout: timeout,
+            failureStatus: failureStatus);
     }
 }
