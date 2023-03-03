@@ -1,1 +1,0 @@
-docker build -f Fluentd.Dockerfile -t cecochat-fluentd:0.1 .
