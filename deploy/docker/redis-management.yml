@@ -9,10 +9,10 @@ services:
     networks:
       - cecochat
     ports:
-      - "8081:8081"
+      - "8082:8081"
     deploy:
       resources:
         limits:
           memory: 128M
     environment:
-      - REDIS_HOSTS=redis1:redis1:6379
+      - REDIS_HOSTS=redis:redis:6379
