@@ -2,12 +2,25 @@ version: '3'
 networks:
   cecochat:
 services:
+  fluentd:
+    image: cecochat-fluentd:0.1
+    container_name: cecochat-fluentd
+    hostname: fluentd
+    networks: &networks
+      - cecochat
+    ports:
+      - 24224:24224
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+    volumes:
+      - ./logging/fluent.conf:/fluentd/etc/fluent.conf
   es:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.12.0
     container_name: cecochat-es
     hostname: es
-    networks: &networks
-      - cecochat
+    networks: *networks
     ports:
       - 9200:9200
     deploy:
@@ -19,7 +32,7 @@ services:
       - discovery.type=single-node
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
     volumes:
-      - cecochat-es1-data:/usr/share/elasticsearch/data
+      - cecochat-es-data:/usr/share/elasticsearch/data
   kibana:
     image: docker.elastic.co/kibana/kibana:7.12.0
     container_name: cecochat-kibana
@@ -30,14 +43,14 @@ services:
     deploy:
       resources:
         limits:
-          memory: 128M
+          memory: 256M
     environment:
       SERVER_NAME: kibana
       ELASTICSEARCH_HOSTS: http://es:9200
     volumes:
-      - ./elastic/kibana.yml:/usr/share/kibana/config/kibana.yml
+      - ./logging/kibana.yml:/usr/share/kibana/config/kibana.yml
     depends_on:
       - es
 volumes:
-  cecochat-es1-data:
+  cecochat-es-data:
     external: true
