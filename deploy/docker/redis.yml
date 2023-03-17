@@ -2,10 +2,10 @@ version: '3'
 networks:
   cecochat:
 services:
-  redis1:
+  redis:
     image: redis:7.0.5
-    container_name: cecochat-redis1
-    hostname: redis1
+    container_name: cecochat-redis
+    hostname: redis
     networks: &networks
       - cecochat
     ports:
@@ -15,9 +15,9 @@ services:
         limits:
           memory: 64M
     volumes:
-      - ./redis/redis1.conf:/redis.conf
-      - cecochat-redis1-data:/data
+      - ./redis/redis.conf:/redis.conf
+      - cecochat-redis-data:/data
     command: [ "redis-server", "/redis.conf" ]
 volumes:
-  cecochat-redis1-data:
+  cecochat-redis-data:
     external: true

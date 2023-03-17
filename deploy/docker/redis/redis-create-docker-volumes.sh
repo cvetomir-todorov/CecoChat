@@ -1,1 +1,1 @@
-docker volume create cecochat-redis1-data
+docker volume create cecochat-redis-data
