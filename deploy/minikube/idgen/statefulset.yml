@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: idgen
+  namespace: cecochat
+  labels:
+    app: idgen
+spec:
+  selector:
+    matchLabels:
+      app: idgen
+  serviceName: idgen
+  replicas: 2
+  template:
+    metadata:
+      name: idgen
+      namespace: cecochat
+      labels:
+        app: idgen
+    spec:
+      containers:
+        - name: idgen
+          image: ceco.com/cecochat/idgen:0.1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 443
+          env:
+            # aspnet
+            - name: ASPNETCORE_ENVIRONMENT
+              value: Production
+            - name: ASPNETCORE_URLS
+              value: https://+
+            - name: ASPNETCORE_HTTPS_PORT
+              value: "443"
+            - name: ASPNETCORE_Kestrel__Certificates__Default__Path
+              value: /app/cecochat-dev.pfx
+            - name: ASPNETCORE_Kestrel__Certificates__Default__Password
+              value: cecochat
+            # configdb
+            - name: CECOCHAT_ConfigDB__Endpoints__0
+              value: redis:6379
+            # tracing
+            - name: CECOCHAT_OtelSampling__Strategy
+              value: AlwaysOn
+            - name: CECOCHAT_Jaeger__AgentHost
+              value: jaeger
+          volumeMounts:
+            - mountPath: /bin/entrypoint.sh
+              name: config
+              readOnly: true
+              subPath: entrypoint.sh
+          command:
+            - /bin/entrypoint.sh
+      volumes:
+        - name: config
+          configMap:
+            name: idgen
+            defaultMode: 0700
