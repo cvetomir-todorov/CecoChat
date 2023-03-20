@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: history
+  namespace: cecochat
+  labels:
+    app: history
+spec:
+  selector:
+    app: history
+  type: ClusterIP
+  ports:
+    - port: 443
