@@ -45,10 +45,10 @@ spec:
             - name: CECOCHAT_Jaeger__AgentHost
               value: jaeger
           volumeMounts:
-            - mountPath: /bin/entrypoint.sh
-              name: config
-              readOnly: true
+            - name: config
+              mountPath: /bin/entrypoint.sh
               subPath: entrypoint.sh
+              readOnly: true
           command:
             - /bin/entrypoint.sh
       volumes:
