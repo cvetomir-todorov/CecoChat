@@ -10,8 +10,8 @@ LABEL author="Cvetomir Todorov"
 WORKDIR /app
 COPY --from=build /app/out .
 
-ADD certificates/ceco-com.crt /usr/local/share/ca-certificates/ceco-com.crt
-RUN chmod 644 /usr/local/share/ca-certificates/ceco-com.crt
+ADD certificates/services.crt /usr/local/share/ca-certificates/services.crt
+RUN chmod 644 /usr/local/share/ca-certificates/services.crt
 RUN update-ca-certificates
 
 ENTRYPOINT ["dotnet", "CecoChat.Server.IDGen.dll"]
