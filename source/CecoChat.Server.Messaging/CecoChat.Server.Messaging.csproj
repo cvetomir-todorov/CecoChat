@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="..\certificates\cecochat-dev.pfx" Link="cecochat-dev.pfx">
+    <Content Include="..\certificates\services.pfx" Link="services.pfx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
