@@ -28,8 +28,8 @@ spec:
             limits:
               memory: 128Mi
           volumeMounts:
-            - mountPath: /data
-              name: redis
+            - name: redis
+              mountPath: /data
   volumeClaimTemplates:
     - metadata:
         name: redis
