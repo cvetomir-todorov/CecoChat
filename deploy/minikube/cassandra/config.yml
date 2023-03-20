@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cassandra-env
+  namespace: cecochat
+data:
+  CASSANDRA_CLUSTER_NAME: cecochat
+  CASSANDRA_DC: Europe
+  CASSANDRA_RACK: Main
+  CASSANDRA_ENDPOINT_SNITCH: GossipingPropertyFileSnitch
+  CASSANDRA_NUM_TOKENS: "128"
+  CASSANDRA_RPC_ADDRESS: "0.0.0.0"
+  HEAP_NEWSIZE: 128M
+  MAX_HEAP_SIZE: 512M
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cassandra-scripts
+  namespace: cecochat
+data:
+  ready.sh: |-
+    #!/bin/bash
+    if [[ $(nodetool status | grep $POD_IP) == *"UN"* ]]; then
+      if [[ $DEBUG ]]; then
+        echo "UN"
+      fi
+      exit 0
+    else
+      if [[ $DEBUG ]]; then
+        echo "Not UN"
+      fi
+      exit 1
+    fi
+  prestop.sh: |-
+    #!/bin/bash
+    nodetool drain
