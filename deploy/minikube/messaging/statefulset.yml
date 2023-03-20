@@ -24,31 +24,19 @@ spec:
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 443
+          envFrom:
+            - configMapRef:
+                name: service-aspnet
+            - configMapRef:
+                name: service-configdb
+            - configMapRef:
+                name: service-tracing
           env:
-            # aspnet
-            - name: ASPNETCORE_ENVIRONMENT
-              value: Production
-            - name: ASPNETCORE_URLS
-              value: https://+
-            - name: ASPNETCORE_HTTPS_PORT
-              value: "443"
-            - name: ASPNETCORE_Kestrel__Certificates__Default__Path
-              value: /app/services.pfx
-            - name: ASPNETCORE_Kestrel__Certificates__Default__Password
-              value: cecochat
-            # configdb
-            - name: CECOCHAT_ConfigDB__Endpoints__0
-              value: redis:6379
             # backplane
             - name: CECOCHAT_Backplane__Kafka__BootstrapServers__0
               value: backplane-kafka-0.backplane-kafka.cecochat.svc.cluster.local:9092
             - name: CECOCHAT_Backplane__Kafka__BootstrapServers__1
               value: backplane-kafka-1.backplane-kafka.cecochat.svc.cluster.local:9092
-            # tracing
-            - name: CECOCHAT_OtelSampling__Strategy
-              value: AlwaysOn
-            - name: CECOCHAT_Jaeger__AgentHost
-              value: jaeger
             # idgen
             - name: CECOCHAT_IDGen__Address
               value: https://idgen
