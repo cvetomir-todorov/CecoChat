@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: cassandra
+  namespace: cecochat
+  labels:
+    app: cassandra
+spec:
+  selector:
+    matchLabels:
+      app: cassandra
+  serviceName: cassandra
+  replicas: 2
+  template:
+    metadata:
+      name: cassandra
+      namespace: cecochat
+      labels:
+        app: cassandra
+    spec:
+      terminationGracePeriodSeconds: 300 # 5 mins
+      containers:
+        - name: cassandra
+          image: cassandra:3.11.13
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 7000
+              name: intra-node
+            - containerPort: 7001
+              name: tls-intra-node
+            - containerPort: 7199
+              name: jmx
+            - containerPort: 9042
+              name: cql
+          resources:
+            limits:
+              memory: 1024Mi
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                  - /bin/prestop.sh
+          readinessProbe:
+            exec:
+              command:
+                - /bin/ready.sh
+          envFrom:
+            - configMapRef:
+                name: cassandra-env
+          env:
+            - name: CASSANDRA_SEEDS
+              value: cassandra-0.cassandra.cecochat.svc.cluster.local,cassandra-1.cassandra.cecochat.svc.cluster.local
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+          volumeMounts:
+            - name: config
+              mountPath: /bin/prestop.sh
+              subPath: prestop.sh
+              readOnly: true
+            - name: config
+              mountPath: /bin/ready.sh
+              subPath: ready.sh
+              readOnly: true
+            - name: cassandra
+              mountPath: /var/lib/cassandra/
+      volumes:
+        - name: config
+          configMap:
+            name: cassandra-scripts
+            defaultMode: 0700
+  volumeClaimTemplates:
+    - metadata:
+        name: cassandra
+        namespace: cecochat
+        labels:
+          app: cassandra
+      spec:
+        accessModes: [ReadWriteOnce]
+        resources:
+          requests:
+            storage: 1Gi
