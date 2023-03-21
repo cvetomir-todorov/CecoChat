@@ -18,6 +18,7 @@ spec:
       labels:
         app: idgen
     spec:
+      terminationGracePeriodSeconds: 10
       containers:
         - name: idgen
           image: ceco.com/cecochat/idgen:0.1
