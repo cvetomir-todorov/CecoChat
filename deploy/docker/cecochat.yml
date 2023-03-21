@@ -18,7 +18,7 @@ services:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: https://+
       ASPNETCORE_HTTPS_PORT: 443
-      ASPNETCORE_Kestrel__Certificates__Default__Path: "/app/cecochat-dev.pfx"
+      ASPNETCORE_Kestrel__Certificates__Default__Path: "/app/services.pfx"
       ASPNETCORE_Kestrel__Certificates__Default__Password: "cecochat"
       CECOCHAT_HistoryClient__Address: "https://history"
       CECOCHAT_StateClient__Address: "https://state"
@@ -45,7 +45,7 @@ services:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: https://+
       ASPNETCORE_HTTPS_PORT: 443
-      ASPNETCORE_Kestrel__Certificates__Default__Path: "/app/cecochat-dev.pfx"
+      ASPNETCORE_Kestrel__Certificates__Default__Path: "/app/services.pfx"
       ASPNETCORE_Kestrel__Certificates__Default__Password: "cecochat"
       CECOCHAT_ConfigDB__Endpoints__0: "redis:6379"
       CECOCHAT_Config__ServerID: s1
@@ -71,7 +71,7 @@ services:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: https://+
       ASPNETCORE_HTTPS_PORT: 443
-      ASPNETCORE_Kestrel__Certificates__Default__Path: "/app/cecochat-dev.pfx"
+      ASPNETCORE_Kestrel__Certificates__Default__Path: "/app/services.pfx"
       ASPNETCORE_Kestrel__Certificates__Default__Password: "cecochat"
       CECOCHAT_ConfigDB__Endpoints__0: "redis:6379"
       CECOCHAT_Backplane__ServerID: s2
@@ -97,7 +97,7 @@ services:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: https://+
       ASPNETCORE_HTTPS_PORT: 443
-      ASPNETCORE_Kestrel__Certificates__Default__Path: "/app/cecochat-dev.pfx"
+      ASPNETCORE_Kestrel__Certificates__Default__Path: "/app/services.pfx"
       ASPNETCORE_Kestrel__Certificates__Default__Password: "cecochat"
       CECOCHAT_StateDB__ContactPoints__0: cass1
       CECOCHAT_StateDB__ContactPoints__1: cass2
@@ -121,7 +121,7 @@ services:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: https://+
       ASPNETCORE_HTTPS_PORT: 443
-      ASPNETCORE_Kestrel__Certificates__Default__Path: "/app/cecochat-dev.pfx"
+      ASPNETCORE_Kestrel__Certificates__Default__Path: "/app/services.pfx"
       ASPNETCORE_Kestrel__Certificates__Default__Password: "cecochat"
       CECOCHAT_ConfigDB__Endpoints__0: "redis:6379"
       CECOCHAT_HistoryDB__ContactPoints__0: cass1
@@ -146,7 +146,7 @@ services:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: https://+
       ASPNETCORE_HTTPS_PORT: 443
-      ASPNETCORE_Kestrel__Certificates__Default__Path: "/app/cecochat-dev.pfx"
+      ASPNETCORE_Kestrel__Certificates__Default__Path: "/app/services.pfx"
       ASPNETCORE_Kestrel__Certificates__Default__Password: "cecochat"
       CECOCHAT_Config__ServerID: "1"
       CECOCHAT_ConfigDB__Endpoints__0: "redis:6379"
@@ -168,7 +168,7 @@ services:
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: https://+
       ASPNETCORE_HTTPS_PORT: 443
-      ASPNETCORE_Kestrel__Certificates__Default__Path: "/app/cecochat-dev.pfx"
+      ASPNETCORE_Kestrel__Certificates__Default__Path: "/app/services.pfx"
       ASPNETCORE_Kestrel__Certificates__Default__Password: "cecochat"
       CECOCHAT_UserDB__Init__ConnectionString: "Host=yb-tserver;Port=5433;Database=postgres;Username=yugabyte;Password=yugabyte;"
       CECOCHAT_UserDB__Seed: "true"
