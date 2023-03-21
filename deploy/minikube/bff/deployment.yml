@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bff
+  namespace: cecochat
+  labels:
+    app: bff
+spec:
+  selector:
+    matchLabels:
+      app: bff
+  replicas: 2
+  template:
+    metadata:
+      name: bff
+      namespace: cecochat
+      labels:
+        app: bff
+    spec:
+      containers:
+        - name: bff
+          image: ceco.com/cecochat/bff:0.1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 443
+          envFrom:
+            - configMapRef:
+                name: service-aspnet
+            - configMapRef:
+                name: service-configdb
+            - configMapRef:
+                name: service-tracing
+          env:
+            - name: CECOCHAT_UserClient__Address
+              value: https://user
+            - name: CECOCHAT_StateClient__Address
+              value: https://state
+            - name: CECOCHAT_HistoryClient__Address
+              value: https://history
