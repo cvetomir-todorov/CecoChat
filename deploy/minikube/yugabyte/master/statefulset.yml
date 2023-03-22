@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: yb-master
+  namespace: cecochat
+  labels:
+    app: yb-master
+spec:
+  selector:
+    matchLabels:
+      app: yb-master
+  serviceName: yb-master
+  replicas: 2
+  podManagementPolicy: Parallel
+  template:
+    metadata:
+      name: yb-master
+      namespace: cecochat
+      labels:
+        app: yb-master
+    spec:
+      containers:
+        - name: yb-master
+          image: yugabytedb/yugabyte:2.16.1.0-b50
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 7000
+              name: ui
+            - containerPort: 7100
+              name: rpc
+          env:
+            - name: GET_HOSTS_FROM
+              value: dns
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          volumeMounts:
+            - name: yb-master
+              mountPath: /mnt/master
+          command:
+            - "/home/yugabyte/bin/yb-master"
+          args:
+            - "--fs_data_dirs=/mnt/master"
+            - "--rpc_bind_addresses=$(POD_NAME).yb-master.$(NAMESPACE).svc.cluster.local:7100"
+            - "--server_broadcast_addresses=$(POD_NAME).yb-master.$(NAMESPACE).svc.cluster.local:7100"
+            - "--master_addresses=yb-master-0.yb-master.$(NAMESPACE).svc.cluster.local:7100,yb-master-1.yb-master.$(NAMESPACE).svc.cluster.local:7100"
+            - "--webserver_interface=0.0.0.0"
+            - "--master_replication_factor=2"
+            - "--replication_factor=1"
+            - "--logtostderr"
+  volumeClaimTemplates:
+    - metadata:
+        name: yb-master
+        namespace: cecochat
+        labels:
+          app: yb-master
+      spec:
+        accessModes: [ReadWriteOnce]
+        resources:
+          requests:
+            storage: 1Gi
