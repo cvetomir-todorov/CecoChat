@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user
+  namespace: cecochat
+  labels:
+    app: user
+spec:
+  selector:
+    matchLabels:
+      app: user
+  replicas: 2
+  template:
+    metadata:
+      name: user
+      namespace: cecochat
+      labels:
+        app: user
+    spec:
+      containers:
+        - name: user
+          image: ceco.com/cecochat/user:0.1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 443
+          startupProbe:
+            httpGet:
+              path: /startupz
+              port: 443
+              scheme: HTTPS
+            initialDelaySeconds: 2
+            periodSeconds: 5
+            timeoutSeconds: 5
+            failureThreshold: 2
+          livenessProbe:
+            httpGet:
+              path: /livez
+              port: 443
+              scheme: HTTPS
+            periodSeconds: 30
+            timeoutSeconds: 1
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 443
+              scheme: HTTPS
+            periodSeconds: 30
+            timeoutSeconds: 5
+          envFrom:
+            - configMapRef:
+                name: service-aspnet
+            - configMapRef:
+                name: service-tracing
+          env:
+            - name: CECOCHAT_UserDB__Init__ConnectionString
+              value: Host=yb-tserver-0.yb-tserver.cecochat.svc.cluster.local;Port=5433;Database=postgres;Username=yugabyte;Password=yugabyte;
+            - name: CECOCHAT_UserDB__Seed
+              value: "true"
+            - name: CECOCHAT_UserDB__Connect__ConnectionString
+              value: Host=yb-tserver-0.yb-tserver.cecochat.svc.cluster.local,yb-tserver-1.yb-tserver.cecochat.svc.cluster.local;Port=5433;Database=users;Username=cecochat_dev;Password=secret;Keepalive=30;Load Balance Hosts=true;
