@@ -14,11 +14,6 @@ services:
       resources:
         limits:
           memory: 256M
-    environment:
-      SERVICE_7000_NAME: yb-master
-      POSTGRES_USER: cecochat
-      POSTGRES_PASSWORD: secret_password
-      POSTGRES_DB: cecochat_users
     volumes:
       - cecochat-yb-master:/mnt/master
     command:
@@ -39,11 +34,6 @@ services:
       resources:
         limits:
           memory: 256M
-    environment:
-      SERVICE_5433_NAME: ysql
-      SERVICE_9042_NAME: ycql
-      SERVICE_6379_NAME: yedis
-      SERVICE_9000_NAME: yb-tserver
     volumes:
       - cecochat-yb-tserver:/mnt/tserver
     command:
