@@ -11,6 +11,7 @@ spec:
       app: idgen
   serviceName: idgen
   replicas: 2
+  podManagementPolicy: Parallel
   template:
     metadata:
       name: idgen
