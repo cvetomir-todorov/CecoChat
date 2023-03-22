@@ -23,6 +23,29 @@ spec:
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 443
+          startupProbe:
+            httpGet:
+              path: /startupz
+              port: 443
+              scheme: HTTPS
+            initialDelaySeconds: 2
+            periodSeconds: 5
+            timeoutSeconds: 5
+            failureThreshold: 2
+          livenessProbe:
+            httpGet:
+              path: /livez
+              port: 443
+              scheme: HTTPS
+            periodSeconds: 30
+            timeoutSeconds: 1
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: 443
+              scheme: HTTPS
+            periodSeconds: 30
+            timeoutSeconds: 5
           envFrom:
             - configMapRef:
                 name: service-aspnet
