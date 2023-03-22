@@ -11,6 +11,7 @@ spec:
       app: backplane
   serviceName: backplane-zk
   replicas: 2
+  podManagementPolicy: Parallel
   template:
     metadata:
       name: backplane-zk

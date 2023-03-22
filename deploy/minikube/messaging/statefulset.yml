@@ -11,6 +11,7 @@ spec:
       app: messaging
   serviceName: messaging
   replicas: 2
+  podManagementPolicy: Parallel
   template:
     metadata:
       name: messaging

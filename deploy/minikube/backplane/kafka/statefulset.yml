@@ -11,6 +11,7 @@ spec:
       app: backplane
   serviceName: backplane-kafka
   replicas: 2
+  podManagementPolicy: Parallel
   template:
     metadata:
       name: backplane-kafka
