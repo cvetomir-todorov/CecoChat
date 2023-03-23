@@ -1,6 +1,6 @@
 [Chat engine](docs/intro-capabilities.md) for millions of users.
 
-[System design](docs/intro-design.md) based on microservice architecture. [Implementation](source/) based on cloud agnostic technologies - Kafka, YugabyteDB, Cassandra, HTTP, gRPC, Redis, .NET 6, ASP.NET. Dynamically and statically [configurable](docs/design-configuration.md) microservices. [Observable](docs/design-observability.md) environment based on OpenTelemetry, Jaeger, Prometheus, Grafana, ElasticSearch, Fluentd, Kibana. Containerized components based on Docker which can be [ran locally](docs/dev-run-locally.md).
+[System design](docs/intro-design.md) based on microservice architecture. [Implementation](source/) based on cloud agnostic technologies - Kafka, YugabyteDB, Cassandra, HTTP, gRPC, Redis, .NET 6, ASP.NET, Docker, Kubernetes. Dynamically and statically [configurable](docs/design-configuration.md) microservices. [Observable](docs/design-observability.md) environment based on OpenTelemetry, Jaeger, Prometheus, Grafana, ElasticSearch, Fluentd, Kibana. Containerized components which can be [ran locally](docs/dev-run-locally.md) via Docker Compose or Minikube.
 
 Check out [what next](docs/what-next.md) needs to be implemented. I appreciate all comments so feel free to use the `Discussions` tab.
 
@@ -64,20 +64,6 @@ Check out [what next](docs/what-next.md) needs to be implemented. I appreciate a
 ![Cassandra](docs/tech-images/cassandra.png)
 ![Redis](docs/tech-images/redis.png)
 
-## Internal
-
-![.NET](docs/tech-images/dotnet.png)
-![ASP.NET](docs/tech-images/aspnet.png)
-![EFCore](docs/tech-images/efcore.png)
-![SignalR](docs/tech-images/signalr.webp)
-
-![Autofac](docs/tech-images/autofac.png)
-![Serilog](docs/tech-images/serilog.png)
-![AutoMapper](docs/tech-images/automapper.webp)
-![FluentValidation](docs/tech-images/fluent-validation.png)
-![Polly](docs/tech-images/polly.png)
-![Refit](docs/tech-images/refit.png)
-
 ## Observability
 
 ![OpenTelemetry](docs/tech-images/open-telemetry.png)
@@ -91,3 +77,25 @@ Check out [what next](docs/what-next.md) needs to be implemented. I appreciate a
 ## Deployment
 
 ![Docker](docs/tech-images/docker.png)
+![Kubernetes](docs/tech-images/kubernetes.webp)
+
+## Services
+
+![.NET](docs/tech-images/dotnet.png)
+![ASP.NET](docs/tech-images/aspnet.png)
+![EFCore](docs/tech-images/efcore.png)
+![SignalR](docs/tech-images/signalr.webp)
+
+![Autofac](docs/tech-images/autofac.png)
+![Serilog](docs/tech-images/serilog.png)
+![AutoMapper](docs/tech-images/automapper.webp)
+![FluentValidation](docs/tech-images/fluent-validation.png)
+![Polly](docs/tech-images/polly.png)
+![Refit](docs/tech-images/refit.png)
+
+## Tools
+
+![Ubuntu](docs/tech-images/ubuntu.webp)
+![Git](docs/tech-images/git.webp)
+![JetBrainsRider](docs/tech-images/jetbrains-rider.png)
+![Minikube](docs/tech-images/minikube.webp)

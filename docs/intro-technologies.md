@@ -89,6 +89,29 @@ Configuration is based on Redis:
 * has a built-in PUB/SUB mechanism
 * should be replaced by a more reliable technology in the future, e.g. a relational DB for storage and Kafka for notifications
 
+# Observability
+
+![OpenTelemetry](tech-images/open-telemetry.png)
+![Jaeger](tech-images/jaeger.png)
+![Prometheus](tech-images/prometheus.png)
+![Grafana](tech-images/grafana.png)
+![ElasticSearch](tech-images/elasticsearch.png)
+![Fluentd](tech-images/fluentd.png)
+![Kibana](tech-images/kibana.png)
+
+* Distributed tracing is based on OpenTelemetry and Jaeger is configured for viewing traces and spans
+* Metrics and monitoring is based on OpenTelemetry, Prometheus and Grafana
+* Log aggregation is based on the EFK stack (ElasticSearch, Fluentd, Kibana)
+
+# Deployment
+
+![Docker](tech-images/docker.png)
+![Kubernetes](tech-images/kubernetes.webp)
+
+* Containerization relies on Docker for its maturity, popularity, tooling and integration
+* Orchestration is based on Kubernetes for its power, maturity, popularity, tooling
+* infrastructure as code - TBD, probably Terraform
+
 # Services
 
 ![.NET](tech-images/dotnet.png)
@@ -117,24 +140,14 @@ Additional libraries which are all open-source and created, supported and develo
 * Polly is a popular HTTP client policies library
 * Refit is one of the most popular REST clients
 
-# Observability
+# Tools
 
-![OpenTelemetry](tech-images/open-telemetry.png)
-![Jaeger](tech-images/jaeger.png)
-![Prometheus](tech-images/prometheus.png)
-![Grafana](tech-images/grafana.png)
-![ElasticSearch](tech-images/elasticsearch.png)
-![Fluentd](tech-images/fluentd.png)
-![Kibana](tech-images/kibana.png)
+![Ubuntu](tech-images/ubuntu.webp)
+![Git](tech-images/git.webp)
+![JetBrainsRider](tech-images/jetbrains-rider.png)
+![Minikube](tech-images/minikube.webp)
 
-* distributed tracing is based on OpenTelemetry and Jaeger is configured for viewing traces and spans
-* metrics and monitoring is based on OpenTelemetry, Prometheus and Grafana
-* log aggregation is based on the EFK stack (ElasticSearch, Fluentd, Kibana)
-
-# Deployment
-
-![Docker](tech-images/docker.png)
-
-* containerization relies on Docker for its maturity, popularity, tooling and integration
-* orchestration - TBD, probably Kubernetes
-* infrastructure as code - TBD, probably Terraform
+* Ubuntu is an excellent choice for power users doing development
+* Git is a non-negotiable VCS for development at the time of writing
+* JetBrains Rider is the second most used .NET IDE
+* Minikube is one of the most popular Kubernetes local clusters
