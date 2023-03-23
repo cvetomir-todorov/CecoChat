@@ -9,5 +9,6 @@ spec:
   selector:
     app: idgen
   type: ClusterIP
+  clusterIP: None
   ports:
     - port: 443
