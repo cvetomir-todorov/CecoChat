@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: jaeger
+  namespace: cecochat
+  labels:
+    app: jaeger
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - jaeger.cecochat.com
+      secretName: ingress-tls
+  rules:
+    - host: jaeger.cecochat.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: jaeger
+                port:
+                  number: 16686
