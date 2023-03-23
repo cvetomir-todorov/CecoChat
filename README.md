@@ -1,6 +1,6 @@
 [Chat engine](docs/intro-capabilities.md) for millions of users.
 
-[System design](docs/intro-design.md) based on microservice architecture. [Implementation](source/) based on cloud agnostic technologies - Kafka, YugabyteDB, Cassandra, HTTP, gRPC, Redis, .NET 6, ASP.NET, Docker, Kubernetes. Dynamically and statically [configurable](docs/design-configuration.md) microservices. [Observable](docs/design-observability.md) environment based on OpenTelemetry, Jaeger, Prometheus, Grafana, ElasticSearch, Fluentd, Kibana. Containerized components which can be [ran locally](docs/dev-run-locally.md) via Docker Compose or Minikube.
+[System design](docs/intro-design.md) based on microservice architecture. [Implementation](source/) based on cloud agnostic technologies - Kafka, YugabyteDB, Cassandra, HTTP, gRPC, Redis, .NET 6, ASP.NET, Docker, Kubernetes. Dynamically and statically [configurable](docs/design-configuration.md) microservices. [Observable](docs/design-observability.md) environment based on OpenTelemetry, Jaeger, Prometheus, Grafana, ElasticSearch, Fluentd, Kibana. Containerized components which can be [ran locally](docs/dev-run-prerequisites.md) via Docker or Minikube.
 
 Check out [what next](docs/what-next.md) needs to be implemented. I appreciate all comments so feel free to use the `Discussions` tab.
 
@@ -36,8 +36,10 @@ Check out [what next](docs/what-next.md) needs to be implemented. I appreciate a
   - [Observability](docs/design-observability.md)
   - [Deployment](docs/design-deployment.md)
 * Development
+  - [Local run prerequisites](docs/dev-run-prerequisites.md)
+  - [Local run in Docker](docs/dev-run-docker.md)
+  - [Local run in Minikube](docs/dev-run-minikube.md)
   - [CI pipeline](docs/dev-ci.md)
-  - [Run locally](docs/dev-run-locally.md)
 * [What next](docs/what-next.md)
 
 # Design
