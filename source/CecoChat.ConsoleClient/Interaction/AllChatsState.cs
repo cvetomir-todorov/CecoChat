@@ -23,8 +23,16 @@ public sealed class AllChatsState : State
         Console.WriteLine("Choose user to chat (press '0'...'9') | New (press 'n') | Refresh (press 'f') | Exit (press 'x'):");
         Console.WriteLine("=================================================================================================");
         List<long> userIds = Storage.GetUsers();
-        List<ProfilePublic> profiles = await Client.GetPublicProfiles(userIds);
-        Dictionary<long, ProfilePublic> profilesMap = profiles.ToDictionary(profile => profile.UserId);
+        Dictionary<long, ProfilePublic> profilesMap;
+        if (userIds.Count > 0)
+        {
+            List<ProfilePublic> profiles = await Client.GetPublicProfiles(userIds);
+            profilesMap = profiles.ToDictionary(profile => profile.UserId);
+        }
+        else
+        {
+            profilesMap = new Dictionary<long, ProfilePublic>(capacity: 0);
+        }
 
         int key = 0;
         foreach (long userId in userIds)
