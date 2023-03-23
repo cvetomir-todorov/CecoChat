@@ -9,5 +9,6 @@ spec:
   selector:
     app: messaging
   type: ClusterIP
+  clusterIP: None
   ports:
     - port: 443
