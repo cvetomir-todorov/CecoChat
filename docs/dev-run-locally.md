@@ -4,7 +4,7 @@ Despite there is quite a bit of code written a good part of it is a proof-of-con
 
 # Run 3rd party components
 
-Before running the containers some preparation steps need to be done manually. The scripts for them are in the respective technology folder. Docker volumes need to be created. After running the containers some need to be prepared using `docker exec -it` just one time (unless the volumes are deleted). The `docker-compose` files for the containers are in the [run folder](../run/).
+Before running the containers some preparation steps need to be done manually. The scripts for them are in the respective technology folder. Docker volumes need to be created. After running the containers some need to be prepared using `docker exec -it` just one time (unless the volumes are deleted). The `docker-compose` files for the containers are in the [deploy to docker folder](../deploy/docker/).
 
 Container groups
 
@@ -57,7 +57,7 @@ Container groups
 
 # Containerize and run CecoChat
 
-In order to containerize CecoChat you can use the folder which contains the [Docker files](../run/cecochat/) for building the Docker images. Internally the Docker files do `dotnet publish` and use `Release` configuration but this can be changed as prefered. The `docker-compose` file creates containers for:
+In order to containerize CecoChat you can use the folder which contains the [Dockerfiles](../package/cecochat/) for building the Docker images. Internally the Docker files do `dotnet publish` and use `Release` configuration but this can be changed as prefered. The `docker-compose` file creates containers for:
 
 * 1 BFF
 * 2 Messaging
