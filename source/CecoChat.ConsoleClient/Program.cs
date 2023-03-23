@@ -8,9 +8,29 @@ public static class Program
 {
     public static async Task Main()
     {
-        Console.Write("Select a username: 'bob' (ID=1), 'alice' (ID=2), 'john' (ID=3), 'peter' (ID=1200): ");
+        string cluster = string.Empty;
+        bool chosen = false;
+        while (!chosen)
+        {
+            Console.WriteLine("Choose a cluster: local/Docker https://localhost:31000 (press '1') | Kubernetes https://bff.cecochat.com (press '2')");
+            ConsoleKeyInfo keyInfo = Console.ReadKey(intercept: true);
+            switch (keyInfo.Key)
+            {
+                case ConsoleKey.D1:
+                    cluster = "https://localhost:31000";
+                    chosen = true;
+                    break;
+                case ConsoleKey.D2:
+                    cluster = "https://bff.cecochat.com";
+                    chosen = true;
+                    break;
+            }
+        }
+
+        Console.Write("Type a username: 'bob' (ID=1), 'alice' (ID=2), 'john' (ID=3), 'peter' (ID=1200): ");
         string username = Console.ReadLine() ?? string.Empty;
-        ChatClient client = new("https://localhost:31000");
+
+        ChatClient client = new(cluster);
         await client.CreateSession(username, password: "not-empty");
         MessageStorage storage = new(client.UserId);
         ChangeHandler changeHandler = new(storage);
