@@ -8,7 +8,8 @@ metadata:
 spec:
   selector:
     statefulset.kubernetes.io/pod-name: messaging-0
-  type: NodePort
+  type: ClusterIP
+  internalTrafficPolicy: Local
   ports:
     - port: 443
       name: "https"
@@ -25,7 +26,8 @@ metadata:
 spec:
   selector:
     statefulset.kubernetes.io/pod-name: messaging-1
-  type: NodePort
+  type: ClusterIP
+  internalTrafficPolicy: Local
   ports:
     - port: 443
       name: "https"
