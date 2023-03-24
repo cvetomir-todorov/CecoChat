@@ -26,9 +26,9 @@
 * Scalability
   - Designed for up to 10 mln of simultaneously active users, which unfortunately is expensive to validate due to the infrastructure required
   - Supported by numbers from the [calculations](research-calculations.md)
-  - Linear scalability of the main technologies (Kafka, Cassandra) 
+  - Linear scalability of the main technologies (Kafka, Cassandra, YugabyteDB) 
 * Security
-  - TLS used on communication level
+  - TLS for Kubernetes cluster and services
   - Access tokens for authn and authz
 * Observability
   - Health
@@ -38,6 +38,9 @@
   - Monitoring
 * Deployment
   - Containerization
+  - Load balancing
+  - High availability (partial)
 * Maintainability
+  - Minimal documentation
   - Code quality gate
   - Open-source technologies
