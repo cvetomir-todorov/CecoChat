@@ -4,11 +4,11 @@ metadata:
   name: backplane-kafka
   namespace: cecochat
   labels:
-    app: backplane
+    app: backplane-kafka
 spec:
   selector:
     matchLabels:
-      app: backplane
+      app: backplane-kafka
   serviceName: backplane-kafka
   replicas: 2
   podManagementPolicy: Parallel
@@ -17,7 +17,7 @@ spec:
       name: backplane-kafka
       namespace: cecochat
       labels:
-        app: backplane
+        app: backplane-kafka
     spec:
       containers:
         - name: backplane-kafka
@@ -61,7 +61,7 @@ spec:
         name: backplane-kafka
         namespace: cecochat
         labels:
-          app: backplane
+          app: backplane-kafka
       spec:
         accessModes: [ReadWriteOnce]
         resources:
