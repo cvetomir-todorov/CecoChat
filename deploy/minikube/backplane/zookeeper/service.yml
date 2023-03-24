@@ -4,10 +4,10 @@ metadata:
   name: backplane-zk
   namespace: cecochat
   labels:
-    app: backplane
+    app: backplane-zk
 spec:
   selector:
-    app: backplane
+    app: backplane-zk
   type: ClusterIP
   clusterIP: None
   ports:

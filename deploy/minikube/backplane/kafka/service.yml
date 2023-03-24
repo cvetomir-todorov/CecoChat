@@ -4,10 +4,10 @@ metadata:
   name: backplane-kafka
   namespace: cecochat
   labels:
-    app: backplane
+    app: backplane-kafka
 spec:
   selector:
-    app: backplane
+    app: backplane-kafka
   type: ClusterIP
   clusterIP: None
   ports:

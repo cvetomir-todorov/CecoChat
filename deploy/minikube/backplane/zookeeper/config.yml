@@ -4,7 +4,7 @@ metadata:
   name: backplane-zk
   namespace: cecochat
   labels:
-    app: backplane
+    app: backplane-zk
 data:
   entrypoint.sh: |-
     #!/bin/bash
