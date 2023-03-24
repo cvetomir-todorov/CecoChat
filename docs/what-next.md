@@ -40,16 +40,14 @@
   - Design cross-region communication
 * Security
   - Rate limiting
-  - Use secure transports and protocols on communication level
+  - Secure access to integration, data storage, observability components
 * Observability
   - Metrics for system resources
   - Alerting
 * Deployment
   - Infrastructure as code
-  - Load balancing
   - Auto-scaling
-    - Distribute partitions between stateful service instances
-  - Failover
+  - High availability (complete)
 
 ## Development
 
@@ -69,4 +67,4 @@
   - Improve existing log aggregation - performance of Fluentd, ElasticSearch index customizations
 * Misc
   - Improve monotonic clock skew and make snowflake ID generation to use it as `IdGen.ITimeSource`
-  - Improve error handling, resilience, validation (e.g. gRPC requests)
+  - Improve error handling, resilience
