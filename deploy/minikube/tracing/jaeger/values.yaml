@@ -1,0 +1,11 @@
+StatefulSet:
+  Replicas: 1
+Image:
+  Name: jaegertracing/all-in-one
+  Tag: 1.38.1
+  PullPolicy: IfNotPresent
+Networking:
+  AccessPort: 16686
+Ingress:
+  Host: jaeger.cecochat.com
+  SecretName: ingress-tls
