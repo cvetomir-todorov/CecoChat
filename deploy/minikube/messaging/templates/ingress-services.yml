@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{.Release.Name}}-0
+  namespace: {{.Release.Namespace}}
+  labels:
+    app: {{.Release.Name}}
+spec:
+  selector:
+    statefulset.kubernetes.io/pod-name: {{.Release.Name}}-0
+  type: ClusterIP
+  internalTrafficPolicy: Local
+  ports:
+    - port: {{.Values.Networking.Port}}
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{.Release.Name}}-1
+  namespace: {{.Release.Namespace}}
+  labels:
+    app: {{.Release.Name}}
+spec:
+  selector:
+    statefulset.kubernetes.io/pod-name: {{.Release.Name}}-1
+  type: ClusterIP
+  internalTrafficPolicy: Local
+  ports:
+    - port: {{.Values.Networking.Port}}

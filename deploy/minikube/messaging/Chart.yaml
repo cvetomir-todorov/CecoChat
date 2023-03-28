@@ -1,0 +1,8 @@
+apiVersion: v2
+name: messaging
+description: The Messaging service in CecoChat
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+maintainers:
+  - name: CecoChat

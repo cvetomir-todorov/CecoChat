@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: messaging
-  namespace: cecochat
+  name: {{.Release.Name}}
+  namespace: {{.Release.Namespace}}
   labels:
-    app: messaging
+    app: {{.Release.Name}}
 data:
-  entrypoint.sh: |-
+  {{.Values.Entrypoint.ConfigName}}: |-
     #!/bin/bash
     export CECOCHAT_Config__ServerID=${HOSTNAME##*-}
     export CECOCHAT_IDGen__OriginatorID=${HOSTNAME##*-}
