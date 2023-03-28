@@ -1,0 +1,34 @@
+Zk:
+  StatefulSet:
+    Replicas: 2
+  Image:
+    Name: zookeeper
+    Tag: 3.4.14
+    PullPolicy: IfNotPresent
+  Networking:
+    ClientPort: 2181
+    FollowerPort: 2888
+    LeaderPort: 3888
+  Entrypoint:
+    ConfigName: entrypoint.sh
+    MountPath: /bin/entrypoint.sh
+  Resources:
+    Limits:
+      Memory: 128Mi
+    Requests:
+      Storage: 128Mi
+Kafka:
+  StatefulSet:
+    Replicas: 2
+  Image:
+    Name: confluentinc/cp-kafka
+    Tag: 7.2.2
+    PullPolicy: IfNotPresent
+  Networking:
+    Port: 9092
+  Entrypoint:
+    ConfigName: entrypoint.sh
+    MountPath: /bin/entrypoint.sh
+  Resources:
+    Requests:
+      Storage: 512Mi
