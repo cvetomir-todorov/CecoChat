@@ -1,0 +1,8 @@
+apiVersion: v2
+name: redis
+description: The Redis instance representing Config DB for CecoChat
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+maintainers:
+  - name: CecoChat
