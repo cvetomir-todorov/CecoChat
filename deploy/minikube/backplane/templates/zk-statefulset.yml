@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{.Release.Name}}-zk
+  namespace: {{.Release.Namespace}}
+  labels:
+    app: {{.Release.Name}}-zk
+spec:
+  selector:
+    matchLabels:
+      app: {{.Release.Name}}-zk
+  serviceName: {{.Release.Name}}-zk
+  replicas: {{.Values.Zk.StatefulSet.Replicas}}
+  podManagementPolicy: Parallel
+  template:
+    metadata:
+      labels:
+        app: {{.Release.Name}}-zk
+    spec:
+      containers:
+        - name: {{.Release.Name}}-zk
+          image: {{.Values.Zk.Image.Name}}:{{.Values.Zk.Image.Tag}}
+          imagePullPolicy: {{.Values.Zk.Image.PullPolicy}}
+          ports:
+            - containerPort: {{.Values.Zk.Networking.ClientPort}}
+            - containerPort: {{.Values.Zk.Networking.FollowerPort}}
+            - containerPort: {{.Values.Zk.Networking.LeaderPort}}
+          resources:
+            limits:
+              memory: {{.Values.Zk.Resources.Limits.Memory}}
+          env:
+            - name: ZOO_PORT
+              value: "{{.Values.Zk.Networking.ClientPort}}"
+            - name: ZOO_SERVERS
+              value: server.0={{.Release.Name}}-zk-0.{{.Release.Name}}-zk.{{.Release.Namespace}}.svc.cluster.local:{{.Values.Zk.Networking.FollowerPort}}:{{.Values.Zk.Networking.LeaderPort}} server.1={{.Release.Name}}-zk-1.{{.Release.Name}}-zk.{{.Release.Namespace}}.svc.cluster.local:{{.Values.Zk.Networking.FollowerPort}}:{{.Values.Zk.Networking.LeaderPort}}
+          volumeMounts:
+            - name: config
+              mountPath: {{.Values.Zk.Entrypoint.MountPath}}
+              subPath: {{.Values.Zk.Entrypoint.ConfigName}}
+              readOnly: true
+            - name: zk-data
+              mountPath: /data
+              subPath: data
+            - name: zk-data
+              mountPath: /datalog
+              subPath: datalog
+          command:
+            - {{.Values.Zk.Entrypoint.MountPath}}
+      volumes:
+        - name: config
+          configMap:
+            name: {{.Release.Name}}-zk
+            defaultMode: 0700
+  volumeClaimTemplates:
+    - metadata:
+        name: zk-data
+      spec:
+        accessModes: [ReadWriteOnce]
+        resources:
+          requests:
+            storage: {{.Values.Zk.Resources.Requests.Storage}}

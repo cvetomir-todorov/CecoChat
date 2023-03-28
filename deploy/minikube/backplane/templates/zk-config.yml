@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: backplane-zk
-  namespace: cecochat
+  name: {{.Release.Name}}-zk
+  namespace: {{.Release.Namespace}}
   labels:
-    app: backplane-zk
+    app: {{.Release.Name}}-zk
 data:
-  entrypoint.sh: |-
+  {{.Values.Zk.Entrypoint.ConfigName}}: |-
     #!/bin/bash
     export ZOO_MY_ID=${HOSTNAME##*-}
     /docker-entrypoint.sh zkServer.sh start-foreground

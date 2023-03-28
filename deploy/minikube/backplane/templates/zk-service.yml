@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{.Release.Name}}-zk
+  namespace: {{.Release.Namespace}}
+  labels:
+    app: {{.Release.Name}}-zk
+spec:
+  selector:
+    app: {{.Release.Name}}-zk
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - port: {{.Values.Zk.Networking.ClientPort}}
+      name: client
+    - port: {{.Values.Zk.Networking.FollowerPort}}
+      name: follower
+    - port: {{.Values.Zk.Networking.LeaderPort}}
+      name: leader
