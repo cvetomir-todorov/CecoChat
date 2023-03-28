@@ -1,37 +1,37 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: messaging
-  namespace: cecochat
+  name: {{.Release.Name}}
+  namespace: {{.Release.Namespace}}
   labels:
-    app: messaging
+    app: {{.Release.Name}}
   annotations:
     nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
-    nginx.ingress.kubernetes.io/proxy-read-timeout: "300" # 5 mins
-    nginx.ingress.kubernetes.io/proxy-send-timeout: "300" # 5 mins
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "{{.Values.Ingress.ReadTimeout}}"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "{{.Values.Ingress.SendTimeout}}"
     nginx.ingress.kubernetes.io/use-regex: "true"
     nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
   ingressClassName: nginx
   tls:
     - hosts:
-        - messaging.cecochat.com
-      secretName: ingress-tls
+        - {{.Values.Ingress.Host}}
+      secretName: {{.Values.Ingress.SecretName}}
   rules:
-    - host: messaging.cecochat.com
+    - host: {{.Values.Ingress.Host}}
       http:
         paths:
           - path: /m0(/|$)(.*)
             pathType: Prefix
             backend:
               service:
-                name: messaging-0
+                name: {{.Release.Name}}-0
                 port:
-                  name: "https"
+                  number: {{.Values.Networking.Port}}
           - path: /m1(/|$)(.*)
             pathType: Prefix
             backend:
               service:
-                name: messaging-1
+                name: {{.Release.Name}}-1
                 port:
-                  name: "https"
+                  number: {{.Values.Networking.Port}}
