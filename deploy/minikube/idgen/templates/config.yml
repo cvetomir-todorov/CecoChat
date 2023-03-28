@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: idgen
-  namespace: cecochat
+  name: {{.Release.Name}}
+  namespace: {{.Release.Namespace}}
   labels:
-    app: idgen
+    app: {{.Release.Name}}
 data:
-  entrypoint.sh: |-
+  {{.Values.Entrypoint.ConfigName}}: |-
     #!/bin/bash
     export CECOCHAT_Config__ServerID=${HOSTNAME##*-}
     dotnet CecoChat.Server.IDGen.dll

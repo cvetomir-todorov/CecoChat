@@ -1,0 +1,13 @@
+StatefulSet:
+  Replicas: 2
+Image:
+  Name: ceco.com/cecochat/idgen
+  Tag: 0.1
+  PullPolicy: IfNotPresent
+Networking:
+  Port: 443
+Probes:
+  Scheme: HTTPS
+Entrypoint:
+  ConfigName: entrypoint.sh
+  MountPath: /bin/entrypoint.sh
