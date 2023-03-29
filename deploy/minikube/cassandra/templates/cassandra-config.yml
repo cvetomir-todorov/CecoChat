@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{.Release.Name}}-env
+  namespace: {{.Release.Namespace}}
+data:
+  CASSANDRA_CLUSTER_NAME: "{{.Values.Env.CASSANDRA_CLUSTER_NAME}}"
+  CASSANDRA_DC: "{{.Values.Env.CASSANDRA_DC}}"
+  CASSANDRA_RACK: "{{.Values.Env.CASSANDRA_RACK}}"
+  CASSANDRA_ENDPOINT_SNITCH: "{{.Values.Env.CASSANDRA_ENDPOINT_SNITCH}}"
+  CASSANDRA_NUM_TOKENS: "{{.Values.Env.CASSANDRA_NUM_TOKENS}}"
+  CASSANDRA_RPC_ADDRESS: "{{.Values.Env.CASSANDRA_RPC_ADDRESS}}"
+  HEAP_NEWSIZE: "{{.Values.Env.HEAP_NEWSIZE}}"
+  MAX_HEAP_SIZE: "{{.Values.Env.MAX_HEAP_SIZE}}"
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{.Release.Name}}-scripts
+  namespace: {{.Release.Namespace}}
+data:
+  {{.Values.Scripts.Ready.ConfigName}}: |-
+    #!/bin/bash
+    if [[ $(nodetool status | grep $POD_IP) == *"UN"* ]]; then
+      if [[ $DEBUG ]]; then
+        echo "UN"
+      fi
+      exit 0
+    else
+      if [[ $DEBUG ]]; then
+        echo "Not UN"
+      fi
+      exit 1
+    fi
+  {{.Values.Scripts.PreStop.ConfigName}}: |-
+    #!/bin/bash
+    nodetool drain
