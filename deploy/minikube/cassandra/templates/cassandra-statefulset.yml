@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{.Release.Name}}
+  namespace: {{.Release.Namespace}}
+  labels:
+    app: {{.Release.Name}}
+spec:
+  selector:
+    matchLabels:
+      app: {{.Release.Name}}
+  serviceName: {{.Release.Name}}
+  replicas: {{.Values.StatefulSet.Replicas}}
+  podManagementPolicy: Parallel
+  template:
+    metadata:
+      labels:
+        app: {{.Release.Name}}
+    spec:
+      terminationGracePeriodSeconds: 300 # 5 mins
+      containers:
+        - name: {{.Release.Name}}
+          image: {{.Values.Image.Name}}:{{.Values.Image.Tag}}
+          imagePullPolicy: {{.Values.Image.PullPolicy}}
+          ports:
+            - containerPort: {{.Values.Networking.IntraNodePort}}
+            - containerPort: {{.Values.Networking.TlsIntraNodePort}}
+            - containerPort: {{.Values.Networking.JmxPort}}
+            - containerPort: {{.Values.Networking.CqlPort}}
+          resources:
+            limits:
+              memory: {{.Values.Resources.Limits.Memory}}
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                  - {{.Values.Scripts.PreStop.MountPath}}
+          readinessProbe:
+            exec:
+              command:
+                - {{.Values.Scripts.Ready.MountPath}}
+          envFrom:
+            - configMapRef:
+                name: {{.Release.Name}}-env
+          env:
+            - name: CASSANDRA_SEEDS
+              value: {{.Release.Name}}-0.{{.Release.Name}}.{{.Release.Namespace}}.svc.cluster.local,{{.Release.Name}}-1.{{.Release.Name}}.{{.Release.Namespace}}.svc.cluster.local
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+          volumeMounts:
+            - name: config
+              mountPath: {{.Values.Scripts.PreStop.MountPath}}
+              subPath: {{.Values.Scripts.PreStop.ConfigName}}
+              readOnly: true
+            - name: config
+              mountPath: {{.Values.Scripts.Ready.MountPath}}
+              subPath: {{.Values.Scripts.Ready.ConfigName}}
+              readOnly: true
+            - name: cassandra-data
+              mountPath: /var/lib/cassandra/
+      volumes:
+        - name: config
+          configMap:
+            name: {{.Release.Name}}-scripts
+            defaultMode: 0700
+  volumeClaimTemplates:
+    - metadata:
+        name: cassandra-data
+      spec:
+        accessModes: [ReadWriteOnce]
+        resources:
+          requests:
+            storage: {{.Values.Resources.Requests.Storage}}

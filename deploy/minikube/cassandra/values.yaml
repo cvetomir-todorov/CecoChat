@@ -1,0 +1,32 @@
+Env:
+  CASSANDRA_CLUSTER_NAME: cecochat
+  CASSANDRA_DC: Europe
+  CASSANDRA_RACK: Main
+  CASSANDRA_ENDPOINT_SNITCH: GossipingPropertyFileSnitch
+  CASSANDRA_NUM_TOKENS: 128
+  CASSANDRA_RPC_ADDRESS: 0.0.0.0
+  HEAP_NEWSIZE: 128M
+  MAX_HEAP_SIZE: 512M
+StatefulSet:
+  Replicas: 2
+Image:
+  Name: cassandra
+  Tag: 3.11.13
+  PullPolicy: IfNotPresent
+Networking:
+  IntraNodePort: 7000
+  TlsIntraNodePort: 7001
+  JmxPort: 7199
+  CqlPort: 9042
+Scripts:
+  Ready:
+    ConfigName: ready.sh
+    MountPath: /bin/ready.sh
+  PreStop:
+    ConfigName: prestop.sh
+    MountPath: /bin/prestop.sh
+Resources:
+  Limits:
+    Memory: 1Gi
+  Requests:
+    Storage: 1Gi

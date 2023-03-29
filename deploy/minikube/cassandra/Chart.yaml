@@ -1,0 +1,8 @@
+apiVersion: v2
+name: backplane
+description: Cassandra database in CecoChat used by State and History services
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+maintainers:
+  - name: CecoChat
