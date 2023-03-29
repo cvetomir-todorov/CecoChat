@@ -45,7 +45,7 @@ spec:
               mountPath: {{.Values.Kafka.Entrypoint.MountPath}}
               subPath: {{.Values.Kafka.Entrypoint.ConfigName}}
               readOnly: true
-            - name: kafka-data
+            - name: data
               mountPath: /var/lib/kafka/data
           command:
             - {{.Values.Kafka.Entrypoint.MountPath}}
@@ -56,7 +56,7 @@ spec:
             defaultMode: 0777
   volumeClaimTemplates:
     - metadata:
-        name: kafka-data
+        name: data
       spec:
         accessModes: [ReadWriteOnce]
         resources:

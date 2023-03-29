@@ -38,10 +38,10 @@ spec:
               mountPath: {{.Values.Zk.Entrypoint.MountPath}}
               subPath: {{.Values.Zk.Entrypoint.ConfigName}}
               readOnly: true
-            - name: zk-data
+            - name: data
               mountPath: /data
               subPath: data
-            - name: zk-data
+            - name: data
               mountPath: /datalog
               subPath: datalog
           command:
@@ -53,7 +53,7 @@ spec:
             defaultMode: 0700
   volumeClaimTemplates:
     - metadata:
-        name: zk-data
+        name: data
       spec:
         accessModes: [ReadWriteOnce]
         resources:

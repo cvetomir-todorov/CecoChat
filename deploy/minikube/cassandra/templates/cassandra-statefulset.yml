@@ -58,7 +58,7 @@ spec:
               mountPath: {{.Values.Scripts.Ready.MountPath}}
               subPath: {{.Values.Scripts.Ready.ConfigName}}
               readOnly: true
-            - name: cassandra-data
+            - name: data
               mountPath: /var/lib/cassandra/
       volumes:
         - name: config
@@ -67,7 +67,7 @@ spec:
             defaultMode: 0700
   volumeClaimTemplates:
     - metadata:
-        name: cassandra-data
+        name: data
       spec:
         accessModes: [ReadWriteOnce]
         resources:
