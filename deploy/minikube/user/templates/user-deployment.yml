@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{.Release.Name}}
+  namespace: {{.Release.Namespace}}
+  labels:
+    app: {{.Release.Name}}
+spec:
+  selector:
+    matchLabels:
+      app: {{.Release.Name}}
+  replicas: {{.Values.Deployment.Replicas}}
+  template:
+    metadata:
+      labels:
+        app: {{.Release.Name}}
+    spec:
+      containers:
+        - name: {{.Release.Name}}
+          image: {{.Values.Image.Name}}:{{.Values.Image.Tag}}
+          imagePullPolicy: {{.Values.Image.PullPolicy}}
+          ports:
+            - containerPort: {{.Values.Networking.Port}}
+          startupProbe:
+            httpGet:
+              path: /startupz
+              port: {{.Values.Networking.Port}}
+              scheme: {{.Values.Probes.Scheme}}
+            initialDelaySeconds: 2
+            periodSeconds: 5
+            timeoutSeconds: 5
+            failureThreshold: 2
+          livenessProbe:
+            httpGet:
+              path: /livez
+              port: {{.Values.Networking.Port}}
+              scheme: {{.Values.Probes.Scheme}}
+            periodSeconds: 30
+            timeoutSeconds: 1
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: {{.Values.Networking.Port}}
+              scheme: {{.Values.Probes.Scheme}}
+            periodSeconds: 30
+            timeoutSeconds: 5
+          envFrom:
+            - configMapRef:
+                name: service-aspnet
+            - configMapRef:
+                name: service-tracing
+          env:
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: CECOCHAT_UserDB__Init__ConnectionString
+              value: Host={{.Values.Networking.UserDB.Host}}-0.{{.Values.Networking.UserDB.Service}}.$(NAMESPACE).svc.cluster.local;Port={{.Values.Networking.UserDB.Port}};Database=postgres;Username={{.Values.Networking.UserDB.Root.User}};Password={{.Values.Networking.UserDB.Root.Pass}};
+            - name: CECOCHAT_UserDB__Seed
+              value: "true"
+            - name: CECOCHAT_UserDB__Connect__ConnectionString
+              value: Host={{.Values.Networking.UserDB.Host}}-0.{{.Values.Networking.UserDB.Service}}.$(NAMESPACE).svc.cluster.local,{{.Values.Networking.UserDB.Host}}-1.{{.Values.Networking.UserDB.Service}}.$(NAMESPACE).svc.cluster.local;Port={{.Values.Networking.UserDB.Port}};Database=users;Username={{.Values.Networking.UserDB.Normal.User}};Password={{.Values.Networking.UserDB.Normal.Pass}};Keepalive=30;Load Balance Hosts=true;
