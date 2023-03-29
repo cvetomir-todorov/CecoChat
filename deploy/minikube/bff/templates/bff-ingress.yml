@@ -1,26 +1,26 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: bff
-  namespace: cecochat
+  name: {{.Release.Name}}
+  namespace: {{.Release.Namespace}}
   labels:
-    app: bff
+    app: {{.Release.Name}}
   annotations:
     nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
 spec:
   ingressClassName: nginx
   tls:
     - hosts:
-        - bff.cecochat.com
-      secretName: ingress-tls
+        - {{.Values.Ingress.Host}}
+      secretName: {{.Values.Ingress.SecretName}}
   rules:
-    - host: bff.cecochat.com
+    - host: {{.Values.Ingress.Host}}
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: bff
+                name: {{.Release.Name}}
                 port:
-                  name: "https"
+                  number: {{.Values.Networking.Port}}

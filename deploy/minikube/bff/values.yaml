@@ -1,0 +1,16 @@
+Deployment:
+  Replicas: 2
+Image:
+  Name: ceco.com/cecochat/bff
+  Tag: 0.1
+  PullPolicy: IfNotPresent
+Networking:
+  Port: 443
+  UserService: user
+  StateService: state
+  HistoryService: history
+Ingress:
+  Host: bff.cecochat.com
+  SecretName: ingress-tls
+Probes:
+  Scheme: HTTPS

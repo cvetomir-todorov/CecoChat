@@ -1,33 +1,31 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: bff
-  namespace: cecochat
+  name: {{.Release.Name}}
+  namespace: {{.Release.Namespace}}
   labels:
-    app: bff
+    app: {{.Release.Name}}
 spec:
   selector:
     matchLabels:
-      app: bff
-  replicas: 2
+      app: {{.Release.Name}}
+  replicas: {{.Values.Deployment.Replicas}}
   template:
     metadata:
-      name: bff
-      namespace: cecochat
       labels:
-        app: bff
+        app: {{.Release.Name}}
     spec:
       containers:
-        - name: bff
-          image: ceco.com/cecochat/bff:0.1
-          imagePullPolicy: IfNotPresent
+        - name: {{.Release.Name}}
+          image: {{.Values.Image.Name}}:{{.Values.Image.Tag}}
+          imagePullPolicy: {{.Values.Image.PullPolicy}}
           ports:
-            - containerPort: 443
+            - containerPort: {{.Values.Networking.Port}}
           startupProbe:
             httpGet:
               path: /startupz
-              port: 443
-              scheme: HTTPS
+              port: {{.Values.Networking.Port}}
+              scheme: {{.Values.Probes.Scheme}}
             initialDelaySeconds: 2
             periodSeconds: 5
             timeoutSeconds: 5
@@ -35,15 +33,15 @@ spec:
           livenessProbe:
             httpGet:
               path: /livez
-              port: 443
-              scheme: HTTPS
+              port: {{.Values.Networking.Port}}
+              scheme: {{.Values.Probes.Scheme}}
             periodSeconds: 30
             timeoutSeconds: 1
           readinessProbe:
             httpGet:
               path: /readyz
-              port: 443
-              scheme: HTTPS
+              port: {{.Values.Networking.Port}}
+              scheme: {{.Values.Probes.Scheme}}
             periodSeconds: 30
             timeoutSeconds: 5
           envFrom:
@@ -55,8 +53,8 @@ spec:
                 name: service-tracing
           env:
             - name: CECOCHAT_UserClient__Address
-              value: https://user
+              value: https://{{.Values.Networking.UserService}}
             - name: CECOCHAT_StateClient__Address
-              value: https://state
+              value: https://{{.Values.Networking.StateService}}
             - name: CECOCHAT_HistoryClient__Address
-              value: https://history
+              value: https://{{.Values.Networking.HistoryService}}
