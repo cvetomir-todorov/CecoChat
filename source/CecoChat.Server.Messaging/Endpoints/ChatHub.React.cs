@@ -43,7 +43,7 @@ public partial class ChatHub
         {
             throw new ValidationHubException(result.Errors);
         }
-        if (!Context.User!.TryGetUserClaims(out UserClaims? userClaims))
+        if (!Context.User!.TryGetUserClaims(Context.ConnectionId, _logger, out UserClaims? userClaims))
         {
             throw new HubException(MissingUserDataExMsg);
         }
