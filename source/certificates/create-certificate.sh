@@ -12,5 +12,5 @@ openssl x509 -text -in services.crt
 
 # create a pfx
 cat services.crt services.key > services.all
-openssl pkcs12 -export -in services.all -out services.pfx
+openssl pkcs12 -export -in services.all -out services.pfx -password pass:cecochat
 rm services.all

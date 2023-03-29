@@ -4,13 +4,15 @@
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
 # Cecochat
-containerize/Connect
-containerize/Messaging
-containerize/History
-containerize/Materialize
-containerize/Profile
 *drawio.bkp
 *drawio.dtmp
+source/certificates/services.key
+source/certificates/services.csr
+source/certificates/services.crt
+source/certificates/services.pfx
+deploy/minikube/certificates/ingress.key
+deploy/minikube/certificates/ingress.csr
+deploy/minikube/certificates/ingress.crt
 
 # User-specific files
 *.rsuser

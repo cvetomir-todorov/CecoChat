@@ -9,8 +9,3 @@ openssl req -text -in ingress.csr
 # create a certificate using the CSR and sign it with the private key
 openssl x509 -req -days 3650 -sha512 -in ingress.csr -extensions v3_req -extfile ingress.conf -signkey ingress.key -out ingress.crt
 openssl x509 -text -in ingress.crt
-
-# create a pfx
-cat ingress.crt ingress.key > ingress.all
-openssl pkcs12 -export -in ingress.all -out ingress.pfx
-rm ingress.all
