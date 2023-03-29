@@ -26,11 +26,11 @@ spec:
             limits:
               memory: {{.Values.Resources.Limits.Memory}}
           volumeMounts:
-            - name: redis-data
+            - name: data
               mountPath: /data
   volumeClaimTemplates:
     - metadata:
-        name: redis-data
+        name: data
       spec:
         accessModes: [ReadWriteOnce]
         resources:
