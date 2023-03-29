@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{.Release.Name}}-tserver
+  namespace: {{.Release.Namespace}}
+  labels:
+    app: {{.Release.Name}}-tserver
+spec:
+  selector:
+    app: {{.Release.Name}}-tserver
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - name: "sql"
+      port: {{.Values.TServer.Networking.SqlPort}}
+    - name: "ui"
+      port: {{.Values.TServer.Networking.UiPort}}
+    - name: "rpc"
+      port: {{.Values.TServer.Networking.RpcPort}}

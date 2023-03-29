@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{.Release.Name}}-master
+  namespace: {{.Release.Namespace}}
+  labels:
+    app: {{.Release.Name}}-master
+spec:
+  selector:
+    app: {{.Release.Name}}-master
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - name: "ui"
+      port: {{.Values.Master.Networking.UiPort}}
+    - name: "rpc"
+      port: {{.Values.Master.Networking.RpcPort}}

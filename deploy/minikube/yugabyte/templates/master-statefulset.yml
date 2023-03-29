@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{.Release.Name}}-master
+  namespace: {{.Release.Namespace}}
+  labels:
+    app: {{.Release.Name}}-master
+spec:
+  selector:
+    matchLabels:
+      app: {{.Release.Name}}-master
+  serviceName: {{.Release.Name}}-master
+  replicas: {{.Values.Master.StatefulSet.Replicas}}
+  podManagementPolicy: Parallel
+  template:
+    metadata:
+      labels:
+        app: {{.Release.Name}}-master
+    spec:
+      containers:
+        - name: {{.Release.Name}}-master
+          image: {{.Values.Master.Image.Name}}:{{.Values.Master.Image.Tag}}
+          imagePullPolicy: {{.Values.Master.Image.PullPolicy}}
+          ports:
+            - containerPort: {{.Values.Master.Networking.UiPort}}
+            - containerPort: {{.Values.Master.Networking.RpcPort}}
+          env:
+            - name: GET_HOSTS_FROM
+              value: dns
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          volumeMounts:
+            - name: data
+              mountPath: /mnt/master
+          command:
+            - "/home/yugabyte/bin/yb-master"
+          args:
+            - "--fs_data_dirs=/mnt/master"
+            - "--rpc_bind_addresses=$(POD_NAME).{{.Release.Name}}-master.$(NAMESPACE).svc.cluster.local:{{.Values.Master.Networking.RpcPort}}"
+            - "--server_broadcast_addresses=$(POD_NAME).{{.Release.Name}}-master.$(NAMESPACE).svc.cluster.local:{{.Values.Master.Networking.RpcPort}}"
+            - "--master_addresses={{.Release.Name}}-master-0.{{.Release.Name}}-master.$(NAMESPACE).svc.cluster.local:{{.Values.Master.Networking.RpcPort}},{{.Release.Name}}-master-1.{{.Release.Name}}-master.$(NAMESPACE).svc.cluster.local:{{.Values.Master.Networking.RpcPort}}"
+            - "--webserver_interface={{.Values.Master.Networking.WebServerInterface}}"
+            - "--master_replication_factor={{.Values.Master.Data.MasterReplicationFactor}}"
+            - "--replication_factor={{.Values.Master.Data.ReplicationFactor}}"
+            - "--logtostderr"
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: [ReadWriteOnce]
+        resources:
+          requests:
+            storage: {{.Values.Master.Resources.Requests.Storage}}

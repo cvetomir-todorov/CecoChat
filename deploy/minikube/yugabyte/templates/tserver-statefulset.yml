@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{.Release.Name}}-tserver
+  namespace: {{.Release.Namespace}}
+  labels:
+    app: {{.Release.Name}}-tserver
+spec:
+  selector:
+    matchLabels:
+      app: {{.Release.Name}}-tserver
+  serviceName: {{.Release.Name}}-tserver
+  replicas: {{.Values.TServer.StatefulSet.Replicas}}
+  podManagementPolicy: Parallel
+  template:
+    metadata:
+      labels:
+        app: {{.Release.Name}}-tserver
+    spec:
+      containers:
+        - name: {{.Release.Name}}-tserver
+          image: {{.Values.TServer.Image.Name}}:{{.Values.TServer.Image.Tag}}
+          imagePullPolicy: {{.Values.TServer.Image.PullPolicy}}
+          ports:
+            - containerPort: {{.Values.TServer.Networking.SqlPort}}
+            - containerPort: {{.Values.TServer.Networking.UiPort}}
+            - containerPort: {{.Values.TServer.Networking.RpcPort}}
+          env:
+            - name: GET_HOSTS_FROM
+              value: dns
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          volumeMounts:
+            - name: data
+              mountPath: /mnt/tserver
+          command:
+            - "/home/yugabyte/bin/yb-tserver"
+          args:
+            - "--fs_data_dirs=/mnt/tserver"
+            - "--rpc_bind_addresses=$(POD_NAME).{{.Release.Name}}-tserver.$(NAMESPACE).svc.cluster.local:{{.Values.TServer.Networking.RpcPort}}"
+            - "--server_broadcast_addresses=$(POD_NAME).{{.Release.Name}}-tserver.$(NAMESPACE).svc.cluster.local:{{.Values.TServer.Networking.RpcPort}}"
+            - "--tserver_master_addrs={{.Release.Name}}-master-0.{{.Release.Name}}-master.$(NAMESPACE).svc.cluster.local:{{.Values.Master.Networking.RpcPort}},{{.Release.Name}}-master-1.{{.Release.Name}}-master.$(NAMESPACE).svc.cluster.local:{{.Values.Master.Networking.RpcPort}}"
+            - "--start_pgsql_proxy"
+            - "--pgsql_proxy_bind_address={{.Values.TServer.Networking.PgsqlProxyBindAddress}}"
+            - "--webserver_interface={{.Values.TServer.Networking.WebServerInterface}}"
+            - "--logtostderr"
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: [ReadWriteOnce]
+        resources:
+          requests:
+            storage: {{.Values.TServer.Resources.Requests.Storage}}
