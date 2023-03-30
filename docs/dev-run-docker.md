@@ -1,6 +1,6 @@
 # Docker deployment
 
-Make sure that the [prerequisites](dev-run-prerequisites.md) have been met before continuing.
+Make sure that the [prerequisites](dev-run-prerequisites.md) have been met before continuing
 
 # Instances
 
@@ -46,11 +46,14 @@ The convenience of `docker compose` makes it possible to run exactly what is nee
 
 * Working on the Messaging service:
   - Run the IDGen service from the IDE
+  - `docker compose -f redis.yml up -d`
   - `docker compose -f kafka.yml up -d`
 * Working on User service:
+  - `docker compose -f redis.yml up -d`
   - `docker compose -f yugabyte.yml up -d`
   - Run the BFF service from the IDE to make queries
 * Working on State/History service:
+  - `docker compose -f redis.yml up -d`
   - `docker compose -f kafka.yml up -d`
   - `docker compose -f cassandra.yml up -d`
   - Run the IDGen and Messaging services from the IDE to input messages into Kafka
