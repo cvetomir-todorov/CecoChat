@@ -31,11 +31,11 @@ internal sealed class SnowflakeConfig : ISnowflakeConfig
         _redisContext.Dispose();
     }
 
-    public IReadOnlyCollection<short> GetGeneratorIDs(string server)
+    public IReadOnlyCollection<short> GetGeneratorIds(string server)
     {
         EnsureInitialized();
 
-        if (!_values!.ServerGeneratorIDs.TryGetValue(server, out List<short>? generatorIDs))
+        if (!_values!.GeneratorIds.TryGetValue(server, out List<short>? generatorIDs))
         {
             throw new InvalidOperationException($"No snowflake generator IDs configured for server {server}.");
         }
@@ -61,9 +61,9 @@ internal sealed class SnowflakeConfig : ISnowflakeConfig
     {
         ISubscriber subscriber = _redisContext.GetSubscriber();
 
-        ChannelMessageQueue generatorIDsMQ = await subscriber.SubscribeAsync($"notify:{SnowflakeKeys.ServerGeneratorIDs}");
-        generatorIDsMQ.OnMessage(channelMessage => _configUtility.HandleChange(channelMessage, HandleGeneratorIDs));
-        _logger.LogInformation("Subscribed for changes about {ServerGeneratorIDs} from channel {Channel}", SnowflakeKeys.ServerGeneratorIDs, generatorIDsMQ.Channel);
+        ChannelMessageQueue generatorIdsChannel = await subscriber.SubscribeAsync($"notify:{SnowflakeKeys.GeneratorIds}");
+        generatorIdsChannel.OnMessage(channelMessage => _configUtility.HandleChange(channelMessage, HandleGeneratorIDs));
+        _logger.LogInformation("Subscribed for changes about {ServerGeneratorIDs} from channel {Channel}", SnowflakeKeys.GeneratorIds, generatorIdsChannel.Channel);
     }
 
     private Task HandleGeneratorIDs(ChannelMessage channelMessage)
@@ -88,8 +88,8 @@ internal sealed class SnowflakeConfig : ISnowflakeConfig
 
     private void PrintValues(SnowflakeConfigValues values)
     {
-        _logger.LogInformation("Total of {ServerCount} server(s) configured:", values.ServerGeneratorIDs.Count);
-        foreach (KeyValuePair<string, List<short>> pair in values.ServerGeneratorIDs)
+        _logger.LogInformation("Total of {ServerCount} server(s) configured:", values.GeneratorIds.Count);
+        foreach (KeyValuePair<string, List<short>> pair in values.GeneratorIds)
         {
             _logger.LogInformation("Server {Server} is assigned generator IDs: [{GeneratorIds}]", pair.Key, string.Join(separator: ", ", pair.Value));
         }

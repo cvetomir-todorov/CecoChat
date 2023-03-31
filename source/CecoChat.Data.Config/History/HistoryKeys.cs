@@ -2,5 +2,5 @@
 
 internal static class HistoryKeys
 {
-    public const string ChatMessageCount = "history.chat.message-count";
+    public const string MessageCount = "history.message-count";
 }

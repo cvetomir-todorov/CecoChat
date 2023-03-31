@@ -37,7 +37,7 @@ public sealed class StartBackplaneComponents : IHostedService, IDisposable
         _stoppedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _appStoppingCt);
 
         int partitionCount = _partitioningConfig.PartitionCount;
-        PartitionRange partitions = _partitioningConfig.GetServerPartitions(_configOptions.ServerId);
+        PartitionRange partitions = _partitioningConfig.GetPartitions(_configOptions.ServerId);
 
         _backplaneComponents.ConfigurePartitioning(partitionCount, partitions);
         _backplaneComponents.StartConsumption(_stoppedCts.Token);

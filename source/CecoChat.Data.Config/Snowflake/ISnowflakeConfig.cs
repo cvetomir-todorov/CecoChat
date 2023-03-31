@@ -4,5 +4,5 @@ public interface ISnowflakeConfig : IDisposable
 {
     Task Initialize();
 
-    IReadOnlyCollection<short> GetGeneratorIDs(string server);
+    IReadOnlyCollection<short> GetGeneratorIds(string server);
 }

@@ -35,7 +35,7 @@ public sealed class HistoryService : Contracts.History.History.HistoryBase
         string chatId = DataUtility.CreateChatID(userClaims.UserId, request.OtherUserId);
         DateTime olderThan = request.OlderThan.ToDateTime();
         IReadOnlyCollection<HistoryMessage> historyMessages = await _messageRepo.GetHistory(
-            userClaims.UserId, chatId, olderThan, _historyConfig.ChatMessageCount);
+            userClaims.UserId, chatId, olderThan, _historyConfig.MessageCount);
 
         GetHistoryResponse response = new();
         response.Messages.Add(historyMessages);

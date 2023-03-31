@@ -24,17 +24,17 @@ internal sealed class HistoryConfigRepo : IHistoryConfigRepo
 
         if (usage.UseMessageCount)
         {
-            values.ChatMessageCount = await GetChatMessageCount();
+            values.MessageCount = await GetMessageCount();
         }
 
         return values;
     }
 
-    private async Task<int> GetChatMessageCount()
+    private async Task<int> GetMessageCount()
     {
         IDatabase database = _redisContext.GetDatabase();
-        RedisValue value = await database.StringGetAsync(HistoryKeys.ChatMessageCount);
-        value.TryParse(out int chatMessageCount);
-        return chatMessageCount;
+        RedisValue value = await database.StringGetAsync(HistoryKeys.MessageCount);
+        value.TryParse(out int messageCount);
+        return messageCount;
     }
 }

@@ -46,11 +46,11 @@ internal sealed class PartitioningConfig : IPartitioningConfig
         }
     }
 
-    public PartitionRange GetServerPartitions(string server)
+    public PartitionRange GetPartitions(string server)
     {
         EnsureInitialized();
 
-        if (!_values!.ServerPartitionsMap.TryGetValue(server, out PartitionRange partitions))
+        if (!_values!.ServerPartitionMap.TryGetValue(server, out PartitionRange partitions))
         {
             throw new InvalidOperationException($"No partitions configured for server {server}.");
         }
@@ -58,7 +58,7 @@ internal sealed class PartitioningConfig : IPartitioningConfig
         return partitions;
     }
 
-    public string GetServerAddress(int partition)
+    public string GetAddress(int partition)
     {
         EnsureInitialized();
 
@@ -93,36 +93,36 @@ internal sealed class PartitioningConfig : IPartitioningConfig
     {
         ISubscriber subscriber = _redisContext.GetSubscriber();
 
-        if (usage.UseServerPartitions || usage.UseServerAddresses)
+        if (usage.UsePartitions || usage.UseAddresses)
         {
-            ChannelMessageQueue partitionsMQ = await subscriber.SubscribeAsync($"notify:{PartitioningKeys.ServerPartitions}");
-            partitionsMQ.OnMessage(channelMessage => _configUtility.HandleChange(channelMessage, HandleServerPartitions));
+            ChannelMessageQueue partitionsChannel = await subscriber.SubscribeAsync($"notify:{PartitioningKeys.Partitions}");
+            partitionsChannel.OnMessage(channelMessage => _configUtility.HandleChange(channelMessage, HandlePartitions));
             _logger.LogInformation("Subscribed for changes about {PartitionCount}, {ServerPartitions} from channel {Channel}",
-                PartitioningKeys.PartitionCount, PartitioningKeys.ServerPartitions, partitionsMQ.Channel);
+                PartitioningKeys.PartitionCount, PartitioningKeys.Partitions, partitionsChannel.Channel);
         }
-        if (usage.UseServerAddresses)
+        if (usage.UseAddresses)
         {
-            ChannelMessageQueue serverAddressesMQ = await subscriber.SubscribeAsync($"notify:{PartitioningKeys.ServerAddresses}");
-            serverAddressesMQ.OnMessage(channelMessage => _configUtility.HandleChange(channelMessage, HandleServerAddresses));
+            ChannelMessageQueue addressesChannel = await subscriber.SubscribeAsync($"notify:{PartitioningKeys.Addresses}");
+            addressesChannel.OnMessage(channelMessage => _configUtility.HandleChange(channelMessage, HandleAddresses));
             _logger.LogInformation("Subscribed for changes about {ServerAddresses} from channel {Channel}",
-                PartitioningKeys.ServerAddresses, serverAddressesMQ.Channel);
+                PartitioningKeys.Addresses, addressesChannel.Channel);
         }
     }
 
-    private async Task HandleServerPartitions(ChannelMessage channelMessage)
+    private async Task HandlePartitions(ChannelMessage channelMessage)
     {
         EnsureInitialized();
 
-        if (!_usage!.UseServerPartitions && !_usage.UseServerAddresses)
+        if (!_usage!.UsePartitions && !_usage.UseAddresses)
         {
             return;
         }
 
         bool areValid = await LoadValidateValues(_usage);
-        if (areValid && !string.IsNullOrWhiteSpace(_usage.ServerPartitionChangesToWatch))
+        if (areValid && !string.IsNullOrWhiteSpace(_usage.ServerToWatch))
         {
             PartitioningConfigValues values = _values!;
-            if (values.ServerPartitionsMap.TryGetValue(_usage.ServerPartitionChangesToWatch, out PartitionRange partitions))
+            if (values.ServerPartitionMap.TryGetValue(_usage.ServerToWatch, out PartitionRange partitions))
             {
                 PartitionsChangedEventData eventData = new()
                 {
@@ -134,16 +134,16 @@ internal sealed class PartitioningConfig : IPartitioningConfig
             }
             else
             {
-                _logger.LogError("After server partition changes there are no partitions for watched server {Server}", _usage.ServerPartitionChangesToWatch);
+                _logger.LogError("After server partition changes there are no partitions for watched server {Server}", _usage.ServerToWatch);
             }
         }
     }
 
-    private async Task HandleServerAddresses(ChannelMessage channelMessage)
+    private async Task HandleAddresses(ChannelMessage channelMessage)
     {
         EnsureInitialized();
 
-        if (_usage!.UseServerAddresses)
+        if (_usage!.UseAddresses)
         {
             await LoadValidateValues(_usage);
         }
@@ -170,16 +170,16 @@ internal sealed class PartitioningConfig : IPartitioningConfig
     {
         _logger.LogInformation("Partition count set to {PartitionCount}", values.PartitionCount);
 
-        if (usage.UseServerPartitions || usage.UseServerAddresses)
+        if (usage.UsePartitions || usage.UseAddresses)
         {
-            foreach (KeyValuePair<string, PartitionRange> pair in values.ServerPartitionsMap)
+            foreach (KeyValuePair<string, PartitionRange> pair in values.ServerPartitionMap)
             {
                 string server = pair.Key;
                 PartitionRange partitions = pair.Value;
                 _logger.LogInformation("Partitions {Partitions} are assigned to server {Server}", partitions, server);
             }
         }
-        if (usage.UseServerAddresses)
+        if (usage.UseAddresses)
         {
             foreach (KeyValuePair<string, string> pair in values.ServerAddressMap)
             {

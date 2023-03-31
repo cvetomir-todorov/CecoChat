@@ -74,7 +74,7 @@ public class SessionController : ControllerBase
         ProfileFull profile = _mapper.Map<ProfileFull>(internalProfile);
 
         int partition = _partitionUtility.ChoosePartition(userId, _partitioningConfig.PartitionCount);
-        string messagingServerAddress = _partitioningConfig.GetServerAddress(partition);
+        string messagingServerAddress = _partitioningConfig.GetAddress(partition);
         _logger.LogInformation("User {UserId} in partition {Partition} assigned to messaging server {MessagingServer}", userId, partition, messagingServerAddress);
 
         _logger.LogTrace("Responding with new session having client ID {ClientId}, full profile {ProfileUserName} for user {UserId}, using messaging server {MessagingServer}",

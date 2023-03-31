@@ -28,8 +28,8 @@ public sealed class InitDynamicConfig : IHostedService
 
         await _partitioningConfig.Initialize(new PartitioningConfigUsage
         {
-            UseServerPartitions = true,
-            ServerPartitionChangesToWatch = _configOptions.ServerId
+            UsePartitions = true,
+            ServerToWatch = _configOptions.ServerId
         });
 
         _configDbInitHealthCheck.IsReady = true;
