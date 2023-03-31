@@ -11,7 +11,7 @@ Master:
     WebServerInterface: 0.0.0.0
   Data:
     MasterReplicationFactor: 2
-    ReplicationFactor: 1
+    ReplicationFactor: 2
   Resources:
     Requests:
       Storage: 1Gi
