@@ -9,5 +9,5 @@ public interface IHistoryConfig
 {
     Task Initialize(HistoryConfigUsage usage);
 
-    int ChatMessageCount { get; }
+    int MessageCount { get; }
 }

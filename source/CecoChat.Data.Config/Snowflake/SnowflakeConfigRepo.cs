@@ -23,14 +23,14 @@ internal sealed class SnowflakeConfigRepo : ISnowflakeConfigRepo
     public async Task<SnowflakeConfigValues> GetValues()
     {
         SnowflakeConfigValues values = new();
-        await GetServerGeneratorIDs(values);
+        await GetGeneratorIds(values);
         return values;
     }
 
-    private async Task GetServerGeneratorIDs(SnowflakeConfigValues values)
+    private async Task GetGeneratorIds(SnowflakeConfigValues values)
     {
         IDatabase database = _redisContext.GetDatabase();
-        HashEntry[] pairs = await database.HashGetAllAsync(SnowflakeKeys.ServerGeneratorIDs);
+        HashEntry[] pairs = await database.HashGetAllAsync(SnowflakeKeys.GeneratorIds);
 
         foreach (HashEntry pair in pairs)
         {
@@ -39,19 +39,19 @@ internal sealed class SnowflakeConfigRepo : ISnowflakeConfigRepo
 
             if (server == null || generatorIDsValue == null)
             {
-                _logger.LogError("Empty values are present in hash config {HashConfig}", SnowflakeKeys.ServerGeneratorIDs);
+                _logger.LogError("Empty values are present in hash config {HashConfig}", SnowflakeKeys.GeneratorIds);
                 continue;
             }
 
-            List<short> generatorIDs = new();
-            values.ServerGeneratorIDs[server] = generatorIDs;
+            List<short> generatorIds = new();
+            values.GeneratorIds[server] = generatorIds;
 
-            string[] generatorIDStrings = generatorIDsValue.Split(",", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-            foreach (string generatorIDString in generatorIDStrings)
+            string[] generatorIdStrings = generatorIDsValue.Split(",", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+            foreach (string generatorIdString in generatorIdStrings)
             {
-                if (short.TryParse(generatorIDString, out short generatorID))
+                if (short.TryParse(generatorIdString, out short generatorId))
                 {
-                    generatorIDs.Add(generatorID);
+                    generatorIds.Add(generatorId);
                 }
             }
         }

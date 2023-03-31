@@ -19,7 +19,7 @@ public sealed class InitDynamicConfig : IHostedService
     {
         await _partitioningConfig.Initialize(new PartitioningConfigUsage
         {
-            UseServerAddresses = true
+            UseAddresses = true
         });
 
         _configDbInitHealthCheck.IsReady = true;

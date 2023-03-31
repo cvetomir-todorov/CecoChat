@@ -4,11 +4,11 @@ namespace CecoChat.Data.Config.Partitioning;
 
 public sealed class PartitioningConfigUsage
 {
-    public bool UseServerPartitions { get; set; }
+    public bool UsePartitions { get; set; }
 
-    public string ServerPartitionChangesToWatch { get; set; } = string.Empty;
+    public string ServerToWatch { get; set; } = string.Empty;
 
-    public bool UseServerAddresses { get; set; }
+    public bool UseAddresses { get; set; }
 }
 
 public interface IPartitioningConfig : IDisposable
@@ -17,9 +17,9 @@ public interface IPartitioningConfig : IDisposable
 
     int PartitionCount { get; }
 
-    PartitionRange GetServerPartitions(string server);
+    PartitionRange GetPartitions(string server);
 
-    string GetServerAddress(int partition);
+    string GetAddress(int partition);
 }
 
 public sealed class PartitionsChangedEventData

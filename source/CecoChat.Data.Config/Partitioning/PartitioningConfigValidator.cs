@@ -13,11 +13,11 @@ internal sealed class PartitioningConfigValidator : AbstractValidator<Partitioni
         RuleFor(x => x.PartitionCount).InclusiveBetween(from: PartitionCountMin, to: PartitionCountMax);
         RuleFor(x => x.PartitionServerMap).Custom(ValidatePartitionServerMap);
 
-        if (usage.UseServerPartitions || usage.UseServerAddresses)
+        if (usage.UsePartitions || usage.UseAddresses)
         {
-            RuleFor(x => x.ServerPartitionsMap).Custom(ValidateServerPartitionsMap);
+            RuleFor(x => x.ServerPartitionMap).Custom(ValidateServerPartitionMap);
         }
-        if (usage.UseServerAddresses)
+        if (usage.UseAddresses)
         {
             RuleFor(x => x.ServerAddressMap).Custom(ValidateServerAddressMap);
         }
@@ -59,7 +59,7 @@ internal sealed class PartitioningConfigValidator : AbstractValidator<Partitioni
         }
     }
 
-    private static void ValidateServerPartitionsMap(IDictionary<string, PartitionRange> serverPartitionRangeMap, ValidationContext<PartitioningConfigValues> context)
+    private static void ValidateServerPartitionMap(IDictionary<string, PartitionRange> serverPartitionRangeMap, ValidationContext<PartitioningConfigValues> context)
     {
         PartitioningConfigValues values = context.InstanceToValidate;
         if (!IsPartitionCountValid(values.PartitionCount))

@@ -6,51 +6,51 @@ internal sealed class SnowflakeConfigValidator : AbstractValidator<SnowflakeConf
 {
     public SnowflakeConfigValidator()
     {
-        RuleFor(x => x.ServerGeneratorIDs).Custom(ValidateServerGeneratorIDs);
+        RuleFor(x => x.GeneratorIds).Custom(ValidateServerGeneratorIDs);
     }
 
-    private static void ValidateServerGeneratorIDs(IDictionary<string, List<short>> serverGeneratorIDs, ValidationContext<SnowflakeConfigValues> context)
+    private static void ValidateServerGeneratorIDs(IDictionary<string, List<short>> serverGeneratorIds, ValidationContext<SnowflakeConfigValues> context)
     {
-        HashSet<string> uniqueServers = new(capacity: serverGeneratorIDs.Count);
-        HashSet<short> allUniqueIDs = new(capacity: serverGeneratorIDs.Count);
-        int allIDsCount = 0;
-        HashSet<short> serverUniqueIDs = new();
+        HashSet<string> uniqueServers = new(capacity: serverGeneratorIds.Count);
+        HashSet<short> allUniqueIds = new(capacity: serverGeneratorIds.Count);
+        int allIdsCount = 0;
+        HashSet<short> serverUniqueIds = new();
 
-        if (serverGeneratorIDs.Count == 0)
+        if (serverGeneratorIds.Count == 0)
         {
             context.AddFailure("No snowflake servers configured.");
         }
 
-        foreach (KeyValuePair<string, List<short>> pair in serverGeneratorIDs)
+        foreach (KeyValuePair<string, List<short>> pair in serverGeneratorIds)
         {
             string server = pair.Key;
-            List<short> generatorIDs = pair.Value;
+            List<short> generatorIds = pair.Value;
 
             if (!uniqueServers.Add(server))
             {
                 context.AddFailure($"Duplicate snowflake server {server}.");
             }
-            if (generatorIDs.Count == 0)
+            if (generatorIds.Count == 0)
             {
                 context.AddFailure($"No generator IDs configured for snowflake server {server}.");
             }
 
-            serverUniqueIDs.Clear();
-            allIDsCount += generatorIDs.Count;
+            serverUniqueIds.Clear();
+            allIdsCount += generatorIds.Count;
 
-            foreach (short generatorID in generatorIDs)
+            foreach (short generatorId in generatorIds)
             {
-                serverUniqueIDs.Add(generatorID);
-                allUniqueIDs.Add(generatorID);
+                serverUniqueIds.Add(generatorId);
+                allUniqueIds.Add(generatorId);
             }
 
-            if (serverUniqueIDs.Count < generatorIDs.Count)
+            if (serverUniqueIds.Count < generatorIds.Count)
             {
-                context.AddFailure($"Duplicate generator IDs [{string.Join(",", generatorIDs)}] for snowflake server {server}.");
+                context.AddFailure($"Duplicate generator IDs [{string.Join(",", generatorIds)}] for snowflake server {server}.");
             }
         }
 
-        if (allUniqueIDs.Count < allIDsCount)
+        if (allUniqueIds.Count < allIdsCount)
         {
             context.AddFailure($"Duplicate generator IDs within individual or across all snowflake servers.");
         }

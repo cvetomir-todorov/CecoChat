@@ -4,8 +4,8 @@ internal sealed class SnowflakeConfigValues
 {
     public SnowflakeConfigValues()
     {
-        ServerGeneratorIDs = new Dictionary<string, List<short>>();
+        GeneratorIds = new Dictionary<string, List<short>>();
     }
 
-    public IDictionary<string, List<short>> ServerGeneratorIDs { get; }
+    public IDictionary<string, List<short>> GeneratorIds { get; }
 }

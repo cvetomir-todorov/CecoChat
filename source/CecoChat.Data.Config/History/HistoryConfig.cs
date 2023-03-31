@@ -27,12 +27,12 @@ internal sealed class HistoryConfig : IHistoryConfig
         _configUtility = configUtility;
     }
 
-    public int ChatMessageCount
+    public int MessageCount
     {
         get
         {
             EnsureInitialized();
-            return _values!.ChatMessageCount;
+            return _values!.MessageCount;
         }
     }
 
@@ -57,9 +57,9 @@ internal sealed class HistoryConfig : IHistoryConfig
 
         if (usage.UseMessageCount)
         {
-            ChannelMessageQueue chatMessageCountMQ = await subscriber.SubscribeAsync($"notify:{HistoryKeys.ChatMessageCount}");
-            chatMessageCountMQ.OnMessage(channelMessage => _configUtility.HandleChange(channelMessage, HandleMessageCount));
-            _logger.LogInformation("Subscribed for changes about {ChatMessageCount} from channel {Channel}", HistoryKeys.ChatMessageCount, chatMessageCountMQ.Channel);
+            ChannelMessageQueue messageCountChannel = await subscriber.SubscribeAsync($"notify:{HistoryKeys.MessageCount}");
+            messageCountChannel.OnMessage(channelMessage => _configUtility.HandleChange(channelMessage, HandleMessageCount));
+            _logger.LogInformation("Subscribed for changes about {MessageCount} from channel {Channel}", HistoryKeys.MessageCount, messageCountChannel.Channel);
         }
     }
 
@@ -91,7 +91,7 @@ internal sealed class HistoryConfig : IHistoryConfig
     {
         if (usage.UseMessageCount)
         {
-            _logger.LogInformation("Chat message count set to {ChatMessageCount}", values.ChatMessageCount);
+            _logger.LogInformation("Chat message count set to {MessageCount}", values.MessageCount);
         }
     }
 

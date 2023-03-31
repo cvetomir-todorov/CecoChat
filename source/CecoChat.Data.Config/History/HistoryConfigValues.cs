@@ -2,5 +2,5 @@
 
 internal sealed class HistoryConfigValues
 {
-    public int ChatMessageCount { get; set; }
+    public int MessageCount { get; set; }
 }

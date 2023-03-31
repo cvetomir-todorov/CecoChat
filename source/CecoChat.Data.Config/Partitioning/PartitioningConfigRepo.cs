@@ -28,8 +28,8 @@ internal sealed class PartitioningConfigRepo : IPartitioningConfigRepo
         PartitioningConfigValues values = new();
 
         values.PartitionCount = await GetPartitionCount();
-        await GetServerPartitions(usage, values);
-        await GetServerAddresses(usage, values);
+        await GetPartitions(usage, values);
+        await GetAddresses(usage, values);
 
         return values;
     }
@@ -42,15 +42,15 @@ internal sealed class PartitioningConfigRepo : IPartitioningConfigRepo
         return partitionCount;
     }
 
-    private async Task GetServerPartitions(PartitioningConfigUsage usage, PartitioningConfigValues values)
+    private async Task GetPartitions(PartitioningConfigUsage usage, PartitioningConfigValues values)
     {
-        if (!usage.UseServerPartitions && !usage.UseServerAddresses)
+        if (!usage.UsePartitions && !usage.UseAddresses)
         {
             return;
         }
 
         IDatabase database = _redisContext.GetDatabase();
-        HashEntry[] pairs = await database.HashGetAllAsync(PartitioningKeys.ServerPartitions);
+        HashEntry[] pairs = await database.HashGetAllAsync(PartitioningKeys.Partitions);
 
         foreach (HashEntry pair in pairs)
         {
@@ -59,7 +59,7 @@ internal sealed class PartitioningConfigRepo : IPartitioningConfigRepo
 
             if (server == null || partitionsValue == null)
             {
-                _logger.LogError("Empty values are present in hash config {HashConfig}", PartitioningKeys.ServerPartitions);
+                _logger.LogError("Empty values are present in hash config {HashConfig}", PartitioningKeys.Partitions);
                 continue;
             }
 
@@ -71,19 +71,19 @@ internal sealed class PartitioningConfigRepo : IPartitioningConfigRepo
                 }
             }
 
-            values.ServerPartitionsMap[server] = partitions;
+            values.ServerPartitionMap[server] = partitions;
         }
     }
 
-    private async Task GetServerAddresses(PartitioningConfigUsage usage, PartitioningConfigValues values)
+    private async Task GetAddresses(PartitioningConfigUsage usage, PartitioningConfigValues values)
     {
-        if (!usage.UseServerAddresses)
+        if (!usage.UseAddresses)
         {
             return;
         }
 
         IDatabase database = _redisContext.GetDatabase();
-        HashEntry[] pairs = await database.HashGetAllAsync(PartitioningKeys.ServerAddresses);
+        HashEntry[] pairs = await database.HashGetAllAsync(PartitioningKeys.Addresses);
 
         foreach (HashEntry pair in pairs)
         {
@@ -92,7 +92,7 @@ internal sealed class PartitioningConfigRepo : IPartitioningConfigRepo
 
             if (server == null || address == null)
             {
-                _logger.LogError("Empty values are present in hash config {HashConfig}", PartitioningKeys.ServerAddresses);
+                _logger.LogError("Empty values are present in hash config {HashConfig}", PartitioningKeys.Addresses);
                 continue;
             }
 
