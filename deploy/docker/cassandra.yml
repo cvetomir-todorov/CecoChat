@@ -2,15 +2,10 @@ version: '3'
 networks: 
   cecochat:
 services:
-  cass1:
+  cassandra0:
     image: cassandra:3.11.13
-    container_name: cecochat-cass1
-    healthcheck: &healthcheck
-      test: ["CMD", "cqlsh", "-e", "describe keyspaces"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-    hostname: cass1
+    container_name: cecochat-cassandra0
+    hostname: cassandra0
     networks: &networks
       - cecochat
     ports:
@@ -19,8 +14,37 @@ services:
       resources:
         limits:
           memory: 512M
+    healthcheck: &healthcheck
+      test: ["CMD", "cqlsh", "-e", "describe keyspaces"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
     environment:
-      CASSANDRA_SEEDS: "cass1,cass2"
+      CASSANDRA_SEEDS: "cassandra0,cassandra1"
+      CASSANDRA_CLUSTER_NAME: cecochat
+      CASSANDRA_DC: Europe
+      CASSANDRA_RACK: Rack0
+      CASSANDRA_ENDPOINT_SNITCH: GossipingPropertyFileSnitch
+      CASSANDRA_NUM_TOKENS: 128
+      HEAP_NEWSIZE: 128M
+      MAX_HEAP_SIZE: 512M
+    volumes: 
+      - cecochat-cassandra0-data:/var/lib/cassandra
+      - cecochat-cassandra0-conf:/etc/cassandra
+  cassandra1:
+    image: cassandra:3.11.13
+    container_name: cecochat-cassandra1
+    hostname: cassandra1
+    networks: *networks
+    ports:
+      - "9043:9042"
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    healthcheck: *healthcheck
+    environment:
+      CASSANDRA_SEEDS: "cassandra0,cassandra1"
       CASSANDRA_CLUSTER_NAME: cecochat
       CASSANDRA_DC: Europe
       CASSANDRA_RACK: Rack1
@@ -29,38 +53,14 @@ services:
       HEAP_NEWSIZE: 128M
       MAX_HEAP_SIZE: 512M
     volumes: 
-      - cecochat-cass1-data:/var/lib/cassandra
-      - cecochat-cass1-conf:/etc/cassandra
-  cass2:
-    image: cassandra:3.11.13
-    container_name: cecochat-cass2
-    healthcheck: *healthcheck
-    hostname: cass2
-    networks: *networks
-    ports:
-      - "9043:9042"
-    deploy:
-      resources:
-        limits:
-          memory: 512M
-    environment:
-      CASSANDRA_SEEDS: "cass1,cass2"
-      CASSANDRA_CLUSTER_NAME: cecochat
-      CASSANDRA_DC: Europe
-      CASSANDRA_RACK: Rack2
-      CASSANDRA_ENDPOINT_SNITCH: GossipingPropertyFileSnitch
-      CASSANDRA_NUM_TOKENS: 128
-      HEAP_NEWSIZE: 128M
-      MAX_HEAP_SIZE: 512M
-    volumes: 
-      - cecochat-cass2-data:/var/lib/cassandra
-      - cecochat-cass2-conf:/etc/cassandra
+      - cecochat-cassandra1-data:/var/lib/cassandra
+      - cecochat-cassandra1-conf:/etc/cassandra
 volumes:
-  cecochat-cass1-data:
+  cecochat-cassandra0-data:
     external: true
-  cecochat-cass1-conf:
+  cecochat-cassandra0-conf:
     external: true
-  cecochat-cass2-data:
+  cecochat-cassandra1-data:
     external: true
-  cecochat-cass2-conf:
+  cecochat-cassandra1-conf:
     external: true
