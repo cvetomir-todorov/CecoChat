@@ -107,9 +107,10 @@ Configuration is based on Redis:
 
 ![Docker](tech-images/docker.png)
 ![Kubernetes](tech-images/kubernetes.webp)
+![Helm](tech-images/helm.webp)
 
 * Containerization relies on Docker for its maturity, popularity, tooling and integration
-* Orchestration is based on Kubernetes for its power, maturity, popularity, tooling
+* Orchestration is based on Kubernetes and Helm for its power, maturity, popularity, tooling
 * infrastructure as code - TBD, probably Terraform
 
 # Services

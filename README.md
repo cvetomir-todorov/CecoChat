@@ -1,6 +1,18 @@
 [Chat engine](docs/intro-capabilities.md) for millions of users.
 
-[System design](docs/intro-design.md) based on microservice architecture. [Implementation](source/) based on cloud agnostic technologies - Kafka, YugabyteDB, Cassandra, HTTP, gRPC, Redis, .NET 6, ASP.NET, Docker, Kubernetes. Dynamically and statically [configurable](docs/design-configuration.md) microservices. [Observable](docs/design-observability.md) environment based on OpenTelemetry, Jaeger, Prometheus, Grafana, ElasticSearch, Fluentd, Kibana. Containerized components which can be [ran locally](docs/dev-run-prerequisites.md) via Docker or Minikube.
+* [System design](docs/intro-design.md) based on microservice architecture
+* [Implementation](source/) based on cloud agnostic technologies
+  - Integration: Kafka, gRPC, WebSocket, HTTP
+  - Data storage: YugabyteDB, Cassandra, Redis
+  - Internal implementation: .NET 6, ASP.NET
+* Dynamically and statically [configurable](docs/design-configuration.md) microservices
+* [Observable](docs/design-observability.md) environment based on OpenTelemetry
+  - Tracing: Jaeger
+  - Metrics: Prometheus, Grafana
+  - Logging: ElasticSearch, Fluentd, Kibana
+* Containerized components which can be [ran locally](docs/dev-run-prerequisites.md)
+  - Selected components via Docker
+  - Whole cluster via Minikube, Kubernetes, Helm
 
 Check out [what next](docs/what-next.md) needs to be implemented. I appreciate all comments so feel free to use the `Discussions` tab.
 
@@ -80,6 +92,7 @@ Check out [what next](docs/what-next.md) needs to be implemented. I appreciate a
 
 ![Docker](docs/tech-images/docker.png)
 ![Kubernetes](docs/tech-images/kubernetes.webp)
+![Helm](docs/tech-images/helm.webp)
 
 ## Services
 
