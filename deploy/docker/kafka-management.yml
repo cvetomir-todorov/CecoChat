@@ -15,4 +15,4 @@ services:
         limits:
           memory: 128M
     environment: 
-      KAFKA_BROKERCONNECT: "kafka1:19091"
+      KAFKA_BROKERCONNECT: "kafka0:19091"
