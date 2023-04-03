@@ -23,7 +23,14 @@ public sealed class MessagingClient : IAsyncDisposable
     public async Task Connect(string messagingServerAddress, string accessToken, CancellationToken ct)
     {
         UriBuilder uriBuilder = new(messagingServerAddress);
-        uriBuilder.Path += "/chat";
+        if (uriBuilder.Path.EndsWith("/"))
+        {
+            uriBuilder.Path += "chat";
+        }
+        else
+        {
+            uriBuilder.Path += "/chat";
+        }
 
         _messagingClient = new HubConnectionBuilder()
             .WithUrl(uriBuilder.Uri, http =>
