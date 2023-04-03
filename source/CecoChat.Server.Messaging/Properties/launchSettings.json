@@ -9,7 +9,8 @@
       "applicationUrl": "https://+:31001",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "CECOCHAT_Config__ServerID": "0"
+        "CECOCHAT_Config__ServerID": "0",
+        "CECOCHAT_IDGen__OriginatorID": "0"
       }
     },
     "Messaging 1": {
@@ -20,7 +21,8 @@
       "applicationUrl": "https://+:31011",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "CECOCHAT_Config__ServerID": "1"
+        "CECOCHAT_Config__ServerID": "1",
+        "CECOCHAT_IDGen__OriginatorID": "1"
       }
     }
   }
