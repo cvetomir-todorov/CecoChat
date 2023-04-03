@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS public."Profiles"
     "AvatarUrl" text COLLATE pg_catalog."default" NOT NULL,
     "Phone" text COLLATE pg_catalog."default" NOT NULL,
     "Email" text COLLATE pg_catalog."default" NOT NULL,
-    CONSTRAINT "PK_Profiles" PRIMARY KEY ("UserId")
+    PRIMARY KEY ("UserId" HASH)
 )
 WITH (
     OIDS = FALSE
