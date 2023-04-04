@@ -63,7 +63,7 @@ spec:
             - name: CECOCHAT_StateDB__SocketConnectTimeout
               value: {{.Values.Networking.HistoryDB.SocketConnectTimeout}}
             - name: CECOCHAT_StateDB__ExponentialReconnectPolicy
-              value: {{.Values.Networking.HistoryDB.ExponentialReconnectPolicy}}
+              value: "{{.Values.Networking.HistoryDB.ExponentialReconnectPolicy}}"
             - name: CECOCHAT_StateDB__ExponentialReconnectPolicyBaseDelay
               value: {{.Values.Networking.HistoryDB.ExponentialReconnectPolicyBaseDelay}}
             - name: CECOCHAT_StateDB__ExponentialReconnectPolicyMaxDelay

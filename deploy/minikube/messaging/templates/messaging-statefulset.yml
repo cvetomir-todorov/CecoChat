@@ -60,7 +60,7 @@ spec:
             - name: CECOCHAT_IDGen__Address
               value: https://{{.Values.Networking.IDGenService}}
             - name: CECOCHAT_IDGen__RefreshIDsCount
-              value: {{.Values.Messaging.RefreshIDsCount}}
+              value: "{{.Values.Messaging.RefreshIDsCount}}"
           volumeMounts:
             - name: config
               mountPath: {{.Values.Entrypoint.MountPath}}
