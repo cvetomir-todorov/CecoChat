@@ -58,3 +58,13 @@ spec:
               value: {{.Values.Networking.HistoryDB.Host}}-0.{{.Values.Networking.HistoryDB.Service}}.{{.Release.Namespace}}.svc.cluster.local
             - name: CECOCHAT_HistoryDB__ContactPoints__1
               value: {{.Values.Networking.HistoryDB.Host}}-1.{{.Values.Networking.HistoryDB.Service}}.{{.Release.Namespace}}.svc.cluster.local
+            - name: CECOCHAT_HistoryDB__LocalDC
+              value: {{.Values.Networking.HistoryDB.LocalDC}}
+            - name: CECOCHAT_HistoryDB__SocketConnectTimeout
+              value: {{.Values.Networking.HistoryDB.SocketConnectTimeout}}
+            - name: CECOCHAT_HistoryDB__ExponentialReconnectPolicy
+              value: {{.Values.Networking.HistoryDB.ExponentialReconnectPolicy}}
+            - name: CECOCHAT_HistoryDB__ExponentialReconnectPolicyBaseDelay
+              value: {{.Values.Networking.HistoryDB.ExponentialReconnectPolicyBaseDelay}}
+            - name: CECOCHAT_HistoryDB__ExponentialReconnectPolicyMaxDelay
+              value: {{.Values.Networking.HistoryDB.ExponentialReconnectPolicyMaxDelay}}
