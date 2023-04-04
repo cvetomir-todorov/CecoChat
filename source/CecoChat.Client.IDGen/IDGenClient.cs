@@ -40,6 +40,8 @@ internal sealed class IDGenClient : IIDGenClient
         _idChannel = idChannel;
 
         _logger.LogInformation("IDGen address set to {Address}", _options.Address);
+        _logger.LogInformation("Start refreshing message IDs each {RefreshIDsInterval:##} ms with {RefreshIDsCount} IDs",
+            _options.RefreshIDsInterval.TotalMilliseconds, _options.RefreshIDsCount);
         _invalidateIDsTimer = new(
             callback: _ => RefreshIDs(),
             state: null,
