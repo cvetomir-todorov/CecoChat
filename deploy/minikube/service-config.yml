@@ -18,6 +18,9 @@ metadata:
   namespace: cecochat
 data:
   CECOCHAT_ConfigDB__Endpoints__0: redis:6379
+  CECOCHAT_ConfigDB__ConnectRetry: 16
+  CECOCHAT_ConfigDB__ConnectTimeout: 5000
+  CECOCHAT_ConfigDB__KeepAlive: 2
 ---
 
 apiVersion: v1
@@ -36,5 +39,9 @@ metadata:
   name: service-tracing
   namespace: cecochat
 data:
-  CECOCHAT_OtelSampling__Strategy: AlwaysOn
+  CECOCHAT_OtelSampling__Strategy: Probability
+  CECOCHAT_OtelSampling__Probability: 0.1
   CECOCHAT_Jaeger__AgentHost: jaeger
+  CECOCHAT_Jaeger__AgentPort: 6831
+  CECOCHAT_Jaeger__ExportProcessorType: Batch
+  CECOCHAT_Jaeger__BatchExportScheduledDelayMillis: 2000
