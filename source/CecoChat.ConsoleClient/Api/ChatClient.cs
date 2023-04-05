@@ -1,4 +1,5 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
+using CecoChat.Client.Messaging;
 using CecoChat.Contracts.Bff;
 using CecoChat.Contracts.Messaging;
 using CecoChat.Data;
@@ -9,7 +10,7 @@ namespace CecoChat.ConsoleClient.Api;
 public sealed class ChatClient : IAsyncDisposable
 {
     private readonly IBffClient _bffClient;
-    private readonly MessagingClient _messagingClient;
+    private readonly IMessagingClient _messagingClient;
     private long _userId;
     private ProfileFull? _userProfile;
     private string? _accessToken;
