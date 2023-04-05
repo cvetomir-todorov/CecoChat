@@ -62,6 +62,9 @@ The convenience of `docker compose` makes it possible to run exactly what is nee
   - `docker compose -f tracing.yml up -d`
   - `docker compose -f metrics.yml up -d`
   - `docker compose -f logging.yml up -d`
+* Start all CecoChat containers in docker:
+  - `docker compose -f cecochat-messaging.yml up -d`
+  - `docker compose -f cecochat-bff.yml up -d`
 * In order to stop containers or destroy them:
   - `docker compose -f <some.yml> stop`
   - `docker compose -f <some.yml> down`
