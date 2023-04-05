@@ -16,7 +16,6 @@ services:
       timeout: 5s
       retries: 5
     environment:
-      CECOCHAT_Config__ServerID: 0
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: https://+
       ASPNETCORE_HTTPS_PORT: 443
@@ -32,6 +31,7 @@ services:
       CECOCHAT_Jaeger__AgentPort: 6831
       CECOCHAT_Jaeger__ExportProcessorType: Batch
       CECOCHAT_Jaeger__BatchExportScheduledDelayMillis: 2000
+      CECOCHAT_Config__ServerID: 0
 #    logging: &fluentd-logging
 #      driver: "fluentd"
 #      options:
@@ -46,7 +46,6 @@ services:
       - "31001:443"
     healthcheck: *healthcheck
     environment:
-      CECOCHAT_Config__ServerID: 0
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: https://+
       ASPNETCORE_HTTPS_PORT: 443
@@ -56,16 +55,18 @@ services:
       CECOCHAT_ConfigDB__ConnectRetry: 16
       CECOCHAT_ConfigDB__ConnectTimeout: 5000
       CECOCHAT_ConfigDB__KeepAlive: 2
-      CECOCHAT_Backplane__Kafka__BootstrapServers__0: kafka0:19091
-      CECOCHAT_Backplane__Kafka__BootstrapServers__1: kafka1:19092
-      CECOCHAT_IDGen__OriginatorID: 0
-      CECOCHAT_IDGen__Address: "https://idgen"
       CECOCHAT_OtelSampling__Strategy: Probability
       CECOCHAT_OtelSampling__Probability: 0.1
       CECOCHAT_Jaeger__AgentHost: jaeger
       CECOCHAT_Jaeger__AgentPort: 6831
       CECOCHAT_Jaeger__ExportProcessorType: Batch
       CECOCHAT_Jaeger__BatchExportScheduledDelayMillis: 2000
+      CECOCHAT_Config__ServerID: 0
+      CECOCHAT_Backplane__Kafka__BootstrapServers__0: kafka0:19091
+      CECOCHAT_Backplane__Kafka__BootstrapServers__1: kafka1:19092
+      CECOCHAT_IDGen__Address: "https://idgen"
+      CECOCHAT_IDGen__OriginatorID: 0
+      CECOCHAT_IDGen__RefreshIDsCount: 1024
 #    logging: *fluentd-logging
   cecochat-messaging1:
     image: ceco.com/cecochat/messaging:0.1
@@ -76,7 +77,6 @@ services:
       - "31011:443"
     healthcheck: *healthcheck
     environment:
-      CECOCHAT_Config__ServerID: 1
       ASPNETCORE_ENVIRONMENT: Production
       ASPNETCORE_URLS: https://+
       ASPNETCORE_HTTPS_PORT: 443
@@ -86,14 +86,16 @@ services:
       CECOCHAT_ConfigDB__ConnectRetry: 16
       CECOCHAT_ConfigDB__ConnectTimeout: 5000
       CECOCHAT_ConfigDB__KeepAlive: 2
-      CECOCHAT_Backplane__Kafka__BootstrapServers__0: kafka0:19091
-      CECOCHAT_Backplane__Kafka__BootstrapServers__1: kafka1:19092
-      CECOCHAT_IDGen__OriginatorID: 1
-      CECOCHAT_IDGen__Address: "https://idgen"
       CECOCHAT_OtelSampling__Strategy: Probability
       CECOCHAT_OtelSampling__Probability: 0.1
       CECOCHAT_Jaeger__AgentHost: jaeger
       CECOCHAT_Jaeger__AgentPort: 6831
       CECOCHAT_Jaeger__ExportProcessorType: Batch
       CECOCHAT_Jaeger__BatchExportScheduledDelayMillis: 2000
+      CECOCHAT_Config__ServerID: 1
+      CECOCHAT_Backplane__Kafka__BootstrapServers__0: kafka0:19091
+      CECOCHAT_Backplane__Kafka__BootstrapServers__1: kafka1:19092
+      CECOCHAT_IDGen__Address: "https://idgen"
+      CECOCHAT_IDGen__OriginatorID: 1
+      CECOCHAT_IDGen__RefreshIDsCount: 1024
 #    logging: *fluentd-logging
