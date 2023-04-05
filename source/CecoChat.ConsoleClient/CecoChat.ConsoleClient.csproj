@@ -7,11 +7,10 @@
 
   <ItemGroup>
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.27.0" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="6.0.14" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.MessagePack" Version="6.0.14" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CecoChat.Client.Messaging\CecoChat.Client.Messaging.csproj" />
     <ProjectReference Include="..\CecoChat.Contracts.Bff\CecoChat.Contracts.Bff.csproj" />
     <ProjectReference Include="..\CecoChat.Contracts.Messaging\CecoChat.Contracts.Messaging.csproj" />
     <ProjectReference Include="..\CecoChat.Data\CecoChat.Data.csproj" />

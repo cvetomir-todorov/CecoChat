@@ -2,9 +2,9 @@ using CecoChat.Contracts.Messaging;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace CecoChat.ConsoleClient.Api;
+namespace CecoChat.Client.Messaging;
 
-public sealed class MessagingClient : IAsyncDisposable
+public sealed class MessagingClient : IMessagingClient
 {
     private HubConnection? _messagingClient;
 
@@ -74,14 +74,6 @@ public sealed class MessagingClient : IAsyncDisposable
         await _messagingClient.StartAsync(ct);
     }
 
-    public event EventHandler<ListenNotification>? MessageReceived;
-
-    public event EventHandler<ListenNotification>? ReactionReceived;
-
-    public event EventHandler<ListenNotification>? MessageDelivered;
-
-    public event EventHandler? Disconnected;
-
     public Task<SendMessageResponse> SendMessage(SendMessageRequest request)
     {
         if (_messagingClient == null)
@@ -111,4 +103,12 @@ public sealed class MessagingClient : IAsyncDisposable
 
         return _messagingClient.InvokeAsync<UnReactResponse>(nameof(IChatHub.UnReact), request);
     }
+
+    public event EventHandler<ListenNotification>? MessageReceived;
+
+    public event EventHandler<ListenNotification>? ReactionReceived;
+
+    public event EventHandler<ListenNotification>? MessageDelivered;
+
+    public event EventHandler? Disconnected;
 }
