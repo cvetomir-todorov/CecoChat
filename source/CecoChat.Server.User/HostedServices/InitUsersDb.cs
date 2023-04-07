@@ -89,13 +89,13 @@ public sealed class InitUsersDb : IHostedService
         await _dbContext.Database.ExecuteSqlRawAsync("TRUNCATE TABLE public.\"Profiles\"", ct);
 
         ProfileEntity[] profiles = new ProfileEntity[userCount];
-
         for (int i = 0; i < userCount; ++i)
         {
+            long userId = i + 1;
             profiles[i] = new()
             {
-                UserId = i, UserName = $"user{i}", DisplayName = $"User {i}",
-                AvatarUrl = $"https://cdn.cecochat.com/avatars/user{i}.jpg", Email = $"user{i}@cecochat.com", Phone = "+359888000000"
+                UserId = userId, UserName = $"user{userId}", DisplayName = $"User {userId}",
+                AvatarUrl = $"https://cdn.cecochat.com/avatars/user{userId}.jpg", Email = $"user{userId}@cecochat.com", Phone = "+359888000000"
             };
         }
 

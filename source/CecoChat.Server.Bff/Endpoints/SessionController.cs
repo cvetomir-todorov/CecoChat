@@ -4,6 +4,7 @@ using CecoChat.Client.User;
 using CecoChat.Contracts.Bff;
 using CecoChat.Data.Config.Partitioning;
 using CecoChat.Server.Backplane;
+using CecoChat.Server.Bff.Auth;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
