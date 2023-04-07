@@ -9,6 +9,6 @@ public class UserDbAutofacModule : Module
     protected override void Load(ContainerBuilder builder)
     {
         builder.RegisterType<NpgsqlDbInitializer>().As<INpgsqlDbInitializer>().SingleInstance();
-        builder.RegisterType<ProfileRepo>().As<IProfileRepo>().SingleInstance();
+        builder.RegisterType<ProfileRepo>().As<IProfileRepo>().InstancePerLifetimeScope();
     }
 }
