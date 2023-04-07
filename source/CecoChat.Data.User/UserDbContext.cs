@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
 namespace CecoChat.Data.User;
@@ -20,6 +21,7 @@ public class UserDbContext : DbContext
 public sealed class ProfileEntity
 {
     [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.None)]
     public long UserId { get; set; }
 
     public string UserName { get; set; } = string.Empty;

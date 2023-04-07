@@ -1,5 +1,6 @@
 using CecoChat.Data.User;
 using CecoChat.Npgsql;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Npgsql;
 
@@ -34,15 +35,25 @@ public sealed class InitUsersDb : IHostedService
 
         if (initialized && _options.Seed)
         {
-            await SeedDb(cancellationToken);
-            _logger.LogInformation("Seeded database");
+            if (_options.SeedConsoleClientUsers)
+            {
+                await SeedConsoleClientUsers(cancellationToken);
+                _logger.LogInformation("Seeded database with console client users.");
+            }
+            if (_options.SeedLoadTestingUsers)
+            {
+                await SeedLoadTestingUsers(_options.SeedLoadTestingUserCount, cancellationToken);
+                _logger.LogInformation("Seeded database with {0} load testing users.", _options.SeedLoadTestingUserCount);
+            }
         }
 
         _userDbInitHealthCheck.IsReady = true;
     }
 
-    private Task SeedDb(CancellationToken cancellationToken)
+    private async Task SeedConsoleClientUsers(CancellationToken ct)
     {
+        await _dbContext.Database.ExecuteSqlRawAsync("TRUNCATE TABLE public.\"Profiles\"", ct);
+
         ProfileEntity[] profiles =
         {
             new()
@@ -69,7 +80,28 @@ public sealed class InitUsersDb : IHostedService
         };
 
         _dbContext.Profiles.AddRange(profiles);
-        return _dbContext.SaveChangesAsync(cancellationToken);
+        await _dbContext.SaveChangesAsync(ct);
+        _dbContext.ChangeTracker.Clear();
+    }
+
+    private async Task SeedLoadTestingUsers(int userCount, CancellationToken ct)
+    {
+        await _dbContext.Database.ExecuteSqlRawAsync("TRUNCATE TABLE public.\"Profiles\"", ct);
+
+        ProfileEntity[] profiles = new ProfileEntity[userCount];
+
+        for (int i = 0; i < userCount; ++i)
+        {
+            profiles[i] = new()
+            {
+                UserId = i, UserName = $"user{i}", DisplayName = $"User {i}",
+                AvatarUrl = $"https://cdn.cecochat.com/avatars/user{i}.jpg", Email = $"user{i}@cecochat.com", Phone = "+359888000000"
+            };
+        }
+
+        _dbContext.Profiles.AddRange(profiles);
+        await _dbContext.SaveChangesAsync(ct);
+        _dbContext.ChangeTracker.Clear();
     }
 
     public Task StopAsync(CancellationToken cancellationToken)

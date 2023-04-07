@@ -129,5 +129,6 @@ services:
       CECOCHAT_Jaeger__BatchExportScheduledDelayMillis: 2000
       CECOCHAT_UserDB__Init__ConnectionString: "Host=yb-tserver0,yb-tserver1;Port=5433;Database=postgres;Username=yugabyte;Password=yugabyte;"
       CECOCHAT_UserDB__Seed: "true"
+      CECOCHAT_UserDB__SeedConsoleClientUsers: "true"
       CECOCHAT_UserDB__Connect__ConnectionString: "Host=yb-tserver0,yb-tserver1;Port=5433;Database=users;Username=cecochat_dev;Password=secret;Keepalive=30;Load Balance Hosts=true;"
 #    logging: *fluentd-logging
