@@ -58,5 +58,7 @@ spec:
               value: Host={{.Values.Networking.UserDB.Host}}-0.{{.Values.Networking.UserDB.Service}}.$(NAMESPACE).svc.cluster.local;Port={{.Values.Networking.UserDB.Port}};Database=postgres;Username={{.Values.Networking.UserDB.Root.User}};Password={{.Values.Networking.UserDB.Root.Pass}};
             - name: CECOCHAT_UserDB__Seed
               value: "true"
+            - name: CECOCHAT_UserDB__SeedConsoleClientUsers
+              value: "true"
             - name: CECOCHAT_UserDB__Connect__ConnectionString
               value: Host={{.Values.Networking.UserDB.Host}}-0.{{.Values.Networking.UserDB.Service}}.$(NAMESPACE).svc.cluster.local,{{.Values.Networking.UserDB.Host}}-1.{{.Values.Networking.UserDB.Service}}.$(NAMESPACE).svc.cluster.local;Port={{.Values.Networking.UserDB.Port}};Database=users;Username={{.Values.Networking.UserDB.Normal.User}};Password={{.Values.Networking.UserDB.Normal.Pass}};Keepalive=30;Load Balance Hosts=true;
