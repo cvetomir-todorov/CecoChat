@@ -1,4 +1,4 @@
-namespace CecoChat.Server.Bff.Endpoints;
+namespace CecoChat.Server.Bff.Auth;
 
 public sealed class AuthOptions
 {

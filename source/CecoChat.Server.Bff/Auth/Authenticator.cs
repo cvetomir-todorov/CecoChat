@@ -5,7 +5,7 @@ using CecoChat.Jwt;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
-namespace CecoChat.Server.Bff.Endpoints;
+namespace CecoChat.Server.Bff.Auth;
 
 public interface IAuthenticator
 {
@@ -68,7 +68,8 @@ public class Authenticator : IAuthenticator
             Dictionary<string, long> map = new();
             for (int i = 0; i < authOptions.LoadTestingUserCount; ++i)
             {
-                map.Add($"user{i}", i);
+                long userId = i + 1;
+                map.Add($"user{userId}", userId);
             }
 
             return map;
