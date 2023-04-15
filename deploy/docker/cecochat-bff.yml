@@ -65,8 +65,8 @@ services:
       CECOCHAT_Jaeger__BatchExportScheduledDelayMillis: 2000
       CECOCHAT_Backplane__Kafka__BootstrapServers__0: kafka0:19091
       CECOCHAT_Backplane__Kafka__BootstrapServers__1: kafka1:19092
-      CECOCHAT_StateDB__ContactPoints__0: cassandra0
-      CECOCHAT_StateDB__ContactPoints__1: cassandra1
+      CECOCHAT_StateDB__ContactPoints__0: cassandra0:9042
+      CECOCHAT_StateDB__ContactPoints__1: cassandra1:9042
       CECOCHAT_StateDB__LocalDC: Europe
       CECOCHAT_StateDB__SocketConnectTimeout: 00:00:05.0
       CECOCHAT_StateDB__ExponentialReconnectPolicy: true
@@ -99,8 +99,8 @@ services:
       CECOCHAT_Jaeger__BatchExportScheduledDelayMillis: 2000
       CECOCHAT_Backplane__Kafka__BootstrapServers__0: kafka0:19091
       CECOCHAT_Backplane__Kafka__BootstrapServers__1: kafka1:19092
-      CECOCHAT_HistoryDB__ContactPoints__0: cassandra0
-      CECOCHAT_HistoryDB__ContactPoints__1: cassandra1
+      CECOCHAT_HistoryDB__ContactPoints__0: cassandra0:9042
+      CECOCHAT_HistoryDB__ContactPoints__1: cassandra1:9042
       CECOCHAT_HistoryDB__LocalDC: Europe
       CECOCHAT_HistoryDB__SocketConnectTimeout: 00:00:05.0
       CECOCHAT_HistoryDB__ExponentialReconnectPolicy: true

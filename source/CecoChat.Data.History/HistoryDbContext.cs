@@ -20,7 +20,7 @@ internal sealed class HistoryDbContext : CassandraDbContext, IHistoryDbContext
 
     public HistoryDbContext(
         ILogger<HistoryDbContext> logger,
-        IOptions<CassandraOptions> options) : base(options)
+        IOptions<CassandraOptions> options) : base(logger, options)
     {
         _logger = logger;
     }

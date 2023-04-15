@@ -20,7 +20,7 @@ internal sealed class StateDbContext : CassandraDbContext, IStateDbContext
 
     public StateDbContext(
         ILogger<StateDbContext> logger,
-        IOptions<CassandraOptions> options) : base(options)
+        IOptions<CassandraOptions> options) : base(logger, options)
     {
         _logger = logger;
     }
