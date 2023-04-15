@@ -10,7 +10,10 @@ public static class UserDbRegistrations
     {
         return services.AddDbContext<UserDbContext>(builder =>
         {
-            builder.UseNpgsql(options.ConnectionString);
+            builder.UseNpgsql(options.ConnectionString, npgsql =>
+            {
+                npgsql.EnableRetryOnFailure(maxRetryCount: 3, maxRetryDelay: TimeSpan.FromSeconds(5), errorCodesToAdd: null);
+            });
         });
     }
 }
