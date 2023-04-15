@@ -1,5 +1,7 @@
 ﻿using System.Collections.Concurrent;
+using System.Net;
 using Cassandra;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace CecoChat.Cassandra;
@@ -15,12 +17,14 @@ public interface ICassandraDbContext : IDisposable
 
 public class CassandraDbContext : ICassandraDbContext
 {
+    private readonly ILogger _logger;
     private readonly CassandraOptions _options;
     private readonly Lazy<Cluster> _cluster;
     private readonly ConcurrentDictionary<string, ISession> _sessions;
 
-    public CassandraDbContext(IOptions<CassandraOptions> options)
+    public CassandraDbContext(ILogger<CassandraDbContext> logger, IOptions<CassandraOptions> options)
     {
+        _logger = logger;
         _options = options.Value;
         _cluster = new Lazy<Cluster>(CreateCluster);
         _sessions = new ConcurrentDictionary<string, ISession>();
@@ -28,8 +32,10 @@ public class CassandraDbContext : ICassandraDbContext
 
     private Cluster CreateCluster()
     {
+        List<IPEndPoint> endpoints = GetEndpoints();
+
         Builder clusterBuilder = new Builder()
-            .AddContactPoints(_options.ContactPoints)
+            .AddContactPoints(endpoints)
             .WithCompression(CompressionType.LZ4)
             .WithLoadBalancingPolicy(new DCAwareRoundRobinPolicy(_options.LocalDC));
 
@@ -49,6 +55,40 @@ public class CassandraDbContext : ICassandraDbContext
 
         Cluster cluster = clusterBuilder.Build();
         return cluster;
+    }
+
+    private List<IPEndPoint> GetEndpoints()
+    {
+        List<string> errors = new();
+        HashSet<string> uniqueEndpoints = new();
+        List<IPEndPoint> endpoints = new(capacity: _options.ContactPoints.Length);
+
+        foreach (string contactPoint in _options.ContactPoints)
+        {
+            if (!uniqueEndpoints.Add(contactPoint))
+            {
+                continue;
+            }
+
+            string[] parts = contactPoint.Split(':', StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length != 2 || parts[0].Length == 0 || parts[1].Length == 0 || !int.TryParse(parts[1], out int port))
+            {
+                errors.Add($"contact point '{contactPoint}' should be in format 'host:port'");
+            }
+            else
+            {
+                IPAddress hostIp = Dns.GetHostEntry(parts[0]).AddressList.First();
+                endpoints.Add(new IPEndPoint(hostIp, port));
+            }
+        }
+
+        if (errors.Count > 0)
+        {
+            throw new InvalidOperationException($"Cassandra errors: {string.Join(", ", errors)}");
+        }
+
+        _logger.LogInformation("Use Cassandra nodes {CassandraNodes}", string.Join(", ", uniqueEndpoints));
+        return endpoints;
     }
 
     public void Dispose()
