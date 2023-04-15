@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CecoChat.Client.Messaging\CecoChat.Client.Messaging.csproj" />
+    <ProjectReference Include="..\CecoChat.Contracts.Bff\CecoChat.Contracts.Bff.csproj" />
+    <ProjectReference Include="..\CecoChat.Contracts.Messaging\CecoChat.Contracts.Messaging.csproj" />
+    <ProjectReference Include="..\CecoChat.Data\CecoChat.Data.csproj" />
+    <ProjectReference Include="..\CecoChat\CecoChat.csproj" />
+  </ItemGroup>
+
+</Project>
