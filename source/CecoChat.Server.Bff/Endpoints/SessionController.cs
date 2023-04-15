@@ -51,7 +51,7 @@ public class SessionController : ControllerBase
         }
 
         Activity.Current?.AddTag("cecochat.user_id", authResult.UserId);
-        _logger.LogInformation("User {Username} from {UserIP}:{UserPort} authenticated and assigned user ID {UserId} and client ID {ClientId}",
+        _logger.LogTrace("User {Username} from {UserIP}:{UserPort} authenticated and assigned user ID {UserId} and client ID {ClientId}",
             request.Username, HttpContext.Connection.RemoteIpAddress, HttpContext.Connection.RemotePort, authResult.UserId, authResult.ClientId);
 
         Contracts.User.ProfileFull internalProfile = await _userClient.GetFullProfile(authResult.AccessToken, ct);
@@ -59,7 +59,7 @@ public class SessionController : ControllerBase
 
         int partition = _partitionUtility.ChoosePartition(authResult.UserId, _partitioningConfig.PartitionCount);
         string messagingServerAddress = _partitioningConfig.GetAddress(partition);
-        _logger.LogInformation("User {UserId} in partition {Partition} assigned to messaging server {MessagingServer}", authResult.UserId, partition, messagingServerAddress);
+        _logger.LogTrace("User {UserId} in partition {Partition} assigned to messaging server {MessagingServer}", authResult.UserId, partition, messagingServerAddress);
 
         _logger.LogTrace("Responding with new session having client ID {ClientId}, full profile {ProfileUserName} for user {UserId}, using messaging server {MessagingServer}",
             authResult.ClientId, profile.UserName, authResult.UserId, messagingServerAddress);
