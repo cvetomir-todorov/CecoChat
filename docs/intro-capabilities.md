@@ -2,15 +2,14 @@
 
 ## Functional
 
-* User can send messages to other users
-* User receives messages from other users in real-time
-* User can (un)react to messages with emojis
-* User can connect with multiple clients
-* User is shown chats with indication of new messages
-* User can review chat history at a random point in time 
-* User receives a delivery notification when the message has been processed
-* User has a profile with full and public-only data
-* User can see public profiles of other users
+* Messaging in real-time
+  - Send and receive messages, react and unreact with emojis
+  - Notifications when a message has been processed
+  - Multiple clients for the same user
+* Chats
+  - Shown with indication for new messages
+  - Review history at a random point in time
+* User profiles with full and public-only data
 
 ## Limitations
 

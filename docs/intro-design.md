@@ -16,4 +16,13 @@
 * Observability is achieved via health checks, distributed tracing, log aggregation and metrics with monitoring
 * Deployment infrastructure takes care of failover, growth/shrinkage of the different services based on load and predictive analytics
 
+More details on the design of each aspect:
+
+* [Messaging](design-messaging.md)
+* [User chats, chat history](design-state-history.md)
+* [Clients](design-clients.md)
+* [Configuration](design-configuration.md)
+* [Observability](design-observability.md)
+* [Deployment](design-deployment.md)
+
 All the diagrams are in the [diagrams](diagrams/) folder and [draw.io](https://app.diagrams.net/) is needed in order to view them. From the `Help` item in the menu a desktop tool could be downloaded, if preferred. Currently this is the [link with the releases](https://github.com/jgraph/drawio-desktop/releases).
