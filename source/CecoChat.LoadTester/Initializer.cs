@@ -11,13 +11,10 @@ public static class Initializer
         for (int i = 0; i < args.ClientCount; ++i)
         {
             long userId = i + 1;
-            contexts[i] = new ClientContext
-            {
-                UserId = userId,
-                Client = new ChatClient(args.BffAddress),
-                Random = random,
-                Friends = GenerateFriends(userId, args.ClientCount, args.FriendCount, random),
-            };
+            ChatClient client = new(args.BffAddress);
+            long[] friends = GenerateFriends(userId, args.ClientCount, args.FriendCount, random);
+
+            contexts[i] = new ClientContext(userId, friends, client, random);
         }
         Console.WriteLine("Initialized {0} contexts.", args.ClientCount);
 
