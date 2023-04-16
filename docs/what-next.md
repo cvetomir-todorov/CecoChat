@@ -60,6 +60,7 @@
 ## Improvements
 
 * Performance
+  - Cache user profiles to avoid putting stress on the UserDB
   - Benchmark Kafka and improve its configuration
 * Observability
   - Add Open Telemetry metrics in UserDB when Npgsql adds support
