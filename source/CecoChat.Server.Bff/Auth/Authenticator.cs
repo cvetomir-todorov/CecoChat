@@ -84,7 +84,7 @@ public class Authenticator : IAuthenticator
     {
         if (!_userIdMap.TryGetValue(username, out long userId))
         {
-            return new AuthenticateResult {IsAuthenticated = false};
+            return new AuthenticateResult { IsAuthenticated = false };
         }
 
         (Guid clientId, string accessToken) = CreateSession(userId);

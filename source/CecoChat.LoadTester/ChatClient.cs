@@ -24,9 +24,9 @@ public sealed class ChatClient : IAsyncDisposable
         _bffClient.Dispose();
         return _messagingClient.DisposeAsync();
     }
-    
+
     public int MessagesSent { get; private set; }
-    
+
     public int MessagesProcessed { get; private set; }
 
     public int MessagesReceived { get; private set; }
