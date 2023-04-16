@@ -29,9 +29,17 @@ public sealed class Args
 
 public sealed class ClientContext
 {
-    public long UserId { get; init; }
-    public ChatClient Client { get; init; }
-    public Random Random { get; init; }
-    public long[] Friends { get; init; }
+    public ClientContext(long userId, long[] friends, ChatClient client, Random random)
+    {
+        UserId = userId;
+        Client = client;
+        Friends = friends;
+        Random = random;
+    }
+
+    public long UserId { get; }
+    public ChatClient Client { get; }
+    public long[] Friends { get; }
+    public Random Random { get; }
     public bool Success { get; set; }
 }
