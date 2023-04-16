@@ -58,23 +58,38 @@ public sealed class InitUsersDb : IHostedService
         {
             new()
             {
-                UserId = 1, UserName = "bob1", DisplayName = "Robert",
-                AvatarUrl = "https://cdn.cecochat.com/avatars/bob1.jpg", Email = "bob1@cecochat.com", Phone = "+359888111111"
+                UserId = 1,
+                UserName = "bob1",
+                DisplayName = "Robert",
+                AvatarUrl = "https://cdn.cecochat.com/avatars/bob1.jpg",
+                Email = "bob1@cecochat.com",
+                Phone = "+359888111111"
             },
             new()
             {
-                UserId = 2, UserName = "alice2", DisplayName = "Alice in Wonderland",
-                AvatarUrl = "https://cdn.cecochat.com/avatars/alice2.jpg", Email = "alice2@cecochat.com", Phone = "+359888222222"
+                UserId = 2,
+                UserName = "alice2",
+                DisplayName = "Alice in Wonderland",
+                AvatarUrl = "https://cdn.cecochat.com/avatars/alice2.jpg",
+                Email = "alice2@cecochat.com",
+                Phone = "+359888222222"
             },
             new()
             {
-                UserId = 3, UserName = "john3", DisplayName = "Sir John",
-                AvatarUrl = "https://cdn.cecochat.com/avatars/john3.jpg", Email = "john3@cecochat.com", Phone = "+359888333333"
+                UserId = 3,
+                UserName = "john3",
+                DisplayName = "Sir John",
+                AvatarUrl = "https://cdn.cecochat.com/avatars/john3.jpg",
+                Email = "john3@cecochat.com",
+                Phone = "+359888333333"
             },
             new()
             {
-                UserId = 1200, UserName = "peter1200", DisplayName = "Peter the Great",
-                AvatarUrl = "https://cdn.cecochat.com/avatars/peter1200.jpg", Email = "peter1200@cecochat.com",
+                UserId = 1200,
+                UserName = "peter1200",
+                DisplayName = "Peter the Great",
+                AvatarUrl = "https://cdn.cecochat.com/avatars/peter1200.jpg",
+                Email = "peter1200@cecochat.com",
                 Phone = "+359888120012"
             }
         };
@@ -94,8 +109,12 @@ public sealed class InitUsersDb : IHostedService
             long userId = i + 1;
             profiles[i] = new()
             {
-                UserId = userId, UserName = $"user{userId}", DisplayName = $"User {userId}",
-                AvatarUrl = $"https://cdn.cecochat.com/avatars/user{userId}.jpg", Email = $"user{userId}@cecochat.com", Phone = "+359888000000"
+                UserId = userId,
+                UserName = $"user{userId}",
+                DisplayName = $"User {userId}",
+                AvatarUrl = $"https://cdn.cecochat.com/avatars/user{userId}.jpg",
+                Email = $"user{userId}@cecochat.com",
+                Phone = "+359888000000"
             };
         }
 
