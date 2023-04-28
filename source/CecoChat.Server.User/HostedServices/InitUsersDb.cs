@@ -43,7 +43,7 @@ public sealed class InitUsersDb : IHostedService
             if (_options.SeedLoadTestingUsers)
             {
                 await SeedLoadTestingUsers(_options.SeedLoadTestingUserCount, cancellationToken);
-                _logger.LogInformation("Seeded database with {0} load testing users.", _options.SeedLoadTestingUserCount);
+                _logger.LogInformation("Seeded database with {UserCount} load testing users.", _options.SeedLoadTestingUserCount);
             }
         }
 
