@@ -1,15 +1,21 @@
 [Chat engine](docs/intro-capabilities.md) for millions of users
 
 * Messaging in real-time
-  - Send and receive messages, react and unreact with emojis
+  - Send and receive messages, (un)react with emojis
   - Notifications when a message has been processed
   - Multiple clients for the same user
 * Chats
-  - Shown with indication for new messages
+  - Indication for new messages
   - Review history at a random point in time
 * User profiles with full and public-only data
 
 Check out [what next](docs/what-next.md) needs to be implemented. I appreciate all comments so feel free to use the `Discussions` tab.
+
+# Technology
+
+* [System design](docs/intro-design.md) based on [microservice architecture](https://microservices.io/)
+* [Implementation](source/) based on [cloud agnostic technologies](docs/intro-technologies.md)
+* [Configurable](docs/design-configuration.md), [observable](docs/design-observability.md), [containerized and runnable](docs/dev-run-prerequisites.md), [deployable](docs/design-deployment.md) local environment
 
 # Code
 
@@ -24,22 +30,6 @@ Check out [what next](docs/what-next.md) needs to be implemented. I appreciate a
 [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=cvetomir-todorov_CecoChat&metric=code_smells)](https://sonarcloud.io/dashboard?id=cvetomir-todorov_CecoChat)
 [![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=cvetomir-todorov_CecoChat&metric=duplicated_lines_density)](https://sonarcloud.io/dashboard?id=cvetomir-todorov_CecoChat)
 [![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=cvetomir-todorov_CecoChat&metric=sqale_index)](https://sonarcloud.io/dashboard?id=cvetomir-todorov_CecoChat)
-
-# Technologies
-
-* [System design](docs/intro-design.md) based on microservice architecture
-* [Implementation](source/) based on [cloud agnostic technologies](docs/intro-technologies.md)
-  - Integration: Kafka, gRPC, WebSocket, HTTP
-  - Data storage: YugabyteDB, Cassandra, Redis
-  - Internal implementation: .NET 6, ASP.NET
-* Dynamically and statically [configurable](docs/design-configuration.md) microservices
-* [Observable](docs/design-observability.md) environment based on OpenTelemetry
-  - Tracing: Jaeger
-  - Metrics: Prometheus, Grafana
-  - Logging: ElasticSearch, Fluentd, Kibana
-* Containerized components which can be [ran locally](docs/dev-run-prerequisites.md)
-  - Select components via Docker
-  - Whole cluster via Minikube, Kubernetes, Helm
 
 # Documentation
 
