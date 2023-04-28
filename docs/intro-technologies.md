@@ -1,8 +1,13 @@
 # Technologies
 
-![Technologies](images/cecochat-08-technologies.png)
+The technologies chosen are [cloud agnostic](https://codersociety.com/blog/articles/cloud-agnostic) which makes the solution independent from a specific cloud provider.
 
-The technologies chosen are [cloud agnostic](https://codersociety.com/blog/articles/cloud-agnostic) which makes the solution independent from any specific cloud provider.
+* Integration - Kafka, gRPC, WebSocket, HTTP
+* Data storage - Yugabyte, Cassandra, Redis
+* Operations - OpenTelemetry, Docker, Kubernetes
+* Services - .NET, ASP.NET
+
+![Technologies](images/cecochat-08-technologies.png)
 
 # Client communication
 
@@ -120,7 +125,7 @@ Configuration is based on Redis:
 ![EFCore](tech-images/efcore.png)
 ![SignalR](tech-images/signalr.webp)
 
-The services use .NET 6, ASP.NET and Entity Framework Core:
+The services are based on .NET 6, ASP.NET, SignalR and Entity Framework Core:
 * open-source software backed by Microsoft
 * very mature, feature-rich, lots of tools
 * widely-used with a big community

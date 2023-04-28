@@ -3,15 +3,15 @@
 ## Functional
 
 * Messaging in real-time
-  - Send and receive messages, react and unreact with emojis
+  - Send and receive messages, (un)react with emojis
   - Notifications when a message has been processed
   - Multiple clients for the same user
 * Chats
-  - Shown with indication for new messages
+  - Indication for new messages
   - Review history at a random point in time
 * User profiles with full and public-only data
 
-## Limitations
+#### Limitations
 
 * No user register/login/identity
 * No user friendship
@@ -20,12 +20,14 @@
 ## Non-functional
 
 * Reliability
-  - Durability is preferred at the cost of some latency
+  - Durability is guaranteed by acknowledgement and replication
   - Eventual consistency guarantees - once the sent message is processed it will eventually be persisted and delivered
 * Scalability
-  - Designed for up to 10 mln of simultaneously active users, which unfortunately is expensive to validate due to the infrastructure required
+  - Designed for up to 10 mln of simultaneously active users
+  - Unfortunately, expensive to validate due to the infrastructure required
+  - Linear scalability of the main technologies (Kafka, Cassandra, YugabyteDB)
   - Supported by numbers from the [calculations](research-calculations.md)
-  - Linear scalability of the main technologies (Kafka, Cassandra, YugabyteDB) 
+  - Minimal [load test on 2 machines](load-test.md)
 * Security
   - TLS for Kubernetes cluster and services
   - Access tokens for authn and authz
@@ -40,6 +42,7 @@
   - Load balancing
   - High availability (partial)
 * Maintainability
-  - Minimal documentation
+  - Simple design
   - Code quality gate
+  - Minimal documentation
   - Open-source technologies
