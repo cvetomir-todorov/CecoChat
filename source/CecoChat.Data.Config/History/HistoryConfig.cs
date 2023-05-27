@@ -63,7 +63,7 @@ internal sealed class HistoryConfig : IHistoryConfig
         }
     }
 
-    private async Task HandleMessageCount(ChannelMessage channelMessage)
+    private async Task HandleMessageCount(ChannelMessage _)
     {
         EnsureInitialized();
 

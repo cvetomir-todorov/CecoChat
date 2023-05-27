@@ -109,7 +109,7 @@ internal sealed class PartitioningConfig : IPartitioningConfig
         }
     }
 
-    private async Task HandlePartitions(ChannelMessage channelMessage)
+    private async Task HandlePartitions(ChannelMessage _)
     {
         EnsureInitialized();
 
@@ -139,7 +139,7 @@ internal sealed class PartitioningConfig : IPartitioningConfig
         }
     }
 
-    private async Task HandleAddresses(ChannelMessage channelMessage)
+    private async Task HandleAddresses(ChannelMessage _)
     {
         EnsureInitialized();
 
