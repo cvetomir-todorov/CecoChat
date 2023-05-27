@@ -66,7 +66,7 @@ internal sealed class SnowflakeConfig : ISnowflakeConfig
         _logger.LogInformation("Subscribed for changes about {ServerGeneratorIDs} from channel {Channel}", SnowflakeKeys.GeneratorIds, generatorIdsChannel.Channel);
     }
 
-    private Task HandleGeneratorIDs(ChannelMessage channelMessage)
+    private Task HandleGeneratorIDs(ChannelMessage _)
     {
         return LoadValidateValues();
     }
