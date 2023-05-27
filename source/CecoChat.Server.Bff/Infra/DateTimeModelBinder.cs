@@ -5,7 +5,7 @@ namespace CecoChat.Server.Bff.Infra;
 
 public class DateTimeModelBinder : IModelBinder
 {
-    private static readonly string[] _dateTimeFormats =
+    private static readonly string[] DateTimeFormats =
     {
         "yyyyMMdd'T'HHmmss.FFFFFFFK", "yyyy-MM-dd'T'HH:mm:ss.FFFFFFFK",
         "MM/dd/yyyy HH:mm:ss", "MM/dd/yyyy HH:mm:ss.FFFFFFFK"
@@ -25,7 +25,7 @@ public class DateTimeModelBinder : IModelBinder
             return Task.CompletedTask;
         }
 
-        bool isParsed = DateTime.TryParseExact(textValue, _dateTimeFormats, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out DateTime result);
+        bool isParsed = DateTime.TryParseExact(textValue, DateTimeFormats, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out DateTime result);
         if (isParsed)
         {
             if (result.Kind == DateTimeKind.Local)
