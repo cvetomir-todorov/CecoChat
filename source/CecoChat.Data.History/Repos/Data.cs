@@ -20,7 +20,8 @@ internal sealed class DataMapper : IDataMapper
     {
         switch (dataType)
         {
-            case DataType.PlainText: return (sbyte)DbDataType.PlainText;
+            case DataType.PlainText:
+                return (sbyte)DbDataType.PlainText;
             default:
                 throw new EnumValueNotSupportedException(dataType);
         }
@@ -32,7 +33,8 @@ internal sealed class DataMapper : IDataMapper
 
         switch (dbDataTypeAsEnum)
         {
-            case DbDataType.PlainText: return DataType.PlainText;
+            case DbDataType.PlainText:
+                return DataType.PlainText;
             default:
                 throw new EnumValueNotSupportedException(dbDataTypeAsEnum);
         }
