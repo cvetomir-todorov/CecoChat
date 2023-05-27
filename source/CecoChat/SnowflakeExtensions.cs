@@ -9,7 +9,7 @@ public static class Snowflake
 
 public static class SnowflakeExtensions
 {
-    private static readonly long _epochTicks = Snowflake.Epoch.Ticks;
+    private static readonly long EpochTicks = Snowflake.Epoch.Ticks;
 
     public static DateTime ToTimestamp(this long snowflake)
     {
@@ -18,7 +18,7 @@ public static class SnowflakeExtensions
         // the 41 bits for timestamp are incremented each tick
         // each tick is 1 ms so we have to convert it to system time ticks
         long snowflakeTicks = (snowflake >> 22) * TimeSpan.TicksPerMillisecond;
-        long timestampTicks = _epochTicks + snowflakeTicks;
+        long timestampTicks = EpochTicks + snowflakeTicks;
         DateTime timestamp = new(timestampTicks, DateTimeKind.Utc);
         return timestamp;
     }
@@ -48,7 +48,7 @@ public static class SnowflakeExtensions
     private static long ToSnowflakeInternal(DateTime timestamp, Rounding rounding)
     {
         long timestampTicks = timestamp.Ticks;
-        long snowflakeTicks = timestampTicks - _epochTicks;
+        long snowflakeTicks = timestampTicks - EpochTicks;
         long snowflakeMs = snowflakeTicks / TimeSpan.TicksPerMillisecond;
 
         switch (rounding)

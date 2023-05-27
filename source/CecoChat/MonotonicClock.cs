@@ -12,20 +12,20 @@ public interface IClock
 
 public sealed class MonotonicClock : IClock
 {
-    private static readonly DateTime _startUtc;
-    private static readonly Stopwatch _stopwatch;
+    private static readonly DateTime StartUtc;
+    private static readonly Stopwatch Stopwatch;
 
     static MonotonicClock()
     {
-        _stopwatch = new Stopwatch();
-        _stopwatch.Start();
-        _startUtc = DateTime.UtcNow;
+        Stopwatch = new Stopwatch();
+        Stopwatch.Start();
+        StartUtc = DateTime.UtcNow;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public DateTime GetNowUtc()
     {
-        return _startUtc.Add(_stopwatch.Elapsed);
+        return StartUtc.Add(Stopwatch.Elapsed);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
