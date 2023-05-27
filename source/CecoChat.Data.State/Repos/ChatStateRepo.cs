@@ -59,11 +59,13 @@ internal sealed class ChatStateRepo : IChatStateRepo
 
     public void Prepare()
     {
-        PreparedStatement _ = _chatsQuery.Value;
 #pragma warning disable IDE0059
+#pragma warning disable IDE1006
+        PreparedStatement _ = _chatsQuery.Value;
         PreparedStatement __ = _chatQuery.Value;
         PreparedStatement ___ = _updateQuery.Value;
 #pragma warning restore IDE0059
+#pragma warning restore IDE1006
     }
 
     public async Task<IReadOnlyCollection<ChatState>> GetChats(long userId, DateTime newerThan)
