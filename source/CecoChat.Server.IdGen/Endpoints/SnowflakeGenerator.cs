@@ -33,7 +33,7 @@ public sealed class SnowflakeGenerator : IIdentityGenerator
         IdGeneratorOptions idGenOptions = new(idStructure, timeSource, SequenceOverflowStrategy.SpinWait);
 
         _generators = new List<IdGenerator>();
-        IReadOnlyCollection<short> generatorIds = snowflakeConfig.GetGeneratorIds(configOptions.Value.ServerID);
+        IReadOnlyCollection<short> generatorIds = snowflakeConfig.GetGeneratorIds(configOptions.Value.ServerId);
         foreach (short generatorId in generatorIds)
         {
             _generators.Add(new IdGenerator(generatorId, idGenOptions));
