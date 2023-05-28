@@ -120,7 +120,7 @@ internal sealed class ChatMessageRepo : IChatMessageRepo
     public void AddMessage(DataMessage message)
     {
         sbyte dbMessageType = _mapper.MapHistoryToDbDataType(message.DataType);
-        string chatId = DataUtility.CreateChatID(message.SenderId, message.ReceiverId);
+        string chatId = DataUtility.CreateChatId(message.SenderId, message.ReceiverId);
 
         BoundStatement query = _messagesForChatQuery.Value.Bind(
             chatId, message.MessageId, message.SenderId, message.ReceiverId, dbMessageType, message.Data);
@@ -133,7 +133,7 @@ internal sealed class ChatMessageRepo : IChatMessageRepo
 
     public void SetReaction(ReactionMessage message)
     {
-        string chatId = DataUtility.CreateChatID(message.SenderId, message.ReceiverId);
+        string chatId = DataUtility.CreateChatId(message.SenderId, message.ReceiverId);
         BoundStatement query = _setReactionQuery.Value.Bind(message.ReactorId, message.Reaction, chatId, message.MessageId);
         query.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
         query.SetIdempotence(false);
@@ -144,7 +144,7 @@ internal sealed class ChatMessageRepo : IChatMessageRepo
 
     public void UnsetReaction(ReactionMessage message)
     {
-        string chatId = DataUtility.CreateChatID(message.SenderId, message.ReceiverId);
+        string chatId = DataUtility.CreateChatId(message.SenderId, message.ReceiverId);
         BoundStatement query = _unsetReactionQuery.Value.Bind(message.ReactorId, chatId, message.MessageId);
         query.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
         query.SetIdempotence(false);
