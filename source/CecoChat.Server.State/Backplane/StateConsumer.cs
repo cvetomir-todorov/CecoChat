@@ -138,7 +138,7 @@ public sealed class StateConsumer : IStateConsumer
     private void UpdateReceiverState(BackplaneMessage backplaneMessage)
     {
         long targetUserId = backplaneMessage.ReceiverId;
-        string chatId = DataUtility.CreateChatID(backplaneMessage.SenderId, backplaneMessage.ReceiverId);
+        string chatId = DataUtility.CreateChatId(backplaneMessage.SenderId, backplaneMessage.ReceiverId);
         ChatState receiverChat = GetChatFromDb(targetUserId, chatId);
 
         bool needsUpdate = false;
@@ -168,7 +168,7 @@ public sealed class StateConsumer : IStateConsumer
     private void UpdateSenderState(BackplaneMessage backplaneMessage)
     {
         long targetUserId = backplaneMessage.SenderId;
-        string chatId = DataUtility.CreateChatID(backplaneMessage.SenderId, backplaneMessage.ReceiverId);
+        string chatId = DataUtility.CreateChatId(backplaneMessage.SenderId, backplaneMessage.ReceiverId);
         ChatState senderChat = GetChatFromDb(targetUserId, chatId);
 
         bool needsUpdate = false;

@@ -87,7 +87,7 @@ public sealed class ChatClient : IAsyncDisposable
         List<LocalStorage.Chat> chats = new(capacity: response.Chats.Length);
         foreach (ChatState bffChat in response.Chats)
         {
-            long otherUserId = DataUtility.GetOtherUsedID(bffChat.ChatID, UserId);
+            long otherUserId = DataUtility.GetOtherUsedId(bffChat.ChatID, UserId);
             LocalStorage.Chat chat = Map.BffChat(bffChat, otherUserId);
             chats.Add(chat);
         }

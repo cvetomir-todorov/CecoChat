@@ -32,7 +32,7 @@ public sealed class HistoryService : Contracts.History.History.HistoryBase
             throw new RpcException(new Status(StatusCode.Unauthenticated, string.Empty));
         }
 
-        string chatId = DataUtility.CreateChatID(userClaims.UserId, request.OtherUserId);
+        string chatId = DataUtility.CreateChatId(userClaims.UserId, request.OtherUserId);
         DateTime olderThan = request.OlderThan.ToDateTime();
         IReadOnlyCollection<HistoryMessage> historyMessages = await _messageRepo.GetHistory(
             userClaims.UserId, chatId, olderThan, _historyConfig.MessageCount);
