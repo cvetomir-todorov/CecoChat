@@ -1,4 +1,4 @@
-namespace CecoChat.Server.IDGen.HostedServices;
+namespace CecoChat.Server.IdGen.HostedServices;
 
 public sealed class ConfigOptions
 {
