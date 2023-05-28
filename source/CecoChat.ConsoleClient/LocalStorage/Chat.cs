@@ -43,8 +43,8 @@ public sealed class Chat
         }
     }
 
-    public bool TryGetMessage(long messageID, [NotNullWhen(returnValue: true)] out Message? message)
+    public bool TryGetMessage(long messageId, [NotNullWhen(returnValue: true)] out Message? message)
     {
-        return _messageMap.TryGetValue(messageID, out message);
+        return _messageMap.TryGetValue(messageId, out message);
     }
 }
