@@ -2,22 +2,22 @@ using System.Threading.Channels;
 
 namespace CecoChat.Client.IdGen;
 
-internal interface IIDChannel
+internal interface IIdChannel
 {
-    ValueTask<(bool, long)> TryTakeID(TimeSpan timeout, CancellationToken ct);
+    ValueTask<(bool, long)> TryTakeId(TimeSpan timeout, CancellationToken ct);
 
-    void ClearIDs();
+    void ClearIds();
 
-    void AddNewIDs(IReadOnlyCollection<long> newIDs);
+    void AddNewIds(IReadOnlyCollection<long> newIds);
 }
 
-internal sealed class IDChannel : IIDChannel
+internal sealed class IdChannel : IIdChannel
 {
     private readonly Channel<long> _blueChannel;
     private readonly Channel<long> _greenChannel;
     private Channel<long> _currentChannel;
 
-    public IDChannel()
+    public IdChannel()
     {
         UnboundedChannelOptions options = new()
         {
@@ -29,7 +29,7 @@ internal sealed class IDChannel : IIDChannel
         _currentChannel = _blueChannel;
     }
 
-    public async ValueTask<(bool, long)> TryTakeID(TimeSpan timeout, CancellationToken ct)
+    public async ValueTask<(bool, long)> TryTakeId(TimeSpan timeout, CancellationToken ct)
     {
         CancellationTokenSource? timeoutCts = null;
         CancellationTokenSource? linkedCts = null;
@@ -53,7 +53,7 @@ internal sealed class IDChannel : IIDChannel
         }
     }
 
-    public void ClearIDs()
+    public void ClearIds()
     {
         while (_currentChannel.Reader.TryRead(out long _))
         {
@@ -61,7 +61,7 @@ internal sealed class IDChannel : IIDChannel
         }
     }
 
-    public void AddNewIDs(IReadOnlyCollection<long> newIDs)
+    public void AddNewIds(IReadOnlyCollection<long> newIds)
     {
         Channel<long> otherChannel = _blueChannel != _currentChannel ? _blueChannel : _greenChannel;
 
@@ -70,9 +70,9 @@ internal sealed class IDChannel : IIDChannel
             // drain the other channel
         }
 
-        foreach (long newID in newIDs)
+        foreach (long newId in newIds)
         {
-            otherChannel.Writer.TryWrite(newID);
+            otherChannel.Writer.TryWrite(newId);
         }
 
         _currentChannel = otherChannel;

@@ -3,7 +3,7 @@ using CecoChat.Polly;
 
 namespace CecoChat.Client.IdGen;
 
-public sealed class IDGenOptions
+public sealed class IdGenOptions
 {
     public Uri? Address { get; set; }
     public TimeSpan CallTimeout { get; set; }
