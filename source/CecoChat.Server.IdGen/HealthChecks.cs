@@ -1,6 +1,6 @@
 using CecoChat.Health;
 
-namespace CecoChat.Server.IDGen;
+namespace CecoChat.Server.IdGen;
 
 public class ConfigDbInitHealthCheck : StatusHealthCheck
 { }

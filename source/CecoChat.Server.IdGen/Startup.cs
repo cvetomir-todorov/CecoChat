@@ -9,15 +9,15 @@ using CecoChat.Jaeger;
 using CecoChat.Otel;
 using CecoChat.Redis;
 using CecoChat.Redis.Health;
-using CecoChat.Server.IDGen.Endpoints;
-using CecoChat.Server.IDGen.HostedServices;
+using CecoChat.Server.IdGen.Endpoints;
+using CecoChat.Server.IdGen.HostedServices;
 using FluentValidation;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 
-namespace CecoChat.Server.IDGen;
+namespace CecoChat.Server.IdGen;
 
 public class Startup
 {
@@ -70,7 +70,7 @@ public class Startup
     {
         ResourceBuilder serviceResourceBuilder = ResourceBuilder
             .CreateEmpty()
-            .AddService(serviceName: "IDGen", serviceNamespace: "CecoChat", serviceVersion: "0.1")
+            .AddService(serviceName: "IdGen", serviceNamespace: "CecoChat", serviceVersion: "0.1")
             .AddEnvironmentVariableDetector();
 
         services

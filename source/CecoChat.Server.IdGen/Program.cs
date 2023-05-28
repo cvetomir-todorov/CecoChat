@@ -1,4 +1,4 @@
-namespace CecoChat.Server.IDGen;
+namespace CecoChat.Server.IdGen;
 
 public static class Program
 {

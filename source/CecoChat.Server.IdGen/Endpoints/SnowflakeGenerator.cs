@@ -1,15 +1,15 @@
 ﻿using CecoChat.Data.Config.Snowflake;
-using CecoChat.Server.IDGen.HostedServices;
+using CecoChat.Server.IdGen.HostedServices;
 using IdGen;
 using Microsoft.Extensions.Options;
 
-namespace CecoChat.Server.IDGen.Endpoints;
+namespace CecoChat.Server.IdGen.Endpoints;
 
 public interface IIdentityGenerator
 {
-    long GenerateOne(long originatorID);
+    long GenerateOne(long originatorId);
 
-    IEnumerable<long> GenerateMany(long originatorID, int count);
+    IEnumerable<long> GenerateMany(long originatorId, int count);
 }
 
 public sealed class SnowflakeGenerator : IIdentityGenerator
@@ -40,21 +40,21 @@ public sealed class SnowflakeGenerator : IIdentityGenerator
         }
     }
 
-    public long GenerateOne(long originatorID)
+    public long GenerateOne(long originatorId)
     {
-        long id = ChooseGenerator(originatorID, out int generatorIndex).CreateId();
-        _logger.LogTrace("Generated ID {Id} for originator {OriginatorId} using generator {GeneratorIndex}", id, originatorID, generatorIndex);
+        long id = ChooseGenerator(originatorId, out int generatorIndex).CreateId();
+        _logger.LogTrace("Generated ID {Id} for originator {OriginatorId} using generator {GeneratorIndex}", id, originatorId, generatorIndex);
         return id;
     }
 
-    public IEnumerable<long> GenerateMany(long originatorID, int count)
+    public IEnumerable<long> GenerateMany(long originatorId, int count)
     {
-        IEnumerable<long> ids = ChooseGenerator(originatorID, out int generatorIndex).Take(count);
-        _logger.LogTrace("Generated {IdCount} IDs for originator {OriginatorId} using generator {GeneratorIndex}", count, originatorID, generatorIndex);
+        IEnumerable<long> ids = ChooseGenerator(originatorId, out int generatorIndex).Take(count);
+        _logger.LogTrace("Generated {IdCount} IDs for originator {OriginatorId} using generator {GeneratorIndex}", count, originatorId, generatorIndex);
         return ids;
     }
 
-    private IdGenerator ChooseGenerator(long originatorID, out int generatorIndex)
+    private IdGenerator ChooseGenerator(long originatorId, out int generatorIndex)
     {
         if (_generators.Count == 1)
         {
@@ -62,7 +62,7 @@ public sealed class SnowflakeGenerator : IIdentityGenerator
         }
         else
         {
-            int hash = _hashFunction.Compute(originatorID);
+            int hash = _hashFunction.Compute(originatorId);
             generatorIndex = Math.Abs(hash) % _generators.Count;
         }
 

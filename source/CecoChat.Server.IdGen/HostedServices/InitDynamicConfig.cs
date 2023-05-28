@@ -1,7 +1,7 @@
 using CecoChat.Data.Config.Snowflake;
 using Microsoft.Extensions.Options;
 
-namespace CecoChat.Server.IDGen.HostedServices;
+namespace CecoChat.Server.IdGen.HostedServices;
 
 public sealed class InitDynamicConfig : IHostedService
 {
