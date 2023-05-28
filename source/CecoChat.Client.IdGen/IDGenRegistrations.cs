@@ -2,7 +2,7 @@
 using CecoChat.Polly;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace CecoChat.Client.IDGen;
+namespace CecoChat.Client.IdGen;
 
 public static class IDGenRegistrations
 {

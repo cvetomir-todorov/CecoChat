@@ -1,7 +1,7 @@
 ﻿using CecoChat.Http.Client;
 using CecoChat.Polly;
 
-namespace CecoChat.Client.IDGen;
+namespace CecoChat.Client.IdGen;
 
 public sealed class IDGenOptions
 {
