@@ -64,9 +64,9 @@ services:
       CECOCHAT_Config__ServerID: 0
       CECOCHAT_Backplane__Kafka__BootstrapServers__0: kafka0:19091
       CECOCHAT_Backplane__Kafka__BootstrapServers__1: kafka1:19092
-      CECOCHAT_IDGen__Address: "https://idgen"
-      CECOCHAT_IDGen__OriginatorID: 0
-      CECOCHAT_IDGen__RefreshIDsCount: 1024
+      CECOCHAT_IdGen__Address: "https://idgen"
+      CECOCHAT_IdGen__OriginatorId: 0
+      CECOCHAT_IdGen__RefreshIdsCount: 1024
 #    logging: *fluentd-logging
   cecochat-messaging1:
     image: ceco.com/cecochat/messaging:0.1
@@ -95,7 +95,7 @@ services:
       CECOCHAT_Config__ServerID: 1
       CECOCHAT_Backplane__Kafka__BootstrapServers__0: kafka0:19091
       CECOCHAT_Backplane__Kafka__BootstrapServers__1: kafka1:19092
-      CECOCHAT_IDGen__Address: "https://idgen"
-      CECOCHAT_IDGen__OriginatorID: 1
-      CECOCHAT_IDGen__RefreshIDsCount: 1024
+      CECOCHAT_IdGen__Address: "https://idgen"
+      CECOCHAT_IdGen__OriginatorId: 1
+      CECOCHAT_IdGen__RefreshIdsCount: 1024
 #    logging: *fluentd-logging

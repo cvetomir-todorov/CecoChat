@@ -7,10 +7,10 @@ public sealed class IdGenOptions
 {
     public Uri? Address { get; set; }
     public TimeSpan CallTimeout { get; set; }
-    public long OriginatorID { get; set; }
-    public int RefreshIDsCount { get; set; }
-    public TimeSpan RefreshIDsInterval { get; set; }
-    public TimeSpan GetIDWaitInterval { get; set; }
+    public long OriginatorId { get; set; }
+    public int RefreshIdsCount { get; set; }
+    public TimeSpan RefreshIdsInterval { get; set; }
+    public TimeSpan GetIdWaitInterval { get; set; }
 
     public SocketsHttpHandlerOptions? SocketsHttpHandler { get; set; }
     public RetryOptions? Retry { get; set; }

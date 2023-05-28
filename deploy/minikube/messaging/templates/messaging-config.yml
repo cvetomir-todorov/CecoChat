@@ -9,5 +9,5 @@ data:
   {{.Values.Entrypoint.ConfigName}}: |-
     #!/bin/bash
     export CECOCHAT_Config__ServerID=${HOSTNAME##*-}
-    export CECOCHAT_IDGen__OriginatorID=${HOSTNAME##*-}
+    export CECOCHAT_IdGen__OriginatorId=${HOSTNAME##*-}
     dotnet CecoChat.Server.Messaging.dll
