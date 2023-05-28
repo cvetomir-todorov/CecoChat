@@ -1,4 +1,4 @@
-using CecoChat.Client.IDGen;
+using CecoChat.Client.IdGen;
 using CecoChat.Contracts.Messaging;
 using CecoChat.Server.Identity;
 using CecoChat.Server.Messaging.Backplane;

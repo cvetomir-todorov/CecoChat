@@ -3,7 +3,7 @@ using CecoChat.AspNet.Health;
 using CecoChat.AspNet.Prometheus;
 using CecoChat.AspNet.SignalR.Telemetry;
 using CecoChat.Autofac;
-using CecoChat.Client.IDGen;
+using CecoChat.Client.IdGen;
 using CecoChat.Contracts.Backplane;
 using CecoChat.Data.Config;
 using CecoChat.Http.Health;
