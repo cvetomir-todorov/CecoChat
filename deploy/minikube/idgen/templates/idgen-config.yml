@@ -9,4 +9,4 @@ data:
   {{.Values.Entrypoint.ConfigName}}: |-
     #!/bin/bash
     export CECOCHAT_Config__ServerID=${HOSTNAME##*-}
-    dotnet CecoChat.Server.IDGen.dll
+    dotnet CecoChat.Server.IdGen.dll

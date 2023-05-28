@@ -27,7 +27,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CecoChat.Contracts", "CecoC
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CecoChat.Data.History", "CecoChat.Data.History\CecoChat.Data.History.csproj", "{53BA66E3-EE2B-4B22-917D-95B0A1592DF0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CecoChat.Server.IDGen", "CecoChat.Server.IDGen\CecoChat.Server.IDGen.csproj", "{27134AF1-F40F-4D2A-B231-D6CEA80D7AC1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CecoChat.Server.IdGen", "CecoChat.Server.IdGen\CecoChat.Server.IdGen.csproj", "{27134AF1-F40F-4D2A-B231-D6CEA80D7AC1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CecoChat.Client.IdGen", "CecoChat.Client.IdGen\CecoChat.Client.IdGen.csproj", "{3BC3144F-BBD7-486E-94E9-847D9D01095E}"
 EndProject
