@@ -1,8 +1,8 @@
 syntax = "proto3";
-option csharp_namespace = "CecoChat.Contracts.IDGen";
-package CecoChat.Contracts.IDGen;
+option csharp_namespace = "CecoChat.Contracts.IdGen";
+package CecoChat.Contracts.IdGen;
 
-service IDGen {
+service IdGen {
   rpc GenerateOne(GenerateOneRequest) returns (GenerateOneResponse);
   rpc GenerateMany(GenerateManyRequest) returns (GenerateManyResponse);
 }

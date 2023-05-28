@@ -1,9 +1,9 @@
-﻿using CecoChat.Contracts.IDGen;
+﻿using CecoChat.Contracts.IdGen;
 using Grpc.Core;
 
 namespace CecoChat.Server.IDGen.Endpoints;
 
-public sealed class IdGenService : Contracts.IDGen.IDGen.IDGenBase
+public sealed class IdGenService : Contracts.IdGen.IdGen.IdGenBase
 {
     private readonly IIdentityGenerator _generator;
 
