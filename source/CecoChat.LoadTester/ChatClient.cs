@@ -69,7 +69,7 @@ public sealed class ChatClient : IAsyncDisposable
 
         GetHistoryRequest request = new()
         {
-            OtherUserID = userId,
+            OtherUserId = userId,
             OlderThan = DateTime.UtcNow
         };
         await _bffClient.GetHistoryMessages(request, _accessToken!);
@@ -91,7 +91,7 @@ public sealed class ChatClient : IAsyncDisposable
     {
         GetHistoryRequest request = new()
         {
-            OtherUserID = userId,
+            OtherUserId = userId,
             OlderThan = olderThan
         };
         await _bffClient.GetHistoryMessages(request, _accessToken!);

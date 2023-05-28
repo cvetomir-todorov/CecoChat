@@ -6,8 +6,8 @@ namespace CecoChat.Contracts.Bff;
 
 public sealed class GetHistoryRequest
 {
-    [AliasAs("otherUserID")]
-    public long OtherUserID { get; set; }
+    [AliasAs("otherUserId")]
+    public long OtherUserId { get; set; }
 
     [AliasAs("olderThan")]
     public DateTime OlderThan { get; set; }
@@ -21,14 +21,14 @@ public sealed class GetHistoryResponse
 
 public sealed class HistoryMessage
 {
-    [AliasAs("messageID")]
-    public long MessageID { get; set; }
+    [AliasAs("messageId")]
+    public long MessageId { get; set; }
 
-    [AliasAs("senderID")]
-    public long SenderID { get; set; }
+    [AliasAs("senderId")]
+    public long SenderId { get; set; }
 
-    [AliasAs("receiverID")]
-    public long ReceiverID { get; set; }
+    [AliasAs("receiverId")]
+    public long ReceiverId { get; set; }
 
     [AliasAs("dataType")]
     public DataType DataType { get; set; }

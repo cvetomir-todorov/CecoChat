@@ -16,9 +16,9 @@ public static class Map
     {
         LocalStorage.Message message = new()
         {
-            MessageId = bffHistoryMessage.MessageID,
-            SenderId = bffHistoryMessage.SenderID,
-            ReceiverId = bffHistoryMessage.ReceiverID
+            MessageId = bffHistoryMessage.MessageId,
+            SenderId = bffHistoryMessage.SenderId,
+            ReceiverId = bffHistoryMessage.ReceiverId
         };
 
         switch (bffHistoryMessage.DataType)
