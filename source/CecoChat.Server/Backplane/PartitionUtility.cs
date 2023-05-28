@@ -2,7 +2,7 @@
 
 public interface IPartitionUtility
 {
-    int ChoosePartition(long userID, int partitionCount);
+    int ChoosePartition(long userId, int partitionCount);
 }
 
 public sealed class PartitionUtility : IPartitionUtility
@@ -15,9 +15,9 @@ public sealed class PartitionUtility : IPartitionUtility
         _hash = hash;
     }
 
-    public int ChoosePartition(long userID, int partitionCount)
+    public int ChoosePartition(long userId, int partitionCount)
     {
-        int hash = _hash.Compute(userID);
+        int hash = _hash.Compute(userId);
         int partition = Math.Abs(hash) % partitionCount;
         return partition;
     }
