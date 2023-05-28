@@ -15,7 +15,7 @@ public partial class ChatHub : Hub<IChatListener>, IChatHub
     private readonly IMessagingTelemetry _messagingTelemetry;
     private readonly IContractMapper _mapper;
     private readonly IInputValidator _inputValidator;
-    private readonly IIDGenClient _idGenClient;
+    private readonly IIdGenClient _idGenClient;
     private readonly ISendersProducer _sendersProducer;
 
     private const string MissingUserDataExMsg = "User has authenticated but data cannot be parsed from the access token.";
@@ -26,7 +26,7 @@ public partial class ChatHub : Hub<IChatListener>, IChatHub
         IMessagingTelemetry messagingTelemetry,
         IContractMapper mapper,
         IInputValidator inputValidator,
-        IIDGenClient idGenClient,
+        IIdGenClient idGenClient,
         ISendersProducer sendersProducer)
     {
         _logger = logger;

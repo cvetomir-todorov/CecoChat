@@ -36,7 +36,7 @@ public class Startup
     private readonly RedisOptions _configDbOptions;
     private readonly ClientOptions _clientOptions;
     private readonly BackplaneOptions _backplaneOptions;
-    private readonly IDGenOptions _idGenOptions;
+    private readonly IdGenOptions _idGenOptions;
     private readonly JwtOptions _jwtOptions;
     private readonly OtelSamplingOptions _otelSamplingOptions;
     private readonly JaegerOptions _jaegerOptions;
@@ -86,7 +86,7 @@ public class Startup
         services.AddAuthorization();
 
         // idgen
-        services.AddIDGenClient(_idGenOptions);
+        services.AddIdGenClient(_idGenOptions);
 
         // clients
         services
@@ -183,7 +183,7 @@ public class Startup
 
         // idgen
         IConfiguration idGenConfiguration = Configuration.GetSection("IDGen");
-        builder.RegisterModule(new IDGenAutofacModule(idGenConfiguration));
+        builder.RegisterModule(new IdGenAutofacModule(idGenConfiguration));
 
         // backplane
         builder.RegisterModule(new PartitionUtilityAutofacModule());

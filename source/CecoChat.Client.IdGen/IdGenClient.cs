@@ -6,44 +6,44 @@ using Microsoft.Extensions.Options;
 
 namespace CecoChat.Client.IdGen;
 
-public interface IIDGenClient : IDisposable
+public interface IIdGenClient : IDisposable
 {
-    ValueTask<GetIDResult> GetID(CancellationToken ct);
+    ValueTask<GetIdResult> GetId(CancellationToken ct);
 }
 
-public readonly struct GetIDResult
+public readonly struct GetIdResult
 {
-    public bool Success => ID > 0;
-    public long ID { get; init; }
+    public bool Success => Id > 0;
+    public long Id { get; init; }
 }
 
-internal sealed class IDGenClient : IIDGenClient
+internal sealed class IdGenClient : IIdGenClient
 {
     private readonly ILogger _logger;
-    private readonly IDGenOptions _options;
+    private readonly IdGenOptions _options;
     private readonly Contracts.IDGen.IDGen.IDGenClient _client;
-    private readonly IIDChannel _idChannel;
-    private readonly Timer _invalidateIDsTimer;
+    private readonly IIdChannel _idChannel;
+    private readonly Timer _invalidateIdsTimer;
     private int _isRefreshing;
     private static readonly int True = 1;
     private static readonly int False = 0;
 
-    public IDGenClient(
-        ILogger<IDGenClient> logger,
-        IOptions<IDGenOptions> options,
+    public IdGenClient(
+        ILogger<IdGenClient> logger,
+        IOptions<IdGenOptions> options,
         Contracts.IDGen.IDGen.IDGenClient client,
-        IIDChannel idChannel)
+        IIdChannel idChannel)
     {
         _logger = logger;
         _options = options.Value;
         _client = client;
         _idChannel = idChannel;
 
-        _logger.LogInformation("IDGen address set to {Address}", _options.Address);
-        _logger.LogInformation("Start refreshing message IDs each {RefreshIDsInterval:##} ms with {RefreshIDsCount} IDs",
+        _logger.LogInformation("ID Gen address set to {Address}", _options.Address);
+        _logger.LogInformation("Start refreshing message IDs each {RefreshIdsInterval:##} ms with {RefreshIdsCount} IDs",
             _options.RefreshIDsInterval.TotalMilliseconds, _options.RefreshIDsCount);
-        _invalidateIDsTimer = new(
-            callback: _ => RefreshIDs(),
+        _invalidateIdsTimer = new(
+            callback: _ => RefreshIds(),
             state: null,
             dueTime: TimeSpan.Zero,
             period: _options.RefreshIDsInterval);
@@ -51,22 +51,22 @@ internal sealed class IDGenClient : IIDGenClient
 
     public void Dispose()
     {
-        _invalidateIDsTimer.Dispose();
+        _invalidateIdsTimer.Dispose();
     }
 
-    public async ValueTask<GetIDResult> GetID(CancellationToken ct)
+    public async ValueTask<GetIdResult> GetId(CancellationToken ct)
     {
-        (bool success, long id) = await _idChannel.TryTakeID(_options.GetIDWaitInterval, ct);
+        (bool success, long id) = await _idChannel.TryTakeId(_options.GetIDWaitInterval, ct);
         if (!success)
         {
             _logger.LogWarning("Timed-out while waiting for new IDs to be generated");
-            return new GetIDResult();
+            return new GetIdResult();
         }
 
-        return new GetIDResult { ID = id };
+        return new GetIdResult { Id = id };
     }
 
-    private void RefreshIDs()
+    private void RefreshIds()
     {
         if (True == Interlocked.CompareExchange(ref _isRefreshing, True, False))
         {
@@ -84,9 +84,9 @@ internal sealed class IDGenClient : IIDGenClient
             DateTime deadline = DateTime.UtcNow.Add(_options.CallTimeout);
 
             Activity.Current = null;
-            _idChannel.ClearIDs();
+            _idChannel.ClearIds();
             GenerateManyResponse response = _client.GenerateMany(request, deadline: deadline);
-            _idChannel.AddNewIDs(response.Ids);
+            _idChannel.AddNewIds(response.Ids);
         }
         catch (RpcException rpcException)
         {
