@@ -99,7 +99,7 @@ public sealed class ChatClient : IAsyncDisposable
     {
         GetHistoryRequest request = new()
         {
-            OtherUserID = otherUserId,
+            OtherUserId = otherUserId,
             OlderThan = olderThan
         };
         GetHistoryResponse response = await _bffClient.GetHistoryMessages(request, _accessToken!);
