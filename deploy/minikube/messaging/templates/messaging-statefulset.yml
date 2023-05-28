@@ -57,10 +57,10 @@ spec:
             - configMapRef:
                 name: service-tracing
           env:
-            - name: CECOCHAT_IDGen__Address
-              value: https://{{.Values.Networking.IDGenService}}
-            - name: CECOCHAT_IDGen__RefreshIDsCount
-              value: "{{.Values.Messaging.RefreshIDsCount}}"
+            - name: CECOCHAT_IdGen__Address
+              value: https://{{.Values.Networking.IdGenService}}
+            - name: CECOCHAT_IdGen__RefreshIdsCount
+              value: "{{.Values.Messaging.RefreshIdsCount}}"
           volumeMounts:
             - name: config
               mountPath: {{.Values.Entrypoint.MountPath}}

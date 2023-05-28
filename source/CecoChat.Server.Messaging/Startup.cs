@@ -57,7 +57,7 @@ public class Startup
         Configuration.GetSection("Backplane").Bind(_backplaneOptions);
 
         _idGenOptions = new();
-        Configuration.GetSection("IDGen").Bind(_idGenOptions);
+        Configuration.GetSection("IdGen").Bind(_idGenOptions);
 
         _jwtOptions = new();
         Configuration.GetSection("Jwt").Bind(_jwtOptions);
@@ -182,7 +182,7 @@ public class Startup
         builder.RegisterModule(new SignalRTelemetryAutofacModule());
 
         // idgen
-        IConfiguration idGenConfiguration = Configuration.GetSection("IDGen");
+        IConfiguration idGenConfiguration = Configuration.GetSection("IdGen");
         builder.RegisterModule(new IdGenAutofacModule(idGenConfiguration));
 
         // backplane

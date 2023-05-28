@@ -41,12 +41,12 @@ internal sealed class IdGenClient : IIdGenClient
 
         _logger.LogInformation("ID Gen address set to {Address}", _options.Address);
         _logger.LogInformation("Start refreshing message IDs each {RefreshIdsInterval:##} ms with {RefreshIdsCount} IDs",
-            _options.RefreshIDsInterval.TotalMilliseconds, _options.RefreshIDsCount);
+            _options.RefreshIdsInterval.TotalMilliseconds, _options.RefreshIdsCount);
         _invalidateIdsTimer = new(
             callback: _ => RefreshIds(),
             state: null,
             dueTime: TimeSpan.Zero,
-            period: _options.RefreshIDsInterval);
+            period: _options.RefreshIdsInterval);
     }
 
     public void Dispose()
@@ -56,7 +56,7 @@ internal sealed class IdGenClient : IIdGenClient
 
     public async ValueTask<GetIdResult> GetId(CancellationToken ct)
     {
-        (bool success, long id) = await _idChannel.TryTakeId(_options.GetIDWaitInterval, ct);
+        (bool success, long id) = await _idChannel.TryTakeId(_options.GetIdWaitInterval, ct);
         if (!success)
         {
             _logger.LogWarning("Timed-out while waiting for new IDs to be generated");
@@ -78,8 +78,8 @@ internal sealed class IdGenClient : IIdGenClient
         {
             GenerateManyRequest request = new()
             {
-                OriginatorId = _options.OriginatorID,
-                Count = _options.RefreshIDsCount
+                OriginatorId = _options.OriginatorId,
+                Count = _options.RefreshIdsCount
             };
             DateTime deadline = DateTime.UtcNow.Add(_options.CallTimeout);
 
