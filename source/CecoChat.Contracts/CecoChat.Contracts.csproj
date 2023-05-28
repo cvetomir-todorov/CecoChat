@@ -23,7 +23,7 @@
     <Protobuf Include="History\HistoryService.proto" GrpcServices="All" />
     <Protobuf Include="History\DataMessage.proto" />
     <Protobuf Include="History\ReactionMessage.proto" />
-    <Protobuf Include="IDGen\IDGenService.proto" GrpcServices="All" />
+    <Protobuf Include="IdGen\IdGenService.proto" GrpcServices="All" />
     <Protobuf Include="State\ChatState.proto" />
     <Protobuf Include="State\StateService.proto" GrpcServices="All" />
     <Protobuf Include="User\ProfileFull.proto" />

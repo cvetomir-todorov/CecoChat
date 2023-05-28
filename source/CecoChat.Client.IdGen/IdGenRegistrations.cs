@@ -18,7 +18,7 @@ public static class IdGenRegistrations
         }
 
         services
-            .AddGrpcClient<Contracts.IDGen.IDGen.IDGenClient>(grpc =>
+            .AddGrpcClient<Contracts.IdGen.IdGen.IdGenClient>(grpc =>
             {
                 grpc.Address = options.Address;
             })

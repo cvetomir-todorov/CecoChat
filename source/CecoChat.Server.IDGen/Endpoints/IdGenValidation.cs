@@ -1,4 +1,4 @@
-using CecoChat.Contracts.IDGen;
+using CecoChat.Contracts.IdGen;
 using FluentValidation;
 
 namespace CecoChat.Server.IDGen.Endpoints;
