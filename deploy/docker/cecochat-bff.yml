@@ -65,13 +65,13 @@ services:
       CECOCHAT_Jaeger__BatchExportScheduledDelayMillis: 2000
       CECOCHAT_Backplane__Kafka__BootstrapServers__0: kafka0:19091
       CECOCHAT_Backplane__Kafka__BootstrapServers__1: kafka1:19092
-      CECOCHAT_StateDB__ContactPoints__0: cassandra0:9042
-      CECOCHAT_StateDB__ContactPoints__1: cassandra1:9042
-      CECOCHAT_StateDB__LocalDC: Europe
-      CECOCHAT_StateDB__SocketConnectTimeout: 00:00:05.0
-      CECOCHAT_StateDB__ExponentialReconnectPolicy: true
-      CECOCHAT_StateDB__ExponentialReconnectPolicyBaseDelay: 00:00:00.100
-      CECOCHAT_StateDB__ExponentialReconnectPolicyMaxDelay: 00:00:05.0
+      CECOCHAT_StateDb__ContactPoints__0: cassandra0:9042
+      CECOCHAT_StateDb__ContactPoints__1: cassandra1:9042
+      CECOCHAT_StateDb__LocalDc: Europe
+      CECOCHAT_StateDb__SocketConnectTimeout: 00:00:05.0
+      CECOCHAT_StateDb__ExponentialReconnectPolicy: true
+      CECOCHAT_StateDb__ExponentialReconnectPolicyBaseDelay: 00:00:00.100
+      CECOCHAT_StateDb__ExponentialReconnectPolicyMaxDelay: 00:00:05.0
 #    logging: *fluentd-logging
   cecochat-history:
     image: ceco.com/cecochat/history:0.1
@@ -101,7 +101,7 @@ services:
       CECOCHAT_Backplane__Kafka__BootstrapServers__1: kafka1:19092
       CECOCHAT_HistoryDb__ContactPoints__0: cassandra0:9042
       CECOCHAT_HistoryDb__ContactPoints__1: cassandra1:9042
-      CECOCHAT_HistoryDb__LocalDC: Europe
+      CECOCHAT_HistoryDb__LocalDc: Europe
       CECOCHAT_HistoryDb__SocketConnectTimeout: 00:00:05.0
       CECOCHAT_HistoryDb__ExponentialReconnectPolicy: true
       CECOCHAT_HistoryDb__ExponentialReconnectPolicyBaseDelay: 00:00:00.100
