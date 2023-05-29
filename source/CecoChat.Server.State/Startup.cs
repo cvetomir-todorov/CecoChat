@@ -46,7 +46,7 @@ public class Startup
         Environment = environment;
 
         _configDbOptions = new();
-        configuration.GetSection("ConfigDB").Bind(_configDbOptions);
+        configuration.GetSection("ConfigDb").Bind(_configDbOptions);
 
         _backplaneOptions = new();
         configuration.GetSection("Backplane").Bind(_backplaneOptions);

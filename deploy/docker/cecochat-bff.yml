@@ -21,10 +21,10 @@ services:
       ASPNETCORE_HTTPS_PORT: 443
       ASPNETCORE_Kestrel__Certificates__Default__Path: "/app/services.pfx"
       ASPNETCORE_Kestrel__Certificates__Default__Password: "cecochat"
-      CECOCHAT_ConfigDB__Endpoints__0: redis:6379
-      CECOCHAT_ConfigDB__ConnectRetry: 16
-      CECOCHAT_ConfigDB__ConnectTimeout: 5000
-      CECOCHAT_ConfigDB__KeepAlive: 2
+      CECOCHAT_ConfigDb__Endpoints__0: redis:6379
+      CECOCHAT_ConfigDb__ConnectRetry: 16
+      CECOCHAT_ConfigDb__ConnectTimeout: 5000
+      CECOCHAT_ConfigDb__KeepAlive: 2
       CECOCHAT_OtelSampling__Strategy: Probability
       CECOCHAT_OtelSampling__Probability: 0.1
       CECOCHAT_Jaeger__AgentHost: jaeger
@@ -53,10 +53,10 @@ services:
       ASPNETCORE_HTTPS_PORT: 443
       ASPNETCORE_Kestrel__Certificates__Default__Path: "/app/services.pfx"
       ASPNETCORE_Kestrel__Certificates__Default__Password: "cecochat"
-      CECOCHAT_ConfigDB__Endpoints__0: redis:6379
-      CECOCHAT_ConfigDB__ConnectRetry: 16
-      CECOCHAT_ConfigDB__ConnectTimeout: 5000
-      CECOCHAT_ConfigDB__KeepAlive: 2
+      CECOCHAT_ConfigDb__Endpoints__0: redis:6379
+      CECOCHAT_ConfigDb__ConnectRetry: 16
+      CECOCHAT_ConfigDb__ConnectTimeout: 5000
+      CECOCHAT_ConfigDb__KeepAlive: 2
       CECOCHAT_OtelSampling__Strategy: Probability
       CECOCHAT_OtelSampling__Probability: 0.1
       CECOCHAT_Jaeger__AgentHost: jaeger
@@ -87,10 +87,10 @@ services:
       ASPNETCORE_HTTPS_PORT: 443
       ASPNETCORE_Kestrel__Certificates__Default__Path: "/app/services.pfx"
       ASPNETCORE_Kestrel__Certificates__Default__Password: "cecochat"
-      CECOCHAT_ConfigDB__Endpoints__0: redis:6379
-      CECOCHAT_ConfigDB__ConnectRetry: 16
-      CECOCHAT_ConfigDB__ConnectTimeout: 5000
-      CECOCHAT_ConfigDB__KeepAlive: 2
+      CECOCHAT_ConfigDb__Endpoints__0: redis:6379
+      CECOCHAT_ConfigDb__ConnectRetry: 16
+      CECOCHAT_ConfigDb__ConnectTimeout: 5000
+      CECOCHAT_ConfigDb__KeepAlive: 2
       CECOCHAT_OtelSampling__Strategy: Probability
       CECOCHAT_OtelSampling__Probability: 0.1
       CECOCHAT_Jaeger__AgentHost: jaeger

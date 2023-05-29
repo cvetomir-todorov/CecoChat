@@ -47,7 +47,7 @@ public class Startup
         Environment = environment;
 
         _configDbOptions = new();
-        Configuration.GetSection("ConfigDB").Bind(_configDbOptions);
+        Configuration.GetSection("ConfigDb").Bind(_configDbOptions);
 
         _backplaneOptions = new();
         Configuration.GetSection("Backplane").Bind(_backplaneOptions);
@@ -169,7 +169,7 @@ public class Startup
         builder.RegisterHostedService<StartMaterializeMessages>();
 
         // configuration
-        IConfiguration configDbConfig = Configuration.GetSection("ConfigDB");
+        IConfiguration configDbConfig = Configuration.GetSection("ConfigDb");
         builder.RegisterModule(new ConfigDbAutofacModule(configDbConfig, registerHistory: true));
 
         // history db

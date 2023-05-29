@@ -17,10 +17,10 @@ metadata:
   name: service-configdb
   namespace: cecochat
 data:
-  CECOCHAT_ConfigDB__Endpoints__0: redis:6379
-  CECOCHAT_ConfigDB__ConnectRetry: 16
-  CECOCHAT_ConfigDB__ConnectTimeout: 5000
-  CECOCHAT_ConfigDB__KeepAlive: 2
+  CECOCHAT_ConfigDb__Endpoints__0: redis:6379
+  CECOCHAT_ConfigDb__ConnectRetry: 16
+  CECOCHAT_ConfigDb__ConnectTimeout: 5000
+  CECOCHAT_ConfigDb__KeepAlive: 2
 ---
 
 apiVersion: v1

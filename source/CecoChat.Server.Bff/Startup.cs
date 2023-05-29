@@ -46,7 +46,7 @@ public class Startup
         Configuration = configuration;
 
         _configDbOptions = new();
-        Configuration.GetSection("ConfigDB").Bind(_configDbOptions);
+        Configuration.GetSection("ConfigDb").Bind(_configDbOptions);
 
         _historyOptions = new();
         Configuration.GetSection("HistoryClient").Bind(_historyOptions);
@@ -179,7 +179,7 @@ public class Startup
         builder.RegisterHostedService<InitDynamicConfig>();
 
         // configuration
-        IConfiguration configDbConfig = Configuration.GetSection("ConfigDB");
+        IConfiguration configDbConfig = Configuration.GetSection("ConfigDb");
         builder.RegisterModule(new ConfigDbAutofacModule(configDbConfig, registerPartitioning: true));
 
         // backplane

@@ -32,7 +32,7 @@ public class Startup
         Environment = environment;
 
         _configDbOptions = new();
-        Configuration.GetSection("ConfigDB").Bind(_configDbOptions);
+        Configuration.GetSection("ConfigDb").Bind(_configDbOptions);
 
         _otelSamplingOptions = new();
         Configuration.GetSection("OtelSampling").Bind(_otelSamplingOptions);
@@ -119,7 +119,7 @@ public class Startup
         builder.RegisterHostedService<InitDynamicConfig>();
 
         // configuration
-        IConfiguration configDbConfig = Configuration.GetSection("ConfigDB");
+        IConfiguration configDbConfig = Configuration.GetSection("ConfigDb");
         builder.RegisterModule(new ConfigDbAutofacModule(configDbConfig, registerSnowflake: true));
         builder.RegisterOptions<ConfigOptions>(Configuration.GetSection("Config"));
 
