@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using CecoChat;
 
 namespace Check.Hashing;
@@ -11,18 +10,18 @@ public static class Program
         EvaluateHashParams evaluateParams = new()
         {
             PartitionCount = 1000,
-            MinUserID = 1,
-            MaxUserID = 100_000_000
+            MinUserId = 1,
+            MaxUserId = 100_000_000
         };
 
         INonCryptoHash fnv = new FnvHash();
         INonCryptoHash xxHash = new XXHash();
 
         // warm-up
-        fnv.Compute(evaluateParams.MinUserID);
-        fnv.Compute(evaluateParams.MaxUserID);
-        xxHash.Compute(evaluateParams.MinUserID);
-        xxHash.Compute(evaluateParams.MaxUserID);
+        fnv.Compute(evaluateParams.MinUserId);
+        fnv.Compute(evaluateParams.MaxUserId);
+        xxHash.Compute(evaluateParams.MinUserId);
+        xxHash.Compute(evaluateParams.MaxUserId);
 
         // actual
         EvaluateHashResult fnvResult = EvaluateHash(fnv, evaluateParams);
@@ -35,7 +34,7 @@ public static class Program
     private static void PrintResult(string hashName, EvaluateHashParams evaluateParams, EvaluateHashResult result)
     {
         Console.WriteLine("{0} for user IDs in [{1}, {2}] and partition count = {3}.", hashName,
-            evaluateParams.MinUserID, evaluateParams.MaxUserID, evaluateParams.PartitionCount);
+            evaluateParams.MinUserId, evaluateParams.MaxUserId, evaluateParams.PartitionCount);
         Console.WriteLine("All {0} hashes calculated for {1:0.##} ms, 1000 hashes calculated for {2:0.####} ms.",
             evaluateParams.UserCount, result.TotalTime.TotalMilliseconds, result.AverageTimePer1000Hashes.TotalMilliseconds);
         Console.WriteLine("Total distribution deviation = {0}", result.TotalDistributionDeviation);
@@ -45,9 +44,9 @@ public static class Program
     private record EvaluateHashParams
     {
         public int PartitionCount { get; init; }
-        public long MinUserID { get; init; }
-        public long MaxUserID { get; init; }
-        public long UserCount => MaxUserID - MinUserID + 1;
+        public long MinUserId { get; init; }
+        public long MaxUserId { get; init; }
+        public long UserCount => MaxUserId - MinUserId + 1;
     }
 
     private record EvaluateHashResult
@@ -63,9 +62,9 @@ public static class Program
         int[] partitions = new int[evaluateParams.PartitionCount];
         Stopwatch stopwatch = Stopwatch.StartNew();
 
-        for (long userID = evaluateParams.MinUserID; userID <= evaluateParams.MaxUserID; ++userID)
+        for (long userId = evaluateParams.MinUserId; userId <= evaluateParams.MaxUserId; ++userId)
         {
-            int partition = Math.Abs(hash.Compute(userID) % evaluateParams.PartitionCount);
+            int partition = Math.Abs(hash.Compute(userId) % evaluateParams.PartitionCount);
             partitions[partition]++;
         }
 

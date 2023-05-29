@@ -1,5 +1,3 @@
-using System;
-using System.Threading.Tasks;
 using CecoChat.Contracts.Messaging;
 using Microsoft.AspNetCore.SignalR;
 

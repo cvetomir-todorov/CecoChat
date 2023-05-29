@@ -7,7 +7,7 @@ Each messaging server is uniquely assigned part of the messages from the PUB/SUB
 Recipient Kafka partition = Hash(Recipient ID) % Partition count
 ```
 
-The hash function from the formula needs to be stable because it would be run on different servers. It needs to provide an **excellent** distribution since we don't want hot partitions. And since this is the same function which is used to decide which messaging server each client connects to - we don't want to hit our messaging server connection number limit. The performance requirements are not key, it just doesn't need to be slow. I used [FNV](https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function) which satisfied the requirements. I [checked](../check/) how it behaves and its total distribution deviation and max one are small enough.
+The hash function from the formula needs to be stable because it would be run on different servers. It needs to provide an **excellent** distribution since we don't want hot partitions. And since this is the same function which is used to decide which messaging server each client connects to - we don't want to hit our messaging server connection number limit. The performance requirements are not key, it just doesn't need to be slow. I used [FNV](https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function) which satisfied the requirements. The code in `Check.sln` checks how it behaves and verifies its total distribution deviation and max one are small enough.
 
 ## Send
 
