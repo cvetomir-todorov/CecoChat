@@ -1,7 +1,7 @@
 ﻿{
   "$schema": "http://json.schemastore.org/launchsettings.json",
   "profiles": {
-    "Messaging 0": {
+    "Messaging0": {
       "commandName": "Project",
       "dotnetRunMessages": "true",
       "launchBrowser": false,
@@ -13,7 +13,7 @@
         "CECOCHAT_IDGen__OriginatorID": "0"
       }
     },
-    "Messaging 1": {
+    "Messaging1": {
       "commandName": "Project",
       "dotnetRunMessages": "true",
       "launchBrowser": false,
