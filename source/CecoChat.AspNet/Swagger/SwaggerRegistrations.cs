@@ -42,7 +42,7 @@ public static class SwaggerRegistrations
             app.UseSwagger();
         }
 
-        if (options.UseSwaggerUI)
+        if (options.UseSwaggerUi)
         {
             if (options.Url == null)
             {
