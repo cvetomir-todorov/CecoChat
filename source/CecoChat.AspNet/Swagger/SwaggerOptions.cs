@@ -6,7 +6,7 @@ public sealed class SwaggerOptions
 {
     public bool UseSwagger { get; set; }
 
-    public bool UseSwaggerUI { get; set; }
+    public bool UseSwaggerUi { get; set; }
 
     public Uri? Url { get; set; }
 
