@@ -52,7 +52,7 @@ public class Startup
         configuration.GetSection("Backplane").Bind(_backplaneOptions);
 
         _stateDbOptions = new();
-        configuration.GetSection("StateDB").Bind(_stateDbOptions);
+        configuration.GetSection("StateDb").Bind(_stateDbOptions);
 
         _jwtOptions = new();
         configuration.GetSection("Jwt").Bind(_jwtOptions);
@@ -167,7 +167,7 @@ public class Startup
         builder.RegisterHostedService<StartBackplaneComponents>();
 
         // state db
-        IConfiguration stateDbConfig = Configuration.GetSection("StateDB");
+        IConfiguration stateDbConfig = Configuration.GetSection("StateDb");
         builder.RegisterModule(new StateDbAutofacModule(stateDbConfig));
         builder.RegisterModule(new CassandraHealthAutofacModule(stateDbConfig));
 

@@ -54,17 +54,17 @@ spec:
             - configMapRef:
                 name: service-tracing
           env:
-            - name: CECOCHAT_StateDB__ContactPoints__0
-              value: {{.Values.Networking.HistoryDB.Host}}-0.{{.Values.Networking.HistoryDB.Service}}.{{.Release.Namespace}}.svc.cluster.local:9042
-            - name: CECOCHAT_StateDB__ContactPoints__1
-              value: {{.Values.Networking.HistoryDB.Host}}-1.{{.Values.Networking.HistoryDB.Service}}.{{.Release.Namespace}}.svc.cluster.local:9042
-            - name: CECOCHAT_StateDB__LocalDC
-              value: {{.Values.Networking.HistoryDB.LocalDC}}
-            - name: CECOCHAT_StateDB__SocketConnectTimeout
-              value: {{.Values.Networking.HistoryDB.SocketConnectTimeout}}
-            - name: CECOCHAT_StateDB__ExponentialReconnectPolicy
-              value: "{{.Values.Networking.HistoryDB.ExponentialReconnectPolicy}}"
-            - name: CECOCHAT_StateDB__ExponentialReconnectPolicyBaseDelay
-              value: {{.Values.Networking.HistoryDB.ExponentialReconnectPolicyBaseDelay}}
-            - name: CECOCHAT_StateDB__ExponentialReconnectPolicyMaxDelay
-              value: {{.Values.Networking.HistoryDB.ExponentialReconnectPolicyMaxDelay}}
+            - name: CECOCHAT_StateDb__ContactPoints__0
+              value: {{.Values.Networking.StateDb.Host}}-0.{{.Values.Networking.StateDb.Service}}.{{.Release.Namespace}}.svc.cluster.local:9042
+            - name: CECOCHAT_StateDb__ContactPoints__1
+              value: {{.Values.Networking.StateDb.Host}}-1.{{.Values.Networking.StateDb.Service}}.{{.Release.Namespace}}.svc.cluster.local:9042
+            - name: CECOCHAT_StateDb__LocalDc
+              value: {{.Values.Networking.StateDb.LocalDc}}
+            - name: CECOCHAT_StateDb__SocketConnectTimeout
+              value: {{.Values.Networking.StateDb.SocketConnectTimeout}}
+            - name: CECOCHAT_StateDb__ExponentialReconnectPolicy
+              value: "{{.Values.Networking.StateDb.ExponentialReconnectPolicy}}"
+            - name: CECOCHAT_StateDb__ExponentialReconnectPolicyBaseDelay
+              value: {{.Values.Networking.StateDb.ExponentialReconnectPolicyBaseDelay}}
+            - name: CECOCHAT_StateDb__ExponentialReconnectPolicyMaxDelay
+              value: {{.Values.Networking.StateDb.ExponentialReconnectPolicyMaxDelay}}
