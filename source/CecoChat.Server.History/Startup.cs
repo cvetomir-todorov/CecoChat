@@ -53,7 +53,7 @@ public class Startup
         Configuration.GetSection("Backplane").Bind(_backplaneOptions);
 
         _historyDbOptions = new();
-        Configuration.GetSection("HistoryDB").Bind(_historyDbOptions);
+        Configuration.GetSection("HistoryDb").Bind(_historyDbOptions);
 
         _jwtOptions = new();
         Configuration.GetSection("Jwt").Bind(_jwtOptions);
@@ -173,7 +173,7 @@ public class Startup
         builder.RegisterModule(new ConfigDbAutofacModule(configDbConfig, registerHistory: true));
 
         // history db
-        IConfiguration historyDbConfig = Configuration.GetSection("HistoryDB");
+        IConfiguration historyDbConfig = Configuration.GetSection("HistoryDb");
         builder.RegisterModule(new HistoryDbAutofacModule(historyDbConfig));
         builder.RegisterModule(new CassandraHealthAutofacModule(historyDbConfig));
 
