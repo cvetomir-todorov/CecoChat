@@ -1,6 +1,6 @@
 # Concurrent connections limit
 
-Below is a benchmark for the number of concurrent connections per messaging server. The code is in the [check](../check/) folder.
+Below is a benchmark for the number of concurrent connections per messaging server. The code is in `Check.sln`.
 
 ## Hardware setup
 

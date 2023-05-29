@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
 using CecoChat.Contracts.Messaging;
 using CommandLine;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -53,12 +49,7 @@ public static class Program
                 .AddMessagePackProtocol()
                 .Build();
 
-            ClientData client = new()
-            {
-                Id = i,
-                Connection = connection
-            };
-
+            ClientData client = new(id: i, connection);
             clients.Add(client);
         }
 
@@ -119,6 +110,12 @@ public static class Program
 
     private sealed class ClientData
     {
+        public ClientData(int id, HubConnection connection)
+        {
+            Id = id;
+            Connection = connection;
+        }
+
         public int Id { get; init; }
         public HubConnection Connection { get; init; }
     }

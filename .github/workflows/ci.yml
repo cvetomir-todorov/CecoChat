@@ -47,12 +47,12 @@ jobs:
     - name: Restore
       run: |
         dotnet restore source/CecoChat.sln
-        dotnet restore check/Check.sln
+        dotnet restore source/Check.sln
 
     - name: Build
       run: |
         dotnet build --no-restore source/CecoChat.sln
-        dotnet build --no-restore check/Check.sln
+        dotnet build --no-restore source/Check.sln
 
     - name: Upload pfx needed for code analysis
       uses: actions/upload-artifact@v3
