@@ -35,7 +35,7 @@ public class Startup
         Environment = environment;
 
         _userDbOptions = new();
-        Configuration.GetSection("UserDB").Bind(_userDbOptions);
+        Configuration.GetSection("UserDb").Bind(_userDbOptions);
 
         _jwtOptions = new();
         Configuration.GetSection("Jwt").Bind(_jwtOptions);
@@ -138,7 +138,7 @@ public class Startup
 
         // user db
         builder.RegisterModule(new UserDbAutofacModule());
-        builder.RegisterOptions<UserDbOptions>(Configuration.GetSection("UserDB"));
+        builder.RegisterOptions<UserDbOptions>(Configuration.GetSection("UserDb"));
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
