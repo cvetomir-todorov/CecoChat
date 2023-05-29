@@ -4,7 +4,7 @@ public sealed class CassandraOptions
 {
     public string[] ContactPoints { get; set; } = Array.Empty<string>();
 
-    public string LocalDC { get; set; } = string.Empty;
+    public string LocalDc { get; set; } = string.Empty;
 
     public TimeSpan SocketConnectTimeout { get; set; }
 
