@@ -37,7 +37,7 @@ public class CassandraDbContext : ICassandraDbContext
         Builder clusterBuilder = new Builder()
             .AddContactPoints(endpoints)
             .WithCompression(CompressionType.LZ4)
-            .WithLoadBalancingPolicy(new DCAwareRoundRobinPolicy(_options.LocalDC));
+            .WithLoadBalancingPolicy(new DCAwareRoundRobinPolicy(_options.LocalDc));
 
         if (_options.SocketConnectTimeout > TimeSpan.Zero)
         {
