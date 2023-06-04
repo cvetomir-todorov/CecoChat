@@ -8,8 +8,8 @@
 
 Security is part of modern development with an ever-growing importance. Both the .NET services and the Minikube deployment use TLS certificates. Below are their locations:
 
-* [.NET services certificate](../source/certificates/)
-* [Minikube ingress certificate](../deploy/minikube/certificates/)
+* [.NET services certificate](../source/certificates)
+* [Minikube ingress certificate](../deploy/minikube/certificates)
 
 For a setup follow the steps and use the related scripts:
 
@@ -27,7 +27,7 @@ For a setup follow the steps and use the related scripts:
 
 # Containerization
 
-* In order to containerize the system the scripts in the [package folder](../package/) should be used in order to build the Docker images
+* In order to containerize the system the scripts in the [package folder](../package) should be used in order to build the Docker images
 * The Docker files for the .NET services do `dotnet publish` and use `Release` configuration but this can be changed as preferred
 * The shell needs to be pointed to the correct docker daemon, e.g. for Minikube `minikube docker-env` should be applied
 

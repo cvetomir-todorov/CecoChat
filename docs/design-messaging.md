@@ -23,7 +23,7 @@ Additionally we use the Kafka delivery handler in order to send the client a pos
 
 Each messaging server contains a Kafka consumer which is manually assigned Kafka partitions and consumes messages only from them. Only clients whose hashed user ID value matches the assigned partitions according to the formula connects to that messaging server.
 
-Messages for a client are enqueued in a bounded message queue. That helps limit the memory for each client. If the client is a slow receiver though there is a possibility for the messages to fill the queue up. Which means that some messages would get dropped. Using counters sent along with each message the client can track for gaps and use the history service in order to get missing messages. This is described in detail in [reliable messaging and consistency section](research-main-problems.md#reliable-messaging-and-consistency).
+Messages for a client are enqueued in a bounded message queue. That helps limit the memory for each client. If the client is a slow receiver though there is a possibility for the messages to fill the queue up. Which means that some messages would get dropped. Using counters sent along with each message the client can track for gaps and use the history service in order to get missing messages. This is described in detail in [reliable messaging and consistency](research-reliable-messaging-consistency.md).
 
 ## Multiple clients
 
