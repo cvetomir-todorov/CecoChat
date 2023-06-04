@@ -14,7 +14,7 @@ Check out [what next](docs/what-next.md) needs to be implemented. I appreciate a
 # Technology
 
 * [System design](docs/intro-design.md) based on [microservice architecture](https://microservices.io/)
-* [Implementation](source/) based on [cloud agnostic technologies](docs/intro-technologies.md)
+* [Implementation](source) based on [cloud agnostic technologies](docs/intro-technologies.md)
 * [Configurable](docs/design-configuration.md), [observable](docs/design-observability.md), [containerized and runnable](docs/dev-run-prerequisites.md), [deployable](docs/design-deployment.md) local environment
 
 # Code
@@ -40,7 +40,9 @@ Check out [what next](docs/what-next.md) needs to be implemented. I appreciate a
 * Research
   - [Concurrent connections limit](docs/research-connection-limit.md)
   - [Calculations](docs/research-calculations.md)
-  - [Main problems](docs/research-main-problems.md)
+  - [Messaging traffic](docs/research-messaging-traffic.md)
+  - [Message IDs](docs/research-message-ids.md)
+  - [Reliable messaging and consistency](docs/research-reliable-messaging-consistency.md)
 * Design
   - [Messaging](docs/design-messaging.md)
   - [User chats, chat history](docs/design-state-history.md)

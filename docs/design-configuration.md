@@ -4,7 +4,7 @@
 
 ### Static
 
-Static app configuration is stored in `appsettings.json` files as is typical for .NET applications. For some services it is overriden for the `Development` environment via the `appsettings.ENVIRONMENT.json` approach. The [CecoChat docker-compose files](../deploy/docker/) uses environment variables with specific prefixes in order to push static configuration values to the services at start-up. [ASP.NET documentation](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-5.0#environment-variables) describes how to name the environment variables in order to override both ASP.NET and app-specific values.
+Static app configuration is stored in `appsettings.json` files as is typical for .NET applications. For some services it is overriden for the `Development` environment via the `appsettings.ENVIRONMENT.json` approach. The [CecoChat docker-compose files](../deploy/docker) uses environment variables with specific prefixes in order to push static configuration values to the services at start-up. [ASP.NET documentation](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-5.0#environment-variables) describes how to name the environment variables in order to override both ASP.NET and app-specific values.
 
 ### Dynamic
 

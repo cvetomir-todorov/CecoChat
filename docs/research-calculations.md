@@ -1,6 +1,18 @@
 # Calculations
 
-Below are some calculations about the system.
+The calculations below are based on the [concurrent connections limit](research-connection-limit.md) showing that a messaging server is limited to **64 k connections**. The calculation tells us that **160 messaging servers** are needed in order to support **10 mln active users**. We would consider **256 bytes message size**.
+
+### Daily 24 hour usage
+
+Calculating the daily usage with **64 mln users** spread throughout the day each of which sends **128 messages per day** gives us **95 000 messages/s for the cell** and **23 MB/s for the cell** with **0.15 MB/s per messaging server**.
+
+### Peak 1 hour usage
+
+Calculating a peak usage for **1 hour** daily where **80%** of the maximum users - **8 mln active users** send **50%** of their daily messages - **64 messages** we get **142 200 messages/s for the cell** and **35 MB/s for the cell** with **0.22 MB/s per messaging server**.
+
+### Conclusion
+
+These numbers do not take into account the security and transport data overhead. Additionally, this traffic would be multiplied. For example sending a message would require that data to be passed between different layers, possibly to multiple recipients. Numbers are not small when we look at the system as a whole. But for a single messaging server the throughput is tiny. The system is limited by how many concurrent connections a messaging server can handle. That means we would need a lot of messaging servers, linearly scalable technologies and we need to support a high level of concurrency. The usage of Kafka, Cassandra and the .NET async programming model make a good start.
 
 # System limits
 
