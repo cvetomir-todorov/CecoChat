@@ -2,7 +2,7 @@ namespace CecoChat.Npgsql;
 
 public class NpgsqlOptions
 {
-    public string ConnectionString { get; set; } = string.Empty;
+    public string ConnectionString { get; init; } = string.Empty;
 
-    public TimeSpan HealthTimeout { get; set; }
+    public TimeSpan HealthTimeout { get; init; }
 }

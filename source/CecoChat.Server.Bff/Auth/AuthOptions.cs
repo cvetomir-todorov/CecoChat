@@ -2,9 +2,9 @@ namespace CecoChat.Server.Bff.Auth;
 
 public sealed class AuthOptions
 {
-    public bool ConsoleClientUsers { get; set; }
+    public bool ConsoleClientUsers { get; init; }
 
-    public bool LoadTestingUsers { get; set; }
+    public bool LoadTestingUsers { get; init; }
 
-    public int LoadTestingUserCount { get; set; }
+    public int LoadTestingUserCount { get; init; }
 }

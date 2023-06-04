@@ -2,13 +2,13 @@
 
 public sealed class RedisOptions
 {
-    public string[] Endpoints { get; set; } = Array.Empty<string>();
+    public string[] Endpoints { get; init; } = Array.Empty<string>();
 
-    public int ConnectRetry { get; set; }
+    public int ConnectRetry { get; init; }
 
-    public int ConnectTimeout { get; set; }
+    public int ConnectTimeout { get; init; }
 
-    public int KeepAlive { get; set; }
+    public int KeepAlive { get; init; }
 
-    public TimeSpan HealthTimeout { get; set; }
+    public TimeSpan HealthTimeout { get; init; }
 }

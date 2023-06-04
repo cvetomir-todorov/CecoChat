@@ -2,11 +2,11 @@
 
 public sealed class JwtOptions
 {
-    public string Secret { get; set; } = string.Empty;
+    public string Secret { get; init; } = string.Empty;
 
-    public string Issuer { get; set; } = string.Empty;
+    public string Issuer { get; init; } = string.Empty;
 
-    public string Audience { get; set; } = string.Empty;
+    public string Audience { get; init; } = string.Empty;
 
-    public TimeSpan AccessTokenExpiration { get; set; }
+    public TimeSpan AccessTokenExpiration { get; init; }
 }

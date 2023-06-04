@@ -11,22 +11,22 @@ public interface IChatHub
 
 public sealed class SendMessageRequest
 {
-    public long ReceiverId { get; set; }
-    public DataType DataType { get; set; }
-    public string Data { get; set; } = string.Empty;
+    public long ReceiverId { get; init; }
+    public DataType DataType { get; init; }
+    public string Data { get; init; } = string.Empty;
 }
 
 public sealed class SendMessageResponse
 {
-    public long MessageId { get; set; }
+    public long MessageId { get; init; }
 }
 
 public sealed class ReactRequest
 {
-    public long MessageId { get; set; }
-    public long SenderId { get; set; }
-    public long ReceiverId { get; set; }
-    public string Reaction { get; set; } = string.Empty;
+    public long MessageId { get; init; }
+    public long SenderId { get; init; }
+    public long ReceiverId { get; init; }
+    public string Reaction { get; init; } = string.Empty;
 }
 
 public sealed class ReactResponse
@@ -34,9 +34,9 @@ public sealed class ReactResponse
 
 public sealed class UnReactRequest
 {
-    public long MessageId { get; set; }
-    public long SenderId { get; set; }
-    public long ReceiverId { get; set; }
+    public long MessageId { get; init; }
+    public long SenderId { get; init; }
+    public long ReceiverId { get; init; }
 }
 
 public sealed class UnReactResponse

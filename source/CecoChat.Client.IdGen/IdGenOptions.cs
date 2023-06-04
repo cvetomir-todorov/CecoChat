@@ -5,16 +5,16 @@ namespace CecoChat.Client.IdGen;
 
 public sealed class IdGenOptions
 {
-    public Uri? Address { get; set; }
-    public TimeSpan CallTimeout { get; set; }
-    public long OriginatorId { get; set; }
-    public int RefreshIdsCount { get; set; }
-    public TimeSpan RefreshIdsInterval { get; set; }
-    public TimeSpan GetIdWaitInterval { get; set; }
+    public Uri? Address { get; init; }
+    public TimeSpan CallTimeout { get; init; }
+    public long OriginatorId { get; init; }
+    public int RefreshIdsCount { get; init; }
+    public TimeSpan RefreshIdsInterval { get; init; }
+    public TimeSpan GetIdWaitInterval { get; init; }
 
-    public SocketsHttpHandlerOptions? SocketsHttpHandler { get; set; }
-    public RetryOptions? Retry { get; set; }
+    public SocketsHttpHandlerOptions? SocketsHttpHandler { get; init; }
+    public RetryOptions? Retry { get; init; }
 
-    public string HealthPath { get; set; } = string.Empty;
-    public TimeSpan HealthTimeout { get; set; }
+    public string HealthPath { get; init; } = string.Empty;
+    public TimeSpan HealthTimeout { get; init; }
 }

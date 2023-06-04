@@ -75,8 +75,10 @@ public class UserController : ControllerBase
         }
 
         IEnumerable<Contracts.User.ProfilePublic> profiles = await _userClient.GetPublicProfiles(userClaims.UserId, requestedUserIds, accessToken, ct);
-        GetPublicProfilesResponse response = new();
-        response.Profiles = profiles.Select(profile => _mapper.Map<ProfilePublic>(profile)).ToArray();
+        GetPublicProfilesResponse response = new()
+        {
+            Profiles = profiles.Select(profile => _mapper.Map<ProfilePublic>(profile)).ToArray()
+        };
 
         _logger.LogTrace("Responding with {PublicProfileCount} public profiles requested by user {UserId}", response.Profiles.Length, userClaims.UserId);
         return Ok(response);

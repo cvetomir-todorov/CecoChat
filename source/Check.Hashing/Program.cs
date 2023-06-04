@@ -15,7 +15,7 @@ public static class Program
         };
 
         INonCryptoHash fnv = new FnvHash();
-        INonCryptoHash xxHash = new XXHash();
+        INonCryptoHash xxHash = new XxHash();
 
         // warm-up
         fnv.Compute(evaluateParams.MinUserId);

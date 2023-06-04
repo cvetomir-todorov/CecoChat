@@ -7,23 +7,23 @@ public interface IChatListener
 
 public sealed class ListenNotification
 {
-    public long MessageId { get; set; }
-    public long SenderId { get; set; }
-    public long ReceiverId { get; set; }
+    public long MessageId { get; init; }
+    public long SenderId { get; init; }
+    public long ReceiverId { get; init; }
     public MessageType Type { get; set; }
-    public DeliveryStatus DeliveryStatus { get; set; }
+    public DeliveryStatus DeliveryStatus { get; init; }
     public NotificationData? Data { get; set; }
     public NotificationReaction? Reaction { get; set; }
 }
 
 public sealed class NotificationData
 {
-    public DataType Type { get; set; }
-    public string Data { get; set; } = string.Empty;
+    public DataType Type { get; init; }
+    public string Data { get; init; } = string.Empty;
 }
 
 public sealed class NotificationReaction
 {
-    public long ReactorId { get; set; }
-    public string Reaction { get; set; } = string.Empty;
+    public long ReactorId { get; init; }
+    public string Reaction { get; init; } = string.Empty;
 }

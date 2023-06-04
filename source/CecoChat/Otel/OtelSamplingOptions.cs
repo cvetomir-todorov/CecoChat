@@ -7,7 +7,7 @@ public enum OtelSamplingStrategy
 
 public sealed class OtelSamplingOptions
 {
-    public OtelSamplingStrategy Strategy { get; set; }
+    public OtelSamplingStrategy Strategy { get; init; }
 
-    public double Probability { get; set; }
+    public double Probability { get; init; }
 }
