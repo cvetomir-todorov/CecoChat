@@ -1,10 +1,10 @@
-FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 
 WORKDIR /app
 COPY . ./
 RUN dotnet publish CecoChat.Server.History/CecoChat.Server.History.csproj -c Release -o out
 
-FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS runtime
 LABEL author="Cvetomir Todorov"
 
 RUN apt update && \
