@@ -69,7 +69,7 @@ public static class ClaimsPrincipalExtensions
 
     private static bool TryGetUserId(this ClaimsPrincipal user, out long userId)
     {
-        string subject = user.FindFirstValue(JwtRegisteredClaimNames.Sub);
+        string? subject = user.FindFirstValue(JwtRegisteredClaimNames.Sub);
         if (string.IsNullOrWhiteSpace(subject))
         {
             userId = default;
@@ -86,7 +86,7 @@ public static class ClaimsPrincipalExtensions
 
     private static bool TryGetClientId(this ClaimsPrincipal user, out Guid clientId)
     {
-        string actor = user.FindFirstValue(ClaimTypes.Actor);
+        string? actor = user.FindFirstValue(ClaimTypes.Actor);
         if (string.IsNullOrWhiteSpace(actor))
         {
             clientId = Guid.Empty;
