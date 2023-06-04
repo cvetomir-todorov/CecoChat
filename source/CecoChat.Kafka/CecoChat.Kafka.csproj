@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="AspNetCore.HealthChecks.Kafka" Version="6.0.3" />
-    <PackageReference Include="Confluent.Kafka" Version="2.0.2" />
+    <PackageReference Include="Confluent.Kafka" Version="2.1.1" />
   </ItemGroup>
 
   <ItemGroup>
