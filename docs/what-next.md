@@ -63,6 +63,7 @@
   - Cache user profiles to avoid putting stress on the UserDB
   - Benchmark Kafka and improve its configuration
 * Observability
+  - Use Cassandra instrumentation from .NET contrib
   - Add Open Telemetry metrics in UserDB when Npgsql adds support
   - Improve existing distributed tracing - baggage propagation, custom instrumentation implementation
   - Improve existing log aggregation - performance of Fluentd, ElasticSearch index customizations
