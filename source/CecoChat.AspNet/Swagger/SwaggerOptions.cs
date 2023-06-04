@@ -4,13 +4,13 @@ namespace CecoChat.AspNet.Swagger;
 
 public sealed class SwaggerOptions
 {
-    public bool UseSwagger { get; set; }
+    public bool UseSwagger { get; init; }
 
-    public bool UseSwaggerUi { get; set; }
+    public bool UseSwaggerUi { get; init; }
 
-    public Uri? Url { get; set; }
+    public Uri? Url { get; init; }
 
-    public bool AddAuthorizationHeader { get; set; }
+    public bool AddAuthorizationHeader { get; init; }
 
-    public OpenApiInfo OpenApiInfo { get; set; } = new();
+    public OpenApiInfo OpenApiInfo { get; init; } = new();
 }

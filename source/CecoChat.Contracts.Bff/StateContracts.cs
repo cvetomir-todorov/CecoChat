@@ -5,26 +5,26 @@ namespace CecoChat.Contracts.Bff;
 public sealed class GetChatsRequest
 {
     [AliasAs("newerThan")]
-    public DateTime NewerThan { get; set; }
+    public DateTime NewerThan { get; init; }
 }
 
 public sealed class GetChatsResponse
 {
     [AliasAs("chats")]
-    public ChatState[] Chats { get; set; } = Array.Empty<ChatState>();
+    public ChatState[] Chats { get; init; } = Array.Empty<ChatState>();
 }
 
 public sealed class ChatState
 {
     [AliasAs("chatID")]
-    public string ChatID { get; set; } = string.Empty;
+    public string ChatId { get; init; } = string.Empty;
 
     [AliasAs("newestMessage")]
-    public long NewestMessage { get; set; }
+    public long NewestMessage { get; init; }
 
     [AliasAs("otherUserDelivered")]
-    public long OtherUserDelivered { get; set; }
+    public long OtherUserDelivered { get; init; }
 
     [AliasAs("otherUserSeen")]
-    public long OtherUserSeen { get; set; }
+    public long OtherUserSeen { get; init; }
 }

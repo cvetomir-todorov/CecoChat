@@ -27,24 +27,24 @@ namespace CecoChat.AspNet.Health;
 /// </summary>
 public sealed class CustomHealthReport
 {
-    public string? ServiceName { get; set; }
+    public string ServiceName { get; init; } = string.Empty;
 
-    public string? ServiceVersion { get; set; }
+    public string? ServiceVersion { get; init; }
 
-    public string? Runtime { get; set; }
+    public string Runtime { get; init; } = string.Empty;
 
-    public HealthStatus Status { get; set; }
+    public HealthStatus Status { get; init; }
 
-    public TimeSpan Duration { get; set; } = TimeSpan.Zero;
+    public TimeSpan Duration { get; init; } = TimeSpan.Zero;
 
-    public CustomHealthDependencyReport[] Dependencies { get; set; } = Array.Empty<CustomHealthDependencyReport>();
+    public CustomHealthDependencyReport[] Dependencies { get; init; } = Array.Empty<CustomHealthDependencyReport>();
 }
 
 public sealed class CustomHealthDependencyReport
 {
-    public string? Name { get; set; }
+    public string? Name { get; init; }
 
-    public HealthStatus Status { get; set; }
+    public HealthStatus Status { get; init; }
 
-    public TimeSpan Duration { get; set; } = TimeSpan.Zero;
+    public TimeSpan Duration { get; init; } = TimeSpan.Zero;
 }

@@ -55,7 +55,7 @@ public class StateController : ControllerBase
     {
         return new ChatState
         {
-            ChatID = fromService.ChatId,
+            ChatId = fromService.ChatId,
             NewestMessage = fromService.NewestMessage,
             OtherUserDelivered = fromService.OtherUserDelivered,
             OtherUserSeen = fromService.OtherUserSeen

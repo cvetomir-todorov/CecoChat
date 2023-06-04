@@ -14,40 +14,45 @@ public static class CustomHealth
         CustomHealthReport customReport = new()
         {
             ServiceName = serviceName,
+            ServiceVersion = GetVersion(),
             Runtime = RuntimeInformation.FrameworkDescription,
             Status = report.Status,
-            Duration = report.TotalDuration
+            Duration = report.TotalDuration,
+            Dependencies = GetDependencies(report)
         };
-
-        SetVersion(customReport);
-        SetDependencies(report, customReport);
 
         return context.Response.WriteAsJsonAsync(customReport, SerializerOptions);
     }
 
-    private static void SetVersion(CustomHealthReport customReport)
+    private static string? GetVersion()
     {
+        string? version = null;
+
         Assembly? entryAssembly = Assembly.GetEntryAssembly();
         if (entryAssembly != null)
         {
-            Version? version = entryAssembly.GetName().Version;
-            if (version != null)
+            Version? assemblyVersion = entryAssembly.GetName().Version;
+            if (assemblyVersion != null)
             {
-                customReport.ServiceVersion = $"{version.Major}.{version.Minor}.{version.Build}";
+                version = $"{assemblyVersion.Major}.{assemblyVersion.Minor}.{assemblyVersion.Build}";
             }
         }
+
+        return version;
     }
 
-    private static void SetDependencies(HealthReport report, CustomHealthReport customReport)
+    private static CustomHealthDependencyReport[] GetDependencies(HealthReport report)
     {
+        CustomHealthDependencyReport[] dependencies = Array.Empty<CustomHealthDependencyReport>();
+
         if (report.Entries.Count > 0)
         {
-            customReport.Dependencies = new CustomHealthDependencyReport[report.Entries.Count];
+            dependencies = new CustomHealthDependencyReport[report.Entries.Count];
 
             int index = 0;
             foreach (KeyValuePair<string, HealthReportEntry> entry in report.Entries)
             {
-                customReport.Dependencies[index] = new CustomHealthDependencyReport
+                dependencies[index] = new CustomHealthDependencyReport
                 {
                     Name = entry.Key,
                     Status = entry.Value.Status,
@@ -56,6 +61,8 @@ public static class CustomHealth
                 index++;
             }
         }
+
+        return dependencies;
     }
 
     private static readonly JsonSerializerOptions SerializerOptions = new()

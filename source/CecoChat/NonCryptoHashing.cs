@@ -35,7 +35,7 @@ public sealed class FnvHash : INonCryptoHash
 /// <summary>
 /// A non-stable .NET hashing function using xxHash algorithm.
 /// </summary>
-public sealed class XXHash : INonCryptoHash
+public sealed class XxHash : INonCryptoHash
 {
     public int Compute(long value)
     {

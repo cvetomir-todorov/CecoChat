@@ -2,5 +2,5 @@
 
 public sealed class KafkaOptions
 {
-    public string[] BootstrapServers { get; set; } = Array.Empty<string>();
+    public string[] BootstrapServers { get; init; } = Array.Empty<string>();
 }

@@ -5,12 +5,12 @@ namespace CecoChat.Client.User;
 
 public class UserOptions
 {
-    public Uri? Address { get; set; }
-    public TimeSpan CallTimeout { get; set; }
+    public Uri? Address { get; init; }
+    public TimeSpan CallTimeout { get; init; }
 
-    public SocketsHttpHandlerOptions? SocketsHttpHandler { get; set; }
-    public RetryOptions? Retry { get; set; }
+    public SocketsHttpHandlerOptions? SocketsHttpHandler { get; init; }
+    public RetryOptions? Retry { get; init; }
 
-    public string HealthPath { get; set; } = string.Empty;
-    public TimeSpan HealthTimeout { get; set; }
+    public string HealthPath { get; init; } = string.Empty;
+    public TimeSpan HealthTimeout { get; init; }
 }
