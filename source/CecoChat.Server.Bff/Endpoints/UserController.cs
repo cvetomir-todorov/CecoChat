@@ -69,7 +69,7 @@ public class UserController : ControllerBase
             return Unauthorized();
         }
 
-        if (!TryParseUserIds("user_ids", out long[]? requestedUserIds))
+        if (!TryParseUserIds("userIds", out long[]? requestedUserIds))
         {
             return BadRequest(ModelState);
         }
