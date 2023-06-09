@@ -1,5 +1,6 @@
 ﻿CREATE TABLE state.user_chats (
     user_id bigint,
+    other_user_id bigint,
     chat_id text,
     newest_message bigint,
     other_user_delivered bigint,
