@@ -199,6 +199,7 @@ public class Startup
         builder.RegisterOptions<JwtOptions>(Configuration.GetSection("Jwt"));
 
         // shared
+        builder.RegisterType<ContractMapper>().As<IContractMapper>().SingleInstance();
         builder.RegisterType<MonotonicClock>().As<IClock>().SingleInstance();
     }
 

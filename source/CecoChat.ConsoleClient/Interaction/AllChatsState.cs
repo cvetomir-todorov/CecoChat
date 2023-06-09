@@ -1,3 +1,4 @@
+using CecoChat.ConsoleClient.Api;
 using CecoChat.ConsoleClient.LocalStorage;
 
 namespace CecoChat.ConsoleClient.Interaction;
@@ -15,29 +16,18 @@ public sealed class AllChatsState : State
     {
         if (Context.ReloadData)
         {
-            await GetChats();
+            await Load();
         }
 
         Console.Clear();
         DisplayUserData();
         Console.WriteLine("Choose user to chat (press '0'...'9') | New (press 'n') | Refresh (press 'f') | Exit (press 'x'):");
         Console.WriteLine("=================================================================================================");
-        List<long> userIds = Storage.GetUsers();
-        Dictionary<long, ProfilePublic> profilesMap;
-        if (userIds.Count > 0)
-        {
-            List<ProfilePublic> profiles = await Client.GetPublicProfiles(userIds);
-            profilesMap = profiles.ToDictionary(profile => profile.UserId);
-        }
-        else
-        {
-            profilesMap = new Dictionary<long, ProfilePublic>(capacity: 0);
-        }
-
+        List<long> userIds = MessageStorage.GetUsers();
         int key = 0;
         foreach (long userId in userIds)
         {
-            ProfilePublic profile = profilesMap[userId];
+            ProfilePublic profile = ProfileStorage.GetProfile(userId);
             Console.WriteLine("Press '{0}' for: {1,-24} | {2,-8} | {3,-24} | {4,-48}", key++, profile.DisplayName, $"ID={profile.UserId}", $"user name={profile.UserName}", $"avatar={profile.AvatarUrl}");
         }
 
@@ -67,14 +57,18 @@ public sealed class AllChatsState : State
         }
     }
 
-    private async Task GetChats()
+    private async Task Load()
     {
         DateTime currentState = DateTime.UtcNow;
-        IList<Chat> chats = await Client.GetChats(_lastKnownChatState);
+        AllChatsScreen screen = await Client.LoadAllChatsScreen(_lastKnownChatState, includeProfiles: true);
 
-        foreach (Chat chat in chats)
+        foreach (Chat chat in screen.Chats)
         {
-            Storage.AddOrUpdateChat(chat);
+            MessageStorage.AddOrUpdateChat(chat);
+        }
+        foreach (ProfilePublic profile in screen.Profiles)
+        {
+            ProfileStorage.AddOrUpdateProfile(profile);
         }
 
         _lastKnownChatState = currentState;

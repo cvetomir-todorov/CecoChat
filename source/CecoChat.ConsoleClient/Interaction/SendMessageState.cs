@@ -26,7 +26,7 @@ public sealed class SendMessageState : State
             DataType = DataType.PlainText,
             Data = plainText,
         };
-        Storage.AddMessage(message);
+        MessageStorage.AddMessage(message);
 
         Context.ReloadData = false;
         return States.OneChat;

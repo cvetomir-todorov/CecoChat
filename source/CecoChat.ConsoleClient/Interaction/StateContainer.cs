@@ -5,10 +5,11 @@ namespace CecoChat.ConsoleClient.Interaction;
 
 public sealed class StateContainer
 {
-    public StateContainer(ChatClient client, MessageStorage storage)
+    public StateContainer(ChatClient client, MessageStorage messageStorage, ProfileStorage profileStorageStorage)
     {
         Client = client;
-        Storage = storage;
+        MessageStorage = messageStorage;
+        ProfileStorage = profileStorageStorage;
         Context = new StateContext();
 
         AllChats = new AllChatsState(this);
@@ -20,7 +21,8 @@ public sealed class StateContainer
     }
 
     public ChatClient Client { get; }
-    public MessageStorage Storage { get; }
+    public MessageStorage MessageStorage { get; }
+    public ProfileStorage ProfileStorage { get; }
     public StateContext Context { get; }
 
     public State AllChats { get; }

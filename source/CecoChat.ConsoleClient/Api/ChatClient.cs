@@ -2,10 +2,15 @@
 using CecoChat.Client.Messaging;
 using CecoChat.Contracts.Bff;
 using CecoChat.Contracts.Messaging;
-using CecoChat.Data;
 using Refit;
 
 namespace CecoChat.ConsoleClient.Api;
+
+public sealed class AllChatsScreen
+{
+    public List<LocalStorage.Chat> Chats { get; init; } = new();
+    public List<LocalStorage.ProfilePublic> Profiles { get; init; } = new();
+}
 
 public sealed class ChatClient : IAsyncDisposable
 {
@@ -83,14 +88,7 @@ public sealed class ChatClient : IAsyncDisposable
             NewerThan = newerThan
         };
         GetChatsResponse response = await _bffClient.GetStateChats(request, _accessToken!);
-
-        List<LocalStorage.Chat> chats = new(capacity: response.Chats.Length);
-        foreach (ChatState bffChat in response.Chats)
-        {
-            long otherUserId = DataUtility.GetOtherUsedId(bffChat.ChatId, UserId);
-            LocalStorage.Chat chat = Map.BffChat(bffChat, otherUserId);
-            chats.Add(chat);
-        }
+        List<LocalStorage.Chat> chats = Map.BffChats(response.Chats, UserId);
 
         return chats;
     }
@@ -161,13 +159,27 @@ public sealed class ChatClient : IAsyncDisposable
     public async Task<List<LocalStorage.ProfilePublic>> GetPublicProfiles(IEnumerable<long> userIds)
     {
         GetPublicProfilesResponse response = await _bffClient.GetPublicProfiles(userIds.ToArray(), _accessToken!);
-        List<LocalStorage.ProfilePublic> profiles = new(capacity: response.Profiles.Length);
-
-        foreach (ProfilePublic profile in response.Profiles)
-        {
-            profiles.Add(Map.PublicProfile(profile));
-        }
+        List<LocalStorage.ProfilePublic> profiles = Map.PublicProfiles(response.Profiles);
 
         return profiles;
+    }
+
+    public async Task<AllChatsScreen> LoadAllChatsScreen(DateTime chatsNewerThan, bool includeProfiles)
+    {
+        GetAllChatsScreenRequest request = new()
+        {
+            ChatsNewerThan = chatsNewerThan,
+            IncludeProfiles = includeProfiles
+        };
+        GetAllChatsScreenResponse response = await _bffClient.GetAllChatsScreen(request, _accessToken!);
+
+        List<LocalStorage.Chat> chats = Map.BffChats(response.Chats, UserId);
+        List<LocalStorage.ProfilePublic> profiles = Map.PublicProfiles(response.Profiles);
+
+        return new AllChatsScreen
+        {
+            Chats = chats,
+            Profiles = profiles
+        };
     }
 }

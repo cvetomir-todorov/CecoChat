@@ -7,6 +7,6 @@ public sealed class GetChatsRequestValidator : AbstractValidator<GetChatsRequest
 {
     public GetChatsRequestValidator()
     {
-        RuleFor(x => x.NewerThan).GreaterThanOrEqualTo(Snowflake.Epoch);
+        RuleFor(x => x.NewerThan).ValidNewerThanDateTime();
     }
 }

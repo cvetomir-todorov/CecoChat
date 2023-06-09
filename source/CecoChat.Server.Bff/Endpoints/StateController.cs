@@ -12,13 +12,16 @@ namespace CecoChat.Server.Bff.Endpoints;
 public class StateController : ControllerBase
 {
     private readonly ILogger _logger;
+    private readonly IContractMapper _contractMapper;
     private readonly IStateClient _client;
 
     public StateController(
         ILogger<StateController> logger,
+        IContractMapper contractMapper,
         IStateClient client)
     {
         _logger = logger;
+        _contractMapper = contractMapper;
         _client = client;
     }
 
@@ -41,7 +44,7 @@ public class StateController : ControllerBase
         }
 
         IReadOnlyCollection<Contracts.State.ChatState> serviceChats = await _client.GetChats(userClaims.UserId, request.NewerThan, accessToken, ct);
-        ChatState[] clientChats = serviceChats.Select(MapChat).ToArray();
+        ChatState[] clientChats = serviceChats.Select(chat => _contractMapper.MapChat(chat)).ToArray();
 
         _logger.LogTrace("Responding with {ChatCount} chats for user {UserId} which are newer than {NewerThan}",
             clientChats.Length, userClaims.UserId, request.NewerThan);
@@ -49,16 +52,5 @@ public class StateController : ControllerBase
         {
             Chats = clientChats
         });
-    }
-
-    private static ChatState MapChat(Contracts.State.ChatState fromService)
-    {
-        return new ChatState
-        {
-            ChatId = fromService.ChatId,
-            NewestMessage = fromService.NewestMessage,
-            OtherUserDelivered = fromService.OtherUserDelivered,
-            OtherUserSeen = fromService.OtherUserSeen
-        };
     }
 }

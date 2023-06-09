@@ -15,7 +15,7 @@ public sealed class OneChatState : State
             await GetHistory(Context.UserId);
         }
 
-        List<Message> messages = Storage.GetChatMessages(Context.UserId);
+        List<Message> messages = MessageStorage.GetChatMessages(Context.UserId);
         messages.Sort((left, right) => left.MessageId.CompareTo(right.MessageId));
 
         Console.Clear();
@@ -63,7 +63,7 @@ public sealed class OneChatState : State
         IList<Message> history = await Client.GetHistory(userId, DateTime.UtcNow);
         foreach (Message message in history)
         {
-            Storage.AddMessage(message);
+            MessageStorage.AddMessage(message);
         }
     }
 

@@ -32,8 +32,9 @@ public static class Program
 
         ChatClient client = new(cluster);
         await client.CreateSession(username, password: "not-empty");
-        MessageStorage storage = new(client.UserId);
-        ChangeHandler changeHandler = new(storage);
+        MessageStorage messageStorage = new(client.UserId);
+        ProfileStorage profileStorage = new();
+        ChangeHandler changeHandler = new(messageStorage);
 
         client.Disconnected += (_, _) => Console.WriteLine("Disconnected.");
         client.MessageReceived += (_, notification) => changeHandler.AddReceivedMessage(notification);
@@ -41,15 +42,15 @@ public static class Program
         client.ReactionReceived += (_, notification) => changeHandler.UpdateReaction(notification);
         await client.StartMessaging(CancellationToken.None);
 
-        await RunStateMachine(client, storage);
+        await RunStateMachine(client, messageStorage, profileStorage);
 
         await client.DisposeAsync();
         Console.WriteLine("Bye!");
     }
 
-    private static async Task RunStateMachine(ChatClient client, MessageStorage storage)
+    private static async Task RunStateMachine(ChatClient client, MessageStorage messageStorage, ProfileStorage profileStorage)
     {
-        StateContainer states = new(client, storage);
+        StateContainer states = new(client, messageStorage, profileStorage);
         states.Context.ReloadData = true;
         State currentState = states.AllChats;
 
