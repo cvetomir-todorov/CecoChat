@@ -1,7 +1,22 @@
+using CecoChat.Data;
+
 namespace CecoChat.ConsoleClient.Api;
 
 public static class Map
 {
+    public static List<LocalStorage.Chat> BffChats(Contracts.Bff.ChatState[] bffChats, long currentUserId)
+    {
+        List<LocalStorage.Chat> chats = new(capacity: bffChats.Length);
+        foreach (Contracts.Bff.ChatState bffChat in bffChats)
+        {
+            long otherUserId = DataUtility.GetOtherUsedId(bffChat.ChatId, currentUserId);
+            LocalStorage.Chat chat = BffChat(bffChat, otherUserId);
+            chats.Add(chat);
+        }
+
+        return chats;
+    }
+
     public static LocalStorage.Chat BffChat(Contracts.Bff.ChatState bffChat, long otherUserId)
     {
         return new LocalStorage.Chat(otherUserId)
@@ -40,6 +55,18 @@ public static class Map
         }
 
         return message;
+    }
+
+    public static List<LocalStorage.ProfilePublic> PublicProfiles(Contracts.Bff.ProfilePublic[] bffProfiles)
+    {
+        List<LocalStorage.ProfilePublic> profiles = new(capacity: bffProfiles.Length);
+
+        foreach (Contracts.Bff.ProfilePublic profile in bffProfiles)
+        {
+            profiles.Add(PublicProfile(profile));
+        }
+
+        return profiles;
     }
 
     public static LocalStorage.ProfilePublic PublicProfile(Contracts.Bff.ProfilePublic bffProfile)

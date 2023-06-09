@@ -20,7 +20,7 @@ public sealed class ReactState : State
             return States.OneChat;
         }
 
-        if (!Storage.TryGetMessage(Client.UserId, Context.UserId, messageId, out Message? message))
+        if (!MessageStorage.TryGetMessage(Client.UserId, Context.UserId, messageId, out Message? message))
         {
             Context.ReloadData = false;
             return States.OneChat;

@@ -12,7 +12,8 @@ public abstract class State
         States = states;
     }
 
-    protected MessageStorage Storage => States.Storage;
+    protected MessageStorage MessageStorage => States.MessageStorage;
+    protected ProfileStorage ProfileStorage => States.ProfileStorage;
     protected ChatClient Client => States.Client;
     protected StateContext Context => States.Context;
 

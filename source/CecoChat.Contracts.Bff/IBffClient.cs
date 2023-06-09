@@ -10,6 +10,11 @@ public interface IBffClient : IDisposable
     Task<CreateSessionResponse> CreateSession(
         [Body] CreateSessionRequest request);
 
+    [Get("/api/screen/allChats")]
+    Task<GetAllChatsScreenResponse> GetAllChatsScreen(
+        [Query] GetAllChatsScreenRequest request,
+        [Authorize(AuthorizationScheme)] string accessToken);
+
     [Get("/api/state/chats")]
     Task<GetChatsResponse> GetStateChats(
         [Query] GetChatsRequest request,
