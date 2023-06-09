@@ -138,8 +138,9 @@ public sealed class StateConsumer : IStateConsumer
     private void UpdateReceiverState(BackplaneMessage backplaneMessage)
     {
         long targetUserId = backplaneMessage.ReceiverId;
+        long otherUserId = backplaneMessage.SenderId;
         string chatId = DataUtility.CreateChatId(backplaneMessage.SenderId, backplaneMessage.ReceiverId);
-        ChatState receiverChat = GetChatFromDb(targetUserId, chatId);
+        ChatState receiverChat = GetChatFromDb(targetUserId, otherUserId, chatId);
 
         bool needsUpdate = false;
         if (backplaneMessage.MessageId > receiverChat.NewestMessage)
@@ -168,8 +169,9 @@ public sealed class StateConsumer : IStateConsumer
     private void UpdateSenderState(BackplaneMessage backplaneMessage)
     {
         long targetUserId = backplaneMessage.SenderId;
+        long otherUserId = backplaneMessage.ReceiverId;
         string chatId = DataUtility.CreateChatId(backplaneMessage.SenderId, backplaneMessage.ReceiverId);
-        ChatState senderChat = GetChatFromDb(targetUserId, chatId);
+        ChatState senderChat = GetChatFromDb(targetUserId, otherUserId, chatId);
 
         bool needsUpdate = false;
         if (backplaneMessage.MessageId > senderChat.NewestMessage)
@@ -185,10 +187,14 @@ public sealed class StateConsumer : IStateConsumer
         }
     }
 
-    private ChatState GetChatFromDb(long userId, string chatId)
+    private ChatState GetChatFromDb(long userId, long otherUserId, string chatId)
     {
         ChatState? chat = _repo.GetChat(userId, chatId);
-        chat ??= new ChatState { ChatId = chatId };
+        chat ??= new ChatState
+        {
+            ChatId = chatId,
+            OtherUserId = otherUserId
+        };
 
         return chat;
     }

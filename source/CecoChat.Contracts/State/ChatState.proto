@@ -4,7 +4,8 @@ package CecoChat.Contracts.State;
 
 message ChatState {
   string chat_id = 1;
-  int64 newest_message = 2;
-  int64 other_user_delivered = 3;
-  int64 other_user_seen = 4;
+  int64 other_user_id = 2;
+  int64 newest_message = 3;
+  int64 other_user_delivered = 4;
+  int64 other_user_seen = 5;
 }
