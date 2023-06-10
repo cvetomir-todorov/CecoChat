@@ -1,11 +1,21 @@
 using CecoChat.Client.History;
 using CecoChat.Contracts.Bff;
 using CecoChat.Server.Identity;
+using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace CecoChat.Server.Bff.Endpoints;
+
+public sealed class GetHistoryRequestValidator : AbstractValidator<GetHistoryRequest>
+{
+    public GetHistoryRequestValidator()
+    {
+        RuleFor(x => x.OtherUserId).ValidUserId();
+        RuleFor(x => x.OlderThan).ValidOlderThanDateTime();
+    }
+}
 
 [ApiController]
 [Route("api/history")]

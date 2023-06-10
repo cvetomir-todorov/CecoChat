@@ -3,11 +3,21 @@ using CecoChat.Client.History;
 using CecoChat.Client.User;
 using CecoChat.Contracts.Bff;
 using CecoChat.Server.Identity;
+using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace CecoChat.Server.Bff.Endpoints;
+
+public sealed class GetOneChatScreenRequestValidator : AbstractValidator<GetOneChatScreenRequest>
+{
+    public GetOneChatScreenRequestValidator()
+    {
+        RuleFor(x => x.OtherUserId).ValidUserId();
+        RuleFor(x => x.MessagesOlderThan).ValidOlderThanDateTime();
+    }
+}
 
 [ApiController]
 [Route("api/screen/oneChat")]

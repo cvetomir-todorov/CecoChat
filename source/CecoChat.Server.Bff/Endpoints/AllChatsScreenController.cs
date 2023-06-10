@@ -3,11 +3,20 @@ using CecoChat.Client.State;
 using CecoChat.Client.User;
 using CecoChat.Contracts.Bff;
 using CecoChat.Server.Identity;
+using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace CecoChat.Server.Bff.Endpoints;
+
+public sealed class GetAllChatsScreenRequestValidation : AbstractValidator<GetAllChatsScreenRequest>
+{
+    public GetAllChatsScreenRequestValidation()
+    {
+        RuleFor(x => x.ChatsNewerThan).ValidNewerThanDateTime();
+    }
+}
 
 [ApiController]
 [Route("api/screen/allChats")]

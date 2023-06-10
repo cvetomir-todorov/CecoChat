@@ -5,10 +5,20 @@ using CecoChat.Contracts.Bff;
 using CecoChat.Data.Config.Partitioning;
 using CecoChat.Server.Backplane;
 using CecoChat.Server.Bff.Auth;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace CecoChat.Server.Bff.Endpoints;
+
+public sealed class CreateSessionRequestValidator : AbstractValidator<CreateSessionRequest>
+{
+    public CreateSessionRequestValidator()
+    {
+        RuleFor(x => x.Username).NotNull().NotEmpty();
+        RuleFor(x => x.Password).NotNull().NotEmpty();
+    }
+}
 
 [ApiController]
 [Route("api")]
