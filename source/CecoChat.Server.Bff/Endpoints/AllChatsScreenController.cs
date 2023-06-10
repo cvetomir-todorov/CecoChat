@@ -34,14 +34,13 @@ public class AllChatsScreenController : ControllerBase
     }
 
     [Authorize(Roles = "user")]
-    [HttpGet(Name = "AllChatsScreen")]
+    [HttpGet(Name = "GetAllChatsScreen")]
     [ProducesResponseType(typeof(GetAllChatsScreenResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetAllChatsScreen(
-        [FromQuery][BindRequired] GetAllChatsScreenRequest request, CancellationToken ct)
+    public async Task<IActionResult> GetAllChatsScreen([FromQuery][BindRequired] GetAllChatsScreenRequest request, CancellationToken ct)
     {
         if (!HttpContext.TryGetUserClaims(_logger, out UserClaims? userClaims))
         {

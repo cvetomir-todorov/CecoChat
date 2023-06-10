@@ -3,9 +3,9 @@ using FluentValidation;
 
 namespace CecoChat.Server.Bff.Endpoints;
 
-public class AllChatsScreenRequestValidation : AbstractValidator<GetAllChatsScreenRequest>
+public sealed class GetAllChatsScreenRequestValidation : AbstractValidator<GetAllChatsScreenRequest>
 {
-    public AllChatsScreenRequestValidation()
+    public GetAllChatsScreenRequestValidation()
     {
         RuleFor(x => x.ChatsNewerThan).ValidNewerThanDateTime();
     }
