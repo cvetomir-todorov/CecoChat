@@ -9,15 +9,15 @@ using Microsoft.AspNetCore.Mvc;
 namespace CecoChat.Server.Bff.Endpoints;
 
 [ApiController]
-[Route("api")]
-public class UserController : ControllerBase
+[Route("api/user/profile")]
+public class ProfileController : ControllerBase
 {
     private readonly ILogger _logger;
     private readonly IUserClient _userClient;
     private readonly IMapper _mapper;
 
-    public UserController(
-        ILogger<UserController> logger,
+    public ProfileController(
+        ILogger<ProfileController> logger,
         IUserClient userClient,
         IMapper mapper)
     {
@@ -27,7 +27,7 @@ public class UserController : ControllerBase
     }
 
     [Authorize(Roles = "user")]
-    [HttpGet("user/profile/{id}", Name = "GetPublicProfile")]
+    [HttpGet("{id}", Name = "GetPublicProfile")]
     [ProducesResponseType(typeof(GetPublicProfileResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -52,7 +52,7 @@ public class UserController : ControllerBase
     }
 
     [Authorize(Roles = "user")]
-    [HttpGet("user/profile", Name = "GetPublicProfiles")]
+    [HttpGet(Name = "GetPublicProfiles")]
     [ProducesResponseType(typeof(GetPublicProfilesResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
