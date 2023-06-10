@@ -12,6 +12,12 @@ public sealed class AllChatsScreen
     public List<LocalStorage.ProfilePublic> Profiles { get; init; } = new();
 }
 
+public sealed class OneChatScreen
+{
+    public List<LocalStorage.Message> Messages { get; init; } = new();
+    public LocalStorage.ProfilePublic? Profile { get; init; }
+}
+
 public sealed class ChatClient : IAsyncDisposable
 {
     private readonly IBffClient _bffClient;
@@ -101,13 +107,7 @@ public sealed class ChatClient : IAsyncDisposable
             OlderThan = olderThan
         };
         GetHistoryResponse response = await _bffClient.GetHistoryMessages(request, _accessToken!);
-
-        List<LocalStorage.Message> messages = new(response.Messages.Length);
-        foreach (HistoryMessage bffMessage in response.Messages)
-        {
-            LocalStorage.Message message = Map.BffMessage(bffMessage);
-            messages.Add(message);
-        }
+        List<LocalStorage.Message> messages = Map.BffMessages(response.Messages);
 
         return messages;
     }
@@ -120,8 +120,8 @@ public sealed class ChatClient : IAsyncDisposable
             DataType = Contracts.Messaging.DataType.PlainText,
             Data = text
         };
-
         SendMessageResponse response = await _messagingClient.SendMessage(request);
+
         return response.MessageId;
     }
 
@@ -173,6 +173,11 @@ public sealed class ChatClient : IAsyncDisposable
         };
         GetAllChatsScreenResponse response = await _bffClient.GetAllChatsScreen(request, _accessToken!);
 
+        if (includeProfiles && response.Profiles.Length < response.Chats.Length)
+        {
+            throw new InvalidOperationException($"Loading all chats screen requested profiles, returned {response.Chats.Length} but profiles were only {response.Profiles.Length}.");
+        }
+
         List<LocalStorage.Chat> chats = Map.BffChats(response.Chats, UserId);
         List<LocalStorage.ProfilePublic> profiles = Map.PublicProfiles(response.Profiles);
 
@@ -180,6 +185,35 @@ public sealed class ChatClient : IAsyncDisposable
         {
             Chats = chats,
             Profiles = profiles
+        };
+    }
+
+    public async Task<OneChatScreen> LoadOneChatScreen(long otherUserId, DateTime messagesOlderThan, bool includeProfile)
+    {
+        GetOneChatScreenRequest request = new()
+        {
+            OtherUserId = otherUserId,
+            MessagesOlderThan = messagesOlderThan,
+            IncludeProfile = includeProfile
+        };
+        GetOneChatScreenResponse response = await _bffClient.GetOneChatScreen(request, _accessToken!);
+
+        if (includeProfile && response.Profile == null)
+        {
+            throw new InvalidOperationException("Loading one chat screen requested a profile, but it was not returned.");
+        }
+
+        List<LocalStorage.Message> messages = Map.BffMessages(response.Messages);
+        LocalStorage.ProfilePublic? profile = null;
+        if (includeProfile)
+        {
+            profile = Map.PublicProfile(response.Profile!);
+        }
+
+        return new OneChatScreen
+        {
+            Messages = messages,
+            Profile = profile
         };
     }
 }

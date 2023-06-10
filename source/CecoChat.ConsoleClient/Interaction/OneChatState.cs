@@ -1,4 +1,5 @@
 using System.Text;
+using CecoChat.ConsoleClient.Api;
 using CecoChat.ConsoleClient.LocalStorage;
 
 namespace CecoChat.ConsoleClient.Interaction;
@@ -12,7 +13,7 @@ public sealed class OneChatState : State
     {
         if (Context.ReloadData)
         {
-            await GetHistory(Context.UserId);
+            await Load(Context.UserId);
         }
 
         List<Message> messages = MessageStorage.GetChatMessages(Context.UserId);
@@ -20,7 +21,7 @@ public sealed class OneChatState : State
 
         Console.Clear();
         DisplayUserData();
-        ProfilePublic profile = await Client.GetPublicProfile(Context.UserId);
+        ProfilePublic profile = ProfileStorage.GetProfile(Context.UserId);
         Console.WriteLine("Chatting with: {0} | ID={1} | user name={2} | avatar={3}", profile.DisplayName, profile.UserId, profile.UserName, profile.AvatarUrl);
 
         foreach (Message message in messages)
@@ -58,13 +59,16 @@ public sealed class OneChatState : State
         }
     }
 
-    private async Task GetHistory(long userId)
+    private async Task Load(long otherUserId)
     {
-        IList<Message> history = await Client.GetHistory(userId, DateTime.UtcNow);
-        foreach (Message message in history)
+        OneChatScreen screen = await Client.LoadOneChatScreen(otherUserId, messagesOlderThan: DateTime.UtcNow, includeProfile: true);
+
+        foreach (Message message in screen.Messages)
         {
             MessageStorage.AddMessage(message);
         }
+
+        ProfileStorage.AddOrUpdateProfile(screen.Profile!);
     }
 
     private void DisplayMessage(Message message, ProfilePublic profilePublic)

@@ -27,6 +27,18 @@ public static class Map
         };
     }
 
+    public static List<LocalStorage.Message> BffMessages(Contracts.Bff.HistoryMessage[] bffMessages)
+    {
+        List<LocalStorage.Message> messages = new(bffMessages.Length);
+        foreach (Contracts.Bff.HistoryMessage bffMessage in bffMessages)
+        {
+            LocalStorage.Message message = BffMessage(bffMessage);
+            messages.Add(message);
+        }
+
+        return messages;
+    }
+
     public static LocalStorage.Message BffMessage(Contracts.Bff.HistoryMessage bffHistoryMessage)
     {
         LocalStorage.Message message = new()

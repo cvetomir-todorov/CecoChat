@@ -7,7 +7,7 @@ public sealed class GetHistoryRequestValidator : AbstractValidator<GetHistoryReq
 {
     public GetHistoryRequestValidator()
     {
-        RuleFor(x => x.OtherUserId).GreaterThan(0);
-        RuleFor(x => x.OlderThan).GreaterThan(Snowflake.Epoch);
+        RuleFor(x => x.OtherUserId).ValidUserId();
+        RuleFor(x => x.OlderThan).ValidOlderThanDateTime();
     }
 }

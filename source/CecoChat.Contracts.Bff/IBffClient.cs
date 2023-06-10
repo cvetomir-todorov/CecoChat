@@ -15,6 +15,11 @@ public interface IBffClient : IDisposable
         [Query] GetAllChatsScreenRequest request,
         [Authorize(AuthorizationScheme)] string accessToken);
 
+    [Get("/api/screen/oneChat")]
+    Task<GetOneChatScreenResponse> GetOneChatScreen(
+        [Query] GetOneChatScreenRequest request,
+        [Authorize(AuthorizationScheme)] string accessToken);
+
     [Get("/api/state/chats")]
     Task<GetChatsResponse> GetStateChats(
         [Query] GetChatsRequest request,
