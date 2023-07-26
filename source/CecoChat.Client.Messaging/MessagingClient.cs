@@ -23,7 +23,7 @@ public sealed class MessagingClient : IMessagingClient
     public async Task Connect(string messagingServerAddress, string accessToken, CancellationToken ct)
     {
         UriBuilder uriBuilder = new(messagingServerAddress);
-        if (uriBuilder.Path.EndsWith("/"))
+        if (uriBuilder.Path.EndsWith('/'))
         {
             uriBuilder.Path += "chat";
         }

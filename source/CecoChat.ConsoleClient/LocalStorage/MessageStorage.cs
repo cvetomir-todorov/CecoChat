@@ -28,7 +28,7 @@ public sealed class MessageStorage
     public void AddMessage(Message message)
     {
         long otherUserId = GetOtherUserId(message.SenderId, message.ReceiverId);
-        Chat chat = _chatMap.GetOrAdd(otherUserId, _ => new Chat(otherUserId));
+        Chat chat = _chatMap.GetOrAdd(otherUserId, localOtherUserId => new Chat(localOtherUserId));
         chat.AddNew(message);
     }
 
