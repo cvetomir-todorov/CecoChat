@@ -61,9 +61,10 @@ internal sealed class SnowflakeConfig : ISnowflakeConfig
     {
         ISubscriber subscriber = _redisContext.GetSubscriber();
 
-        ChannelMessageQueue generatorIdsChannel = await subscriber.SubscribeAsync($"notify:{SnowflakeKeys.GeneratorIds}");
-        generatorIdsChannel.OnMessage(channelMessage => _configUtility.HandleChange(channelMessage, HandleGeneratorIDs));
-        _logger.LogInformation("Subscribed for changes about {ServerGeneratorIDs} from channel {Channel}", SnowflakeKeys.GeneratorIds, generatorIdsChannel.Channel);
+        RedisChannel channel = new($"notify:{SnowflakeKeys.GeneratorIds}", RedisChannel.PatternMode.Literal);
+        ChannelMessageQueue messageQueue = await subscriber.SubscribeAsync(channel);
+        messageQueue.OnMessage(channelMessage => _configUtility.HandleChange(channelMessage, HandleGeneratorIDs));
+        _logger.LogInformation("Subscribed for changes about {ServerGeneratorIDs} from channel {Channel}", SnowflakeKeys.GeneratorIds, messageQueue.Channel);
     }
 
     private Task HandleGeneratorIDs(ChannelMessage _)

@@ -57,9 +57,10 @@ internal sealed class HistoryConfig : IHistoryConfig
 
         if (usage.UseMessageCount)
         {
-            ChannelMessageQueue messageCountChannel = await subscriber.SubscribeAsync($"notify:{HistoryKeys.MessageCount}");
-            messageCountChannel.OnMessage(channelMessage => _configUtility.HandleChange(channelMessage, HandleMessageCount));
-            _logger.LogInformation("Subscribed for changes about {MessageCount} from channel {Channel}", HistoryKeys.MessageCount, messageCountChannel.Channel);
+            RedisChannel channel = new($"notify:{HistoryKeys.MessageCount}", RedisChannel.PatternMode.Literal);
+            ChannelMessageQueue messageQueue = await subscriber.SubscribeAsync(channel);
+            messageQueue.OnMessage(channelMessage => _configUtility.HandleChange(channelMessage, HandleMessageCount));
+            _logger.LogInformation("Subscribed for changes about {MessageCount} from channel {Channel}", HistoryKeys.MessageCount, messageQueue.Channel);
         }
     }
 
