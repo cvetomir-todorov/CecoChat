@@ -95,17 +95,19 @@ internal sealed class PartitioningConfig : IPartitioningConfig
 
         if (usage.UsePartitions || usage.UseAddresses)
         {
-            ChannelMessageQueue partitionsChannel = await subscriber.SubscribeAsync($"notify:{PartitioningKeys.Partitions}");
-            partitionsChannel.OnMessage(channelMessage => _configUtility.HandleChange(channelMessage, HandlePartitions));
+            RedisChannel channel = new($"notify:{PartitioningKeys.Partitions}", RedisChannel.PatternMode.Literal);
+            ChannelMessageQueue messageQueue = await subscriber.SubscribeAsync(channel);
+            messageQueue.OnMessage(channelMessage => _configUtility.HandleChange(channelMessage, HandlePartitions));
             _logger.LogInformation("Subscribed for changes about {PartitionCount}, {ServerPartitions} from channel {Channel}",
-                PartitioningKeys.PartitionCount, PartitioningKeys.Partitions, partitionsChannel.Channel);
+                PartitioningKeys.PartitionCount, PartitioningKeys.Partitions, messageQueue.Channel);
         }
         if (usage.UseAddresses)
         {
-            ChannelMessageQueue addressesChannel = await subscriber.SubscribeAsync($"notify:{PartitioningKeys.Addresses}");
-            addressesChannel.OnMessage(channelMessage => _configUtility.HandleChange(channelMessage, HandleAddresses));
+            RedisChannel channel = new($"notify:{PartitioningKeys.Addresses}", RedisChannel.PatternMode.Literal);
+            ChannelMessageQueue messageQueue = await subscriber.SubscribeAsync(channel);
+            messageQueue.OnMessage(channelMessage => _configUtility.HandleChange(channelMessage, HandleAddresses));
             _logger.LogInformation("Subscribed for changes about {ServerAddresses} from channel {Channel}",
-                PartitioningKeys.Addresses, addressesChannel.Channel);
+                PartitioningKeys.Addresses, messageQueue.Channel);
         }
     }
 
