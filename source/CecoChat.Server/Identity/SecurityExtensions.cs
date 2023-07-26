@@ -14,12 +14,12 @@ public static class SecurityExtensions
         {
             return false;
         }
-        if (values.Count > 1)
+        if (values.Count != 1)
         {
             return false;
         }
 
-        string? value = values.First();
+        string? value = values[0];
         const string bearerPrefix = "Bearer ";
         if (value == null || !value.StartsWith(bearerPrefix, StringComparison.CurrentCultureIgnoreCase))
         {

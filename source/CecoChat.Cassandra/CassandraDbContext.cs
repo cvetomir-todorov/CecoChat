@@ -77,7 +77,7 @@ public class CassandraDbContext : ICassandraDbContext
             }
             else
             {
-                IPAddress hostIp = Dns.GetHostEntry(parts[0]).AddressList.First();
+                IPAddress hostIp = Dns.GetHostEntry(parts[0]).AddressList[0];
                 endpoints.Add(new IPEndPoint(hostIp, port));
             }
         }
