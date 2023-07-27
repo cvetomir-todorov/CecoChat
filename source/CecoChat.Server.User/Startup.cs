@@ -9,6 +9,7 @@ using CecoChat.Jaeger;
 using CecoChat.Jwt;
 using CecoChat.Npgsql.Health;
 using CecoChat.Otel;
+using CecoChat.Redis;
 using CecoChat.Server.Identity;
 using CecoChat.Server.User.Endpoints;
 using CecoChat.Server.User.HostedServices;
@@ -24,6 +25,7 @@ namespace CecoChat.Server.User;
 public class Startup
 {
     private readonly UserDbOptions _userDbOptions;
+    private readonly RedisOptions _userCacheOptions;
     private readonly JwtOptions _jwtOptions;
     private readonly OtelSamplingOptions _otelSamplingOptions;
     private readonly JaegerOptions _jaegerOptions;
@@ -36,6 +38,9 @@ public class Startup
 
         _userDbOptions = new();
         Configuration.GetSection("UserDb").Bind(_userDbOptions);
+
+        _userCacheOptions = new();
+        Configuration.GetSection("UserCache").Bind(_userCacheOptions);
 
         _jwtOptions = new();
         Configuration.GetSection("Jwt").Bind(_jwtOptions);
@@ -139,6 +144,10 @@ public class Startup
         // user db
         builder.RegisterModule(new UserDbAutofacModule());
         builder.RegisterOptions<UserDbOptions>(Configuration.GetSection("UserDb"));
+
+        // user cache
+        IConfiguration userCacheConfig = Configuration.GetSection("UserCache");
+        builder.RegisterModule(new RedisAutofacModule(userCacheConfig));
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

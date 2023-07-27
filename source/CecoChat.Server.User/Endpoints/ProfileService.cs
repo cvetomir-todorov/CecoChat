@@ -1,7 +1,11 @@
+using System.Globalization;
 using CecoChat.Contracts.User;
 using CecoChat.Data.User.Repos;
+using CecoChat.Redis;
 using CecoChat.Server.Identity;
+using Google.Protobuf;
 using Grpc.Core;
+using StackExchange.Redis;
 
 namespace CecoChat.Server.User.Endpoints;
 
@@ -9,11 +13,14 @@ public class ProfileService : Profile.ProfileBase
 {
     private readonly ILogger _logger;
     private readonly IProfileRepo _repo;
+    private readonly IRedisContext _redisContext;
+    private const int RedisDbIndex = 1;
 
-    public ProfileService(ILogger<ProfileService> logger, IProfileRepo repo)
+    public ProfileService(ILogger<ProfileService> logger, IProfileRepo repo, IRedisContext redisContext)
     {
         _logger = logger;
         _repo = repo;
+        _redisContext = redisContext;
     }
 
     public override async Task<GetFullProfileResponse> GetFullProfile(GetFullProfileRequest request, ServerCallContext context)
@@ -40,10 +47,25 @@ public class ProfileService : Profile.ProfileBase
             throw new RpcException(new Status(StatusCode.Unauthenticated, string.Empty));
         }
 
-        ProfilePublic? profile = await _repo.GetPublicProfile(request.UserId, userClaims.UserId);
-        if (profile == null)
+        IDatabase cache = _redisContext.GetDatabase(RedisDbIndex);
+        RedisKey profileKey = CreateUserProfileKey(request.UserId);
+        RedisValue cachedProfile = await cache.StringGetAsync(profileKey);
+        ProfilePublic? profile;
+
+        if (cachedProfile.IsNullOrEmpty)
         {
-            throw new RpcException(new Status(StatusCode.NotFound, $"There is no profile for user ID {request.UserId}."));
+            profile = await _repo.GetPublicProfile(request.UserId, userClaims.UserId);
+            if (profile == null)
+            {
+                throw new RpcException(new Status(StatusCode.NotFound, $"There is no profile for user ID {request.UserId}."));
+            }
+
+            byte[] profileBytes = profile.ToByteArray();
+            await cache.StringSetAsync(profileKey, profileBytes);
+        }
+        else
+        {
+            profile = ProfilePublic.Parser.ParseFrom(cachedProfile);
         }
 
         _logger.LogTrace("Responding with public profile {RequestedUserId} requested by user {UserId}", profile.UserId, userClaims.UserId);
@@ -57,12 +79,55 @@ public class ProfileService : Profile.ProfileBase
             throw new RpcException(new Status(StatusCode.Unauthenticated, string.Empty));
         }
 
-        IEnumerable<ProfilePublic> profiles = await _repo.GetPublicProfiles(request.UserIds, userClaims.UserId);
-
+        IDatabase cache = _redisContext.GetDatabase(RedisDbIndex);
+        RedisKey[] profileKeys = request.UserIds.Select(CreateUserProfileKey).ToArray();
+        RedisValue[] cachedProfiles = await cache.StringGetAsync(profileKeys);
+        List<long>? missingUserIds = null;
         GetPublicProfilesResponse response = new();
-        response.Profiles.Add(profiles);
+
+        for (int i = 0; i < request.UserIds.Count; ++i)
+        {
+            RedisValue cachedProfile = cachedProfiles[i];
+
+            if (cachedProfile.IsNullOrEmpty)
+            {
+                missingUserIds ??= new List<long>();
+                missingUserIds.Add(request.UserIds[i]);
+            }
+            else
+            {
+                ProfilePublic profile = ProfilePublic.Parser.ParseFrom(cachedProfile);
+                response.Profiles.Add(profile);
+            }
+        }
+
+        if (missingUserIds != null && missingUserIds.Count > 0)
+        {
+            IEnumerable<ProfilePublic> missingProfiles = await _repo.GetPublicProfiles(missingUserIds, userClaims.UserId);
+            KeyValuePair<RedisKey, RedisValue>[] toAddToCache = new KeyValuePair<RedisKey, RedisValue>[missingUserIds.Count];
+            int index = 0;
+
+            foreach (ProfilePublic missingProfile in missingProfiles)
+            {
+                response.Profiles.Add(missingProfile);
+
+                toAddToCache[index] = new KeyValuePair<RedisKey, RedisValue>(
+                    key: CreateUserProfileKey(missingProfile.UserId),
+                    value: missingProfile.ToByteArray());
+
+                index++;
+            }
+
+            await cache.StringSetAsync(toAddToCache);
+        }
 
         _logger.LogTrace("Responding with {PublicProfileCount} public profiles requested by user {UserId}", response.Profiles.Count, userClaims.UserId);
         return response;
+    }
+
+    private static RedisKey CreateUserProfileKey(long userId)
+    {
+        // we store all profiles in a separate database, so we don't need to prefix the key
+        return new RedisKey(userId.ToString(CultureInfo.InvariantCulture));
     }
 }
