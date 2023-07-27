@@ -10,6 +10,7 @@ using CecoChat.Jwt;
 using CecoChat.Npgsql.Health;
 using CecoChat.Otel;
 using CecoChat.Redis;
+using CecoChat.Redis.Health;
 using CecoChat.Server.Identity;
 using CecoChat.Server.User.Endpoints;
 using CecoChat.Server.User.HostedServices;
@@ -131,6 +132,9 @@ public class Startup
             .AddNpgsql(
                 "user-db",
                 _userDbOptions.Connect,
+                tags: new[] { HealthTags.Health, HealthTags.Ready })
+            .AddRedis("user-cache",
+                _userCacheOptions,
                 tags: new[] { HealthTags.Health, HealthTags.Ready });
 
         services.AddSingleton<UserDbInitHealthCheck>();
