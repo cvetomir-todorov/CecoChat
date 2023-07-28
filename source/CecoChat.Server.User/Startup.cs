@@ -26,7 +26,7 @@ namespace CecoChat.Server.User;
 public class Startup
 {
     private readonly UserDbOptions _userDbOptions;
-    private readonly RedisOptions _userCacheOptions;
+    private readonly RedisOptions _userCacheStoreOptions;
     private readonly JwtOptions _jwtOptions;
     private readonly OtelSamplingOptions _otelSamplingOptions;
     private readonly JaegerOptions _jaegerOptions;
@@ -40,8 +40,8 @@ public class Startup
         _userDbOptions = new();
         Configuration.GetSection("UserDb").Bind(_userDbOptions);
 
-        _userCacheOptions = new();
-        Configuration.GetSection("UserCache").Bind(_userCacheOptions);
+        _userCacheStoreOptions = new();
+        Configuration.GetSection("UserCache:Store").Bind(_userCacheStoreOptions);
 
         _jwtOptions = new();
         Configuration.GetSection("Jwt").Bind(_jwtOptions);
@@ -134,7 +134,7 @@ public class Startup
                 _userDbOptions.Connect,
                 tags: new[] { HealthTags.Health, HealthTags.Ready })
             .AddRedis("user-cache",
-                _userCacheOptions,
+                _userCacheStoreOptions,
                 tags: new[] { HealthTags.Health, HealthTags.Ready });
 
         services.AddSingleton<UserDbInitHealthCheck>();
@@ -147,7 +147,8 @@ public class Startup
 
         // user db
         IConfiguration userCacheConfig = Configuration.GetSection("UserCache");
-        builder.RegisterModule(new UserDbAutofacModule(userCacheConfig));
+        IConfiguration userCacheStoreConfig = userCacheConfig.GetSection("Store");
+        builder.RegisterModule(new UserDbAutofacModule(userCacheConfig, userCacheStoreConfig));
         builder.RegisterOptions<UserDbOptions>(Configuration.GetSection("UserDb"));
     }
 
