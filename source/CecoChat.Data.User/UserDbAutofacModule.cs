@@ -22,10 +22,20 @@ public class UserDbAutofacModule : Module
     {
         builder.RegisterType<NpgsqlDbInitializer>().As<INpgsqlDbInitializer>().SingleInstance();
         builder.RegisterModule(new RedisAutofacModule(_userCacheConfig, RedisContextName));
+
+        builder
+            .RegisterType<CachingProfileRepo>()
+            .Named<IProfileRepo>("caching-profile-repo")
+            .WithNamedParameter(typeof(IRedisContext), RedisContextName)
+            .InstancePerLifetimeScope();
         builder
             .RegisterType<ProfileRepo>()
-            .As<IProfileRepo>()
-            .WithNamedParameter(typeof(IRedisContext), RedisContextName)
+            .Named<IProfileRepo>("profile-repo")
+            .InstancePerLifetimeScope();
+        builder
+            .RegisterDecorator<IProfileRepo>(
+                decorator: (context, inner) => context.ResolveNamed<IProfileRepo>("caching-profile-repo", TypedParameter.From(inner)),
+                fromKey: "profile-repo")
             .InstancePerLifetimeScope();
     }
 }
