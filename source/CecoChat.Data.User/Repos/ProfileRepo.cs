@@ -24,8 +24,6 @@ internal class ProfileRepo : IProfileRepo
     private readonly UserDbContext _dbContext;
     private readonly IMapper _mapper;
     private readonly IRedisContext _redisContext;
-    // TODO: move to config
-    private const int RedisDbIndex = 1;
 
     public ProfileRepo(ILogger<ProfileRepo> logger, UserDbContext dbContext, IMapper mapper, IRedisContext redisContext)
     {
@@ -52,7 +50,7 @@ internal class ProfileRepo : IProfileRepo
 
     public async Task<ProfilePublic?> GetPublicProfile(long requestedUserId, long userId)
     {
-        IDatabase cache = _redisContext.GetDatabase(RedisDbIndex);
+        IDatabase cache = _redisContext.GetDatabase();
         RedisKey profileKey = CreateUserProfileKey(requestedUserId);
         RedisValue cachedProfile = await cache.StringGetAsync(profileKey);
         ProfilePublic? profile;
@@ -85,7 +83,7 @@ internal class ProfileRepo : IProfileRepo
 
     public async Task<IEnumerable<ProfilePublic>> GetPublicProfiles(IList<long> requestedUserIds, long userId)
     {
-        IDatabase cache = _redisContext.GetDatabase(RedisDbIndex);
+        IDatabase cache = _redisContext.GetDatabase();
         RedisKey[] profileKeys = requestedUserIds.Select(CreateUserProfileKey).ToArray();
         RedisValue[] cachedProfiles = await cache.StringGetAsync(profileKeys);
         List<ProfilePublic> resultProfiles = new(capacity: requestedUserIds.Count);
