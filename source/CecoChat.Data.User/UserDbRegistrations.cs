@@ -8,12 +8,14 @@ public static class UserDbRegistrations
 {
     public static IServiceCollection AddUserDb(this IServiceCollection services, NpgsqlOptions options)
     {
-        return services.AddDbContext<UserDbContext>(builder =>
-        {
-            builder.UseNpgsql(options.ConnectionString, npgsql =>
+        return services.AddDbContextPool<UserDbContext>(
+            optionsAction: builder =>
             {
-                npgsql.EnableRetryOnFailure(maxRetryCount: 3, maxRetryDelay: TimeSpan.FromSeconds(5), errorCodesToAdd: null);
-            });
-        });
+                builder.UseNpgsql(options.ConnectionString, npgsql =>
+                {
+                    npgsql.EnableRetryOnFailure(maxRetryCount: 3, maxRetryDelay: TimeSpan.FromSeconds(5), errorCodesToAdd: null);
+                });
+            },
+            poolSize: options.DbContextPoolSize);
     }
 }
