@@ -50,6 +50,11 @@ public sealed class RedisContext : IRedisContext
 
     public IDatabase GetDatabase(int db = -1)
     {
+        if (db < 0)
+        {
+            db = _redisOptions.DefaultDatabase;
+        }
+
         return Connection.GetDatabase(db);
     }
 
@@ -62,8 +67,8 @@ public sealed class RedisContext : IRedisContext
     {
         ConfigurationOptions redisConfiguration = CreateRedisConfiguration();
         ConnectionMultiplexer connection = ConnectionMultiplexer.Connect(redisConfiguration);
-        _logger.LogInformation("Redis connection '{ConnectionString}' is {ConnectionState}",
-            connection.Configuration, connection.IsConnected ? "established" : "not established");
+        _logger.LogInformation("Redis connection '{ConnectionString}' with default database {DefaultDb} is {ConnectionState}",
+            connection.Configuration, _redisOptions.DefaultDatabase, connection.IsConnected ? "established" : "not established");
 
         connection.ConnectionFailed += (_, args) =>
         {
