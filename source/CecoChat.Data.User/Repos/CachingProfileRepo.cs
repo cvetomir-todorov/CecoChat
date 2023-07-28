@@ -35,14 +35,37 @@ public class CachingProfileRepo : IProfileRepo
 
     public async Task<ProfilePublic?> GetPublicProfile(long requestedUserId, long userId)
     {
+        ProfilePublic? profile;
+        string profileSource;
+
         if (!_cacheOptions.Enabled)
         {
-            return await _decoratedRepo.GetPublicProfile(requestedUserId, userId);
+            profile = await _decoratedRepo.GetPublicProfile(requestedUserId, userId);
+            profileSource = "DB";
+        }
+        else
+        {
+            (profile, profileSource) = await GetPublicProfileUsingCache(requestedUserId, userId);
         }
 
+        if (profile == null)
+        {
+            _logger.LogTrace("Failed to fetch from {ProfileSource} public profile for user {UserId}", profileSource, requestedUserId);
+        }
+        else
+        {
+            _logger.LogTrace("Fetched from {ProfileSource} public profile for user {RequestedUserId} requested by user {UserId}", profileSource, requestedUserId, userId);
+        }
+
+        return profile;
+    }
+
+    private async Task<(ProfilePublic?, string)> GetPublicProfileUsingCache(long requestedUserId, long userId)
+    {
         IDatabase cache = _cacheContext.GetDatabase();
         RedisKey profileKey = CreateUserProfileKey(requestedUserId);
         RedisValue cachedProfile = await cache.StringGetAsync(profileKey);
+
         ProfilePublic? profile;
         string profileSource;
 
@@ -51,8 +74,7 @@ public class CachingProfileRepo : IProfileRepo
             profile = await _decoratedRepo.GetPublicProfile(requestedUserId, userId);
             if (profile == null)
             {
-                _logger.LogTrace("Failed to fetch public profile for user {UserId}", requestedUserId);
-                return null;
+                return (null, "DB");
             }
 
             profileSource = "DB";
@@ -65,15 +87,16 @@ public class CachingProfileRepo : IProfileRepo
             profileSource = "cache";
         }
 
-        _logger.LogTrace("Fetched from {ProfileSource} public profile for user {RequestedUserId} requested by user {UserId}", profileSource, requestedUserId, userId);
-        return profile;
+        return (profile, profileSource);
     }
 
     public async Task<IEnumerable<ProfilePublic>> GetPublicProfiles(IList<long> requestedUserIds, long userId)
     {
         if (!_cacheOptions.Enabled)
         {
-            return await _decoratedRepo.GetPublicProfiles(requestedUserIds, userId);
+            IEnumerable<ProfilePublic> profiles = await _decoratedRepo.GetPublicProfiles(requestedUserIds, userId);
+            LogFetchedPublicProfiles(totalCount: requestedUserIds.Count, fromCacheCount: 0, fromDbCount: requestedUserIds.Count, userId);
+            return profiles;
         }
 
         IDatabase cache = _cacheContext.GetDatabase();
@@ -88,10 +111,15 @@ public class CachingProfileRepo : IProfileRepo
             await LoadUncachedProfiles(uncachedUserIds, userId, resultProfiles, cache);
         }
 
+        LogFetchedPublicProfiles(totalCount: requestedUserIds.Count, fromCacheCount: profilesFromCacheCount, fromDbCount: uncachedUserIds?.Count ?? 0, userId);
+        return resultProfiles;
+    }
+
+    private void LogFetchedPublicProfiles(int totalCount, int fromCacheCount, int fromDbCount, long userId)
+    {
         _logger.LogTrace(
             "Fetched {PublicProfileCount} public profiles in total ({FromCacheCount} from cache, {FromDbCount} from DB) as requested by user {UserId}",
-            requestedUserIds.Count, profilesFromCacheCount, uncachedUserIds?.Count ?? 0, userId);
-        return resultProfiles;
+            totalCount, fromCacheCount, fromDbCount, userId);
     }
 
     private static List<long>? ProcessProfilesFromCache(IList<long> userIds, RedisValue[] cachedProfiles, ICollection<ProfilePublic> output)
