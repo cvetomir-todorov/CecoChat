@@ -25,6 +25,7 @@ services:
       CECOCHAT_ConfigDb__ConnectRetry: 16
       CECOCHAT_ConfigDb__ConnectTimeout: 5000
       CECOCHAT_ConfigDb__KeepAlive: 2
+      CECOCHAT_ConfigDb__DefaultDatabase: 0
       CECOCHAT_OtelSampling__Strategy: Probability
       CECOCHAT_OtelSampling__Probability: 0.1
       CECOCHAT_Jaeger__AgentHost: jaeger
@@ -55,6 +56,7 @@ services:
       CECOCHAT_ConfigDb__ConnectRetry: 16
       CECOCHAT_ConfigDb__ConnectTimeout: 5000
       CECOCHAT_ConfigDb__KeepAlive: 2
+      CECOCHAT_ConfigDb__DefaultDatabase: 0
       CECOCHAT_OtelSampling__Strategy: Probability
       CECOCHAT_OtelSampling__Probability: 0.1
       CECOCHAT_Jaeger__AgentHost: jaeger
@@ -86,6 +88,7 @@ services:
       CECOCHAT_ConfigDb__ConnectRetry: 16
       CECOCHAT_ConfigDb__ConnectTimeout: 5000
       CECOCHAT_ConfigDb__KeepAlive: 2
+      CECOCHAT_ConfigDb__DefaultDatabase: 0
       CECOCHAT_OtelSampling__Strategy: Probability
       CECOCHAT_OtelSampling__Probability: 0.1
       CECOCHAT_Jaeger__AgentHost: jaeger
