@@ -1,4 +1,5 @@
 using Autofac;
+using CecoChat.Autofac;
 using CecoChat.Data.User.Repos;
 using CecoChat.Npgsql;
 using CecoChat.Redis;
@@ -15,10 +16,16 @@ public class UserDbAutofacModule : Module
         _userCacheConfig = userCacheConfig;
     }
 
+    public static readonly string RedisContextName = "user-cache";
+
     protected override void Load(ContainerBuilder builder)
     {
         builder.RegisterType<NpgsqlDbInitializer>().As<INpgsqlDbInitializer>().SingleInstance();
-        builder.RegisterType<ProfileRepo>().As<IProfileRepo>().InstancePerLifetimeScope();
-        builder.RegisterModule(new RedisAutofacModule(_userCacheConfig));
+        builder.RegisterModule(new RedisAutofacModule(_userCacheConfig, RedisContextName));
+        builder
+            .RegisterType<ProfileRepo>()
+            .As<IProfileRepo>()
+            .WithNamedParameter(typeof(IRedisContext), RedisContextName)
+            .InstancePerLifetimeScope();
     }
 }
