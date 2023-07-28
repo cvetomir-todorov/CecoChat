@@ -146,12 +146,9 @@ public class Startup
         builder.RegisterHostedService<InitUsersDb>();
 
         // user db
-        builder.RegisterModule(new UserDbAutofacModule());
-        builder.RegisterOptions<UserDbOptions>(Configuration.GetSection("UserDb"));
-
-        // user cache
         IConfiguration userCacheConfig = Configuration.GetSection("UserCache");
-        builder.RegisterModule(new RedisAutofacModule(userCacheConfig));
+        builder.RegisterModule(new UserDbAutofacModule(userCacheConfig));
+        builder.RegisterOptions<UserDbOptions>(Configuration.GetSection("UserDb"));
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
