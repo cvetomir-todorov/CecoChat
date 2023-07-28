@@ -25,6 +25,7 @@ services:
       CECOCHAT_ConfigDb__ConnectRetry: 16
       CECOCHAT_ConfigDb__ConnectTimeout: 5000
       CECOCHAT_ConfigDb__KeepAlive: 2
+      CECOCHAT_ConfigDb__DefaultDatabase: 0
       CECOCHAT_OtelSampling__Strategy: Probability
       CECOCHAT_OtelSampling__Probability: 0.1
       CECOCHAT_Jaeger__AgentHost: jaeger
@@ -57,6 +58,7 @@ services:
       CECOCHAT_ConfigDb__ConnectRetry: 16
       CECOCHAT_ConfigDb__ConnectTimeout: 5000
       CECOCHAT_ConfigDb__KeepAlive: 2
+      CECOCHAT_ConfigDb__DefaultDatabase: 0
       CECOCHAT_OtelSampling__Strategy: Probability
       CECOCHAT_OtelSampling__Probability: 0.1
       CECOCHAT_Jaeger__AgentHost: jaeger
@@ -91,6 +93,7 @@ services:
       CECOCHAT_ConfigDb__ConnectRetry: 16
       CECOCHAT_ConfigDb__ConnectTimeout: 5000
       CECOCHAT_ConfigDb__KeepAlive: 2
+      CECOCHAT_ConfigDb__DefaultDatabase: 0
       CECOCHAT_OtelSampling__Strategy: Probability
       CECOCHAT_OtelSampling__Probability: 0.1
       CECOCHAT_Jaeger__AgentHost: jaeger
@@ -131,4 +134,10 @@ services:
       CECOCHAT_UserDb__Seed: "true"
       CECOCHAT_UserDb__SeedConsoleClientUsers: "true"
       CECOCHAT_UserDb__Connect__ConnectionString: "Host=yb-tserver0,yb-tserver1;Port=5433;Database=users;Username=cecochat_dev;Password=secret;Keepalive=30;Load Balance Hosts=true;"
+      CECOCHAT_UserCache__Enabled: "true"
+      CECOCHAT_UserCache__Store__Endpoints__0: redis:6379
+      CECOCHAT_UserCache__Store__ConnectRetry: 16
+      CECOCHAT_UserCache__Store__ConnectTimeout: 5000
+      CECOCHAT_UserCache__Store__KeepAlive: 2
+      CECOCHAT_UserCache__Store__DefaultDatabase: 1
 #    logging: *fluentd-logging
