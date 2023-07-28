@@ -6,5 +6,5 @@ public sealed class UserCacheOptions
 {
     public bool Enabled { get; init; }
 
-    public RedisOptions Db { get; init; } = new();
+    public RedisOptions Store { get; init; } = new();
 }
