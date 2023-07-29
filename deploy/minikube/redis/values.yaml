@@ -2,7 +2,7 @@ StatefulSet:
   Replicas: 1
 Image:
   Name: redis
-  Tag: 7.0.5
+  Tag: 7.0.12
   PullPolicy: IfNotPresent
 Networking:
   Port: 6379

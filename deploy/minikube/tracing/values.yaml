@@ -2,7 +2,7 @@ StatefulSet:
   Replicas: 1
 Image:
   Name: jaegertracing/all-in-one
-  Tag: 1.38.1
+  Tag: 1.47.0
   PullPolicy: IfNotPresent
 Networking:
   AccessPort: 16686
