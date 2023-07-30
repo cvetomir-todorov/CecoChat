@@ -60,7 +60,6 @@
 ## Improvements
 
 * Performance
-  - Cache user profiles to avoid putting stress on the UserDB
   - Use allocation-free logging
   - Benchmark Kafka and improve its configuration
 * Observability
@@ -68,6 +67,8 @@
   - Add Open Telemetry metrics in UserDB when Npgsql adds support
   - Improve existing distributed tracing - baggage propagation, custom instrumentation implementation
   - Improve existing log aggregation - performance of Fluentd, ElasticSearch index customizations
+* Deployment
+  - Create a redis cluster
 * Misc
   - Control sending notifications to SignalR connected clients as previously with gRPC clients
   - Improve monotonic clock skew and make snowflake ID generation to use it as `IdGen.ITimeSource`
