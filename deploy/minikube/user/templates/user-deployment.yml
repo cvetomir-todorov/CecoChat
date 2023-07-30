@@ -54,6 +54,7 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
+            # User DB
             - name: CECOCHAT_UserDb__Init__ConnectionString
               value: Host={{.Values.Networking.UserDb.Host}}-0.{{.Values.Networking.UserDb.Service}}.$(NAMESPACE).svc.cluster.local;Port={{.Values.Networking.UserDb.Port}};Database=postgres;Username={{.Values.Networking.UserDb.Root.User}};Password={{.Values.Networking.UserDb.Root.Pass}};
             - name: CECOCHAT_UserDb__Seed
@@ -62,3 +63,16 @@ spec:
               value: "true"
             - name: CECOCHAT_UserDb__Connect__ConnectionString
               value: Host={{.Values.Networking.UserDb.Host}}-0.{{.Values.Networking.UserDb.Service}}.$(NAMESPACE).svc.cluster.local,{{.Values.Networking.UserDb.Host}}-1.{{.Values.Networking.UserDb.Service}}.$(NAMESPACE).svc.cluster.local;Port={{.Values.Networking.UserDb.Port}};Database=users;Username={{.Values.Networking.UserDb.Normal.User}};Password={{.Values.Networking.UserDb.Normal.Pass}};Keepalive=30;Load Balance Hosts=true;
+            # User cache
+            - name: CECOCHAT_UserCache__Enabled
+              value: "{{.Values.Networking.UserCache.Enabled}}"
+            - name: CECOCHAT_UserCache__Store__Endpoints__0
+              value: {{.Values.Networking.UserCache.Store.Endpoint}}
+            - name: CECOCHAT_UserCache__Store__ConnectRetry
+              value: "{{.Values.Networking.UserCache.Store.ConnectRetry}}"
+            - name: CECOCHAT_UserCache__Store__ConnectTimeout
+              value: "{{.Values.Networking.UserCache.Store.ConnectTimeout}}"
+            - name: CECOCHAT_UserCache__Store__KeepAlive
+              value: "{{.Values.Networking.UserCache.Store.KeepAlive}}"
+            - name: CECOCHAT_UserCache__Store__DefaultDatabase
+              value: "{{.Values.Networking.UserCache.Store.DefaultDatabase}}"
