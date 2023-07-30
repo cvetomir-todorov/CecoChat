@@ -16,5 +16,13 @@ Networking:
     Normal:
       User: cecochat_dev
       Pass: secret
+  UserCache:
+    Enabled: true
+    Store:
+      Endpoint: redis:6379
+      ConnectRetry: 16
+      ConnectTimeout: 5000
+      KeepAlive: 2
+      DefaultDatabase: 1
 Probes:
   Scheme: HTTPS

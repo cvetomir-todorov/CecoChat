@@ -21,6 +21,7 @@ data:
   CECOCHAT_ConfigDb__ConnectRetry: 16
   CECOCHAT_ConfigDb__ConnectTimeout: 5000
   CECOCHAT_ConfigDb__KeepAlive: 2
+  CECOCHAT_ConfigDb__DefaultDatabase: 0
 ---
 
 apiVersion: v1
