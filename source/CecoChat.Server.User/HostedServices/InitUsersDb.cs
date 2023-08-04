@@ -31,10 +31,15 @@ public sealed class InitUsersDb : IHostedService
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         string database = new NpgsqlConnectionStringBuilder(_options.Connect.ConnectionString).Database!;
-        bool initialized = _initializer.Initialize(_options.Init, database, typeof(UserDbContext).Assembly);
+        _initializer.Initialize(_options.Init, database, typeof(UserDbContext).Assembly);
 
-        if (initialized && _options.Seed)
+        if (_options.Seed)
         {
+            _logger.LogInformation("Seeding the database...");
+
+            await DeleteAllProfiles(cancellationToken);
+            _logger.LogInformation("Deleted all users");
+
             if (_options.SeedConsoleClientUsers)
             {
                 await SeedConsoleClientUsers(cancellationToken);
@@ -52,7 +57,7 @@ public sealed class InitUsersDb : IHostedService
 
     private async Task SeedConsoleClientUsers(CancellationToken ct)
     {
-        await _dbContext.Database.ExecuteSqlRawAsync("TRUNCATE TABLE public.\"Profiles\"", ct);
+        await DeleteAllProfiles(ct);
 
         ProfileEntity[] profiles =
         {
@@ -101,7 +106,7 @@ public sealed class InitUsersDb : IHostedService
 
     private async Task SeedLoadTestingUsers(int userCount, CancellationToken ct)
     {
-        await _dbContext.Database.ExecuteSqlRawAsync("TRUNCATE TABLE public.\"Profiles\"", ct);
+        await DeleteAllProfiles(ct);
 
         ProfileEntity[] profiles = new ProfileEntity[userCount];
         for (int i = 0; i < userCount; ++i)
@@ -121,6 +126,11 @@ public sealed class InitUsersDb : IHostedService
         _dbContext.Profiles.AddRange(profiles);
         await _dbContext.SaveChangesAsync(ct);
         _dbContext.ChangeTracker.Clear();
+    }
+
+    private Task<int> DeleteAllProfiles(CancellationToken ct)
+    {
+        return _dbContext.Database.ExecuteSqlRawAsync("TRUNCATE TABLE public.\"Profiles\"", ct);
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
