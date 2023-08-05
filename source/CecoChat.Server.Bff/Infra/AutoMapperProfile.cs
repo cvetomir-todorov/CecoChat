@@ -4,6 +4,8 @@ public class AutoMapperProfile : AutoMapper.Profile
 {
     public AutoMapperProfile()
     {
+        CreateMap<Contracts.Bff.RegisterRequest, Contracts.User.ProfileCreate>();
+
         CreateMap<Contracts.User.ProfileFull, Contracts.Bff.ProfileFull>();
         CreateMap<Contracts.User.ProfilePublic, Contracts.Bff.ProfilePublic>();
     }
