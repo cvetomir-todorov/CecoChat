@@ -5,6 +5,11 @@ namespace CecoChat.Data;
 
 public static class ProfileValidationRules
 {
+    public static IRuleBuilderOptions<T, long> ValidUserId<T>(this IRuleBuilderInitial<T, long> ruleBuilder)
+    {
+        return ruleBuilder.GreaterThan(0);
+    }
+
     public static IRuleBuilderOptions<T, string> ValidUserName<T>(this IRuleBuilderInitial<T, string> ruleBuilder)
     {
         return ruleBuilder
