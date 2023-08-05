@@ -1,6 +1,7 @@
 using Autofac;
 using CecoChat.Autofac;
 using CecoChat.Data.User.Repos;
+using CecoChat.Data.User.Security;
 using CecoChat.Npgsql;
 using CecoChat.Redis;
 using Microsoft.Extensions.Configuration;
@@ -27,6 +28,7 @@ public class UserDbAutofacModule : Module
         builder.RegisterOptions<UserCacheOptions>(_userCacheConfig);
 
         builder.RegisterType<ProfileCommandRepo>().As<IProfileCommandRepo>().InstancePerLifetimeScope();
+        builder.RegisterType<PasswordHasher>().As<IPasswordHasher>().SingleInstance();
 
         builder
             .RegisterType<CachingProfileQueryRepo>()

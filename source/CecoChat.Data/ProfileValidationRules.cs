@@ -21,6 +21,13 @@ public static class ProfileValidationRules
             .WithMessage("{PropertyName} should not contain upper-case characters but provided value '{PropertyValue}' does.");
     }
 
+    public static IRuleBuilderOptions<T, string> ValidPassword<T>(this IRuleBuilderInitial<T, string> ruleBuilder)
+    {
+        return ruleBuilder
+            .NotEmpty()
+            .Length(8, 128);
+    }
+
     public static IRuleBuilderOptions<T, string> ValidDisplayName<T>(this IRuleBuilderInitial<T, string> ruleBuilder)
     {
         return ruleBuilder

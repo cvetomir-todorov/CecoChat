@@ -9,6 +9,10 @@ public sealed class RegisterRequest
     [AliasAs("userName")]
     public string UserName { get; init; } = string.Empty;
 
+    [JsonPropertyName("password")]
+    [AliasAs("password")]
+    public string Password { get; set; } = string.Empty;
+
     [JsonPropertyName("displayName")]
     [AliasAs("displayName")]
     public string DisplayName { get; init; } = string.Empty;

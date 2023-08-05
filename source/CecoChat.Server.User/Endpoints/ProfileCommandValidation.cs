@@ -12,6 +12,8 @@ public sealed class CreateProfileRequestValidator : AbstractValidator<CreateProf
             .NotNull();
         RuleFor(x => x.Profile.UserName)
             .ValidUserName();
+        RuleFor(x => x.Profile.Password)
+            .ValidPassword();
         RuleFor(x => x.Profile.DisplayName)
             .ValidDisplayName();
         RuleFor(x => x.Profile.AvatarUrl)

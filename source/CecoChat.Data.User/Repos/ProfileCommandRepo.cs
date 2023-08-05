@@ -1,4 +1,5 @@
 using CecoChat.Contracts.User;
+using CecoChat.Data.User.Security;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Npgsql;
@@ -9,11 +10,13 @@ internal class ProfileCommandRepo : IProfileCommandRepo
 {
     private readonly ILogger _logger;
     private readonly UserDbContext _dbContext;
+    private readonly IPasswordHasher _passwordHasher;
 
-    public ProfileCommandRepo(ILogger<ProfileCommandRepo> logger, UserDbContext dbContext)
+    public ProfileCommandRepo(ILogger<ProfileCommandRepo> logger, UserDbContext dbContext, IPasswordHasher passwordHasher)
     {
         _logger = logger;
         _dbContext = dbContext;
+        _passwordHasher = passwordHasher;
     }
 
     public async Task<CreateProfileResult> CreateProfile(ProfileCreate profile)
@@ -23,9 +26,12 @@ internal class ProfileCommandRepo : IProfileCommandRepo
             throw new ArgumentException("Profile user name should not contain upper-case letters.", nameof(profile));
         }
 
+        string passwordHashAndSalt = _passwordHasher.Hash(profile.Password);
+
         ProfileEntity entity = new()
         {
             UserName = profile.UserName,
+            Password = passwordHashAndSalt,
             DisplayName = profile.DisplayName,
             AvatarUrl = profile.AvatarUrl,
             Phone = profile.Phone,
