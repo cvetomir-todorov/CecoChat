@@ -1,0 +1,17 @@
+syntax = "proto3";
+option csharp_namespace = "CecoChat.Contracts.User";
+package CecoChat.Contracts.User;
+import "User/ProfileCreate.proto";
+
+service ProfileCommand {
+  rpc CreateProfile(CreateProfileRequest) returns (CreateProfileResponse);
+}
+
+message CreateProfileRequest {
+  ProfileCreate profile = 1;
+}
+
+message CreateProfileResponse {
+  bool success = 1;
+  bool duplicate_user_name = 2;
+}
