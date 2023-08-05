@@ -28,18 +28,18 @@ internal sealed class UserClient : IUserClient
 {
     private readonly ILogger _logger;
     private readonly UserOptions _options;
-    private readonly Profile.ProfileClient _profileClient;
+    private readonly ProfileQuery.ProfileQueryClient _profileQueryClient;
     private readonly ProfileCommand.ProfileCommandClient _profileCommandClient;
 
     public UserClient(
         ILogger<UserClient> logger,
         IOptions<UserOptions> options,
-        Profile.ProfileClient profileClient,
+        ProfileQuery.ProfileQueryClient profileQueryClient,
         ProfileCommand.ProfileCommandClient profileCommandClient)
     {
         _logger = logger;
         _options = options.Value;
-        _profileClient = profileClient;
+        _profileQueryClient = profileQueryClient;
         _profileCommandClient = profileCommandClient;
     }
 
@@ -77,7 +77,7 @@ internal sealed class UserClient : IUserClient
         Metadata headers = new();
         headers.AddAuthorization(accessToken);
         DateTime deadline = DateTime.UtcNow.Add(_options.CallTimeout);
-        GetFullProfileResponse response = await _profileClient.GetFullProfileAsync(request, headers, deadline, ct);
+        GetFullProfileResponse response = await _profileQueryClient.GetFullProfileAsync(request, headers, deadline, ct);
 
         _logger.LogTrace("Received full profile {ProfileUserName} for user {UserId}", response.Profile.UserName, response.Profile.UserId);
         return response.Profile;
@@ -91,7 +91,7 @@ internal sealed class UserClient : IUserClient
         Metadata headers = new();
         headers.AddAuthorization(accessToken);
         DateTime deadline = DateTime.UtcNow.Add(_options.CallTimeout);
-        GetPublicProfileResponse response = await _profileClient.GetPublicProfileAsync(request, headers, deadline, ct);
+        GetPublicProfileResponse response = await _profileQueryClient.GetPublicProfileAsync(request, headers, deadline, ct);
 
         _logger.LogTrace("Received profile for user {RequestedUserId} requested by user {UserId}", requestedUserId, userId);
         return response.Profile;
@@ -105,7 +105,7 @@ internal sealed class UserClient : IUserClient
         Metadata headers = new();
         headers.AddAuthorization(accessToken);
         DateTime deadline = DateTime.UtcNow.Add(_options.CallTimeout);
-        GetPublicProfilesResponse response = await _profileClient.GetPublicProfilesAsync(request, headers, deadline, ct);
+        GetPublicProfilesResponse response = await _profileQueryClient.GetPublicProfilesAsync(request, headers, deadline, ct);
 
         _logger.LogTrace("Received {PublicProfileCount} public profiles requested by user {UserId}", response.Profiles.Count, userId);
         return response.Profiles;

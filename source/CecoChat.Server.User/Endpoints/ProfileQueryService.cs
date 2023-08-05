@@ -6,12 +6,12 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace CecoChat.Server.User.Endpoints;
 
-public class ProfileService : Profile.ProfileBase
+public class ProfileQueryService : ProfileQuery.ProfileQueryBase
 {
     private readonly ILogger _logger;
     private readonly IProfileQueryRepo _repo;
 
-    public ProfileService(ILogger<ProfileService> logger, IProfileQueryRepo repo)
+    public ProfileQueryService(ILogger<ProfileQueryService> logger, IProfileQueryRepo repo)
     {
         _logger = logger;
         _repo = repo;
