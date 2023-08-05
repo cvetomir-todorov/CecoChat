@@ -8,18 +8,18 @@ using StackExchange.Redis;
 
 namespace CecoChat.Data.User.Repos;
 
-public class CachingProfileRepo : IProfileRepo
+public class CachingProfileQueryRepo : IProfileQueryRepo
 {
     private readonly ILogger _logger;
     private readonly UserCacheOptions _cacheOptions;
     private readonly IRedisContext _cacheContext;
-    private readonly IProfileRepo _decoratedRepo;
+    private readonly IProfileQueryRepo _decoratedRepo;
 
-    public CachingProfileRepo(
-        ILogger<CachingProfileRepo> logger,
+    public CachingProfileQueryRepo(
+        ILogger<CachingProfileQueryRepo> logger,
         IOptions<UserCacheOptions> cacheOptions,
         IRedisContext cacheContext,
-        IProfileRepo decoratedRepo)
+        IProfileQueryRepo decoratedRepo)
     {
         _logger = logger;
         _cacheOptions = cacheOptions.Value;

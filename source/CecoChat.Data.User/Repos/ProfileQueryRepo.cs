@@ -5,14 +5,14 @@ using Microsoft.Extensions.Logging;
 
 namespace CecoChat.Data.User.Repos;
 
-internal class ProfileRepo : IProfileRepo
+internal class ProfileQueryRepo : IProfileQueryRepo
 {
     private readonly ILogger _logger;
     private readonly IMapper _mapper;
     private readonly UserDbContext _dbContext;
 
-    public ProfileRepo(
-        ILogger<ProfileRepo> logger,
+    public ProfileQueryRepo(
+        ILogger<ProfileQueryRepo> logger,
         IMapper mapper,
         UserDbContext dbContext)
     {
