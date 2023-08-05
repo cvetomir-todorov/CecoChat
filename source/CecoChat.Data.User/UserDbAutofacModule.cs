@@ -26,6 +26,8 @@ public class UserDbAutofacModule : Module
         builder.RegisterModule(new RedisAutofacModule(_userCacheStoreConfig, RedisContextName));
         builder.RegisterOptions<UserCacheOptions>(_userCacheConfig);
 
+        builder.RegisterType<ProfileCommandRepo>().As<IProfileCommandRepo>().InstancePerLifetimeScope();
+
         builder
             .RegisterType<CachingProfileRepo>()
             .Named<IProfileRepo>("caching-profile-repo")
