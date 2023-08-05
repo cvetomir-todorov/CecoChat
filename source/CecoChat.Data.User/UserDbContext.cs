@@ -14,14 +14,16 @@ public class UserDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasDefaultSchema("public");
+
+        modelBuilder.Entity<ProfileEntity>().HasKey(e => e.UserId);
+        modelBuilder.Entity<ProfileEntity>().Property(e => e.UserId).ValueGeneratedOnAdd();
+
         base.OnModelCreating(modelBuilder);
     }
 }
 
 public sealed class ProfileEntity
 {
-    [Key]
-    [DatabaseGenerated(DatabaseGeneratedOption.None)]
     public long UserId { get; set; }
 
     public string UserName { get; set; } = string.Empty;
