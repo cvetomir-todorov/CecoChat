@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CecoChat.Data.User\CecoChat.Data.User.csproj" />
+    <ProjectReference Include="..\CecoChat.Data\CecoChat.Data.csproj" />
     <ProjectReference Include="..\CecoChat.Server\CecoChat.Server.csproj" />
   </ItemGroup>
 
