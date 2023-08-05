@@ -6,6 +6,10 @@ public interface IBffClient : IDisposable
 {
     private const string AuthorizationScheme = "Bearer";
 
+    [Post("/api/registration")]
+    Task Register(
+        [Body] RegisterRequest request);
+
     [Post("/api/session")]
     Task<CreateSessionResponse> CreateSession(
         [Body] CreateSessionRequest request);
