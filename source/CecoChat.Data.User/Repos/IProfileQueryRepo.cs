@@ -2,7 +2,7 @@ using CecoChat.Contracts.User;
 
 namespace CecoChat.Data.User.Repos;
 
-public interface IProfileRepo
+public interface IProfileQueryRepo
 {
     Task<ProfileFull?> GetFullProfile(long requestedUserId);
 

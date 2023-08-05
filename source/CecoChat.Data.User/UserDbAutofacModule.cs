@@ -29,17 +29,17 @@ public class UserDbAutofacModule : Module
         builder.RegisterType<ProfileCommandRepo>().As<IProfileCommandRepo>().InstancePerLifetimeScope();
 
         builder
-            .RegisterType<CachingProfileRepo>()
-            .Named<IProfileRepo>("caching-profile-repo")
+            .RegisterType<CachingProfileQueryRepo>()
+            .Named<IProfileQueryRepo>("caching-profile-repo")
             .WithNamedParameter(typeof(IRedisContext), RedisContextName)
             .InstancePerLifetimeScope();
         builder
-            .RegisterType<ProfileRepo>()
-            .Named<IProfileRepo>("profile-repo")
+            .RegisterType<ProfileQueryRepo>()
+            .Named<IProfileQueryRepo>("profile-repo")
             .InstancePerLifetimeScope();
         builder
-            .RegisterDecorator<IProfileRepo>(
-                decorator: (context, inner) => context.ResolveNamed<IProfileRepo>("caching-profile-repo", TypedParameter.From(inner)),
+            .RegisterDecorator<IProfileQueryRepo>(
+                decorator: (context, inner) => context.ResolveNamed<IProfileQueryRepo>("caching-profile-repo", TypedParameter.From(inner)),
                 fromKey: "profile-repo")
             .InstancePerLifetimeScope();
     }

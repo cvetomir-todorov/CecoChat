@@ -9,9 +9,9 @@ namespace CecoChat.Server.User.Endpoints;
 public class ProfileService : Profile.ProfileBase
 {
     private readonly ILogger _logger;
-    private readonly IProfileRepo _repo;
+    private readonly IProfileQueryRepo _repo;
 
-    public ProfileService(ILogger<ProfileService> logger, IProfileRepo repo)
+    public ProfileService(ILogger<ProfileService> logger, IProfileQueryRepo repo)
     {
         _logger = logger;
         _repo = repo;
