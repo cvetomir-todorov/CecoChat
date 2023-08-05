@@ -14,6 +14,9 @@ WITH (
 TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS public."Profiles"
+    ADD CONSTRAINT "Profiles_UserName_unique" UNIQUE ("UserName");
+
+ALTER TABLE IF EXISTS public."Profiles"
     OWNER to yugabyte;
 GRANT ALL ON TABLE public."Profiles" TO cecochat_dev;
 GRANT ALL ON TABLE public."Profiles" TO yugabyte;
