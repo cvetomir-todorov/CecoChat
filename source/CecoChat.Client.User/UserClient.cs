@@ -8,6 +8,8 @@ namespace CecoChat.Client.User;
 
 public interface IUserClient : IDisposable
 {
+    Task<CreateProfileResult> CreateProfile(ProfileCreate profile, CancellationToken ct);
+
     Task<ProfileFull> GetFullProfile(string accessToken, CancellationToken ct);
 
     Task<ProfilePublic> GetPublicProfile(long userId, long requestedUserId, string accessToken, CancellationToken ct);
@@ -15,25 +17,57 @@ public interface IUserClient : IDisposable
     Task<IEnumerable<ProfilePublic>> GetPublicProfiles(long userId, IEnumerable<long> requestedUserIds, string accessToken, CancellationToken ct);
 }
 
+public struct CreateProfileResult
+{
+    public bool Success { get; init; }
+
+    public bool DuplicateUserName { get; init; }
+}
+
 internal sealed class UserClient : IUserClient
 {
     private readonly ILogger _logger;
     private readonly UserOptions _options;
     private readonly Profile.ProfileClient _profileClient;
+    private readonly ProfileCommand.ProfileCommandClient _profileCommandClient;
 
     public UserClient(
         ILogger<UserClient> logger,
         IOptions<UserOptions> options,
-        Profile.ProfileClient profileClient)
+        Profile.ProfileClient profileClient,
+        ProfileCommand.ProfileCommandClient profileCommandClient)
     {
         _logger = logger;
         _options = options.Value;
         _profileClient = profileClient;
+        _profileCommandClient = profileCommandClient;
     }
 
     public void Dispose()
     {
         // nothing to dispose for now, but keep the IDisposable as part of the contract
+    }
+
+    public async Task<CreateProfileResult> CreateProfile(ProfileCreate profile, CancellationToken ct)
+    {
+        CreateProfileRequest request = new();
+        request.Profile = profile;
+
+        DateTime deadline = DateTime.UtcNow.Add(_options.CallTimeout);
+        CreateProfileResponse response = await _profileCommandClient.CreateProfileAsync(request, deadline: deadline, cancellationToken: ct);
+
+        if (response.Success)
+        {
+            _logger.LogTrace("Received confirmation for created profile for user {UserName}", profile.UserName);
+            return new CreateProfileResult { Success = true };
+        }
+        if (response.DuplicateUserName)
+        {
+            _logger.LogTrace("Received failure for creating a profile for user {UserName} because of a duplicate user name", profile.UserName);
+            return new CreateProfileResult { DuplicateUserName = true };
+        }
+
+        throw new InvalidOperationException($"Failed to process {nameof(CreateProfileResponse)}.");
     }
 
     public async Task<ProfileFull> GetFullProfile(string accessToken, CancellationToken ct)
