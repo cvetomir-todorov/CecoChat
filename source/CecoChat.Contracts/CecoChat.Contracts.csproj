@@ -26,11 +26,11 @@
     <Protobuf Include="IdGen\IdGenService.proto" GrpcServices="All" />
     <Protobuf Include="State\ChatState.proto" />
     <Protobuf Include="State\StateService.proto" GrpcServices="All" />
+    <Protobuf Include="User\ProfileCommandService.proto" GrpcServices="All" />
     <Protobuf Include="User\ProfileCreate.proto" />
     <Protobuf Include="User\ProfileFull.proto" />
     <Protobuf Include="User\ProfilePublic.proto" />
-    <Protobuf Include="User\ProfileService.proto" GrpcServices="All" />
-    <Protobuf Include="User\ProfileCommandService.proto" GrpcServices="All" />
+    <Protobuf Include="User\ProfileQueryService.proto" GrpcServices="All" />
     <Protobuf Include="Uuid.proto" />
   </ItemGroup>
 

@@ -4,7 +4,7 @@ package CecoChat.Contracts.User;
 import "User/ProfileFull.proto";
 import "User/ProfilePublic.proto";
 
-service Profile {
+service ProfileQuery {
   rpc GetFullProfile(GetFullProfileRequest) returns (GetFullProfileResponse);
   rpc GetPublicProfile(GetPublicProfileRequest) returns (GetPublicProfileResponse);
   rpc GetPublicProfiles(GetPublicProfilesRequest) returns (GetPublicProfilesResponse);
