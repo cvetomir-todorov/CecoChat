@@ -1,5 +1,6 @@
 using CecoChat.Client.History;
 using CecoChat.Contracts.Bff;
+using CecoChat.Data;
 using CecoChat.Server.Identity;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
