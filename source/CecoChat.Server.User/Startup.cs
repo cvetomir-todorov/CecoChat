@@ -164,6 +164,7 @@ public class Startup
         app.UseAuthorization();
         app.UseEndpoints(endpoints =>
         {
+            endpoints.MapGrpcService<ProfileCommandService>();
             endpoints.MapGrpcService<ProfileService>();
             endpoints.MapHttpHealthEndpoints(setup =>
             {
