@@ -10,6 +10,8 @@ public sealed class RegisterRequestValidator : AbstractValidator<RegisterRequest
     {
         RuleFor(x => x.UserName)
             .ValidUserName();
+        RuleFor(x => x.Password)
+            .ValidPassword();
         RuleFor(x => x.DisplayName)
             .ValidDisplayName();
         RuleFor(x => x.Phone)

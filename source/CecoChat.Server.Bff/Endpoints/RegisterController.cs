@@ -41,7 +41,7 @@ public class RegisterController : ControllerBase
         {
             _logger.LogTrace("Responding with confirmation for successfully creating a profile for user {UserName}", request.UserName);
 
-            // TODO: clear sensitive data
+            request.Password = null!;
             return CreatedAtAction(nameof(Register), request);
         }
         if (result.DuplicateUserName)
