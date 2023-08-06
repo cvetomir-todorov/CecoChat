@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Scripts\cecochat_dev-user.sql" />
+    <EmbeddedResource Include="Scripts\dev-user.sql" />
     <EmbeddedResource Include="Scripts\users-database.sql" />
     <EmbeddedResource Include="Scripts\profiles-table.sql" />
   </ItemGroup>
