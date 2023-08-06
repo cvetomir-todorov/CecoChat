@@ -33,12 +33,6 @@ public class CachingProfileQueryRepo : IProfileQueryRepo
         return _decoratedRepo.Authenticate(userName, password);
     }
 
-    public Task<ProfileFull?> GetFullProfile(long requestedUserId)
-    {
-        // no caching here
-        return _decoratedRepo.GetFullProfile(requestedUserId);
-    }
-
     public async Task<ProfilePublic?> GetPublicProfile(long requestedUserId, long userId)
     {
         ProfilePublic? profile;

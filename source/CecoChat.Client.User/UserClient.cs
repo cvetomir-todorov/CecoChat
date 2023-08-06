@@ -81,19 +81,6 @@ internal sealed class UserClient : IUserClient
         throw new InvalidOperationException($"Failed to process {nameof(AuthenticateResponse)}.");
     }
 
-    public async Task<ProfileFull> GetFullProfile(string accessToken, CancellationToken ct)
-    {
-        GetFullProfileRequest request = new();
-
-        Metadata headers = new();
-        headers.AddAuthorization(accessToken);
-        DateTime deadline = DateTime.UtcNow.Add(_options.CallTimeout);
-        GetFullProfileResponse response = await _profileQueryClient.GetFullProfileAsync(request, headers, deadline, ct);
-
-        _logger.LogTrace("Received full profile {ProfileUserName} for user {UserId}", response.Profile.UserName, response.Profile.UserId);
-        return response.Profile;
-    }
-
     public async Task<ProfilePublic> GetPublicProfile(long userId, long requestedUserId, string accessToken, CancellationToken ct)
     {
         GetPublicProfileRequest request = new();

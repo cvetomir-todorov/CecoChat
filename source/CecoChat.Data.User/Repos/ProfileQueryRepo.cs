@@ -51,21 +51,6 @@ internal class ProfileQueryRepo : IProfileQueryRepo
         return new AuthenticateResult { Profile = profile };
     }
 
-    public async Task<ProfileFull?> GetFullProfile(long requestedUserId)
-    {
-        ProfileEntity? entity = await _dbContext.Profiles.FirstOrDefaultAsync(profile => profile.UserId == requestedUserId);
-        if (entity == null)
-        {
-            _logger.LogTrace("Failed to fetch full profile for user {UserId}", requestedUserId);
-            return null;
-        }
-
-        _logger.LogTrace("Fetched full profile {ProfileUserName} for user {UserId}", entity.UserName, entity.UserId);
-
-        ProfileFull profile = _mapper.Map<ProfileFull>(entity);
-        return profile;
-    }
-
     public async Task<ProfilePublic?> GetPublicProfile(long requestedUserId, long userId)
     {
         ProfileEntity? entity = await _dbContext.Profiles.FirstOrDefaultAsync(profile => profile.UserId == requestedUserId);

@@ -42,21 +42,6 @@ public class ProfileQueryService : ProfileQuery.ProfileQueryBase
     }
 
     [Authorize(Roles = "user")]
-    public override async Task<GetFullProfileResponse> GetFullProfile(GetFullProfileRequest request, ServerCallContext context)
-    {
-        UserClaims userClaims = GetUserClaims(context);
-
-        ProfileFull? profile = await _repo.GetFullProfile(userClaims.UserId);
-        if (profile == null)
-        {
-            throw new RpcException(new Status(StatusCode.NotFound, $"There is no profile for user ID {userClaims.UserId}."));
-        }
-
-        _logger.LogTrace("Responding with full profile {ProfileUserName} for user {UserId}", profile.UserName, userClaims.UserId);
-        return new GetFullProfileResponse { Profile = profile };
-    }
-
-    [Authorize(Roles = "user")]
     public override async Task<GetPublicProfileResponse> GetPublicProfile(GetPublicProfileRequest request, ServerCallContext context)
     {
         UserClaims userClaims = GetUserClaims(context);
