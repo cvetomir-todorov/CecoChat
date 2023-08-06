@@ -1,4 +1,5 @@
 using CecoChat.Contracts.History;
+using CecoChat.Data;
 using FluentValidation;
 
 namespace CecoChat.Server.History.Endpoints;
@@ -7,6 +8,7 @@ public sealed class GetHistoryRequestValidator : AbstractValidator<GetHistoryReq
 {
     public GetHistoryRequestValidator()
     {
-        RuleFor(x => x.OtherUserId).GreaterThan(0);
+        RuleFor(x => x.OtherUserId)
+            .ValidUserId();
     }
 }

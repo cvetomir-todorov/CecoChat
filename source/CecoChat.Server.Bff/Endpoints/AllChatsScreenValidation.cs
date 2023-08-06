@@ -1,4 +1,5 @@
 using CecoChat.Contracts.Bff;
+using CecoChat.Data;
 using FluentValidation;
 
 namespace CecoChat.Server.Bff.Endpoints;
