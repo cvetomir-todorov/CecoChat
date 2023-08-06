@@ -119,7 +119,8 @@ public static class Program
             {
                 Console.WriteLine(error);
             }
-            throw new Exception("Unsuccessful registration.");
+
+            throw new ApplicationException("Unsuccessful registration.");
         }
     }
 
@@ -132,7 +133,7 @@ public static class Program
             {
                 Console.WriteLine(error);
             }
-            throw new Exception("Unsuccessful authentication.");
+            throw new ApplicationException("Unsuccessful authentication.");
         }
     }
 
