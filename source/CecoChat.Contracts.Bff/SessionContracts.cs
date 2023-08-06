@@ -5,9 +5,9 @@ namespace CecoChat.Contracts.Bff;
 
 public sealed class CreateSessionRequest
 {
-    [JsonPropertyName("username")]
-    [AliasAs("username")]
-    public string Username { get; init; } = string.Empty;
+    [JsonPropertyName("userName")]
+    [AliasAs("userName")]
+    public string UserName { get; init; } = string.Empty;
 
     [JsonPropertyName("password")]
     [AliasAs("password")]

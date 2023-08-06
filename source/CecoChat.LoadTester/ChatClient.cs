@@ -35,7 +35,7 @@ public sealed class ChatClient : IAsyncDisposable
     {
         CreateSessionRequest request = new()
         {
-            Username = username,
+            UserName = username,
             Password = password
         };
         CreateSessionResponse response = await _bffClient.CreateSession(request);
