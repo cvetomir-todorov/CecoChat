@@ -14,6 +14,10 @@ WITH (
 )
 TABLESPACE pg_default;
 
+CREATE INDEX "Profiles_UserName_index"
+    ON public."Profiles" USING btree
+        ("UserName" ASC NULLS LAST);
+
 ALTER TABLE IF EXISTS public."Profiles"
     ADD CONSTRAINT "Profiles_UserName_unique" UNIQUE ("UserName");
 

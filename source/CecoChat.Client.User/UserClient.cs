@@ -6,24 +6,6 @@ using Microsoft.Extensions.Options;
 
 namespace CecoChat.Client.User;
 
-public interface IUserClient : IDisposable
-{
-    Task<CreateProfileResult> CreateProfile(ProfileCreate profile, CancellationToken ct);
-
-    Task<ProfileFull> GetFullProfile(string accessToken, CancellationToken ct);
-
-    Task<ProfilePublic> GetPublicProfile(long userId, long requestedUserId, string accessToken, CancellationToken ct);
-
-    Task<IEnumerable<ProfilePublic>> GetPublicProfiles(long userId, IEnumerable<long> requestedUserIds, string accessToken, CancellationToken ct);
-}
-
-public struct CreateProfileResult
-{
-    public bool Success { get; init; }
-
-    public bool DuplicateUserName { get; init; }
-}
-
 internal sealed class UserClient : IUserClient
 {
     private readonly ILogger _logger;
@@ -68,6 +50,35 @@ internal sealed class UserClient : IUserClient
         }
 
         throw new InvalidOperationException($"Failed to process {nameof(CreateProfileResponse)}.");
+    }
+
+    public async Task<AuthenticateResult> Authenticate(string userName, string password, CancellationToken ct)
+    {
+        AuthenticateRequest request = new();
+        request.UserName = userName;
+        request.Password = password;
+
+        DateTime deadline = DateTime.UtcNow.Add(_options.CallTimeout);
+        AuthenticateResponse response = await _profileQueryClient.AuthenticateAsync(request, deadline: deadline, cancellationToken: ct);
+
+        if (response.Missing)
+        {
+            _logger.LogTrace("Received response for missing profile for user {UserName}", userName);
+            return new AuthenticateResult { Missing = true };
+        }
+        if (response.InvalidPassword)
+        {
+            _logger.LogTrace("Received response for invalid password attempted for user {UserName}", userName);
+            return new AuthenticateResult { InvalidPassword = true };
+        }
+        if (response.Profile != null)
+        {
+            _logger.LogTrace("Received response for successful authentication and a full profile for user {UserId} named {UserName}",
+                response.Profile.UserId, response.Profile.UserName);
+            return new AuthenticateResult { Profile = response.Profile };
+        }
+
+        throw new InvalidOperationException($"Failed to process {nameof(AuthenticateResponse)}.");
     }
 
     public async Task<ProfileFull> GetFullProfile(string accessToken, CancellationToken ct)
