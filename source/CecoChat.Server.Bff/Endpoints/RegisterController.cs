@@ -33,8 +33,8 @@ public class RegisterController : ControllerBase
     public async Task<IActionResult> Register([FromBody][BindRequired] RegisterRequest request, CancellationToken ct)
     {
         ProfileCreate profile = _mapper.Map<ProfileCreate>(request);
-        // TODO: make endpoint accept avatar image and set avatar URL
         profile.AvatarUrl = $"https://cdn.cecochat.com/avatars/{request.UserName}.jpg";
+
         CreateProfileResult result = await _userClient.CreateProfile(profile, ct);
 
         if (result.Success)
