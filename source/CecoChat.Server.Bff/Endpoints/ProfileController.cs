@@ -26,7 +26,7 @@ public class ProfileController : ControllerBase
         _mapper = mapper;
     }
 
-    [Authorize(Roles = "user")]
+    [Authorize(Policy = "user")]
     [HttpGet("{id}", Name = "GetPublicProfile")]
     [ProducesResponseType(typeof(GetPublicProfileResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -51,7 +51,7 @@ public class ProfileController : ControllerBase
         return Ok(response);
     }
 
-    [Authorize(Roles = "user")]
+    [Authorize(Policy = "user")]
     [HttpGet(Name = "GetPublicProfiles")]
     [ProducesResponseType(typeof(GetPublicProfilesResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

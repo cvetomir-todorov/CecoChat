@@ -42,7 +42,7 @@ public class AllChatsScreenController : ControllerBase
         _userClient = userClient;
     }
 
-    [Authorize(Roles = "user")]
+    [Authorize(Policy = "user")]
     [HttpGet(Name = "GetAllChatsScreen")]
     [ProducesResponseType(typeof(GetAllChatsScreenResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

@@ -24,7 +24,7 @@ public sealed class HistoryService : Contracts.History.History.HistoryBase
         _messageRepo = messageRepo;
     }
 
-    [Authorize(Roles = "user")]
+    [Authorize(Policy = "user")]
     public override async Task<GetHistoryResponse> GetHistory(GetHistoryRequest request, ServerCallContext context)
     {
         if (!context.GetHttpContext().TryGetUserClaims(_logger, out UserClaims? userClaims))

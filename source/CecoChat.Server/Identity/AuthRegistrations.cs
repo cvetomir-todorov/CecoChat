@@ -1,4 +1,5 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text;
 using CecoChat.Jwt;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -7,7 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace CecoChat.Server.Identity;
 
-public static class IdentityRegistrations
+public static class AuthRegistrations
 {
     public static IServiceCollection AddJwtAuthentication(this IServiceCollection services, JwtOptions jwtOptions)
     {
@@ -36,5 +37,19 @@ public static class IdentityRegistrations
             });
 
         return services;
+    }
+
+    public static IServiceCollection AddUserPolicyAuthorization(this IServiceCollection services)
+    {
+        return services.AddAuthorization(authorization =>
+        {
+            authorization.AddPolicy("user", policy =>
+            {
+                policy
+                    .RequireAuthenticatedUser()
+                    .RequireRole("user")
+                    .RequireClaim(ClaimTypes.Name);
+            });
+        });
     }
 }

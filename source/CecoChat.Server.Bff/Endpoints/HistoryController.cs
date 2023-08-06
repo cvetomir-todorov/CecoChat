@@ -36,7 +36,7 @@ public class HistoryController : ControllerBase
         _historyClient = historyClient;
     }
 
-    [Authorize(Roles = "user")]
+    [Authorize(Policy = "user")]
     [HttpGet("messages", Name = "GetMessages")]
     [ProducesResponseType(typeof(GetHistoryResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

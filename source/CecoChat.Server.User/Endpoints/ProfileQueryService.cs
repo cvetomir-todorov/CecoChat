@@ -41,7 +41,7 @@ public class ProfileQueryService : ProfileQuery.ProfileQueryBase
         throw new InvalidOperationException($"Failed to process {nameof(AuthenticateResult)}");
     }
 
-    [Authorize(Roles = "user")]
+    [Authorize(Policy = "user")]
     public override async Task<GetPublicProfileResponse> GetPublicProfile(GetPublicProfileRequest request, ServerCallContext context)
     {
         UserClaims userClaims = GetUserClaims(context);
@@ -56,7 +56,7 @@ public class ProfileQueryService : ProfileQuery.ProfileQueryBase
         return new GetPublicProfileResponse { Profile = profile };
     }
 
-    [Authorize(Roles = "user")]
+    [Authorize(Policy = "user")]
     public override async Task<GetPublicProfilesResponse> GetPublicProfiles(GetPublicProfilesRequest request, ServerCallContext context)
     {
         UserClaims userClaims = GetUserClaims(context);

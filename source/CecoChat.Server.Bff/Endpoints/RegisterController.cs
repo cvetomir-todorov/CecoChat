@@ -2,6 +2,7 @@ using AutoMapper;
 using CecoChat.Client.User;
 using CecoChat.Contracts.Bff;
 using CecoChat.Contracts.User;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
@@ -25,6 +26,7 @@ public class RegisterController : ControllerBase
         _userClient = userClient;
     }
 
+    [AllowAnonymous]
     [HttpPost("registration", Name = "Registration")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
