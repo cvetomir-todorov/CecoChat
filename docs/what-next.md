@@ -2,17 +2,17 @@
 
 ## Essential features
 
-* User/profile
-  - User identity/register/login
-  - Handle friendship between users
-* Add clients
+* Users
+  - Friendship between users
+* Clients
   - Web-based
   - Mobile
 * Setup versioning
 
-## Additional features
+## Product features
 
-* User/profile
+* Users
+  - Avatars
   - Edit user profiles
 * Privacy
   - Add end-to-end encryption for messages
@@ -39,8 +39,13 @@
 * Architecture
   - Design cross-region communication
 * Security
+  - Introduce an auth server
+    - Issue access tokens, introduce refresh tokens, etc.
+    - Restrict service-to-service communication
   - Rate limiting
-  - Secure access to integration, data storage, observability components
+  - Secure access to data storage components - Yugabyte, Cassandra, Redis
+  - Secure access to integration components - Kafka
+  - Secure access to observability components - logs database, Prometheus, Jaeger
 * Observability
   - Metrics for system resources
   - Alerting

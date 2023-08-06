@@ -1,6 +1,6 @@
 # Capabilities
 
-## Functional
+## Product
 
 * Messaging in real-time
   - Send and receive messages, (un)react with emojis
@@ -9,15 +9,16 @@
 * Chats
   - Indication for new messages
   - Review history at a random point in time
-* User profiles with full and public-only data
+* Users
+  - Registration and authentication
+  - Profiles with full and public-only data
 
 #### Limitations
 
-* No user register/login/identity
 * No user friendship
 * No web/mobile clients (only a client for development purposes)
 
-## Non-functional
+## Technical
 
 * Reliability
   - Durability is guaranteed by acknowledgement and replication
@@ -29,8 +30,9 @@
   - Supported by numbers from the [calculations](research-calculations.md)
   - Minimal [load test on 2 machines](load-test.md)
 * Security
-  - TLS for Kubernetes cluster and services
-  - Access tokens for authn and authz
+  - TLS for the Kubernetes cluster
+  - TLS communication between services
+  - JWT access tokens for authentication and authorization
 * Observability
   - Health
   - Distributed tracing

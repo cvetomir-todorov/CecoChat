@@ -7,7 +7,9 @@
 * Chats
   - Indication for new messages
   - Review history at a random point in time
-* User profiles with full and public-only data
+* Users
+  - Registration and authentication
+  - Profiles with full and public-only data
 
 Check out [what next](docs/what-next.md) needs to be implemented. I appreciate all comments so feel free to use the `Discussions` tab.
 
