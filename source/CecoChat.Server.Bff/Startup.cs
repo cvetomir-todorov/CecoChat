@@ -15,7 +15,6 @@ using CecoChat.Otel;
 using CecoChat.Redis;
 using CecoChat.Redis.Health;
 using CecoChat.Server.Backplane;
-using CecoChat.Server.Bff.Auth;
 using CecoChat.Server.Bff.HostedServices;
 using CecoChat.Server.Bff.Infra;
 using CecoChat.Server.ExceptionHandling;
@@ -194,8 +193,6 @@ public class Startup
         builder.RegisterModule(new UserClientAutofacModule(userClientConfig));
 
         // security
-        builder.RegisterType<Authenticator>().As<IAuthenticator>().SingleInstance();
-        builder.RegisterOptions<AuthOptions>(Configuration.GetSection("Auth"));
         builder.RegisterOptions<JwtOptions>(Configuration.GetSection("Jwt"));
 
         // shared
