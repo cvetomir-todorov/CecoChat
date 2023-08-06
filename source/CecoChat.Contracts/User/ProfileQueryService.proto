@@ -6,7 +6,6 @@ import "User/ProfilePublic.proto";
 
 service ProfileQuery {
   rpc Authenticate(AuthenticateRequest) returns (AuthenticateResponse);
-  rpc GetFullProfile(GetFullProfileRequest) returns (GetFullProfileResponse);
   rpc GetPublicProfile(GetPublicProfileRequest) returns (GetPublicProfileResponse);
   rpc GetPublicProfiles(GetPublicProfilesRequest) returns (GetPublicProfilesResponse);
 }
@@ -20,13 +19,6 @@ message AuthenticateResponse {
   bool missing = 1;
   bool invalid_password = 2;
   ProfileFull profile = 3;
-}
-
-message GetFullProfileRequest {
-}
-
-message GetFullProfileResponse {
-  ProfileFull profile = 1;
 }
 
 message GetPublicProfileRequest {

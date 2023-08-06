@@ -8,8 +8,6 @@ public interface IUserClient : IDisposable
 
     Task<AuthenticateResult> Authenticate(string userName, string password, CancellationToken ct);
 
-    Task<ProfileFull> GetFullProfile(string accessToken, CancellationToken ct);
-
     Task<ProfilePublic> GetPublicProfile(long userId, long requestedUserId, string accessToken, CancellationToken ct);
 
     Task<IEnumerable<ProfilePublic>> GetPublicProfiles(long userId, IEnumerable<long> requestedUserIds, string accessToken, CancellationToken ct);
