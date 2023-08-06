@@ -1,8 +1,8 @@
 using FluentValidation;
 
-namespace CecoChat.Server.Bff.Endpoints;
+namespace CecoChat.Data;
 
-public static class ValidationRules
+public static class TimeValidationRules
 {
     public static IRuleBuilderOptions<T, DateTime> ValidNewerThanDateTime<T>(this IRuleBuilderInitial<T, DateTime> ruleBuilder)
     {

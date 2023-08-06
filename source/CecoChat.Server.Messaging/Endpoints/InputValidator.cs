@@ -1,4 +1,5 @@
 using CecoChat.Contracts.Messaging;
+using CecoChat.Data;
 using FluentValidation;
 
 namespace CecoChat.Server.Messaging.Endpoints;
@@ -25,8 +26,12 @@ public sealed class SendMessageRequestValidator : AbstractValidator<SendMessageR
 {
     public SendMessageRequestValidator()
     {
-        RuleFor(x => x.ReceiverId).GreaterThan(0);
-        RuleFor(x => x.Data).NotEmpty().MinimumLength(1).MaximumLength(128);
+        RuleFor(x => x.ReceiverId)
+            .ValidUserId();
+        RuleFor(x => x.Data)
+            .NotEmpty()
+            .MinimumLength(1)
+            .MaximumLength(128);
     }
 }
 
@@ -34,10 +39,15 @@ public sealed class ReactRequestValidator : AbstractValidator<ReactRequest>
 {
     public ReactRequestValidator()
     {
-        RuleFor(x => x.MessageId).GreaterThan(0);
-        RuleFor(x => x.SenderId).GreaterThan(0);
-        RuleFor(x => x.ReceiverId).GreaterThan(0);
-        RuleFor(x => x.Reaction).NotEmpty().MaximumLength(8);
+        RuleFor(x => x.MessageId)
+            .ValidMessageId();
+        RuleFor(x => x.SenderId)
+            .ValidUserId();
+        RuleFor(x => x.ReceiverId)
+            .ValidUserId();
+        RuleFor(x => x.Reaction)
+            .NotEmpty()
+            .MaximumLength(8);
     }
 }
 
@@ -45,8 +55,11 @@ public sealed class UnReactRequestValidator : AbstractValidator<UnReactRequest>
 {
     public UnReactRequestValidator()
     {
-        RuleFor(x => x.MessageId).GreaterThan(0);
-        RuleFor(x => x.SenderId).GreaterThan(0);
-        RuleFor(x => x.ReceiverId).GreaterThan(0);
+        RuleFor(x => x.MessageId)
+            .ValidMessageId();
+        RuleFor(x => x.SenderId)
+            .ValidUserId();
+        RuleFor(x => x.ReceiverId)
+            .ValidUserId();
     }
 }
