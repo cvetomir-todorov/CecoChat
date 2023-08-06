@@ -1,20 +1,11 @@
 using CecoChat.Client.State;
 using CecoChat.Contracts.Bff;
 using CecoChat.Server.Identity;
-using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace CecoChat.Server.Bff.Endpoints;
-
-public sealed class GetChatsRequestValidator : AbstractValidator<GetChatsRequest>
-{
-    public GetChatsRequestValidator()
-    {
-        RuleFor(x => x.NewerThan).ValidNewerThanDateTime();
-    }
-}
 
 [ApiController]
 [Route("api/state")]
