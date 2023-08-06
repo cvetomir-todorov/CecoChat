@@ -22,7 +22,10 @@ public class UriPropertyValidator<T> : IPropertyValidator<T, string>
 
     public string Name => "UriPropertyValidator";
 
+#pragma warning disable IDE0060
+    // dotnet format suggests to remove unused parameter which though is from an external interface
     public bool IsValid(ValidationContext<T> context, string value)
+#pragma warning restore IDE0060
     {
         if (string.IsNullOrWhiteSpace(value))
         {
@@ -32,7 +35,10 @@ public class UriPropertyValidator<T> : IPropertyValidator<T, string>
         return Uri.TryCreate(value, _uriKind, out _);
     }
 
+#pragma warning disable IDE0060
+    // dotnet format suggests to remove unused parameter which though is from an external interface
     public string GetDefaultMessageTemplate(string errorCode)
+#pragma warning restore IDE0060
     {
         return $"{{PropertyName}} must be a valid URI, but the attempted value {{PropertyValue}} is not.";
     }
