@@ -6,18 +6,6 @@ using Refit;
 
 namespace CecoChat.ConsoleClient.Api;
 
-public sealed class AllChatsScreen
-{
-    public List<LocalStorage.Chat> Chats { get; init; } = new();
-    public List<LocalStorage.ProfilePublic> Profiles { get; init; } = new();
-}
-
-public sealed class OneChatScreen
-{
-    public List<LocalStorage.Message> Messages { get; init; } = new();
-    public LocalStorage.ProfilePublic? Profile { get; init; }
-}
-
 public sealed class ChatClient : IAsyncDisposable
 {
     private readonly IBffClient _bffClient;
@@ -43,17 +31,40 @@ public sealed class ChatClient : IAsyncDisposable
 
     public ProfileFull? UserProfile => _userProfile;
 
-    public async Task CreateSession(string username, string password)
+    public async Task<ClientResponse> Register(string userName, string password, string displayName, string phone, string email)
+    {
+        RegisterRequest request = new()
+        {
+            UserName = userName,
+            Password = password,
+            DisplayName = displayName,
+            Phone = phone,
+            Email = email
+        };
+        IApiResponse apiResponse = await _bffClient.Register(request);
+        ClientResponse response = ProcessApiResponse(apiResponse);
+
+        return response;
+    }
+
+    public async Task<ClientResponse> CreateSession(string username, string password)
     {
         CreateSessionRequest request = new()
         {
             UserName = username,
             Password = password
         };
-        CreateSessionResponse response = await _bffClient.CreateSession(request);
-        ProcessAccessToken(response.AccessToken);
-        _userProfile = response.Profile;
-        _messagingServerAddress = response.MessagingServerAddress;
+        IApiResponse<CreateSessionResponse> apiResponse = await _bffClient.CreateSession(request);
+
+        ClientResponse response = ProcessApiResponse(apiResponse);
+        if (response.Success)
+        {
+            ProcessAccessToken(apiResponse.Content!.AccessToken);
+            _userProfile = apiResponse.Content.Profile;
+            _messagingServerAddress = apiResponse.Content.MessagingServerAddress;
+        }
+
+        return response;
     }
 
     private void ProcessAccessToken(string accessToken)
@@ -215,5 +226,39 @@ public sealed class ChatClient : IAsyncDisposable
             Messages = messages,
             Profile = profile
         };
+    }
+
+    private static ClientResponse ProcessApiResponse(IApiResponse apiResponse)
+    {
+        ClientResponse response = new();
+        if (apiResponse.IsSuccessStatusCode)
+        {
+            response.Success = true;
+        }
+        else if (apiResponse.Error is ValidationApiException validationApiException)
+        {
+            if (validationApiException.Content != null)
+            {
+                foreach (KeyValuePair<string, string[]> errorPair in validationApiException.Content.Errors)
+                {
+                    response.Errors.AddRange(errorPair.Value);
+                }
+            }
+
+            if (response.Errors.Count == 0)
+            {
+                response.Errors.Add($"{apiResponse.Error.Message}");
+            }
+        }
+        else if (!string.IsNullOrWhiteSpace(apiResponse.Error.Content))
+        {
+            response.Errors.Add($"{(int)apiResponse.StatusCode} {apiResponse.StatusCode}: {apiResponse.Error.Content}");
+        }
+        else
+        {
+            response.Errors.Add($"{apiResponse.Error.Message}");
+        }
+
+        return response;
     }
 }

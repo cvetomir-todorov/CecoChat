@@ -38,11 +38,17 @@ public sealed class ChatClient : IAsyncDisposable
             UserName = username,
             Password = password
         };
-        CreateSessionResponse response = await _bffClient.CreateSession(request);
+
+        IApiResponse<CreateSessionResponse> apiResponse = await _bffClient.CreateSession(request);
+        if (!apiResponse.IsSuccessStatusCode || apiResponse.Content == null)
+        {
+            throw new InvalidOperationException("Unexpected API error.", apiResponse.Error);
+        }
 
         _messagingClient.MessageDelivered += (_, _) => MessagesProcessed++;
         _messagingClient.MessageReceived += (_, _) => MessagesReceived++;
 
+        CreateSessionResponse response = apiResponse.Content;
         await _messagingClient.Connect(response.MessagingServerAddress, response.AccessToken, ct);
 
         _accessToken = response.AccessToken;
