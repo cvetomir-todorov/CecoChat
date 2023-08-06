@@ -25,7 +25,7 @@ public class RegisterController : ControllerBase
         _userClient = userClient;
     }
 
-    [HttpPost("register", Name = "Register")]
+    [HttpPost("registration", Name = "Registration")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
