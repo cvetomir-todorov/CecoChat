@@ -34,7 +34,7 @@ public class StateController : ControllerBase
         _client = client;
     }
 
-    [Authorize(Roles = "user")]
+    [Authorize(Policy = "user")]
     [HttpGet("chats", Name = "GetChats")]
     [ProducesResponseType(typeof(GetChatsResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

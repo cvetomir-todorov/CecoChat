@@ -81,6 +81,7 @@ public class Startup
 
         // security
         services.AddJwtAuthentication(_jwtOptions);
+        services.AddUserPolicyAuthorization();
 
         // web
         services.AddControllers(mvc =>

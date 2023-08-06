@@ -83,7 +83,7 @@ public class Startup
 
         // security
         services.AddJwtAuthentication(_jwtOptions);
-        services.AddAuthorization();
+        services.AddUserPolicyAuthorization();
 
         // idgen
         services.AddIdGenClient(_idGenOptions);

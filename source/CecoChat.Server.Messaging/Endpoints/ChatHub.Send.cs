@@ -10,7 +10,7 @@ namespace CecoChat.Server.Messaging.Endpoints;
 
 public partial class ChatHub
 {
-    [Authorize(Roles = "user")]
+    [Authorize(Policy = "user")]
     public async Task<SendMessageResponse> SendMessage(SendMessageRequest request)
     {
         ValidationResult result = _inputValidator.SendMessageRequest.Validate(request);

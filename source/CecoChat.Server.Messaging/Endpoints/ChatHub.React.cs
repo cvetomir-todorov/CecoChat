@@ -9,7 +9,7 @@ namespace CecoChat.Server.Messaging.Endpoints;
 
 public partial class ChatHub
 {
-    [Authorize(Roles = "user")]
+    [Authorize(Policy = "user")]
     public async Task<ReactResponse> React(ReactRequest request)
     {
         ValidationResult result = _inputValidator.ReactRequest.Validate(request);
@@ -35,7 +35,7 @@ public partial class ChatHub
         return new ReactResponse();
     }
 
-    [Authorize(Roles = "user")]
+    [Authorize(Policy = "user")]
     public async Task<UnReactResponse> UnReact(UnReactRequest request)
     {
         ValidationResult result = _inputValidator.UnReactRequest.Validate(request);

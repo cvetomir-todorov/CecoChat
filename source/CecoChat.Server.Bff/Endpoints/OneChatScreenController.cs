@@ -44,7 +44,7 @@ public class OneChatScreenController : ControllerBase
         _userClient = userClient;
     }
 
-    [Authorize(Roles = "user")]
+    [Authorize(Policy = "user")]
     [HttpGet(Name = "GetOneChatScreen")]
     [ProducesResponseType(typeof(GetOneChatScreenResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

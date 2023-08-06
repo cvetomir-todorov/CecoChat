@@ -19,7 +19,7 @@ public class StateService : Contracts.State.State.StateBase
         _repo = repo;
     }
 
-    [Authorize(Roles = "user")]
+    [Authorize(Policy = "user")]
     public override async Task<GetChatsResponse> GetChats(GetChatsRequest request, ServerCallContext context)
     {
         if (!context.GetHttpContext().TryGetUserClaims(_logger, out UserClaims? userClaims))

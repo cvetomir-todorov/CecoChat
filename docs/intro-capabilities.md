@@ -32,7 +32,7 @@
 * Security
   - TLS for the Kubernetes cluster
   - TLS communication between services
-  - JWT access tokens for authentication and authorization
+  - JWT access tokens for authentication and policy-based authorization
 * Observability
   - Health
   - Distributed tracing
@@ -41,6 +41,7 @@
   - Monitoring
 * Deployment
   - Containerization
+  - Orchestration
   - Load balancing
   - High availability (partial)
 * Maintainability

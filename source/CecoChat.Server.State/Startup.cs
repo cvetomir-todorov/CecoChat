@@ -78,7 +78,7 @@ public class Startup
 
         // security
         services.AddJwtAuthentication(_jwtOptions);
-        services.AddAuthorization();
+        services.AddUserPolicyAuthorization();
 
         // clients
         services.AddGrpc(grpc =>
