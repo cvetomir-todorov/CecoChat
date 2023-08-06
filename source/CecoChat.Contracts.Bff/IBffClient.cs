@@ -7,11 +7,11 @@ public interface IBffClient : IDisposable
     private const string AuthorizationScheme = "Bearer";
 
     [Post("/api/registration")]
-    Task Register(
+    Task<IApiResponse> Register(
         [Body] RegisterRequest request);
 
     [Post("/api/session")]
-    Task<CreateSessionResponse> CreateSession(
+    Task<IApiResponse<CreateSessionResponse>> CreateSession(
         [Body] CreateSessionRequest request);
 
     [Get("/api/screen/allChats")]
