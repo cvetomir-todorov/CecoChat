@@ -27,6 +27,12 @@ public class CachingProfileQueryRepo : IProfileQueryRepo
         _decoratedRepo = decoratedRepo;
     }
 
+    public Task<AuthenticateResult> Authenticate(string userName, string password)
+    {
+        // no caching here
+        return _decoratedRepo.Authenticate(userName, password);
+    }
+
     public Task<ProfileFull?> GetFullProfile(long requestedUserId)
     {
         // no caching here
