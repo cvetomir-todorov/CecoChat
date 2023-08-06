@@ -98,13 +98,13 @@ public static class Program
 
         Console.Write("Type a password: ");
         string password = Console.ReadLine() ?? string.Empty;
-        
+
         Console.Write("Type a display name: ");
         string displayName = Console.ReadLine() ?? string.Empty;
-        
+
         Console.Write("Type a phone: ");
         string phone = Console.ReadLine() ?? string.Empty;
-        
+
         Console.Write("Type an email: ");
         string email = Console.ReadLine() ?? string.Empty;
 

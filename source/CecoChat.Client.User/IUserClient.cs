@@ -16,15 +16,12 @@ public interface IUserClient : IDisposable
 public readonly struct CreateProfileResult
 {
     public bool Success { get; init; }
-
     public bool DuplicateUserName { get; init; }
 }
 
 public readonly struct AuthenticateResult
 {
     public bool Missing { get; init; }
-    
     public bool InvalidPassword { get; init; }
-    
     public ProfileFull? Profile { get; init; }
 }
