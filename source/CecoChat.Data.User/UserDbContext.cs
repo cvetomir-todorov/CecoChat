@@ -15,6 +15,7 @@ public class UserDbContext : DbContext
 
         modelBuilder.Entity<ProfileEntity>().HasKey(e => e.UserId);
         modelBuilder.Entity<ProfileEntity>().Property(e => e.UserId).ValueGeneratedOnAdd();
+        modelBuilder.Entity<ProfileEntity>().Property(e => e.Version).IsConcurrencyToken();
 
         base.OnModelCreating(modelBuilder);
     }
@@ -23,6 +24,8 @@ public class UserDbContext : DbContext
 public sealed class ProfileEntity
 {
     public long UserId { get; set; }
+
+    public Guid Version { get; set; }
 
     public string UserName { get; set; } = string.Empty;
 

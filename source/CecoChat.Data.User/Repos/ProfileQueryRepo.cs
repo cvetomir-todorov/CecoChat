@@ -46,8 +46,9 @@ internal class ProfileQueryRepo : IProfileQueryRepo
             return new AuthenticateResult { InvalidPassword = true };
         }
 
-        _logger.LogTrace("Fetched profile for user {UserId} named {UserName} with expected password", entity.UserId, entity.UserName);
         ProfileFull profile = _mapper.Map<ProfileFull>(entity);
+
+        _logger.LogTrace("Fetched profile for user {UserId} named {UserName} with expected password", entity.UserId, entity.UserName);
         return new AuthenticateResult { Profile = profile };
     }
 
