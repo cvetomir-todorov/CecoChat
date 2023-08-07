@@ -2,9 +2,14 @@ syntax = "proto3";
 option csharp_namespace = "CecoChat.Contracts.User";
 package CecoChat.Contracts.User;
 import "User/ProfileCreate.proto";
+import "User/ProfileChangePassword.proto";
+import "User/ProfileUpdate.proto";
+import "Uuid.proto";
 
 service ProfileCommand {
   rpc CreateProfile(CreateProfileRequest) returns (CreateProfileResponse);
+  rpc ChangePassword(ChangePasswordRequest) returns (ChangePasswordResponse);
+  rpc UpdateProfile(UpdateProfileRequest) returns (UpdateProfileResponse);
 }
 
 message CreateProfileRequest {
@@ -14,4 +19,24 @@ message CreateProfileRequest {
 message CreateProfileResponse {
   bool success = 1;
   bool duplicate_user_name = 2;
+}
+
+message ChangePasswordRequest {
+  ProfileChangePassword profile = 1;
+}
+
+message ChangePasswordResponse {
+  bool success = 1;
+  Uuid new_version = 2;
+  bool concurrently_updated = 3;
+}
+
+message UpdateProfileRequest {
+  ProfileUpdate profile = 1;
+}
+
+message UpdateProfileResponse {
+  bool success = 1;
+  Uuid new_version = 2;
+  bool concurrently_updated = 3;
 }

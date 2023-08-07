@@ -1,5 +1,7 @@
+using CecoChat.Contracts;
 using CecoChat.Contracts.User;
 using CecoChat.Data.User.Repos;
+using CecoChat.Server.Identity;
 using Grpc.Core;
 using Microsoft.AspNetCore.Authorization;
 
@@ -33,5 +35,64 @@ public class ProfileCommandService : ProfileCommand.ProfileCommandBase
         }
 
         throw new InvalidOperationException($"Failed to process {nameof(CreateProfileResult)}.");
+    }
+
+    public override async Task<ChangePasswordResponse> ChangePassword(ChangePasswordRequest request, ServerCallContext context)
+    {
+        UserClaims userClaims = GetUserClaims(context);
+
+        ChangePasswordResult result = await _profileRepo.ChangePassword(request.Profile, userClaims.UserId);
+
+        if (result.Success)
+        {
+            _logger.LogTrace("Responding with successful password change for user {UserId}", userClaims.UserId);
+            return new ChangePasswordResponse
+            {
+                Success = true,
+                NewVersion = result.NewVersion.ToUuid()
+            };
+        }
+        if (result.ConcurrentlyUpdated)
+        {
+            _logger.LogTrace("Responding with failed password change for user {UserId} since the profile has been concurrently updated", userClaims.UserId);
+            return new ChangePasswordResponse { ConcurrentlyUpdated = true };
+        }
+
+        throw new InvalidOperationException($"Failed to process {nameof(ChangePasswordResult)}.");
+    }
+
+    [Authorize(Policy = "user")]
+    public override async Task<UpdateProfileResponse> UpdateProfile(UpdateProfileRequest request, ServerCallContext context)
+    {
+        UserClaims userClaims = GetUserClaims(context);
+
+        UpdateProfileResult result = await _profileRepo.UpdateProfile(request.Profile, userClaims.UserId);
+
+        if (result.Success)
+        {
+            _logger.LogTrace("Responding with successful profile update for user {UserId}", userClaims.UserId);
+            return new UpdateProfileResponse
+            {
+                Success = true,
+                NewVersion = result.NewVersion.ToUuid()
+            };
+        }
+        if (result.ConcurrentlyUpdated)
+        {
+            _logger.LogTrace("Responding with failed profile update for user {UserId} since it has been concurrently updated", userClaims.UserId);
+            return new UpdateProfileResponse { ConcurrentlyUpdated = true };
+        }
+
+        throw new InvalidOperationException($"Failed to process {nameof(UpdateProfileResult)}.");
+    }
+
+    private UserClaims GetUserClaims(ServerCallContext context)
+    {
+        if (!context.GetHttpContext().TryGetUserClaims(_logger, out UserClaims? userClaims))
+        {
+            throw new RpcException(new Status(StatusCode.Unauthenticated, string.Empty));
+        }
+
+        return userClaims;
     }
 }
