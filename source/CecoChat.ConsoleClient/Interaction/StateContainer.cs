@@ -17,6 +17,10 @@ public sealed class StateContainer
         OneChat = new OneChatState(this);
         SendMessage = new SendMessageState(this);
         React = new ReactState(this);
+
+        ChangePassword = new ChangePasswordState(this);
+        EditProfile = new EditProfileState(this);
+
         Final = new FinalState(this);
     }
 
@@ -30,6 +34,10 @@ public sealed class StateContainer
     public State OneChat { get; }
     public State SendMessage { get; }
     public State React { get; }
+
+    public State ChangePassword { get; }
+    public State EditProfile { get; }
+
     public State Final { get; }
 }
 

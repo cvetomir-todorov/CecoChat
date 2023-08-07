@@ -1,5 +1,4 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using CecoChat.Client.Messaging;
+﻿using CecoChat.Client.Messaging;
 using CecoChat.Contracts.Bff;
 using CecoChat.Contracts.Messaging;
 using Refit;
@@ -10,7 +9,6 @@ public sealed class ChatClient : IAsyncDisposable
 {
     private readonly IBffClient _bffClient;
     private readonly IMessagingClient _messagingClient;
-    private long _userId;
     private ProfileFull? _userProfile;
     private string? _accessToken;
     private string? _messagingServerAddress;
@@ -27,7 +25,7 @@ public sealed class ChatClient : IAsyncDisposable
         return _messagingClient.DisposeAsync();
     }
 
-    public long UserId => _userId;
+    public long UserId => _userProfile!.UserId;
 
     public ProfileFull? UserProfile => _userProfile;
 
@@ -59,20 +57,12 @@ public sealed class ChatClient : IAsyncDisposable
         ClientResponse response = ProcessApiResponse(apiResponse);
         if (response.Success)
         {
-            ProcessAccessToken(apiResponse.Content!.AccessToken);
+            _accessToken = apiResponse.Content!.AccessToken;
             _userProfile = apiResponse.Content.Profile;
             _messagingServerAddress = apiResponse.Content.MessagingServerAddress;
         }
 
         return response;
-    }
-
-    private void ProcessAccessToken(string accessToken)
-    {
-        _accessToken = accessToken;
-
-        JwtSecurityToken jwt = new(accessToken);
-        _userId = long.Parse(jwt.Subject);
     }
 
     public async Task StartMessaging(CancellationToken ct)
@@ -97,6 +87,42 @@ public sealed class ChatClient : IAsyncDisposable
     public event EventHandler<ListenNotification>? MessageDelivered;
 
     public event EventHandler? Disconnected;
+
+    public async Task<ClientResponse> ChangePassword(string newPassword)
+    {
+        ChangePasswordRequest request = new()
+        {
+            NewPassword = newPassword,
+            Version = _userProfile!.Version
+        };
+        IApiResponse<ChangePasswordResponse> apiResponse = await _bffClient.ChangePassword(request, _accessToken!);
+        ClientResponse response = ProcessApiResponse(apiResponse);
+
+        if (response.Success)
+        {
+            UserProfile!.Version = apiResponse.Content!.NewVersion;
+        }
+
+        return response;
+    }
+
+    public async Task<ClientResponse> EditProfile(string displayName)
+    {
+        EditProfileRequest request = new()
+        {
+            DisplayName = displayName,
+            Version = _userProfile!.Version
+        };
+        IApiResponse<EditProfileResponse> apiResponse = await _bffClient.EditProfile(request, _accessToken!);
+        ClientResponse response = ProcessApiResponse(apiResponse);
+
+        if (response.Success)
+        {
+            UserProfile!.Version = apiResponse.Content!.NewVersion;
+        }
+
+        return response;
+    }
 
     public async Task<IList<LocalStorage.Chat>> GetChats(DateTime newerThan)
     {

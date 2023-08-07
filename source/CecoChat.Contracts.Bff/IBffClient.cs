@@ -14,6 +14,16 @@ public interface IBffClient : IDisposable
     Task<IApiResponse<CreateSessionResponse>> CreateSession(
         [Body] CreateSessionRequest request);
 
+    [Post("/api/user/password")]
+    Task<IApiResponse<ChangePasswordResponse>> ChangePassword(
+        [Body] ChangePasswordRequest request,
+        [Authorize(AuthorizationScheme)] string accessToken);
+
+    [Post("/api/user")]
+    Task<IApiResponse<EditProfileResponse>> EditProfile(
+        [Body] EditProfileRequest request,
+        [Authorize(AuthorizationScheme)] string accessToken);
+
     [Get("/api/screen/allChats")]
     Task<GetAllChatsScreenResponse> GetAllChatsScreen(
         [Query] GetAllChatsScreenRequest request,

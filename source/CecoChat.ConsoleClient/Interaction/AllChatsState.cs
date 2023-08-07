@@ -21,7 +21,9 @@ public sealed class AllChatsState : State
 
         Console.Clear();
         DisplayUserData();
-        Console.WriteLine("Choose user to chat (press '0'...'9') | New (press 'n') | Refresh (press 'f') | Exit (press 'x'):");
+        Console.WriteLine("Chat with a user (press '0'...'9') | New (press 'n') | Refresh (press 'f')");
+        Console.WriteLine("Change password (press 'p') | Edit profile (press 'e')");
+        Console.WriteLine("Exit (press 'x')");
         Console.WriteLine("=================================================================================================");
         List<long> userIds = MessageStorage.GetUsers();
         int key = 0;
@@ -45,6 +47,14 @@ public sealed class AllChatsState : State
         {
             Context.ReloadData = true;
             return States.AllChats;
+        }
+        else if (keyInfo.KeyChar == 'p')
+        {
+            return States.ChangePassword;
+        }
+        else if (keyInfo.KeyChar == 'e')
+        {
+            return States.EditProfile;
         }
         else if (keyInfo.KeyChar == 'x' || keyInfo.KeyChar == 'X')
         {
