@@ -8,6 +8,10 @@ public interface IUserClient : IDisposable
 
     Task<AuthenticateResult> Authenticate(string userName, string password, CancellationToken ct);
 
+    Task<ChangePasswordResult> ChangePassword(ProfileChangePassword profile, long userId, string accessToken, CancellationToken ct);
+
+    Task<UpdateProfileResult> UpdateProfile(ProfileUpdate profile, long userId, string accessToken, CancellationToken ct);
+
     Task<ProfilePublic> GetPublicProfile(long userId, long requestedUserId, string accessToken, CancellationToken ct);
 
     Task<IEnumerable<ProfilePublic>> GetPublicProfiles(long userId, IEnumerable<long> requestedUserIds, string accessToken, CancellationToken ct);
@@ -24,4 +28,18 @@ public readonly struct AuthenticateResult
     public bool Missing { get; init; }
     public bool InvalidPassword { get; init; }
     public ProfileFull? Profile { get; init; }
+}
+
+public readonly struct ChangePasswordResult
+{
+    public bool Success { get; init; }
+    public Guid NewVersion { get; init; }
+    public bool ConcurrentlyUpdated { get; init; }
+}
+
+public readonly struct UpdateProfileResult
+{
+    public bool Success { get; init; }
+    public Guid NewVersion { get; init; }
+    public bool ConcurrentlyUpdated { get; init; }
 }

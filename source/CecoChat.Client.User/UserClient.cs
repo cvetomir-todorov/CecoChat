@@ -1,3 +1,4 @@
+using CecoChat.Contracts;
 using CecoChat.Contracts.User;
 using CecoChat.Grpc;
 using Grpc.Core;
@@ -79,6 +80,62 @@ internal sealed class UserClient : IUserClient
         }
 
         throw new InvalidOperationException($"Failed to process {nameof(AuthenticateResponse)}.");
+    }
+
+    public async Task<ChangePasswordResult> ChangePassword(ProfileChangePassword profile, long userId, string accessToken, CancellationToken ct)
+    {
+        ChangePasswordRequest request = new();
+        request.Profile = profile;
+
+        Metadata headers = new();
+        headers.AddAuthorization(accessToken);
+        DateTime deadline = DateTime.UtcNow.Add(_options.CallTimeout);
+        ChangePasswordResponse response = await _profileCommandClient.ChangePasswordAsync(request, headers, deadline, ct);
+
+        if (response.Success)
+        {
+            _logger.LogTrace("Received response for successful password change for user {UserId}", userId);
+            return new ChangePasswordResult
+            {
+                Success = true,
+                NewVersion = response.NewVersion.ToGuid()
+            };
+        }
+        if (response.ConcurrentlyUpdated)
+        {
+            _logger.LogTrace("Received response for concurrently updated profile for user {UserId}", userId);
+            return new ChangePasswordResult { ConcurrentlyUpdated = true };
+        }
+
+        throw new InvalidOperationException($"Failed to process {nameof(ChangePasswordResponse)}.");
+    }
+
+    public async Task<UpdateProfileResult> UpdateProfile(ProfileUpdate profile, long userId, string accessToken, CancellationToken ct)
+    {
+        UpdateProfileRequest request = new();
+        request.Profile = profile;
+
+        Metadata headers = new();
+        headers.AddAuthorization(accessToken);
+        DateTime deadline = DateTime.UtcNow.Add(_options.CallTimeout);
+        UpdateProfileResponse response = await _profileCommandClient.UpdateProfileAsync(request, headers, deadline, ct);
+
+        if (response.Success)
+        {
+            _logger.LogTrace("Received response for successful profile update for user {UserId}", userId);
+            return new UpdateProfileResult
+            {
+                Success = true,
+                NewVersion = response.NewVersion.ToGuid()
+            };
+        }
+        if (response.ConcurrentlyUpdated)
+        {
+            _logger.LogTrace("Received response for concurrently updated profile for user {UserId}", userId);
+            return new UpdateProfileResult { ConcurrentlyUpdated = true };
+        }
+
+        throw new InvalidOperationException($"Failed to process {nameof(UpdateProfileResponse)}.");
     }
 
     public async Task<ProfilePublic> GetPublicProfile(long userId, long requestedUserId, string accessToken, CancellationToken ct)
