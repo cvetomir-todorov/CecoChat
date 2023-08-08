@@ -44,6 +44,7 @@
   - Introduce an auth server
     - Issue access tokens, introduce refresh tokens, etc.
     - Restrict service-to-service communication
+    - Use pepper instead of just salt for passwords
   - Rate limiting
   - Secure access to data storage components - Yugabyte, Cassandra, Redis
   - Secure access to integration components - Kafka

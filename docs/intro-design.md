@@ -2,7 +2,7 @@
 
 ![Overall design](images/cecochat-01-overall.png)
 
-* Clients register their account in the User service via the BFF
+* Clients register and manage their profile in the User service via the BFF
 * Clients create their session using the User service via the BFF
 * Clients acquire other users public profiles from the User service via the BFF
 * Clients acquire user chats and chat history from the State and History services via the BFF
@@ -21,6 +21,7 @@ More details on the design of each aspect:
 
 * [Messaging](design-messaging.md)
 * [User chats, chat history](design-state-history.md)
+* [User profiles](design-users.md)
 * [Clients](design-clients.md)
 * [Configuration](design-configuration.md)
 * [Observability](design-observability.md)

@@ -3,7 +3,9 @@
 ![Clients](images/cecochat-05-clients.png)
 
 Clients use the BFF for the following operations:
-* Create a new session which returns a session ID, access token, messaging server ID based on the supplied credentials. This is the only operation that is not authorized.
+* Register a new account by providing credentials and profile data.
+* Create a new session which returns a session ID, access token, full profile, messaging server address based on the supplied credentials.
+* Manage their own profile including changing password, editing trivial profile data.
 * Get user chats returns all the chats for a user which have a message newer than a specified timestamp.
 * Get chat messages returns all messages and reactions to them for a given chat which are older than a specified timestamp.
 

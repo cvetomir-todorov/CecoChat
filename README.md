@@ -49,6 +49,7 @@ Check out [what next](docs/what-next.md) needs to be implemented. I appreciate a
 * Design
   - [Messaging](docs/design-messaging.md)
   - [User chats, chat history](docs/design-state-history.md)
+  - [User profiles](docs/design-users.md)
   - [Clients](docs/design-clients.md)
   - [Configuration](docs/design-configuration.md)
   - [Observability](docs/design-observability.md)
