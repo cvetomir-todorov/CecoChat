@@ -7,7 +7,8 @@ public sealed class GenerateOneRequestValidator : AbstractValidator<GenerateOneR
 {
     public GenerateOneRequestValidator()
     {
-        RuleFor(x => x.OriginatorId).GreaterThanOrEqualTo(0);
+        RuleFor(x => x.OriginatorId)
+            .GreaterThanOrEqualTo(0);
     }
 }
 
@@ -15,7 +16,9 @@ public sealed class GenerateManyRequestValidator : AbstractValidator<GenerateMan
 {
     public GenerateManyRequestValidator()
     {
-        RuleFor(x => x.OriginatorId).GreaterThanOrEqualTo(0);
-        RuleFor(x => x.Count).InclusiveBetween(2, 16384);
+        RuleFor(x => x.OriginatorId)
+            .GreaterThanOrEqualTo(0);
+        RuleFor(x => x.Count)
+            .InclusiveBetween(2, 16384);
     }
 }
