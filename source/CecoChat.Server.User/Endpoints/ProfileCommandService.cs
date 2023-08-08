@@ -37,6 +37,7 @@ public class ProfileCommandService : ProfileCommand.ProfileCommandBase
         throw new InvalidOperationException($"Failed to process {nameof(CreateProfileResult)}.");
     }
 
+    [Authorize(Policy = "user")]
     public override async Task<ChangePasswordResponse> ChangePassword(ChangePasswordRequest request, ServerCallContext context)
     {
         UserClaims userClaims = GetUserClaims(context);
