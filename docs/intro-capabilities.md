@@ -11,6 +11,7 @@
   - Review history at a random point in time
 * Users
   - Registration and authentication
+  - Change password, edit trivial profile data
   - Profiles with full and public-only data
 
 #### Limitations
@@ -33,6 +34,7 @@
   - TLS for the Kubernetes cluster
   - TLS communication between services
   - JWT access tokens for authentication and policy-based authorization
+  - Store password using hashing with salt
 * Observability
   - Health
   - Distributed tracing

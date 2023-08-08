@@ -7,13 +7,15 @@
 * Clients
   - Web-based
   - Mobile
+* Setup aggregated logs storage
 * Setup versioning
 
 ## Product features
 
 * Users
   - Avatars
-  - Edit user profiles
+  - Change phone/email including confirmation
+  - User search
 * Privacy
   - Add end-to-end encryption for messages
 * Media messages

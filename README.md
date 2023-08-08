@@ -9,6 +9,7 @@
   - Review history at a random point in time
 * Users
   - Registration and authentication
+  - Change password, edit trivial profile data
   - Profiles with full and public-only data
 
 Check out [what next](docs/what-next.md) needs to be implemented. I appreciate all comments so feel free to use the `Discussions` tab.
