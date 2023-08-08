@@ -8,4 +8,18 @@ public static class MessagingValidationRules
     {
         return ruleBuilder.GreaterThan(0);
     }
+
+    public static IRuleBuilderOptions<T, string> ValidMessageData<T>(this IRuleBuilderInitial<T, string> ruleBuilder)
+    {
+        return ruleBuilder
+            .NotEmpty()
+            .Length(1, 128);
+    }
+
+    public static IRuleBuilderOptions<T, string> ValidReaction<T>(this IRuleBuilderInitial<T, string> ruleBuilder)
+    {
+        return ruleBuilder
+            .NotEmpty()
+            .MaximumLength(8);
+    }
 }

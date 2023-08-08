@@ -1,3 +1,4 @@
+using CecoChat.Contracts;
 using CecoChat.Contracts.User;
 using CecoChat.Data;
 using FluentValidation;
@@ -22,5 +23,31 @@ public sealed class CreateProfileRequestValidator : AbstractValidator<CreateProf
             .ValidPhone();
         RuleFor(x => x.Profile.Email)
             .ValidEmail();
+    }
+}
+
+public sealed class ChangePasswordRequestValidator : AbstractValidator<ChangePasswordRequest>
+{
+    public ChangePasswordRequestValidator()
+    {
+        RuleFor(x => x.Profile)
+            .NotNull();
+        RuleFor(x => x.Profile.NewPassword)
+            .ValidPassword();
+        RuleFor(x => x.Profile.Version.ToGuid())
+            .ValidVersion();
+    }
+}
+
+public sealed class UpdateProfileRequestValidator : AbstractValidator<UpdateProfileRequest>
+{
+    public UpdateProfileRequestValidator()
+    {
+        RuleFor(x => x.Profile)
+            .NotNull();
+        RuleFor(x => x.Profile.DisplayName)
+            .ValidDisplayName();
+        RuleFor(x => x.Profile.Version.ToGuid())
+            .ValidVersion();
     }
 }

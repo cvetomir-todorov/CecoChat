@@ -8,7 +8,9 @@ public sealed class GetHistoryRequestValidator : AbstractValidator<GetHistoryReq
 {
     public GetHistoryRequestValidator()
     {
-        RuleFor(x => x.OtherUserId).ValidUserId();
-        RuleFor(x => x.OlderThan).ValidOlderThanDateTime();
+        RuleFor(x => x.OtherUserId)
+            .ValidUserId();
+        RuleFor(x => x.OlderThan)
+            .ValidOlderThanDateTime();
     }
 }

@@ -29,9 +29,7 @@ public sealed class SendMessageRequestValidator : AbstractValidator<SendMessageR
         RuleFor(x => x.ReceiverId)
             .ValidUserId();
         RuleFor(x => x.Data)
-            .NotEmpty()
-            .MinimumLength(1)
-            .MaximumLength(128);
+            .ValidMessageData();
     }
 }
 
@@ -46,8 +44,7 @@ public sealed class ReactRequestValidator : AbstractValidator<ReactRequest>
         RuleFor(x => x.ReceiverId)
             .ValidUserId();
         RuleFor(x => x.Reaction)
-            .NotEmpty()
-            .MaximumLength(8);
+            .ValidReaction();
     }
 }
 

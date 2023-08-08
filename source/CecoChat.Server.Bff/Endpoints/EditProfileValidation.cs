@@ -11,7 +11,7 @@ public sealed class ChangePasswordRequestValidator : AbstractValidator<ChangePas
         RuleFor(x => x.NewPassword)
             .ValidPassword();
         RuleFor(x => x.Version)
-            .NotEmpty();
+            .ValidVersion();
     }
 }
 
@@ -22,6 +22,6 @@ public sealed class EditProfileRequestValidator : AbstractValidator<EditProfileR
         RuleFor(x => x.DisplayName)
             .ValidDisplayName();
         RuleFor(x => x.Version)
-            .NotEmpty();
+            .ValidVersion();
     }
 }

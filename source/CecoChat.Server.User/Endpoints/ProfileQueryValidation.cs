@@ -1,13 +1,26 @@
 using CecoChat.Contracts.User;
+using CecoChat.Data;
 using FluentValidation;
 
 namespace CecoChat.Server.User.Endpoints;
+
+public sealed class AuthenticateRequestValidator : AbstractValidator<AuthenticateRequest>
+{
+    public AuthenticateRequestValidator()
+    {
+        RuleFor(x => x.UserName)
+            .ValidUserName();
+        RuleFor(x => x.Password)
+            .ValidPassword();
+    }
+}
 
 public sealed class GetPublicProfileRequestValidator : AbstractValidator<GetPublicProfileRequest>
 {
     public GetPublicProfileRequestValidator()
     {
-        RuleFor(x => x.UserId).GreaterThan(0);
+        RuleFor(x => x.UserId)
+            .ValidUserId();
     }
 }
 
@@ -19,6 +32,6 @@ public sealed class GetPublicProfilesRequestValidator : AbstractValidator<GetPub
             .NotEmpty()
             .Must(userIds => userIds.Count < 128)
             .WithMessage("{PropertyName} count must not exceed 128, but {PropertyValue} was provided.")
-            .ForEach(userId => userId.GreaterThan(0));
+            .ForEach(userId => userId.ValidUserId());
     }
 }

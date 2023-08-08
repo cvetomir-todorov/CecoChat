@@ -10,6 +10,18 @@ public static class ProfileValidationRules
         return ruleBuilder.GreaterThan(0);
     }
 
+    public static IRuleBuilderOptions<IEnumerable<long>, long> ValidUserId(this IRuleBuilderInitialCollection<IEnumerable<long>, long> ruleBuilder)
+    {
+        return ruleBuilder.GreaterThan(0);
+    }
+
+    public static IRuleBuilderOptions<T, Guid> ValidVersion<T>(this IRuleBuilderInitial<T, Guid> ruleBuilder)
+    {
+        return ruleBuilder
+            .Must(version => version != Guid.Empty)
+            .WithMessage("{PropertyName} should not be an empty UUID/GUID but provided value '{PropertyValue}' is.");
+    }
+
     public static IRuleBuilderOptions<T, string> ValidUserName<T>(this IRuleBuilderInitial<T, string> ruleBuilder)
     {
         return ruleBuilder

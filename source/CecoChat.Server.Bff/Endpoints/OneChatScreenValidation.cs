@@ -8,7 +8,9 @@ public sealed class GetOneChatScreenRequestValidator : AbstractValidator<GetOneC
 {
     public GetOneChatScreenRequestValidator()
     {
-        RuleFor(x => x.OtherUserId).ValidUserId();
-        RuleFor(x => x.MessagesOlderThan).ValidOlderThanDateTime();
+        RuleFor(x => x.OtherUserId)
+            .ValidUserId();
+        RuleFor(x => x.MessagesOlderThan)
+            .ValidOlderThanDateTime();
     }
 }

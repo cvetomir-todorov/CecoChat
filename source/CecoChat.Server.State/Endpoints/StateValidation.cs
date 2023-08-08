@@ -1,14 +1,14 @@
-using CecoChat.Contracts.Bff;
+using CecoChat.Contracts.State;
 using CecoChat.Data;
 using FluentValidation;
 
-namespace CecoChat.Server.Bff.Endpoints;
+namespace CecoChat.Server.State.Endpoints;
 
 public sealed class GetChatsRequestValidator : AbstractValidator<GetChatsRequest>
 {
     public GetChatsRequestValidator()
     {
-        RuleFor(x => x.NewerThan)
+        RuleFor(x => x.NewerThan.ToDateTime())
             .ValidNewerThanDateTime();
     }
 }

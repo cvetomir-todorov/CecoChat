@@ -8,6 +8,7 @@ public sealed class GetAllChatsScreenRequestValidation : AbstractValidator<GetAl
 {
     public GetAllChatsScreenRequestValidation()
     {
-        RuleFor(x => x.ChatsNewerThan).ValidNewerThanDateTime();
+        RuleFor(x => x.ChatsNewerThan)
+            .ValidNewerThanDateTime();
     }
 }
