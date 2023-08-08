@@ -15,7 +15,7 @@ public class EditProfileState : State
         {
             throw new InvalidOperationException("Client is not connected.");
         }
-        
+
         DisplayUserData();
         Console.WriteLine("Edit your profile - press empty without entering anything to preserve current.");
 
