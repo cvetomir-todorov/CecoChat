@@ -1,1 +1,52 @@
-<mxfile host="Electron" modified="2023-02-18T14:11:02.297Z" agent="5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/20.8.16 Chrome/106.0.5249.199 Electron/21.4.0 Safari/537.36" etag="Eilbs3Z8KxlIt2DgL9el" version="20.8.16" type="device"><diagram id="G4t1x3i_cumIOjZ8GDXV" name="Page-1">7Vhbc5s6EP41fkyGS+w4j77EaWfSaafpTNq+dIQQoBOBiBC26a8/KyGQMdjHOZO67bTJg9Gn1SK03+5qd+Qv0u2dQHnyjoeEjTwn3I785cjzPMedwI9CqhpxPcevkVjQ0GAWeKDfiQEdg5Y0JEVHUHLOJM27IOZZRrDsYEgIvumKRZx135qjmPSAB4xYH32koUxqdDp2LP6G0Dhp3uw6ZiZFjbABigSFfLMD+bcjfyE4l/VTul0Qpk6vOZd63erAbLsxQTJ5yoJZ4D2unr99XX78XC2cT6n77SK6MFrWiJXmgx8TkqmzUzsmRUG5GtFCHbEgSJJQWSAhasyoerWZFUSWIoNpfzbyJgy2NA8EPMXq6aKj7e1yWAJhDDLawk9qE0My70ACxTSLtUaxJkItDEOhV+pzllVjPDjyXD1mXMLPfJNQSR5yhBW2AcIClsiUwchVL0L4KRa8zML3pWQ0IwYPkXh6D6uoVCR2Lp0xgIjROIMhI5HaWixQqE5jwRkX+uV+oP9hLqKM7eDRWP0DXkgB37kzM9F/MNM3bWMnIiTZ7kDG1HeEp0SKCkQa17sxtDOOd2WGG0tiv2FmskPgicGQ8Zu41WypBQ+GXS9gmtdj2iyS2no1jyzDaoJR0eEMILCHCUqV0bKgUD9FGRRY0IBox1byYGgaUYwkLFIKFWNSzRiIId5C0xThZpZIfNln2S3CiV2mN6FZHqjTRVmolWBC19oVIsFT4y6tPySoMFBMMiKM05QZfS5JR7NyBAdYqV+IGFPRCmIlCcucma/4y+nDnHavz0jqAH+9d2+q9ZbP8Nu4Wn26mn4fCJ89e5EQ8okZciETHvMMsVuLzrV5VOBcOjCyMvec58Zc/xApK5McUSl518hwoqL6bNbrwRdt1HEzXG53J5eVGRUSCTlTSRIAzBD4Gm7gFWWN+oOWK3gpMDlyPCbVg76YyCNy5pKgjuooDwRh4BTrbmoeMqpeCl+Gqh2BnFMdZlrNHxRg6eW640F6rU6U9xxnj1D1Diy92k/5/4zrh9FFEzTbYLkf0e6I2nVZ6GibCw7Oq8LhsBhOkDw4mdBCcuM3vwnJfzx7p78meycvY+/1Gcjr98lrcuaBJFembIalyiVzlSYgJ7J7FBD2gRdUZ0d/GXApIQVbgZnJYpLv5UJeZ8BFWykcpcfpaelqLyt5A1npnEnpqnfKD0RfW9qLx75zf1SXIn3vPi6lbz39a9avEwyuf3rKG79yyjMccy7dceOwL4sj1vEbER5FBZE9mr2Cf4//BP9uHfdn+fdk4NJZ+2rEtaHtQU+eS95MXBTam6A6d1wv39rJxr93SutaHeyu1ljP96xo3dj970pkoJqIIjR2nIFqIsKhNx2qJsLrm8B5JbM2CfJYNeGetZqY/iDDzqEI1BmgWz73I/xKF9ErAUpr+T+QBgONkvOyoOl8DnVK6tBWd790sq47cYNNsd0m3cCFHsqBVmi+WpmVFJNa9aEuXnxaLWFFm1aOqis0b3SxclheNx5zgtUFwy47VHj87YbYvHRqi2/6cubC0Daq69uC7ff7t/8C</diagram></mxfile>
+<mxfile host="Electron" modified="2023-08-08T15:14:00.202Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.6.5 Chrome/114.0.5735.243 Electron/25.3.1 Safari/537.36" etag="e1uJxqovlK_X6iLN-_xv" version="21.6.5" type="device">
+  <diagram id="G4t1x3i_cumIOjZ8GDXV" name="Page-1">
+    <mxGraphModel dx="2020" dy="1203" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="Ab2WFq_ZDRXyC0Tm1_-f-1" value="When a session is created the client is returned:&lt;br&gt;- session ID&lt;br&gt;- access token&lt;br&gt;- full profile&lt;br&gt;- messaging server address" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;align=left;gradientColor=#b3b3b3;fillColor=#f5f5f5;strokeColor=#666666;" parent="1" vertex="1">
+          <mxGeometry x="290" y="40" width="320" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="Ab2WFq_ZDRXyC0Tm1_-f-2" value="After clients create their session they&amp;nbsp;subscribe for notifications - messages, reactions etc.&lt;br&gt;Each message sent by and received from a client has a generated unique message ID which allows deduplication" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;align=left;gradientColor=#b3b3b3;fillColor=#f5f5f5;strokeColor=#666666;" parent="1" vertex="1">
+          <mxGeometry x="290" y="200" width="320" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="bcZL19yvxoAcIgyFT48z-1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;startArrow=classic;startFill=1;" parent="1" source="bcZL19yvxoAcIgyFT48z-3" target="bcZL19yvxoAcIgyFT48z-6" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="115" y="200" />
+              <mxPoint x="115" y="230" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="bcZL19yvxoAcIgyFT48z-2" value="Register&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Create session&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Manage own&amp;nbsp;profile&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Get public profiles&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Get user chats&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Get chat history" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="bcZL19yvxoAcIgyFT48z-3" target="bcZL19yvxoAcIgyFT48z-8" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="115" y="190" />
+              <mxPoint x="115" y="70" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="bcZL19yvxoAcIgyFT48z-3" value="Client" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" parent="1" vertex="1">
+          <mxGeometry x="40" y="150" width="30" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="bcZL19yvxoAcIgyFT48z-4" value="Send message&lt;br&gt;React to message&lt;br&gt;Receive notifications" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.75;entryDx=0;entryDy=0;startArrow=classic;startFill=1;" parent="1" source="bcZL19yvxoAcIgyFT48z-5" target="bcZL19yvxoAcIgyFT48z-6" edge="1">
+          <mxGeometry x="0.1515" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="bcZL19yvxoAcIgyFT48z-5" value="Client" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" parent="1" vertex="1">
+          <mxGeometry x="40" y="290" width="30" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="bcZL19yvxoAcIgyFT48z-6" value="&lt;font style=&quot;font-size: 12px&quot;&gt;Messaging&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;gradientColor=#ffa500;fillColor=#ffcd28;strokeColor=#d79b00;" parent="1" vertex="1">
+          <mxGeometry x="160" y="200" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="bcZL19yvxoAcIgyFT48z-8" value="&lt;font style=&quot;font-size: 12px&quot;&gt;Backend&amp;nbsp;&lt;br&gt;For Frontend&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;gradientColor=#ffa500;fillColor=#ffcd28;strokeColor=#d79b00;" parent="1" vertex="1">
+          <mxGeometry x="160" y="40" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="bcZL19yvxoAcIgyFT48z-10" value="After connecting to the Messaging server the clients&lt;br&gt;use the BFF service to:&lt;br&gt;- get user profiles&lt;br&gt;- get their chat state&lt;br&gt;- get a specific chat history" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;align=left;gradientColor=#b3b3b3;fillColor=#f5f5f5;strokeColor=#666666;" parent="1" vertex="1">
+          <mxGeometry x="290" y="270" width="320" height="80" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

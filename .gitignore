@@ -6,6 +6,7 @@
 # Cecochat
 *drawio.bkp
 *drawio.dtmp
+*.dtmp
 source/certificates/services.key
 source/certificates/services.csr
 source/certificates/services.crt
