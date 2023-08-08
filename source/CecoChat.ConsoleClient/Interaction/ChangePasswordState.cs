@@ -15,7 +15,7 @@ public class ChangePasswordState : State
         {
             throw new InvalidOperationException("Client is not connected.");
         }
-        
+
         DisplayUserData();
         Console.Write("Enter new password: ");
         string newPassword = Console.ReadLine() ?? string.Empty;

@@ -68,7 +68,7 @@ public class EditProfileController : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> EditProfile([FromBody] [BindRequired] EditProfileRequest request, CancellationToken ct)
+    public async Task<IActionResult> EditProfile([FromBody][BindRequired] EditProfileRequest request, CancellationToken ct)
     {
         if (!HttpContext.TryGetUserClaims(_logger, out UserClaims? userClaims))
         {
