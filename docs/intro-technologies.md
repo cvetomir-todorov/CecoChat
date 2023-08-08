@@ -66,6 +66,15 @@ User database is based on Yugabyte DB
 * supports change data capture (CDC)
 * observable with integration for popular existing technologies
 
+# User cache
+
+![Redis](tech-images/redis.png)
+
+User cache is based on Redis:
+* open-source software
+* lightweight and performant
+* easy to use and manage
+
 # State and History databases
 
 ![Cassandra](tech-images/cassandra.png)
