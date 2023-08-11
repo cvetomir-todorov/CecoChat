@@ -33,4 +33,4 @@ The issue of lost updates is considered in the implementation. This occurs when 
 
 ## Public profiles
 
-Public profiles are obtained by the clients when opening all chats and a single chat. Since the public profile data doesn't change frequently, calling the User database is avoided if the requested public profiles are already in a User cache. This reduces latency and also reduces the load on the User database which is SQL-based.
+Public profiles are obtained by the clients when opening all chats and a single chat. Since the public profile data doesn't change frequently, calling the User database is avoided if the requested public profiles are already in a User cache. This reduces latency and also reduces the load on the User database which is SQL-based. The profile entries are added for a certain amount of time, after which they expire.
