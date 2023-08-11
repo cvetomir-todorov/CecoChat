@@ -1,7 +1,4 @@
-using System.Globalization;
 using CecoChat.Contracts.User;
-using CecoChat.Redis;
-using Google.Protobuf;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using StackExchange.Redis;
@@ -12,18 +9,18 @@ public class CachingProfileQueryRepo : IProfileQueryRepo
 {
     private readonly ILogger _logger;
     private readonly UserCacheOptions _cacheOptions;
-    private readonly IRedisContext _cacheContext;
+    private readonly IProfileCache _profileCache;
     private readonly IProfileQueryRepo _decoratedRepo;
 
     public CachingProfileQueryRepo(
         ILogger<CachingProfileQueryRepo> logger,
         IOptions<UserCacheOptions> cacheOptions,
-        IRedisContext cacheContext,
+        IProfileCache profileCache,
         IProfileQueryRepo decoratedRepo)
     {
         _logger = logger;
         _cacheOptions = cacheOptions.Value;
-        _cacheContext = cacheContext;
+        _profileCache = profileCache;
         _decoratedRepo = decoratedRepo;
     }
 
@@ -62,32 +59,23 @@ public class CachingProfileQueryRepo : IProfileQueryRepo
 
     private async Task<(ProfilePublic?, string)> GetPublicProfileUsingCache(long requestedUserId, long userId)
     {
-        IDatabase cache = _cacheContext.GetDatabase();
-        RedisKey profileKey = CreateUserProfileKey(requestedUserId);
-        RedisValue cachedProfile = await cache.StringGetAsync(profileKey);
+        RedisKey profileKey = _profileCache.CreateKey(requestedUserId);
+        ProfilePublic? profile = await _profileCache.GetOne(profileKey);
 
-        ProfilePublic? profile;
-        string profileSource;
-
-        if (cachedProfile.IsNullOrEmpty)
+        if (profile == null)
         {
             profile = await _decoratedRepo.GetPublicProfile(requestedUserId, userId);
-            if (profile == null)
+            if (profile != null)
             {
-                return (null, "DB");
+                await _profileCache.SetOneAsynchronously(profile);
             }
 
-            profileSource = "DB";
-            byte[] profileBytes = profile.ToByteArray();
-            await cache.StringSetAsync(profileKey, profileBytes);
+            return (profile, "DB");
         }
         else
         {
-            profile = ProfilePublic.Parser.ParseFrom(cachedProfile);
-            profileSource = "cache";
+            return (profile, "cache");
         }
-
-        return (profile, profileSource);
     }
 
     public async Task<IEnumerable<ProfilePublic>> GetPublicProfiles(IList<long> requestedUserIds, long userId)
@@ -99,16 +87,15 @@ public class CachingProfileQueryRepo : IProfileQueryRepo
             return profiles;
         }
 
-        IDatabase cache = _cacheContext.GetDatabase();
-        RedisKey[] profileKeys = requestedUserIds.Select(CreateUserProfileKey).ToArray();
-        RedisValue[] cachedProfiles = await cache.StringGetAsync(profileKeys);
+        RedisKey[] profileKeys = requestedUserIds.Select(_profileCache.CreateKey).ToArray();
+        RedisValue[] cachedProfiles = await _profileCache.GetMany(profileKeys);
         List<ProfilePublic> resultProfiles = new(capacity: requestedUserIds.Count);
 
         List<long>? uncachedUserIds = ProcessProfilesFromCache(requestedUserIds, cachedProfiles, resultProfiles);
         int profilesFromCacheCount = resultProfiles.Count;
         if (uncachedUserIds != null && uncachedUserIds.Count > 0)
         {
-            await LoadUncachedProfiles(uncachedUserIds, userId, resultProfiles, cache);
+            await LoadUncachedProfiles(uncachedUserIds, userId, resultProfiles);
         }
 
         LogFetchedPublicProfiles(totalCount: requestedUserIds.Count, fromCacheCount: profilesFromCacheCount, fromDbCount: uncachedUserIds?.Count ?? 0, userId);
@@ -145,30 +132,14 @@ public class CachingProfileQueryRepo : IProfileQueryRepo
         return uncachedUserIds;
     }
 
-    private async Task LoadUncachedProfiles(List<long> uncachedUserIds, long userId, ICollection<ProfilePublic> output, IDatabase cache)
+    private async Task LoadUncachedProfiles(List<long> uncachedUserIds, long userId, ICollection<ProfilePublic> output)
     {
         IEnumerable<ProfilePublic> uncachedProfiles = await _decoratedRepo.GetPublicProfiles(uncachedUserIds, userId);
-
-        KeyValuePair<RedisKey, RedisValue>[] toAddToCache = new KeyValuePair<RedisKey, RedisValue>[uncachedUserIds.Count];
-        int index = 0;
 
         foreach (ProfilePublic uncachedProfile in uncachedProfiles)
         {
             output.Add(uncachedProfile);
-
-            toAddToCache[index] = new(
-                key: CreateUserProfileKey(uncachedProfile.UserId),
-                value: uncachedProfile.ToByteArray());
-
-            index++;
+            await _profileCache.SetOneAsynchronously(uncachedProfile);
         }
-
-        await cache.StringSetAsync(toAddToCache);
-    }
-
-    private static RedisKey CreateUserProfileKey(long userId)
-    {
-        // we store all profiles in a separate database, so we don't need to prefix the key
-        return new RedisKey(userId.ToString(CultureInfo.InvariantCulture));
     }
 }
