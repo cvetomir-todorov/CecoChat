@@ -29,11 +29,15 @@ public class UserDbAutofacModule : Module
 
         builder.RegisterType<ProfileCommandRepo>().As<IProfileCommandRepo>().InstancePerLifetimeScope();
         builder.RegisterType<PasswordHasher>().As<IPasswordHasher>().SingleInstance();
+        builder
+            .RegisterType<ProfileCache>()
+            .As<IProfileCache>()
+            .WithNamedParameter(typeof(IRedisContext), RedisContextName)
+            .SingleInstance();
 
         builder
             .RegisterType<CachingProfileQueryRepo>()
             .Named<IProfileQueryRepo>("caching-profile-repo")
-            .WithNamedParameter(typeof(IRedisContext), RedisContextName)
             .InstancePerLifetimeScope();
         builder
             .RegisterType<ProfileQueryRepo>()

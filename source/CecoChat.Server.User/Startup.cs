@@ -144,6 +144,7 @@ public class Startup
     {
         // ordered hosted services
         builder.RegisterHostedService<InitUsersDb>();
+        builder.RegisterHostedService<AsyncProfileCaching>();
 
         // user db
         IConfiguration userCacheConfig = Configuration.GetSection("UserCache");
