@@ -22,6 +22,7 @@ internal sealed class IdGenClient : IIdGenClient
     private readonly ILogger _logger;
     private readonly IdGenOptions _options;
     private readonly Contracts.IdGen.IdGen.IdGenClient _client;
+    private readonly IClock _clock;
     private readonly IIdChannel _idChannel;
     private readonly Timer _invalidateIdsTimer;
     private int _isRefreshing;
@@ -32,11 +33,13 @@ internal sealed class IdGenClient : IIdGenClient
         ILogger<IdGenClient> logger,
         IOptions<IdGenOptions> options,
         Contracts.IdGen.IdGen.IdGenClient client,
+        IClock clock,
         IIdChannel idChannel)
     {
         _logger = logger;
         _options = options.Value;
         _client = client;
+        _clock = clock;
         _idChannel = idChannel;
 
         _logger.LogInformation("ID Gen address set to {Address}", _options.Address);
@@ -81,7 +84,7 @@ internal sealed class IdGenClient : IIdGenClient
                 OriginatorId = _options.OriginatorId,
                 Count = _options.RefreshIdsCount
             };
-            DateTime deadline = DateTime.UtcNow.Add(_options.CallTimeout);
+            DateTime deadline = _clock.GetNowUtc().Add(_options.CallTimeout);
 
             Activity.Current = null;
             _idChannel.ClearIds();

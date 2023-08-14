@@ -13,17 +13,22 @@ internal sealed class UserClient : IUserClient
     private readonly UserOptions _options;
     private readonly ProfileQuery.ProfileQueryClient _profileQueryClient;
     private readonly ProfileCommand.ProfileCommandClient _profileCommandClient;
+    private readonly IClock _clock;
 
     public UserClient(
         ILogger<UserClient> logger,
         IOptions<UserOptions> options,
         ProfileQuery.ProfileQueryClient profileQueryClient,
-        ProfileCommand.ProfileCommandClient profileCommandClient)
+        ProfileCommand.ProfileCommandClient profileCommandClient,
+        IClock clock)
     {
         _logger = logger;
         _options = options.Value;
         _profileQueryClient = profileQueryClient;
         _profileCommandClient = profileCommandClient;
+        _clock = clock;
+
+        _logger.LogInformation("User address set to {Address}", _options.Address);
     }
 
     public void Dispose()
@@ -36,7 +41,7 @@ internal sealed class UserClient : IUserClient
         CreateProfileRequest request = new();
         request.Profile = profile;
 
-        DateTime deadline = DateTime.UtcNow.Add(_options.CallTimeout);
+        DateTime deadline = _clock.GetNowUtc().Add(_options.CallTimeout);
         CreateProfileResponse response = await _profileCommandClient.CreateProfileAsync(request, deadline: deadline, cancellationToken: ct);
 
         if (response.Success)
@@ -59,7 +64,7 @@ internal sealed class UserClient : IUserClient
         request.UserName = userName;
         request.Password = password;
 
-        DateTime deadline = DateTime.UtcNow.Add(_options.CallTimeout);
+        DateTime deadline = _clock.GetNowUtc().Add(_options.CallTimeout);
         AuthenticateResponse response = await _profileQueryClient.AuthenticateAsync(request, deadline: deadline, cancellationToken: ct);
 
         if (response.Missing)
@@ -89,7 +94,7 @@ internal sealed class UserClient : IUserClient
 
         Metadata headers = new();
         headers.AddAuthorization(accessToken);
-        DateTime deadline = DateTime.UtcNow.Add(_options.CallTimeout);
+        DateTime deadline = _clock.GetNowUtc().Add(_options.CallTimeout);
         ChangePasswordResponse response = await _profileCommandClient.ChangePasswordAsync(request, headers, deadline, ct);
 
         if (response.Success)
@@ -117,7 +122,7 @@ internal sealed class UserClient : IUserClient
 
         Metadata headers = new();
         headers.AddAuthorization(accessToken);
-        DateTime deadline = DateTime.UtcNow.Add(_options.CallTimeout);
+        DateTime deadline = _clock.GetNowUtc().Add(_options.CallTimeout);
         UpdateProfileResponse response = await _profileCommandClient.UpdateProfileAsync(request, headers, deadline, ct);
 
         if (response.Success)
@@ -145,7 +150,7 @@ internal sealed class UserClient : IUserClient
 
         Metadata headers = new();
         headers.AddAuthorization(accessToken);
-        DateTime deadline = DateTime.UtcNow.Add(_options.CallTimeout);
+        DateTime deadline = _clock.GetNowUtc().Add(_options.CallTimeout);
         GetPublicProfileResponse response = await _profileQueryClient.GetPublicProfileAsync(request, headers, deadline, ct);
 
         _logger.LogTrace("Received profile for user {RequestedUserId} requested by user {UserId}", requestedUserId, userId);
@@ -159,7 +164,7 @@ internal sealed class UserClient : IUserClient
 
         Metadata headers = new();
         headers.AddAuthorization(accessToken);
-        DateTime deadline = DateTime.UtcNow.Add(_options.CallTimeout);
+        DateTime deadline = _clock.GetNowUtc().Add(_options.CallTimeout);
         GetPublicProfilesResponse response = await _profileQueryClient.GetPublicProfilesAsync(request, headers, deadline, ct);
 
         _logger.LogTrace("Received {PublicProfileCount} public profiles requested by user {UserId}", response.Profiles.Count, userId);

@@ -17,15 +17,18 @@ internal sealed class StateClient : IStateClient
     private readonly ILogger _logger;
     private readonly StateOptions _options;
     private readonly Contracts.State.State.StateClient _client;
+    private readonly IClock _clock;
 
     public StateClient(
         ILogger<StateClient> logger,
         IOptions<StateOptions> options,
-        Contracts.State.State.StateClient client)
+        Contracts.State.State.StateClient client,
+        IClock clock)
     {
         _logger = logger;
         _options = options.Value;
         _client = client;
+        _clock = clock;
 
         _logger.LogInformation("State address set to {Address}", _options.Address);
     }
@@ -44,7 +47,7 @@ internal sealed class StateClient : IStateClient
 
         Metadata headers = new();
         headers.AddAuthorization(accessToken);
-        DateTime deadline = DateTime.UtcNow.Add(_options.CallTimeout);
+        DateTime deadline = _clock.GetNowUtc().Add(_options.CallTimeout);
         GetChatsResponse response = await _client.GetChatsAsync(request, headers, deadline, ct);
 
         _logger.LogTrace("Received {ChatCount} chats for user {UserId} which are newer than {NewerThan}", response.Chats.Count, userId, newerThan);
