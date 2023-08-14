@@ -167,6 +167,8 @@ public class Startup
         {
             endpoints.MapGrpcService<ProfileCommandService>();
             endpoints.MapGrpcService<ProfileQueryService>();
+            endpoints.MapGrpcService<ContactQueryService>();
+
             endpoints.MapHttpHealthEndpoints(setup =>
             {
                 Func<HttpContext, HealthReport, Task> responseWriter = (context, report) => CustomHealth.Writer(serviceName: "user", context, report);

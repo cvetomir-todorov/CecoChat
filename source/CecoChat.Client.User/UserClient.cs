@@ -13,6 +13,7 @@ internal sealed class UserClient : IUserClient
     private readonly UserOptions _options;
     private readonly ProfileQuery.ProfileQueryClient _profileQueryClient;
     private readonly ProfileCommand.ProfileCommandClient _profileCommandClient;
+    private readonly ContactQuery.ContactQueryClient _contactQueryClient;
     private readonly IClock _clock;
 
     public UserClient(
@@ -20,12 +21,14 @@ internal sealed class UserClient : IUserClient
         IOptions<UserOptions> options,
         ProfileQuery.ProfileQueryClient profileQueryClient,
         ProfileCommand.ProfileCommandClient profileCommandClient,
+        ContactQuery.ContactQueryClient contactQueryClient,
         IClock clock)
     {
         _logger = logger;
         _options = options.Value;
         _profileQueryClient = profileQueryClient;
         _profileCommandClient = profileCommandClient;
+        _contactQueryClient = contactQueryClient;
         _clock = clock;
 
         _logger.LogInformation("User address set to {Address}", _options.Address);
@@ -169,5 +172,18 @@ internal sealed class UserClient : IUserClient
 
         _logger.LogTrace("Received {PublicProfileCount} public profiles requested by user {UserId}", response.Profiles.Count, userId);
         return response.Profiles;
+    }
+
+    public async Task<IEnumerable<Contact>> GetContacts(long userId, string accessToken, CancellationToken ct)
+    {
+        GetContactsRequest request = new();
+
+        Metadata headers = new();
+        headers.AddAuthorization(accessToken);
+        DateTime deadline = _clock.GetNowUtc().Add(_options.CallTimeout);
+        GetContactsResponse response = await _contactQueryClient.GetContactsAsync(request, headers, deadline, ct);
+
+        _logger.LogTrace("Received {ContactCount} contacts for user {UserId}", response.Contacts.Count, userId);
+        return response.Contacts;
     }
 }

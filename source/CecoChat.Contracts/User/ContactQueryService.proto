@@ -1,0 +1,15 @@
+syntax = "proto3";
+option csharp_namespace = "CecoChat.Contracts.User";
+package CecoChat.Contracts.User;
+import "User/Contact.proto";
+
+service ContactQuery {
+  rpc GetContacts(GetContactsRequest) returns (GetContactsResponse);
+}
+
+message GetContactsRequest {
+}
+
+message GetContactsResponse {
+  repeated Contact contacts = 1;
+}

@@ -15,6 +15,8 @@ public interface IUserClient : IDisposable
     Task<ProfilePublic> GetPublicProfile(long userId, long requestedUserId, string accessToken, CancellationToken ct);
 
     Task<IEnumerable<ProfilePublic>> GetPublicProfiles(long userId, IEnumerable<long> requestedUserIds, string accessToken, CancellationToken ct);
+
+    Task<IEnumerable<Contact>> GetContacts(long userId, string accessToken, CancellationToken ct);
 }
 
 public readonly struct CreateProfileResult
