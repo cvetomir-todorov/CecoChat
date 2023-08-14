@@ -17,15 +17,18 @@ internal sealed class HistoryClient : IHistoryClient
     private readonly ILogger _logger;
     private readonly HistoryOptions _options;
     private readonly Contracts.History.History.HistoryClient _client;
+    private readonly IClock _clock;
 
     public HistoryClient(
         ILogger<HistoryClient> logger,
         IOptions<HistoryOptions> options,
-        Contracts.History.History.HistoryClient client)
+        Contracts.History.History.HistoryClient client,
+        IClock clock)
     {
         _logger = logger;
         _options = options.Value;
         _client = client;
+        _clock = clock;
 
         _logger.LogInformation("History address set to {Address}", _options.Address);
     }
@@ -45,7 +48,7 @@ internal sealed class HistoryClient : IHistoryClient
 
         Metadata headers = new();
         headers.AddAuthorization(accessToken);
-        DateTime deadline = DateTime.UtcNow.Add(_options.CallTimeout);
+        DateTime deadline = _clock.GetNowUtc().Add(_options.CallTimeout);
         GetHistoryResponse response = await _client.GetHistoryAsync(request, headers, deadline, ct);
 
         _logger.LogTrace("Received {MessageCount} messages for history between {UserId} and {OtherUserId} older than {OlderThan}", response.Messages.Count, userId, otherUserId, olderThan);
