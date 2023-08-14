@@ -74,10 +74,12 @@ public sealed class NpgsqlDbInitializer : INpgsqlDbInitializer
 
     private static List<SqlScript> GetGenericSqlScripts(Assembly scriptSource)
     {
-        List<string> scriptNames = scriptSource
-            .GetManifestResourceNames()
-            .Where(name => name.EndsWith("user.sql") || name.EndsWith("database.sql"))
-            .ToList();
+        string[] resources = scriptSource.GetManifestResourceNames();
+        IEnumerable<string> userScripts = resources.Where(name => name.Contains("user-"));
+        IEnumerable<string> databaseScripts = resources.Where(name => name.Contains("database-"));
+
+        // put users in front
+        List<string> scriptNames = userScripts.Union(databaseScripts).ToList();
 
         return GetSqlScripts(scriptNames, scriptSource);
     }
@@ -86,7 +88,8 @@ public sealed class NpgsqlDbInitializer : INpgsqlDbInitializer
     {
         List<string> scriptNames = scriptSource
             .GetManifestResourceNames()
-            .Where(name => name.EndsWith("table.sql"))
+            .Where(name => name.Contains("table-"))
+            .OrderBy(name => name)
             .ToList();
 
         return GetSqlScripts(scriptNames, scriptSource);
