@@ -1,5 +1,6 @@
 using Autofac;
 using CecoChat.Autofac;
+using CecoChat.Data.User.Contacts;
 using CecoChat.Data.User.Repos;
 using CecoChat.Data.User.Security;
 using CecoChat.Npgsql;
@@ -48,5 +49,7 @@ public class UserDbAutofacModule : Module
                 decorator: (context, inner) => context.ResolveNamed<IProfileQueryRepo>("caching-profile-repo", TypedParameter.From(inner)),
                 fromKey: "profile-repo")
             .InstancePerLifetimeScope();
+
+        builder.RegisterType<ContactQueryRepo>().As<IContactQueryRepo>().InstancePerLifetimeScope();
     }
 }

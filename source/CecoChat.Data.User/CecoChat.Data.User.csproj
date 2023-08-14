@@ -8,6 +8,7 @@
     <EmbeddedResource Include="Scripts\user-dev.sql" />
     <EmbeddedResource Include="Scripts\database-users.sql" />
     <EmbeddedResource Include="Scripts\table-01-profiles.sql" />
+    <EmbeddedResource Include="Scripts\table-02-contacts.sql" />
   </ItemGroup>
 
   <ItemGroup>
