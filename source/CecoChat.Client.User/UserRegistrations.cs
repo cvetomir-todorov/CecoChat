@@ -31,5 +31,12 @@ public static class UserRegistrations
             })
             .ConfigureSocketsPrimaryHttpClientHandler(options.SocketsHttpHandler)
             .AddGrpcRetryPolicy(options.Retry);
+
+        services.AddGrpcClient<ContactQuery.ContactQueryClient>(grpc =>
+            {
+                grpc.Address = options.Address;
+            })
+            .ConfigureSocketsPrimaryHttpClientHandler(options.SocketsHttpHandler)
+            .AddGrpcRetryPolicy(options.Retry);
     }
 }
