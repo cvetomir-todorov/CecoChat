@@ -30,14 +30,10 @@ public class AutoMapperProfile : AutoMapper.Profile
                 {
                     switch (contactContract.Status)
                     {
-                        case Contracts.User.ContactStatus.PendingRequest:
-                            return Contracts.Bff.ContactStatus.PendingRequest;
-                        case Contracts.User.ContactStatus.CancelledRequest:
-                            return Contracts.Bff.ContactStatus.CancelledRequest;
-                        case Contracts.User.ContactStatus.Established:
-                            return Contracts.Bff.ContactStatus.Established;
-                        case Contracts.User.ContactStatus.Removed:
-                            return Contracts.Bff.ContactStatus.Removed;
+                        case Contracts.User.ContactStatus.Pending:
+                            return Contracts.Bff.ContactStatus.Pending;
+                        case Contracts.User.ContactStatus.Connected:
+                            return Contracts.Bff.ContactStatus.Connected;
                         default:
                             throw new EnumValueNotSupportedException(contactContract.Status);
                     }
