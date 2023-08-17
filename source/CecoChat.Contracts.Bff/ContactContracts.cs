@@ -20,10 +20,8 @@ public sealed class Contact
 
 public enum ContactStatus
 {
-    PendingRequest,
-    CancelledRequest,
-    Established,
-    Removed
+    Pending,
+    Connected
 }
 
 public sealed class GetContactsResponse
@@ -32,3 +30,47 @@ public sealed class GetContactsResponse
     [AliasAs("contacts")]
     public Contact[] Contacts { get; init; } = Array.Empty<Contact>();
 }
+
+public sealed class InviteContactRequest
+{ }
+
+public sealed class InviteContactResponse
+{
+    [JsonPropertyName("version")]
+    [AliasAs("version")]
+    public Guid Version { get; init; }
+}
+
+public sealed class ApproveContactRequest
+{
+    [JsonPropertyName("version")]
+    [AliasAs("version")]
+    public Guid Version { get; init; }
+}
+
+public sealed class ApproveContactResponse
+{
+    [JsonPropertyName("newVersion")]
+    [AliasAs("newVersion")]
+    public Guid NewVersion { get; set; }
+}
+
+public sealed class CancelContactRequest
+{
+    [JsonPropertyName("version")]
+    [AliasAs("version")]
+    public Guid Version { get; init; }
+}
+
+public sealed class CancelContactResponse
+{ }
+
+public sealed class RemoveContactRequest
+{
+    [JsonPropertyName("version")]
+    [AliasAs("version")]
+    public Guid Version { get; init; }
+}
+
+public sealed class RemoveContactResponse
+{ }
