@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS public."Contacts"
     "User2Id" bigint NOT NULL,
     "Version" uuid NOT NULL,
     "Status" text COLLATE pg_catalog."default" NOT NULL,
+    "TargetUserId" bigint NOT NULL,
     CONSTRAINT "Contacts_pkey" PRIMARY KEY ("User1Id", "User2Id")
 )
 WITH (
