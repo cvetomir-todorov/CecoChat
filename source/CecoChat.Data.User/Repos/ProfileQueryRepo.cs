@@ -32,7 +32,9 @@ internal class ProfileQueryRepo : IProfileQueryRepo
             throw new ArgumentException("User name should not contain upper-case letters.", nameof(userName));
         }
 
-        ProfileEntity? entity = await _dbContext.Profiles.FirstOrDefaultAsync(profile => profile.UserName == userName);
+        ProfileEntity? entity = await _dbContext.Profiles
+            .AsNoTracking()
+            .FirstOrDefaultAsync(profile => profile.UserName == userName);
         if (entity == null)
         {
             _logger.LogTrace("Failed to fetch full profile for user {UserName}", userName);
@@ -54,7 +56,9 @@ internal class ProfileQueryRepo : IProfileQueryRepo
 
     public async Task<ProfilePublic?> GetPublicProfile(long requestedUserId, long userId)
     {
-        ProfileEntity? entity = await _dbContext.Profiles.FirstOrDefaultAsync(profile => profile.UserId == requestedUserId);
+        ProfileEntity? entity = await _dbContext.Profiles
+            .AsNoTracking()
+            .FirstOrDefaultAsync(profile => profile.UserId == requestedUserId);
         if (entity == null)
         {
             return null;
@@ -69,6 +73,7 @@ internal class ProfileQueryRepo : IProfileQueryRepo
         return await _dbContext.Profiles
             .Where(entity => requestedUserIds.Contains(entity.UserId))
             .Select(entity => _mapper.Map<ProfilePublic>(entity))
+            .AsNoTracking()
             .ToListAsync();
     }
 }
