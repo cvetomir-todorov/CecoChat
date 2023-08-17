@@ -21,8 +21,9 @@ public class UserDbContext : DbContext
 
         modelBuilder.Entity<ContactEntity>().HasKey(nameof(ContactEntity.User1Id), nameof(ContactEntity.User2Id));
         modelBuilder.Entity<ContactEntity>().Property(e => e.Status)
-            .HasDefaultValue(ContactEntityStatus.PendingRequest)
-            .HasConversion<string>();
+            .HasConversion<string>(
+                status => status.ToString(),
+                statusString => (ContactEntityStatus)Enum.Parse(typeof(ContactEntityStatus), statusString));
         modelBuilder.Entity<ContactEntity>().Property(e => e.Version).IsConcurrencyToken();
 
         base.OnModelCreating(modelBuilder);
@@ -47,12 +48,11 @@ public sealed class ContactEntity
     public long User2Id { get; set; }
     public Guid Version { get; set; }
     public ContactEntityStatus Status { get; set; }
+    public long TargetUserId { get; set; }
 }
 
 public enum ContactEntityStatus
 {
-    PendingRequest,
-    CancelledRequest,
-    Established,
-    Removed
+    Pending,
+    Connected
 }

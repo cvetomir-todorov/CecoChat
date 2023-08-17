@@ -51,5 +51,6 @@ public class UserDbAutofacModule : Module
             .InstancePerLifetimeScope();
 
         builder.RegisterType<ContactQueryRepo>().As<IContactQueryRepo>().InstancePerLifetimeScope();
+        builder.RegisterType<ContactCommandRepo>().As<IContactCommandRepo>().InstancePerLifetimeScope();
     }
 }
