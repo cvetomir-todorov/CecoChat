@@ -14,6 +14,7 @@ internal sealed class UserClient : IUserClient
     private readonly ProfileQuery.ProfileQueryClient _profileQueryClient;
     private readonly ProfileCommand.ProfileCommandClient _profileCommandClient;
     private readonly ContactQuery.ContactQueryClient _contactQueryClient;
+    private readonly ContactCommand.ContactCommandClient _contactCommandClient;
     private readonly IClock _clock;
 
     public UserClient(
@@ -22,6 +23,7 @@ internal sealed class UserClient : IUserClient
         ProfileQuery.ProfileQueryClient profileQueryClient,
         ProfileCommand.ProfileCommandClient profileCommandClient,
         ContactQuery.ContactQueryClient contactQueryClient,
+        ContactCommand.ContactCommandClient contactCommandClient,
         IClock clock)
     {
         _logger = logger;
@@ -29,6 +31,7 @@ internal sealed class UserClient : IUserClient
         _profileQueryClient = profileQueryClient;
         _profileCommandClient = profileCommandClient;
         _contactQueryClient = contactQueryClient;
+        _contactCommandClient = contactCommandClient;
         _clock = clock;
 
         _logger.LogInformation("User address set to {Address}", _options.Address);
@@ -185,5 +188,168 @@ internal sealed class UserClient : IUserClient
 
         _logger.LogTrace("Received {ContactCount} contacts for user {UserId}", response.Contacts.Count, userId);
         return response.Contacts;
+    }
+
+    public async Task<InviteContactResult> InviteContact(long contactUserId, long userId, string accessToken, CancellationToken ct)
+    {
+        InviteRequest request = new();
+        request.ContactUserId = contactUserId;
+
+        Metadata headers = new();
+        headers.AddAuthorization(accessToken);
+        DateTime deadline = _clock.GetNowUtc().Add(_options.CallTimeout);
+        InviteResponse response = await _contactCommandClient.InviteAsync(request, headers, deadline, ct);
+
+        if (response.Success)
+        {
+            _logger.LogTrace("Received successful sending for contact request from user {UserId} to contact {ContactUserId}", userId, contactUserId);
+            return new InviteContactResult
+            {
+                Success = true,
+                Version = response.Version.ToGuid()
+            };
+        }
+        if (response.AlreadyExists)
+        {
+            _logger.LogTrace("Received failed sending for contact request from user {UserId} to contact {ContactUserId}", userId, contactUserId);
+            return new InviteContactResult
+            {
+                AlreadyExists = true
+            };
+        }
+
+        throw new InvalidOperationException($"Failed to process {nameof(InviteResponse)}.");
+    }
+    
+    // TODO: add logging
+
+    public async Task<ApproveContactResult> ApproveContact(long contactUserId, Guid version, long userId, string accessToken, CancellationToken ct)
+    {
+        ApproveRequest request = new();
+        request.ContactUserId = contactUserId;
+        request.Version = version.ToUuid();
+
+        Metadata headers = new();
+        headers.AddAuthorization(accessToken);
+        DateTime deadline = _clock.GetNowUtc().Add(_options.CallTimeout);
+        ApproveResponse response = await _contactCommandClient.ApproveAsync(request, headers, deadline, ct);
+
+        if (response.Success)
+        {
+            return new ApproveContactResult
+            {
+                Success = true,
+                NewVersion = response.NewVersion.ToGuid()
+            };
+        }
+        if (response.MissingContact)
+        {
+            return new ApproveContactResult
+            {
+                MissingContact = true
+            };
+        }
+        if (response.Invalid)
+        {
+            return new ApproveContactResult
+            {
+                Invalid = true
+            };
+        }
+        if (response.ConcurrentlyUpdated)
+        {
+            return new ApproveContactResult
+            {
+                ConcurrentlyUpdated = true
+            };
+        }
+
+        throw new InvalidOperationException($"Failed to process {nameof(ApproveResponse)}.");
+    }
+
+    public async Task<CancelContactResult> CancelContact(long contactUserId, Guid version, long userId, string accessToken, CancellationToken ct)
+    {
+        CancelRequest request = new();
+        request.ContactUserId = contactUserId;
+        request.Version = version.ToUuid();
+
+        Metadata headers = new();
+        headers.AddAuthorization(accessToken);
+        DateTime deadline = _clock.GetNowUtc().Add(_options.CallTimeout);
+        CancelResponse response = await _contactCommandClient.CancelAsync(request, headers, deadline, ct);
+
+        if (response.Success)
+        {
+            return new CancelContactResult
+            {
+                Success = true
+            };
+        }
+        if (response.MissingContact)
+        {
+            return new CancelContactResult
+            {
+                MissingContact = true
+            };
+        }
+        if (response.Invalid)
+        {
+            return new CancelContactResult
+            {
+                Invalid = true
+            };
+        }
+        if (response.ConcurrentlyUpdated)
+        {
+            return new CancelContactResult
+            {
+                ConcurrentlyUpdated = true
+            };
+        }
+
+        throw new InvalidOperationException($"Failed to process {typeof(CancelResponse)}.");
+    }
+
+    public async Task<RemoveContactResult> RemoveContact(long contactUserId, Guid version, long userId, string accessToken, CancellationToken ct)
+    {
+        RemoveRequest request = new();
+        request.ContactUserId = contactUserId;
+        request.Version = version.ToUuid();
+
+        Metadata headers = new();
+        headers.AddAuthorization(accessToken);
+        DateTime deadline = _clock.GetNowUtc().Add(_options.CallTimeout);
+        RemoveResponse response = await _contactCommandClient.RemoveAsync(request, headers, deadline, ct);
+
+        if (response.Success)
+        {
+            return new RemoveContactResult
+            {
+                Success = true
+            };
+        }
+        if (response.MissingContact)
+        {
+            return new RemoveContactResult
+            {
+                MissingContact = true
+            };
+        }
+        if (response.Invalid)
+        {
+            return new RemoveContactResult
+            {
+                Invalid = true
+            };
+        }
+        if (response.ConcurrentlyUpdated)
+        {
+            return new RemoveContactResult
+            {
+                ConcurrentlyUpdated = true
+            };
+        }
+
+        throw new InvalidOperationException($"Failed to process {typeof(RemoveResponse)}.");
     }
 }
