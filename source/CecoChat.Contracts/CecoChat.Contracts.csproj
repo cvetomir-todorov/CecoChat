@@ -27,6 +27,7 @@
     <Protobuf Include="State\ChatState.proto" />
     <Protobuf Include="State\StateService.proto" GrpcServices="All" />
     <Protobuf Include="User\Contact.proto" />
+    <Protobuf Include="User\ContactCommandService.proto" GrpcServices="All" />
     <Protobuf Include="User\ContactQueryService.proto" GrpcServices="All" />
     <Protobuf Include="User\ProfileChangePassword.proto" />
     <Protobuf Include="User\ProfileCommandService.proto" GrpcServices="All" />

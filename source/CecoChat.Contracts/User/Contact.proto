@@ -7,11 +7,10 @@ message Contact {
   int64 contact_user_id = 1;
   Uuid version = 2;
   ContactStatus status = 3;
+  int64 target_user_id = 4;
 }
 
 enum ContactStatus {
-  PENDING_REQUEST = 0;
-  CANCELLED_REQUEST = 1;
-  ESTABLISHED = 2;
-  REMOVED = 3;
+  PENDING = 0;
+  CONNECTED = 1;
 }

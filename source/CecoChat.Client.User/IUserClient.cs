@@ -17,6 +17,14 @@ public interface IUserClient : IDisposable
     Task<IEnumerable<ProfilePublic>> GetPublicProfiles(long userId, IEnumerable<long> requestedUserIds, string accessToken, CancellationToken ct);
 
     Task<IEnumerable<Contact>> GetContacts(long userId, string accessToken, CancellationToken ct);
+
+    Task<InviteContactResult> InviteContact(long contactUserId, long userId, string accessToken, CancellationToken ct);
+
+    Task<ApproveContactResult> ApproveContact(long contactUserId, Guid version, long userId, string accessToken, CancellationToken ct);
+
+    Task<CancelContactResult> CancelContact(long contactUserId, Guid version, long userId, string accessToken, CancellationToken ct);
+
+    Task<RemoveContactResult> RemoveContact(long contactUserId, Guid version, long userId, string accessToken, CancellationToken ct);
 }
 
 public readonly struct CreateProfileResult
@@ -43,5 +51,37 @@ public readonly struct UpdateProfileResult
 {
     public bool Success { get; init; }
     public Guid NewVersion { get; init; }
+    public bool ConcurrentlyUpdated { get; init; }
+}
+
+public readonly struct InviteContactResult
+{
+    public bool Success { get; init; }
+    public Guid Version { get; init; }
+    public bool AlreadyExists { get; init; }
+}
+
+public readonly struct ApproveContactResult
+{
+    public bool Success { get; init; }
+    public Guid NewVersion { get; init; }
+    public bool MissingContact { get; init; }
+    public bool Invalid { get; init; }
+    public bool ConcurrentlyUpdated { get; init; }
+}
+
+public readonly struct CancelContactResult
+{
+    public bool Success { get; init; }
+    public bool MissingContact { get; init; }
+    public bool Invalid { get; init; }
+    public bool ConcurrentlyUpdated { get; init; }
+}
+
+public readonly struct RemoveContactResult
+{
+    public bool Success { get; init; }
+    public bool MissingContact { get; init; }
+    public bool Invalid { get; init; }
     public bool ConcurrentlyUpdated { get; init; }
 }
