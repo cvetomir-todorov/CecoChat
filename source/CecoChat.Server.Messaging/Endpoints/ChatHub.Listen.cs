@@ -18,8 +18,6 @@ public partial class ChatHub : Hub<IChatListener>, IChatHub
     private readonly IIdGenClient _idGenClient;
     private readonly ISendersProducer _sendersProducer;
 
-    private const string MissingUserDataExMsg = "User has authenticated but data cannot be parsed from the access token.";
-
     public ChatHub(
         ILogger<ChatHub> logger,
         IClientContainer clientContainer,
@@ -40,10 +38,7 @@ public partial class ChatHub : Hub<IChatListener>, IChatHub
 
     public override async Task OnConnectedAsync()
     {
-        if (!Context.User!.TryGetUserClaims(out UserClaims? userClaims))
-        {
-            throw new HubException(MissingUserDataExMsg);
-        }
+        UserClaims userClaims = Context.User!.GetUserClaimsSignalR(Context.ConnectionId, _logger, setUserIdTag: false);
 
         await _clientContainer.AddClient(userClaims.UserId, Context.ConnectionId);
         await base.OnConnectedAsync();
@@ -52,10 +47,7 @@ public partial class ChatHub : Hub<IChatListener>, IChatHub
 
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
-        if (!Context.User!.TryGetUserClaims(out UserClaims? userClaims))
-        {
-            throw new HubException(MissingUserDataExMsg);
-        }
+        UserClaims userClaims = Context.User!.GetUserClaimsSignalR(Context.ConnectionId, _logger, setUserIdTag: false);
 
         await _clientContainer.RemoveClient(userClaims.UserId, Context.ConnectionId);
         await base.OnDisconnectedAsync(exception);

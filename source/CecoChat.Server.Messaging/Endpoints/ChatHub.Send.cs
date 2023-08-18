@@ -18,10 +18,8 @@ public partial class ChatHub
         {
             throw new ValidationHubException(result.Errors);
         }
-        if (!Context.User!.TryGetUserClaims(Context.ConnectionId, _logger, out UserClaims? userClaims))
-        {
-            throw new HubException(MissingUserDataExMsg);
-        }
+
+        UserClaims userClaims = Context.User!.GetUserClaimsSignalR(Context.ConnectionId, _logger);
 
         _messagingTelemetry.NotifyPlainTextReceived();
         long messageId = await GetMessageId();
