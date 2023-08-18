@@ -1,6 +1,7 @@
 using Autofac;
 using CecoChat.Autofac;
 using CecoChat.Data.User.Contacts;
+using CecoChat.Data.User.Infra;
 using CecoChat.Data.User.Profiles;
 using CecoChat.Data.User.Security;
 using CecoChat.Npgsql;
@@ -52,5 +53,7 @@ public class UserDbAutofacModule : Module
 
         builder.RegisterType<ContactQueryRepo>().As<IContactQueryRepo>().InstancePerLifetimeScope();
         builder.RegisterType<ContactCommandRepo>().As<IContactCommandRepo>().InstancePerLifetimeScope();
+
+        builder.RegisterType<DataUtility>().As<IDataUtility>().SingleInstance();
     }
 }

@@ -1,5 +1,6 @@
 using CecoChat.Contracts;
 using CecoChat.Contracts.User;
+using CecoChat.Data.User.Infra;
 using CecoChat.Data.User.Security;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -12,12 +13,14 @@ internal class ProfileCommandRepo : IProfileCommandRepo
 {
     private readonly ILogger _logger;
     private readonly UserDbContext _dbContext;
+    private readonly IDataUtility _dataUtility;
     private readonly IPasswordHasher _passwordHasher;
 
-    public ProfileCommandRepo(ILogger<ProfileCommandRepo> logger, UserDbContext dbContext, IPasswordHasher passwordHasher)
+    public ProfileCommandRepo(ILogger<ProfileCommandRepo> logger, UserDbContext dbContext, IDataUtility dataUtility, IPasswordHasher passwordHasher)
     {
         _logger = logger;
         _dbContext = dbContext;
+        _dataUtility = dataUtility;
         _passwordHasher = passwordHasher;
     }
 
@@ -81,7 +84,7 @@ internal class ProfileCommandRepo : IProfileCommandRepo
         };
         EntityEntry<ProfileEntity> entry = _dbContext.Profiles.Attach(entity);
         entry.Property(e => e.Password).IsModified = true;
-        Guid newVersion = SetVersion(entry, profile.Version.ToGuid());
+        Guid newVersion = _dataUtility.SetVersion(entry, profile.Version.ToGuid());
 
         try
         {
@@ -112,7 +115,7 @@ internal class ProfileCommandRepo : IProfileCommandRepo
         };
         EntityEntry<ProfileEntity> entry = _dbContext.Profiles.Attach(entity);
         entry.Property(e => e.DisplayName).IsModified = true;
-        Guid newVersion = SetVersion(entry, profile.Version.ToGuid());
+        Guid newVersion = _dataUtility.SetVersion(entry, profile.Version.ToGuid());
 
         try
         {
@@ -132,14 +135,5 @@ internal class ProfileCommandRepo : IProfileCommandRepo
                 ConcurrentlyUpdated = true
             };
         }
-    }
-
-    private static Guid SetVersion(EntityEntry<ProfileEntity> entity, Guid originalVersion)
-    {
-        PropertyEntry<ProfileEntity, Guid> property = entity.Property(e => e.Version);
-        property.OriginalValue = originalVersion;
-        property.CurrentValue = Guid.NewGuid();
-
-        return property.CurrentValue;
     }
 }

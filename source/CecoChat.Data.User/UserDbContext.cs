@@ -30,7 +30,12 @@ public class UserDbContext : DbContext
     }
 }
 
-public sealed class ProfileEntity
+public interface IVersionEntity
+{
+    Guid Version { get; set; }
+}
+
+public sealed class ProfileEntity : IVersionEntity
 {
     public long UserId { get; set; }
     public Guid Version { get; set; }
@@ -42,7 +47,7 @@ public sealed class ProfileEntity
     public string Email { get; set; } = string.Empty;
 }
 
-public sealed class ContactEntity
+public sealed class ContactEntity : IVersionEntity
 {
     public long User1Id { get; set; }
     public long User2Id { get; set; }

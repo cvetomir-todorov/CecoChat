@@ -1,5 +1,6 @@
 using CecoChat.Contracts;
 using CecoChat.Contracts.User;
+using CecoChat.Data.User.Infra;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Logging;
@@ -11,13 +12,16 @@ internal class ContactCommandRepo : IContactCommandRepo
 {
     private readonly ILogger _logger;
     private readonly UserDbContext _dbContext;
+    private readonly IDataUtility _dataUtility;
 
     public ContactCommandRepo(
         ILogger<ContactCommandRepo> logger,
-        UserDbContext dbContext)
+        UserDbContext dbContext,
+        IDataUtility dataUtility)
     {
         _logger = logger;
         _dbContext = dbContext;
+        _dataUtility = dataUtility;
     }
 
     public async Task<AddContactResult> AddContact(long userId, Contact contact)
@@ -67,7 +71,7 @@ internal class ContactCommandRepo : IContactCommandRepo
         EntityEntry<ContactEntity> entry = _dbContext.Contacts.Attach(entity);
         entry.Property(e => e.Status).IsModified = true;
         entry.Property(e => e.TargetUserId).IsModified = true;
-        Guid newVersion = SetVersion(entry, contact.Version.ToGuid());
+        Guid newVersion = _dataUtility.SetVersion(entry, contact.Version.ToGuid());
 
         try
         {
@@ -95,7 +99,7 @@ internal class ContactCommandRepo : IContactCommandRepo
 
         EntityEntry<ContactEntity> entry = _dbContext.Contacts.Attach(entity);
         entry.State = EntityState.Deleted;
-        SetVersion(entry, contact.Version.ToGuid());
+        _dataUtility.SetVersion(entry, contact.Version.ToGuid());
 
         try
         {
@@ -144,15 +148,5 @@ internal class ContactCommandRepo : IContactCommandRepo
             default:
                 throw new EnumValueNotSupportedException(status);
         }
-    }
-
-    // TODO: reuse with profile repo
-    private static Guid SetVersion(EntityEntry<ContactEntity> entity, Guid originalVersion)
-    {
-        PropertyEntry<ContactEntity, Guid> property = entity.Property(e => e.Version);
-        property.OriginalValue = originalVersion;
-        property.CurrentValue = Guid.NewGuid();
-
-        return property.CurrentValue;
     }
 }

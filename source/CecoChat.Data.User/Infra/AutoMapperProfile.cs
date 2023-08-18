@@ -1,7 +1,7 @@
 using CecoChat.Contracts;
 using CecoChat.Contracts.User;
 
-namespace CecoChat.Data.User;
+namespace CecoChat.Data.User.Infra;
 
 public class AutoMapperProfile : AutoMapper.Profile
 {
