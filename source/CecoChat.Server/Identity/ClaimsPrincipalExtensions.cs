@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
 
 namespace CecoChat.Server.Identity;
@@ -28,13 +29,12 @@ public static class ClaimsPrincipalExtensions
         return true;
     }
 
-    public static bool TryGetUserClaims(this ClaimsPrincipal user, string connection, ILogger logger, [NotNullWhen(true)] out UserClaims? userClaims, bool setUserIdTag = true)
+    public static UserClaims GetUserClaimsSignalR(this ClaimsPrincipal user, string connection, ILogger logger, bool setUserIdTag = true)
     {
-        if (!user.TryGetUserClaims(out userClaims))
+        if (!user.TryGetUserClaims(out UserClaims? userClaims))
         {
-            logger.LogError("Client named '{Name}' with connection {Connection} was authorized but has no parseable access token",
-                user.Identity?.Name, connection);
-            return false;
+            logger.LogError("Client named '{Name}' with connection {Connection} was authorized but has no parseable access token", user.Identity?.Name, connection);
+            throw new HubException("User has authenticated but data cannot be parsed from the access token.");
         }
 
         if (setUserIdTag)
@@ -42,10 +42,10 @@ public static class ClaimsPrincipalExtensions
             Activity.Current?.SetTag(UserIdTagName, userClaims.UserId);
         }
 
-        return true;
+        return userClaims;
     }
 
-    public static bool TryGetUserClaims(this ClaimsPrincipal user, [NotNullWhen(true)] out UserClaims? userClaims)
+    private static bool TryGetUserClaims(this ClaimsPrincipal user, [NotNullWhen(true)] out UserClaims? userClaims)
     {
         if (!user.TryGetUserId(out long userId))
         {

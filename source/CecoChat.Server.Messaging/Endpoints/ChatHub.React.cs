@@ -3,7 +3,6 @@ using CecoChat.Contracts.Messaging;
 using CecoChat.Server.Identity;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.SignalR;
 
 namespace CecoChat.Server.Messaging.Endpoints;
 
@@ -17,10 +16,8 @@ public partial class ChatHub
         {
             throw new ValidationHubException(result.Errors);
         }
-        if (!Context.User!.TryGetUserClaims(Context.ConnectionId, _logger, out UserClaims? userClaims))
-        {
-            throw new HubException(MissingUserDataExMsg);
-        }
+
+        UserClaims userClaims = Context.User!.GetUserClaimsSignalR(Context.ConnectionId, _logger);
 
         _messagingTelemetry.NotifyReactionReceived();
         _logger.LogTrace("User {UserId} with client {ClientId} and connection {ConnectionId} reacted with {Reaction} to message {MessageId} sent by user {SenderId}",
@@ -43,10 +40,8 @@ public partial class ChatHub
         {
             throw new ValidationHubException(result.Errors);
         }
-        if (!Context.User!.TryGetUserClaims(Context.ConnectionId, _logger, out UserClaims? userClaims))
-        {
-            throw new HubException(MissingUserDataExMsg);
-        }
+
+        UserClaims userClaims = Context.User!.GetUserClaimsSignalR(Context.ConnectionId, _logger);
 
         _messagingTelemetry.NotifyUnreactionReceived();
         _logger.LogTrace("User {UserId} with client {ClientId} and connection {ConnectionId} un-reacted to message {MessageId} sent by user {SenderId}",
