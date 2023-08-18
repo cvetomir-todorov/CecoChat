@@ -4,7 +4,7 @@ using CecoChat.Data.User.Security;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace CecoChat.Data.User.Repos;
+namespace CecoChat.Data.User.Profiles;
 
 internal class ProfileQueryRepo : IProfileQueryRepo
 {

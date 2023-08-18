@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using StackExchange.Redis;
 
-namespace CecoChat.Data.User.Repos;
+namespace CecoChat.Data.User.Profiles;
 
 /// <summary>
 /// The abstraction leaks Redis details, but that avoids allocations, so it's acceptable.

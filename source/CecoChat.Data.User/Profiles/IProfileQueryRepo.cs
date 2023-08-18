@@ -1,6 +1,6 @@
 using CecoChat.Contracts.User;
 
-namespace CecoChat.Data.User.Repos;
+namespace CecoChat.Data.User.Profiles;
 
 public interface IProfileQueryRepo
 {

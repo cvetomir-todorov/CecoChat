@@ -1,4 +1,4 @@
-using CecoChat.Data.User.Repos;
+using CecoChat.Data.User.Profiles;
 
 namespace CecoChat.Server.User.HostedServices;
 
