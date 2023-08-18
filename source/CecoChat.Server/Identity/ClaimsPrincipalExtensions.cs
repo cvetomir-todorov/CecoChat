@@ -2,6 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using Grpc.Core;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
@@ -35,6 +36,24 @@ public static class ClaimsPrincipalExtensions
         {
             logger.LogError("Client named '{Name}' with connection {Connection} was authorized but has no parseable access token", user.Identity?.Name, connection);
             throw new HubException("User has authenticated but data cannot be parsed from the access token.");
+        }
+
+        if (setUserIdTag)
+        {
+            Activity.Current?.SetTag(UserIdTagName, userClaims.UserId);
+        }
+
+        return userClaims;
+    }
+
+    public static UserClaims GetUserClaimsGrpc(this ServerCallContext context, ILogger logger, bool setUserIdTag = true)
+    {
+        HttpContext httpContext = context.GetHttpContext();
+
+        if (!httpContext.User.TryGetUserClaims(out UserClaims? userClaims))
+        {
+            logger.LogError("Client named '{Name}' was authorized but has no parseable access token", httpContext.User.Identity?.Name);
+            throw new RpcException(new Status(StatusCode.Unauthenticated, string.Empty));
         }
 
         if (setUserIdTag)

@@ -27,10 +27,7 @@ public sealed class HistoryService : Contracts.History.History.HistoryBase
     [Authorize(Policy = "user")]
     public override async Task<GetHistoryResponse> GetHistory(GetHistoryRequest request, ServerCallContext context)
     {
-        if (!context.GetHttpContext().TryGetUserClaims(_logger, out UserClaims? userClaims))
-        {
-            throw new RpcException(new Status(StatusCode.Unauthenticated, string.Empty));
-        }
+        UserClaims userClaims = context.GetUserClaimsGrpc(_logger);
 
         string chatId = DataUtility.CreateChatId(userClaims.UserId, request.OtherUserId);
         DateTime olderThan = request.OlderThan.ToDateTime();

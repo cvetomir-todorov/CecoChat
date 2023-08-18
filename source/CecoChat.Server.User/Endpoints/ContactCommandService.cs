@@ -24,7 +24,7 @@ public class ContactCommandService : ContactCommand.ContactCommandBase
 
     public override async Task<InviteResponse> Invite(InviteRequest request, ServerCallContext context)
     {
-        UserClaims userClaims = GetUserClaims(context);
+        UserClaims userClaims = context.GetUserClaimsGrpc(_logger);
 
         Contact? existingContact = await _queryRepo.GetContact(userClaims.UserId, request.ContactUserId);
         if (existingContact != null)
@@ -67,7 +67,7 @@ public class ContactCommandService : ContactCommand.ContactCommandBase
 
     public override async Task<ApproveResponse> Approve(ApproveRequest request, ServerCallContext context)
     {
-        UserClaims userClaims = GetUserClaims(context);
+        UserClaims userClaims = context.GetUserClaimsGrpc(_logger);
 
         Contact? existingContact = await _queryRepo.GetContact(userClaims.UserId, request.ContactUserId);
         if (existingContact == null)
@@ -115,7 +115,7 @@ public class ContactCommandService : ContactCommand.ContactCommandBase
 
     public override async Task<CancelResponse> Cancel(CancelRequest request, ServerCallContext context)
     {
-        UserClaims userClaims = GetUserClaims(context);
+        UserClaims userClaims = context.GetUserClaimsGrpc(_logger);
 
         Contact? existingContact = await _queryRepo.GetContact(userClaims.UserId, request.ContactUserId);
         if (existingContact == null)
@@ -160,7 +160,7 @@ public class ContactCommandService : ContactCommand.ContactCommandBase
 
     public override async Task<RemoveResponse> Remove(RemoveRequest request, ServerCallContext context)
     {
-        UserClaims userClaims = GetUserClaims(context);
+        UserClaims userClaims = context.GetUserClaimsGrpc(_logger);
 
         Contact? existingContact = await _queryRepo.GetContact(userClaims.UserId, request.ContactUserId);
         if (existingContact == null)
@@ -201,16 +201,5 @@ public class ContactCommandService : ContactCommand.ContactCommandBase
         }
 
         throw new InvalidOperationException($"Failed to process {nameof(RemoveContactResult)}.");
-    }
-
-    // TODO: reuse
-    private UserClaims GetUserClaims(ServerCallContext context)
-    {
-        if (!context.GetHttpContext().TryGetUserClaims(_logger, out UserClaims? userClaims))
-        {
-            throw new RpcException(new Status(StatusCode.Unauthenticated, string.Empty));
-        }
-
-        return userClaims;
     }
 }

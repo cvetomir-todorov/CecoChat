@@ -18,7 +18,7 @@ public class ContactQueryService : ContactQuery.ContactQueryBase
 
     public override async Task<GetContactsResponse> GetContacts(GetContactsRequest request, ServerCallContext context)
     {
-        UserClaims userClaims = GetUserClaims(context);
+        UserClaims userClaims = context.GetUserClaimsGrpc(_logger);
 
         IEnumerable<Contact> contacts = await _repo.GetContacts(userClaims.UserId);
 
@@ -27,15 +27,5 @@ public class ContactQueryService : ContactQuery.ContactQueryBase
 
         _logger.LogTrace("Responding with {ContactCount} contacts for user {UserId}", response.Contacts.Count, userClaims.UserId);
         return response;
-    }
-
-    private UserClaims GetUserClaims(ServerCallContext context)
-    {
-        if (!context.GetHttpContext().TryGetUserClaims(_logger, out UserClaims? userClaims))
-        {
-            throw new RpcException(new Status(StatusCode.Unauthenticated, string.Empty));
-        }
-
-        return userClaims;
     }
 }
