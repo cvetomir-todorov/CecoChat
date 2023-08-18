@@ -8,7 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace CecoChat.Server.Identity;
 
-public static class AuthRegistrations
+public static class IdentityRegistrations
 {
     public static IServiceCollection AddJwtAuthentication(this IServiceCollection services, JwtOptions jwtOptions)
     {

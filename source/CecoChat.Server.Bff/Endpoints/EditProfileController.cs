@@ -33,11 +33,7 @@ public class EditProfileController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> ChangePassword([FromBody][BindRequired] ChangePasswordRequest request, CancellationToken ct)
     {
-        if (!HttpContext.TryGetUserClaims(_logger, out UserClaims? userClaims))
-        {
-            return Unauthorized();
-        }
-        if (!HttpContext.TryGetBearerAccessTokenValue(out string? accessToken))
+        if (!HttpContext.TryGetUserClaimsAndAccessToken(_logger, out UserClaims? userClaims, out string? accessToken))
         {
             return Unauthorized();
         }
@@ -70,11 +66,7 @@ public class EditProfileController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> EditProfile([FromBody][BindRequired] EditProfileRequest request, CancellationToken ct)
     {
-        if (!HttpContext.TryGetUserClaims(_logger, out UserClaims? userClaims))
-        {
-            return Unauthorized();
-        }
-        if (!HttpContext.TryGetBearerAccessTokenValue(out string? accessToken))
+        if (!HttpContext.TryGetUserClaimsAndAccessToken(_logger, out UserClaims? userClaims, out string? accessToken))
         {
             return Unauthorized();
         }
