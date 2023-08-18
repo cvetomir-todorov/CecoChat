@@ -5,6 +5,7 @@ using CecoChat.AspNet.Health;
 using CecoChat.AspNet.Prometheus;
 using CecoChat.Autofac;
 using CecoChat.Data.User;
+using CecoChat.Data.User.Infra;
 using CecoChat.Jaeger;
 using CecoChat.Jwt;
 using CecoChat.Npgsql.Health;
