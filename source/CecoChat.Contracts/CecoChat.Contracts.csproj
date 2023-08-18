@@ -26,9 +26,9 @@
     <Protobuf Include="IdGen\IdGenService.proto" GrpcServices="All" />
     <Protobuf Include="State\ChatState.proto" />
     <Protobuf Include="State\StateService.proto" GrpcServices="All" />
-    <Protobuf Include="User\Contact.proto" />
-    <Protobuf Include="User\ContactCommandService.proto" GrpcServices="All" />
-    <Protobuf Include="User\ContactQueryService.proto" GrpcServices="All" />
+    <Protobuf Include="User\Connection.proto" />
+    <Protobuf Include="User\ConnectionCommandService.proto" GrpcServices="All" />
+    <Protobuf Include="User\ConnectionQueryService.proto" GrpcServices="All" />
     <Protobuf Include="User\ProfileChangePassword.proto" />
     <Protobuf Include="User\ProfileCommandService.proto" GrpcServices="All" />
     <Protobuf Include="User\ProfileCreate.proto" />

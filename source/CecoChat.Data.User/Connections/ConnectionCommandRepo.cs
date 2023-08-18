@@ -1,0 +1,152 @@
+using CecoChat.Contracts;
+using CecoChat.Contracts.User;
+using CecoChat.Data.User.Infra;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.Extensions.Logging;
+using Npgsql;
+
+namespace CecoChat.Data.User.Connections;
+
+internal class ConnectionCommandRepo : IConnectionCommandRepo
+{
+    private readonly ILogger _logger;
+    private readonly UserDbContext _dbContext;
+    private readonly IDataUtility _dataUtility;
+
+    public ConnectionCommandRepo(
+        ILogger<ConnectionCommandRepo> logger,
+        UserDbContext dbContext,
+        IDataUtility dataUtility)
+    {
+        _logger = logger;
+        _dbContext = dbContext;
+        _dataUtility = dataUtility;
+    }
+
+    public async Task<AddConnectionResult> AddConnection(long userId, Connection connection)
+    {
+        ConnectionEntity entity = CreateEntityWithUserIds(userId, connection.ConnectionId);
+        entity.Version = Guid.NewGuid();
+        entity.Status = MapStatus(connection.Status);
+        entity.TargetId = connection.TargetUserId;
+
+        _dbContext.Connections.Add(entity);
+
+        try
+        {
+            await _dbContext.SaveChangesAsync();
+            _logger.LogTrace("Added a new connection from {UserId} to {ConnectionId}", userId, connection.ConnectionId);
+
+            return new AddConnectionResult
+            {
+                Success = true,
+                Version = entity.Version
+            };
+        }
+        catch (DbUpdateException dbUpdateException) when (dbUpdateException.InnerException is PostgresException postgresException)
+        {
+            // https://www.postgresql.org/docs/current/errcodes-appendix.html
+            if (postgresException.SqlState == "23505")
+            {
+                if (postgresException.MessageText.Contains("Connections_pkey"))
+                {
+                    return new AddConnectionResult
+                    {
+                        AlreadyExists = true
+                    };
+                }
+            }
+
+            throw;
+        }
+    }
+
+    public async Task<UpdateConnectionResult> UpdateConnection(long userId, Connection connection)
+    {
+        ConnectionEntity entity = CreateEntityWithUserIds(userId, connection.ConnectionId);
+        entity.Status = MapStatus(connection.Status);
+        entity.TargetId = connection.TargetUserId;
+
+        EntityEntry<ConnectionEntity> entry = _dbContext.Connections.Attach(entity);
+        entry.Property(e => e.Status).IsModified = true;
+        entry.Property(e => e.TargetId).IsModified = true;
+        Guid newVersion = _dataUtility.SetVersion(entry, connection.Version.ToGuid());
+
+        try
+        {
+            await _dbContext.SaveChangesAsync();
+            _logger.LogTrace("Updated existing connection from {UserId} to {ConnectionId} with status {ConnectionStatus}", userId, connection.ConnectionId, connection.Status);
+
+            return new UpdateConnectionResult
+            {
+                Success = true,
+                NewVersion = newVersion
+            };
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            return new UpdateConnectionResult
+            {
+                ConcurrentlyUpdated = true
+            };
+        }
+    }
+
+    public async Task<RemoveConnectionResult> RemoveConnection(long userId, Connection connection)
+    {
+        ConnectionEntity entity = CreateEntityWithUserIds(userId, connection.ConnectionId);
+
+        EntityEntry<ConnectionEntity> entry = _dbContext.Connections.Attach(entity);
+        entry.State = EntityState.Deleted;
+        _dataUtility.SetVersion(entry, connection.Version.ToGuid());
+
+        try
+        {
+            await _dbContext.SaveChangesAsync();
+            _logger.LogTrace("Removed existing connection from {UserId} to {ConnectionId}", userId, connection.ConnectionId);
+
+            return new RemoveConnectionResult
+            {
+                Success = true
+            };
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            return new RemoveConnectionResult
+            {
+                ConcurrentlyUpdated = true
+            };
+        }
+    }
+
+    private static ConnectionEntity CreateEntityWithUserIds(long userId, long connectionId)
+    {
+        if (userId == connectionId)
+        {
+            throw new InvalidOperationException($"User ID and connection ID should be different, but have the same value {userId}.");
+        }
+
+        long smallerId = Math.Min(userId, connectionId);
+        long biggerId = Math.Max(userId, connectionId);
+
+        return new ConnectionEntity
+        {
+            User1Id = smallerId,
+            User2Id = biggerId
+        };
+    }
+
+    private static ConnectionEntityStatus MapStatus(ConnectionStatus status)
+    {
+        switch (status)
+        {
+            case ConnectionStatus.Pending:
+                return ConnectionEntityStatus.Pending;
+            case ConnectionStatus.Connected:
+                return ConnectionEntityStatus.Connected;
+            default:
+                throw new EnumValueNotSupportedException(status);
+        }
+    }
+}

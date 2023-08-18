@@ -8,15 +8,15 @@ using Microsoft.AspNetCore.Mvc;
 namespace CecoChat.Server.Bff.Endpoints;
 
 [ApiController]
-[Route("api/contact")]
-public class ContactController : ControllerBase
+[Route("api/connection")]
+public class ConnectionController : ControllerBase
 {
     private readonly ILogger _logger;
     private readonly IMapper _mapper;
     private readonly IUserClient _userClient;
 
-    public ContactController(
-        ILogger<ContactController> logger,
+    public ConnectionController(
+        ILogger<ConnectionController> logger,
         IMapper mapper,
         IUserClient userClient)
     {
@@ -27,50 +27,50 @@ public class ContactController : ControllerBase
 
     [Authorize(Policy = "user")]
     [HttpGet]
-    [ProducesResponseType(typeof(GetContactsResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(GetConnectionsResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> GetContacts(CancellationToken ct)
+    public async Task<IActionResult> GetConnections(CancellationToken ct)
     {
         if (!HttpContext.TryGetUserClaimsAndAccessToken(_logger, out UserClaims? userClaims, out string? accessToken))
         {
             return Unauthorized();
         }
 
-        IEnumerable<Contracts.User.Contact> contacts = await _userClient.GetContacts(userClaims.UserId, accessToken, ct);
-        GetContactsResponse response = new()
+        IEnumerable<Contracts.User.Connection> connections = await _userClient.GetConnections(userClaims.UserId, accessToken, ct);
+        GetConnectionsResponse response = new()
         {
-            Contacts = _mapper.Map<Contact[]>(contacts)
+            Connections = _mapper.Map<Connection[]>(connections)
         };
 
-        _logger.LogTrace("Responding with {ContactCount} contacts for user {UserId}", response.Contacts.Length, userClaims.UserId);
+        _logger.LogTrace("Responding with {ConnectionCount} connections for user {UserId}", response.Connections.Length, userClaims.UserId);
         return Ok(response);
     }
 
     // TODO: add logging
 
     [Authorize(Policy = "user")]
-    [HttpPost("{contactId}/invite")]
-    [ProducesResponseType(typeof(InviteContactResponse), StatusCodes.Status200OK)]
+    [HttpPost("{connectionId}/invite")]
+    [ProducesResponseType(typeof(InviteConnectionResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> InviteContact([FromRoute(Name = "contactId")] long contactId, [FromBody] InviteContactRequest request, CancellationToken ct)
+    public async Task<IActionResult> InviteConnection([FromRoute(Name = "connectionId")] long connectionId, [FromBody] InviteConnectionRequest request, CancellationToken ct)
     {
         if (!HttpContext.TryGetUserClaimsAndAccessToken(_logger, out UserClaims? userClaims, out string? accessToken))
         {
             return Unauthorized();
         }
 
-        InviteContactResult result = await _userClient.InviteContact(contactId, userClaims.UserId, accessToken, ct);
+        InviteResult result = await _userClient.Invite(connectionId, userClaims.UserId, accessToken, ct);
         if (result.Success)
         {
-            InviteContactResponse response = new()
+            InviteConnectionResponse response = new()
             {
                 Version = result.Version
             };
@@ -81,35 +81,35 @@ public class ContactController : ControllerBase
             return Conflict();
         }
 
-        throw new InvalidOperationException($"Failed to process {nameof(InviteContactResult)}.");
+        throw new InvalidOperationException($"Failed to process {nameof(InviteResult)}.");
     }
 
     [Authorize(Policy = "user")]
-    [HttpPut("{contactId}/invite")]
-    [ProducesResponseType(typeof(ApproveContactResponse), StatusCodes.Status200OK)]
+    [HttpPut("{connectionId}/invite")]
+    [ProducesResponseType(typeof(ApproveConnectionResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> ApproveContact([FromRoute(Name = "contactId")] long contactId, [FromBody] ApproveContactRequest request, CancellationToken ct)
+    public async Task<IActionResult> ApproveConnection([FromRoute(Name = "connectionId")] long connectionId, [FromBody] ApproveConnectionRequest request, CancellationToken ct)
     {
         if (!HttpContext.TryGetUserClaimsAndAccessToken(_logger, out UserClaims? userClaims, out string? accessToken))
         {
             return Unauthorized();
         }
 
-        ApproveContactResult result = await _userClient.ApproveContact(contactId, request.Version, userClaims.UserId, accessToken, ct);
+        ApproveResult result = await _userClient.Approve(connectionId, request.Version, userClaims.UserId, accessToken, ct);
         if (result.Success)
         {
-            ApproveContactResponse response = new()
+            ApproveConnectionResponse response = new()
             {
                 NewVersion = result.NewVersion
             };
             return Ok(response);
         }
-        if (result.MissingContact)
+        if (result.MissingConnection)
         {
             return NotFound();
         }
@@ -122,32 +122,32 @@ public class ContactController : ControllerBase
             return Conflict("concurrently updated");
         }
 
-        throw new InvalidOperationException($"Failed to process {nameof(ApproveContactResult)}.");
+        throw new InvalidOperationException($"Failed to process {nameof(ApproveResult)}.");
     }
 
     [Authorize(Policy = "user")]
-    [HttpDelete("{contactId}/invite")]
-    [ProducesResponseType(typeof(CancelContactResponse), StatusCodes.Status200OK)]
+    [HttpDelete("{connectionId}/invite")]
+    [ProducesResponseType(typeof(CancelConnectionResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> CancelContact([FromRoute(Name = "contactId")] long contactId, [FromBody] CancelContactRequest request, CancellationToken ct)
+    public async Task<IActionResult> CancelConnection([FromRoute(Name = "connectionId")] long connectionId, [FromBody] CancelConnectionRequest request, CancellationToken ct)
     {
         if (!HttpContext.TryGetUserClaimsAndAccessToken(_logger, out UserClaims? userClaims, out string? accessToken))
         {
             return Unauthorized();
         }
 
-        CancelContactResult result = await _userClient.CancelContact(contactId, request.Version, userClaims.UserId, accessToken, ct);
+        CancelResult result = await _userClient.Cancel(connectionId, request.Version, userClaims.UserId, accessToken, ct);
         if (result.Success)
         {
-            CancelContactResponse response = new();
+            CancelConnectionResponse response = new();
             return Ok(response);
         }
-        if (result.MissingContact)
+        if (result.MissingConnection)
         {
             return NotFound();
         }
@@ -160,32 +160,32 @@ public class ContactController : ControllerBase
             return Conflict("concurrently updated");
         }
 
-        throw new InvalidOperationException($"Failed to process {nameof(CancelContactResult)}.");
+        throw new InvalidOperationException($"Failed to process {nameof(CancelResult)}.");
     }
 
     [Authorize(Policy = "user")]
-    [HttpDelete("{contactId}")]
-    [ProducesResponseType(typeof(RemoveContactResponse), StatusCodes.Status200OK)]
+    [HttpDelete("{connectionId}")]
+    [ProducesResponseType(typeof(RemoveConnectionResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> RemoveContact([FromRoute(Name = "contactId")] long contactId, [FromBody] RemoveContactRequest request, CancellationToken ct)
+    public async Task<IActionResult> RemoveConnection([FromRoute(Name = "connectionId")] long connectionId, [FromBody] RemoveConnectionRequest request, CancellationToken ct)
     {
         if (!HttpContext.TryGetUserClaimsAndAccessToken(_logger, out UserClaims? userClaims, out string? accessToken))
         {
             return Unauthorized();
         }
 
-        RemoveContactResult result = await _userClient.RemoveContact(contactId, request.Version, userClaims.UserId, accessToken, ct);
+        RemoveResult result = await _userClient.Remove(connectionId, request.Version, userClaims.UserId, accessToken, ct);
         if (result.Success)
         {
-            RemoveContactResponse response = new();
+            RemoveConnectionResponse response = new();
             return Ok(response);
         }
-        if (result.MissingContact)
+        if (result.MissingConnection)
         {
             return NotFound();
         }
@@ -198,6 +198,6 @@ public class ContactController : ControllerBase
             return Conflict("concurrently updated");
         }
 
-        throw new InvalidOperationException($"Failed to process {nameof(RemoveContactResult)}.");
+        throw new InvalidOperationException($"Failed to process {nameof(RemoveResult)}.");
     }
 }

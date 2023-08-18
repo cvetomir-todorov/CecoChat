@@ -13,8 +13,8 @@ internal sealed class UserClient : IUserClient
     private readonly UserOptions _options;
     private readonly ProfileQuery.ProfileQueryClient _profileQueryClient;
     private readonly ProfileCommand.ProfileCommandClient _profileCommandClient;
-    private readonly ContactQuery.ContactQueryClient _contactQueryClient;
-    private readonly ContactCommand.ContactCommandClient _contactCommandClient;
+    private readonly ConnectionQuery.ConnectionQueryClient _connectionQueryClient;
+    private readonly ConnectionCommand.ConnectionCommandClient _connectionCommandClient;
     private readonly IClock _clock;
 
     public UserClient(
@@ -22,16 +22,16 @@ internal sealed class UserClient : IUserClient
         IOptions<UserOptions> options,
         ProfileQuery.ProfileQueryClient profileQueryClient,
         ProfileCommand.ProfileCommandClient profileCommandClient,
-        ContactQuery.ContactQueryClient contactQueryClient,
-        ContactCommand.ContactCommandClient contactCommandClient,
+        ConnectionQuery.ConnectionQueryClient connectionQueryClient,
+        ConnectionCommand.ConnectionCommandClient connectionCommandClient,
         IClock clock)
     {
         _logger = logger;
         _options = options.Value;
         _profileQueryClient = profileQueryClient;
         _profileCommandClient = profileCommandClient;
-        _contactQueryClient = contactQueryClient;
-        _contactCommandClient = contactCommandClient;
+        _connectionQueryClient = connectionQueryClient;
+        _connectionCommandClient = connectionCommandClient;
         _clock = clock;
 
         _logger.LogInformation("User address set to {Address}", _options.Address);
@@ -177,33 +177,33 @@ internal sealed class UserClient : IUserClient
         return response.Profiles;
     }
 
-    public async Task<IEnumerable<Contact>> GetContacts(long userId, string accessToken, CancellationToken ct)
+    public async Task<IEnumerable<Connection>> GetConnections(long userId, string accessToken, CancellationToken ct)
     {
-        GetContactsRequest request = new();
+        GetConnectionsRequest request = new();
 
         Metadata headers = new();
         headers.AddAuthorization(accessToken);
         DateTime deadline = _clock.GetNowUtc().Add(_options.CallTimeout);
-        GetContactsResponse response = await _contactQueryClient.GetContactsAsync(request, headers, deadline, ct);
+        GetConnectionsResponse response = await _connectionQueryClient.GetConnectionsAsync(request, headers, deadline, ct);
 
-        _logger.LogTrace("Received {ContactCount} contacts for user {UserId}", response.Contacts.Count, userId);
-        return response.Contacts;
+        _logger.LogTrace("Received {ConnectionCount} connections for user {UserId}", response.Connections.Count, userId);
+        return response.Connections;
     }
 
-    public async Task<InviteContactResult> InviteContact(long contactUserId, long userId, string accessToken, CancellationToken ct)
+    public async Task<InviteResult> Invite(long connectionId, long userId, string accessToken, CancellationToken ct)
     {
         InviteRequest request = new();
-        request.ContactUserId = contactUserId;
+        request.ConnectionId = connectionId;
 
         Metadata headers = new();
         headers.AddAuthorization(accessToken);
         DateTime deadline = _clock.GetNowUtc().Add(_options.CallTimeout);
-        InviteResponse response = await _contactCommandClient.InviteAsync(request, headers, deadline, ct);
+        InviteResponse response = await _connectionCommandClient.InviteAsync(request, headers, deadline, ct);
 
         if (response.Success)
         {
-            _logger.LogTrace("Received successful sending for contact request from user {UserId} to contact {ContactUserId}", userId, contactUserId);
-            return new InviteContactResult
+            _logger.LogTrace("Received successful invite from {UserId} to {ConnectionId}", userId, connectionId);
+            return new InviteResult
             {
                 Success = true,
                 Version = response.Version.ToGuid()
@@ -211,8 +211,8 @@ internal sealed class UserClient : IUserClient
         }
         if (response.AlreadyExists)
         {
-            _logger.LogTrace("Received failed sending for contact request from user {UserId} to contact {ContactUserId}", userId, contactUserId);
-            return new InviteContactResult
+            _logger.LogTrace("Received failed sending invite from {UserId} to {ConnectionId}", userId, connectionId);
+            return new InviteResult
             {
                 AlreadyExists = true
             };
@@ -223,42 +223,42 @@ internal sealed class UserClient : IUserClient
     
     // TODO: add logging
 
-    public async Task<ApproveContactResult> ApproveContact(long contactUserId, Guid version, long userId, string accessToken, CancellationToken ct)
+    public async Task<ApproveResult> Approve(long connectionId, Guid version, long userId, string accessToken, CancellationToken ct)
     {
         ApproveRequest request = new();
-        request.ContactUserId = contactUserId;
+        request.ConnectionId = connectionId;
         request.Version = version.ToUuid();
 
         Metadata headers = new();
         headers.AddAuthorization(accessToken);
         DateTime deadline = _clock.GetNowUtc().Add(_options.CallTimeout);
-        ApproveResponse response = await _contactCommandClient.ApproveAsync(request, headers, deadline, ct);
+        ApproveResponse response = await _connectionCommandClient.ApproveAsync(request, headers, deadline, ct);
 
         if (response.Success)
         {
-            return new ApproveContactResult
+            return new ApproveResult
             {
                 Success = true,
                 NewVersion = response.NewVersion.ToGuid()
             };
         }
-        if (response.MissingContact)
+        if (response.MissingConnection)
         {
-            return new ApproveContactResult
+            return new ApproveResult
             {
-                MissingContact = true
+                MissingConnection = true
             };
         }
         if (response.Invalid)
         {
-            return new ApproveContactResult
+            return new ApproveResult
             {
                 Invalid = true
             };
         }
         if (response.ConcurrentlyUpdated)
         {
-            return new ApproveContactResult
+            return new ApproveResult
             {
                 ConcurrentlyUpdated = true
             };
@@ -267,41 +267,41 @@ internal sealed class UserClient : IUserClient
         throw new InvalidOperationException($"Failed to process {nameof(ApproveResponse)}.");
     }
 
-    public async Task<CancelContactResult> CancelContact(long contactUserId, Guid version, long userId, string accessToken, CancellationToken ct)
+    public async Task<CancelResult> Cancel(long connectionId, Guid version, long userId, string accessToken, CancellationToken ct)
     {
         CancelRequest request = new();
-        request.ContactUserId = contactUserId;
+        request.ConnectionId = connectionId;
         request.Version = version.ToUuid();
 
         Metadata headers = new();
         headers.AddAuthorization(accessToken);
         DateTime deadline = _clock.GetNowUtc().Add(_options.CallTimeout);
-        CancelResponse response = await _contactCommandClient.CancelAsync(request, headers, deadline, ct);
+        CancelResponse response = await _connectionCommandClient.CancelAsync(request, headers, deadline, ct);
 
         if (response.Success)
         {
-            return new CancelContactResult
+            return new CancelResult
             {
                 Success = true
             };
         }
-        if (response.MissingContact)
+        if (response.MissingConnection)
         {
-            return new CancelContactResult
+            return new CancelResult
             {
-                MissingContact = true
+                MissingConnection = true
             };
         }
         if (response.Invalid)
         {
-            return new CancelContactResult
+            return new CancelResult
             {
                 Invalid = true
             };
         }
         if (response.ConcurrentlyUpdated)
         {
-            return new CancelContactResult
+            return new CancelResult
             {
                 ConcurrentlyUpdated = true
             };
@@ -310,41 +310,41 @@ internal sealed class UserClient : IUserClient
         throw new InvalidOperationException($"Failed to process {typeof(CancelResponse)}.");
     }
 
-    public async Task<RemoveContactResult> RemoveContact(long contactUserId, Guid version, long userId, string accessToken, CancellationToken ct)
+    public async Task<RemoveResult> Remove(long connectionId, Guid version, long userId, string accessToken, CancellationToken ct)
     {
         RemoveRequest request = new();
-        request.ContactUserId = contactUserId;
+        request.ConnectionId = connectionId;
         request.Version = version.ToUuid();
 
         Metadata headers = new();
         headers.AddAuthorization(accessToken);
         DateTime deadline = _clock.GetNowUtc().Add(_options.CallTimeout);
-        RemoveResponse response = await _contactCommandClient.RemoveAsync(request, headers, deadline, ct);
+        RemoveResponse response = await _connectionCommandClient.RemoveAsync(request, headers, deadline, ct);
 
         if (response.Success)
         {
-            return new RemoveContactResult
+            return new RemoveResult
             {
                 Success = true
             };
         }
-        if (response.MissingContact)
+        if (response.MissingConnection)
         {
-            return new RemoveContactResult
+            return new RemoveResult
             {
-                MissingContact = true
+                MissingConnection = true
             };
         }
         if (response.Invalid)
         {
-            return new RemoveContactResult
+            return new RemoveResult
             {
                 Invalid = true
             };
         }
         if (response.ConcurrentlyUpdated)
         {
-            return new RemoveContactResult
+            return new RemoveResult
             {
                 ConcurrentlyUpdated = true
             };

@@ -3,11 +3,11 @@ using Refit;
 
 namespace CecoChat.Contracts.Bff;
 
-public sealed class Contact
+public sealed class Connection
 {
-    [JsonPropertyName("contactUserId")]
-    [AliasAs("contactUserId")]
-    public long ContactUserId { get; init; }
+    [JsonPropertyName("connectionId")]
+    [AliasAs("connectionId")]
+    public long ConnectionId { get; init; }
 
     [JsonPropertyName("version")]
     [AliasAs("version")]
@@ -18,59 +18,59 @@ public sealed class Contact
     public string Status { get; init; } = string.Empty;
 }
 
-public enum ContactStatus
+public enum ConnectionStatus
 {
     Pending,
     Connected
 }
 
-public sealed class GetContactsResponse
+public sealed class GetConnectionsResponse
 {
-    [JsonPropertyName("contacts")]
-    [AliasAs("contacts")]
-    public Contact[] Contacts { get; init; } = Array.Empty<Contact>();
+    [JsonPropertyName("connections")]
+    [AliasAs("connections")]
+    public Connection[] Connections { get; init; } = Array.Empty<Connection>();
 }
 
-public sealed class InviteContactRequest
+public sealed class InviteConnectionRequest
 { }
 
-public sealed class InviteContactResponse
+public sealed class InviteConnectionResponse
 {
     [JsonPropertyName("version")]
     [AliasAs("version")]
     public Guid Version { get; init; }
 }
 
-public sealed class ApproveContactRequest
+public sealed class ApproveConnectionRequest
 {
     [JsonPropertyName("version")]
     [AliasAs("version")]
     public Guid Version { get; init; }
 }
 
-public sealed class ApproveContactResponse
+public sealed class ApproveConnectionResponse
 {
     [JsonPropertyName("newVersion")]
     [AliasAs("newVersion")]
     public Guid NewVersion { get; set; }
 }
 
-public sealed class CancelContactRequest
+public sealed class CancelConnectionRequest
 {
     [JsonPropertyName("version")]
     [AliasAs("version")]
     public Guid Version { get; init; }
 }
 
-public sealed class CancelContactResponse
+public sealed class CancelConnectionResponse
 { }
 
-public sealed class RemoveContactRequest
+public sealed class RemoveConnectionRequest
 {
     [JsonPropertyName("version")]
     [AliasAs("version")]
     public Guid Version { get; init; }
 }
 
-public sealed class RemoveContactResponse
+public sealed class RemoveConnectionResponse
 { }
