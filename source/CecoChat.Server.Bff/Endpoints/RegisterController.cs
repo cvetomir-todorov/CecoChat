@@ -52,6 +52,6 @@ public class RegisterController : ControllerBase
             return Conflict(new ProblemDetails { Title = "Duplicate user name" });
         }
 
-        throw new InvalidOperationException($"Failed to process {nameof(CreateProfileResult)}.");
+        throw new ProcessingFailureException(typeof(CreateProfileResult));
     }
 }

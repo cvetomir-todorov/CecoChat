@@ -38,7 +38,7 @@ public class ProfileQueryService : ProfileQuery.ProfileQueryBase
             return new AuthenticateResponse { Profile = authenticateResult.Profile };
         }
 
-        throw new InvalidOperationException($"Failed to process {nameof(AuthenticateResult)}");
+        throw new ProcessingFailureException(typeof(AuthenticateResult));
     }
 
     [Authorize(Policy = "user")]

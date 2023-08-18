@@ -61,7 +61,7 @@ internal sealed class UserClient : IUserClient
             return new CreateProfileResult { DuplicateUserName = true };
         }
 
-        throw new InvalidOperationException($"Failed to process {nameof(CreateProfileResponse)}.");
+        throw new ProcessingFailureException(typeof(CreateProfileResponse));
     }
 
     public async Task<AuthenticateResult> Authenticate(string userName, string password, CancellationToken ct)
@@ -90,7 +90,7 @@ internal sealed class UserClient : IUserClient
             return new AuthenticateResult { Profile = response.Profile };
         }
 
-        throw new InvalidOperationException($"Failed to process {nameof(AuthenticateResponse)}.");
+        throw new ProcessingFailureException(typeof(AuthenticateResponse));
     }
 
     public async Task<ChangePasswordResult> ChangePassword(ProfileChangePassword profile, long userId, string accessToken, CancellationToken ct)
@@ -118,7 +118,7 @@ internal sealed class UserClient : IUserClient
             return new ChangePasswordResult { ConcurrentlyUpdated = true };
         }
 
-        throw new InvalidOperationException($"Failed to process {nameof(ChangePasswordResponse)}.");
+        throw new ProcessingFailureException(typeof(ChangePasswordResponse));
     }
 
     public async Task<UpdateProfileResult> UpdateProfile(ProfileUpdate profile, long userId, string accessToken, CancellationToken ct)
@@ -146,7 +146,7 @@ internal sealed class UserClient : IUserClient
             return new UpdateProfileResult { ConcurrentlyUpdated = true };
         }
 
-        throw new InvalidOperationException($"Failed to process {nameof(UpdateProfileResponse)}.");
+        throw new ProcessingFailureException(typeof(UpdateProfileResponse));
     }
 
     public async Task<ProfilePublic> GetPublicProfile(long userId, long requestedUserId, string accessToken, CancellationToken ct)
@@ -218,7 +218,7 @@ internal sealed class UserClient : IUserClient
             };
         }
 
-        throw new InvalidOperationException($"Failed to process {nameof(InviteResponse)}.");
+        throw new ProcessingFailureException(typeof(InviteResponse));
     }
     
     // TODO: add logging
@@ -264,7 +264,7 @@ internal sealed class UserClient : IUserClient
             };
         }
 
-        throw new InvalidOperationException($"Failed to process {nameof(ApproveResponse)}.");
+        throw new ProcessingFailureException(typeof(ApproveResponse));
     }
 
     public async Task<CancelResult> Cancel(long connectionId, Guid version, long userId, string accessToken, CancellationToken ct)
@@ -307,7 +307,7 @@ internal sealed class UserClient : IUserClient
             };
         }
 
-        throw new InvalidOperationException($"Failed to process {typeof(CancelResponse)}.");
+        throw new ProcessingFailureException(typeof(CancelResponse));
     }
 
     public async Task<RemoveResult> Remove(long connectionId, Guid version, long userId, string accessToken, CancellationToken ct)
@@ -350,6 +350,6 @@ internal sealed class UserClient : IUserClient
             };
         }
 
-        throw new InvalidOperationException($"Failed to process {typeof(RemoveResponse)}.");
+        throw new ProcessingFailureException(typeof(RemoveResponse));
     }
 }
