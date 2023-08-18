@@ -52,7 +52,7 @@ public class ConnectionCommandService : ConnectionCommand.ConnectionCommandBase
             };
         }
 
-        throw new InvalidOperationException($"Failed to process {nameof(AddConnectionResult)}.");
+        throw new ProcessingFailureException(typeof(AddConnectionResult));
     }
 
     public override async Task<ApproveResponse> Approve(ApproveRequest request, ServerCallContext context)
@@ -100,7 +100,7 @@ public class ConnectionCommandService : ConnectionCommand.ConnectionCommandBase
             };
         }
 
-        throw new InvalidOperationException($"Failed to process {nameof(UpdateConnectionResult)}.");
+        throw new ProcessingFailureException(typeof(UpdateConnectionResult));
     }
 
     public override async Task<CancelResponse> Cancel(CancelRequest request, ServerCallContext context)
@@ -145,7 +145,7 @@ public class ConnectionCommandService : ConnectionCommand.ConnectionCommandBase
             };
         }
 
-        throw new InvalidOperationException($"Failed to process {nameof(RemoveConnectionResult)}.");
+        throw new ProcessingFailureException(typeof(RemoveConnectionResult));
     }
 
     public override async Task<RemoveResponse> Remove(RemoveRequest request, ServerCallContext context)
@@ -190,6 +190,6 @@ public class ConnectionCommandService : ConnectionCommand.ConnectionCommandBase
             };
         }
 
-        throw new InvalidOperationException($"Failed to process {nameof(RemoveConnectionResult)}.");
+        throw new ProcessingFailureException(typeof(RemoveConnectionResult));
     }
 }

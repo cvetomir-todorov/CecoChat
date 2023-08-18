@@ -53,7 +53,7 @@ public class EditProfileController : ControllerBase
             return Conflict();
         }
 
-        throw new InvalidOperationException($"Failed to process {nameof(ChangePasswordResult)}.");
+        throw new ProcessingFailureException(typeof(ChangePasswordResult));
     }
 
     [Authorize(Policy = "user")]
@@ -86,6 +86,6 @@ public class EditProfileController : ControllerBase
             return Conflict();
         }
 
-        throw new InvalidOperationException($"Failed to process {nameof(UpdateProfileResult)}.");
+        throw new ProcessingFailureException(typeof(UpdateProfileResult));
     }
 }

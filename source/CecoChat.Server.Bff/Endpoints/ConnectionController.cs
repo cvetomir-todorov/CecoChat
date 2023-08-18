@@ -81,7 +81,7 @@ public class ConnectionController : ControllerBase
             return Conflict();
         }
 
-        throw new InvalidOperationException($"Failed to process {nameof(InviteResult)}.");
+        throw new ProcessingFailureException(typeof(InviteResult));
     }
 
     [Authorize(Policy = "user")]
@@ -122,7 +122,7 @@ public class ConnectionController : ControllerBase
             return Conflict("concurrently updated");
         }
 
-        throw new InvalidOperationException($"Failed to process {nameof(ApproveResult)}.");
+        throw new ProcessingFailureException(typeof(ApproveResult));
     }
 
     [Authorize(Policy = "user")]
@@ -160,7 +160,7 @@ public class ConnectionController : ControllerBase
             return Conflict("concurrently updated");
         }
 
-        throw new InvalidOperationException($"Failed to process {nameof(CancelResult)}.");
+        throw new ProcessingFailureException(typeof(CancelResult));
     }
 
     [Authorize(Policy = "user")]
@@ -198,6 +198,6 @@ public class ConnectionController : ControllerBase
             return Conflict("concurrently updated");
         }
 
-        throw new InvalidOperationException($"Failed to process {nameof(RemoveResult)}.");
+        throw new ProcessingFailureException(typeof(RemoveResult));
     }
 }

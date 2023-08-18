@@ -34,7 +34,7 @@ public class ProfileCommandService : ProfileCommand.ProfileCommandBase
             return new CreateProfileResponse { DuplicateUserName = true };
         }
 
-        throw new InvalidOperationException($"Failed to process {nameof(CreateProfileResult)}.");
+        throw new ProcessingFailureException(typeof(CreateProfileResult));
     }
 
     [Authorize(Policy = "user")]
@@ -59,7 +59,7 @@ public class ProfileCommandService : ProfileCommand.ProfileCommandBase
             return new ChangePasswordResponse { ConcurrentlyUpdated = true };
         }
 
-        throw new InvalidOperationException($"Failed to process {nameof(ChangePasswordResult)}.");
+        throw new ProcessingFailureException(typeof(ChangePasswordResult));
     }
 
     [Authorize(Policy = "user")]
@@ -84,6 +84,6 @@ public class ProfileCommandService : ProfileCommand.ProfileCommandBase
             return new UpdateProfileResponse { ConcurrentlyUpdated = true };
         }
 
-        throw new InvalidOperationException($"Failed to process {nameof(UpdateProfileResult)}.");
+        throw new ProcessingFailureException(typeof(UpdateProfileResult));
     }
 }
