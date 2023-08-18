@@ -168,8 +168,8 @@ public class Startup
         {
             endpoints.MapGrpcService<ProfileCommandService>();
             endpoints.MapGrpcService<ProfileQueryService>();
-            endpoints.MapGrpcService<ContactCommandService>();
-            endpoints.MapGrpcService<ContactQueryService>();
+            endpoints.MapGrpcService<ConnectionCommandService>();
+            endpoints.MapGrpcService<ConnectionQueryService>();
 
             endpoints.MapHttpHealthEndpoints(setup =>
             {

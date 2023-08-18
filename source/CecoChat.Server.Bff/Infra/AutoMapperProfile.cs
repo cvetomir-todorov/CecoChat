@@ -20,22 +20,22 @@ public class AutoMapperProfile : AutoMapper.Profile
                 options => options.MapFrom(profileContract => profileContract.Version.ToGuid()));
         CreateMap<Contracts.User.ProfilePublic, Contracts.Bff.ProfilePublic>();
 
-        CreateMap<Contracts.User.Contact, Contracts.Bff.Contact>()
+        CreateMap<Contracts.User.Connection, Contracts.Bff.Connection>()
             .ForMember(
-                contactBff => contactBff.Version,
-                options => options.MapFrom(contactContract => contactContract.Version.ToGuid()))
+                connectionBff => connectionBff.Version,
+                options => options.MapFrom(connectionContract => connectionContract.Version.ToGuid()))
             .ForMember(
-                contactBff => contactBff.Status,
-                options => options.MapFrom((contactContract, _) =>
+                connectionBff => connectionBff.Status,
+                options => options.MapFrom((connectionContract, _) =>
                 {
-                    switch (contactContract.Status)
+                    switch (connectionContract.Status)
                     {
-                        case Contracts.User.ContactStatus.Pending:
-                            return Contracts.Bff.ContactStatus.Pending;
-                        case Contracts.User.ContactStatus.Connected:
-                            return Contracts.Bff.ContactStatus.Connected;
+                        case Contracts.User.ConnectionStatus.Pending:
+                            return Contracts.Bff.ConnectionStatus.Pending;
+                        case Contracts.User.ConnectionStatus.Connected:
+                            return Contracts.Bff.ConnectionStatus.Connected;
                         default:
-                            throw new EnumValueNotSupportedException(contactContract.Status);
+                            throw new EnumValueNotSupportedException(connectionContract.Status);
                     }
                 }));
     }

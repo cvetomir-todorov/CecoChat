@@ -3,7 +3,7 @@ option csharp_namespace = "CecoChat.Contracts.User";
 package CecoChat.Contracts.User;
 import "Uuid.proto";
 
-service ContactCommand {
+service ConnectionCommand {
   rpc Invite(InviteRequest) returns (InviteResponse);
   rpc Approve(ApproveRequest) returns (ApproveResponse);
   rpc Cancel(CancelRequest) returns (CancelResponse);
@@ -11,7 +11,7 @@ service ContactCommand {
 }
 
 message InviteRequest {
-  int64 contact_user_id = 1;
+  int64 connection_id = 1;
 }
 
 message InviteResponse {
@@ -21,38 +21,38 @@ message InviteResponse {
 }
 
 message ApproveRequest {
-  int64 contact_user_id = 1;
+  int64 connection_id = 1;
   Uuid version = 2;
 }
 
 message ApproveResponse {
   bool success = 1;
   Uuid new_version = 2;
-  bool missing_contact = 3;
+  bool missing_connection = 3;
   bool invalid = 4;
   bool concurrently_updated = 5;
 }
 
 message CancelRequest {
-  int64 contact_user_id = 1;
+  int64 connection_id = 1;
   Uuid version = 2;
 }
 
 message CancelResponse {
   bool success = 1;
-  bool missing_contact = 2;
+  bool missing_connection = 2;
   bool invalid = 3;
   bool concurrently_updated = 4;
 }
 
 message RemoveRequest {
-  int64 contact_user_id = 1;
+  int64 connection_id = 1;
   Uuid version = 2;
 }
 
 message RemoveResponse {
   bool success = 1;
-  bool missing_contact = 2;
+  bool missing_connection = 2;
   bool invalid = 3;
   bool concurrently_updated = 4;
 }

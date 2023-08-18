@@ -1,0 +1,15 @@
+syntax = "proto3";
+option csharp_namespace = "CecoChat.Contracts.User";
+package CecoChat.Contracts.User;
+import "User/Connection.proto";
+
+service ConnectionQuery {
+  rpc GetConnections(GetConnectionsRequest) returns (GetConnectionsResponse);
+}
+
+message GetConnectionsRequest {
+}
+
+message GetConnectionsResponse {
+  repeated Connection connections = 1;
+}

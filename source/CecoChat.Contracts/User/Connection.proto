@@ -3,14 +3,14 @@ option csharp_namespace = "CecoChat.Contracts.User";
 package CecoChat.Contracts.User;
 import "Uuid.proto";
 
-message Contact {
-  int64 contact_user_id = 1;
+message Connection {
+  int64 connection_id = 1;
   Uuid version = 2;
-  ContactStatus status = 3;
+  ConnectionStatus status = 3;
   int64 target_user_id = 4;
 }
 
-enum ContactStatus {
+enum ConnectionStatus {
   PENDING = 0;
   CONNECTED = 1;
 }
