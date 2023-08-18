@@ -1,7 +1,7 @@
 using Autofac;
 using CecoChat.Autofac;
 using CecoChat.Data.User.Contacts;
-using CecoChat.Data.User.Repos;
+using CecoChat.Data.User.Profiles;
 using CecoChat.Data.User.Security;
 using CecoChat.Npgsql;
 using CecoChat.Redis;

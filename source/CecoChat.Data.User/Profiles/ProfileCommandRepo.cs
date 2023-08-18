@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Logging;
 using Npgsql;
 
-namespace CecoChat.Data.User.Repos;
+namespace CecoChat.Data.User.Profiles;
 
 internal class ProfileCommandRepo : IProfileCommandRepo
 {
