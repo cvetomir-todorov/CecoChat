@@ -34,11 +34,7 @@ public class ContactController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetContacts(CancellationToken ct)
     {
-        if (!HttpContext.TryGetUserClaims(_logger, out UserClaims? userClaims))
-        {
-            return Unauthorized();
-        }
-        if (!HttpContext.TryGetBearerAccessTokenValue(out string? accessToken))
+        if (!HttpContext.TryGetUserClaimsAndAccessToken(_logger, out UserClaims? userClaims, out string? accessToken))
         {
             return Unauthorized();
         }
@@ -66,11 +62,7 @@ public class ContactController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> InviteContact([FromRoute(Name = "contactId")] long contactId, [FromBody] InviteContactRequest request, CancellationToken ct)
     {
-        if (!HttpContext.TryGetUserClaims(_logger, out UserClaims? userClaims))
-        {
-            return Unauthorized();
-        }
-        if (!HttpContext.TryGetBearerAccessTokenValue(out string? accessToken))
+        if (!HttpContext.TryGetUserClaimsAndAccessToken(_logger, out UserClaims? userClaims, out string? accessToken))
         {
             return Unauthorized();
         }
@@ -103,11 +95,7 @@ public class ContactController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> ApproveContact([FromRoute(Name = "contactId")] long contactId, [FromBody] ApproveContactRequest request, CancellationToken ct)
     {
-        if (!HttpContext.TryGetUserClaims(_logger, out UserClaims? userClaims))
-        {
-            return Unauthorized();
-        }
-        if (!HttpContext.TryGetBearerAccessTokenValue(out string? accessToken))
+        if (!HttpContext.TryGetUserClaimsAndAccessToken(_logger, out UserClaims? userClaims, out string? accessToken))
         {
             return Unauthorized();
         }
@@ -148,11 +136,7 @@ public class ContactController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> CancelContact([FromRoute(Name = "contactId")] long contactId, [FromBody] CancelContactRequest request, CancellationToken ct)
     {
-        if (!HttpContext.TryGetUserClaims(_logger, out UserClaims? userClaims))
-        {
-            return Unauthorized();
-        }
-        if (!HttpContext.TryGetBearerAccessTokenValue(out string? accessToken))
+        if (!HttpContext.TryGetUserClaimsAndAccessToken(_logger, out UserClaims? userClaims, out string? accessToken))
         {
             return Unauthorized();
         }
@@ -190,11 +174,7 @@ public class ContactController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> RemoveContact([FromRoute(Name = "contactId")] long contactId, [FromBody] RemoveContactRequest request, CancellationToken ct)
     {
-        if (!HttpContext.TryGetUserClaims(_logger, out UserClaims? userClaims))
-        {
-            return Unauthorized();
-        }
-        if (!HttpContext.TryGetBearerAccessTokenValue(out string? accessToken))
+        if (!HttpContext.TryGetUserClaimsAndAccessToken(_logger, out UserClaims? userClaims, out string? accessToken))
         {
             return Unauthorized();
         }

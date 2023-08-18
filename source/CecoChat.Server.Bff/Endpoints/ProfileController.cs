@@ -35,11 +35,7 @@ public class ProfileController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetPublicProfile([FromRoute(Name = "id")] long requestedUserId, CancellationToken ct)
     {
-        if (!HttpContext.TryGetUserClaims(_logger, out UserClaims? userClaims))
-        {
-            return Unauthorized();
-        }
-        if (!HttpContext.TryGetBearerAccessTokenValue(out string? accessToken))
+        if (!HttpContext.TryGetUserClaimsAndAccessToken(_logger, out UserClaims? userClaims, out string? accessToken))
         {
             return Unauthorized();
         }
@@ -60,15 +56,10 @@ public class ProfileController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetPublicProfiles(CancellationToken ct)
     {
-        if (!HttpContext.TryGetUserClaims(_logger, out UserClaims? userClaims))
+        if (!HttpContext.TryGetUserClaimsAndAccessToken(_logger, out UserClaims? userClaims, out string? accessToken))
         {
             return Unauthorized();
         }
-        if (!HttpContext.TryGetBearerAccessTokenValue(out string? accessToken))
-        {
-            return Unauthorized();
-        }
-
         if (!TryParseUserIds("userIds", out long[]? requestedUserIds))
         {
             return BadRequest(ModelState);

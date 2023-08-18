@@ -42,11 +42,7 @@ public class OneChatScreenController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetOneChatScreen([FromQuery][BindRequired] GetOneChatScreenRequest request, CancellationToken ct)
     {
-        if (!HttpContext.TryGetUserClaims(_logger, out UserClaims? userClaims))
-        {
-            return Unauthorized();
-        }
-        if (!HttpContext.TryGetBearerAccessTokenValue(out string? accessToken))
+        if (!HttpContext.TryGetUserClaimsAndAccessToken(_logger, out UserClaims? userClaims, out string? accessToken))
         {
             return Unauthorized();
         }

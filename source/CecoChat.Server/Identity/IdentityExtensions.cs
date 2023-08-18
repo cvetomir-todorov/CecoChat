@@ -6,19 +6,30 @@ using Grpc.Core;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Primitives;
+using Microsoft.Net.Http.Headers;
 
 namespace CecoChat.Server.Identity;
 
-public static class ClaimsPrincipalExtensions
+public static class IdentityExtensions
 {
     private const string UserIdTagName = "cecochat.user_id";
 
-    public static bool TryGetUserClaims(this HttpContext context, ILogger logger, [NotNullWhen(true)] out UserClaims? userClaims, bool setUserIdTag = true)
+    public static bool TryGetUserClaimsAndAccessToken(
+        this HttpContext context,
+        ILogger logger,
+        [NotNullWhen(true)] out UserClaims? userClaims,
+        [NotNullWhen(true)] out string? accessToken,
+        bool setUserIdTag = true)
     {
         if (!context.User.TryGetUserClaims(out userClaims))
         {
-            logger.LogError("Client named '{Name}' from {ClientIp}:{ClientPort} was authorized but has no parseable access token",
-                context.User.Identity?.Name, context.Connection.RemoteIpAddress, context.Connection.RemotePort);
+            logger.LogError("Client named '{Name}' was authorized but has no parseable access token", context.User.Identity?.Name);
+            accessToken = null;
+            return false;
+        }
+        if (!context.TryGetAccessToken(out accessToken))
+        {
             return false;
         }
 
@@ -27,6 +38,29 @@ public static class ClaimsPrincipalExtensions
             Activity.Current?.SetTag(UserIdTagName, userClaims.UserId);
         }
 
+        return true;
+    }
+
+    private static bool TryGetAccessToken(this HttpContext context, [NotNullWhen(true)] out string? accessToken)
+    {
+        accessToken = null;
+        if (!context.Request.Headers.TryGetValue(HeaderNames.Authorization, out StringValues values))
+        {
+            return false;
+        }
+        if (values.Count != 1)
+        {
+            return false;
+        }
+
+        string? value = values[0];
+        const string bearerPrefix = "Bearer ";
+        if (value == null || !value.StartsWith(bearerPrefix, StringComparison.CurrentCultureIgnoreCase))
+        {
+            return false;
+        }
+
+        accessToken = value.Substring(startIndex: bearerPrefix.Length);
         return true;
     }
 
