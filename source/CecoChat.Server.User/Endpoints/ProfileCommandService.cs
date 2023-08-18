@@ -40,7 +40,7 @@ public class ProfileCommandService : ProfileCommand.ProfileCommandBase
     [Authorize(Policy = "user")]
     public override async Task<ChangePasswordResponse> ChangePassword(ChangePasswordRequest request, ServerCallContext context)
     {
-        UserClaims userClaims = GetUserClaims(context);
+        UserClaims userClaims = context.GetUserClaimsGrpc(_logger);
 
         ChangePasswordResult result = await _profileRepo.ChangePassword(request.Profile, userClaims.UserId);
 
@@ -65,7 +65,7 @@ public class ProfileCommandService : ProfileCommand.ProfileCommandBase
     [Authorize(Policy = "user")]
     public override async Task<UpdateProfileResponse> UpdateProfile(UpdateProfileRequest request, ServerCallContext context)
     {
-        UserClaims userClaims = GetUserClaims(context);
+        UserClaims userClaims = context.GetUserClaimsGrpc(_logger);
 
         UpdateProfileResult result = await _profileRepo.UpdateProfile(request.Profile, userClaims.UserId);
 
@@ -85,15 +85,5 @@ public class ProfileCommandService : ProfileCommand.ProfileCommandBase
         }
 
         throw new InvalidOperationException($"Failed to process {nameof(UpdateProfileResult)}.");
-    }
-
-    private UserClaims GetUserClaims(ServerCallContext context)
-    {
-        if (!context.GetHttpContext().TryGetUserClaims(_logger, out UserClaims? userClaims))
-        {
-            throw new RpcException(new Status(StatusCode.Unauthenticated, string.Empty));
-        }
-
-        return userClaims;
     }
 }

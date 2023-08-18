@@ -44,7 +44,7 @@ public class ProfileQueryService : ProfileQuery.ProfileQueryBase
     [Authorize(Policy = "user")]
     public override async Task<GetPublicProfileResponse> GetPublicProfile(GetPublicProfileRequest request, ServerCallContext context)
     {
-        UserClaims userClaims = GetUserClaims(context);
+        UserClaims userClaims = context.GetUserClaimsGrpc(_logger);
 
         ProfilePublic? profile = await _repo.GetPublicProfile(request.UserId, userClaims.UserId);
         if (profile == null)
@@ -59,7 +59,7 @@ public class ProfileQueryService : ProfileQuery.ProfileQueryBase
     [Authorize(Policy = "user")]
     public override async Task<GetPublicProfilesResponse> GetPublicProfiles(GetPublicProfilesRequest request, ServerCallContext context)
     {
-        UserClaims userClaims = GetUserClaims(context);
+        UserClaims userClaims = context.GetUserClaimsGrpc(_logger);
 
         IEnumerable<ProfilePublic> profiles = await _repo.GetPublicProfiles(request.UserIds, userClaims.UserId);
 
@@ -68,15 +68,5 @@ public class ProfileQueryService : ProfileQuery.ProfileQueryBase
 
         _logger.LogTrace("Responding with {PublicProfileCount} public profiles requested by user {UserId}", response.Profiles.Count, userClaims.UserId);
         return response;
-    }
-
-    private UserClaims GetUserClaims(ServerCallContext context)
-    {
-        if (!context.GetHttpContext().TryGetUserClaims(_logger, out UserClaims? userClaims))
-        {
-            throw new RpcException(new Status(StatusCode.Unauthenticated, string.Empty));
-        }
-
-        return userClaims;
     }
 }

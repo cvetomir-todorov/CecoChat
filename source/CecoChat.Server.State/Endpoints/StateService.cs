@@ -22,10 +22,7 @@ public class StateService : Contracts.State.State.StateBase
     [Authorize(Policy = "user")]
     public override async Task<GetChatsResponse> GetChats(GetChatsRequest request, ServerCallContext context)
     {
-        if (!context.GetHttpContext().TryGetUserClaims(_logger, out UserClaims? userClaims))
-        {
-            throw new RpcException(new Status(StatusCode.Unauthenticated, string.Empty));
-        }
+        UserClaims userClaims = context.GetUserClaimsGrpc(_logger);
 
         DateTime newerThan = request.NewerThan.ToDateTime();
         IReadOnlyCollection<ChatState> chats = await _repo.GetChats(userClaims.UserId, newerThan);
