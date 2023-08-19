@@ -18,42 +18,42 @@ public interface IBffClient : IDisposable
     Task<IApiResponse<CreateSessionResponse>> CreateSession(
         [Body] CreateSessionRequest request);
 
-    [Post("/api/user/password")]
+    [Put("/api/profile/password")]
     Task<IApiResponse<ChangePasswordResponse>> ChangePassword(
         [Body] ChangePasswordRequest request,
         [Authorize(AuthorizationScheme)] string accessToken);
 
-    [Post("/api/user")]
+    [Put("/api/profile")]
     Task<IApiResponse<EditProfileResponse>> EditProfile(
         [Body] EditProfileRequest request,
         [Authorize(AuthorizationScheme)] string accessToken);
 
-    [Get("/api/screen/allChats")]
+    [Get("/api/screens/allChats")]
     Task<GetAllChatsScreenResponse> GetAllChatsScreen(
         [Query] GetAllChatsScreenRequest request,
         [Authorize(AuthorizationScheme)] string accessToken);
 
-    [Get("/api/screen/oneChat")]
+    [Get("/api/screens/oneChat")]
     Task<GetOneChatScreenResponse> GetOneChatScreen(
         [Query] GetOneChatScreenRequest request,
         [Authorize(AuthorizationScheme)] string accessToken);
 
-    [Get("/api/state/chats")]
+    [Get("/api/chats/state")]
     Task<GetChatsResponse> GetStateChats(
         [Query] GetChatsRequest request,
         [Authorize(AuthorizationScheme)] string accessToken);
 
-    [Get("/api/history/messages")]
+    [Get("/api/chats/history")]
     Task<GetHistoryResponse> GetHistoryMessages(
         [Query] GetHistoryRequest request,
         [Authorize(AuthorizationScheme)] string accessToken);
 
-    [Get("/api/user/profile/{id}")]
+    [Get("/api/profiles/{id}")]
     Task<GetPublicProfileResponse> GetPublicProfile(
         [AliasAs("id")] long userId,
         [Authorize(AuthorizationScheme)] string accessToken);
 
-    [Get("/api/user/profile")]
+    [Get("/api/profiles")]
     Task<GetPublicProfilesResponse> GetPublicProfiles(
         [Query(CollectionFormat.Csv)][AliasAs("userIds")] long[] userIds,
         [Authorize(AuthorizationScheme)] string accessToken);

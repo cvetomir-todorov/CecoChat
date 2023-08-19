@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 namespace CecoChat.Server.Bff.Endpoints.Screens;
 
 [ApiController]
-[Route("api/screen/oneChat")]
+[Route("api/screens/oneChat")]
 [ApiExplorerSettings(GroupName = "Screens")]
 public class OneChatScreenController : ControllerBase
 {

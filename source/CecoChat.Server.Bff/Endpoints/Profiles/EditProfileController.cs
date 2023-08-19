@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 namespace CecoChat.Server.Bff.Endpoints.Profiles;
 
 [ApiController]
-[Route("api/user")]
+[Route("api/profile")]
 [ApiExplorerSettings(GroupName = "Profiles")]
 public class EditProfileController : ControllerBase
 {
@@ -28,7 +28,7 @@ public class EditProfileController : ControllerBase
     }
 
     [Authorize(Policy = "user")]
-    [HttpPost("password", Name = "ChangePassword")]
+    [HttpPut("password", Name = "ChangePassword")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -59,7 +59,7 @@ public class EditProfileController : ControllerBase
     }
 
     [Authorize(Policy = "user")]
-    [HttpPost(Name = "EditProfile")]
+    [HttpPut(Name = "EditProfile")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
