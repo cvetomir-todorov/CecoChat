@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using Refit;
 
-namespace CecoChat.Contracts.Bff;
+namespace CecoChat.Contracts.Bff.Auth;
 
 public sealed class RegisterRequest
 {

@@ -4,10 +4,10 @@ namespace CecoChat.ConsoleClient.Api;
 
 public static class Map
 {
-    public static List<LocalStorage.Chat> BffChats(Contracts.Bff.ChatState[] bffChats, long currentUserId)
+    public static List<LocalStorage.Chat> BffChats(Contracts.Bff.Chats.ChatState[] bffChats, long currentUserId)
     {
         List<LocalStorage.Chat> chats = new(capacity: bffChats.Length);
-        foreach (Contracts.Bff.ChatState bffChat in bffChats)
+        foreach (Contracts.Bff.Chats.ChatState bffChat in bffChats)
         {
             long otherUserId = DataUtility.GetOtherUsedId(bffChat.ChatId, currentUserId);
             LocalStorage.Chat chat = BffChat(bffChat, otherUserId);
@@ -17,7 +17,7 @@ public static class Map
         return chats;
     }
 
-    public static LocalStorage.Chat BffChat(Contracts.Bff.ChatState bffChat, long otherUserId)
+    public static LocalStorage.Chat BffChat(Contracts.Bff.Chats.ChatState bffChat, long otherUserId)
     {
         return new LocalStorage.Chat(otherUserId)
         {
@@ -27,10 +27,10 @@ public static class Map
         };
     }
 
-    public static List<LocalStorage.Message> BffMessages(Contracts.Bff.HistoryMessage[] bffMessages)
+    public static List<LocalStorage.Message> BffMessages(Contracts.Bff.Chats.HistoryMessage[] bffMessages)
     {
         List<LocalStorage.Message> messages = new(bffMessages.Length);
-        foreach (Contracts.Bff.HistoryMessage bffMessage in bffMessages)
+        foreach (Contracts.Bff.Chats.HistoryMessage bffMessage in bffMessages)
         {
             LocalStorage.Message message = BffMessage(bffMessage);
             messages.Add(message);
@@ -39,7 +39,7 @@ public static class Map
         return messages;
     }
 
-    public static LocalStorage.Message BffMessage(Contracts.Bff.HistoryMessage bffHistoryMessage)
+    public static LocalStorage.Message BffMessage(Contracts.Bff.Chats.HistoryMessage bffHistoryMessage)
     {
         LocalStorage.Message message = new()
         {
@@ -50,7 +50,7 @@ public static class Map
 
         switch (bffHistoryMessage.DataType)
         {
-            case Contracts.Bff.DataType.PlainText:
+            case Contracts.Bff.Chats.DataType.PlainText:
                 message.DataType = LocalStorage.DataType.PlainText;
                 message.Data = bffHistoryMessage.Data;
                 break;
@@ -69,11 +69,11 @@ public static class Map
         return message;
     }
 
-    public static List<LocalStorage.ProfilePublic> PublicProfiles(Contracts.Bff.ProfilePublic[] bffProfiles)
+    public static List<LocalStorage.ProfilePublic> PublicProfiles(Contracts.Bff.Profiles.ProfilePublic[] bffProfiles)
     {
         List<LocalStorage.ProfilePublic> profiles = new(capacity: bffProfiles.Length);
 
-        foreach (Contracts.Bff.ProfilePublic profile in bffProfiles)
+        foreach (Contracts.Bff.Profiles.ProfilePublic profile in bffProfiles)
         {
             profiles.Add(PublicProfile(profile));
         }
@@ -81,7 +81,7 @@ public static class Map
         return profiles;
     }
 
-    public static LocalStorage.ProfilePublic PublicProfile(Contracts.Bff.ProfilePublic bffProfile)
+    public static LocalStorage.ProfilePublic PublicProfile(Contracts.Bff.Profiles.ProfilePublic bffProfile)
     {
         return new LocalStorage.ProfilePublic
         {

@@ -12,5 +12,7 @@ public sealed class SwaggerOptions
 
     public bool AddAuthorizationHeader { get; init; }
 
+    public bool GroupByApiExplorerGroup { get; init; }
+
     public OpenApiInfo OpenApiInfo { get; init; } = new();
 }

@@ -1,15 +1,16 @@
 using System.Diagnostics.CodeAnalysis;
 using AutoMapper;
 using CecoChat.Client.User;
-using CecoChat.Contracts.Bff;
+using CecoChat.Contracts.Bff.Profiles;
 using CecoChat.Server.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CecoChat.Server.Bff.Endpoints;
+namespace CecoChat.Server.Bff.Endpoints.Profiles;
 
 [ApiController]
 [Route("api/user/profile")]
+[ApiExplorerSettings(GroupName = "Profiles")]
 public class ProfileController : ControllerBase
 {
     private readonly ILogger _logger;

@@ -1,14 +1,15 @@
 using CecoChat.Client.State;
-using CecoChat.Contracts.Bff;
+using CecoChat.Contracts.Bff.Chats;
 using CecoChat.Server.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
-namespace CecoChat.Server.Bff.Endpoints;
+namespace CecoChat.Server.Bff.Endpoints.Chats;
 
 [ApiController]
 [Route("api/state")]
+[ApiExplorerSettings(GroupName = "Chats")]
 public class StateController : ControllerBase
 {
     private readonly ILogger _logger;

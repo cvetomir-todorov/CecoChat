@@ -1,8 +1,8 @@
-using CecoChat.Contracts.Bff;
+using CecoChat.Contracts.Bff.Screens;
 using CecoChat.Data;
 using FluentValidation;
 
-namespace CecoChat.Server.Bff.Endpoints;
+namespace CecoChat.Server.Bff.Endpoints.Screens;
 
 public sealed class GetOneChatScreenRequestValidator : AbstractValidator<GetOneChatScreenRequest>
 {

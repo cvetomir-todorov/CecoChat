@@ -1,8 +1,8 @@
-using CecoChat.Contracts.Bff;
+using CecoChat.Contracts.Bff.Chats;
 using CecoChat.Data;
 using FluentValidation;
 
-namespace CecoChat.Server.Bff.Endpoints;
+namespace CecoChat.Server.Bff.Endpoints.Chats;
 
 public sealed class GetHistoryRequestValidator : AbstractValidator<GetHistoryRequest>
 {

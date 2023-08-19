@@ -26,6 +26,13 @@ public static class SwaggerRegistrations
                     config.OperationFilter<SecurityRequirementsOperationFilter>();
                 }
 
+                if (options.GroupByApiExplorerGroup)
+                {
+                    config.OperationFilter<TagByApiExplorerSettingsOperationFilter>();
+                    config.DocInclusionPredicate((_, api) => !string.IsNullOrWhiteSpace(api.GroupName));
+                }
+
+                config.EnableAnnotations();
                 config.SwaggerDoc(options.OpenApiInfo.Version, options.OpenApiInfo);
             });
             services.ConfigureSwaggerGen(config =>

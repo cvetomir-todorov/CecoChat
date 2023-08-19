@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using Refit;
 
-namespace CecoChat.Contracts.Bff;
+namespace CecoChat.Contracts.Bff.Connections;
 
 public sealed class Connection
 {

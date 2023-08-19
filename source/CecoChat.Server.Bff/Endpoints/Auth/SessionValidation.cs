@@ -1,8 +1,8 @@
-using CecoChat.Contracts.Bff;
+using CecoChat.Contracts.Bff.Auth;
 using CecoChat.Data;
 using FluentValidation;
 
-namespace CecoChat.Server.Bff.Endpoints;
+namespace CecoChat.Server.Bff.Endpoints.Auth;
 
 public sealed class CreateSessionRequestValidator : AbstractValidator<CreateSessionRequest>
 {
