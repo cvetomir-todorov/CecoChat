@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 namespace CecoChat.Server.Bff.Endpoints.Chats;
 
 [ApiController]
-[Route("api/state")]
+[Route("api/chats")]
 [ApiExplorerSettings(GroupName = "Chats")]
 public class StateController : ControllerBase
 {
@@ -27,7 +27,7 @@ public class StateController : ControllerBase
     }
 
     [Authorize(Policy = "user")]
-    [HttpGet("chats", Name = "GetChats")]
+    [HttpGet("state", Name = "GetChatState")]
     [ProducesResponseType(typeof(GetChatsResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]

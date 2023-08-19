@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace CecoChat.Server.Bff.Endpoints.Profiles;
 
 [ApiController]
-[Route("api/user/profile")]
+[Route("api/profiles")]
 [ApiExplorerSettings(GroupName = "Profiles")]
 public class ProfileController : ControllerBase
 {

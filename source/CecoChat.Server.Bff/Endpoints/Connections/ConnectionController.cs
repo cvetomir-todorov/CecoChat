@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace CecoChat.Server.Bff.Endpoints.Connections;
 
 [ApiController]
-[Route("api/connection")]
+[Route("api/connections")]
 [ApiExplorerSettings(GroupName = "Connections")]
 public class ConnectionController : ControllerBase
 {
@@ -53,7 +53,7 @@ public class ConnectionController : ControllerBase
     // TODO: add logging
 
     [Authorize(Policy = "user")]
-    [HttpPost("{connectionId}/invite")]
+    [HttpPost("{id}/invite")]
     [ProducesResponseType(typeof(InviteConnectionResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -61,7 +61,7 @@ public class ConnectionController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> InviteConnection([FromRoute(Name = "connectionId")] long connectionId, [FromBody] InviteConnectionRequest request, CancellationToken ct)
+    public async Task<IActionResult> InviteConnection([FromRoute(Name = "id")] long connectionId, [FromBody] InviteConnectionRequest request, CancellationToken ct)
     {
         if (!HttpContext.TryGetUserClaimsAndAccessToken(_logger, out UserClaims? userClaims, out string? accessToken))
         {
@@ -86,7 +86,7 @@ public class ConnectionController : ControllerBase
     }
 
     [Authorize(Policy = "user")]
-    [HttpPut("{connectionId}/invite")]
+    [HttpPut("{id}/invite")]
     [ProducesResponseType(typeof(ApproveConnectionResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -94,7 +94,7 @@ public class ConnectionController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> ApproveConnection([FromRoute(Name = "connectionId")] long connectionId, [FromBody] ApproveConnectionRequest request, CancellationToken ct)
+    public async Task<IActionResult> ApproveConnection([FromRoute(Name = "id")] long connectionId, [FromBody] ApproveConnectionRequest request, CancellationToken ct)
     {
         if (!HttpContext.TryGetUserClaimsAndAccessToken(_logger, out UserClaims? userClaims, out string? accessToken))
         {
@@ -127,7 +127,7 @@ public class ConnectionController : ControllerBase
     }
 
     [Authorize(Policy = "user")]
-    [HttpDelete("{connectionId}/invite")]
+    [HttpDelete("{id}/invite")]
     [ProducesResponseType(typeof(CancelConnectionResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -135,7 +135,7 @@ public class ConnectionController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> CancelConnection([FromRoute(Name = "connectionId")] long connectionId, [FromBody] CancelConnectionRequest request, CancellationToken ct)
+    public async Task<IActionResult> CancelConnection([FromRoute(Name = "id")] long connectionId, [FromBody] CancelConnectionRequest request, CancellationToken ct)
     {
         if (!HttpContext.TryGetUserClaimsAndAccessToken(_logger, out UserClaims? userClaims, out string? accessToken))
         {
@@ -165,7 +165,7 @@ public class ConnectionController : ControllerBase
     }
 
     [Authorize(Policy = "user")]
-    [HttpDelete("{connectionId}")]
+    [HttpDelete("{id}")]
     [ProducesResponseType(typeof(RemoveConnectionResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -173,7 +173,7 @@ public class ConnectionController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> RemoveConnection([FromRoute(Name = "connectionId")] long connectionId, [FromBody] RemoveConnectionRequest request, CancellationToken ct)
+    public async Task<IActionResult> RemoveConnection([FromRoute(Name = "id")] long connectionId, [FromBody] RemoveConnectionRequest request, CancellationToken ct)
     {
         if (!HttpContext.TryGetUserClaimsAndAccessToken(_logger, out UserClaims? userClaims, out string? accessToken))
         {
