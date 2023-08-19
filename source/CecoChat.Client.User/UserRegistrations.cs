@@ -18,6 +18,13 @@ public static class UserRegistrations
             throw new ArgumentNullException(nameof(options), $"{nameof(options.Retry)}");
         }
 
+        services.AddGrpcClient<Auth.AuthClient>(grpc =>
+            {
+                grpc.Address = options.Address;
+            })
+            .ConfigureSocketsPrimaryHttpClientHandler(options.SocketsHttpHandler)
+            .AddGrpcRetryPolicy(options.Retry);
+
         services.AddGrpcClient<ProfileCommand.ProfileCommandClient>(grpc =>
             {
                 grpc.Address = options.Address;

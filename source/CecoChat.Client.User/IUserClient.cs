@@ -4,11 +4,11 @@ namespace CecoChat.Client.User;
 
 public interface IUserClient : IDisposable
 {
-    Task<CreateProfileResult> CreateProfile(ProfileCreate profile, CancellationToken ct);
+    Task<RegisterResult> Register(Registration registration, CancellationToken ct);
 
     Task<AuthenticateResult> Authenticate(string userName, string password, CancellationToken ct);
 
-    Task<ChangePasswordResult> ChangePassword(ProfileChangePassword profile, long userId, string accessToken, CancellationToken ct);
+    Task<ChangePasswordResult> ChangePassword(string newPassword, Guid version, long userId, string accessToken, CancellationToken ct);
 
     Task<UpdateProfileResult> UpdateProfile(ProfileUpdate profile, long userId, string accessToken, CancellationToken ct);
 
@@ -27,7 +27,7 @@ public interface IUserClient : IDisposable
     Task<RemoveResult> Remove(long connectionId, Guid version, long userId, string accessToken, CancellationToken ct);
 }
 
-public readonly struct CreateProfileResult
+public readonly struct RegisterResult
 {
     public bool Success { get; init; }
     public bool DuplicateUserName { get; init; }

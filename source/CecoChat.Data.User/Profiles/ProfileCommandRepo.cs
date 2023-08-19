@@ -1,7 +1,6 @@
 using CecoChat.Contracts;
 using CecoChat.Contracts.User;
 using CecoChat.Data.User.Infra;
-using CecoChat.Data.User.Security;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Logging;
@@ -14,41 +13,40 @@ internal class ProfileCommandRepo : IProfileCommandRepo
     private readonly ILogger _logger;
     private readonly UserDbContext _dbContext;
     private readonly IDataUtility _dataUtility;
-    private readonly IPasswordHasher _passwordHasher;
 
-    public ProfileCommandRepo(ILogger<ProfileCommandRepo> logger, UserDbContext dbContext, IDataUtility dataUtility, IPasswordHasher passwordHasher)
+    public ProfileCommandRepo(
+        ILogger<ProfileCommandRepo> logger,
+        UserDbContext dbContext,
+        IDataUtility dataUtility)
     {
         _logger = logger;
         _dbContext = dbContext;
         _dataUtility = dataUtility;
-        _passwordHasher = passwordHasher;
     }
 
-    public async Task<CreateProfileResult> CreateProfile(ProfileCreate profile)
+    public async Task<CreateProfileResult> CreateProfile(Registration registration)
     {
-        if (profile.UserName.Any(char.IsUpper))
+        if (registration.UserName.Any(char.IsUpper))
         {
-            throw new ArgumentException("Profile user name should not contain upper-case letters.", nameof(profile));
+            throw new ArgumentException("Profile user name should not contain upper-case letters.", nameof(registration));
         }
-
-        string passwordHashAndSalt = _passwordHasher.Hash(profile.Password);
 
         ProfileEntity entity = new()
         {
-            UserName = profile.UserName,
+            UserName = registration.UserName,
             Version = Guid.NewGuid(),
-            Password = passwordHashAndSalt,
-            DisplayName = profile.DisplayName,
-            AvatarUrl = profile.AvatarUrl,
-            Phone = profile.Phone,
-            Email = profile.Email
+            Password = registration.Password,
+            DisplayName = registration.DisplayName,
+            AvatarUrl = registration.AvatarUrl,
+            Phone = registration.Phone,
+            Email = registration.Email
         };
         _dbContext.Profiles.Add(entity);
 
         try
         {
             await _dbContext.SaveChangesAsync();
-            _logger.LogTrace("Inserted a new profile for user {UserName}", profile.UserName);
+            _logger.LogTrace("Inserted a new profile for user {UserName}", registration.UserName);
 
             return new CreateProfileResult
             {
@@ -73,18 +71,16 @@ internal class ProfileCommandRepo : IProfileCommandRepo
         }
     }
 
-    public async Task<ChangePasswordResult> ChangePassword(ProfileChangePassword profile, long userId)
+    public async Task<ChangePasswordResult> ChangePassword(string newPassword, Guid version, long userId)
     {
-        string passwordHashAndSalt = _passwordHasher.Hash(profile.NewPassword);
-
         ProfileEntity entity = new()
         {
             UserId = userId,
-            Password = passwordHashAndSalt
+            Password = newPassword
         };
         EntityEntry<ProfileEntity> entry = _dbContext.Profiles.Attach(entity);
         entry.Property(e => e.Password).IsModified = true;
-        Guid newVersion = _dataUtility.SetVersion(entry, profile.Version.ToGuid());
+        Guid newVersion = _dataUtility.SetVersion(entry, version);
 
         try
         {

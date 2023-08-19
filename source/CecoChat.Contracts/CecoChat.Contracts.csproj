@@ -26,16 +26,16 @@
     <Protobuf Include="IdGen\IdGenService.proto" GrpcServices="All" />
     <Protobuf Include="State\ChatState.proto" />
     <Protobuf Include="State\StateService.proto" GrpcServices="All" />
+    <Protobuf Include="User\AuthService.proto" GrpcServices="All" />
     <Protobuf Include="User\Connection.proto" />
     <Protobuf Include="User\ConnectionCommandService.proto" GrpcServices="All" />
     <Protobuf Include="User\ConnectionQueryService.proto" GrpcServices="All" />
-    <Protobuf Include="User\ProfileChangePassword.proto" />
     <Protobuf Include="User\ProfileCommandService.proto" GrpcServices="All" />
-    <Protobuf Include="User\ProfileCreate.proto" />
     <Protobuf Include="User\ProfileFull.proto" />
     <Protobuf Include="User\ProfilePublic.proto" />
-    <Protobuf Include="User\ProfileQueryService.proto" GrpcServices="All" />
     <Protobuf Include="User\ProfileUpdate.proto" />
+    <Protobuf Include="User\ProfileQueryService.proto" GrpcServices="All" />
+    <Protobuf Include="User\Registration.proto" />
     <Protobuf Include="Uuid.proto" />
   </ItemGroup>
 

@@ -4,9 +4,9 @@ namespace CecoChat.Data.User.Profiles;
 
 public interface IProfileCommandRepo
 {
-    Task<CreateProfileResult> CreateProfile(ProfileCreate profile);
+    Task<CreateProfileResult> CreateProfile(Registration registration);
 
-    Task<ChangePasswordResult> ChangePassword(ProfileChangePassword profile, long userId);
+    Task<ChangePasswordResult> ChangePassword(string newPassword, Guid version, long userId);
 
     Task<UpdateProfileResult> UpdateProfile(ProfileUpdate profile, long userId);
 }

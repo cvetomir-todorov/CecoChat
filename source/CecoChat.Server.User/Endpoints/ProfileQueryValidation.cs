@@ -4,17 +4,6 @@ using FluentValidation;
 
 namespace CecoChat.Server.User.Endpoints;
 
-public sealed class AuthenticateRequestValidator : AbstractValidator<AuthenticateRequest>
-{
-    public AuthenticateRequestValidator()
-    {
-        RuleFor(x => x.UserName)
-            .ValidUserName();
-        RuleFor(x => x.Password)
-            .ValidPassword();
-    }
-}
-
 public sealed class GetPublicProfileRequestValidator : AbstractValidator<GetPublicProfileRequest>
 {
     public GetPublicProfileRequestValidator()

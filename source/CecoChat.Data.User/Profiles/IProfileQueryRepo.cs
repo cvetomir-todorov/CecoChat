@@ -4,20 +4,16 @@ namespace CecoChat.Data.User.Profiles;
 
 public interface IProfileQueryRepo
 {
-    Task<AuthenticateResult> Authenticate(string userName, string password);
+    Task<FullProfileResult> GetFullProfile(string userName, bool includePassword);
 
     Task<ProfilePublic?> GetPublicProfile(long requestedUserId, long userId);
 
     Task<IEnumerable<ProfilePublic>> GetPublicProfiles(IList<long> requestedUserIds, long userId);
 }
 
-public readonly struct AuthenticateResult
+public readonly struct FullProfileResult
 {
-    public bool Missing { get; init; }
-
-    public bool InvalidPassword { get; init; }
-
+    public bool Success { get; init; }
     public ProfileFull? Profile { get; init; }
-
-    public bool Success => Profile != null;
+    public string? Password { get; init; }
 }

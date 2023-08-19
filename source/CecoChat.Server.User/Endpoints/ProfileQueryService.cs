@@ -17,30 +17,6 @@ public class ProfileQueryService : ProfileQuery.ProfileQueryBase
         _repo = repo;
     }
 
-    [AllowAnonymous]
-    public override async Task<AuthenticateResponse> Authenticate(AuthenticateRequest request, ServerCallContext context)
-    {
-        AuthenticateResult authenticateResult = await _repo.Authenticate(request.UserName, request.Password);
-        if (authenticateResult.Missing)
-        {
-            _logger.LogTrace("Responding with missing profile for user {UserName}", request.UserName);
-            return new AuthenticateResponse { Missing = true };
-        }
-        if (authenticateResult.InvalidPassword)
-        {
-            _logger.LogTrace("Responding with invalid password for user {UserName}", request.UserName);
-            return new AuthenticateResponse { InvalidPassword = true };
-        }
-        if (authenticateResult.Profile != null)
-        {
-            _logger.LogTrace("Responding after successful authentication with full profile for user {UserId} named {UserName}",
-                authenticateResult.Profile.UserId, authenticateResult.Profile.UserName);
-            return new AuthenticateResponse { Profile = authenticateResult.Profile };
-        }
-
-        throw new ProcessingFailureException(typeof(AuthenticateResult));
-    }
-
     [Authorize(Policy = "user")]
     public override async Task<GetPublicProfileResponse> GetPublicProfile(GetPublicProfileRequest request, ServerCallContext context)
     {

@@ -1,7 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 
-namespace CecoChat.Data.User.Security;
+namespace CecoChat.Server.User.Security;
 
 public interface IPasswordHasher
 {
@@ -13,7 +13,7 @@ public interface IPasswordHasher
     bool Verify(string password, string hashAndSalt);
 }
 
-public class PasswordHasher : IPasswordHasher
+internal class PasswordHasher : IPasswordHasher
 {
     // based on the following resources:
     // https://stackoverflow.com/a/59338614/608971
