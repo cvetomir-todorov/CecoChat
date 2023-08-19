@@ -38,9 +38,7 @@ public class EditProfileController : ControllerBase
             return Unauthorized();
         }
 
-        Contracts.User.ProfileChangePassword profile = _mapper.Map<Contracts.User.ProfileChangePassword>(request);
-
-        ChangePasswordResult result = await _userClient.ChangePassword(profile, userClaims.UserId, accessToken, ct);
+        ChangePasswordResult result = await _userClient.ChangePassword(request.NewPassword, request.Version, userClaims.UserId, accessToken, ct);
         if (result.Success)
         {
             ChangePasswordResponse response = new() { NewVersion = result.NewVersion };

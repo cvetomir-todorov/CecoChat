@@ -11,6 +11,7 @@ internal sealed class UserClient : IUserClient
 {
     private readonly ILogger _logger;
     private readonly UserOptions _options;
+    private readonly Auth.AuthClient _authClient;
     private readonly ProfileQuery.ProfileQueryClient _profileQueryClient;
     private readonly ProfileCommand.ProfileCommandClient _profileCommandClient;
     private readonly ConnectionQuery.ConnectionQueryClient _connectionQueryClient;
@@ -20,6 +21,7 @@ internal sealed class UserClient : IUserClient
     public UserClient(
         ILogger<UserClient> logger,
         IOptions<UserOptions> options,
+        Auth.AuthClient authClient,
         ProfileQuery.ProfileQueryClient profileQueryClient,
         ProfileCommand.ProfileCommandClient profileCommandClient,
         ConnectionQuery.ConnectionQueryClient connectionQueryClient,
@@ -28,6 +30,7 @@ internal sealed class UserClient : IUserClient
     {
         _logger = logger;
         _options = options.Value;
+        _authClient = authClient;
         _profileQueryClient = profileQueryClient;
         _profileCommandClient = profileCommandClient;
         _connectionQueryClient = connectionQueryClient;
@@ -42,26 +45,26 @@ internal sealed class UserClient : IUserClient
         // nothing to dispose for now, but keep the IDisposable as part of the contract
     }
 
-    public async Task<CreateProfileResult> CreateProfile(ProfileCreate profile, CancellationToken ct)
+    public async Task<RegisterResult> Register(Registration registration, CancellationToken ct)
     {
-        CreateProfileRequest request = new();
-        request.Profile = profile;
+        RegisterRequest request = new();
+        request.Registration = registration;
 
         DateTime deadline = _clock.GetNowUtc().Add(_options.CallTimeout);
-        CreateProfileResponse response = await _profileCommandClient.CreateProfileAsync(request, deadline: deadline, cancellationToken: ct);
+        RegisterResponse response = await _authClient.RegisterAsync(request, deadline: deadline, cancellationToken: ct);
 
         if (response.Success)
         {
-            _logger.LogTrace("Received confirmation for created profile for user {UserName}", profile.UserName);
-            return new CreateProfileResult { Success = true };
+            _logger.LogTrace("Received confirmation for created profile for user {UserName}", registration.UserName);
+            return new RegisterResult { Success = true };
         }
         if (response.DuplicateUserName)
         {
-            _logger.LogTrace("Received failure for creating a profile for user {UserName} because of a duplicate user name", profile.UserName);
-            return new CreateProfileResult { DuplicateUserName = true };
+            _logger.LogTrace("Received failure for creating a profile for user {UserName} because of a duplicate user name", registration.UserName);
+            return new RegisterResult { DuplicateUserName = true };
         }
 
-        throw new ProcessingFailureException(typeof(CreateProfileResponse));
+        throw new ProcessingFailureException(typeof(RegisterResponse));
     }
 
     public async Task<AuthenticateResult> Authenticate(string userName, string password, CancellationToken ct)
@@ -71,7 +74,7 @@ internal sealed class UserClient : IUserClient
         request.Password = password;
 
         DateTime deadline = _clock.GetNowUtc().Add(_options.CallTimeout);
-        AuthenticateResponse response = await _profileQueryClient.AuthenticateAsync(request, deadline: deadline, cancellationToken: ct);
+        AuthenticateResponse response = await _authClient.AuthenticateAsync(request, deadline: deadline, cancellationToken: ct);
 
         if (response.Missing)
         {
@@ -93,10 +96,11 @@ internal sealed class UserClient : IUserClient
         throw new ProcessingFailureException(typeof(AuthenticateResponse));
     }
 
-    public async Task<ChangePasswordResult> ChangePassword(ProfileChangePassword profile, long userId, string accessToken, CancellationToken ct)
+    public async Task<ChangePasswordResult> ChangePassword(string newPassword, Guid version, long userId, string accessToken, CancellationToken ct)
     {
         ChangePasswordRequest request = new();
-        request.Profile = profile;
+        request.NewPassword = newPassword;
+        request.Version = version.ToUuid();
 
         Metadata headers = new();
         headers.AddAuthorization(accessToken);

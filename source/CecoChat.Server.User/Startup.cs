@@ -15,6 +15,7 @@ using CecoChat.Redis.Health;
 using CecoChat.Server.Identity;
 using CecoChat.Server.User.Endpoints;
 using CecoChat.Server.User.HostedServices;
+using CecoChat.Server.User.Security;
 using FluentValidation;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Npgsql;
@@ -152,6 +153,9 @@ public class Startup
         IConfiguration userCacheStoreConfig = userCacheConfig.GetSection("Store");
         builder.RegisterModule(new UserDbAutofacModule(userCacheConfig, userCacheStoreConfig));
         builder.RegisterOptions<UserDbOptions>(Configuration.GetSection("UserDb"));
+
+        // security
+        builder.RegisterType<PasswordHasher>().As<IPasswordHasher>().SingleInstance();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -166,6 +170,7 @@ public class Startup
         app.UseAuthorization();
         app.UseEndpoints(endpoints =>
         {
+            endpoints.MapGrpcService<AuthService>();
             endpoints.MapGrpcService<ProfileCommandService>();
             endpoints.MapGrpcService<ProfileQueryService>();
             endpoints.MapGrpcService<ConnectionCommandService>();

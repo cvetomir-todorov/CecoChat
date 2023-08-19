@@ -5,36 +5,13 @@ using FluentValidation;
 
 namespace CecoChat.Server.User.Endpoints;
 
-public sealed class CreateProfileRequestValidator : AbstractValidator<CreateProfileRequest>
-{
-    public CreateProfileRequestValidator()
-    {
-        RuleFor(x => x.Profile)
-            .NotNull();
-        RuleFor(x => x.Profile.UserName)
-            .ValidUserName();
-        RuleFor(x => x.Profile.Password)
-            .ValidPassword();
-        RuleFor(x => x.Profile.DisplayName)
-            .ValidDisplayName();
-        RuleFor(x => x.Profile.AvatarUrl)
-            .ValidAvatarUrl();
-        RuleFor(x => x.Profile.Phone)
-            .ValidPhone();
-        RuleFor(x => x.Profile.Email)
-            .ValidEmail();
-    }
-}
-
 public sealed class ChangePasswordRequestValidator : AbstractValidator<ChangePasswordRequest>
 {
     public ChangePasswordRequestValidator()
     {
-        RuleFor(x => x.Profile)
-            .NotNull();
-        RuleFor(x => x.Profile.NewPassword)
+        RuleFor(x => x.NewPassword)
             .ValidPassword();
-        RuleFor(x => x.Profile.Version.ToGuid())
+        RuleFor(x => x.Version.ToGuid())
             .ValidVersion();
     }
 }

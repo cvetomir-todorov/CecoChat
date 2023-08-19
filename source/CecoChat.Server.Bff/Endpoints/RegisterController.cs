@@ -1,7 +1,6 @@
 using AutoMapper;
 using CecoChat.Client.User;
 using CecoChat.Contracts.Bff;
-using CecoChat.Contracts.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -34,10 +33,10 @@ public class RegisterController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Register([FromBody][BindRequired] RegisterRequest request, CancellationToken ct)
     {
-        ProfileCreate profile = _mapper.Map<ProfileCreate>(request);
-        profile.AvatarUrl = $"https://cdn.cecochat.com/avatars/{request.UserName}.jpg";
+        Contracts.User.Registration registration = _mapper.Map<Contracts.User.Registration>(request);
+        registration.AvatarUrl = $"https://cdn.cecochat.com/avatars/{request.UserName}.jpg";
 
-        CreateProfileResult result = await _userClient.CreateProfile(profile, ct);
+        RegisterResult result = await _userClient.Register(registration, ct);
 
         if (result.Success)
         {
@@ -52,6 +51,6 @@ public class RegisterController : ControllerBase
             return Conflict(new ProblemDetails { Title = "Duplicate user name" });
         }
 
-        throw new ProcessingFailureException(typeof(CreateProfileResult));
+        throw new ProcessingFailureException(typeof(RegisterResult));
     }
 }

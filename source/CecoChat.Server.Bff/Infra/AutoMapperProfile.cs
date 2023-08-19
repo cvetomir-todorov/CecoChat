@@ -6,11 +6,7 @@ public class AutoMapperProfile : AutoMapper.Profile
 {
     public AutoMapperProfile()
     {
-        CreateMap<Contracts.Bff.RegisterRequest, Contracts.User.ProfileCreate>();
-        CreateMap<Contracts.Bff.ChangePasswordRequest, Contracts.User.ProfileChangePassword>()
-            .ForMember(
-                profileContract => profileContract.Version,
-                options => options.MapFrom(request => request.Version.ToUuid()));
+        CreateMap<Contracts.Bff.RegisterRequest, Contracts.User.Registration>();
         CreateMap<Contracts.Bff.EditProfileRequest, Contracts.User.ProfileUpdate>()
             .ForMember(profileContract => profileContract.Version,
                 options => options.MapFrom(request => request.Version.ToUuid()));
