@@ -17,20 +17,20 @@ public class OneChatScreenController : ControllerBase
     private readonly IMapper _mapper;
     private readonly IContractMapper _contractMapper;
     private readonly IHistoryClient _historyClient;
-    private readonly IUserClient _userClient;
+    private readonly IProfileClient _profileClient;
 
     public OneChatScreenController(
         ILogger<OneChatScreenController> logger,
         IMapper mapper,
         IContractMapper contractMapper,
         IHistoryClient historyClient,
-        IUserClient userClient)
+        IProfileClient profileClient)
     {
         _logger = logger;
         _mapper = mapper;
         _contractMapper = contractMapper;
         _historyClient = historyClient;
-        _userClient = userClient;
+        _profileClient = profileClient;
     }
 
     [Authorize(Policy = "user")]
@@ -53,7 +53,7 @@ public class OneChatScreenController : ControllerBase
         ProfilePublic? profile = null;
         if (request.IncludeProfile)
         {
-            Contracts.User.ProfilePublic serviceProfile = await _userClient.GetPublicProfile(userClaims.UserId, request.OtherUserId, accessToken, ct);
+            Contracts.User.ProfilePublic serviceProfile = await _profileClient.GetPublicProfile(userClaims.UserId, request.OtherUserId, accessToken, ct);
             profile = _mapper.Map<ProfilePublic>(serviceProfile);
         }
 

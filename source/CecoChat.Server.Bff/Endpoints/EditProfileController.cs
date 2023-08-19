@@ -14,13 +14,16 @@ public class EditProfileController : ControllerBase
 {
     private readonly ILogger _logger;
     private readonly IMapper _mapper;
-    private readonly IUserClient _userClient;
+    private readonly IProfileClient _profileClient;
 
-    public EditProfileController(ILogger<EditProfileController> logger, IMapper mapper, IUserClient userClient)
+    public EditProfileController(
+        ILogger<EditProfileController> logger,
+        IMapper mapper,
+        IProfileClient profileClient)
     {
         _logger = logger;
         _mapper = mapper;
-        _userClient = userClient;
+        _profileClient = profileClient;
     }
 
     [Authorize(Policy = "user")]
@@ -38,7 +41,7 @@ public class EditProfileController : ControllerBase
             return Unauthorized();
         }
 
-        ChangePasswordResult result = await _userClient.ChangePassword(request.NewPassword, request.Version, userClaims.UserId, accessToken, ct);
+        ChangePasswordResult result = await _profileClient.ChangePassword(request.NewPassword, request.Version, userClaims.UserId, accessToken, ct);
         if (result.Success)
         {
             ChangePasswordResponse response = new() { NewVersion = result.NewVersion };
@@ -71,7 +74,7 @@ public class EditProfileController : ControllerBase
 
         Contracts.User.ProfileUpdate profile = _mapper.Map<Contracts.User.ProfileUpdate>(request);
 
-        UpdateProfileResult result = await _userClient.UpdateProfile(profile, userClaims.UserId, accessToken, ct);
+        UpdateProfileResult result = await _profileClient.UpdateProfile(profile, userClaims.UserId, accessToken, ct);
         if (result.Success)
         {
             EditProfileResponse response = new() { NewVersion = result.NewVersion };

@@ -13,17 +13,17 @@ namespace CecoChat.Server.Bff.Endpoints;
 public class ProfileController : ControllerBase
 {
     private readonly ILogger _logger;
-    private readonly IUserClient _userClient;
     private readonly IMapper _mapper;
+    private readonly IProfileClient _profileClient;
 
     public ProfileController(
         ILogger<ProfileController> logger,
-        IUserClient userClient,
-        IMapper mapper)
+        IMapper mapper,
+        IProfileClient profileClient)
     {
         _logger = logger;
-        _userClient = userClient;
         _mapper = mapper;
+        _profileClient = profileClient;
     }
 
     [Authorize(Policy = "user")]
@@ -40,7 +40,7 @@ public class ProfileController : ControllerBase
             return Unauthorized();
         }
 
-        Contracts.User.ProfilePublic profile = await _userClient.GetPublicProfile(userClaims.UserId, requestedUserId, accessToken, ct);
+        Contracts.User.ProfilePublic profile = await _profileClient.GetPublicProfile(userClaims.UserId, requestedUserId, accessToken, ct);
         GetPublicProfileResponse response = new() { Profile = _mapper.Map<ProfilePublic>(profile) };
 
         _logger.LogTrace("Responding with profile for user {RequestedUserId} requested by user {UserId}", requestedUserId, userClaims.UserId);
@@ -65,7 +65,7 @@ public class ProfileController : ControllerBase
             return BadRequest(ModelState);
         }
 
-        IEnumerable<Contracts.User.ProfilePublic> profiles = await _userClient.GetPublicProfiles(userClaims.UserId, requestedUserIds, accessToken, ct);
+        IEnumerable<Contracts.User.ProfilePublic> profiles = await _profileClient.GetPublicProfiles(userClaims.UserId, requestedUserIds, accessToken, ct);
         GetPublicProfilesResponse response = new()
         {
             Profiles = profiles.Select(profile => _mapper.Map<ProfilePublic>(profile)).ToArray()

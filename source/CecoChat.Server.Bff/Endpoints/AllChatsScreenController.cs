@@ -17,20 +17,20 @@ public class AllChatsScreenController : ControllerBase
     private readonly IMapper _mapper;
     private readonly IContractMapper _contractMapper;
     private readonly IStateClient _stateClient;
-    private readonly IUserClient _userClient;
+    private readonly IProfileClient _profileClient;
 
     public AllChatsScreenController(
         ILogger<AllChatsScreenController> logger,
         IMapper mapper,
         IContractMapper contractMapper,
         IStateClient stateClient,
-        IUserClient userClient)
+        IProfileClient profileClient)
     {
         _logger = logger;
         _mapper = mapper;
         _contractMapper = contractMapper;
         _stateClient = stateClient;
-        _userClient = userClient;
+        _profileClient = profileClient;
     }
 
     [Authorize(Policy = "user")]
@@ -52,7 +52,7 @@ public class AllChatsScreenController : ControllerBase
         if (request.IncludeProfiles && serviceChats.Count > 0)
         {
             long[] userIds = serviceChats.Select(chat => chat.OtherUserId).ToArray();
-            serviceProfiles = await _userClient.GetPublicProfiles(userClaims.UserId, userIds, accessToken, ct);
+            serviceProfiles = await _profileClient.GetPublicProfiles(userClaims.UserId, userIds, accessToken, ct);
         }
 
         ChatState[] chats = serviceChats.Select(chat => _contractMapper.MapChat(chat)).ToArray();

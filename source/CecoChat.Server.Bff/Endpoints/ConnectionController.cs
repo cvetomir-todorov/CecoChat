@@ -13,16 +13,16 @@ public class ConnectionController : ControllerBase
 {
     private readonly ILogger _logger;
     private readonly IMapper _mapper;
-    private readonly IUserClient _userClient;
+    private readonly IConnectionClient _connectionClient;
 
     public ConnectionController(
         ILogger<ConnectionController> logger,
         IMapper mapper,
-        IUserClient userClient)
+        IConnectionClient connectionClient)
     {
         _logger = logger;
         _mapper = mapper;
-        _userClient = userClient;
+        _connectionClient = connectionClient;
     }
 
     [Authorize(Policy = "user")]
@@ -39,7 +39,7 @@ public class ConnectionController : ControllerBase
             return Unauthorized();
         }
 
-        IEnumerable<Contracts.User.Connection> connections = await _userClient.GetConnections(userClaims.UserId, accessToken, ct);
+        IEnumerable<Contracts.User.Connection> connections = await _connectionClient.GetConnections(userClaims.UserId, accessToken, ct);
         GetConnectionsResponse response = new()
         {
             Connections = _mapper.Map<Connection[]>(connections)
@@ -67,7 +67,7 @@ public class ConnectionController : ControllerBase
             return Unauthorized();
         }
 
-        InviteResult result = await _userClient.Invite(connectionId, userClaims.UserId, accessToken, ct);
+        InviteResult result = await _connectionClient.Invite(connectionId, userClaims.UserId, accessToken, ct);
         if (result.Success)
         {
             InviteConnectionResponse response = new()
@@ -100,7 +100,7 @@ public class ConnectionController : ControllerBase
             return Unauthorized();
         }
 
-        ApproveResult result = await _userClient.Approve(connectionId, request.Version, userClaims.UserId, accessToken, ct);
+        ApproveResult result = await _connectionClient.Approve(connectionId, request.Version, userClaims.UserId, accessToken, ct);
         if (result.Success)
         {
             ApproveConnectionResponse response = new()
@@ -141,7 +141,7 @@ public class ConnectionController : ControllerBase
             return Unauthorized();
         }
 
-        CancelResult result = await _userClient.Cancel(connectionId, request.Version, userClaims.UserId, accessToken, ct);
+        CancelResult result = await _connectionClient.Cancel(connectionId, request.Version, userClaims.UserId, accessToken, ct);
         if (result.Success)
         {
             CancelConnectionResponse response = new();
@@ -179,7 +179,7 @@ public class ConnectionController : ControllerBase
             return Unauthorized();
         }
 
-        RemoveResult result = await _userClient.Remove(connectionId, request.Version, userClaims.UserId, accessToken, ct);
+        RemoveResult result = await _connectionClient.Remove(connectionId, request.Version, userClaims.UserId, accessToken, ct);
         if (result.Success)
         {
             RemoveConnectionResponse response = new();
