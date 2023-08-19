@@ -22,7 +22,7 @@ public class SessionController : ControllerBase
 {
     private readonly ILogger _logger;
     private readonly IMapper _mapper;
-    private readonly IUserClient _userClient;
+    private readonly IAuthClient _authClient;
     private readonly IPartitionUtility _partitionUtility;
     private readonly IPartitioningConfig _partitioningConfig;
     private readonly JwtOptions _jwtOptions;
@@ -33,7 +33,7 @@ public class SessionController : ControllerBase
     public SessionController(
         ILogger<SessionController> logger,
         IMapper mapper,
-        IUserClient userClient,
+        IAuthClient authClient,
         IOptions<JwtOptions> jwtOptions,
         IClock clock,
         IPartitionUtility partitionUtility,
@@ -41,7 +41,7 @@ public class SessionController : ControllerBase
     {
         _logger = logger;
         _mapper = mapper;
-        _userClient = userClient;
+        _authClient = authClient;
         _jwtOptions = jwtOptions.Value;
         _clock = clock;
         _partitionUtility = partitionUtility;
@@ -61,7 +61,7 @@ public class SessionController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> CreateSession([FromBody][BindRequired] CreateSessionRequest request, CancellationToken ct)
     {
-        AuthenticateResult authenticateResult = await _userClient.Authenticate(request.UserName, request.Password, ct);
+        AuthenticateResult authenticateResult = await _authClient.Authenticate(request.UserName, request.Password, ct);
         if (authenticateResult.Missing || authenticateResult.InvalidPassword)
         {
             _logger.LogTrace("Responding with no session because authentication failed for user {UserName}", request.UserName);

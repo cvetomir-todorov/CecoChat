@@ -13,16 +13,16 @@ public class RegisterController : ControllerBase
 {
     private readonly ILogger _logger;
     private readonly IMapper _mapper;
-    private readonly IUserClient _userClient;
+    private readonly IAuthClient _authClient;
 
     public RegisterController(
         ILogger<RegisterController> logger,
         IMapper mapper,
-        IUserClient userClient)
+        IAuthClient authClient)
     {
         _logger = logger;
         _mapper = mapper;
-        _userClient = userClient;
+        _authClient = authClient;
     }
 
     [AllowAnonymous]
@@ -36,7 +36,7 @@ public class RegisterController : ControllerBase
         Contracts.User.Registration registration = _mapper.Map<Contracts.User.Registration>(request);
         registration.AvatarUrl = $"https://cdn.cecochat.com/avatars/{request.UserName}.jpg";
 
-        RegisterResult result = await _userClient.Register(registration, ct);
+        RegisterResult result = await _authClient.Register(registration, ct);
 
         if (result.Success)
         {
