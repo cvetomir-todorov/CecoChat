@@ -1,5 +1,7 @@
 using CecoChat.Client.Messaging;
 using CecoChat.Contracts.Bff;
+using CecoChat.Contracts.Bff.Auth;
+using CecoChat.Contracts.Bff.Chats;
 using CecoChat.Contracts.Messaging;
 using Refit;
 

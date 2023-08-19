@@ -4,7 +4,7 @@ using System.Security.Claims;
 using System.Text;
 using AutoMapper;
 using CecoChat.Client.User;
-using CecoChat.Contracts.Bff;
+using CecoChat.Contracts.Bff.Auth;
 using CecoChat.Data.Config.Partitioning;
 using CecoChat.Jwt;
 using CecoChat.Server.Backplane;
@@ -14,10 +14,11 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
-namespace CecoChat.Server.Bff.Endpoints;
+namespace CecoChat.Server.Bff.Endpoints.Auth;
 
 [ApiController]
 [Route("api")]
+[ApiExplorerSettings(GroupName = "Auth")]
 public class SessionController : ControllerBase
 {
     private readonly ILogger _logger;

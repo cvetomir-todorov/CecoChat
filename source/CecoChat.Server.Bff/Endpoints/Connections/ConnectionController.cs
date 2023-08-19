@@ -1,14 +1,15 @@
 using AutoMapper;
 using CecoChat.Client.User;
-using CecoChat.Contracts.Bff;
+using CecoChat.Contracts.Bff.Connections;
 using CecoChat.Server.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CecoChat.Server.Bff.Endpoints;
+namespace CecoChat.Server.Bff.Endpoints.Connections;
 
 [ApiController]
 [Route("api/connection")]
+[ApiExplorerSettings(GroupName = "Connections")]
 public class ConnectionController : ControllerBase
 {
     private readonly ILogger _logger;

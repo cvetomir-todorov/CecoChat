@@ -1,4 +1,4 @@
-using CecoChat.Contracts.Bff;
+using CecoChat.Contracts.Bff.Chats;
 
 namespace CecoChat.Server.Bff;
 

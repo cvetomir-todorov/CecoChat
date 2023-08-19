@@ -1,3 +1,7 @@
+using CecoChat.Contracts.Bff.Auth;
+using CecoChat.Contracts.Bff.Chats;
+using CecoChat.Contracts.Bff.Profiles;
+using CecoChat.Contracts.Bff.Screens;
 using Refit;
 
 namespace CecoChat.Contracts.Bff;

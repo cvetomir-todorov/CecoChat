@@ -1,8 +1,8 @@
-using CecoChat.Contracts.Bff;
+using CecoChat.Contracts.Bff.Profiles;
 using CecoChat.Data;
 using FluentValidation;
 
-namespace CecoChat.Server.Bff.Endpoints;
+namespace CecoChat.Server.Bff.Endpoints.Profiles;
 
 public sealed class ChangePasswordRequestValidator : AbstractValidator<ChangePasswordRequest>
 {
