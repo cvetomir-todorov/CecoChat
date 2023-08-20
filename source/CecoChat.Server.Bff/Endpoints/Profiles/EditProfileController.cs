@@ -52,7 +52,10 @@ public class EditProfileController : ControllerBase
         if (result.ConcurrentlyUpdated)
         {
             _logger.LogTrace("Responding with failed password change for user {UserId} since the profile has been concurrently updated", userClaims.UserId);
-            return Conflict();
+            return Conflict(new ProblemDetails
+            {
+                Detail = "Concurrently updated"
+            });
         }
 
         throw new ProcessingFailureException(typeof(ChangePasswordResult));
@@ -85,7 +88,10 @@ public class EditProfileController : ControllerBase
         if (result.ConcurrentlyUpdated)
         {
             _logger.LogTrace("Responding with failed profile edit for user {UserId} since it has been concurrently edited", userClaims.UserId);
-            return Conflict();
+            return Conflict(new ProblemDetails
+            {
+                Detail = "Concurrently updated"
+            });
         }
 
         throw new ProcessingFailureException(typeof(UpdateProfileResult));

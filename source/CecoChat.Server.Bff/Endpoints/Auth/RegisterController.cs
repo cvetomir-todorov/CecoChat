@@ -49,7 +49,10 @@ public class RegisterController : ControllerBase
         if (result.DuplicateUserName)
         {
             _logger.LogTrace("Responding with failure to create a profile for user {UserName} because of a duplicate user name", request.UserName);
-            return Conflict(new ProblemDetails { Title = "Duplicate user name" });
+            return Conflict(new ProblemDetails
+            {
+                Detail = "Duplicate user name"
+            });
         }
 
         throw new ProcessingFailureException(typeof(RegisterResult));
