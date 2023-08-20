@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
-using Swashbuckle.AspNetCore.Filters;
 
 namespace CecoChat.AspNet.Swagger;
 
@@ -15,15 +14,29 @@ public static class SwaggerRegistrations
             {
                 if (options.AddAuthorizationHeader)
                 {
-                    config.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+                    config.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                     {
-                        Type = SecuritySchemeType.ApiKey,
+                        Type = SecuritySchemeType.Http,
                         In = ParameterLocation.Header,
                         Name = "Authorization",
-                        Description = "Standard Authorization header using the Bearer scheme. Example: \"bearer {token}\""
+                        Scheme = "Bearer",
+                        BearerFormat = "JWT",
+                        Description = "Standard Authorization header using the Bearer scheme"
                     });
-
-                    config.OperationFilter<SecurityRequirementsOperationFilter>();
+                    config.AddSecurityRequirement(new OpenApiSecurityRequirement
+                    {
+                        {
+                            new OpenApiSecurityScheme
+                            {
+                                Reference = new OpenApiReference
+                                {
+                                    Type = ReferenceType.SecurityScheme,
+                                    Id = "Bearer"
+                                }
+                            },
+                            Array.Empty<string>()
+                        }
+                    });
                 }
 
                 if (options.GroupByApiExplorerGroup)
