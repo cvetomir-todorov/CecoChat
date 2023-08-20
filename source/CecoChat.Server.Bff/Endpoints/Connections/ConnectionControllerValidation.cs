@@ -1,3 +1,32 @@
+using CecoChat.Contracts.Bff.Connections;
+using CecoChat.Data;
+using FluentValidation;
+
 namespace CecoChat.Server.Bff.Endpoints.Connections;
 
-// TODO: add validation
+public sealed class ApproveConnectionRequestValidator : AbstractValidator<ApproveConnectionRequest>
+{
+    public ApproveConnectionRequestValidator()
+    {
+        RuleFor(x => x.Version)
+            .ValidVersion();
+    }
+}
+
+public sealed class CancelConnectionRequestValidator : AbstractValidator<CancelConnectionRequest>
+{
+    public CancelConnectionRequestValidator()
+    {
+        RuleFor(x => x.Version)
+            .ValidVersion();
+    }
+}
+
+public sealed class RemoveConnectionRequestValidator : AbstractValidator<RemoveConnectionRequest>
+{
+    public RemoveConnectionRequestValidator()
+    {
+        RuleFor(x => x.Version)
+            .ValidVersion();
+    }
+}
