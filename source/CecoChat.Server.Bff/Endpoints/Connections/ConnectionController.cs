@@ -79,7 +79,10 @@ public class ConnectionController : ControllerBase
         }
         if (result.AlreadyExists)
         {
-            return Conflict();
+            return Conflict(new ProblemDetails
+            {
+                Detail = "Already exists"
+            });
         }
 
         throw new ProcessingFailureException(typeof(InviteResult));
@@ -116,11 +119,17 @@ public class ConnectionController : ControllerBase
         }
         if (result.Invalid)
         {
-            return Conflict("invalid");
+            return Conflict(new ProblemDetails
+            {
+                Detail = "Invalid target ID or status"
+            });
         }
         if (result.ConcurrentlyUpdated)
         {
-            return Conflict("concurrently updated");
+            return Conflict(new ProblemDetails
+            {
+                Detail = "Concurrently updated"
+            });
         }
 
         throw new ProcessingFailureException(typeof(ApproveResult));
@@ -154,11 +163,17 @@ public class ConnectionController : ControllerBase
         }
         if (result.Invalid)
         {
-            return Conflict("invalid");
+            return Conflict(new ProblemDetails
+            {
+                Detail = "Invalid status"
+            });
         }
         if (result.ConcurrentlyUpdated)
         {
-            return Conflict("concurrently updated");
+            return Conflict(new ProblemDetails
+            {
+                Detail = "Concurrently updated"
+            });
         }
 
         throw new ProcessingFailureException(typeof(CancelResult));
@@ -192,11 +207,17 @@ public class ConnectionController : ControllerBase
         }
         if (result.Invalid)
         {
-            return Conflict("invalid");
+            return Conflict(new ProblemDetails
+            {
+                Detail = "Invalid status"
+            });
         }
         if (result.ConcurrentlyUpdated)
         {
-            return Conflict("concurrently updated");
+            return Conflict(new ProblemDetails
+            {
+                Detail = "Concurrently updated"
+            });
         }
 
         throw new ProcessingFailureException(typeof(RemoveResult));
