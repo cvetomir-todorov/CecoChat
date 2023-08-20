@@ -11,6 +11,10 @@ namespace CecoChat.Server.Bff.Endpoints.Profiles;
 [ApiController]
 [Route("api/profiles")]
 [ApiExplorerSettings(GroupName = "Profiles")]
+[ProducesResponseType(StatusCodes.Status400BadRequest)]
+[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+[ProducesResponseType(StatusCodes.Status403Forbidden)]
+[ProducesResponseType(StatusCodes.Status500InternalServerError)]
 public class ProfileController : ControllerBase
 {
     private readonly ILogger _logger;
@@ -30,10 +34,6 @@ public class ProfileController : ControllerBase
     [Authorize(Policy = "user")]
     [HttpGet("{id}", Name = "GetPublicProfile")]
     [ProducesResponseType(typeof(GetPublicProfileResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetPublicProfile([FromRoute(Name = "id")] long requestedUserId, CancellationToken ct)
     {
         if (!HttpContext.TryGetUserClaimsAndAccessToken(_logger, out UserClaims? userClaims, out string? accessToken))
@@ -51,10 +51,6 @@ public class ProfileController : ControllerBase
     [Authorize(Policy = "user")]
     [HttpGet(Name = "GetPublicProfiles")]
     [ProducesResponseType(typeof(GetPublicProfilesResponse), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetPublicProfiles(CancellationToken ct)
     {
         if (!HttpContext.TryGetUserClaimsAndAccessToken(_logger, out UserClaims? userClaims, out string? accessToken))
