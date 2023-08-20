@@ -11,6 +11,10 @@ namespace CecoChat.Server.Bff.Endpoints.Profiles;
 [ApiController]
 [Route("api/profile")]
 [ApiExplorerSettings(GroupName = "Profiles")]
+[ProducesResponseType(StatusCodes.Status400BadRequest)]
+[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+[ProducesResponseType(StatusCodes.Status403Forbidden)]
+[ProducesResponseType(StatusCodes.Status500InternalServerError)]
 public class EditProfileController : ControllerBase
 {
     private readonly ILogger _logger;
@@ -30,11 +34,7 @@ public class EditProfileController : ControllerBase
     [Authorize(Policy = "user")]
     [HttpPut("password", Name = "ChangePassword")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> ChangePassword([FromBody][BindRequired] ChangePasswordRequest request, CancellationToken ct)
     {
         if (!HttpContext.TryGetUserClaimsAndAccessToken(_logger, out UserClaims? userClaims, out string? accessToken))
@@ -64,11 +64,7 @@ public class EditProfileController : ControllerBase
     [Authorize(Policy = "user")]
     [HttpPut(Name = "EditProfile")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> EditProfile([FromBody][BindRequired] EditProfileRequest request, CancellationToken ct)
     {
         if (!HttpContext.TryGetUserClaimsAndAccessToken(_logger, out UserClaims? userClaims, out string? accessToken))
