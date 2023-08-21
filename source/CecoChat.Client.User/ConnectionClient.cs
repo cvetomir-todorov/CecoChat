@@ -56,7 +56,7 @@ internal sealed class ConnectionClient : IConnectionClient
 
         if (response.Success)
         {
-            _logger.LogTrace("Received successful invite from {UserId} to {ConnectionId}", userId, connectionId);
+            _logger.LogTrace("Received a successful invite from {UserId} to {ConnectionId}", userId, connectionId);
             return new InviteResult
             {
                 Success = true,
@@ -65,7 +65,7 @@ internal sealed class ConnectionClient : IConnectionClient
         }
         if (response.MissingUser)
         {
-            _logger.LogTrace("Received failed invite from {UserId} to {ConnectionId} because the user is missing", userId, connectionId);
+            _logger.LogTrace("Received a failed invite from {UserId} to {ConnectionId} because the user is missing", userId, connectionId);
             return new InviteResult
             {
                 MissingUser = true
@@ -73,7 +73,7 @@ internal sealed class ConnectionClient : IConnectionClient
         }
         if (response.AlreadyExists)
         {
-            _logger.LogTrace("Received failed invite from {UserId} to {ConnectionId} because the connection already exists", userId, connectionId);
+            _logger.LogTrace("Received a failed invite from {UserId} to {ConnectionId} because the connection already exists", userId, connectionId);
             return new InviteResult
             {
                 AlreadyExists = true
@@ -83,8 +83,6 @@ internal sealed class ConnectionClient : IConnectionClient
         throw new ProcessingFailureException(typeof(InviteResponse));
     }
     
-    // TODO: add logging
-
     public async Task<ApproveResult> Approve(long connectionId, Guid version, long userId, string accessToken, CancellationToken ct)
     {
         ApproveRequest request = new();
@@ -98,6 +96,7 @@ internal sealed class ConnectionClient : IConnectionClient
 
         if (response.Success)
         {
+            _logger.LogTrace("Received a successful approval from {UserId} to {ConnectionId}", userId, request.ConnectionId);
             return new ApproveResult
             {
                 Success = true,
@@ -106,6 +105,7 @@ internal sealed class ConnectionClient : IConnectionClient
         }
         if (response.MissingConnection)
         {
+            _logger.LogTrace("Received a failed approval from {UserId} to {ConnectionId} because the connection is missing", userId, request.ConnectionId);
             return new ApproveResult
             {
                 MissingConnection = true
@@ -113,6 +113,7 @@ internal sealed class ConnectionClient : IConnectionClient
         }
         if (response.Invalid)
         {
+            _logger.LogTrace("Received a failed approval from {UserId} to {ConnectionId} because of invalid target or status", userId, request.ConnectionId);
             return new ApproveResult
             {
                 Invalid = true
@@ -120,6 +121,7 @@ internal sealed class ConnectionClient : IConnectionClient
         }
         if (response.ConcurrentlyUpdated)
         {
+            _logger.LogTrace("Received a failed approval from {UserId} to {ConnectionId}", userId, request.ConnectionId);
             return new ApproveResult
             {
                 ConcurrentlyUpdated = true
@@ -142,6 +144,7 @@ internal sealed class ConnectionClient : IConnectionClient
 
         if (response.Success)
         {
+            _logger.LogTrace("Received a successful cancel from {UserId} to {ConnectionId}", userId, request.ConnectionId);
             return new CancelResult
             {
                 Success = true
@@ -149,6 +152,7 @@ internal sealed class ConnectionClient : IConnectionClient
         }
         if (response.MissingConnection)
         {
+            _logger.LogTrace("Received a failed cancel from {UserId} to {ConnectionId} because the connection is missing", userId, request.ConnectionId);
             return new CancelResult
             {
                 MissingConnection = true
@@ -156,6 +160,7 @@ internal sealed class ConnectionClient : IConnectionClient
         }
         if (response.Invalid)
         {
+            _logger.LogTrace("Received a failed cancel from {UserId} to {ConnectionId} because of invalid status", userId, request.ConnectionId);
             return new CancelResult
             {
                 Invalid = true
@@ -163,6 +168,7 @@ internal sealed class ConnectionClient : IConnectionClient
         }
         if (response.ConcurrentlyUpdated)
         {
+            _logger.LogTrace("Received a failed cancel from {UserId} to {ConnectionId} because the connection has been concurrently updated", userId, request.ConnectionId);
             return new CancelResult
             {
                 ConcurrentlyUpdated = true
@@ -185,6 +191,7 @@ internal sealed class ConnectionClient : IConnectionClient
 
         if (response.Success)
         {
+            _logger.LogTrace("Received a successful removal from {UserId} to {ConnectionId}", userId, request.ConnectionId);
             return new RemoveResult
             {
                 Success = true
@@ -192,6 +199,7 @@ internal sealed class ConnectionClient : IConnectionClient
         }
         if (response.MissingConnection)
         {
+            _logger.LogTrace("Received a failed removal from {UserId} to {ConnectionId} because the connection is missing", userId, request.ConnectionId);
             return new RemoveResult
             {
                 MissingConnection = true
@@ -199,6 +207,7 @@ internal sealed class ConnectionClient : IConnectionClient
         }
         if (response.Invalid)
         {
+            _logger.LogTrace("Received a failed removal from {UserId} to {ConnectionId} because of invalid status", userId, request.ConnectionId);
             return new RemoveResult
             {
                 Invalid = true
@@ -206,6 +215,7 @@ internal sealed class ConnectionClient : IConnectionClient
         }
         if (response.ConcurrentlyUpdated)
         {
+            _logger.LogTrace("Received a failed removal from {UserId} to {ConnectionId} because the connection has been concurrently updated", userId, request.ConnectionId);
             return new RemoveResult
             {
                 ConcurrentlyUpdated = true

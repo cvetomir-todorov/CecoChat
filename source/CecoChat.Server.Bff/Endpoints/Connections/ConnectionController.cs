@@ -50,8 +50,6 @@ public class ConnectionController : ControllerBase
         return Ok(response);
     }
 
-    // TODO: add logging
-
     [Authorize(Policy = "user")]
     [HttpPost("{id}/invite")]
     [ProducesResponseType(typeof(InviteConnectionResponse), StatusCodes.Status200OK)]
@@ -71,10 +69,12 @@ public class ConnectionController : ControllerBase
             {
                 Version = result.Version
             };
+            _logger.LogTrace("Responding with a successful invite from {UserId} to {ConnectionId}", userClaims.UserId, connectionId);
             return Ok(response);
         }
         if (result.MissingUser)
         {
+            _logger.LogTrace("Responding with a failed invite from {UserId} to {ConnectionId} because the user is missing", userClaims.UserId, connectionId);
             return Conflict(new ProblemDetails
             {
                 Detail = "Missing user"
@@ -82,6 +82,7 @@ public class ConnectionController : ControllerBase
         }
         if (result.AlreadyExists)
         {
+            _logger.LogTrace("Responding with a failed invite from {UserId} to {ConnectionId} because the connection already exists", userClaims.UserId, connectionId);
             return Conflict(new ProblemDetails
             {
                 Detail = "Already exists"
@@ -110,14 +111,17 @@ public class ConnectionController : ControllerBase
             {
                 NewVersion = result.NewVersion
             };
+            _logger.LogTrace("Responding with a successful approval from {UserId} to {ConnectionId}", userClaims.UserId, connectionId);
             return Ok(response);
         }
         if (result.MissingConnection)
         {
+            _logger.LogTrace("Responding with a failed approval from {UserId} to {ConnectionId} because the connection is missing", userClaims.UserId, connectionId);
             return NotFound();
         }
         if (result.Invalid)
         {
+            _logger.LogTrace("Responding with a failed approval from {UserId} to {ConnectionId} because of invalid target or status", userClaims.UserId, connectionId);
             return Conflict(new ProblemDetails
             {
                 Detail = "Invalid target ID or status"
@@ -125,6 +129,7 @@ public class ConnectionController : ControllerBase
         }
         if (result.ConcurrentlyUpdated)
         {
+            _logger.LogTrace("Responding with a failed approval from {UserId} to {ConnectionId}", userClaims.UserId, connectionId);
             return Conflict(new ProblemDetails
             {
                 Detail = "Concurrently updated"
@@ -150,14 +155,17 @@ public class ConnectionController : ControllerBase
         if (result.Success)
         {
             CancelConnectionResponse response = new();
+            _logger.LogTrace("Responding with a successful cancel from {UserId} to {ConnectionId}", userClaims.UserId, connectionId);
             return Ok(response);
         }
         if (result.MissingConnection)
         {
+            _logger.LogTrace("Responding with a failed cancel from {UserId} to {ConnectionId} because the connection is missing", userClaims.UserId, connectionId);
             return NotFound();
         }
         if (result.Invalid)
         {
+            _logger.LogTrace("Responding with a failed cancel from {UserId} to {ConnectionId} because of invalid status", userClaims.UserId, connectionId);
             return Conflict(new ProblemDetails
             {
                 Detail = "Invalid status"
@@ -165,6 +173,7 @@ public class ConnectionController : ControllerBase
         }
         if (result.ConcurrentlyUpdated)
         {
+            _logger.LogTrace("Responding with a failed cancel from {UserId} to {ConnectionId} because the connection has been concurrently updated", userClaims.UserId, connectionId);
             return Conflict(new ProblemDetails
             {
                 Detail = "Concurrently updated"
@@ -190,14 +199,17 @@ public class ConnectionController : ControllerBase
         if (result.Success)
         {
             RemoveConnectionResponse response = new();
+            _logger.LogTrace("Responding with a successful removal from {UserId} to {ConnectionId}", userClaims.UserId, connectionId);
             return Ok(response);
         }
         if (result.MissingConnection)
         {
+            _logger.LogTrace("Responding with a failed removal from {UserId} to {ConnectionId} because the connection is missing", userClaims.UserId, connectionId);
             return NotFound();
         }
         if (result.Invalid)
         {
+            _logger.LogTrace("Responding with a failed removal from {UserId} to {ConnectionId} because of invalid status", userClaims.UserId, connectionId);
             return Conflict(new ProblemDetails
             {
                 Detail = "Invalid status"
@@ -205,6 +217,7 @@ public class ConnectionController : ControllerBase
         }
         if (result.ConcurrentlyUpdated)
         {
+            _logger.LogTrace("Responding with a failed removal from {UserId} to {ConnectionId} because the connection has been concurrently updated", userClaims.UserId, connectionId);
             return Conflict(new ProblemDetails
             {
                 Detail = "Concurrently updated"

@@ -70,7 +70,7 @@ public class ConnectionCommandService : ConnectionCommand.ConnectionCommandBase
         Connection? existingConnection = await _queryRepo.GetConnection(userClaims.UserId, request.ConnectionId);
         if (existingConnection == null)
         {
-            _logger.LogTrace("Responding with failed approval from {UserId} to {ConnectionId} because the connection is missing", userClaims.UserId, request.ConnectionId);
+            _logger.LogTrace("Responding with a failed approval from {UserId} to {ConnectionId} because the connection is missing", userClaims.UserId, request.ConnectionId);
             return new ApproveResponse
             {
                 MissingConnection = true
@@ -78,7 +78,7 @@ public class ConnectionCommandService : ConnectionCommand.ConnectionCommandBase
         }
         if (existingConnection.TargetUserId != userClaims.UserId || existingConnection.Status != ConnectionStatus.Pending)
         {
-            _logger.LogTrace("Responding with failed approval from {UserId} to {ConnectionId} because of invalid target or status", userClaims.UserId, request.ConnectionId);
+            _logger.LogTrace("Responding with a failed approval from {UserId} to {ConnectionId} because of invalid target or status", userClaims.UserId, request.ConnectionId);
             return new ApproveResponse
             {
                 Invalid = true
@@ -118,7 +118,7 @@ public class ConnectionCommandService : ConnectionCommand.ConnectionCommandBase
         Connection? existingConnection = await _queryRepo.GetConnection(userClaims.UserId, request.ConnectionId);
         if (existingConnection == null)
         {
-            _logger.LogTrace("Responding with failed cancel from {UserId} to {ConnectionId} because the connection is missing", userClaims.UserId, request.ConnectionId);
+            _logger.LogTrace("Responding with a failed cancel from {UserId} to {ConnectionId} because the connection is missing", userClaims.UserId, request.ConnectionId);
             return new CancelResponse
             {
                 MissingConnection = true
@@ -126,7 +126,7 @@ public class ConnectionCommandService : ConnectionCommand.ConnectionCommandBase
         }
         if (existingConnection.Status != ConnectionStatus.Pending)
         {
-            _logger.LogTrace("Responding with failed cancel from {UserId} to {ConnectionId} because of invalid status", userClaims.UserId, request.ConnectionId);
+            _logger.LogTrace("Responding with a failed cancel from {UserId} to {ConnectionId} because of invalid status", userClaims.UserId, request.ConnectionId);
             return new CancelResponse
             {
                 Invalid = true
@@ -146,7 +146,7 @@ public class ConnectionCommandService : ConnectionCommand.ConnectionCommandBase
         }
         if (result.ConcurrentlyUpdated)
         {
-            _logger.LogTrace("Responding with a failed cancel from {UserId} to {ConnectionId}", userClaims.UserId, request.ConnectionId);
+            _logger.LogTrace("Responding with a failed cancel from {UserId} to {ConnectionId} because the connection has been concurrently updated", userClaims.UserId, request.ConnectionId);
             return new CancelResponse
             {
                 ConcurrentlyUpdated = true
@@ -163,7 +163,7 @@ public class ConnectionCommandService : ConnectionCommand.ConnectionCommandBase
         Connection? existingConnection = await _queryRepo.GetConnection(userClaims.UserId, request.ConnectionId);
         if (existingConnection == null)
         {
-            _logger.LogTrace("Responding with failed removal from {UserId} to {ConnectionId} because the connection is missing", userClaims.UserId, request.ConnectionId);
+            _logger.LogTrace("Responding with a failed removal from {UserId} to {ConnectionId} because the connection is missing", userClaims.UserId, request.ConnectionId);
             return new RemoveResponse
             {
                 MissingConnection = true
@@ -191,7 +191,7 @@ public class ConnectionCommandService : ConnectionCommand.ConnectionCommandBase
         }
         if (result.ConcurrentlyUpdated)
         {
-            _logger.LogTrace("Responding with a failed removal from {UserId} to {ConnectionId}", userClaims.UserId, request.ConnectionId);
+            _logger.LogTrace("Responding with a failed removal from {UserId} to {ConnectionId} because the connection has been concurrently updated", userClaims.UserId, request.ConnectionId);
             return new RemoveResponse
             {
                 ConcurrentlyUpdated = true
