@@ -13,7 +13,7 @@ public class ProfileStorage
 
     public IEnumerable<ProfilePublic> EnumerateProfiles()
     {
-        foreach (KeyValuePair<long,ProfilePublic> pair in _profilesMap)
+        foreach (KeyValuePair<long, ProfilePublic> pair in _profilesMap)
         {
             yield return pair.Value;
         }
