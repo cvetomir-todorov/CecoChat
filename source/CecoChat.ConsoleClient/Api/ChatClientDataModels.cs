@@ -9,6 +9,7 @@ public sealed class ClientResponse
 public sealed class AllChatsScreen
 {
     public List<LocalStorage.Chat> Chats { get; init; } = new();
+    public List<LocalStorage.Connection> Connections { get; init; } = new();
     public List<LocalStorage.ProfilePublic> Profiles { get; init; } = new();
 }
 

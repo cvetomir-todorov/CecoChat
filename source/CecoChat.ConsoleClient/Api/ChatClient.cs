@@ -220,11 +220,13 @@ public sealed class ChatClient : IAsyncDisposable
         }
 
         List<LocalStorage.Chat> chats = Map.BffChats(response.Chats, UserId);
+        List<LocalStorage.Connection> connections = Map.Connections(response.Connections);
         List<LocalStorage.ProfilePublic> profiles = Map.PublicProfiles(response.Profiles);
 
         return new AllChatsScreen
         {
             Chats = chats,
+            Connections = connections,
             Profiles = profiles
         };
     }

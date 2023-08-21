@@ -22,7 +22,10 @@ public sealed class OneChatState : State
         Console.Clear();
         DisplayUserData();
         ProfilePublic profile = ProfileStorage.GetProfile(Context.UserId);
-        Console.WriteLine("Chatting with: {0} | ID={1} | user name={2} | avatar={3}", profile.DisplayName, profile.UserId, profile.UserName, profile.AvatarUrl);
+        Connection? connection = ConnectionStorage.GetConnection(Context.UserId);
+        string status = connection != null ? connection.Status.ToString() : "Not connected";
+        Console.WriteLine("Chatting with: {0} | ID={1} | user name={2} | {3} | avatar={4}",
+            profile.DisplayName, profile.UserId, profile.UserName, status, profile.AvatarUrl);
 
         foreach (Message message in messages)
         {
