@@ -11,6 +11,14 @@ public class ProfileStorage
         _profilesMap = new();
     }
 
+    public IEnumerable<ProfilePublic> EnumerateProfiles()
+    {
+        foreach (KeyValuePair<long,ProfilePublic> pair in _profilesMap)
+        {
+            yield return pair.Value;
+        }
+    }
+
     public void AddOrUpdateProfile(ProfilePublic profile)
     {
         if (!_profilesMap.TryAdd(profile.UserId, profile))

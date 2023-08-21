@@ -15,7 +15,6 @@ public static class Program
         await Authenticate(client, credentials);
 
         MessageStorage messageStorage = new(client.UserId);
-        ProfileStorage profileStorage = new();
         ChangeHandler changeHandler = new(messageStorage);
 
         client.Disconnected += (_, _) => Console.WriteLine("Disconnected.");
@@ -24,7 +23,7 @@ public static class Program
         client.ReactionReceived += (_, notification) => changeHandler.UpdateReaction(notification);
         await client.StartMessaging(CancellationToken.None);
 
-        await RunStateMachine(client, messageStorage, profileStorage);
+        await RunStateMachine(client, messageStorage);
 
         await client.DisposeAsync();
         Console.WriteLine("Bye!");
@@ -139,9 +138,12 @@ public static class Program
 
     private sealed record Credentials(string UserName, string Password);
 
-    private static async Task RunStateMachine(ChatClient client, MessageStorage messageStorage, ProfileStorage profileStorage)
+    private static async Task RunStateMachine(ChatClient client, MessageStorage messageStorage)
     {
-        StateContainer states = new(client, messageStorage, profileStorage);
+        ConnectionStorage connectionStorage = new();
+        ProfileStorage profileStorage = new();
+
+        StateContainer states = new(client, messageStorage, connectionStorage, profileStorage);
         states.Context.ReloadData = true;
         State currentState = states.AllChats;
 

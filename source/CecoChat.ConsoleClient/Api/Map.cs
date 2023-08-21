@@ -69,16 +69,37 @@ public static class Map
         return message;
     }
 
+    public static List<LocalStorage.Connection> Connections(Contracts.Bff.Connections.Connection[] bffConnections)
+    {
+        return bffConnections.Select(Connection).ToList();
+    }
+
+    public static LocalStorage.Connection Connection(Contracts.Bff.Connections.Connection bffConnection)
+    {
+        return new LocalStorage.Connection
+        {
+            ConnectionId = bffConnection.ConnectionId,
+            Version = bffConnection.Version,
+            Status = ConnectionStatus(bffConnection.Status)
+        };
+    }
+
+    public static LocalStorage.ConnectionStatus ConnectionStatus(Contracts.Bff.Connections.ConnectionStatus bffConnectionStatus)
+    {
+        switch (bffConnectionStatus)
+        {
+            case Contracts.Bff.Connections.ConnectionStatus.Pending:
+                return LocalStorage.ConnectionStatus.Pending;
+            case Contracts.Bff.Connections.ConnectionStatus.Connected:
+                return LocalStorage.ConnectionStatus.Connected;
+            default:
+                throw new EnumValueNotSupportedException(bffConnectionStatus);
+        }
+    }
+
     public static List<LocalStorage.ProfilePublic> PublicProfiles(Contracts.Bff.Profiles.ProfilePublic[] bffProfiles)
     {
-        List<LocalStorage.ProfilePublic> profiles = new(capacity: bffProfiles.Length);
-
-        foreach (Contracts.Bff.Profiles.ProfilePublic profile in bffProfiles)
-        {
-            profiles.Add(PublicProfile(profile));
-        }
-
-        return profiles;
+        return bffProfiles.Select(PublicProfile).ToList();
     }
 
     public static LocalStorage.ProfilePublic PublicProfile(Contracts.Bff.Profiles.ProfilePublic bffProfile)

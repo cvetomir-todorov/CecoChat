@@ -15,7 +15,7 @@ public sealed class Connection
 
     [JsonPropertyName("status")]
     [AliasAs("status")]
-    public string Status { get; init; } = string.Empty;
+    public ConnectionStatus Status { get; init; }
 }
 
 public enum ConnectionStatus

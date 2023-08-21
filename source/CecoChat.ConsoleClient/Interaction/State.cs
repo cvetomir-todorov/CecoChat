@@ -13,6 +13,7 @@ public abstract class State
     }
 
     protected MessageStorage MessageStorage => States.MessageStorage;
+    protected ConnectionStorage ConnectionStorage => States.ConnectionStorage;
     protected ProfileStorage ProfileStorage => States.ProfileStorage;
     protected ChatClient Client => States.Client;
     protected StateContext Context => States.Context;

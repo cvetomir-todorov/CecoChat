@@ -25,13 +25,8 @@ public sealed class AllChatsState : State
         Console.WriteLine("Change password (press 'p') | Edit profile (press 'e')");
         Console.WriteLine("Exit (press 'x')");
         Console.WriteLine("=================================================================================================");
-        List<long> userIds = MessageStorage.GetUsers();
-        int key = 0;
-        foreach (long userId in userIds)
-        {
-            ProfilePublic profile = ProfileStorage.GetProfile(userId);
-            Console.WriteLine("Press '{0}' for: {1,-24} | {2,-8} | {3,-24} | {4,-48}", key++, profile.DisplayName, $"ID={profile.UserId}", $"user name={profile.UserName}", $"avatar={profile.AvatarUrl}");
-        }
+
+        List<long> userIds = DisplayUsers();
 
         ConsoleKeyInfo keyInfo = Console.ReadKey(intercept: true);
         if (char.IsNumber(keyInfo.KeyChar))
@@ -76,6 +71,9 @@ public sealed class AllChatsState : State
         {
             MessageStorage.AddOrUpdateChat(chat);
         }
+
+        ConnectionStorage.ReplaceConnections(screen.Connections);
+
         foreach (ProfilePublic profile in screen.Profiles)
         {
             ProfileStorage.AddOrUpdateProfile(profile);
@@ -84,17 +82,51 @@ public sealed class AllChatsState : State
         _lastKnownChatState = currentState;
     }
 
-    private State ProcessNumberKey(ConsoleKeyInfo keyInfo, List<long> userIDs)
+    private List<long> DisplayUsers()
+    {
+        List<long> userIds = new();
+        int key = 0;
+
+        foreach (Connection connection in ConnectionStorage.EnumerateConnections())
+        {
+            ProfilePublic profile = ProfileStorage.GetProfile(connection.ConnectionId);
+
+            DisplayUser(key, connection, profile);
+            userIds.Add(connection.ConnectionId);
+            key++;
+        }
+
+        foreach (ProfilePublic profile in ProfileStorage.EnumerateProfiles())
+        {
+            if (!userIds.Contains(profile.UserId))
+            {
+                DisplayUser(key, connection: null, profile);
+                userIds.Add(profile.UserId);
+                key++;
+            }
+        }
+
+        return userIds;
+    }
+
+    private static void DisplayUser(int key, Connection? connection, ProfilePublic profile)
+    {
+        string status = connection != null ? connection.Status.ToString() : "Not connected";
+        Console.WriteLine("Press '{0}' for: {1,-24} | {2,-8} | {3,-24} | {4,-14} | {5,-48}",
+            key, profile.DisplayName, $"ID={profile.UserId}", $"user name={profile.UserName}", status, $"avatar={profile.AvatarUrl}");
+    }
+
+    private State ProcessNumberKey(ConsoleKeyInfo keyInfo, List<long> userIds)
     {
         int index = keyInfo.KeyChar - '0';
-        if (index < 0 || index >= userIDs.Count)
+        if (index < 0 || index >= userIds.Count)
         {
             Context.ReloadData = false;
             return States.AllChats;
         }
         else
         {
-            Context.UserId = userIDs[index];
+            Context.UserId = userIds[index];
             Context.ReloadData = true;
             return States.OneChat;
         }
