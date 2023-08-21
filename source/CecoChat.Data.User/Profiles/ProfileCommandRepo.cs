@@ -24,29 +24,37 @@ internal class ProfileCommandRepo : IProfileCommandRepo
         _dataUtility = dataUtility;
     }
 
-    public async Task<CreateProfileResult> CreateProfile(Registration registration)
+    public async Task<CreateProfileResult> CreateProfile(ProfileFull profile, string password)
     {
-        if (registration.UserName.Any(char.IsUpper))
+        if (profile.UserName.Any(char.IsUpper))
         {
-            throw new ArgumentException("Profile user name should not contain upper-case letters.", nameof(registration));
+            throw new ArgumentException("Profile user name should not contain upper-case letters.", nameof(profile));
+        }
+        if (profile.UserId != 0)
+        {
+            throw new ArgumentException("Profile user ID should not be set.", nameof(profile));
+        }
+        if (profile.Version != null)
+        {
+            throw new ArgumentException("Profile version should not be set.", nameof(profile));
         }
 
         ProfileEntity entity = new()
         {
-            UserName = registration.UserName,
+            UserName = profile.UserName,
             Version = Guid.NewGuid(),
-            Password = registration.Password,
-            DisplayName = registration.DisplayName,
-            AvatarUrl = registration.AvatarUrl,
-            Phone = registration.Phone,
-            Email = registration.Email
+            Password = password,
+            DisplayName = profile.DisplayName,
+            AvatarUrl = profile.AvatarUrl,
+            Phone = profile.Phone,
+            Email = profile.Email
         };
         _dbContext.Profiles.Add(entity);
 
         try
         {
             await _dbContext.SaveChangesAsync();
-            _logger.LogTrace("Inserted a new profile for user {UserName}", registration.UserName);
+            _logger.LogTrace("Inserted a new profile for user {UserName}", profile.UserName);
 
             return new CreateProfileResult
             {
