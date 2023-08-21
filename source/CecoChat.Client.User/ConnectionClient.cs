@@ -82,7 +82,7 @@ internal sealed class ConnectionClient : IConnectionClient
 
         throw new ProcessingFailureException(typeof(InviteResponse));
     }
-    
+
     public async Task<ApproveResult> Approve(long connectionId, Guid version, long userId, string accessToken, CancellationToken ct)
     {
         ApproveRequest request = new();

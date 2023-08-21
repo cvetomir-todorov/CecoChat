@@ -14,7 +14,7 @@ public class ConnectionStorage
 
     public IEnumerable<Connection> EnumerateConnections()
     {
-        foreach (KeyValuePair<long,Connection> pair in _connectionsMap)
+        foreach (KeyValuePair<long, Connection> pair in _connectionsMap)
         {
             yield return pair.Value;
         }
