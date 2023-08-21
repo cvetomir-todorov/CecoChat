@@ -1,7 +1,5 @@
-using CecoChat.Contracts;
 using CecoChat.Contracts.User;
 using CecoChat.Data.User.Profiles;
-using CecoChat.Server.Identity;
 using CecoChat.Server.User.Security;
 using Grpc.Core;
 using Microsoft.AspNetCore.Authorization;
@@ -30,10 +28,17 @@ public class AuthService : Auth.AuthBase
     [AllowAnonymous]
     public override async Task<RegisterResponse> Register(RegisterRequest request, ServerCallContext context)
     {
-        string plainTextPassword = request.Registration.Password;
-        request.Registration.Password = _passwordHasher.Hash(plainTextPassword);
+        string hashedPassword = _passwordHasher.Hash(request.Registration.Password);
 
-        CreateProfileResult result = await _commandRepo.CreateProfile(request.Registration);
+        ProfileFull profile = new()
+        {
+            UserName = request.Registration.UserName,
+            DisplayName = request.Registration.DisplayName,
+            AvatarUrl = request.Registration.AvatarUrl,
+            Phone = request.Registration.Phone,
+            Email = request.Registration.Email
+        };
+        CreateProfileResult result = await _commandRepo.CreateProfile(profile, hashedPassword);
 
         if (result.Success)
         {
