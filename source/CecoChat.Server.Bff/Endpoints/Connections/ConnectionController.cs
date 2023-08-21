@@ -73,6 +73,13 @@ public class ConnectionController : ControllerBase
             };
             return Ok(response);
         }
+        if (result.MissingUser)
+        {
+            return Conflict(new ProblemDetails
+            {
+                Detail = "Missing user"
+            });
+        }
         if (result.AlreadyExists)
         {
             return Conflict(new ProblemDetails
