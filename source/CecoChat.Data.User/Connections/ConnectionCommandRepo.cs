@@ -47,7 +47,18 @@ internal class ConnectionCommandRepo : IConnectionCommandRepo
         catch (DbUpdateException dbUpdateException) when (dbUpdateException.InnerException is PostgresException postgresException)
         {
             // https://www.postgresql.org/docs/current/errcodes-appendix.html
-            if (postgresException.SqlState == "23505")
+            if (postgresException.SqlState == "23503") // foreign key violation
+            {
+                if (postgresException.MessageText.Contains("Connections_User1Id_foreign") ||
+                    postgresException.MessageText.Contains("Connections_User2Id_foreign"))
+                {
+                    return new AddConnectionResult
+                    {
+                        MissingUser = true
+                    };
+                }
+            }
+            if (postgresException.SqlState == "23505") // unique key violation
             {
                 if (postgresException.MessageText.Contains("Connections_pkey"))
                 {

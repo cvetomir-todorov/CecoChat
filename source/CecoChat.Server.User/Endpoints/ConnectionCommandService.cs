@@ -43,6 +43,14 @@ public class ConnectionCommandService : ConnectionCommand.ConnectionCommandBase
                 Version = result.Version.ToUuid()
             };
         }
+        if (result.MissingUser)
+        {
+            _logger.LogTrace("Responding with a failed invite from {UserId} to {ConnectionId} because the connection ID is missing", userClaims.UserId, request.ConnectionId);
+            return new InviteResponse
+            {
+                MissingUser = true
+            };
+        }
         if (result.AlreadyExists)
         {
             _logger.LogTrace("Responding with a failed invite from {UserId} to {ConnectionId} because the connection has already exists", userClaims.UserId, request.ConnectionId);

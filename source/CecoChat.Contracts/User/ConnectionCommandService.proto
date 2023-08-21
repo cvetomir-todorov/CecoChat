@@ -17,7 +17,8 @@ message InviteRequest {
 message InviteResponse {
   bool success = 1;
   Uuid version = 2;
-  bool already_exists = 3;
+  bool missing_user = 3;
+  bool already_exists = 4;
 }
 
 message ApproveRequest {

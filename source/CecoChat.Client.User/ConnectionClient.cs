@@ -18,9 +18,6 @@ internal sealed class ConnectionClient : IConnectionClient
     public ConnectionClient(
         ILogger<ConnectionClient> logger,
         IOptions<UserOptions> options,
-        Auth.AuthClient authClient,
-        ProfileQuery.ProfileQueryClient profileQueryClient,
-        ProfileCommand.ProfileCommandClient profileCommandClient,
         ConnectionQuery.ConnectionQueryClient connectionQueryClient,
         ConnectionCommand.ConnectionCommandClient connectionCommandClient,
         IClock clock)
@@ -66,9 +63,17 @@ internal sealed class ConnectionClient : IConnectionClient
                 Version = response.Version.ToGuid()
             };
         }
+        if (response.MissingUser)
+        {
+            _logger.LogTrace("Received failed invite from {UserId} to {ConnectionId} because the user is missing", userId, connectionId);
+            return new InviteResult
+            {
+                MissingUser = true
+            };
+        }
         if (response.AlreadyExists)
         {
-            _logger.LogTrace("Received failed invite from {UserId} to {ConnectionId}", userId, connectionId);
+            _logger.LogTrace("Received failed invite from {UserId} to {ConnectionId} because the connection already exists", userId, connectionId);
             return new InviteResult
             {
                 AlreadyExists = true

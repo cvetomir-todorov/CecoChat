@@ -19,6 +19,7 @@ public readonly struct InviteResult
 {
     public bool Success { get; init; }
     public Guid Version { get; init; }
+    public bool MissingUser { get; init; }
     public bool AlreadyExists { get; init; }
 }
 
