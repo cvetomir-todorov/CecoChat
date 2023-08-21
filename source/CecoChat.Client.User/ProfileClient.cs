@@ -108,7 +108,7 @@ internal sealed class ProfileClient : IProfileClient
         return response.Profile;
     }
 
-    public async Task<IEnumerable<ProfilePublic>> GetPublicProfiles(long userId, IEnumerable<long> requestedUserIds, string accessToken, CancellationToken ct)
+    public async Task<IReadOnlyCollection<ProfilePublic>> GetPublicProfiles(long userId, IEnumerable<long> requestedUserIds, string accessToken, CancellationToken ct)
     {
         GetPublicProfilesRequest request = new();
         request.UserIds.Add(requestedUserIds);

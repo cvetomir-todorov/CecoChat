@@ -2,6 +2,7 @@ using AutoMapper;
 using CecoChat.Client.State;
 using CecoChat.Client.User;
 using CecoChat.Contracts.Bff.Chats;
+using CecoChat.Contracts.Bff.Connections;
 using CecoChat.Contracts.Bff.Profiles;
 using CecoChat.Contracts.Bff.Screens;
 using CecoChat.Server.Identity;
@@ -20,6 +21,7 @@ public class AllChatsScreenController : ControllerBase
     private readonly IMapper _mapper;
     private readonly IContractMapper _contractMapper;
     private readonly IStateClient _stateClient;
+    private readonly IConnectionClient _connectionClient;
     private readonly IProfileClient _profileClient;
 
     public AllChatsScreenController(
@@ -27,12 +29,14 @@ public class AllChatsScreenController : ControllerBase
         IMapper mapper,
         IContractMapper contractMapper,
         IStateClient stateClient,
+        IConnectionClient connectionClient,
         IProfileClient profileClient)
     {
         _logger = logger;
         _mapper = mapper;
         _contractMapper = contractMapper;
         _stateClient = stateClient;
+        _connectionClient = connectionClient;
         _profileClient = profileClient;
     }
 
@@ -50,27 +54,48 @@ public class AllChatsScreenController : ControllerBase
             return Unauthorized();
         }
 
-        IReadOnlyCollection<Contracts.State.ChatState> serviceChats = await _stateClient.GetChats(userClaims.UserId, request.ChatsNewerThan, accessToken, ct);
-        IEnumerable<Contracts.User.ProfilePublic> serviceProfiles = Array.Empty<Contracts.User.ProfilePublic>();
-        if (request.IncludeProfiles && serviceChats.Count > 0)
-        {
-            long[] userIds = serviceChats.Select(chat => chat.OtherUserId).ToArray();
-            serviceProfiles = await _profileClient.GetPublicProfiles(userClaims.UserId, userIds, accessToken, ct);
-        }
+        Task<IReadOnlyCollection<Contracts.State.ChatState>> chatsTask = _stateClient.GetChats(userClaims.UserId, request.ChatsNewerThan, accessToken, ct);
+        Task<IReadOnlyCollection<Contracts.User.Connection>> connectionsTask = _connectionClient.GetConnections(userClaims.UserId, accessToken, ct);
 
+        await Task.WhenAll(chatsTask, connectionsTask);
+
+        IReadOnlyCollection<Contracts.State.ChatState> serviceChats = chatsTask.Result;
+        IReadOnlyCollection<Contracts.User.Connection> serviceConnections = connectionsTask.Result;
+
+        ProfilePublic[] profiles = await GetProfiles(request.IncludeProfiles, serviceChats, serviceConnections, userClaims, accessToken, ct);
         ChatState[] chats = serviceChats.Select(chat => _contractMapper.MapChat(chat)).ToArray();
-        ProfilePublic[] profiles = Array.Empty<ProfilePublic>();
-        if (request.IncludeProfiles && chats.Length > 0)
-        {
-            profiles = serviceProfiles.Select(profile => _mapper.Map<ProfilePublic>(profile)).ToArray();
-        }
+        Connection[] connections = _mapper.Map<Connection[]>(serviceConnections);
 
-        _logger.LogTrace("Responding with {ChatCount} chats newer than {NewerThan} and (if requested) their respective user profiles, for all-chats-screen requested by user {UserId}",
-            chats.Length, request.ChatsNewerThan, userClaims.UserId);
+        _logger.LogTrace("Responding with {ChatCount} chats newer than {NewerThan}, {ConnectionCount} connections and {ProfileCount} profiles for all-chats-screen requested by user {UserId}",
+            chats.Length, request.ChatsNewerThan, connections.Length, profiles.Length, userClaims.UserId);
         return Ok(new GetAllChatsScreenResponse
         {
             Chats = chats,
+            Connections = connections,
             Profiles = profiles
         });
+    }
+
+    private async Task<ProfilePublic[]> GetProfiles(
+        bool includeProfiles,
+        IReadOnlyCollection<Contracts.State.ChatState> chats,
+        IReadOnlyCollection<Contracts.User.Connection> connections,
+        UserClaims userClaims,
+        string accessToken,
+        CancellationToken ct)
+    {
+        if (!includeProfiles || (chats.Count == 0 && connections.Count == 0))
+        {
+            return Array.Empty<ProfilePublic>();
+        }
+
+        long[] userIds = chats.Select(chat => chat.OtherUserId)
+            .Union(connections.Select(conn => conn.ConnectionId))
+            .Distinct()
+            .ToArray();
+        IReadOnlyCollection<Contracts.User.ProfilePublic> serviceProfiles = await _profileClient.GetPublicProfiles(userClaims.UserId, userIds, accessToken, ct);
+        ProfilePublic[] profiles = _mapper.Map<ProfilePublic[]>(serviceProfiles);
+
+        return profiles;
     }
 }

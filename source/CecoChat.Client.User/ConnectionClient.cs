@@ -31,7 +31,7 @@ internal sealed class ConnectionClient : IConnectionClient
         _logger.LogInformation("User address set to {Address}", _options.Address);
     }
 
-    public async Task<IEnumerable<Connection>> GetConnections(long userId, string accessToken, CancellationToken ct)
+    public async Task<IReadOnlyCollection<Connection>> GetConnections(long userId, string accessToken, CancellationToken ct)
     {
         GetConnectionsRequest request = new();
 

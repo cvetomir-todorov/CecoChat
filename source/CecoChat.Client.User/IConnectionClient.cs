@@ -4,7 +4,7 @@ namespace CecoChat.Client.User;
 
 public interface IConnectionClient
 {
-    Task<IEnumerable<Connection>> GetConnections(long userId, string accessToken, CancellationToken ct);
+    Task<IReadOnlyCollection<Connection>> GetConnections(long userId, string accessToken, CancellationToken ct);
 
     Task<InviteResult> Invite(long connectionId, long userId, string accessToken, CancellationToken ct);
 
