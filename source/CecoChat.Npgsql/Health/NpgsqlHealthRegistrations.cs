@@ -11,7 +11,7 @@ public static class NpgsqlHealthRegistrations
         string[]? tags = null)
     {
         return builder.AddNpgSql(
-            npgsqlConnectionString: npgsqlOptions.ConnectionString,
+            connectionString: npgsqlOptions.ConnectionString,
             name: name,
             tags: tags,
             timeout: npgsqlOptions.HealthTimeout);
