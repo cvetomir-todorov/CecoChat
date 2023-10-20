@@ -2,6 +2,7 @@
 using CecoChat.Contracts.Bff;
 using CecoChat.Contracts.Bff.Auth;
 using CecoChat.Contracts.Bff.Chats;
+using CecoChat.Contracts.Bff.Connections;
 using CecoChat.Contracts.Bff.Profiles;
 using CecoChat.Contracts.Bff.Screens;
 using CecoChat.Contracts.Messaging;
@@ -44,7 +45,8 @@ public sealed class ChatClient : IAsyncDisposable
             Email = email
         };
         IApiResponse apiResponse = await _bffClient.Register(request);
-        ClientResponse response = ProcessApiResponse(apiResponse);
+        ClientResponse response = new();
+        ProcessApiResponse(apiResponse, response);
 
         return response;
     }
@@ -58,7 +60,8 @@ public sealed class ChatClient : IAsyncDisposable
         };
         IApiResponse<CreateSessionResponse> apiResponse = await _bffClient.CreateSession(request);
 
-        ClientResponse response = ProcessApiResponse(apiResponse);
+        ClientResponse response = new();
+        ProcessApiResponse(apiResponse, response);
         if (response.Success)
         {
             _accessToken = apiResponse.Content!.AccessToken;
@@ -100,7 +103,8 @@ public sealed class ChatClient : IAsyncDisposable
             Version = _userProfile!.Version
         };
         IApiResponse<ChangePasswordResponse> apiResponse = await _bffClient.ChangePassword(request, _accessToken!);
-        ClientResponse response = ProcessApiResponse(apiResponse);
+        ClientResponse response = new();
+        ProcessApiResponse(apiResponse, response);
 
         if (response.Success)
         {
@@ -118,7 +122,8 @@ public sealed class ChatClient : IAsyncDisposable
             Version = _userProfile!.Version
         };
         IApiResponse<EditProfileResponse> apiResponse = await _bffClient.EditProfile(request, _accessToken!);
-        ClientResponse response = ProcessApiResponse(apiResponse);
+        ClientResponse response = new();
+        ProcessApiResponse(apiResponse, response);
 
         if (response.Success)
         {
@@ -260,9 +265,81 @@ public sealed class ChatClient : IAsyncDisposable
         };
     }
 
-    private static ClientResponse ProcessApiResponse(IApiResponse apiResponse)
+    public async Task<ClientResponse<InviteConnectionResponse>> InviteConnection(long connectionId)
     {
-        ClientResponse response = new();
+        InviteConnectionRequest request = new();
+        IApiResponse<InviteConnectionResponse> apiResponse = await _bffClient.InviteConnection(connectionId, request, _accessToken!);
+
+        ClientResponse<InviteConnectionResponse> response = new();
+        ProcessApiResponse(apiResponse, response);
+
+        if (response.Success)
+        {
+            response.Content = apiResponse.Content;
+        }
+
+        return response;
+    }
+
+    public async Task<ClientResponse<ApproveConnectionResponse>> ApproveConnection(long connectionId, Guid version)
+    {
+        ApproveConnectionRequest request = new()
+        {
+            Version = version
+        };
+        IApiResponse<ApproveConnectionResponse> apiResponse = await _bffClient.ApproveConnection(connectionId, request, _accessToken!);
+
+        ClientResponse<ApproveConnectionResponse> response = new();
+        ProcessApiResponse(apiResponse, response);
+
+        if (response.Success)
+        {
+            response.Content = apiResponse.Content;
+        }
+
+        return response;
+    }
+
+    public async Task<ClientResponse<CancelConnectionResponse>> CancelConnection(long connectionId, Guid version)
+    {
+        CancelConnectionRequest request = new()
+        {
+            Version = version
+        };
+        IApiResponse<CancelConnectionResponse> apiResponse = await _bffClient.CancelConnection(connectionId, request, _accessToken!);
+
+        ClientResponse<CancelConnectionResponse> response = new();
+        ProcessApiResponse(apiResponse, response);
+
+        if (response.Success)
+        {
+            response.Content = apiResponse.Content;
+        }
+
+        return response;
+    }
+
+    public async Task<ClientResponse<RemoveConnectionResponse>> RemoveConnection(long connectionId, Guid version)
+    {
+        RemoveConnectionRequest request = new()
+        {
+            Version = version
+        };
+        IApiResponse<RemoveConnectionResponse> apiResponse = await _bffClient.RemoveConnection(connectionId, request, _accessToken!);
+
+        ClientResponse<RemoveConnectionResponse> response = new();
+        ProcessApiResponse(apiResponse, response);
+
+        if (response.Success)
+        {
+            response.Content = apiResponse.Content;
+        }
+
+        return response;
+    }
+
+    private static void ProcessApiResponse(IApiResponse apiResponse, ClientResponse response)
+    {
         if (apiResponse.IsSuccessStatusCode)
         {
             response.Success = true;
@@ -290,7 +367,5 @@ public sealed class ChatClient : IAsyncDisposable
         {
             response.Errors.Add($"{apiResponse.Error.Message}");
         }
-
-        return response;
     }
 }

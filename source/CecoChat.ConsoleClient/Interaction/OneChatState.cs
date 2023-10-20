@@ -21,8 +21,10 @@ public sealed class OneChatState : State
 
         Console.Clear();
         DisplayUserData();
+
         ProfilePublic profile = ProfileStorage.GetProfile(Context.UserId);
         Connection? connection = ConnectionStorage.GetConnection(Context.UserId);
+
         string status = connection != null ? connection.Status.ToString() : "Not connected";
         Console.WriteLine("Chatting with: {0} | ID={1} | user name={2} | {3} | avatar={4}",
             profile.DisplayName, profile.UserId, profile.UserName, status, profile.AvatarUrl);
@@ -31,7 +33,8 @@ public sealed class OneChatState : State
         {
             DisplayMessage(message, profile);
         }
-        Console.WriteLine("Write (press 'w') | React (press 'r') | Refresh (press 'f') | Local refresh (press 'l') | Return (press 'x')");
+        Console.WriteLine("Write (press 'w') | React (press 'r') | Refresh (press 'f') | Local refresh (press 'l')");
+        Console.WriteLine("Manage connection - invite/accept/cancel/remove (press 'm') | Return (press 'x')");
 
         ConsoleKeyInfo keyInfo = Console.ReadKey(intercept: true);
         if (keyInfo.KeyChar == 'w' || keyInfo.KeyChar == 'W')
@@ -49,6 +52,11 @@ public sealed class OneChatState : State
             Context.ReloadData = true;
             return States.OneChat;
         }
+        else if (keyInfo.KeyChar == 'm' || keyInfo.KeyChar == 'M')
+        {
+            Context.ReloadData = true;
+            return States.ManageConnection;
+        }
         else if (keyInfo.KeyChar == 'x' || keyInfo.KeyChar == 'X')
         {
             Context.ReloadData = true;
@@ -64,6 +72,7 @@ public sealed class OneChatState : State
 
     private async Task Load(long otherUserId)
     {
+        // TODO: consider loading the connection
         OneChatScreen screen = await Client.LoadOneChatScreen(otherUserId, messagesOlderThan: DateTime.UtcNow, includeProfile: true);
 
         foreach (Message message in screen.Messages)

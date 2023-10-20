@@ -1,9 +1,14 @@
 namespace CecoChat.ConsoleClient.Api;
 
-public sealed class ClientResponse
+public class ClientResponse
 {
     public bool Success { get; set; }
     public List<string> Errors { get; init; } = new();
+}
+
+public sealed class ClientResponse<TContent> : ClientResponse
+{
+    public TContent? Content { get; set; }
 }
 
 public sealed class AllChatsScreen
