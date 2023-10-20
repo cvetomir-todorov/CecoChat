@@ -1,5 +1,6 @@
 using CecoChat.Contracts.Bff.Auth;
 using CecoChat.Contracts.Bff.Chats;
+using CecoChat.Contracts.Bff.Connections;
 using CecoChat.Contracts.Bff.Profiles;
 using CecoChat.Contracts.Bff.Screens;
 using Refit;
@@ -56,5 +57,29 @@ public interface IBffClient : IDisposable
     [Get("/api/profiles")]
     Task<GetPublicProfilesResponse> GetPublicProfiles(
         [Query(CollectionFormat.Csv)][AliasAs("userIds")] long[] userIds,
+        [Authorize(AuthorizationScheme)] string accessToken);
+
+    [Post("/api/connections/{id}/invite")]
+    Task<IApiResponse<InviteConnectionResponse>> InviteConnection(
+        [AliasAs("id")] long connectionId,
+        [Body] InviteConnectionRequest request,
+        [Authorize(AuthorizationScheme)] string accessToken);
+
+    [Put("/api/connections/{id}/invite")]
+    Task<IApiResponse<ApproveConnectionResponse>> ApproveConnection(
+        [AliasAs("id")] long connectionId,
+        [Body] ApproveConnectionRequest request,
+        [Authorize(AuthorizationScheme)] string accessToken);
+
+    [Delete("/api/connections/{id}/invite")]
+    Task<IApiResponse<CancelConnectionResponse>> CancelConnection(
+        [AliasAs("id")] long connectionId,
+        [Body] CancelConnectionRequest request,
+        [Authorize(AuthorizationScheme)] string accessToken);
+
+    [Delete("/api/connections/{id}")]
+    Task<IApiResponse<RemoveConnectionResponse>> RemoveConnection(
+        [AliasAs("id")] long connectionId,
+        [Body] RemoveConnectionRequest request,
         [Authorize(AuthorizationScheme)] string accessToken);
 }

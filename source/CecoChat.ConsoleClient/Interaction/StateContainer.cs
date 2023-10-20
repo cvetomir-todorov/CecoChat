@@ -18,6 +18,7 @@ public sealed class StateContainer
         OneChat = new OneChatState(this);
         SendMessage = new SendMessageState(this);
         React = new ReactState(this);
+        ManageConnection = new ManageConnectionState(this);
 
         ChangePassword = new ChangePasswordState(this);
         EditProfile = new EditProfileState(this);
@@ -36,6 +37,7 @@ public sealed class StateContainer
     public State OneChat { get; }
     public State SendMessage { get; }
     public State React { get; }
+    public State ManageConnection { get; }
 
     public State ChangePassword { get; }
     public State EditProfile { get; }

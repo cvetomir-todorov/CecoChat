@@ -1,5 +1,4 @@
 using System.Collections.Concurrent;
-using System.Diagnostics.CodeAnalysis;
 
 namespace CecoChat.ConsoleClient.LocalStorage;
 
@@ -34,5 +33,33 @@ public class ConnectionStorage
     {
         _connectionsMap.TryGetValue(userId, out Connection? connection);
         return connection;
+    }
+
+    public void AddConnection(long userId, ConnectionStatus status, Guid version)
+    {
+        Connection connection = new()
+        {
+            ConnectionId = userId,
+            Status = status,
+            Version = version
+        };
+
+        _connectionsMap.TryAdd(connection.ConnectionId, connection);
+    }
+
+    public void UpdateConnection(long userId, ConnectionStatus newStatus, Guid newVersion)
+    {
+        if (!_connectionsMap.TryGetValue(userId, out Connection? connection))
+        {
+            throw new InvalidOperationException($"Failed to get an existing connection for user {userId}.");
+        }
+
+        connection.Status = newStatus;
+        connection.Version = newVersion;
+    }
+
+    public void RemoveConnection(long connectionId)
+    {
+        _connectionsMap.TryRemove(connectionId, out _);
     }
 }
