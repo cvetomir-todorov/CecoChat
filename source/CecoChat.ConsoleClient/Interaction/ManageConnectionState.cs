@@ -11,11 +11,6 @@ public class ManageConnectionState : State
 
     public override async Task<State> Execute()
     {
-        if (Context.ReloadData)
-        {
-            // TODO: get the connection
-        }
-
         ProfilePublic profile = ProfileStorage.GetProfile(Context.UserId);
         LocalStorage.Connection? connection = ConnectionStorage.GetConnection(Context.UserId);
 
@@ -25,37 +20,42 @@ public class ManageConnectionState : State
         DisplayConnection(connection);
 
         ConsoleKeyInfo keyInfo = Console.ReadKey(intercept: true);
-        if (keyInfo.KeyChar == 'x' || keyInfo.KeyChar == 'X')
-        {
-            Context.ReloadData = true;
-            return States.OneChat;
-        }
 
+        bool unexpectedKey = false;
         if (keyInfo.KeyChar == 'i' || keyInfo.KeyChar == 'I')
         {
-            return await SendInvite(Context.UserId);
+            await SendInvite(Context.UserId);
         }
         else if (keyInfo.KeyChar == 'a' || keyInfo.KeyChar == 'A')
         {
-            return await ApproveInvite(connection!);
+            await ApproveInvite(connection!);
         }
         else if (keyInfo.KeyChar == 'c' || keyInfo.KeyChar == 'C')
         {
-            return await CancelInvite(connection!);
+            await CancelInvite(connection!);
         }
         else if (keyInfo.KeyChar == 'r' || keyInfo.KeyChar == 'R')
         {
-            return await RemoveConnection(connection!);
+            await RemoveConnection(connection!);
         }
         else if (keyInfo.KeyChar == 'x' || keyInfo.KeyChar == 'X')
         {
-            Context.ReloadData = true;
-            return States.OneChat;
+            // simple exit
         }
         else
         {
-            Context.ReloadData = false;
+            unexpectedKey = true;
+        }
+
+        if (unexpectedKey)
+        {
+            Context.ReloadData = true;
             return States.ManageConnection;
+        }
+        else
+        {
+            Context.ReloadData = true;
+            return States.OneChat;
         }
     }
 
@@ -80,63 +80,63 @@ public class ManageConnectionState : State
         Console.WriteLine(" | Return (press 'x')");
     }
 
-    private async Task<State> SendInvite(long userId)
+    private async Task SendInvite(long userId)
     {
         ClientResponse<InviteConnectionResponse> response = await Client.InviteConnection(userId);
         if (!response.Success)
         {
-            return DisplayErrorsAndReturnSameState(response);
+            DisplayErrors(response);
         }
         else
         {
             ConnectionStorage.AddConnection(userId, LocalStorage.ConnectionStatus.Pending, response.Content!.Version);
-            return DisplaySuccessAndReturnOneChatState("Invite sent.");
+            DisplaySuccess("Invite sent.");
         }
     }
 
-    private async Task<State> ApproveInvite(LocalStorage.Connection connection)
+    private async Task ApproveInvite(LocalStorage.Connection connection)
     {
         ClientResponse<ApproveConnectionResponse> response = await Client.ApproveConnection(connection.ConnectionId, connection.Version);
         if (!response.Success)
         {
-            return DisplayErrorsAndReturnSameState(response);
+            DisplayErrors(response);
         }
         else
         {
             ConnectionStorage.UpdateConnection(connection.ConnectionId, LocalStorage.ConnectionStatus.Connected, response.Content!.NewVersion);
-            return DisplaySuccessAndReturnOneChatState("Invite approved.");
+            DisplaySuccess("Invite approved.");
         }
     }
 
-    private async Task<State> CancelInvite(LocalStorage.Connection connection)
+    private async Task CancelInvite(LocalStorage.Connection connection)
     {
         ClientResponse<CancelConnectionResponse> response = await Client.CancelConnection(connection.ConnectionId, connection.Version);
         if (!response.Success)
         {
-            return DisplayErrorsAndReturnSameState(response);
+            DisplayErrors(response);
         }
         else
         {
             ConnectionStorage.RemoveConnection(connection.ConnectionId);
-            return DisplaySuccessAndReturnOneChatState("Invite removed.");
+            DisplaySuccess("Invite removed.");
         }
     }
 
-    private async Task<State> RemoveConnection(LocalStorage.Connection connection)
+    private async Task RemoveConnection(LocalStorage.Connection connection)
     {
         ClientResponse<RemoveConnectionResponse> response = await Client.RemoveConnection(connection.ConnectionId, connection.Version);
         if (!response.Success)
         {
-            return DisplayErrorsAndReturnSameState(response);
+            DisplayErrors(response);
         }
         else
         {
             ConnectionStorage.RemoveConnection(connection.ConnectionId);
-            return DisplaySuccessAndReturnOneChatState("Connection removed.");
+            DisplaySuccess("Connection removed.");
         }
     }
 
-    private State DisplayErrorsAndReturnSameState(ClientResponse response)
+    private void DisplayErrors(ClientResponse response)
     {
         foreach (string error in response.Errors)
         {
@@ -145,18 +145,12 @@ public class ManageConnectionState : State
 
         Console.WriteLine("If the error persists, try logging again. Press ENTER to return.");
         Console.ReadLine();
-
-        Context.ReloadData = true;
-        return States.ManageConnection;
     }
 
-    private State DisplaySuccessAndReturnOneChatState(string successMessage)
+    private void DisplaySuccess(string successMessage)
     {
         Console.WriteLine(successMessage);
         Console.WriteLine("Press ENTER to return.");
         Console.ReadLine();
-
-        Context.ReloadData = true;
-        return States.OneChat;
     }
 }
