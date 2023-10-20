@@ -28,13 +28,13 @@ public sealed class OneChatState : State
         string status = connection != null ? connection.Status.ToString() : "Not connected";
         Console.WriteLine("Chatting with: {0} | ID={1} | user name={2} | {3} | avatar={4}",
             profile.DisplayName, profile.UserId, profile.UserName, status, profile.AvatarUrl);
+        Console.WriteLine("Manage connection - invite/accept/cancel/remove (press 'm') | Return (press 'x')");
 
         foreach (Message message in messages)
         {
             DisplayMessage(message, profile);
         }
         Console.WriteLine("Write (press 'w') | React (press 'r') | Refresh (press 'f') | Local refresh (press 'l')");
-        Console.WriteLine("Manage connection - invite/accept/cancel/remove (press 'm') | Return (press 'x')");
 
         ConsoleKeyInfo keyInfo = Console.ReadKey(intercept: true);
         if (keyInfo.KeyChar == 'w' || keyInfo.KeyChar == 'W')
