@@ -72,8 +72,7 @@ public sealed class OneChatState : State
 
     private async Task Load(long otherUserId)
     {
-        // TODO: consider loading the connection
-        OneChatScreen screen = await Client.LoadOneChatScreen(otherUserId, messagesOlderThan: DateTime.UtcNow, includeProfile: true);
+        OneChatScreen screen = await Client.LoadOneChatScreen(otherUserId, messagesOlderThan: DateTime.UtcNow, includeProfile: true, includeConnection: true);
 
         foreach (Message message in screen.Messages)
         {
@@ -81,6 +80,14 @@ public sealed class OneChatState : State
         }
 
         ProfileStorage.AddOrUpdateProfile(screen.Profile!);
+        if (screen.Connection != null)
+        {
+            ConnectionStorage.AddOrUpdateConnection(screen.Connection!);
+        }
+        else
+        {
+            ConnectionStorage.RemoveConnection(otherUserId);
+        }
     }
 
     private void DisplayMessage(Message message, ProfilePublic profilePublic)

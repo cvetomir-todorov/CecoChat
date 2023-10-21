@@ -16,6 +16,20 @@ public class ConnectionQueryService : ConnectionQuery.ConnectionQueryBase
         _repo = repo;
     }
 
+    public override async Task<GetConnectionResponse> GetConnection(GetConnectionRequest request, ServerCallContext context)
+    {
+        UserClaims userClaims = context.GetUserClaimsGrpc(_logger);
+
+        Connection? connection = await _repo.GetConnection(userClaims.UserId, request.ConnectionId);
+
+        GetConnectionResponse response = new();
+        response.Connection = connection;
+
+        _logger.LogTrace("Responding with {Connection} connection for user {UserId} and {ConnectionId}",
+            connection == null ? "null" : "existing", userClaims.UserId, request.ConnectionId);
+        return response;
+    }
+
     public override async Task<GetConnectionsResponse> GetConnections(GetConnectionsRequest request, ServerCallContext context)
     {
         UserClaims userClaims = context.GetUserClaimsGrpc(_logger);

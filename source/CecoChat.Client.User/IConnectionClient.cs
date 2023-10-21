@@ -6,6 +6,8 @@ public interface IConnectionClient
 {
     Task<IReadOnlyCollection<Connection>> GetConnections(long userId, string accessToken, CancellationToken ct);
 
+    Task<Connection?> GetConnection(long userId, long connectionId, string accessToken, CancellationToken ct);
+
     Task<InviteResult> Invite(long connectionId, long userId, string accessToken, CancellationToken ct);
 
     Task<ApproveResult> Approve(long connectionId, Guid version, long userId, string accessToken, CancellationToken ct);

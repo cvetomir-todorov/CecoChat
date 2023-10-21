@@ -44,6 +44,21 @@ internal sealed class ConnectionClient : IConnectionClient
         return response.Connections;
     }
 
+    public async Task<Connection?> GetConnection(long userId, long connectionId, string accessToken, CancellationToken ct)
+    {
+        GetConnectionRequest request = new();
+        request.ConnectionId = connectionId;
+
+        Metadata headers = new();
+        headers.AddAuthorization(accessToken);
+        DateTime deadline = _clock.GetNowUtc().Add(_options.CallTimeout);
+        GetConnectionResponse response = await _connectionQueryClient.GetConnectionAsync(request, headers, deadline, ct);
+
+        _logger.LogTrace("Received {Connection} connection for user {UserId} and {ConnectionId}",
+            response.Connection == null ? "null" : "existing", userId, connectionId);
+        return response.Connection;
+    }
+
     public async Task<InviteResult> Invite(long connectionId, long userId, string accessToken, CancellationToken ct)
     {
         InviteRequest request = new();

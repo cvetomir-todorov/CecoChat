@@ -4,7 +4,16 @@ package CecoChat.Contracts.User;
 import "User/Connection.proto";
 
 service ConnectionQuery {
+  rpc GetConnection(GetConnectionRequest) returns (GetConnectionResponse);
   rpc GetConnections(GetConnectionsRequest) returns (GetConnectionsResponse);
+}
+
+message GetConnectionRequest {
+  int64 connection_id = 1;
+}
+
+message GetConnectionResponse {
+  Connection connection = 1;
 }
 
 message GetConnectionsRequest {

@@ -2,6 +2,7 @@ using AutoMapper;
 using CecoChat.Client.History;
 using CecoChat.Client.User;
 using CecoChat.Contracts.Bff.Chats;
+using CecoChat.Contracts.Bff.Connections;
 using CecoChat.Contracts.Bff.Profiles;
 using CecoChat.Contracts.Bff.Screens;
 using CecoChat.Server.Identity;
@@ -21,19 +22,22 @@ public class OneChatScreenController : ControllerBase
     private readonly IContractMapper _contractMapper;
     private readonly IHistoryClient _historyClient;
     private readonly IProfileClient _profileClient;
+    private readonly IConnectionClient _connectionClient;
 
     public OneChatScreenController(
         ILogger<OneChatScreenController> logger,
         IMapper mapper,
         IContractMapper contractMapper,
         IHistoryClient historyClient,
-        IProfileClient profileClient)
+        IProfileClient profileClient,
+        IConnectionClient connectionClient)
     {
         _logger = logger;
         _mapper = mapper;
         _contractMapper = contractMapper;
         _historyClient = historyClient;
         _profileClient = profileClient;
+        _connectionClient = connectionClient;
     }
 
     [Authorize(Policy = "user")]
@@ -50,6 +54,8 @@ public class OneChatScreenController : ControllerBase
             return Unauthorized();
         }
 
+        // TODO: get data in parallel
+
         IReadOnlyCollection<Contracts.History.HistoryMessage> serviceMessages = await _historyClient.GetHistory(userClaims.UserId, request.OtherUserId, request.MessagesOlderThan, accessToken, ct);
         HistoryMessage[] messages = serviceMessages.Select(message => _contractMapper.MapMessage(message)).ToArray();
 
@@ -60,12 +66,23 @@ public class OneChatScreenController : ControllerBase
             profile = _mapper.Map<ProfilePublic>(serviceProfile);
         }
 
-        _logger.LogTrace("Responding with {MessageCount} message(s) older than {OlderThan} for chat between {UserId} and {OtherUserId} and (if requested) the profile of the other user {OtherUserId}",
+        Connection? connection = null;
+        if (request.IncludeProfile)
+        {
+            Contracts.User.Connection? serviceConnection = await _connectionClient.GetConnection(userClaims.UserId, request.OtherUserId, accessToken, ct);
+            if (serviceConnection != null)
+            {
+                connection = _mapper.Map<Connection>(serviceConnection);
+            }
+        }
+
+        _logger.LogTrace("Responding with {MessageCount} message(s) older than {OlderThan} for chat between {UserId} and {OtherUserId} and (if requested) the profile of and the connection with the other user {OtherUserId}",
             messages.Length, request.MessagesOlderThan, userClaims.UserId, request.OtherUserId, request.OtherUserId);
         return Ok(new GetOneChatScreenResponse
         {
             Messages = messages,
-            Profile = profile
+            Profile = profile,
+            Connection = connection
         });
     }
 }
