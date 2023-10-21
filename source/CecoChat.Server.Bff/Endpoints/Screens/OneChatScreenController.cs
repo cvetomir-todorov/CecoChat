@@ -54,22 +54,41 @@ public class OneChatScreenController : ControllerBase
             return Unauthorized();
         }
 
-        // TODO: get data in parallel
+        LinkedList<Task> tasks = new();
 
-        IReadOnlyCollection<Contracts.History.HistoryMessage> serviceMessages = await _historyClient.GetHistory(userClaims.UserId, request.OtherUserId, request.MessagesOlderThan, accessToken, ct);
+        Task<IReadOnlyCollection<Contracts.History.HistoryMessage>> messagesTask = _historyClient.GetHistory(userClaims.UserId, request.OtherUserId, request.MessagesOlderThan, accessToken, ct);
+        tasks.AddLast(messagesTask);
+
+        Task<Contracts.User.ProfilePublic>? profileTask = null;
+        if (request.IncludeProfile)
+        {
+            profileTask = _profileClient.GetPublicProfile(userClaims.UserId, request.OtherUserId, accessToken, ct);
+            tasks.AddLast(profileTask);
+        }
+
+        Task<Contracts.User.Connection?>? connectionTask = null;
+        if (request.IncludeProfile)
+        {
+            connectionTask = _connectionClient.GetConnection(userClaims.UserId, request.OtherUserId, accessToken, ct);
+            tasks.AddLast(connectionTask);
+        }
+
+        await Task.WhenAll(tasks);
+
+        IReadOnlyCollection<Contracts.History.HistoryMessage> serviceMessages = messagesTask.Result;
         HistoryMessage[] messages = serviceMessages.Select(message => _contractMapper.MapMessage(message)).ToArray();
 
         ProfilePublic? profile = null;
         if (request.IncludeProfile)
         {
-            Contracts.User.ProfilePublic serviceProfile = await _profileClient.GetPublicProfile(userClaims.UserId, request.OtherUserId, accessToken, ct);
+            Contracts.User.ProfilePublic serviceProfile = profileTask!.Result;
             profile = _mapper.Map<ProfilePublic>(serviceProfile);
         }
 
         Connection? connection = null;
-        if (request.IncludeProfile)
+        if (request.IncludeConnection)
         {
-            Contracts.User.Connection? serviceConnection = await _connectionClient.GetConnection(userClaims.UserId, request.OtherUserId, accessToken, ct);
+            Contracts.User.Connection? serviceConnection = connectionTask!.Result;
             if (serviceConnection != null)
             {
                 connection = _mapper.Map<Connection>(serviceConnection);
