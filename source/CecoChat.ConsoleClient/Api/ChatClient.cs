@@ -236,13 +236,14 @@ public sealed class ChatClient : IAsyncDisposable
         };
     }
 
-    public async Task<OneChatScreen> LoadOneChatScreen(long otherUserId, DateTime messagesOlderThan, bool includeProfile)
+    public async Task<OneChatScreen> LoadOneChatScreen(long otherUserId, DateTime messagesOlderThan, bool includeProfile, bool includeConnection)
     {
         GetOneChatScreenRequest request = new()
         {
             OtherUserId = otherUserId,
             MessagesOlderThan = messagesOlderThan,
-            IncludeProfile = includeProfile
+            IncludeProfile = includeProfile,
+            IncludeConnection = includeConnection
         };
         GetOneChatScreenResponse response = await _bffClient.GetOneChatScreen(request, _accessToken!);
 
@@ -258,10 +259,17 @@ public sealed class ChatClient : IAsyncDisposable
             profile = Map.PublicProfile(response.Profile!);
         }
 
+        LocalStorage.Connection? connection = null;
+        if (includeConnection && response.Connection != null)
+        {
+            connection = Map.Connection(response.Connection);
+        }
+
         return new OneChatScreen
         {
             Messages = messages,
-            Profile = profile
+            Profile = profile,
+            Connection = connection
         };
     }
 

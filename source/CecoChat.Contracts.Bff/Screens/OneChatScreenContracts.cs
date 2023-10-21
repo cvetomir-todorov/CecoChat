@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using CecoChat.Contracts.Bff.Chats;
+using CecoChat.Contracts.Bff.Connections;
 using CecoChat.Contracts.Bff.Profiles;
 using Refit;
 
@@ -18,6 +19,10 @@ public sealed class GetOneChatScreenRequest
     [JsonPropertyName("includeProfile")]
     [AliasAs("includeProfile")]
     public bool IncludeProfile { get; init; }
+
+    [JsonPropertyName("includeConnection")]
+    [AliasAs("includeConnection")]
+    public bool IncludeConnection { get; init; }
 }
 
 public sealed class GetOneChatScreenResponse
@@ -29,4 +34,8 @@ public sealed class GetOneChatScreenResponse
     [JsonPropertyName("profile")]
     [AliasAs("profile")]
     public ProfilePublic? Profile { get; init; } = null!;
+
+    [JsonPropertyName("connection")]
+    [AliasAs("connection")]
+    public Connection? Connection { get; init; }
 }

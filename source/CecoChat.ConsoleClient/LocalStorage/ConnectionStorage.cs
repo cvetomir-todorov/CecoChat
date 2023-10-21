@@ -58,6 +58,19 @@ public class ConnectionStorage
         connection.Version = newVersion;
     }
 
+    public void AddOrUpdateConnection(Connection connection)
+    {
+        if (_connectionsMap.TryGetValue(connection.ConnectionId, out Connection? existing))
+        {
+            existing.Status = connection.Status;
+            existing.Version = connection.Version;
+        }
+        else
+        {
+            _connectionsMap.TryAdd(connection.ConnectionId, connection);
+        }
+    }
+
     public void RemoveConnection(long connectionId)
     {
         _connectionsMap.TryRemove(connectionId, out _);

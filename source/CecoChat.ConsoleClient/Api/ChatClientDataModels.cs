@@ -1,3 +1,5 @@
+using CecoChat.ConsoleClient.LocalStorage;
+
 namespace CecoChat.ConsoleClient.Api;
 
 public class ClientResponse
@@ -13,13 +15,14 @@ public sealed class ClientResponse<TContent> : ClientResponse
 
 public sealed class AllChatsScreen
 {
-    public List<LocalStorage.Chat> Chats { get; init; } = new();
-    public List<LocalStorage.Connection> Connections { get; init; } = new();
-    public List<LocalStorage.ProfilePublic> Profiles { get; init; } = new();
+    public List<Chat> Chats { get; init; } = new();
+    public List<Connection> Connections { get; init; } = new();
+    public List<ProfilePublic> Profiles { get; init; } = new();
 }
 
 public sealed class OneChatScreen
 {
-    public List<LocalStorage.Message> Messages { get; init; } = new();
-    public LocalStorage.ProfilePublic? Profile { get; init; }
+    public List<Message> Messages { get; init; } = new();
+    public ProfilePublic? Profile { get; init; }
+    public Connection? Connection { get; init; }
 }
