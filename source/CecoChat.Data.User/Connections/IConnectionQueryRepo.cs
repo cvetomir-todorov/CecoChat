@@ -6,5 +6,5 @@ public interface IConnectionQueryRepo
 {
     Task<Connection?> GetConnection(long userId, long connectionId);
 
-    Task<IEnumerable<Connection>> GetConnections(long userId);
+    Task<IReadOnlyCollection<Connection>> GetConnections(long userId);
 }
