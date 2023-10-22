@@ -37,17 +37,17 @@ internal class ConnectionQueryRepo : IConnectionQueryRepo
         return MapConnection(userId, entity);
     }
 
-    public async Task<IEnumerable<Connection>> GetConnections(long userId)
+    public async Task<IReadOnlyCollection<Connection>> GetConnections(long userId)
     {
-        List<Connection> contacts = await _dbContext.Connections
+        List<Connection> connections = await _dbContext.Connections
             .Where(entity => entity.User1Id == userId)
             .Union(_dbContext.Connections.Where(entity => entity.User2Id == userId))
             .Select(entity => MapConnection(userId, entity))
             .AsNoTracking()
             .ToListAsync();
 
-        _logger.LogTrace("Fetched {ConnectionCount} connections for {UserId}", contacts.Count, userId);
-        return contacts;
+        _logger.LogTrace("Fetched {ConnectionCount} connections for {UserId}", connections.Count, userId);
+        return connections;
     }
 
     private static Connection MapConnection(long userId, ConnectionEntity entity)
