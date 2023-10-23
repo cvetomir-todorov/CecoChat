@@ -23,6 +23,5 @@ Networking:
       ConnectRetry: 16
       ConnectTimeout: 5000
       KeepAlive: 2
-      DefaultDatabase: 1
 Probes:
   Scheme: HTTPS

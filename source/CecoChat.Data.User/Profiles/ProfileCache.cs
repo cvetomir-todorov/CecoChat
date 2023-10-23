@@ -39,7 +39,7 @@ internal class ProfileCache : IProfileCache
     {
         _logger = logger;
         _cacheOptions = userCacheOptions.Value;
-        _cache = redisContext.GetDatabase();
+        _cache = redisContext.GetDatabase(_cacheOptions.ProfilesDatabase);
         _channel = Channel.CreateUnbounded<ProfilePublic>(new UnboundedChannelOptions
         {
             SingleWriter = false,

@@ -11,7 +11,7 @@ namespace CecoChat.Data.User.Connections;
 public class CachingConnectionQueryRepo : IConnectionQueryRepo
 {
     private readonly ILogger _logger;
-    private readonly UserCacheOptions _userCacheOptions;
+    private readonly UserCacheOptions _cacheOptions;
     private readonly IDatabase _cache;
     private readonly IConnectionQueryRepo _decoratedRepo;
 
@@ -22,9 +22,8 @@ public class CachingConnectionQueryRepo : IConnectionQueryRepo
         IConnectionQueryRepo decoratedRepo)
     {
         _logger = logger;
-        _userCacheOptions = userCacheOptions.Value;
-        // TODO: get this from config
-        _cache = redisContext.GetDatabase(db: 2);
+        _cacheOptions = userCacheOptions.Value;
+        _cache = redisContext.GetDatabase(_cacheOptions.ConnectionsDatabase);
         _decoratedRepo = decoratedRepo;
     }
 
@@ -41,7 +40,7 @@ public class CachingConnectionQueryRepo : IConnectionQueryRepo
             if (connection != null)
             {
                 byte[] connectionBytes = connection.ToByteArray();
-                await _cache.StringSetAsync(key, connectionBytes, expiry: _userCacheOptions.ConnectionEntriesDuration);
+                await _cache.StringSetAsync(key, connectionBytes, expiry: _cacheOptions.ConnectionEntriesDuration);
 
                 _logger.LogTrace("Fetched from DB and then cached for user {UserId} a connection to {ConnectionId}", userId, connectionId);
             }
@@ -79,7 +78,7 @@ public class CachingConnectionQueryRepo : IConnectionQueryRepo
                 }
 
                 await _cache.SetAddAsync(key, newValues);
-                await _cache.KeyExpireAsync(key, _userCacheOptions.ConnectionEntriesDuration);
+                await _cache.KeyExpireAsync(key, _cacheOptions.ConnectionEntriesDuration);
 
                 _logger.LogTrace("Fetched from DB and then cached for user {UserId} {ConnectionCount} connections", userId, connections.Count);
             }

@@ -139,5 +139,4 @@ services:
       CECOCHAT_UserCache__Store__ConnectRetry: 16
       CECOCHAT_UserCache__Store__ConnectTimeout: 5000
       CECOCHAT_UserCache__Store__KeepAlive: 2
-      CECOCHAT_UserCache__Store__DefaultDatabase: 1
 #    logging: *fluentd-logging
