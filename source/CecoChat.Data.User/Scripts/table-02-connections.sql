@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS public."Connections"
 (
     "User1Id" bigint NOT NULL,
     "User2Id" bigint NOT NULL,
-    "Version" uuid NOT NULL,
+    "Version" timestamp with time zone NOT NULL,
     "Status" text COLLATE pg_catalog."default" NOT NULL,
     "TargetId" bigint NOT NULL,
     CONSTRAINT "Connections_pkey" PRIMARY KEY ("User1Id", "User2Id")

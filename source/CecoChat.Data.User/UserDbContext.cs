@@ -32,13 +32,13 @@ public class UserDbContext : DbContext
 
 public interface IVersionEntity
 {
-    Guid Version { get; set; }
+    DateTime Version { get; set; }
 }
 
 public sealed class ProfileEntity : IVersionEntity
 {
     public long UserId { get; set; }
-    public Guid Version { get; set; }
+    public DateTime Version { get; set; }
     public string UserName { get; set; } = string.Empty;
     public string Password { get; set; } = string.Empty;
     public string DisplayName { get; set; } = string.Empty;
@@ -51,7 +51,7 @@ public sealed class ConnectionEntity : IVersionEntity
 {
     public long User1Id { get; set; }
     public long User2Id { get; set; }
-    public Guid Version { get; set; }
+    public DateTime Version { get; set; }
     public ConnectionEntityStatus Status { get; set; }
     public long TargetId { get; set; }
 }

@@ -1,5 +1,5 @@
-using CecoChat.Contracts;
 using CecoChat.Contracts.User;
+using Google.Protobuf.WellKnownTypes;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -55,7 +55,7 @@ internal class ConnectionQueryRepo : IConnectionQueryRepo
         return new Connection
         {
             ConnectionId = MapConnectionId(userId, entity),
-            Version = entity.Version.ToUuid(),
+            Version = entity.Version.ToTimestamp(),
             Status = MapStatus(entity.Status),
             TargetUserId = entity.TargetId
         };

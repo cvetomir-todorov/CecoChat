@@ -1,11 +1,11 @@
 syntax = "proto3";
 option csharp_namespace = "CecoChat.Contracts.User";
 package CecoChat.Contracts.User;
-import "Uuid.proto";
+import "google/protobuf/timestamp.proto";
 
 message Connection {
   int64 connection_id = 1;
-  Uuid version = 2;
+  google.protobuf.Timestamp version = 2;
   ConnectionStatus status = 3;
   int64 target_user_id = 4;
 }
