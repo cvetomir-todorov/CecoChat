@@ -11,7 +11,7 @@ public sealed class ProfileFull
 
     [JsonPropertyName("version")]
     [AliasAs("version")]
-    public Guid Version { get; set; }
+    public DateTime Version { get; set; }
 
     [JsonPropertyName("userName")]
     [AliasAs("userName")]

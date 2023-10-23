@@ -35,7 +35,7 @@ public class ConnectionStorage
         return connection;
     }
 
-    public void AddConnection(long userId, ConnectionStatus status, Guid version)
+    public void AddConnection(long userId, ConnectionStatus status, DateTime version)
     {
         Connection connection = new()
         {
@@ -47,7 +47,7 @@ public class ConnectionStorage
         _connectionsMap.TryAdd(connection.ConnectionId, connection);
     }
 
-    public void UpdateConnection(long userId, ConnectionStatus newStatus, Guid newVersion)
+    public void UpdateConnection(long userId, ConnectionStatus newStatus, DateTime newVersion)
     {
         if (!_connectionsMap.TryGetValue(userId, out Connection? connection))
         {

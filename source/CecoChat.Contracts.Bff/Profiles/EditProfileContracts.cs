@@ -11,14 +11,14 @@ public sealed class ChangePasswordRequest
 
     [JsonPropertyName("version")]
     [AliasAs("version")]
-    public Guid Version { get; init; }
+    public DateTime Version { get; init; }
 }
 
 public sealed class ChangePasswordResponse
 {
     [JsonPropertyName("newVersion")]
     [AliasAs("newVersion")]
-    public Guid NewVersion { get; init; }
+    public DateTime NewVersion { get; init; }
 }
 
 public sealed class EditProfileRequest
@@ -29,12 +29,12 @@ public sealed class EditProfileRequest
 
     [JsonPropertyName("version")]
     [AliasAs("version")]
-    public Guid Version { get; init; }
+    public DateTime Version { get; init; }
 }
 
 public sealed class EditProfileResponse
 {
     [JsonPropertyName("newVersion")]
     [AliasAs("newVersion")]
-    public Guid NewVersion { get; init; }
+    public DateTime NewVersion { get; init; }
 }
