@@ -27,7 +27,14 @@ public class UserDbAutofacModule : Module
         builder.RegisterType<NpgsqlDbInitializer>().As<INpgsqlDbInitializer>().SingleInstance();
         builder.RegisterModule(new RedisAutofacModule(_userCacheStoreConfig, RedisContextName));
         builder.RegisterOptions<UserCacheOptions>(_userCacheConfig);
+        builder.RegisterType<DataUtility>().As<IDataUtility>().SingleInstance();
 
+        RegisterProfileRepos(builder);
+        RegisterConnectionRepos(builder);
+    }
+
+    private static void RegisterProfileRepos(ContainerBuilder builder)
+    {
         builder.RegisterType<ProfileCommandRepo>().As<IProfileCommandRepo>().InstancePerLifetimeScope();
         builder
             .RegisterType<ProfileCache>()
@@ -37,21 +44,39 @@ public class UserDbAutofacModule : Module
 
         builder
             .RegisterType<CachingProfileQueryRepo>()
-            .Named<IProfileQueryRepo>("caching-profile-repo")
+            .Named<IProfileQueryRepo>("c-pr-repo")
             .InstancePerLifetimeScope();
         builder
             .RegisterType<ProfileQueryRepo>()
-            .Named<IProfileQueryRepo>("profile-repo")
+            .Named<IProfileQueryRepo>("pr-repo")
             .InstancePerLifetimeScope();
         builder
             .RegisterDecorator<IProfileQueryRepo>(
-                decorator: (context, inner) => context.ResolveNamed<IProfileQueryRepo>("caching-profile-repo", TypedParameter.From(inner)),
-                fromKey: "profile-repo")
+                decorator: (context, inner) => context.ResolveNamed<IProfileQueryRepo>("c-pr-repo", TypedParameter.From(inner)),
+                fromKey: "pr-repo")
+            .InstancePerLifetimeScope();
+    }
+
+    private static void RegisterConnectionRepos(ContainerBuilder builder)
+    {
+        builder
+            .RegisterType<ConnectionCommandRepo>()
+            .As<IConnectionCommandRepo>()
             .InstancePerLifetimeScope();
 
-        builder.RegisterType<ConnectionQueryRepo>().As<IConnectionQueryRepo>().InstancePerLifetimeScope();
-        builder.RegisterType<ConnectionCommandRepo>().As<IConnectionCommandRepo>().InstancePerLifetimeScope();
-
-        builder.RegisterType<DataUtility>().As<IDataUtility>().SingleInstance();
+        builder
+            .RegisterType<CachingConnectionQueryRepo>()
+            .Named<IConnectionQueryRepo>("c-conn-q-repo")
+            .WithNamedParameter(typeof(IRedisContext), RedisContextName)
+            .InstancePerLifetimeScope();
+        builder
+            .RegisterType<ConnectionQueryRepo>()
+            .Named<IConnectionQueryRepo>("conn-q-repo")
+            .InstancePerLifetimeScope();
+        builder
+            .RegisterDecorator<IConnectionQueryRepo>(
+                decorator: (context, inner) => context.ResolveNamed<IConnectionQueryRepo>("c-conn-q-repo", TypedParameter.From(inner)),
+                fromKey: "conn-q-repo")
+            .InstancePerLifetimeScope();
     }
 }
