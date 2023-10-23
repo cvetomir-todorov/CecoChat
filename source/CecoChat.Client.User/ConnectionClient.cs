@@ -1,6 +1,6 @@
-using CecoChat.Contracts;
 using CecoChat.Contracts.User;
 using CecoChat.Grpc;
+using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -75,7 +75,7 @@ internal sealed class ConnectionClient : IConnectionClient
             return new InviteResult
             {
                 Success = true,
-                Version = response.Version.ToGuid()
+                Version = response.Version.ToDateTime()
             };
         }
         if (response.MissingUser)
@@ -98,11 +98,11 @@ internal sealed class ConnectionClient : IConnectionClient
         throw new ProcessingFailureException(typeof(InviteResponse));
     }
 
-    public async Task<ApproveResult> Approve(long connectionId, Guid version, long userId, string accessToken, CancellationToken ct)
+    public async Task<ApproveResult> Approve(long connectionId, DateTime version, long userId, string accessToken, CancellationToken ct)
     {
         ApproveRequest request = new();
         request.ConnectionId = connectionId;
-        request.Version = version.ToUuid();
+        request.Version = version.ToTimestamp();
 
         Metadata headers = new();
         headers.AddAuthorization(accessToken);
@@ -115,7 +115,7 @@ internal sealed class ConnectionClient : IConnectionClient
             return new ApproveResult
             {
                 Success = true,
-                NewVersion = response.NewVersion.ToGuid()
+                NewVersion = response.NewVersion.ToDateTime()
             };
         }
         if (response.MissingConnection)
@@ -146,11 +146,11 @@ internal sealed class ConnectionClient : IConnectionClient
         throw new ProcessingFailureException(typeof(ApproveResponse));
     }
 
-    public async Task<CancelResult> Cancel(long connectionId, Guid version, long userId, string accessToken, CancellationToken ct)
+    public async Task<CancelResult> Cancel(long connectionId, DateTime version, long userId, string accessToken, CancellationToken ct)
     {
         CancelRequest request = new();
         request.ConnectionId = connectionId;
-        request.Version = version.ToUuid();
+        request.Version = version.ToTimestamp();
 
         Metadata headers = new();
         headers.AddAuthorization(accessToken);
@@ -193,11 +193,11 @@ internal sealed class ConnectionClient : IConnectionClient
         throw new ProcessingFailureException(typeof(CancelResponse));
     }
 
-    public async Task<RemoveResult> Remove(long connectionId, Guid version, long userId, string accessToken, CancellationToken ct)
+    public async Task<RemoveResult> Remove(long connectionId, DateTime version, long userId, string accessToken, CancellationToken ct)
     {
         RemoveRequest request = new();
         request.ConnectionId = connectionId;
-        request.Version = version.ToUuid();
+        request.Version = version.ToTimestamp();
 
         Metadata headers = new();
         headers.AddAuthorization(accessToken);

@@ -1,6 +1,6 @@
-using CecoChat.Contracts;
 using CecoChat.Contracts.User;
 using CecoChat.Grpc;
+using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -31,11 +31,11 @@ internal sealed class ProfileClient : IProfileClient
         _logger.LogInformation("Profile client address set to {Address}", _options.Address);
     }
 
-    public async Task<ChangePasswordResult> ChangePassword(string newPassword, Guid version, long userId, string accessToken, CancellationToken ct)
+    public async Task<ChangePasswordResult> ChangePassword(string newPassword, DateTime version, long userId, string accessToken, CancellationToken ct)
     {
         ChangePasswordRequest request = new();
         request.NewPassword = newPassword;
-        request.Version = version.ToUuid();
+        request.Version = version.ToTimestamp();
 
         Metadata headers = new();
         headers.AddAuthorization(accessToken);
@@ -48,7 +48,7 @@ internal sealed class ProfileClient : IProfileClient
             return new ChangePasswordResult
             {
                 Success = true,
-                NewVersion = response.NewVersion.ToGuid()
+                NewVersion = response.NewVersion.ToDateTime()
             };
         }
         if (response.ConcurrentlyUpdated)
@@ -79,7 +79,7 @@ internal sealed class ProfileClient : IProfileClient
             return new UpdateProfileResult
             {
                 Success = true,
-                NewVersion = response.NewVersion.ToGuid()
+                NewVersion = response.NewVersion.ToDateTime()
             };
         }
         if (response.ConcurrentlyUpdated)

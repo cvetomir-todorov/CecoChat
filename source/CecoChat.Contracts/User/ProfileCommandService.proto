@@ -1,8 +1,8 @@
 syntax = "proto3";
 option csharp_namespace = "CecoChat.Contracts.User";
 package CecoChat.Contracts.User;
+import "google/protobuf/timestamp.proto";
 import "User/ProfileUpdate.proto";
-import "Uuid.proto";
 
 service ProfileCommand {
   rpc ChangePassword(ChangePasswordRequest) returns (ChangePasswordResponse);
@@ -11,12 +11,12 @@ service ProfileCommand {
 
 message ChangePasswordRequest {
   string new_password = 1;
-  Uuid version = 2;
+  google.protobuf.Timestamp version = 2;
 }
 
 message ChangePasswordResponse {
   bool success = 1;
-  Uuid new_version = 2;
+  google.protobuf.Timestamp new_version = 2;
   bool concurrently_updated = 3;
 }
 
@@ -26,6 +26,6 @@ message UpdateProfileRequest {
 
 message UpdateProfileResponse {
   bool success = 1;
-  Uuid new_version = 2;
+  google.protobuf.Timestamp new_version = 2;
   bool concurrently_updated = 3;
 }

@@ -4,7 +4,7 @@ namespace CecoChat.Client.User;
 
 public interface IProfileClient
 {
-    Task<ChangePasswordResult> ChangePassword(string newPassword, Guid version, long userId, string accessToken, CancellationToken ct);
+    Task<ChangePasswordResult> ChangePassword(string newPassword, DateTime version, long userId, string accessToken, CancellationToken ct);
 
     Task<UpdateProfileResult> UpdateProfile(ProfileUpdate profile, long userId, string accessToken, CancellationToken ct);
 
@@ -16,13 +16,13 @@ public interface IProfileClient
 public readonly struct ChangePasswordResult
 {
     public bool Success { get; init; }
-    public Guid NewVersion { get; init; }
+    public DateTime NewVersion { get; init; }
     public bool ConcurrentlyUpdated { get; init; }
 }
 
 public readonly struct UpdateProfileResult
 {
     public bool Success { get; init; }
-    public Guid NewVersion { get; init; }
+    public DateTime NewVersion { get; init; }
     public bool ConcurrentlyUpdated { get; init; }
 }

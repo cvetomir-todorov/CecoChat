@@ -1,10 +1,10 @@
 syntax = "proto3";
 option csharp_namespace = "CecoChat.Contracts.User";
 package CecoChat.Contracts.User;
-import "Uuid.proto";
+import "google/protobuf/timestamp.proto";
 
 // update all trivial properties - for now it's only the display name
 message ProfileUpdate {
   string display_name = 1;
-  Uuid version = 2;
+  google.protobuf.Timestamp version = 2;
 }

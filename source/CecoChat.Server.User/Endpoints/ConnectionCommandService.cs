@@ -1,7 +1,7 @@
-using CecoChat.Contracts;
 using CecoChat.Contracts.User;
 using CecoChat.Data.User.Connections;
 using CecoChat.Server.Identity;
+using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 
 namespace CecoChat.Server.User.Endpoints;
@@ -40,7 +40,7 @@ public class ConnectionCommandService : ConnectionCommand.ConnectionCommandBase
             return new InviteResponse
             {
                 Success = true,
-                Version = result.Version.ToUuid()
+                Version = result.Version.ToTimestamp()
             };
         }
         if (result.MissingUser)
@@ -96,7 +96,7 @@ public class ConnectionCommandService : ConnectionCommand.ConnectionCommandBase
             return new ApproveResponse
             {
                 Success = true,
-                NewVersion = result.NewVersion.ToUuid()
+                NewVersion = result.NewVersion.ToTimestamp()
             };
         }
         if (result.ConcurrentlyUpdated)
