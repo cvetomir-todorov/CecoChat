@@ -74,5 +74,3 @@ spec:
               value: "{{.Values.Networking.UserCache.Store.ConnectTimeout}}"
             - name: CECOCHAT_UserCache__Store__KeepAlive
               value: "{{.Values.Networking.UserCache.Store.KeepAlive}}"
-            - name: CECOCHAT_UserCache__Store__DefaultDatabase
-              value: "{{.Values.Networking.UserCache.Store.DefaultDatabase}}"
