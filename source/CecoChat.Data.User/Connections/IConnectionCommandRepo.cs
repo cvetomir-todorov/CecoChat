@@ -14,7 +14,7 @@ public interface IConnectionCommandRepo
 public readonly struct AddConnectionResult
 {
     public bool Success { get; init; }
-    public Guid Version { get; init; }
+    public DateTime Version { get; init; }
     public bool MissingUser { get; init; }
     public bool AlreadyExists { get; init; }
 }
@@ -22,7 +22,7 @@ public readonly struct AddConnectionResult
 public readonly struct UpdateConnectionResult
 {
     public bool Success { get; init; }
-    public Guid NewVersion { get; init; }
+    public DateTime NewVersion { get; init; }
     public bool ConcurrentlyUpdated { get; init; }
 }
 

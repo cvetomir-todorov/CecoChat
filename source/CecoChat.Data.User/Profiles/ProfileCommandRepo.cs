@@ -1,4 +1,3 @@
-using CecoChat.Contracts;
 using CecoChat.Contracts.User;
 using CecoChat.Data.User.Infra;
 using Microsoft.EntityFrameworkCore;
@@ -42,7 +41,7 @@ internal class ProfileCommandRepo : IProfileCommandRepo
         ProfileEntity entity = new()
         {
             UserName = profile.UserName,
-            Version = Guid.NewGuid(),
+            Version = DateTime.UtcNow,
             Password = password,
             DisplayName = profile.DisplayName,
             AvatarUrl = profile.AvatarUrl,
@@ -79,7 +78,7 @@ internal class ProfileCommandRepo : IProfileCommandRepo
         }
     }
 
-    public async Task<ChangePasswordResult> ChangePassword(string newPassword, Guid version, long userId)
+    public async Task<ChangePasswordResult> ChangePassword(string newPassword, DateTime version, long userId)
     {
         ProfileEntity entity = new()
         {
@@ -88,7 +87,7 @@ internal class ProfileCommandRepo : IProfileCommandRepo
         };
         EntityEntry<ProfileEntity> entry = _dbContext.Profiles.Attach(entity);
         entry.Property(e => e.Password).IsModified = true;
-        Guid newVersion = _dataUtility.SetVersion(entry, version);
+        DateTime newVersion = _dataUtility.SetVersion(entry, version);
 
         try
         {
@@ -119,7 +118,7 @@ internal class ProfileCommandRepo : IProfileCommandRepo
         };
         EntityEntry<ProfileEntity> entry = _dbContext.Profiles.Attach(entity);
         entry.Property(e => e.DisplayName).IsModified = true;
-        Guid newVersion = _dataUtility.SetVersion(entry, profile.Version.ToGuid());
+        DateTime newVersion = _dataUtility.SetVersion(entry, profile.Version.ToDateTime());
 
         try
         {

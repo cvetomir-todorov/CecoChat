@@ -1,4 +1,3 @@
-using CecoChat.Contracts;
 using CecoChat.Contracts.User;
 using CecoChat.Data.User.Infra;
 using Microsoft.EntityFrameworkCore;
@@ -27,7 +26,7 @@ internal class ConnectionCommandRepo : IConnectionCommandRepo
     public async Task<AddConnectionResult> AddConnection(long userId, Connection connection)
     {
         ConnectionEntity entity = CreateEntityWithUserIds(userId, connection.ConnectionId);
-        entity.Version = Guid.NewGuid();
+        entity.Version = DateTime.UtcNow;
         entity.Status = MapStatus(connection.Status);
         entity.TargetId = connection.TargetUserId;
 
@@ -82,7 +81,7 @@ internal class ConnectionCommandRepo : IConnectionCommandRepo
         EntityEntry<ConnectionEntity> entry = _dbContext.Connections.Attach(entity);
         entry.Property(e => e.Status).IsModified = true;
         entry.Property(e => e.TargetId).IsModified = true;
-        Guid newVersion = _dataUtility.SetVersion(entry, connection.Version.ToGuid());
+        DateTime newVersion = _dataUtility.SetVersion(entry, connection.Version.ToDateTime());
 
         try
         {
@@ -110,7 +109,7 @@ internal class ConnectionCommandRepo : IConnectionCommandRepo
 
         EntityEntry<ConnectionEntity> entry = _dbContext.Connections.Attach(entity);
         entry.State = EntityState.Deleted;
-        _dataUtility.SetVersion(entry, connection.Version.ToGuid());
+        _dataUtility.SetVersion(entry, connection.Version.ToDateTime());
 
         try
         {
