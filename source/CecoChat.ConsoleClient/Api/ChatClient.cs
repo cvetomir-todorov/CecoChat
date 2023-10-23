@@ -221,7 +221,7 @@ public sealed class ChatClient : IAsyncDisposable
 
         if (includeProfiles && response.Profiles.Length < response.Chats.Length)
         {
-            throw new InvalidOperationException($"Loading all chats screen requested profiles, returned {response.Chats.Length} but profiles were only {response.Profiles.Length}.");
+            throw new InvalidOperationException($"Loading all chats screen, returned {response.Chats.Length} chats but profiles were {response.Profiles.Length}.");
         }
 
         List<LocalStorage.Chat> chats = Map.BffChats(response.Chats, UserId);
@@ -289,7 +289,7 @@ public sealed class ChatClient : IAsyncDisposable
         return response;
     }
 
-    public async Task<ClientResponse<ApproveConnectionResponse>> ApproveConnection(long connectionId, Guid version)
+    public async Task<ClientResponse<ApproveConnectionResponse>> ApproveConnection(long connectionId, DateTime version)
     {
         ApproveConnectionRequest request = new()
         {
@@ -308,7 +308,7 @@ public sealed class ChatClient : IAsyncDisposable
         return response;
     }
 
-    public async Task<ClientResponse<CancelConnectionResponse>> CancelConnection(long connectionId, Guid version)
+    public async Task<ClientResponse<CancelConnectionResponse>> CancelConnection(long connectionId, DateTime version)
     {
         CancelConnectionRequest request = new()
         {
@@ -327,7 +327,7 @@ public sealed class ChatClient : IAsyncDisposable
         return response;
     }
 
-    public async Task<ClientResponse<RemoveConnectionResponse>> RemoveConnection(long connectionId, Guid version)
+    public async Task<ClientResponse<RemoveConnectionResponse>> RemoveConnection(long connectionId, DateTime version)
     {
         RemoveConnectionRequest request = new()
         {

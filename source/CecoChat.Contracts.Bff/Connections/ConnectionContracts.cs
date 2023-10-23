@@ -11,7 +11,7 @@ public sealed class Connection
 
     [JsonPropertyName("version")]
     [AliasAs("version")]
-    public Guid Version { get; init; }
+    public DateTime Version { get; init; }
 
     [JsonPropertyName("status")]
     [AliasAs("status")]
@@ -38,28 +38,28 @@ public sealed class InviteConnectionResponse
 {
     [JsonPropertyName("version")]
     [AliasAs("version")]
-    public Guid Version { get; init; }
+    public DateTime Version { get; init; }
 }
 
 public sealed class ApproveConnectionRequest
 {
     [JsonPropertyName("version")]
     [AliasAs("version")]
-    public Guid Version { get; init; }
+    public DateTime Version { get; init; }
 }
 
 public sealed class ApproveConnectionResponse
 {
     [JsonPropertyName("newVersion")]
     [AliasAs("newVersion")]
-    public Guid NewVersion { get; set; }
+    public DateTime NewVersion { get; set; }
 }
 
 public sealed class CancelConnectionRequest
 {
     [JsonPropertyName("version")]
     [AliasAs("version")]
-    public Guid Version { get; init; }
+    public DateTime Version { get; init; }
 }
 
 public sealed class CancelConnectionResponse
@@ -69,7 +69,7 @@ public sealed class RemoveConnectionRequest
 {
     [JsonPropertyName("version")]
     [AliasAs("version")]
-    public Guid Version { get; init; }
+    public DateTime Version { get; init; }
 }
 
 public sealed class RemoveConnectionResponse
