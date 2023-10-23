@@ -1,7 +1,7 @@
 syntax = "proto3";
 option csharp_namespace = "CecoChat.Contracts.User";
 package CecoChat.Contracts.User;
-import "Uuid.proto";
+import "google/protobuf/timestamp.proto";
 
 service ConnectionCommand {
   rpc Invite(InviteRequest) returns (InviteResponse);
@@ -16,19 +16,19 @@ message InviteRequest {
 
 message InviteResponse {
   bool success = 1;
-  Uuid version = 2;
+  google.protobuf.Timestamp version = 2;
   bool missing_user = 3;
   bool already_exists = 4;
 }
 
 message ApproveRequest {
   int64 connection_id = 1;
-  Uuid version = 2;
+  google.protobuf.Timestamp version = 2;
 }
 
 message ApproveResponse {
   bool success = 1;
-  Uuid new_version = 2;
+  google.protobuf.Timestamp new_version = 2;
   bool missing_connection = 3;
   bool invalid = 4;
   bool concurrently_updated = 5;
@@ -36,7 +36,7 @@ message ApproveResponse {
 
 message CancelRequest {
   int64 connection_id = 1;
-  Uuid version = 2;
+  google.protobuf.Timestamp version = 2;
 }
 
 message CancelResponse {
@@ -48,7 +48,7 @@ message CancelResponse {
 
 message RemoveRequest {
   int64 connection_id = 1;
-  Uuid version = 2;
+  google.protobuf.Timestamp version = 2;
 }
 
 message RemoveResponse {

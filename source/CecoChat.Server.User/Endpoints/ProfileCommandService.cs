@@ -1,8 +1,8 @@
-using CecoChat.Contracts;
 using CecoChat.Contracts.User;
 using CecoChat.Data.User.Profiles;
 using CecoChat.Server.Identity;
 using CecoChat.Server.User.Security;
+using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Microsoft.AspNetCore.Authorization;
 
@@ -30,7 +30,7 @@ public class ProfileCommandService : ProfileCommand.ProfileCommandBase
         UserClaims userClaims = context.GetUserClaimsGrpc(_logger);
 
         string passwordHashAndSalt = _passwordHasher.Hash(request.NewPassword);
-        ChangePasswordResult result = await _commandRepo.ChangePassword(passwordHashAndSalt, request.Version.ToGuid(), userClaims.UserId);
+        ChangePasswordResult result = await _commandRepo.ChangePassword(passwordHashAndSalt, request.Version.ToDateTime(), userClaims.UserId);
 
         if (result.Success)
         {
@@ -38,7 +38,7 @@ public class ProfileCommandService : ProfileCommand.ProfileCommandBase
             return new ChangePasswordResponse
             {
                 Success = true,
-                NewVersion = result.NewVersion.ToUuid()
+                NewVersion = result.NewVersion.ToTimestamp()
             };
         }
         if (result.ConcurrentlyUpdated)
@@ -63,7 +63,7 @@ public class ProfileCommandService : ProfileCommand.ProfileCommandBase
             return new UpdateProfileResponse
             {
                 Success = true,
-                NewVersion = result.NewVersion.ToUuid()
+                NewVersion = result.NewVersion.ToTimestamp()
             };
         }
         if (result.ConcurrentlyUpdated)

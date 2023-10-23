@@ -1,4 +1,3 @@
-using CecoChat.Contracts;
 using CecoChat.Contracts.User;
 using CecoChat.Data;
 using FluentValidation;
@@ -20,7 +19,7 @@ public sealed class ApproveRequestValidator : AbstractValidator<ApproveRequest>
     {
         RuleFor(x => x.ConnectionId)
             .ValidUserId();
-        RuleFor(x => x.Version.ToGuid())
+        RuleFor(x => x.Version.ToDateTime())
             .ValidVersion();
     }
 }
@@ -31,7 +30,7 @@ public sealed class CancelRequestValidator : AbstractValidator<CancelRequest>
     {
         RuleFor(x => x.ConnectionId)
             .ValidUserId();
-        RuleFor(x => x.Version.ToGuid())
+        RuleFor(x => x.Version.ToDateTime())
             .ValidVersion();
     }
 }
@@ -42,7 +41,7 @@ public sealed class RemoveRequestValidator : AbstractValidator<RemoveRequest>
     {
         RuleFor(x => x.ConnectionId)
             .ValidUserId();
-        RuleFor(x => x.Version.ToGuid())
+        RuleFor(x => x.Version.ToDateTime())
             .ValidVersion();
     }
 }

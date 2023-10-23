@@ -10,17 +10,17 @@ public interface IConnectionClient
 
     Task<InviteResult> Invite(long connectionId, long userId, string accessToken, CancellationToken ct);
 
-    Task<ApproveResult> Approve(long connectionId, Guid version, long userId, string accessToken, CancellationToken ct);
+    Task<ApproveResult> Approve(long connectionId, DateTime version, long userId, string accessToken, CancellationToken ct);
 
-    Task<CancelResult> Cancel(long connectionId, Guid version, long userId, string accessToken, CancellationToken ct);
+    Task<CancelResult> Cancel(long connectionId, DateTime version, long userId, string accessToken, CancellationToken ct);
 
-    Task<RemoveResult> Remove(long connectionId, Guid version, long userId, string accessToken, CancellationToken ct);
+    Task<RemoveResult> Remove(long connectionId, DateTime version, long userId, string accessToken, CancellationToken ct);
 }
 
 public readonly struct InviteResult
 {
     public bool Success { get; init; }
-    public Guid Version { get; init; }
+    public DateTime Version { get; init; }
     public bool MissingUser { get; init; }
     public bool AlreadyExists { get; init; }
 }
@@ -28,7 +28,7 @@ public readonly struct InviteResult
 public readonly struct ApproveResult
 {
     public bool Success { get; init; }
-    public Guid NewVersion { get; init; }
+    public DateTime NewVersion { get; init; }
     public bool MissingConnection { get; init; }
     public bool Invalid { get; init; }
     public bool ConcurrentlyUpdated { get; init; }
