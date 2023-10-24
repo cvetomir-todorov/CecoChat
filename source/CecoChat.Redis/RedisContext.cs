@@ -66,16 +66,16 @@ public sealed class RedisContext : IRedisContext
     {
         ConfigurationOptions redisConfiguration = CreateRedisConfiguration();
         ConnectionMultiplexer connection = ConnectionMultiplexer.Connect(redisConfiguration);
-        _logger.LogInformation("Redis connection '{ConnectionString}' with default database {DefaultDb} is {ConnectionState}",
-            connection.Configuration, _redisOptions.DefaultDatabase, connection.IsConnected ? "established" : "not established");
+        _logger.LogInformation("Redis connection {Name} using '{ConnectionString}' with default database {DefaultDb} is {ConnectionState}",
+            _redisOptions.Name, connection.Configuration, _redisOptions.DefaultDatabase, connection.IsConnected ? "established" : "not established");
 
         connection.ConnectionFailed += (_, args) =>
         {
-            _logger.LogWarning(args.Exception, "Redis connection to {$Endpoint} failed", args.EndPoint);
+            _logger.LogWarning(args.Exception, "Redis connection {Name} to {Endpoint} failed", _redisOptions.Name, args.EndPoint);
         };
         connection.ConnectionRestored += (_, args) =>
         {
-            _logger.LogInformation("Redis connection to {$Endpoint} restored", args.EndPoint);
+            _logger.LogInformation("Redis connection {Name} to {Endpoint} restored", _redisOptions.Name, args.EndPoint);
         };
 
         return connection;
