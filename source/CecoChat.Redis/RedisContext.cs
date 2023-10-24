@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using StackExchange.Redis;
 
 namespace CecoChat.Redis;
@@ -21,10 +20,10 @@ public sealed class RedisContext : IRedisContext
 
     public RedisContext(
         ILogger<RedisContext> logger,
-        IOptions<RedisOptions> options)
+        RedisOptions options)
     {
         _logger = logger;
-        _redisOptions = options.Value;
+        _redisOptions = options;
         _connection = new(Connect);
     }
 
