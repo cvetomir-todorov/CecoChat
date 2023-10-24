@@ -4,9 +4,11 @@ using Calzolari.Grpc.AspNetCore.Validation;
 using CecoChat.AspNet.Health;
 using CecoChat.AspNet.Prometheus;
 using CecoChat.Autofac;
+using CecoChat.Client.IdGen;
 using CecoChat.Data.Config;
 using CecoChat.Data.User;
 using CecoChat.Data.User.Infra;
+using CecoChat.Http.Health;
 using CecoChat.Jaeger;
 using CecoChat.Jwt;
 using CecoChat.Npgsql.Health;
@@ -31,6 +33,7 @@ public class Startup
     private readonly RedisOptions _configDbOptions;
     private readonly UserDbOptions _userDbOptions;
     private readonly RedisOptions _userCacheStoreOptions;
+    private readonly IdGenOptions _idGenOptions;
     private readonly JwtOptions _jwtOptions;
     private readonly OtelSamplingOptions _otelSamplingOptions;
     private readonly JaegerOptions _jaegerOptions;
@@ -49,6 +52,9 @@ public class Startup
 
         _userCacheStoreOptions = new();
         Configuration.GetSection("UserCache:Store").Bind(_userCacheStoreOptions);
+
+        _idGenOptions = new();
+        Configuration.GetSection("IdGen").Bind(_idGenOptions);
 
         _jwtOptions = new();
         Configuration.GetSection("Jwt").Bind(_jwtOptions);
@@ -86,6 +92,9 @@ public class Startup
 
         // user db
         services.AddUserDb(_userDbOptions.Connect);
+
+        // id gen
+        services.AddIdGenClient(_idGenOptions);
 
         // common
         services.AddAutoMapper(config =>
@@ -149,6 +158,12 @@ public class Startup
                 tags: new[] { HealthTags.Health, HealthTags.Ready })
             .AddRedis("user-cache",
                 _userCacheStoreOptions,
+                tags: new[] { HealthTags.Health, HealthTags.Ready })
+            .AddUri(
+                "id-gen",
+                new Uri(_idGenOptions.Address!, _idGenOptions.HealthPath),
+                configureHttpClient: (_, client) => client.DefaultRequestVersion = new Version(2, 0),
+                timeout: _idGenOptions.HealthTimeout,
                 tags: new[] { HealthTags.Health, HealthTags.Ready });
 
         services.AddSingleton<ConfigDbInitHealthCheck>();
@@ -171,6 +186,10 @@ public class Startup
         IConfiguration userCacheStoreConfig = userCacheConfig.GetSection("Store");
         builder.RegisterModule(new UserDbAutofacModule(userCacheConfig, userCacheStoreConfig));
         builder.RegisterOptions<UserDbOptions>(Configuration.GetSection("UserDb"));
+
+        // id gen
+        IConfiguration idGenConfiguration = Configuration.GetSection("IdGen");
+        builder.RegisterModule(new IdGenAutofacModule(idGenConfiguration));
 
         // security
         builder.RegisterType<PasswordHasher>().As<IPasswordHasher>().SingleInstance();
