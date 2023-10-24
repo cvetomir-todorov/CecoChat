@@ -4,6 +4,7 @@ using Calzolari.Grpc.AspNetCore.Validation;
 using CecoChat.AspNet.Health;
 using CecoChat.AspNet.Prometheus;
 using CecoChat.Autofac;
+using CecoChat.Data.Config;
 using CecoChat.Data.User;
 using CecoChat.Data.User.Infra;
 using CecoChat.Jaeger;
@@ -27,6 +28,7 @@ namespace CecoChat.Server.User;
 
 public class Startup
 {
+    private readonly RedisOptions _configDbOptions;
     private readonly UserDbOptions _userDbOptions;
     private readonly RedisOptions _userCacheStoreOptions;
     private readonly JwtOptions _jwtOptions;
@@ -38,6 +40,9 @@ public class Startup
     {
         Configuration = configuration;
         Environment = environment;
+
+        _configDbOptions = new();
+        Configuration.GetSection("ConfigDb").Bind(_configDbOptions);
 
         _userDbOptions = new();
         Configuration.GetSection("UserDb").Bind(_userDbOptions);
@@ -128,9 +133,16 @@ public class Startup
     {
         services
             .AddHealthChecks()
+            .AddCheck<ConfigDbInitHealthCheck>(
+                "config-db-init",
+                tags: new[] { HealthTags.Health, HealthTags.Startup })
             .AddCheck<UserDbInitHealthCheck>(
                 "user-db-init",
                 tags: new[] { HealthTags.Health, HealthTags.Startup })
+            .AddRedis(
+                "config-db",
+                _configDbOptions,
+                tags: new[] { HealthTags.Health, HealthTags.Ready })
             .AddNpgsql(
                 "user-db",
                 _userDbOptions.Connect,
@@ -139,14 +151,20 @@ public class Startup
                 _userCacheStoreOptions,
                 tags: new[] { HealthTags.Health, HealthTags.Ready });
 
+        services.AddSingleton<ConfigDbInitHealthCheck>();
         services.AddSingleton<UserDbInitHealthCheck>();
     }
 
     public void ConfigureContainer(ContainerBuilder builder)
     {
         // ordered hosted services
+        builder.RegisterHostedService<InitDynamicConfig>();
         builder.RegisterHostedService<InitUsersDb>();
         builder.RegisterHostedService<AsyncProfileCaching>();
+
+        // config db
+        IConfiguration configDbConfig = Configuration.GetSection("ConfigDb");
+        builder.RegisterModule(new ConfigDbAutofacModule(configDbConfig, registerPartitioning: true));
 
         // user db
         IConfiguration userCacheConfig = Configuration.GetSection("UserCache");
