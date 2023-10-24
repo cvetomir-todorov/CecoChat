@@ -57,8 +57,8 @@ public sealed class BackplaneComponents : IBackplaneComponents
         _sendersProducer.PartitionCount = partitionCount;
         _receiversConsumer.Prepare(partitions);
 
-        _logger.LogInformation("Prepared backplane components for topic {TopicMessagesByReceiver} to use partitions {Partitions}",
-            _backplaneOptions.TopicMessagesByReceiver, partitions);
+        _logger.LogInformation("Prepared backplane components for topic {TopicMessagesByReceiver} to use partitions {Partitions} from {PartitionCount} partitions",
+            _backplaneOptions.TopicMessagesByReceiver, partitions, partitionCount);
     }
 
     public void StartConsumption(CancellationToken ct)
