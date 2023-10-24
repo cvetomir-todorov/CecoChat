@@ -5,20 +5,27 @@ using CecoChat.AspNet.Health;
 using CecoChat.AspNet.Prometheus;
 using CecoChat.Autofac;
 using CecoChat.Client.IdGen;
+using CecoChat.Contracts.Backplane;
 using CecoChat.Data.Config;
 using CecoChat.Data.User;
 using CecoChat.Data.User.Infra;
 using CecoChat.Http.Health;
 using CecoChat.Jaeger;
 using CecoChat.Jwt;
+using CecoChat.Kafka;
+using CecoChat.Kafka.Health;
+using CecoChat.Kafka.Telemetry;
 using CecoChat.Npgsql.Health;
 using CecoChat.Otel;
 using CecoChat.Redis;
 using CecoChat.Redis.Health;
+using CecoChat.Server.Backplane;
 using CecoChat.Server.Identity;
+using CecoChat.Server.User.Backplane;
 using CecoChat.Server.User.Endpoints;
 using CecoChat.Server.User.HostedServices;
 using CecoChat.Server.User.Security;
+using Confluent.Kafka;
 using FluentValidation;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Npgsql;
@@ -34,6 +41,7 @@ public class Startup
     private readonly UserDbOptions _userDbOptions;
     private readonly RedisOptions _userCacheStoreOptions;
     private readonly IdGenOptions _idGenOptions;
+    private readonly BackplaneOptions _backplaneOptions;
     private readonly JwtOptions _jwtOptions;
     private readonly OtelSamplingOptions _otelSamplingOptions;
     private readonly JaegerOptions _jaegerOptions;
@@ -55,6 +63,9 @@ public class Startup
 
         _idGenOptions = new();
         Configuration.GetSection("IdGen").Bind(_idGenOptions);
+
+        _backplaneOptions = new();
+        Configuration.GetSection("Backplane").Bind(_backplaneOptions);
 
         _jwtOptions = new();
         Configuration.GetSection("Jwt").Bind(_jwtOptions);
@@ -126,6 +137,7 @@ public class Startup
                     };
                     aspnet.Filter = httpContext => !excludedPaths.Contains(httpContext.Request.Path);
                 });
+                tracing.AddKafkaInstrumentation();
                 tracing.AddNpgsql();
                 tracing.ConfigureSampling(_otelSamplingOptions);
                 tracing.ConfigureJaegerExporter(_jaegerOptions);
@@ -152,6 +164,11 @@ public class Startup
                 "config-db",
                 _configDbOptions,
                 tags: new[] { HealthTags.Health, HealthTags.Ready })
+            .AddKafka(
+                "backplane",
+                _backplaneOptions.Kafka,
+                _backplaneOptions.Health,
+                tags: new[] { HealthTags.Health, HealthTags.Ready })
             .AddNpgsql(
                 "user-db",
                 _userDbOptions.Connect,
@@ -174,12 +191,20 @@ public class Startup
     {
         // ordered hosted services
         builder.RegisterHostedService<InitDynamicConfig>();
+        builder.RegisterHostedService<InitBackplane>();
         builder.RegisterHostedService<InitUsersDb>();
         builder.RegisterHostedService<AsyncProfileCaching>();
 
         // config db
         IConfiguration configDbConfig = Configuration.GetSection("ConfigDb");
         builder.RegisterModule(new ConfigDbAutofacModule(configDbConfig, registerPartitioning: true));
+
+        // backplane
+        builder.RegisterModule(new PartitionUtilityAutofacModule());
+        builder.RegisterType<TopicPartitionFlyweight>().As<ITopicPartitionFlyweight>().SingleInstance();
+        builder.RegisterFactory<KafkaProducer<Null, BackplaneMessage>, IKafkaProducer<Null, BackplaneMessage>>();
+        builder.RegisterModule(new KafkaAutofacModule());
+        builder.RegisterOptions<BackplaneOptions>(Configuration.GetSection("Backplane"));
 
         // user db
         IConfiguration userCacheConfig = Configuration.GetSection("UserCache");
