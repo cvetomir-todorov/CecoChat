@@ -20,19 +20,27 @@ public sealed class RedisAutofacModule : Module
         if (string.IsNullOrWhiteSpace(_name))
         {
             builder
+                .Register(_ => _redisConfiguration.Get<RedisOptions>()!)
+                .As<RedisOptions>()
+                .SingleInstance();
+            builder
                 .RegisterType<RedisContext>()
                 .As<IRedisContext>()
                 .SingleInstance();
         }
         else
         {
+            string optionsName = $"{_name}-options";
+
+            builder
+                .Register(_ => _redisConfiguration.Get<RedisOptions>()!)
+                .Named<RedisOptions>(optionsName)
+                .SingleInstance();
             builder
                 .RegisterType<RedisContext>()
-                .As<IRedisContext>()
                 .Named<IRedisContext>(_name)
+                .WithNamedParameter(typeof(RedisOptions), parameterName: optionsName)
                 .SingleInstance();
         }
-
-        builder.RegisterOptions<RedisOptions>(_redisConfiguration);
     }
 }
