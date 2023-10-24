@@ -1,4 +1,4 @@
-<mxfile host="Electron" modified="2023-08-08T15:13:41.846Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.6.5 Chrome/114.0.5735.243 Electron/25.3.1 Safari/537.36" etag="wIoGjCYIHrEzicXIg7XF" version="21.6.5" type="device">
+<mxfile host="Electron" modified="2023-10-24T11:42:15.659Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.0.3 Chrome/114.0.5735.289 Electron/25.8.4 Safari/537.36" etag="xPe37skgCezTRMG8-fe4" version="22.0.3" type="device">
   <diagram id="G4t1x3i_cumIOjZ8GDXV" name="Page-1">
     <mxGraphModel dx="2020" dy="1203" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
@@ -12,7 +12,7 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="ENQS6q1PjWJlhAXhEhIM-2" value="Register&lt;br&gt;Create session&lt;br&gt;Manage own&amp;nbsp;profile&lt;br&gt;Get public profiles&lt;br&gt;Get user chats&lt;br&gt;Get chat history" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="4NMri5ObQx2eB0Vx6lmc-1" target="8u_ZxKzGpFRI09v13LqC-1" edge="1">
+        <mxCell id="ENQS6q1PjWJlhAXhEhIM-2" value="Register&lt;br&gt;Create session&lt;br&gt;Manage own&amp;nbsp;profile&lt;br&gt;Manage connections&lt;br&gt;Get public profiles&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Get user chats&lt;br&gt;Get chat history" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="4NMri5ObQx2eB0Vx6lmc-1" target="8u_ZxKzGpFRI09v13LqC-1" edge="1">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
               <mxPoint x="120" y="330" />
@@ -103,7 +103,7 @@
           <mxGeometry x="0.4333" relative="1" as="geometry">
             <mxPoint as="offset" />
             <Array as="points">
-              <mxPoint x="780" y="490" />
+              <mxPoint x="780" y="480" />
               <mxPoint x="780" y="330" />
               <mxPoint x="360" y="330" />
               <mxPoint x="360" y="295" />
@@ -121,17 +121,17 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="8u_ZxKzGpFRI09v13LqC-8" value="Get chat history" style="endArrow=classic;html=1;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="8u_ZxKzGpFRI09v13LqC-1" target="ENQS6q1PjWJlhAXhEhIM-1" edge="1">
-          <mxGeometry x="-0.1916" width="50" height="50" relative="1" as="geometry">
+          <mxGeometry x="-0.1569" y="-2" width="50" height="50" relative="1" as="geometry">
             <mxPoint x="290" y="465" as="sourcePoint" />
             <mxPoint x="370" y="530" as="targetPoint" />
             <mxPoint as="offset" />
           </mxGeometry>
         </mxCell>
         <mxCell id="8u_ZxKzGpFRI09v13LqC-9" value="Get user chats" style="endArrow=classic;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" parent="1" source="8u_ZxKzGpFRI09v13LqC-1" target="8u_ZxKzGpFRI09v13LqC-4" edge="1">
-          <mxGeometry width="50" height="50" relative="1" as="geometry">
+          <mxGeometry x="0.0608" y="10" width="50" height="50" relative="1" as="geometry">
             <mxPoint x="280" y="260" as="sourcePoint" />
             <mxPoint x="330" y="210" as="targetPoint" />
-            <mxPoint as="offset" />
+            <mxPoint x="1" as="offset" />
           </mxGeometry>
         </mxCell>
         <mxCell id="u7EXwUm9e5_MvhXn00Du-1" value="&lt;font style=&quot;font-size: 12px&quot;&gt;User&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;gradientColor=#ffa500;fillColor=#ffcd28;strokeColor=#d79b00;" parent="1" vertex="1">
@@ -140,7 +140,7 @@
         <mxCell id="u7EXwUm9e5_MvhXn00Du-4" value="User DB" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;gradientColor=#7ea6e0;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
           <mxGeometry x="640" y="40" width="120" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="u7EXwUm9e5_MvhXn00Du-5" value="&lt;font style=&quot;font-size: 11px&quot;&gt;Create profile&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Update profile&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Get full profile&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Get public profiles&lt;br&gt;&lt;/font&gt;" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;startArrow=none;startFill=0;" parent="1" target="u7EXwUm9e5_MvhXn00Du-4" edge="1">
+        <mxCell id="u7EXwUm9e5_MvhXn00Du-5" value="&lt;font style=&quot;font-size: 11px&quot;&gt;Manage own profile&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Manage connections&lt;br&gt;Get public profiles&lt;br&gt;&lt;/font&gt;" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;startArrow=none;startFill=0;" parent="1" target="u7EXwUm9e5_MvhXn00Du-4" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="500" y="80" as="sourcePoint" />
             <mxPoint x="570" y="130" as="targetPoint" />
@@ -148,20 +148,21 @@
             <Array as="points" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="u7EXwUm9e5_MvhXn00Du-6" value="Create own profile&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Authenticate&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Manage own profile&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Get public profiles" style="endArrow=classic;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.25;exitDx=0;exitDy=0;" parent="1" source="8u_ZxKzGpFRI09v13LqC-1" target="u7EXwUm9e5_MvhXn00Du-1" edge="1">
-          <mxGeometry x="-0.0914" y="8" width="50" height="50" relative="1" as="geometry">
+        <mxCell id="u7EXwUm9e5_MvhXn00Du-6" value="Create own profile&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Authenticate&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Manage own profile&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Manage connections&lt;br&gt;Get public profiles" style="endArrow=classic;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.25;exitDx=0;exitDy=0;" parent="1" source="8u_ZxKzGpFRI09v13LqC-1" target="u7EXwUm9e5_MvhXn00Du-1" edge="1">
+          <mxGeometry x="-0.1353" y="19" width="50" height="50" relative="1" as="geometry">
             <mxPoint x="290" y="60" as="sourcePoint" />
             <mxPoint x="390" y="310" as="targetPoint" />
-            <mxPoint x="-1" as="offset" />
+            <mxPoint as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="eNCGF5EXhzy075C7Mp53-1" value="User cache" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;gradientColor=#7ea6e0;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+        <mxCell id="eNCGF5EXhzy075C7Mp53-1" value="User cache" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;gradientColor=#7ea6e0;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
           <mxGeometry x="640" y="140" width="120" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="eNCGF5EXhzy075C7Mp53-2" value="Store public profiles&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Fetch public profiles" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;exitX=1;exitY=0.75;exitDx=0;exitDy=0;" edge="1" parent="1" source="u7EXwUm9e5_MvhXn00Du-1" target="eNCGF5EXhzy075C7Mp53-1">
-          <mxGeometry relative="1" as="geometry">
+        <mxCell id="eNCGF5EXhzy075C7Mp53-2" value="Cache public profiles&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Cache connections" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;exitX=1;exitY=0.75;exitDx=0;exitDy=0;" parent="1" source="u7EXwUm9e5_MvhXn00Du-1" target="eNCGF5EXhzy075C7Mp53-1" edge="1">
+          <mxGeometry x="0.0792" y="-11" relative="1" as="geometry">
             <mxPoint x="490" y="170" as="sourcePoint" />
             <mxPoint x="590" y="190" as="targetPoint" />
+            <mxPoint as="offset" />
           </mxGeometry>
         </mxCell>
       </root>
