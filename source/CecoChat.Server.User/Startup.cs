@@ -203,6 +203,7 @@ public class Startup
         builder.RegisterModule(new PartitionUtilityAutofacModule());
         builder.RegisterType<TopicPartitionFlyweight>().As<ITopicPartitionFlyweight>().SingleInstance();
         builder.RegisterFactory<KafkaProducer<Null, BackplaneMessage>, IKafkaProducer<Null, BackplaneMessage>>();
+        builder.RegisterType<ConnectionNotifyProducer>().As<IConnectionNotifyProducer>().SingleInstance();
         builder.RegisterModule(new KafkaAutofacModule());
         builder.RegisterOptions<BackplaneOptions>(Configuration.GetSection("Backplane"));
 
@@ -218,6 +219,9 @@ public class Startup
 
         // security
         builder.RegisterType<PasswordHasher>().As<IPasswordHasher>().SingleInstance();
+
+        // shared
+        builder.RegisterType<MonotonicClock>().As<IClock>().SingleInstance();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

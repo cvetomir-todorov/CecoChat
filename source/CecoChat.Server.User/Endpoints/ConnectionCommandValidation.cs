@@ -4,6 +4,8 @@ using FluentValidation;
 
 namespace CecoChat.Server.User.Endpoints;
 
+// TODO: validate connection ID is different from current user
+
 public sealed class InviteRequestValidator : AbstractValidator<InviteRequest>
 {
     public InviteRequestValidator()

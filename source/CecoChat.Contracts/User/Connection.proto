@@ -11,6 +11,7 @@ message Connection {
 }
 
 enum ConnectionStatus {
-  PENDING = 0;
-  CONNECTED = 1;
+  NOT_CONNECTED = 0;
+  PENDING = 1;
+  CONNECTED = 2;
 }

@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <Protobuf Include="Backplane\BackplaneMessage.proto" />
+    <Protobuf Include="Backplane\ConnectionStatus.proto" />
     <Protobuf Include="Backplane\DataType.proto" />
     <Protobuf Include="Backplane\DeliveryStatus.proto" />
     <Protobuf Include="Backplane\MessageType.proto" />
