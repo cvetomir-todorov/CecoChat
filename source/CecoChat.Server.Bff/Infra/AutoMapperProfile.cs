@@ -26,6 +26,8 @@ public class AutoMapperProfile : AutoMapper.Profile
                 {
                     switch (connectionContract.Status)
                     {
+                        case Contracts.User.ConnectionStatus.NotConnected:
+                            return Contracts.Bff.Connections.ConnectionStatus.NotConnected;
                         case Contracts.User.ConnectionStatus.Pending:
                             return Contracts.Bff.Connections.ConnectionStatus.Pending;
                         case Contracts.User.ConnectionStatus.Connected:

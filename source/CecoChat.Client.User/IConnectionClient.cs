@@ -23,6 +23,7 @@ public readonly struct InviteResult
     public DateTime Version { get; init; }
     public bool MissingUser { get; init; }
     public bool AlreadyExists { get; init; }
+    public bool ConcurrentlyUpdated { get; init; }
 }
 
 public readonly struct ApproveResult

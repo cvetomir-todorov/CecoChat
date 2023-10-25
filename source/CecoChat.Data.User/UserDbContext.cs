@@ -58,6 +58,7 @@ public sealed class ConnectionEntity : IVersionEntity
 
 public enum ConnectionEntityStatus
 {
+    NotConnected,
     Pending,
     Connected
 }

@@ -30,21 +30,34 @@ public class ConnectionCommandService : ConnectionCommand.ConnectionCommandBase
     {
         UserClaims userClaims = context.GetUserClaimsGrpc(_logger);
 
+        Connection? existingConnection = await _queryRepo.GetConnection(userClaims.UserId, request.ConnectionId);
+        if (existingConnection == null)
+        {
+            return await AddNewConnectionForInvite(userClaims.UserId, request.ConnectionId);
+        }
+        else
+        {
+            return await UpdateExistingConnectionForInvite(userClaims.UserId, existingConnection);
+        }
+    }
+
+    private async Task<InviteResponse> AddNewConnectionForInvite(long userId, long connectionId)
+    {
         Connection connection = new()
         {
-            ConnectionId = request.ConnectionId,
+            ConnectionId = connectionId,
             Status = ConnectionStatus.Pending,
-            TargetUserId = request.ConnectionId
+            TargetUserId = connectionId
         };
 
-        AddConnectionResult result = await _commandRepo.AddConnection(userClaims.UserId, connection);
+        AddConnectionResult result = await _commandRepo.AddConnection(userId, connection);
         if (result.Success)
         {
             // set the missing version
             connection.Version = result.Version.ToTimestamp();
-            await _producer.NotifyConnectionChange(userClaims.UserId, connection, CancellationToken.None);
+            await _producer.NotifyConnectionChange(userId, connection, CancellationToken.None);
 
-            _logger.LogTrace("Responding with a successful invite from {UserId} to {ConnectionId}", userClaims.UserId, request.ConnectionId);
+            _logger.LogTrace("Responding with a successful invite from {UserId} to {ConnectionId}", userId, connectionId);
             return new InviteResponse
             {
                 Success = true,
@@ -53,7 +66,7 @@ public class ConnectionCommandService : ConnectionCommand.ConnectionCommandBase
         }
         if (result.MissingUser)
         {
-            _logger.LogTrace("Responding with a failed invite from {UserId} to {ConnectionId} because the connection ID is missing", userClaims.UserId, request.ConnectionId);
+            _logger.LogTrace("Responding with a failed invite from {UserId} to {ConnectionId} because the connection ID is missing", userId, connectionId);
             return new InviteResponse
             {
                 MissingUser = true
@@ -61,7 +74,7 @@ public class ConnectionCommandService : ConnectionCommand.ConnectionCommandBase
         }
         if (result.AlreadyExists)
         {
-            _logger.LogTrace("Responding with a failed invite from {UserId} to {ConnectionId} because the connection has already exists", userClaims.UserId, request.ConnectionId);
+            _logger.LogTrace("Responding with a failed invite from {UserId} to {ConnectionId} because the connection already exists", userId, connectionId);
             return new InviteResponse
             {
                 AlreadyExists = true
@@ -69,6 +82,42 @@ public class ConnectionCommandService : ConnectionCommand.ConnectionCommandBase
         }
 
         throw new ProcessingFailureException(typeof(AddConnectionResult));
+    }
+
+    private async Task<InviteResponse> UpdateExistingConnectionForInvite(long userId, Connection existingConnection)
+    {
+        if (existingConnection.Status != ConnectionStatus.NotConnected)
+        {
+            _logger.LogTrace("Responding with a failed invite from {UserId} to {ConnectionId} because the connection already exists", userId, existingConnection.ConnectionId);
+            return new InviteResponse
+            {
+                AlreadyExists = true
+            };
+        }
+
+        existingConnection.Status = ConnectionStatus.Pending;
+        existingConnection.TargetUserId = existingConnection.ConnectionId;
+
+        UpdateConnectionResult result = await _commandRepo.UpdateConnection(userId, existingConnection);
+        if (result.Success)
+        {
+            _logger.LogTrace("Responding with a successful invite from {UserId} to {ConnectionId}", userId, existingConnection.ConnectionId);
+            return new InviteResponse
+            {
+                Success = true,
+                Version = result.NewVersion.ToTimestamp()
+            };
+        }
+        if (result.ConcurrentlyUpdated)
+        {
+            _logger.LogTrace("Responding with a failed invite from {UserId} to {ConnectionId} because the connection has been concurrently updated", userId, existingConnection.ConnectionId);
+            return new InviteResponse
+            {
+                ConcurrentlyUpdated = true
+            };
+        }
+
+        throw new ProcessingFailureException(typeof(UpdateConnectionResult));
     }
 
     public override async Task<ApproveResponse> Approve(ApproveRequest request, ServerCallContext context)
@@ -111,7 +160,7 @@ public class ConnectionCommandService : ConnectionCommand.ConnectionCommandBase
         }
         if (result.ConcurrentlyUpdated)
         {
-            _logger.LogTrace("Responding with a failed approval from {UserId} to {ConnectionId}", userClaims.UserId, request.ConnectionId);
+            _logger.LogTrace("Responding with a failed approval from {UserId} to {ConnectionId} because the connection has been concurrently updated", userClaims.UserId, request.ConnectionId);
             return new ApproveResponse
             {
                 ConcurrentlyUpdated = true
@@ -144,8 +193,10 @@ public class ConnectionCommandService : ConnectionCommand.ConnectionCommandBase
         }
 
         existingConnection.Version = request.Version;
+        existingConnection.Status = ConnectionStatus.NotConnected;
+        existingConnection.TargetUserId = 0;
 
-        RemoveConnectionResult result = await _commandRepo.RemoveConnection(userClaims.UserId, existingConnection);
+        UpdateConnectionResult result = await _commandRepo.UpdateConnection(userClaims.UserId, existingConnection);
         if (result.Success)
         {
             existingConnection.Status = ConnectionStatus.NotConnected;
@@ -192,8 +243,10 @@ public class ConnectionCommandService : ConnectionCommand.ConnectionCommandBase
         }
 
         existingConnection.Version = request.Version;
+        existingConnection.Status = ConnectionStatus.NotConnected;
+        existingConnection.TargetUserId = 0;
 
-        RemoveConnectionResult result = await _commandRepo.RemoveConnection(userClaims.UserId, existingConnection);
+        UpdateConnectionResult result = await _commandRepo.UpdateConnection(userClaims.UserId, existingConnection);
         if (result.Success)
         {
             existingConnection.Status = ConnectionStatus.NotConnected;

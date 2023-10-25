@@ -72,6 +72,8 @@ internal class ConnectionQueryRepo : IConnectionQueryRepo
     {
         switch (entityStatus)
         {
+            case ConnectionEntityStatus.NotConnected:
+                return ConnectionStatus.NotConnected;
             case ConnectionEntityStatus.Pending:
                 return ConnectionStatus.Pending;
             case ConnectionEntityStatus.Connected:
