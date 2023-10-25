@@ -5,7 +5,8 @@ public enum MessageType
     Disconnect = 0,
     DeliveryStatus = 1,
     Data = 2,
-    Reaction = 3
+    Reaction = 3,
+    Connection = 4
 }
 
 public enum DataType
@@ -20,4 +21,11 @@ public enum DeliveryStatus
     Processed = 2,
     Delivered = 3,
     Seen = 4
+}
+
+public enum ConnectionStatus
+{
+    NotConnected = 0,
+    Pending = 1,
+    Connected = 2
 }

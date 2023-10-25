@@ -14,6 +14,7 @@ public sealed class ListenNotification
     public DeliveryStatus DeliveryStatus { get; init; }
     public NotificationData? Data { get; set; }
     public NotificationReaction? Reaction { get; set; }
+    public NotificationConnection? Connection { get; set; }
 }
 
 public sealed class NotificationData
@@ -26,4 +27,10 @@ public sealed class NotificationReaction
 {
     public long ReactorId { get; init; }
     public string Reaction { get; init; } = string.Empty;
+}
+
+public sealed class NotificationConnection
+{
+    public ConnectionStatus Status { get; init; }
+    public DateTime Version { get; init; }
 }
