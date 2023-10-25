@@ -80,6 +80,7 @@ public sealed class HistoryConsumer : IHistoryConsumer
                 break;
             case MessageType.Disconnect:
             case MessageType.Delivery:
+            case MessageType.Connection:
                 // ignore these
                 break;
             default:

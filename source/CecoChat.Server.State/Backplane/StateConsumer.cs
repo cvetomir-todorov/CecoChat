@@ -107,7 +107,10 @@ public sealed class StateConsumer : IStateConsumer
                 // ignore because the message ID is for a previously sent message
                 break;
             case MessageType.Disconnect:
-                // ignore these
+                // ignore because this is designated to the client apps only
+                break;
+            case MessageType.Connection:
+                // ignore because this is designated to the client apps only
                 break;
             default:
                 throw new EnumValueNotSupportedException(backplaneMessage.Type);
@@ -128,6 +131,9 @@ public sealed class StateConsumer : IStateConsumer
                 // ignore because the message ID is for a previously sent message
                 break;
             case MessageType.Disconnect:
+                // ignore because this is designated to the client apps only
+                break;
+            case MessageType.Connection:
                 // ignore because this is designated to the client apps only
                 break;
             default:
