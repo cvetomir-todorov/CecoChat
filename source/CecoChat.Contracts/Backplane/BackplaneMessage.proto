@@ -1,9 +1,11 @@
 syntax = "proto3";
 option csharp_namespace = "CecoChat.Contracts.Backplane";
 package CecoChat.Contracts.Backplane;
+import "google/protobuf/timestamp.proto";
 import "Backplane/MessageType.proto";
 import "Backplane/DataType.proto";
 import "Backplane/DeliveryStatus.proto";
+import "Backplane/ConnectionStatus.proto";
 
 message BackplaneMessage {
   int64 message_id = 1;
@@ -16,6 +18,7 @@ message BackplaneMessage {
     BackplaneData data = 7;
     DeliveryStatus status = 8;
     BackplaneReaction reaction = 9;
+    BackplaneConnection connection = 10;
   }
 }
 
@@ -27,4 +30,9 @@ message BackplaneData {
 message BackplaneReaction {
   int64 reactor_id = 1;
   string reaction = 2;
+}
+
+message BackplaneConnection {
+  ConnectionStatus status = 1;
+  google.protobuf.Timestamp version = 2;
 }

@@ -1,6 +1,7 @@
 using CecoChat.Contracts.User;
 using CecoChat.Data.User.Connections;
 using CecoChat.Server.Identity;
+using CecoChat.Server.User.Backplane;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 
@@ -11,15 +12,18 @@ public class ConnectionCommandService : ConnectionCommand.ConnectionCommandBase
     private readonly ILogger _logger;
     private readonly IConnectionQueryRepo _queryRepo;
     private readonly IConnectionCommandRepo _commandRepo;
+    private readonly IConnectionNotifyProducer _producer;
 
     public ConnectionCommandService(
         ILogger<ConnectionCommandService> logger,
         IConnectionQueryRepo queryRepo,
-        IConnectionCommandRepo commandRepo)
+        IConnectionCommandRepo commandRepo,
+        IConnectionNotifyProducer producer)
     {
         _logger = logger;
         _queryRepo = queryRepo;
         _commandRepo = commandRepo;
+        _producer = producer;
     }
 
     public override async Task<InviteResponse> Invite(InviteRequest request, ServerCallContext context)
@@ -36,6 +40,10 @@ public class ConnectionCommandService : ConnectionCommand.ConnectionCommandBase
         AddConnectionResult result = await _commandRepo.AddConnection(userClaims.UserId, connection);
         if (result.Success)
         {
+            // set the missing version
+            connection.Version = result.Version.ToTimestamp();
+            await _producer.NotifyConnectionChange(userClaims.UserId, connection, CancellationToken.None);
+
             _logger.LogTrace("Responding with a successful invite from {UserId} to {ConnectionId}", userClaims.UserId, request.ConnectionId);
             return new InviteResponse
             {
@@ -92,6 +100,8 @@ public class ConnectionCommandService : ConnectionCommand.ConnectionCommandBase
         UpdateConnectionResult result = await _commandRepo.UpdateConnection(userClaims.UserId, existingConnection);
         if (result.Success)
         {
+            await _producer.NotifyConnectionChange(userClaims.UserId, existingConnection, CancellationToken.None);
+
             _logger.LogTrace("Responding with a successful approval from {UserId} to {ConnectionId}", userClaims.UserId, request.ConnectionId);
             return new ApproveResponse
             {
@@ -138,6 +148,9 @@ public class ConnectionCommandService : ConnectionCommand.ConnectionCommandBase
         RemoveConnectionResult result = await _commandRepo.RemoveConnection(userClaims.UserId, existingConnection);
         if (result.Success)
         {
+            existingConnection.Status = ConnectionStatus.NotConnected;
+            await _producer.NotifyConnectionChange(userClaims.UserId, existingConnection, CancellationToken.None);
+
             _logger.LogTrace("Responding with a successful cancel from {UserId} to {ConnectionId}", userClaims.UserId, request.ConnectionId);
             return new CancelResponse
             {
@@ -183,6 +196,9 @@ public class ConnectionCommandService : ConnectionCommand.ConnectionCommandBase
         RemoveConnectionResult result = await _commandRepo.RemoveConnection(userClaims.UserId, existingConnection);
         if (result.Success)
         {
+            existingConnection.Status = ConnectionStatus.NotConnected;
+            await _producer.NotifyConnectionChange(userClaims.UserId, existingConnection, CancellationToken.None);
+
             _logger.LogTrace("Responding with a successful removal from {UserId} to {ConnectionId}", userClaims.UserId, request.ConnectionId);
             return new RemoveResponse
             {
