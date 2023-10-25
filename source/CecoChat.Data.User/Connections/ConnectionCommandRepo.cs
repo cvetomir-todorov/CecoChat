@@ -151,6 +151,8 @@ internal class ConnectionCommandRepo : IConnectionCommandRepo
     {
         switch (status)
         {
+            case ConnectionStatus.NotConnected:
+                return ConnectionEntityStatus.NotConnected;
             case ConnectionStatus.Pending:
                 return ConnectionEntityStatus.Pending;
             case ConnectionStatus.Connected:

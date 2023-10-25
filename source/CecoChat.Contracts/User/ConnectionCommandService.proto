@@ -19,6 +19,7 @@ message InviteResponse {
   google.protobuf.Timestamp version = 2;
   bool missing_user = 3;
   bool already_exists = 4;
+  bool concurrently_updated = 5;
 }
 
 message ApproveRequest {

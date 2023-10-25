@@ -20,6 +20,7 @@ public sealed class Connection
 
 public enum ConnectionStatus
 {
+    NotConnected,
     Pending,
     Connected
 }

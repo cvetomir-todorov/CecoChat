@@ -94,6 +94,14 @@ internal sealed class ConnectionClient : IConnectionClient
                 AlreadyExists = true
             };
         }
+        if (response.ConcurrentlyUpdated)
+        {
+            _logger.LogTrace("Received a failed invite from {UserId} to {ConnectionId} because the connection has been concurrently updated", userId, request.ConnectionId);
+            return new InviteResult
+            {
+                ConcurrentlyUpdated = true
+            };
+        }
 
         throw new ProcessingFailureException(typeof(InviteResponse));
     }
@@ -136,7 +144,7 @@ internal sealed class ConnectionClient : IConnectionClient
         }
         if (response.ConcurrentlyUpdated)
         {
-            _logger.LogTrace("Received a failed approval from {UserId} to {ConnectionId}", userId, request.ConnectionId);
+            _logger.LogTrace("Received a failed approval from {UserId} to {ConnectionId} because the connection has been concurrently updated", userId, request.ConnectionId);
             return new ApproveResult
             {
                 ConcurrentlyUpdated = true

@@ -88,6 +88,14 @@ public class ConnectionController : ControllerBase
                 Detail = "Already exists"
             });
         }
+        if (result.ConcurrentlyUpdated)
+        {
+            _logger.LogTrace("Responding with a failed invite from {UserId} to {ConnectionId} because the connection has been concurrently updated", userClaims.UserId, connectionId);
+            return Conflict(new ProblemDetails
+            {
+                Detail = "Concurrently updated"
+            });
+        }
 
         throw new ProcessingFailureException(typeof(InviteResult));
     }
@@ -129,7 +137,7 @@ public class ConnectionController : ControllerBase
         }
         if (result.ConcurrentlyUpdated)
         {
-            _logger.LogTrace("Responding with a failed approval from {UserId} to {ConnectionId}", userClaims.UserId, connectionId);
+            _logger.LogTrace("Responding with a failed approval from {UserId} to {ConnectionId} because the connection has been concurrently updated", userClaims.UserId, connectionId);
             return Conflict(new ProblemDetails
             {
                 Detail = "Concurrently updated"
