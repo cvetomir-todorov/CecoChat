@@ -188,6 +188,9 @@ public class ContractMapper : IContractMapper
             case Contracts.Backplane.MessageType.Reaction:
                 SetReaction(backplaneMessage, notification);
                 break;
+            case Contracts.Backplane.MessageType.Connection:
+                SetConnection(backplaneMessage, notification);
+                break;
             default:
                 throw new EnumValueNotSupportedException(backplaneMessage.Type);
         }
@@ -219,6 +222,32 @@ public class ContractMapper : IContractMapper
         {
             ReactorId = backplaneMessage.Reaction.ReactorId,
             Reaction = backplaneMessage.Reaction.Reaction
+        };
+    }
+
+    private static void SetConnection(BackplaneMessage backplaneMessage, ListenNotification notification)
+    {
+        Contracts.Messaging.ConnectionStatus status;
+        switch (backplaneMessage.Connection.Status)
+        {
+            case Contracts.Backplane.ConnectionStatus.NotConnected:
+                status = Contracts.Messaging.ConnectionStatus.NotConnected;
+                break;
+            case Contracts.Backplane.ConnectionStatus.Pending:
+                status = Contracts.Messaging.ConnectionStatus.Pending;
+                break;
+            case Contracts.Backplane.ConnectionStatus.Connected:
+                status = Contracts.Messaging.ConnectionStatus.Connected;
+                break;
+            default:
+                throw new EnumValueNotSupportedException(backplaneMessage.Connection.Status);
+        }
+
+        notification.Type = Contracts.Messaging.MessageType.Connection;
+        notification.Connection = new NotificationConnection
+        {
+            Status = status,
+            Version = backplaneMessage.Connection.Version.ToDateTime()
         };
     }
 }
