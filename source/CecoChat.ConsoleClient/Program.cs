@@ -15,15 +15,17 @@ public static class Program
         await Authenticate(client, credentials);
 
         MessageStorage messageStorage = new(client.UserId);
-        ChangeHandler changeHandler = new(messageStorage);
+        ConnectionStorage connectionStorage = new();
+        ChangeHandler changeHandler = new(client.UserId, messageStorage, connectionStorage);
 
         client.Disconnected += (_, _) => Console.WriteLine("Disconnected.");
         client.MessageReceived += (_, notification) => changeHandler.AddReceivedMessage(notification);
         client.MessageDelivered += (_, notification) => changeHandler.UpdateDeliveryStatus(notification);
-        client.ReactionReceived += (_, notification) => changeHandler.UpdateReaction(notification);
+        client.ReactionReceived += (_, notification) => changeHandler.HandleReaction(notification);
+        client.ConnectionNotificationReceived += (_, notification) => changeHandler.HandleConnectionChange(notification);
         await client.StartMessaging(CancellationToken.None);
 
-        await RunStateMachine(client, messageStorage);
+        await RunStateMachine(client, messageStorage, connectionStorage);
 
         await client.DisposeAsync();
         Console.WriteLine("Bye!");
@@ -79,13 +81,17 @@ public static class Program
 
     private static Credentials ChooseCredentials()
     {
-        Console.WriteLine("Console users (if seeded): 'bob' (ID=1), 'alice' (ID=2), 'john' (ID=3), 'peter' (ID=1200)");
+        Console.WriteLine("Console users (if seeded): 'bobby' (ID=1), 'alice' (ID=2), 'john' (ID=3), 'peter' (ID=1200)");
 
         Console.Write("User: ");
         string userName = Console.ReadLine() ?? string.Empty;
 
         Console.Write("Pass: ");
         string password = Console.ReadLine() ?? string.Empty;
+        if (password.Length == 0)
+        {
+            password = "secret12";
+        }
 
         return new Credentials(userName, password);
     }
@@ -138,11 +144,9 @@ public static class Program
 
     private sealed record Credentials(string UserName, string Password);
 
-    private static async Task RunStateMachine(ChatClient client, MessageStorage messageStorage)
+    private static async Task RunStateMachine(ChatClient client, MessageStorage messageStorage, ConnectionStorage connectionStorage)
     {
-        ConnectionStorage connectionStorage = new();
         ProfileStorage profileStorage = new();
-
         StateContainer states = new(client, messageStorage, connectionStorage, profileStorage);
         states.Context.ReloadData = true;
         State currentState = states.AllChats;

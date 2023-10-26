@@ -18,5 +18,7 @@ public interface IMessagingClient : IAsyncDisposable
 
     event EventHandler<ListenNotification>? MessageDelivered;
 
+    event EventHandler<ListenNotification>? ConnectionNotificationReceived;
+
     event EventHandler? Disconnected;
 }

@@ -79,14 +79,13 @@ public sealed class OneChatState : State
             MessageStorage.AddMessage(message);
         }
 
-        ProfileStorage.AddOrUpdateProfile(screen.Profile!);
+        if (screen.Profile != null)
+        {
+            ProfileStorage.AddOrUpdateProfile(screen.Profile);
+        }
         if (screen.Connection != null)
         {
-            ConnectionStorage.AddOrUpdateConnection(screen.Connection!);
-        }
-        else
-        {
-            ConnectionStorage.RemoveConnection(otherUserId);
+            ConnectionStorage.UpdateConnection(screen.Connection);
         }
     }
 

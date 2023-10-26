@@ -1,14 +1,19 @@
 using CecoChat.Contracts.Messaging;
+using CecoChat.Data;
 
 namespace CecoChat.ConsoleClient.LocalStorage;
 
 public class ChangeHandler
 {
-    private readonly MessageStorage _storage;
+    private readonly long _userId;
+    private readonly MessageStorage _messageStorage;
+    private readonly ConnectionStorage _connectionStorage;
 
-    public ChangeHandler(MessageStorage storage)
+    public ChangeHandler(long userId, MessageStorage messageStorage, ConnectionStorage connectionStorage)
     {
-        _storage = storage;
+        _userId = userId;
+        _messageStorage = messageStorage;
+        _connectionStorage = connectionStorage;
     }
 
     public void AddReceivedMessage(ListenNotification notification)
@@ -39,7 +44,7 @@ public class ChangeHandler
                 throw new EnumValueNotSupportedException(notification.Data.Type);
         }
 
-        _storage.AddMessage(message);
+        _messageStorage.AddMessage(message);
     }
 
     public void UpdateDeliveryStatus(ListenNotification notification)
@@ -49,14 +54,14 @@ public class ChangeHandler
             throw new InvalidOperationException($"Notification {notification} should have type {MessageType.DeliveryStatus}.");
         }
 
-        if (!_storage.TryGetChat(notification.SenderId, notification.ReceiverId, out Chat? chat))
+        if (!_messageStorage.TryGetChat(notification.SenderId, notification.ReceiverId, out Chat? chat))
         {
-            long otherUserId = _storage.GetOtherUserId(notification.SenderId, notification.ReceiverId);
+            long otherUserId = DataUtility.GetOtherUserId(_userId, notification.SenderId, notification.ReceiverId);
             chat = new Chat(otherUserId)
             {
                 NewestMessage = notification.MessageId
             };
-            _storage.AddOrUpdateChat(chat);
+            _messageStorage.AddOrUpdateChat(chat);
         }
 
         switch (notification.DeliveryStatus)
@@ -75,7 +80,7 @@ public class ChangeHandler
         }
     }
 
-    public void UpdateReaction(ListenNotification notification)
+    public void HandleReaction(ListenNotification notification)
     {
         if (notification.Type != MessageType.Reaction)
         {
@@ -86,7 +91,7 @@ public class ChangeHandler
             throw new InvalidOperationException($"Notification {notification} should have its {nameof(ListenNotification.Reaction)} property not null.");
         }
 
-        if (!_storage.TryGetMessage(notification.SenderId, notification.ReceiverId, notification.MessageId, out Message? message))
+        if (!_messageStorage.TryGetMessage(notification.SenderId, notification.ReceiverId, notification.MessageId, out Message? message))
         {
             // the message is not in the local history
             return;
@@ -103,5 +108,36 @@ public class ChangeHandler
         {
             message.Reactions.Add(notification.Reaction.ReactorId, notification.Reaction.Reaction);
         }
+    }
+
+    public void HandleConnectionChange(ListenNotification notification)
+    {
+        if (notification.Type != MessageType.Connection)
+        {
+            throw new InvalidOperationException($"Notification {notification} should have type {MessageType.Connection}.");
+        }
+        if (notification.Connection == null)
+        {
+            throw new InvalidOperationException($"Notification {notification} should have its {nameof(ListenNotification.Connection)} property not null.");
+        }
+
+        ConnectionStatus status;
+        switch (notification.Connection.Status)
+        {
+            case Contracts.Messaging.ConnectionStatus.NotConnected:
+                status = ConnectionStatus.NotConnected;
+                break;
+            case Contracts.Messaging.ConnectionStatus.Pending:
+                status = ConnectionStatus.Pending;
+                break;
+            case Contracts.Messaging.ConnectionStatus.Connected:
+                status = ConnectionStatus.Connected;
+                break;
+            default:
+                throw new EnumValueNotSupportedException(notification.Connection.Status);
+        }
+
+        long connectionId = DataUtility.GetOtherUserId(_userId, notification.SenderId, notification.ReceiverId);
+        _connectionStorage.UpdateConnection(connectionId, status, notification.Connection.Version);
     }
 }

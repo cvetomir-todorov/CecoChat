@@ -73,7 +73,7 @@ public sealed class AllChatsState : State
             MessageStorage.AddOrUpdateChat(chat);
         }
 
-        ConnectionStorage.ReplaceConnections(screen.Connections);
+        ConnectionStorage.UpdateConnections(screen.Connections);
 
         foreach (ProfilePublic profile in screen.Profiles)
         {
