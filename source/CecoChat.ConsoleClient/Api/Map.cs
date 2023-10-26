@@ -9,7 +9,7 @@ public static class Map
         List<LocalStorage.Chat> chats = new(capacity: bffChats.Length);
         foreach (Contracts.Bff.Chats.ChatState bffChat in bffChats)
         {
-            long otherUserId = DataUtility.GetOtherUsedId(bffChat.ChatId, currentUserId);
+            long otherUserId = DataUtility.GetOtherUserId(bffChat.ChatId, currentUserId);
             LocalStorage.Chat chat = BffChat(bffChat, otherUserId);
             chats.Add(chat);
         }
