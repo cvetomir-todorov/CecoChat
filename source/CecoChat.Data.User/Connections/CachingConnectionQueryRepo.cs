@@ -8,7 +8,7 @@ using StackExchange.Redis;
 
 namespace CecoChat.Data.User.Connections;
 
-public class CachingConnectionQueryRepo : IConnectionQueryRepo
+public class CachingConnectionQueryRepo : ICachingConnectionQueryRepo
 {
     private readonly ILogger _logger;
     private readonly UserCacheOptions _cacheOptions;
