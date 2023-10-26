@@ -44,6 +44,7 @@ public class ManageConnectionState : State
         }
         else
         {
+            // includes local refresh
             unexpectedKey = true;
         }
 
@@ -61,7 +62,7 @@ public class ManageConnectionState : State
 
     private void DisplayConnection(LocalStorage.Connection? connection)
     {
-        if (connection == null)
+        if (connection == null || connection.Status == LocalStorage.ConnectionStatus.NotConnected)
         {
             Console.Write("Not connected | Send an invite (press 'i')");
         }
@@ -77,7 +78,7 @@ public class ManageConnectionState : State
                 throw new EnumValueNotSupportedException(connection.Status);
         }
 
-        Console.WriteLine(" | Return (press 'x')");
+        Console.WriteLine(" | Local refresh (press 'l') | Return (press 'x')");
     }
 
     private async Task SendInvite(long userId)
