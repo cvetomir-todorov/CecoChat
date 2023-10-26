@@ -64,6 +64,16 @@ public static class IdentityExtensions
         return true;
     }
 
+    public static UserClaims GetUserClaimsHttp(this HttpContext httpContext)
+    {
+        if (!httpContext.User.TryGetUserClaims(out UserClaims? userClaims))
+        {
+            throw new InvalidOperationException("User has authenticated but data cannot be parsed from the access token.");
+        }
+
+        return userClaims;
+    }
+
     public static UserClaims GetUserClaimsSignalR(this ClaimsPrincipal user, string connection, ILogger logger, bool setUserIdTag = true)
     {
         if (!user.TryGetUserClaims(out UserClaims? userClaims))
