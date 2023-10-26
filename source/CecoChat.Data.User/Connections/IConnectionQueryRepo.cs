@@ -8,3 +8,6 @@ public interface IConnectionQueryRepo
 
     Task<IReadOnlyCollection<Connection>> GetConnections(long userId);
 }
+
+public interface ICachingConnectionQueryRepo : IConnectionQueryRepo
+{ }

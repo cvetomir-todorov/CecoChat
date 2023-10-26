@@ -44,7 +44,7 @@ public class UserDbAutofacModule : Module
 
         builder
             .RegisterType<CachingProfileQueryRepo>()
-            .Named<IProfileQueryRepo>("c-pr-repo")
+            .Named<IProfileQueryRepo>("ca-pr-repo")
             .InstancePerLifetimeScope();
         builder
             .RegisterType<ProfileQueryRepo>()
@@ -52,7 +52,7 @@ public class UserDbAutofacModule : Module
             .InstancePerLifetimeScope();
         builder
             .RegisterDecorator<IProfileQueryRepo>(
-                decorator: (context, inner) => context.ResolveNamed<IProfileQueryRepo>("c-pr-repo", TypedParameter.From(inner)),
+                decorator: (context, inner) => context.ResolveNamed<IProfileQueryRepo>("ca-pr-repo", TypedParameter.From(inner)),
                 fromKey: "pr-repo")
             .InstancePerLifetimeScope();
     }
@@ -65,18 +65,13 @@ public class UserDbAutofacModule : Module
             .InstancePerLifetimeScope();
 
         builder
-            .RegisterType<CachingConnectionQueryRepo>()
-            .Named<IConnectionQueryRepo>("c-conn-q-repo")
-            .WithNamedParameter(typeof(IRedisContext), RedisContextName)
-            .InstancePerLifetimeScope();
-        builder
             .RegisterType<ConnectionQueryRepo>()
-            .Named<IConnectionQueryRepo>("conn-q-repo")
+            .As<IConnectionQueryRepo>()
             .InstancePerLifetimeScope();
         builder
-            .RegisterDecorator<IConnectionQueryRepo>(
-                decorator: (context, inner) => context.ResolveNamed<IConnectionQueryRepo>("c-conn-q-repo", TypedParameter.From(inner)),
-                fromKey: "conn-q-repo")
+            .RegisterType<CachingConnectionQueryRepo>()
+            .As<ICachingConnectionQueryRepo>()
+            .WithNamedParameter(typeof(IRedisContext), RedisContextName)
             .InstancePerLifetimeScope();
     }
 }

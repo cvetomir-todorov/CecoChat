@@ -8,9 +8,9 @@ namespace CecoChat.Server.User.Endpoints;
 public class ConnectionQueryService : ConnectionQuery.ConnectionQueryBase
 {
     private readonly ILogger _logger;
-    private readonly IConnectionQueryRepo _repo;
+    private readonly ICachingConnectionQueryRepo _repo;
 
-    public ConnectionQueryService(ILogger<ConnectionQueryService> logger, IConnectionQueryRepo repo)
+    public ConnectionQueryService(ILogger<ConnectionQueryService> logger, ICachingConnectionQueryRepo repo)
     {
         _logger = logger;
         _repo = repo;
