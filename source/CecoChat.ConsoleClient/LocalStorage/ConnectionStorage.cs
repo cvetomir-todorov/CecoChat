@@ -19,60 +19,47 @@ public class ConnectionStorage
         }
     }
 
-    public void ReplaceConnections(IEnumerable<Connection> connections)
+    public Connection? GetConnection(long connectionId)
     {
-        _connectionsMap.Clear();
-
-        foreach (Connection connection in connections)
-        {
-            _connectionsMap.TryAdd(connection.ConnectionId, connection);
-        }
-    }
-
-    public Connection? GetConnection(long userId)
-    {
-        _connectionsMap.TryGetValue(userId, out Connection? connection);
+        _connectionsMap.TryGetValue(connectionId, out Connection? connection);
         return connection;
     }
 
-    public void AddConnection(long userId, ConnectionStatus status, DateTime version)
+    public void UpdateConnections(IEnumerable<Connection> connections)
     {
-        Connection connection = new()
+        foreach (Connection connection in connections)
         {
-            ConnectionId = userId,
-            Status = status,
-            Version = version
-        };
-
-        _connectionsMap.TryAdd(connection.ConnectionId, connection);
-    }
-
-    public void UpdateConnection(long userId, ConnectionStatus newStatus, DateTime newVersion)
-    {
-        if (!_connectionsMap.TryGetValue(userId, out Connection? connection))
-        {
-            throw new InvalidOperationException($"Failed to get an existing connection for user {userId}.");
-        }
-
-        connection.Status = newStatus;
-        connection.Version = newVersion;
-    }
-
-    public void AddOrUpdateConnection(Connection connection)
-    {
-        if (_connectionsMap.TryGetValue(connection.ConnectionId, out Connection? existing))
-        {
-            existing.Status = connection.Status;
-            existing.Version = connection.Version;
-        }
-        else
-        {
-            _connectionsMap.TryAdd(connection.ConnectionId, connection);
+            UpdateConnection(connection);
         }
     }
 
-    public void RemoveConnection(long connectionId)
+    public void UpdateConnection(Connection connection)
     {
-        _connectionsMap.TryRemove(connectionId, out _);
+        UpdateConnection(connection.ConnectionId, connection.Status, connection.Version);
+    }
+
+    public void UpdateConnection(long connectionId, ConnectionStatus newStatus, DateTime newVersion)
+    {
+        _connectionsMap.AddOrUpdate(
+            connectionId,
+            addValueFactory: id =>
+            {
+                return new Connection
+                {
+                    ConnectionId = id, Status = newStatus, Version = newVersion
+                };
+            },
+            updateValueFactory: (id, existing) =>
+            {
+                if (existing.Version >= newVersion)
+                {
+                    return existing;
+                }
+
+                return new Connection
+                {
+                    ConnectionId = id, Status = newStatus, Version = newVersion
+                };
+            });
     }
 }

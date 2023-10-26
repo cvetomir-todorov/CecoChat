@@ -82,6 +82,7 @@ public sealed class ChatClient : IAsyncDisposable
         _messagingClient.MessageReceived += (sender, notification) => MessageReceived?.Invoke(sender, notification);
         _messagingClient.ReactionReceived += (sender, notification) => ReactionReceived?.Invoke(sender, notification);
         _messagingClient.MessageDelivered += (sender, notification) => MessageDelivered?.Invoke(sender, notification);
+        _messagingClient.ConnectionNotificationReceived += (sender, notification) => ConnectionNotificationReceived?.Invoke(sender, notification);
         _messagingClient.Disconnected += (sender, e) => Disconnected?.Invoke(sender, e);
 
         await _messagingClient.Connect(_messagingServerAddress, _accessToken, ct);
@@ -92,6 +93,8 @@ public sealed class ChatClient : IAsyncDisposable
     public event EventHandler<ListenNotification>? ReactionReceived;
 
     public event EventHandler<ListenNotification>? MessageDelivered;
+
+    public event EventHandler<ListenNotification>? ConnectionNotificationReceived; 
 
     public event EventHandler? Disconnected;
 

@@ -90,7 +90,7 @@ public class ManageConnectionState : State
         }
         else
         {
-            ConnectionStorage.AddConnection(userId, LocalStorage.ConnectionStatus.Pending, response.Content!.Version);
+            ConnectionStorage.UpdateConnection(userId, LocalStorage.ConnectionStatus.Pending, response.Content!.Version);
             DisplaySuccess("Invite sent.");
         }
     }
@@ -118,7 +118,7 @@ public class ManageConnectionState : State
         }
         else
         {
-            ConnectionStorage.RemoveConnection(connection.ConnectionId);
+            ConnectionStorage.UpdateConnection(connection.ConnectionId, LocalStorage.ConnectionStatus.NotConnected, response.Content!.NewVersion);
             DisplaySuccess("Invite removed.");
         }
     }
@@ -132,7 +132,7 @@ public class ManageConnectionState : State
         }
         else
         {
-            ConnectionStorage.RemoveConnection(connection.ConnectionId);
+            ConnectionStorage.UpdateConnection(connection.ConnectionId, LocalStorage.ConnectionStatus.NotConnected, response.Content!.NewVersion);
             DisplaySuccess("Connection removed.");
         }
     }

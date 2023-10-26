@@ -66,6 +66,9 @@ public sealed class MessagingClient : IMessagingClient
                 case MessageType.Reaction:
                     ReactionReceived?.Invoke(this, notification);
                     break;
+                case MessageType.Connection:
+                    ConnectionNotificationReceived?.Invoke(this, notification);
+                    break;
                 default:
                     throw new EnumValueNotSupportedException(notification.Type);
             }
@@ -109,6 +112,8 @@ public sealed class MessagingClient : IMessagingClient
     public event EventHandler<ListenNotification>? ReactionReceived;
 
     public event EventHandler<ListenNotification>? MessageDelivered;
+
+    public event EventHandler<ListenNotification>? ConnectionNotificationReceived;
 
     public event EventHandler? Disconnected;
 }
