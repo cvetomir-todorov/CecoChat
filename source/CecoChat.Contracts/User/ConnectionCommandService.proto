@@ -42,9 +42,10 @@ message CancelRequest {
 
 message CancelResponse {
   bool success = 1;
-  bool missing_connection = 2;
-  bool invalid = 3;
-  bool concurrently_updated = 4;
+  google.protobuf.Timestamp new_version = 2;
+  bool missing_connection = 3;
+  bool invalid = 4;
+  bool concurrently_updated = 5;
 }
 
 message RemoveRequest {
@@ -54,7 +55,8 @@ message RemoveRequest {
 
 message RemoveResponse {
   bool success = 1;
-  bool missing_connection = 2;
-  bool invalid = 3;
-  bool concurrently_updated = 4;
+  google.protobuf.Timestamp new_version = 2;
+  bool missing_connection = 3;
+  bool invalid = 4;
+  bool concurrently_updated = 5;
 }

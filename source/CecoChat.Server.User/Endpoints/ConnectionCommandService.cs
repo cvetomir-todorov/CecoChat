@@ -205,7 +205,8 @@ public class ConnectionCommandService : ConnectionCommand.ConnectionCommandBase
             _logger.LogTrace("Responding with a successful cancel from {UserId} to {ConnectionId}", userClaims.UserId, request.ConnectionId);
             return new CancelResponse
             {
-                Success = true
+                Success = true,
+                NewVersion = result.NewVersion.ToTimestamp()
             };
         }
         if (result.ConcurrentlyUpdated)
@@ -255,7 +256,8 @@ public class ConnectionCommandService : ConnectionCommand.ConnectionCommandBase
             _logger.LogTrace("Responding with a successful removal from {UserId} to {ConnectionId}", userClaims.UserId, request.ConnectionId);
             return new RemoveResponse
             {
-                Success = true
+                Success = true,
+                NewVersion = result.NewVersion.ToTimestamp()
             };
         }
         if (result.ConcurrentlyUpdated)

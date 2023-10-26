@@ -162,7 +162,11 @@ public class ConnectionController : ControllerBase
         CancelResult result = await _connectionClient.Cancel(connectionId, request.Version, userClaims.UserId, accessToken, ct);
         if (result.Success)
         {
-            CancelConnectionResponse response = new();
+            CancelConnectionResponse response = new()
+            {
+                NewVersion = result.NewVersion
+            };
+
             _logger.LogTrace("Responding with a successful cancel from {UserId} to {ConnectionId}", userClaims.UserId, connectionId);
             return Ok(response);
         }
@@ -206,7 +210,11 @@ public class ConnectionController : ControllerBase
         RemoveResult result = await _connectionClient.Remove(connectionId, request.Version, userClaims.UserId, accessToken, ct);
         if (result.Success)
         {
-            RemoveConnectionResponse response = new();
+            RemoveConnectionResponse response = new()
+            {
+                NewVersion = result.NewVersion
+            };
+
             _logger.LogTrace("Responding with a successful removal from {UserId} to {ConnectionId}", userClaims.UserId, connectionId);
             return Ok(response);
         }

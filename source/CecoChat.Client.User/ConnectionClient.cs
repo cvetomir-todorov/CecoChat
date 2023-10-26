@@ -170,7 +170,8 @@ internal sealed class ConnectionClient : IConnectionClient
             _logger.LogTrace("Received a successful cancel from {UserId} to {ConnectionId}", userId, request.ConnectionId);
             return new CancelResult
             {
-                Success = true
+                Success = true,
+                NewVersion = response.NewVersion.ToDateTime()
             };
         }
         if (response.MissingConnection)
@@ -217,7 +218,8 @@ internal sealed class ConnectionClient : IConnectionClient
             _logger.LogTrace("Received a successful removal from {UserId} to {ConnectionId}", userId, request.ConnectionId);
             return new RemoveResult
             {
-                Success = true
+                Success = true,
+                NewVersion = response.NewVersion.ToDateTime()
             };
         }
         if (response.MissingConnection)
