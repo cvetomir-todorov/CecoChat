@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
+using CecoChat.Data;
 
 namespace CecoChat.ConsoleClient.LocalStorage;
 
@@ -27,7 +28,7 @@ public sealed class MessageStorage
 
     public void AddMessage(Message message)
     {
-        long otherUserId = GetOtherUserId(message.SenderId, message.ReceiverId);
+        long otherUserId = DataUtility.GetOtherUserId(_userId, message.SenderId, message.ReceiverId);
         Chat chat = _chatMap.GetOrAdd(otherUserId, localOtherUserId => new Chat(localOtherUserId));
         chat.AddNew(message);
     }
@@ -51,7 +52,7 @@ public sealed class MessageStorage
 
     public bool TryGetMessage(long userId1, long userId2, long messageId, [NotNullWhen(returnValue: true)] out Message? message)
     {
-        long otherUserId = GetOtherUserId(userId1, userId2);
+        long otherUserId = DataUtility.GetOtherUserId(_userId, userId1, userId2);
 
         message = null;
         if (!_chatMap.TryGetValue(otherUserId, out Chat? dialog))
@@ -64,21 +65,7 @@ public sealed class MessageStorage
 
     public bool TryGetChat(long userId1, long userId2, [NotNullWhen(returnValue: true)] out Chat? chat)
     {
-        long otherUserId = GetOtherUserId(userId1, userId2);
+        long otherUserId = DataUtility.GetOtherUserId(_userId, userId1, userId2);
         return _chatMap.TryGetValue(otherUserId, out chat);
-    }
-
-    public long GetOtherUserId(long userId1, long userId2)
-    {
-        if (userId1 != _userId)
-        {
-            return userId1;
-        }
-        if (userId2 != _userId)
-        {
-            return userId2;
-        }
-
-        throw new InvalidOperationException($"Message is from current user {_userId} to himself.");
     }
 }
