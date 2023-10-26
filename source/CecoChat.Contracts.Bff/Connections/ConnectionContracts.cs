@@ -64,7 +64,11 @@ public sealed class CancelConnectionRequest
 }
 
 public sealed class CancelConnectionResponse
-{ }
+{
+    [JsonPropertyName("newVersion")]
+    [AliasAs("newVersion")]
+    public DateTime NewVersion { get; set; }
+}
 
 public sealed class RemoveConnectionRequest
 {
@@ -74,4 +78,8 @@ public sealed class RemoveConnectionRequest
 }
 
 public sealed class RemoveConnectionResponse
-{ }
+{
+    [JsonPropertyName("newVersion")]
+    [AliasAs("newVersion")]
+    public DateTime NewVersion { get; set; }
+}

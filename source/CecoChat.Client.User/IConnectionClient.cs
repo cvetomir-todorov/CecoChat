@@ -38,6 +38,7 @@ public readonly struct ApproveResult
 public readonly struct CancelResult
 {
     public bool Success { get; init; }
+    public DateTime NewVersion { get; init; }
     public bool MissingConnection { get; init; }
     public bool Invalid { get; init; }
     public bool ConcurrentlyUpdated { get; init; }
@@ -46,6 +47,7 @@ public readonly struct CancelResult
 public readonly struct RemoveResult
 {
     public bool Success { get; init; }
+    public DateTime NewVersion { get; init; }
     public bool MissingConnection { get; init; }
     public bool Invalid { get; init; }
     public bool ConcurrentlyUpdated { get; init; }
