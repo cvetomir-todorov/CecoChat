@@ -88,6 +88,8 @@ public static class Map
     {
         switch (bffConnectionStatus)
         {
+            case Contracts.Bff.Connections.ConnectionStatus.NotConnected:
+                return LocalStorage.ConnectionStatus.NotConnected;
             case Contracts.Bff.Connections.ConnectionStatus.Pending:
                 return LocalStorage.ConnectionStatus.Pending;
             case Contracts.Bff.Connections.ConnectionStatus.Connected:

@@ -25,7 +25,7 @@ public sealed class OneChatState : State
         ProfilePublic profile = ProfileStorage.GetProfile(Context.UserId);
         Connection? connection = ConnectionStorage.GetConnection(Context.UserId);
 
-        string status = connection != null ? connection.Status.ToString() : "Not connected";
+        string status = connection != null ? connection.Status.ToString() : ConnectionStatus.NotConnected.ToString();
         Console.WriteLine("Chatting with: {0} | ID={1} | user name={2} | {3} | avatar={4}",
             profile.DisplayName, profile.UserId, profile.UserName, status, profile.AvatarUrl);
         Console.WriteLine("Manage connection - invite/accept/cancel/remove (press 'm') | Return (press 'x')");

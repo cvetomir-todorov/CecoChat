@@ -21,7 +21,7 @@ public sealed class AllChatsState : State
 
         Console.Clear();
         DisplayUserData();
-        Console.WriteLine("Chat with a user (press '0'...'9') | New (press 'n') | Refresh (press 'f')");
+        Console.WriteLine("Chat with a user (press '0'...'9') | New (press 'n') | Refresh (press 'f') | Local refresh (press 'l')");
         Console.WriteLine("Change password (press 'p') | Edit profile (press 'e')");
         Console.WriteLine("Exit (press 'x')");
         Console.WriteLine("=================================================================================================");
@@ -57,6 +57,7 @@ public sealed class AllChatsState : State
         }
         else
         {
+            // includes local refresh
             Context.ReloadData = false;
             return States.AllChats;
         }
@@ -111,7 +112,7 @@ public sealed class AllChatsState : State
 
     private static void DisplayUser(int key, Connection? connection, ProfilePublic profile)
     {
-        string status = connection != null ? connection.Status.ToString() : "Not connected";
+        string status = connection != null ? connection.Status.ToString() : ConnectionStatus.NotConnected.ToString();
         Console.WriteLine("Press '{0}' for: {1,-24} | {2,-8} | {3,-24} | {4,-14} | {5,-48}",
             key, profile.DisplayName, $"ID={profile.UserId}", $"user name={profile.UserName}", status, $"avatar={profile.AvatarUrl}");
     }
