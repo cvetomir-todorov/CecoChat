@@ -1,26 +1,27 @@
 using CecoChat.Contracts.User;
 using CecoChat.Data;
+using CecoChat.Server.Identity;
 using FluentValidation;
 
 namespace CecoChat.Server.User.Endpoints;
 
-// TODO: validate connection ID is different from current user
-
 public sealed class InviteRequestValidator : AbstractValidator<InviteRequest>
 {
-    public InviteRequestValidator()
+    public InviteRequestValidator(IHttpContextAccessor httpContextAccessor)
     {
         RuleFor(x => x.ConnectionId)
-            .ValidUserId();
+            .ValidUserId()
+            .ConnectionIdDifferentFromUserId(httpContextAccessor);
     }
 }
 
 public sealed class ApproveRequestValidator : AbstractValidator<ApproveRequest>
 {
-    public ApproveRequestValidator()
+    public ApproveRequestValidator(IHttpContextAccessor httpContextAccessor)
     {
         RuleFor(x => x.ConnectionId)
-            .ValidUserId();
+            .ValidUserId()
+            .ConnectionIdDifferentFromUserId(httpContextAccessor);
         RuleFor(x => x.Version.ToDateTime())
             .ValidVersion();
     }
@@ -28,10 +29,11 @@ public sealed class ApproveRequestValidator : AbstractValidator<ApproveRequest>
 
 public sealed class CancelRequestValidator : AbstractValidator<CancelRequest>
 {
-    public CancelRequestValidator()
+    public CancelRequestValidator(IHttpContextAccessor httpContextAccessor)
     {
         RuleFor(x => x.ConnectionId)
-            .ValidUserId();
+            .ValidUserId()
+            .ConnectionIdDifferentFromUserId(httpContextAccessor);
         RuleFor(x => x.Version.ToDateTime())
             .ValidVersion();
     }
@@ -39,11 +41,22 @@ public sealed class CancelRequestValidator : AbstractValidator<CancelRequest>
 
 public sealed class RemoveRequestValidator : AbstractValidator<RemoveRequest>
 {
-    public RemoveRequestValidator()
+    public RemoveRequestValidator(IHttpContextAccessor httpContextAccessor)
     {
         RuleFor(x => x.ConnectionId)
-            .ValidUserId();
+            .ValidUserId()
+            .ConnectionIdDifferentFromUserId(httpContextAccessor);
         RuleFor(x => x.Version.ToDateTime())
             .ValidVersion();
+    }
+}
+
+internal static class HttpContextValidationRules
+{
+    public static IRuleBuilderOptions<T, long> ConnectionIdDifferentFromUserId<T>(this IRuleBuilderOptions<T, long> ruleBuilder, IHttpContextAccessor httpContextAccessor)
+    {
+        return ruleBuilder
+            .Must(connectionId => connectionId != httpContextAccessor.HttpContext!.GetUserClaimsHttp().UserId)
+            .WithMessage("{PropertyName} should be different from current user ID.");
     }
 }

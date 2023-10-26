@@ -113,6 +113,7 @@ public class Startup
             config.AddMaps(typeof(AutoMapperProfile));
         });
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+        services.AddHttpContextAccessor();
         services.AddOptions();
     }
 
