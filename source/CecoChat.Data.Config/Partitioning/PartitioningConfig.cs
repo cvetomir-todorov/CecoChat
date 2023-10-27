@@ -121,7 +121,12 @@ internal sealed class PartitioningConfig : IPartitioningConfig
         }
 
         bool areValid = await LoadValidateValues(_usage);
-        if (areValid && !string.IsNullOrWhiteSpace(_usage.ServerToWatch))
+        if (!areValid)
+        {
+            return;
+        }
+
+        if (!string.IsNullOrWhiteSpace(_usage.ServerToWatch))
         {
             PartitioningConfigValues values = _values!;
             if (values.ServerPartitionMap.TryGetValue(_usage.ServerToWatch, out PartitionRange partitions))
@@ -138,6 +143,17 @@ internal sealed class PartitioningConfig : IPartitioningConfig
             {
                 _logger.LogError("After server partition changes there are no partitions for watched server {Server}", _usage.ServerToWatch);
             }
+        }
+        else
+        {
+            PartitioningConfigValues values = _values!;
+            PartitionsChangedEventData eventData = new()
+            {
+                PartitionCount = values.PartitionCount,
+                Partitions = PartitionRange.Empty
+            };
+
+            _partitionsChanged.Publish(eventData);
         }
     }
 
