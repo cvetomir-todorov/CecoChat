@@ -168,8 +168,7 @@ public class Startup
     {
         // ordered hosted services
         builder.RegisterHostedService<InitDynamicConfig>();
-        builder.RegisterHostedService<StartBackplaneComponents>();
-        builder.RegisterHostedService<HandlePartitionsChanged>();
+        builder.RegisterHostedService<InitBackplane>();
 
         // configuration
         IConfiguration configDbConfig = Configuration.GetSection("ConfigDb");
