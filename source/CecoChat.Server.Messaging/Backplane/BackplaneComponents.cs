@@ -50,7 +50,7 @@ public sealed class BackplaneComponents : IBackplaneComponents
         if (currentPartitionCount < partitionCount)
         {
             _topicPartitionFlyweight.AddOrUpdate(_backplaneOptions.TopicMessagesByReceiver, partitionCount);
-            _logger.LogInformation("Increase cached partitions for topic {Topic} from {CurrentPartitionCount} to {NewPartitionCount}",
+            _logger.LogInformation("Increased cached partitions for topic {Topic} from {CurrentPartitionCount} to {NewPartitionCount}",
                 _backplaneOptions.TopicMessagesByReceiver, currentPartitionCount, partitionCount);
         }
 
