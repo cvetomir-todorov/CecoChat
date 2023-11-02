@@ -149,6 +149,5 @@ services:
       CECOCHAT_Backplane__Kafka__BootstrapServers__0: kafka0:19091
       CECOCHAT_Backplane__Kafka__BootstrapServers__1: kafka1:19092
       CECOCHAT_IdGen__Address: "https://idgen"
-      CECOCHAT_IdGen__OriginatorId: 16384
       CECOCHAT_IdGen__RefreshIdsCount: 32
 #    logging: *fluentd-logging
