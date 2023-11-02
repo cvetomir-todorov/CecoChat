@@ -4,11 +4,11 @@ metadata:
   name: service-aspnet
   namespace: cecochat
 data:
-  ASPNETCORE_ENVIRONMENT: Production
-  ASPNETCORE_URLS: https://+
+  ASPNETCORE_ENVIRONMENT: "Production"
+  ASPNETCORE_URLS: "https://+"
   ASPNETCORE_HTTPS_PORT: "443"
-  ASPNETCORE_Kestrel__Certificates__Default__Path: /app/services.pfx
-  ASPNETCORE_Kestrel__Certificates__Default__Password: cecochat
+  ASPNETCORE_Kestrel__Certificates__Default__Path: "/app/services.pfx"
+  ASPNETCORE_Kestrel__Certificates__Default__Password: "cecochat"
 ---
 
 apiVersion: v1
@@ -17,11 +17,11 @@ metadata:
   name: service-configdb
   namespace: cecochat
 data:
-  CECOCHAT_ConfigDb__Endpoints__0: redis:6379
-  CECOCHAT_ConfigDb__ConnectRetry: 16
-  CECOCHAT_ConfigDb__ConnectTimeout: 5000
-  CECOCHAT_ConfigDb__KeepAlive: 2
-  CECOCHAT_ConfigDb__DefaultDatabase: 0
+  CECOCHAT_ConfigDb__Endpoints__0: "redis:6379"
+  CECOCHAT_ConfigDb__ConnectRetry: "16"
+  CECOCHAT_ConfigDb__ConnectTimeout: "5000"
+  CECOCHAT_ConfigDb__KeepAlive: "2"
+  CECOCHAT_ConfigDb__DefaultDatabase: "0"
 ---
 
 apiVersion: v1
@@ -30,8 +30,8 @@ metadata:
   name: service-backplane
   namespace: cecochat
 data:
-  CECOCHAT_Backplane__Kafka__BootstrapServers__0: backplane-kafka-0.backplane-kafka.cecochat.svc.cluster.local:9092
-  CECOCHAT_Backplane__Kafka__BootstrapServers__1: backplane-kafka-1.backplane-kafka.cecochat.svc.cluster.local:9092
+  CECOCHAT_Backplane__Kafka__BootstrapServers__0: "backplane-kafka-0.backplane-kafka.cecochat.svc.cluster.local:9092"
+  CECOCHAT_Backplane__Kafka__BootstrapServers__1: "backplane-kafka-1.backplane-kafka.cecochat.svc.cluster.local:9092"
 ---
 
 apiVersion: v1
@@ -40,9 +40,9 @@ metadata:
   name: service-tracing
   namespace: cecochat
 data:
-  CECOCHAT_OtelSampling__Strategy: Probability
-  CECOCHAT_OtelSampling__Probability: 0.1
-  CECOCHAT_Jaeger__AgentHost: jaeger
-  CECOCHAT_Jaeger__AgentPort: 6831
-  CECOCHAT_Jaeger__ExportProcessorType: Batch
-  CECOCHAT_Jaeger__BatchExportScheduledDelayMillis: 2000
+  CECOCHAT_OtelSampling__Strategy: "Probability"
+  CECOCHAT_OtelSampling__Probability: "0.1"
+  CECOCHAT_Jaeger__AgentHost: "jaeger"
+  CECOCHAT_Jaeger__AgentPort: "6831"
+  CECOCHAT_Jaeger__ExportProcessorType: "Batch"
+  CECOCHAT_Jaeger__BatchExportScheduledDelayMillis: "2000"
