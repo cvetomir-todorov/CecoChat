@@ -3,7 +3,7 @@
 ## Essential features
 
 * Users
-  - Friendship between users
+  - Search users by name
 * Clients
   - Web-based
   - Mobile
@@ -15,7 +15,6 @@
 * Users
   - Avatars
   - Change phone/email including confirmation
-  - User search
 * Privacy
   - Add end-to-end encryption for messages
 * Media messages

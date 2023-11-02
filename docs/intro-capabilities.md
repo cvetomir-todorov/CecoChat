@@ -13,10 +13,10 @@
   - Registration and authentication
   - Change password, edit trivial profile data
   - Profiles with full and public-only data
+  - Connect with other users - invite/accept/cancel/remove
 
 #### Limitations
 
-* No user friendship
 * No web/mobile clients (only a client for development purposes)
 
 ## Technical
@@ -47,7 +47,7 @@
   - Load balancing
   - High availability (partial)
 * Maintainability
-  - Simple design
+  - Simple individual services
   - Code quality gate
   - Minimal documentation
   - Open-source technologies
