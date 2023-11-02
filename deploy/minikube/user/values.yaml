@@ -6,6 +6,7 @@ Image:
   PullPolicy: IfNotPresent
 Networking:
   Port: 443
+  IdGenService: idgen
   UserDb:
     Host: yb-tserver
     Service: yb-tserver
@@ -23,5 +24,7 @@ Networking:
       ConnectRetry: 16
       ConnectTimeout: 5000
       KeepAlive: 2
+Messaging:
+  RefreshIdsCount: 32
 Probes:
   Scheme: HTTPS
