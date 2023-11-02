@@ -11,6 +11,7 @@
   - Registration and authentication
   - Change password, edit trivial profile data
   - Profiles with full and public-only data
+  - Connect with other users - invite/accept/cancel/remove
 
 Check out [what next](docs/what-next.md) needs to be implemented. I appreciate all comments so feel free to use the `Discussions` tab.
 

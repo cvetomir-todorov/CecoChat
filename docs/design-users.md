@@ -33,4 +33,10 @@ The issue of lost updates is considered in the implementation. This occurs when 
 
 ## Public profiles
 
-Public profiles are obtained by the clients when opening all chats and a single chat. Since the public profile data doesn't change frequently, calling the User database is avoided if the requested public profiles are already in a User cache. This reduces latency and also reduces the load on the User database which is SQL-based. The profile entries are added for a certain amount of time, after which they expire.
+Public profiles are obtained by the clients when opening all chats and a single chat. Since the public profile data doesn't change frequently, calling the User database is avoided if the requested public profiles are already in a User cache. This reduces latency and also reduces the load on the User database. The profile entries are added for a certain amount of time, after which they expire.
+
+## Connections
+
+Connections are obtained by the clients when opening all chats and a single chat. Since connection data doesn't change frequently, calling the User database is avoided if the user connections are already in a User cache. This reduces latency and also the load on the User database. The connections for a user are added for a certain amount of time, after which they expire.
+
+Connections can be created and managed using the following actions - invite/accept/cancel/remove. For each valid and successful action there is a notification for the initiating and targeted users for all their connected clients. Cache is not updated so if a notification is lost the connection data cached would not be up-to-date. Considering the reduced usage of this feature and the low likelihood for a notification to get lost, that's an acceptable compromise for now.
