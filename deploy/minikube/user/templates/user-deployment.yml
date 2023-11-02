@@ -48,6 +48,10 @@ spec:
             - configMapRef:
                 name: service-aspnet
             - configMapRef:
+                name: service-configdb
+            - configMapRef:
+                name: service-backplane
+            - configMapRef:
                 name: service-tracing
           env:
             - name: NAMESPACE
@@ -74,3 +78,8 @@ spec:
               value: "{{.Values.Networking.UserCache.Store.ConnectTimeout}}"
             - name: CECOCHAT_UserCache__Store__KeepAlive
               value: "{{.Values.Networking.UserCache.Store.KeepAlive}}"
+            # ID Gen
+            - name: CECOCHAT_IdGen__Address
+              value: https://{{.Values.Networking.IdGenService}}
+            - name: CECOCHAT_IdGen__RefreshIdsCount
+              value: "{{.Values.Messaging.RefreshIdsCount}}"
