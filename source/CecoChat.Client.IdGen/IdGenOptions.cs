@@ -7,7 +7,6 @@ public sealed class IdGenOptions
 {
     public Uri? Address { get; init; }
     public TimeSpan CallTimeout { get; init; }
-    public long OriginatorId { get; init; }
     public int RefreshIdsCount { get; init; }
     public TimeSpan RefreshIdsInterval { get; init; }
     public TimeSpan GetIdWaitInterval { get; init; }

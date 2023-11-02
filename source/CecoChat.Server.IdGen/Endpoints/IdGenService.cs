@@ -15,13 +15,13 @@ public sealed class IdGenService : Contracts.IdGen.IdGen.IdGenBase
 
     public override Task<GenerateOneResponse> GenerateOne(GenerateOneRequest request, ServerCallContext context)
     {
-        long id = _generator.GenerateOne(request.OriginatorId);
+        long id = _generator.GenerateOne();
         return Task.FromResult(new GenerateOneResponse { Id = id });
     }
 
     public override Task<GenerateManyResponse> GenerateMany(GenerateManyRequest request, ServerCallContext context)
     {
-        IEnumerable<long> ids = _generator.GenerateMany(request.OriginatorId, request.Count);
+        IEnumerable<long> ids = _generator.GenerateMany(request.Count);
         GenerateManyResponse response = new();
         response.Ids.AddRange(ids);
         return Task.FromResult(response);
