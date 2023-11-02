@@ -125,7 +125,6 @@ public class Startup
 
         // snowflake
         builder.RegisterType<SnowflakeGenerator>().As<IIdentityGenerator>().SingleInstance();
-        builder.RegisterType<FnvHash>().As<INonCryptoHash>().SingleInstance();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

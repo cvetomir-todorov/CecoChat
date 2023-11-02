@@ -81,7 +81,6 @@ internal sealed class IdGenClient : IIdGenClient
         {
             GenerateManyRequest request = new()
             {
-                OriginatorId = _options.OriginatorId,
                 Count = _options.RefreshIdsCount
             };
             DateTime deadline = _clock.GetNowUtc().Add(_options.CallTimeout);
