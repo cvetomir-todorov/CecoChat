@@ -62,7 +62,7 @@ public sealed class ConnectionNotifyProducer : IConnectionNotifyProducer
             userId, connection.ConnectionId, connection.Status);
     }
 
-    private BackplaneMessage MapConnection(long userId, Connection connection)
+    private static BackplaneMessage MapConnection(long userId, Connection connection)
     {
         Contracts.Backplane.ConnectionStatus status;
 
