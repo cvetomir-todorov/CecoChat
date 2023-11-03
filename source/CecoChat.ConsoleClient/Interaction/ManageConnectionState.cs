@@ -60,7 +60,7 @@ public class ManageConnectionState : State
         }
     }
 
-    private void DisplayConnection(LocalStorage.Connection? connection)
+    private static void DisplayConnection(LocalStorage.Connection? connection)
     {
         if (connection == null || connection.Status == LocalStorage.ConnectionStatus.NotConnected)
         {
@@ -140,7 +140,7 @@ public class ManageConnectionState : State
         }
     }
 
-    private void DisplayErrors(ClientResponse response)
+    private static void DisplayErrors(ClientResponse response)
     {
         foreach (string error in response.Errors)
         {
@@ -151,7 +151,7 @@ public class ManageConnectionState : State
         Console.ReadLine();
     }
 
-    private void DisplaySuccess(string successMessage)
+    private static void DisplaySuccess(string successMessage)
     {
         Console.WriteLine(successMessage);
         Console.WriteLine("Press ENTER to return.");
