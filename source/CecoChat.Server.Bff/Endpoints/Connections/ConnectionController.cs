@@ -55,7 +55,9 @@ public class ConnectionController : ControllerBase
     [ProducesResponseType(typeof(InviteConnectionResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
+#pragma warning disable IDE0060 // Remove unused parameter
     public async Task<IActionResult> InviteConnection([FromRoute(Name = "id")] long connectionId, [FromBody] InviteConnectionRequest request, CancellationToken ct)
+#pragma warning restore IDE0060 // Remove unused parameter
     {
         if (!HttpContext.TryGetUserClaimsAndAccessToken(_logger, out UserClaims? userClaims, out string? accessToken))
         {
