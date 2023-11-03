@@ -66,16 +66,19 @@ public class ManageConnectionState : State
         {
             Console.Write("Not connected | Send an invite (press 'i')");
         }
-        else switch (connection.Status)
+        else
         {
-            case LocalStorage.ConnectionStatus.Pending:
-                Console.Write("Invitation pending | Accept (press 'a') | Cancel (press 'c')");
-                break;
-            case LocalStorage.ConnectionStatus.Connected:
-                Console.Write("Connected | Remove (press 'r')");
-                break;
-            default:
-                throw new EnumValueNotSupportedException(connection.Status);
+            switch (connection.Status)
+            {
+                case LocalStorage.ConnectionStatus.Pending:
+                    Console.Write("Invitation pending | Accept (press 'a') | Cancel (press 'c')");
+                    break;
+                case LocalStorage.ConnectionStatus.Connected:
+                    Console.Write("Connected | Remove (press 'r')");
+                    break;
+                default:
+                    throw new EnumValueNotSupportedException(connection.Status);
+            }
         }
 
         Console.WriteLine(" | Local refresh (press 'l') | Return (press 'x')");

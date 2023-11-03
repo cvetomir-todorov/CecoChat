@@ -52,7 +52,7 @@ public sealed class InitBackplane : IHostedService, ISubscriber<PartitionsChange
         _topicPartitionFlyweight.Add(_backplaneOptions.TopicMessagesByReceiver, partitionCount);
         _connectionNotifyProducer.PartitionCount = partitionCount;
 
-        _logger.LogInformation("Prepared backplane components for topic {TopicMessagesByReceiver} with {PartitionCount} partitions", 
+        _logger.LogInformation("Prepared backplane components for topic {TopicMessagesByReceiver} with {PartitionCount} partitions",
             _backplaneOptions.TopicMessagesByReceiver, partitionCount);
 
         return Task.CompletedTask;

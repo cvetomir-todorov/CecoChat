@@ -94,7 +94,7 @@ public sealed class ChatClient : IAsyncDisposable
 
     public event EventHandler<ListenNotification>? MessageDelivered;
 
-    public event EventHandler<ListenNotification>? ConnectionNotificationReceived; 
+    public event EventHandler<ListenNotification>? ConnectionNotificationReceived;
 
     public event EventHandler? Disconnected;
 
