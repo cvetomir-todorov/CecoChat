@@ -21,6 +21,7 @@ services:
       ASPNETCORE_HTTPS_PORT: 443
       ASPNETCORE_Kestrel__Certificates__Default__Path: "/app/services.pfx"
       ASPNETCORE_Kestrel__Certificates__Default__Password: "cecochat"
+      CECOCHAT_Config__ServerId: 0
       CECOCHAT_ConfigDb__Endpoints__0: redis:6379
       CECOCHAT_ConfigDb__ConnectRetry: 16
       CECOCHAT_ConfigDb__ConnectTimeout: 5000
@@ -30,7 +31,6 @@ services:
       CECOCHAT_OtelSampling__Probability: 0.1
       CECOCHAT_Jaeger__TargetHost: jaeger
       CECOCHAT_Jaeger__TargetPort: 4317
-      CECOCHAT_Config__ServerId: 0
 #    logging: &fluentd-logging
 #      driver: "fluentd"
 #      options:
@@ -50,20 +50,20 @@ services:
       ASPNETCORE_HTTPS_PORT: 443
       ASPNETCORE_Kestrel__Certificates__Default__Path: "/app/services.pfx"
       ASPNETCORE_Kestrel__Certificates__Default__Password: "cecochat"
+      CECOCHAT_Config__ServerId: 0
       CECOCHAT_ConfigDb__Endpoints__0: redis:6379
       CECOCHAT_ConfigDb__ConnectRetry: 16
       CECOCHAT_ConfigDb__ConnectTimeout: 5000
       CECOCHAT_ConfigDb__KeepAlive: 2
       CECOCHAT_ConfigDb__DefaultDatabase: 0
-      CECOCHAT_OtelSampling__Strategy: Probability
-      CECOCHAT_OtelSampling__Probability: 0.1
-      CECOCHAT_Jaeger__TargetHost: jaeger
-      CECOCHAT_Jaeger__TargetPort: 4317
-      CECOCHAT_Config__ServerId: 0
       CECOCHAT_Backplane__Kafka__BootstrapServers__0: kafka0:19091
       CECOCHAT_Backplane__Kafka__BootstrapServers__1: kafka1:19092
       CECOCHAT_IdGen__Address: "https://idgen"
       CECOCHAT_IdGen__RefreshIdsCount: 1024
+      CECOCHAT_OtelSampling__Strategy: Probability
+      CECOCHAT_OtelSampling__Probability: 0.1
+      CECOCHAT_Jaeger__TargetHost: jaeger
+      CECOCHAT_Jaeger__TargetPort: 4317
 #    logging: *fluentd-logging
   cecochat-messaging1:
     image: ceco.com/cecochat/messaging:0.1
@@ -79,18 +79,18 @@ services:
       ASPNETCORE_HTTPS_PORT: 443
       ASPNETCORE_Kestrel__Certificates__Default__Path: "/app/services.pfx"
       ASPNETCORE_Kestrel__Certificates__Default__Password: "cecochat"
+      CECOCHAT_Config__ServerId: 1
       CECOCHAT_ConfigDb__Endpoints__0: redis:6379
       CECOCHAT_ConfigDb__ConnectRetry: 16
       CECOCHAT_ConfigDb__ConnectTimeout: 5000
       CECOCHAT_ConfigDb__KeepAlive: 2
       CECOCHAT_ConfigDb__DefaultDatabase: 0
-      CECOCHAT_OtelSampling__Strategy: Probability
-      CECOCHAT_OtelSampling__Probability: 0.1
-      CECOCHAT_Jaeger__TargetHost: jaeger
-      CECOCHAT_Jaeger__TargetPort: 4317
-      CECOCHAT_Config__ServerId: 1
       CECOCHAT_Backplane__Kafka__BootstrapServers__0: kafka0:19091
       CECOCHAT_Backplane__Kafka__BootstrapServers__1: kafka1:19092
       CECOCHAT_IdGen__Address: "https://idgen"
       CECOCHAT_IdGen__RefreshIdsCount: 1024
+      CECOCHAT_OtelSampling__Strategy: Probability
+      CECOCHAT_OtelSampling__Probability: 0.1
+      CECOCHAT_Jaeger__TargetHost: jaeger
+      CECOCHAT_Jaeger__TargetPort: 4317
 #    logging: *fluentd-logging
