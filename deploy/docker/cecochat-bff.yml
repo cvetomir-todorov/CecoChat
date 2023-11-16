@@ -26,13 +26,13 @@ services:
       CECOCHAT_ConfigDb__ConnectTimeout: 5000
       CECOCHAT_ConfigDb__KeepAlive: 2
       CECOCHAT_ConfigDb__DefaultDatabase: 0
+      CECOCHAT_UserClient__Address: "https://user"
+      CECOCHAT_StateClient__Address: "https://state"
+      CECOCHAT_HistoryClient__Address: "https://history"
       CECOCHAT_OtelSampling__Strategy: Probability
       CECOCHAT_OtelSampling__Probability: 0.1
       CECOCHAT_Jaeger__TargetHost: jaeger
       CECOCHAT_Jaeger__TargetPort: 4317
-      CECOCHAT_UserClient__Address: "https://user"
-      CECOCHAT_StateClient__Address: "https://state"
-      CECOCHAT_HistoryClient__Address: "https://history"
 #    logging: &fluentd-logging
 #      driver: "fluentd"
 #      options:
@@ -57,10 +57,6 @@ services:
       CECOCHAT_ConfigDb__ConnectTimeout: 5000
       CECOCHAT_ConfigDb__KeepAlive: 2
       CECOCHAT_ConfigDb__DefaultDatabase: 0
-      CECOCHAT_OtelSampling__Strategy: Probability
-      CECOCHAT_OtelSampling__Probability: 0.1
-      CECOCHAT_Jaeger__TargetHost: jaeger
-      CECOCHAT_Jaeger__TargetPort: 4317
       CECOCHAT_Backplane__Kafka__BootstrapServers__0: kafka0:19091
       CECOCHAT_Backplane__Kafka__BootstrapServers__1: kafka1:19092
       CECOCHAT_StateDb__ContactPoints__0: cassandra0:9042
@@ -70,6 +66,10 @@ services:
       CECOCHAT_StateDb__ExponentialReconnectPolicy: true
       CECOCHAT_StateDb__ExponentialReconnectPolicyBaseDelay: 00:00:00.100
       CECOCHAT_StateDb__ExponentialReconnectPolicyMaxDelay: 00:00:05.0
+      CECOCHAT_OtelSampling__Strategy: Probability
+      CECOCHAT_OtelSampling__Probability: 0.1
+      CECOCHAT_Jaeger__TargetHost: jaeger
+      CECOCHAT_Jaeger__TargetPort: 4317
 #    logging: *fluentd-logging
   cecochat-history:
     image: ceco.com/cecochat/history:0.1
@@ -90,10 +90,6 @@ services:
       CECOCHAT_ConfigDb__ConnectTimeout: 5000
       CECOCHAT_ConfigDb__KeepAlive: 2
       CECOCHAT_ConfigDb__DefaultDatabase: 0
-      CECOCHAT_OtelSampling__Strategy: Probability
-      CECOCHAT_OtelSampling__Probability: 0.1
-      CECOCHAT_Jaeger__TargetHost: jaeger
-      CECOCHAT_Jaeger__TargetPort: 4317
       CECOCHAT_Backplane__Kafka__BootstrapServers__0: kafka0:19091
       CECOCHAT_Backplane__Kafka__BootstrapServers__1: kafka1:19092
       CECOCHAT_HistoryDb__ContactPoints__0: cassandra0:9042
@@ -103,6 +99,10 @@ services:
       CECOCHAT_HistoryDb__ExponentialReconnectPolicy: true
       CECOCHAT_HistoryDb__ExponentialReconnectPolicyBaseDelay: 00:00:00.100
       CECOCHAT_HistoryDb__ExponentialReconnectPolicyMaxDelay: 00:00:05.0
+      CECOCHAT_OtelSampling__Strategy: Probability
+      CECOCHAT_OtelSampling__Probability: 0.1
+      CECOCHAT_Jaeger__TargetHost: jaeger
+      CECOCHAT_Jaeger__TargetPort: 4317
 #    logging: *fluentd-logging
   cecochat-user:
     image: ceco.com/cecochat/user:0.1
@@ -123,10 +123,8 @@ services:
       CECOCHAT_ConfigDb__ConnectTimeout: 5000
       CECOCHAT_ConfigDb__KeepAlive: 2
       CECOCHAT_ConfigDb__DefaultDatabase: 0
-      CECOCHAT_OtelSampling__Strategy: Probability
-      CECOCHAT_OtelSampling__Probability: 0.1
-      CECOCHAT_Jaeger__TargetHost: jaeger
-      CECOCHAT_Jaeger__TargetPort: 4317
+      CECOCHAT_Backplane__Kafka__BootstrapServers__0: kafka0:19091
+      CECOCHAT_Backplane__Kafka__BootstrapServers__1: kafka1:19092
       CECOCHAT_UserDb__Init__ConnectionString: "Host=yb-tserver0,yb-tserver1;Port=5433;Database=postgres;Username=yugabyte;Password=yugabyte;"
       CECOCHAT_UserDb__Seed: "true"
       CECOCHAT_UserDb__SeedConsoleClientUsers: "true"
@@ -138,8 +136,10 @@ services:
       CECOCHAT_UserCache__Store__ConnectRetry: 16
       CECOCHAT_UserCache__Store__ConnectTimeout: 5000
       CECOCHAT_UserCache__Store__KeepAlive: 2
-      CECOCHAT_Backplane__Kafka__BootstrapServers__0: kafka0:19091
-      CECOCHAT_Backplane__Kafka__BootstrapServers__1: kafka1:19092
       CECOCHAT_IdGen__Address: "https://idgen"
       CECOCHAT_IdGen__RefreshIdsCount: 32
+      CECOCHAT_OtelSampling__Strategy: Probability
+      CECOCHAT_OtelSampling__Probability: 0.1
+      CECOCHAT_Jaeger__TargetHost: jaeger
+      CECOCHAT_Jaeger__TargetPort: 4317
 #    logging: *fluentd-logging
