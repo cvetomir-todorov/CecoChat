@@ -1,10 +1,10 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{.Release.Name}}
+  name: {{.Release.Name}}-jaeger
   namespace: {{.Release.Namespace}}
   labels:
-    app: {{.Release.Name}}
+    app: {{.Release.Name}}-jaeger
 spec:
   ingressClassName: nginx
   tls:
@@ -19,6 +19,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: {{.Release.Name}}
+                name: {{.Release.Name}}-jaeger
                 port:
-                  number: {{.Values.Networking.AccessPort}}
+                  number: {{.Values.Networking.Jaeger.AccessPort}}

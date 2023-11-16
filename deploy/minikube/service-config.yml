@@ -42,7 +42,5 @@ metadata:
 data:
   CECOCHAT_OtelSampling__Strategy: "Probability"
   CECOCHAT_OtelSampling__Probability: "0.1"
-  CECOCHAT_Jaeger__AgentHost: "jaeger"
-  CECOCHAT_Jaeger__AgentPort: "6831"
-  CECOCHAT_Jaeger__ExportProcessorType: "Batch"
-  CECOCHAT_Jaeger__BatchExportScheduledDelayMillis: "2000"
+  CECOCHAT_Jaeger__AgentHost: "tracing-jaeger-0.tracing-jaeger.cecochat.svc.cluster.local"
+  CECOCHAT_Jaeger__AgentPort: "4317"

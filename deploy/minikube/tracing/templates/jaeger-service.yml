@@ -1,29 +1,19 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{.Release.Name}}
+  name: {{.Release.Name}}-jaeger
   namespace: {{.Release.Namespace}}
   labels:
-    app: {{.Release.Name}}
+    app: {{.Release.Name}}-jaeger
 spec:
   selector:
-    app: {{.Release.Name}}
+    app: {{.Release.Name}}-jaeger
   type: ClusterIP
+  clusterIP: None
   ports:
-    - name: "5775"
-      port: 5775
-      protocol: UDP
-    - name: "5778"
-      port: 5778
-    - name: "6831"
-      port: 6831
-      protocol: UDP
-    - name: "6832"
-      port: 6832
-      protocol: UDP
-    - name: "9411"
-      port: 9411
-    - name: "14268"
-      port: 14268
-    - name: "{{.Values.Networking.AccessPort}}"
-      port: {{.Values.Networking.AccessPort}}
+    - name: "{{.Values.Networking.Jaeger.OtlpOverGrpcPort}}"
+      port: {{.Values.Networking.Jaeger.OtlpOverGrpcPort}}
+    - name: "{{.Values.Networking.Jaeger.ConfigsPort}}"
+      port: {{.Values.Networking.Jaeger.ConfigsPort}}
+    - name: "{{.Values.Networking.Jaeger.AccessPort}}"
+      port: {{.Values.Networking.Jaeger.AccessPort}}
