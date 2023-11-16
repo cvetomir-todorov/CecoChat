@@ -5,7 +5,6 @@ using CecoChat.AspNet.Health;
 using CecoChat.AspNet.Prometheus;
 using CecoChat.Autofac;
 using CecoChat.Data.Config;
-using CecoChat.Jaeger;
 using CecoChat.Otel;
 using CecoChat.Redis;
 using CecoChat.Redis.Health;
@@ -23,7 +22,7 @@ public class Startup
 {
     private readonly RedisOptions _configDbOptions;
     private readonly OtelSamplingOptions _otelSamplingOptions;
-    private readonly JaegerOptions _jaegerOptions;
+    private readonly OtlpOptions _jaegerOptions;
     private readonly PrometheusOptions _prometheusOptions;
 
     public Startup(IConfiguration configuration, IWebHostEnvironment environment)
@@ -88,7 +87,7 @@ public class Startup
                     aspnet.Filter = httpContext => !excludedPaths.Contains(httpContext.Request.Path);
                 });
                 tracing.ConfigureSampling(_otelSamplingOptions);
-                tracing.ConfigureJaegerExporter(_jaegerOptions);
+                tracing.ConfigureOtlpExporter(_jaegerOptions);
             })
             .WithMetrics(metrics =>
             {
