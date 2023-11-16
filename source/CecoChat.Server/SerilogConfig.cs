@@ -33,9 +33,9 @@ public static class SerilogConfig
         return new LoggerConfiguration()
             .MinimumLevel.Is(LogEventLevel.Information)
             .MinimumLevel.Override("System.Net.Http.HttpClient", LogEventLevel.Warning)
-            .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
-            .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Information)
             .MinimumLevel.Override("Grpc", LogEventLevel.Warning)
+            .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+            .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
             .Enrich.WithMachineName()
             .Enrich.WithProperty("Application", entryAssembly.GetName().Name!)
             .Enrich.WithSpan()
@@ -49,7 +49,7 @@ public static class SerilogConfig
     {
         string name = entryAssembly.GetName().Name!;
         string binPath = Path.GetDirectoryName(entryAssembly.Location) ?? Environment.CurrentDirectory;
-        // going from /source/project/bin/debug/.net6.0/ to /source/logs/project.txt
+        // going from /source/project/bin/debug/.net7.0/ to /source/logs/project.txt
         string filePath = Path.Combine(binPath, "..", "..", "..", "..", "logs", $"{name}.txt");
 
         return configuration
