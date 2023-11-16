@@ -5,7 +5,10 @@ Image:
   Tag: 1.47.0
   PullPolicy: IfNotPresent
 Networking:
-  AccessPort: 16686
+  Jaeger:
+    OtlpOverGrpcPort: 4317
+    ConfigsPort: 5778
+    AccessPort: 16686
 Ingress:
   Host: jaeger.cecochat.com
   SecretName: ingress-tls

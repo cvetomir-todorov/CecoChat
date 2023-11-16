@@ -1,6 +1,6 @@
 apiVersion: v2
-name: jaeger
-description: The tracing components for CecoChat - Jaeger so far
+name: tracing
+description: The tracing components for CecoChat - Jaeger
 type: application
 version: 0.1.0
 appVersion: "0.1.0"
