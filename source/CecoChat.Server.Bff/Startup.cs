@@ -9,7 +9,6 @@ using CecoChat.Client.State;
 using CecoChat.Client.User;
 using CecoChat.Data.Config;
 using CecoChat.Http.Health;
-using CecoChat.Jaeger;
 using CecoChat.Jwt;
 using CecoChat.Otel;
 using CecoChat.Redis;
@@ -37,7 +36,7 @@ public class Startup
     private readonly JwtOptions _jwtOptions;
     private readonly SwaggerOptions _swaggerOptions;
     private readonly OtelSamplingOptions _otelSamplingOptions;
-    private readonly JaegerOptions _jaegerOptions;
+    private readonly OtlpOptions _jaegerOptions;
     private readonly PrometheusOptions _prometheusOptions;
 
     public Startup(IConfiguration configuration)
@@ -131,7 +130,7 @@ public class Startup
                 });
                 tracing.AddGrpcClientInstrumentation(grpc => grpc.SuppressDownstreamInstrumentation = true);
                 tracing.ConfigureSampling(_otelSamplingOptions);
-                tracing.ConfigureJaegerExporter(_jaegerOptions);
+                tracing.ConfigureOtlpExporter(_jaegerOptions);
             })
             .WithMetrics(metrics =>
             {

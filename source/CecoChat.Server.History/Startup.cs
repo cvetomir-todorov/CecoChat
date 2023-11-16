@@ -10,7 +10,6 @@ using CecoChat.Contracts.Backplane;
 using CecoChat.Data.Config;
 using CecoChat.Data.History;
 using CecoChat.Data.History.Telemetry;
-using CecoChat.Jaeger;
 using CecoChat.Jwt;
 using CecoChat.Kafka;
 using CecoChat.Kafka.Health;
@@ -38,7 +37,7 @@ public class Startup
     private readonly CassandraOptions _historyDbOptions;
     private readonly JwtOptions _jwtOptions;
     private readonly OtelSamplingOptions _otelSamplingOptions;
-    private readonly JaegerOptions _jaegerOptions;
+    private readonly OtlpOptions _jaegerOptions;
     private readonly PrometheusOptions _prometheusOptions;
 
     public Startup(IConfiguration configuration, IWebHostEnvironment environment)
@@ -118,7 +117,7 @@ public class Startup
                 tracing.AddKafkaInstrumentation();
                 tracing.AddHistoryInstrumentation();
                 tracing.ConfigureSampling(_otelSamplingOptions);
-                tracing.ConfigureJaegerExporter(_jaegerOptions);
+                tracing.ConfigureOtlpExporter(_jaegerOptions);
             })
             .WithMetrics(metrics =>
             {
