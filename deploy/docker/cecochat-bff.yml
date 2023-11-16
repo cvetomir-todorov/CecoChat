@@ -28,10 +28,8 @@ services:
       CECOCHAT_ConfigDb__DefaultDatabase: 0
       CECOCHAT_OtelSampling__Strategy: Probability
       CECOCHAT_OtelSampling__Probability: 0.1
-      CECOCHAT_Jaeger__AgentHost: jaeger
-      CECOCHAT_Jaeger__AgentPort: 6831
-      CECOCHAT_Jaeger__ExportProcessorType: Batch
-      CECOCHAT_Jaeger__BatchExportScheduledDelayMillis: 2000
+      CECOCHAT_Jaeger__TargetHost: jaeger
+      CECOCHAT_Jaeger__TargetPort: 4317
       CECOCHAT_UserClient__Address: "https://user"
       CECOCHAT_StateClient__Address: "https://state"
       CECOCHAT_HistoryClient__Address: "https://history"
@@ -61,10 +59,8 @@ services:
       CECOCHAT_ConfigDb__DefaultDatabase: 0
       CECOCHAT_OtelSampling__Strategy: Probability
       CECOCHAT_OtelSampling__Probability: 0.1
-      CECOCHAT_Jaeger__AgentHost: jaeger
-      CECOCHAT_Jaeger__AgentPort: 6831
-      CECOCHAT_Jaeger__ExportProcessorType: Batch
-      CECOCHAT_Jaeger__BatchExportScheduledDelayMillis: 2000
+      CECOCHAT_Jaeger__TargetHost: jaeger
+      CECOCHAT_Jaeger__TargetPort: 4317
       CECOCHAT_Backplane__Kafka__BootstrapServers__0: kafka0:19091
       CECOCHAT_Backplane__Kafka__BootstrapServers__1: kafka1:19092
       CECOCHAT_StateDb__ContactPoints__0: cassandra0:9042
@@ -96,10 +92,8 @@ services:
       CECOCHAT_ConfigDb__DefaultDatabase: 0
       CECOCHAT_OtelSampling__Strategy: Probability
       CECOCHAT_OtelSampling__Probability: 0.1
-      CECOCHAT_Jaeger__AgentHost: jaeger
-      CECOCHAT_Jaeger__AgentPort: 6831
-      CECOCHAT_Jaeger__ExportProcessorType: Batch
-      CECOCHAT_Jaeger__BatchExportScheduledDelayMillis: 2000
+      CECOCHAT_Jaeger__TargetHost: jaeger
+      CECOCHAT_Jaeger__TargetPort: 4317
       CECOCHAT_Backplane__Kafka__BootstrapServers__0: kafka0:19091
       CECOCHAT_Backplane__Kafka__BootstrapServers__1: kafka1:19092
       CECOCHAT_HistoryDb__ContactPoints__0: cassandra0:9042
@@ -131,10 +125,8 @@ services:
       CECOCHAT_ConfigDb__DefaultDatabase: 0
       CECOCHAT_OtelSampling__Strategy: Probability
       CECOCHAT_OtelSampling__Probability: 0.1
-      CECOCHAT_Jaeger__AgentHost: jaeger
-      CECOCHAT_Jaeger__AgentPort: 6831
-      CECOCHAT_Jaeger__ExportProcessorType: Batch
-      CECOCHAT_Jaeger__BatchExportScheduledDelayMillis: 2000
+      CECOCHAT_Jaeger__TargetHost: jaeger
+      CECOCHAT_Jaeger__TargetPort: 4317
       CECOCHAT_UserDb__Init__ConnectionString: "Host=yb-tserver0,yb-tserver1;Port=5433;Database=postgres;Username=yugabyte;Password=yugabyte;"
       CECOCHAT_UserDb__Seed: "true"
       CECOCHAT_UserDb__SeedConsoleClientUsers: "true"
