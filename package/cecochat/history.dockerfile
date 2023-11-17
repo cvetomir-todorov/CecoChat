@@ -10,6 +10,8 @@ LABEL author="Cvetomir Todorov"
 RUN apt update && \
     apt install -y curl && \
     apt install -y dnsutils && \
+    apt install -y net-tools &&\
+    apt install -y iputils-ping && \
     apt clean && \
     rm -rf /var/lib/apt/lists/*
 
