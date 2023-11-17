@@ -1,0 +1,20 @@
+version: '3'
+networks:
+  cecochat:
+services:
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.88.0
+    container_name: cecochat-otel-collector
+    hostname: otel-collector
+    networks: &networks
+      - cecochat
+    ports:
+      - "4317:4317" # gRPC receiver
+      - "4318:4318" # HTTP Protobuf receiver
+      - "13133:13133" # health_check extension
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+    volumes:
+      - ./telemetry/otel-collector-config.yml:/etc/otelcol-contrib/config.yaml

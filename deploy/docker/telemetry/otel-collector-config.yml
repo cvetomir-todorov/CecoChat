@@ -1,0 +1,36 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: "0.0.0.0:4317" # accept traffic on all interfaces at the standard OTLP gRPC port
+
+processors:
+  memory_limiter:
+    check_interval: 5s
+    limit_mib: 4096
+    spike_limit_mib: 1024
+  batch:
+    send_batch_size: 8192
+    timeout: 1s
+
+exporters:
+  otlp/jaeger:
+    endpoint: "jaeger:4317" # export to jaeger instance at the standard OTLP gRPC port
+    tls:
+      insecure: true
+  debug:
+    verbosity: basic
+
+extensions:
+  health_check:
+
+service:
+  extensions: [health_check]
+  pipelines:
+    traces:
+      receivers: [ otlp ]
+      processors: [ memory_limiter, batch ]
+      exporters: [ debug, otlp/jaeger ]
+  telemetry:
+    logs:
+      level: info

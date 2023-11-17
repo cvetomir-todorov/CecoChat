@@ -9,7 +9,9 @@ services:
     networks: &networks
       - cecochat
     ports:
-      - "4317:4317" # accept OTLP over gRPC
+      # not mapped since the otel collector is using the same port on localhost
+      # while jaeger is being called by the otel collector within the docker network
+      #- "4317:4317" # accept OTLP over gRPC
       - "5778:5778" # serve configs (e.g. sampling)
       - "16686:16686" # serve frontend
     deploy:
