@@ -9,6 +9,7 @@ data:
   ASPNETCORE_HTTPS_PORT: "443"
   ASPNETCORE_Kestrel__Certificates__Default__Path: "/app/services.pfx"
   ASPNETCORE_Kestrel__Certificates__Default__Password: "cecochat"
+  DOTNET_HOSTBUILDER__RELOADCONFIGONCHANGE: "false"
 ---
 
 apiVersion: v1
