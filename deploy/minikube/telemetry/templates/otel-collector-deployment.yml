@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{.Release.Name}}-otel-collector
+  namespace: {{.Release.Namespace}}
+  labels:
+    app: {{.Release.Name}}-otel-collector
+spec:
+  selector:
+    matchLabels:
+      app: {{.Release.Name}}-otel-collector
+  replicas: {{.Values.Deployment.Replicas}}
+  template:
+    metadata:
+      labels:
+        app: {{.Release.Name}}-otel-collector
+    spec:
+      containers:
+        - name: {{.Release.Name}}-otel-collector
+          image: {{.Values.Image.Name}}:{{.Values.Image.Tag}}
+          imagePullPolicy: {{.Values.Image.PullPolicy}}
+          ports:
+            - containerPort: {{.Values.Networking.OtlpOverGrpcPort}}
+          volumeMounts:
+            - name: config
+              mountPath: {{.Values.ConfigFile.MountPath}}
+              subPath: {{.Values.ConfigFile.ConfigName}}
+              readOnly: true
+      volumes:
+        - name: config
+          configMap:
+            name: {{.Release.Name}}-otel-collector
+            defaultMode: 0777

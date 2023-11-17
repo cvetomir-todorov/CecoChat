@@ -1,0 +1,8 @@
+apiVersion: v2
+name: telemetry
+description: The telemetry components for CecoChat - OTel collector contrib
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+maintainers:
+  - name: CecoChat

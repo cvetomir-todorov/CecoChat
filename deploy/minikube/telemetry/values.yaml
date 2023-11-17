@@ -1,0 +1,11 @@
+Deployment:
+  Replicas: 2
+Image:
+  Name: "otel/opentelemetry-collector-contrib"
+  Tag: 0.88.0
+  PullPolicy: IfNotPresent
+Networking:
+  OtlpOverGrpcPort: 4317
+ConfigFile:
+  ConfigName: config.yml
+  MountPath: /etc/otelcol-contrib/config.yaml

@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{.Release.Name}}-otel-collector
+  namespace: {{.Release.Namespace}}
+  labels:
+    app: {{.Release.Name}}-otel-collector
+data:
+  {{.Values.ConfigFile.ConfigName}}: |-
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+            endpoint: "0.0.0.0:4317" # accept traffic on all interfaces at the standard OTLP gRPC port
+
+    processors:
+      memory_limiter:
+        check_interval: 5s
+        limit_mib: 4096
+        spike_limit_mib: 1024
+      batch:
+        send_batch_size: 8192
+        timeout: 1s
+
+    exporters:
+      otlp/jaeger:
+        endpoint: "tracing-jaeger-0.tracing-jaeger.cecochat.svc.cluster.local:4317" # export to jaeger instance at the standard OTLP gRPC port
+        tls:
+          insecure: true
+
+    extensions:
+      health_check:
+
+    service:
+      extensions: [health_check]
+      pipelines:
+        traces:
+          receivers: [ otlp ]
+          processors: [ memory_limiter, batch ]
+          exporters: [ otlp/jaeger ]
+      telemetry:
+        logs:
+          level: info
