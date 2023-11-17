@@ -21,8 +21,8 @@ namespace CecoChat.Server.IdGen;
 public class Startup
 {
     private readonly RedisOptions _configDbOptions;
-    private readonly OtelSamplingOptions _otelSamplingOptions;
-    private readonly OtlpOptions _jaegerOptions;
+    private readonly OtelSamplingOptions _tracingSamplingOptions;
+    private readonly OtlpOptions _tracingExportOptions;
     private readonly PrometheusOptions _prometheusOptions;
 
     public Startup(IConfiguration configuration, IWebHostEnvironment environment)
@@ -33,14 +33,14 @@ public class Startup
         _configDbOptions = new();
         Configuration.GetSection("ConfigDb").Bind(_configDbOptions);
 
-        _otelSamplingOptions = new();
-        Configuration.GetSection("OtelSampling").Bind(_otelSamplingOptions);
+        _tracingSamplingOptions = new();
+        Configuration.GetSection("Telemetry:Tracing:Sampling").Bind(_tracingSamplingOptions);
 
-        _jaegerOptions = new();
-        Configuration.GetSection("Jaeger").Bind(_jaegerOptions);
+        _tracingExportOptions = new();
+        Configuration.GetSection("Telemetry:Tracing:Export").Bind(_tracingExportOptions);
 
         _prometheusOptions = new();
-        Configuration.GetSection("Prometheus").Bind(_prometheusOptions);
+        Configuration.GetSection("Telemetry:Metrics:Prometheus").Bind(_prometheusOptions);
     }
 
     public IConfiguration Configuration { get; }
@@ -86,8 +86,8 @@ public class Startup
                     };
                     aspnet.Filter = httpContext => !excludedPaths.Contains(httpContext.Request.Path);
                 });
-                tracing.ConfigureSampling(_otelSamplingOptions);
-                tracing.ConfigureOtlpExporter(_jaegerOptions);
+                tracing.ConfigureSampling(_tracingSamplingOptions);
+                tracing.ConfigureOtlpExporter(_tracingExportOptions);
             })
             .WithMetrics(metrics =>
             {
