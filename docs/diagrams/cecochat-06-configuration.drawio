@@ -1,1 +1,121 @@
-<mxfile host="Electron" modified="2023-02-18T14:06:01.254Z" agent="5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/20.8.16 Chrome/106.0.5249.199 Electron/21.4.0 Safari/537.36" etag="XWlAkBcRZtpxxtF92OMA" version="20.8.16" type="device"><diagram id="G4t1x3i_cumIOjZ8GDXV" name="Page-1">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</diagram></mxfile>
+<mxfile host="Electron" modified="2023-11-18T11:58:55.484Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.1.2 Chrome/114.0.5735.289 Electron/25.9.4 Safari/537.36" etag="lFcNuNQALwUVs-hdAeVY" version="22.1.2" type="device">
+  <diagram id="G4t1x3i_cumIOjZ8GDXV" name="Page-1">
+    <mxGraphModel dx="2020" dy="1203" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="zEOiwxzGmeE4_qA-A_0B-1" value="Messages for user ID&lt;br&gt;go into a dedicated partition" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;align=left;gradientColor=#b3b3b3;fillColor=#f5f5f5;strokeColor=#666666;" parent="1" vertex="1">
+          <mxGeometry x="570" y="320" width="190" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="zEOiwxzGmeE4_qA-A_0B-2" value="Dynamic configuration contains:&lt;br&gt;- PUB/SUB backplane partition count&lt;br&gt;- key-value pairs&amp;nbsp;(messaging server ID -&amp;gt; partitions)&lt;br&gt;- key-value pairs&amp;nbsp;(messaging&amp;nbsp;server ID -&amp;gt; address)&lt;br&gt;- history settings" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;align=left;gradientColor=#b3b3b3;fillColor=#f5f5f5;strokeColor=#666666;" parent="1" vertex="1">
+          <mxGeometry x="450" y="540" width="310" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="zEOiwxzGmeE4_qA-A_0B-3" value="Client is assigned to a Messaging server which is subscribed to partitions only for messages for the client user" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;align=left;gradientColor=#b3b3b3;fillColor=#f5f5f5;strokeColor=#666666;" parent="1" vertex="1">
+          <mxGeometry x="160" y="40" width="370" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="WAReTh2NtruZ-ETWnuQE-5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;startArrow=classic;startFill=1;" parent="1" source="WAReTh2NtruZ-ETWnuQE-7" target="WAReTh2NtruZ-ETWnuQE-11" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="WAReTh2NtruZ-ETWnuQE-6" value="Register&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Create session&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Manage own&amp;nbsp;profile&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Manage connections&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Get public profiles&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Get user chats&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Get chat history" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="WAReTh2NtruZ-ETWnuQE-7" target="WAReTh2NtruZ-ETWnuQE-24" edge="1">
+          <mxGeometry x="0.0877" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="115" y="210" />
+              <mxPoint x="115" y="130" />
+            </Array>
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WAReTh2NtruZ-ETWnuQE-7" value="Client" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" parent="1" vertex="1">
+          <mxGeometry x="40" y="310" width="30" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="WAReTh2NtruZ-ETWnuQE-8" value="Send message&lt;br&gt;React to message&lt;br&gt;Receive notifications" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.75;entryDx=0;entryDy=0;startArrow=classic;startFill=1;" parent="1" source="WAReTh2NtruZ-ETWnuQE-9" target="WAReTh2NtruZ-ETWnuQE-11" edge="1">
+          <mxGeometry x="0.0303" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WAReTh2NtruZ-ETWnuQE-9" value="Client" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" parent="1" vertex="1">
+          <mxGeometry x="40" y="450" width="30" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="WAReTh2NtruZ-ETWnuQE-10" value="PUB messages and reactions&lt;br&gt;&lt;div&gt;SUB to assigned partitions&lt;/div&gt;" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.008;entryY=0.35;entryDx=0;entryDy=0;entryPerimeter=0;startArrow=classic;startFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" parent="1" source="WAReTh2NtruZ-ETWnuQE-11" target="WAReTh2NtruZ-ETWnuQE-13" edge="1">
+          <mxGeometry x="0.0528" y="1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WAReTh2NtruZ-ETWnuQE-11" value="&lt;font style=&quot;font-size: 12px&quot;&gt;Messaging&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;gradientColor=#ffa500;fillColor=#ffcd28;strokeColor=#d79b00;" parent="1" vertex="1">
+          <mxGeometry x="160" y="360" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="WAReTh2NtruZ-ETWnuQE-13" value="PUB/SUB&lt;br&gt;backplane" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.direct_data;whiteSpace=wrap;gradientColor=#97d077;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="640" y="360" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="WAReTh2NtruZ-ETWnuQE-16" value="Update" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" parent="1" source="WAReTh2NtruZ-ETWnuQE-17" target="WAReTh2NtruZ-ETWnuQE-18" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="WAReTh2NtruZ-ETWnuQE-17" value="Configurator" style="rounded=1;whiteSpace=wrap;html=1;gradientColor=#ffa500;fillColor=#ffcd28;strokeColor=#d79b00;" parent="1" vertex="1">
+          <mxGeometry x="380" y="460" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="WAReTh2NtruZ-ETWnuQE-18" value="Config DB" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;gradientColor=#7ea6e0;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+          <mxGeometry x="640" y="450" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="WAReTh2NtruZ-ETWnuQE-19" value="&lt;font style=&quot;font-size: 12px&quot;&gt;State&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;gradientColor=#ffa500;fillColor=#ffcd28;strokeColor=#d79b00;" parent="1" vertex="1">
+          <mxGeometry x="380" y="100" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="WAReTh2NtruZ-ETWnuQE-22" value="&lt;font style=&quot;font-size: 10px&quot;&gt;PUB config&lt;br&gt;changes&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;gradientColor=#97d077;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="410" y="440" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="WAReTh2NtruZ-ETWnuQE-23" value="&lt;font style=&quot;font-size: 10px&quot;&gt;SUB config&lt;br&gt;changes&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;gradientColor=#97d077;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="190" y="340" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="vOK45yCCNcbg0Topnff8-5" value="Get chat&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;history" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="WAReTh2NtruZ-ETWnuQE-24" target="vOK45yCCNcbg0Topnff8-1">
+          <mxGeometry x="0.0526" y="20" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="330" y="130" />
+              <mxPoint x="330" y="220" />
+            </Array>
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="vOK45yCCNcbg0Topnff8-6" value="Create own profile&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Authenticate&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Manage own profile&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Manage connections&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Get public profiles" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.75;exitDx=0;exitDy=0;" edge="1" parent="1" source="WAReTh2NtruZ-ETWnuQE-24" target="vOK45yCCNcbg0Topnff8-3">
+          <mxGeometry x="0.1698" y="-30" relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="320" y="145" />
+              <mxPoint x="320" y="310" />
+            </Array>
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WAReTh2NtruZ-ETWnuQE-24" value="&lt;font style=&quot;font-size: 12px&quot;&gt;Backend&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;&lt;br&gt;For Frontend&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;gradientColor=#ffa500;fillColor=#ffcd28;strokeColor=#d79b00;" parent="1" vertex="1">
+          <mxGeometry x="160" y="100" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="WAReTh2NtruZ-ETWnuQE-25" value="&lt;font style=&quot;font-size: 10px&quot;&gt;SUB config&lt;br&gt;changes&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;gradientColor=#97d077;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="190" y="80" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="WAReTh2NtruZ-ETWnuQE-30" value="Get user&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;chats" style="endArrow=classic;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;edgeStyle=orthogonalEdgeStyle;rounded=0;" parent="1" source="WAReTh2NtruZ-ETWnuQE-24" target="WAReTh2NtruZ-ETWnuQE-19" edge="1">
+          <mxGeometry x="-0.1304" y="-5" width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="290" y="415" as="sourcePoint" />
+            <mxPoint x="370" y="480" as="targetPoint" />
+            <mxPoint x="5" y="-5" as="offset" />
+            <Array as="points">
+              <mxPoint x="360" y="115" />
+              <mxPoint x="360" y="130" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="WAReTh2NtruZ-ETWnuQE-32" value="&lt;font style=&quot;font-size: 10px&quot;&gt;SUB config&lt;br&gt;changes&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;gradientColor=#97d077;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="410" y="80" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="vOK45yCCNcbg0Topnff8-1" value="&lt;font style=&quot;font-size: 12px&quot;&gt;History&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;gradientColor=#ffa500;fillColor=#ffcd28;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="380" y="190" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="vOK45yCCNcbg0Topnff8-2" value="&lt;font style=&quot;font-size: 10px&quot;&gt;SUB config&lt;br&gt;changes&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;gradientColor=#97d077;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="410" y="170" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="vOK45yCCNcbg0Topnff8-3" value="&lt;font style=&quot;font-size: 12px&quot;&gt;User&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;gradientColor=#ffa500;fillColor=#ffcd28;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="380" y="280" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="vOK45yCCNcbg0Topnff8-4" value="&lt;font style=&quot;font-size: 10px&quot;&gt;SUB config&lt;br&gt;changes&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;gradientColor=#97d077;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="410" y="260" width="60" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
