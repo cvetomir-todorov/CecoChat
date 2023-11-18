@@ -1,4 +1,4 @@
-<mxfile host="Electron" modified="2023-11-02T20:05:01.868Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.0.3 Chrome/114.0.5735.289 Electron/25.8.4 Safari/537.36" etag="zLcqzZ5nGHyuvZVrB7tN" version="22.0.3" type="device">
+<mxfile host="Electron" modified="2023-11-18T11:20:34.140Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.1.2 Chrome/114.0.5735.289 Electron/25.9.4 Safari/537.36" etag="vrjp27k0lxplnQjOCil3" version="22.1.2" type="device">
   <diagram id="G4t1x3i_cumIOjZ8GDXV" name="Page-1">
     <mxGraphModel dx="2020" dy="1203" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
@@ -55,7 +55,7 @@
             <mxPoint x="740" y="440" as="sourcePoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="9bIkWJb_8Kgto9eP_v_A-9" value="PUB/SUB&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;backplane&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;&lt;font style=&quot;border-color: var(--border-color); font-size: 10px;&quot;&gt;Apache Kafka&lt;/font&gt;" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.direct_data;whiteSpace=wrap;gradientColor=#97d077;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+        <mxCell id="9bIkWJb_8Kgto9eP_v_A-9" value="PUB/SUB&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;backplane&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;&lt;font style=&quot;border-color: var(--border-color); font-size: 10px;&quot;&gt;Kafka&lt;/font&gt;" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.direct_data;whiteSpace=wrap;gradientColor=#97d077;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
           <mxGeometry x="640" y="530" width="120" height="80" as="geometry" />
         </mxCell>
         <mxCell id="9bIkWJb_8Kgto9eP_v_A-10" value="History DB&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;&lt;font style=&quot;border-color: var(--border-color); font-size: 10px;&quot;&gt;Cassandra&lt;/font&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;gradientColor=#7ea6e0;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">

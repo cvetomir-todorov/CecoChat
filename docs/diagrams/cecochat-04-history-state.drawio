@@ -1,1 +1,73 @@
-<mxfile host="Electron" modified="2021-11-28T10:32:08.301Z" agent="5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/15.2.7 Chrome/93.0.4577.63 Electron/14.0.1 Safari/537.36" etag="7yNP3avaijxkjOFPl4Al" version="15.2.7" type="device"><diagram id="G4t1x3i_cumIOjZ8GDXV" name="Page-1">7VlbV9s4EP41eUyO70keCQToLhS6Od1CX3oUW7YFjuXKcuLw6ytZEr7GBAhl91DCcazR6GLPzDffKAPzeJWfEZCEl9iD0cDQvHxgngwMQ7cMY8D/NW8rJFPDFIKAIE8qlYIFeoBSqElphjyY1hQpxhFFSV3o4jiGLq3JACF4U1fzcVRfNQEBbAkWLoja0m/Io6GQTmytlJ9DFIRqZV2TPSuglKUgDYGHNxWROR+YxwRjKu5W+TGM+MtT70WMO93R+7gxAmO6zwDr8yVB9tXyS27AmfZv7kQrd6g7Ypo1iDL5xNdfZ8VLZhcCXZQgPn+xEEUU4Vg+Dd2qV0RwFnuQr6INzBkmNMQBjkF0gXHChDoT3kFKt9K4IGNzm7OQriLZyxYg2xs5vmjc8sbIVs2TvNp5sq22riFBK0ghkcKUso0eccszQYxjqGSnKIrUwBzRG7U4u68sx1rlaryhFmu/bmmBFGfEhT3v2JJuC0gAaY/eVOhBr+aR0phnELOnJNvCKhGgaF13UCD9PHjUexx6jVFhQaWCfT9lG6n4CruprFCKCg96hjdZLWcaGE7Ennnm42ILpdc4PzOsOoZp4RlHTEE3krzsZHcB/76EaQoCFAdqOrY7MaPo73FJbuJNiChcJKCw0obhVN39AgI87uTHOMKkGG/6PrA1bnWfOU1N7nrGpPAogu9hpccbT5dar5+sIaEw77Ws7LUkYkjINBWCbEoA0pUsrICPo+32hZqpe+x65q8cI1wYD+E8W3831o51dj9UYFxFCYJdZhUOdIVxIL8FsVf4J3A5UKTKWkuiDMUckeOKGwLuDSFKKZbbq1qPR8BCNks4mZfS2QEhp0SZ22rfLsiRyFGixW0VLDqRgzeaKPVyNJm20WT++cvC+alf3337KwqPbsJ5+OlyqO+JJtLnhtpoLEYcHl4YGoNtRSPhI9KOKZT/G/UAUI59ukPf1Hr12Y3YwUGxbtqdOE8X/Nr0+yVw75MIsGTU9HUBJIpaGHUvZZQh4XqrPODsauRHeMNih9CRh1hupj88QMEOgOtAtenY08bjNqp5Npx4VheqTYyl6TiHQTXTacCaviesTQ4Aa50mNNqwdq4gSTtpZxVlDncbIQY/xHw6tywFUF0sHwXME4ICvq4yyqaBytQCqXS723RjCBzYkZA8ACe+22U6x53ApX8Y09mNANOddzed/XqqoXdRDQbUKfOBWl5rRnOp05Pqnk9VPjx77stjT7Jn5X5vRp9lLLBsU48Fza5PIZ5IjurJWlYDDw27ESzikXsmeknGfQXl7zPPwSn/IxB/BMLfZPz6+Dcy/kn243v+98NZcvrPJ2261s2Ln8dDs2XWBQUU/smLvXnR+o1psdNsb1WAS+N/xFi03zsU20yns/aWpXUqLPX/q6ifwybevKLuC659K2pt5Oi2HPP+NbXTrL7s/pq6qa9bz6vBG/r1GrxNqqaN3TURcl9SpdsNUmXtR6peQIc6fWT8egDuLEu+Jp5Iv1nKPF6coP0pOg5RdPSF+pOQYO4JCa+sOcwmPzRfGB7Nk7XWRP+1muPKIbF+PryYjfO7dGZ5k6P7SUfNocipOIAuD3FYsKyRK86mCVdwWa2erYpfErTi8MzQfIJX3NYh76+c4WmVQzuN89oEsktMo205iJX/IfvCbDBpR+OQdamdyZ3wqfhuMh7PYhti4Upcl1m8a8LWw6kpE3EqISaN4WbQfzSv7XcWr7h9jCncg9bvYPEeIPdXbBSiRWyONB64IEJBzJoR9Gk3E1wWnw4maPNPJ7sv/g7DBK2nyf2kgwi2YmoPJsia5Q/BIkzKn9PN+S8=</diagram></mxfile>
+<mxfile host="Electron" modified="2023-11-18T11:52:19.151Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.1.2 Chrome/114.0.5735.289 Electron/25.9.4 Safari/537.36" etag="LvF5udviF-nDxdEMmv1P" version="22.1.2" type="device">
+  <diagram id="G4t1x3i_cumIOjZ8GDXV" name="Page-1">
+    <mxGraphModel dx="2020" dy="1203" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="4NMri5ObQx2eB0Vx6lmc-16" value="PUB messages and reactions" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;startArrow=none;startFill=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" parent="1" source="4NMri5ObQx2eB0Vx6lmc-4" target="4NMri5ObQx2eB0Vx6lmc-9" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="4NMri5ObQx2eB0Vx6lmc-4" value="&lt;font style=&quot;font-size: 12px&quot;&gt;Messaging&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;gradientColor=#ffa500;fillColor=#ffcd28;strokeColor=#d79b00;" parent="1" vertex="1">
+          <mxGeometry x="40" y="320" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Gfm62hS2zhEuvZ2v64Gk-10" value="Process messages and reactions&lt;br&gt;into chat history" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;exitPerimeter=0;" parent="1" source="4NMri5ObQx2eB0Vx6lmc-9" target="ENQS6q1PjWJlhAXhEhIM-1" edge="1">
+          <mxGeometry x="-0.7" relative="1" as="geometry">
+            <mxPoint as="offset" />
+            <Array as="points">
+              <mxPoint x="420" y="260" />
+              <mxPoint x="300" y="260" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="4NMri5ObQx2eB0Vx6lmc-9" value="PUB/SUB&lt;br&gt;backplane" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.direct_data;whiteSpace=wrap;gradientColor=#97d077;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="360" y="310" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="4NMri5ObQx2eB0Vx6lmc-20" value="History DB" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;gradientColor=#7ea6e0;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+          <mxGeometry x="500" y="160" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="4NMri5ObQx2eB0Vx6lmc-25" value="&lt;font style=&quot;font-size: 11px&quot;&gt;Persist messages&lt;br&gt;Persist reactions&lt;br&gt;&lt;/font&gt;" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;startArrow=none;startFill=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" parent="1" source="ENQS6q1PjWJlhAXhEhIM-1" target="4NMri5ObQx2eB0Vx6lmc-20" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="230" y="105" as="sourcePoint" />
+            <mxPoint x="460" y="250" as="targetPoint" />
+            <mxPoint as="offset" />
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ENQS6q1PjWJlhAXhEhIM-1" value="&lt;font style=&quot;font-size: 12px&quot;&gt;History&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;gradientColor=#ffa500;fillColor=#ffcd28;strokeColor=#d79b00;" parent="1" vertex="1">
+          <mxGeometry x="240" y="170" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="8u_ZxKzGpFRI09v13LqC-3" value="State DB" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;gradientColor=#7ea6e0;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+          <mxGeometry x="500" y="40" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="8u_ZxKzGpFRI09v13LqC-4" value="&lt;font style=&quot;font-size: 12px&quot;&gt;State&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;gradientColor=#ffa500;fillColor=#ffcd28;strokeColor=#d79b00;" parent="1" vertex="1">
+          <mxGeometry x="240" y="50" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="8u_ZxKzGpFRI09v13LqC-5" value="Process messages into state" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;" parent="1" source="4NMri5ObQx2eB0Vx6lmc-9" target="8u_ZxKzGpFRI09v13LqC-4" edge="1">
+          <mxGeometry x="0.6154" relative="1" as="geometry">
+            <mxPoint as="offset" />
+            <Array as="points">
+              <mxPoint x="660" y="350" />
+              <mxPoint x="660" y="140" />
+              <mxPoint x="300" y="140" />
+            </Array>
+            <mxPoint x="290" y="380" as="sourcePoint" />
+            <mxPoint x="150" y="240" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="8u_ZxKzGpFRI09v13LqC-7" value="&lt;font style=&quot;font-size: 11px&quot;&gt;Update user chats&lt;br&gt;&lt;/font&gt;" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;startArrow=none;startFill=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" parent="1" source="8u_ZxKzGpFRI09v13LqC-4" target="8u_ZxKzGpFRI09v13LqC-3" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="340" y="130" as="sourcePoint" />
+            <mxPoint x="420" y="130" as="targetPoint" />
+            <mxPoint as="offset" />
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="O6rn1H-LB7xjsB4d8Ak8-1" value="State and History services are consuming data from the PUB/SUB backplane independently from each other&lt;br&gt;- State service is updating the user chat state&lt;br&gt;- History service is persisting new messages and reactions into chat history" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;align=left;gradientColor=#b3b3b3;fillColor=#f5f5f5;strokeColor=#666666;" parent="1" vertex="1">
+          <mxGeometry x="40" y="40" width="180" height="130" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
