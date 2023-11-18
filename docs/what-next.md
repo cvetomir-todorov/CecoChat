@@ -7,8 +7,11 @@
 * Clients
   - Web-based
   - Mobile
-* Setup aggregated logs storage
-* Setup versioning
+* Development
+  - Setup versioning
+* Deployment
+  - Create a redis cluster
+  - Setup aggregated logs storage
 
 ## Product features
 
@@ -38,9 +41,10 @@
 ## Technical features
 
 * Architecture
+  - Design dynamic configuration
   - Design cross-region communication
 * Security
-  - Introduce an auth server
+  - Introduce an auth service
     - Issue access tokens, introduce refresh tokens, etc.
     - Restrict service-to-service communication
     - Use pepper instead of just salt for passwords
@@ -53,8 +57,7 @@
   - Alerting
 * Deployment
   - Infrastructure as code
-  - Auto-scaling
-  - High availability (complete)
+  - Complete auto-scaling
 
 ## Development
 
@@ -68,15 +71,11 @@
 
 * Performance
   - Use allocation-free logging
-  - Benchmark Kafka and improve its configuration
+  - Make a larger benchmark and improve configuration of backplane, client-server communication, databases
 * Observability
+  - Add Open Telemetry metrics and traces to Redis
+  - Add Open Telemetry metrics to UserDB when Npgsql adds support
   - Use Cassandra instrumentation from .NET contrib
-  - Add Open Telemetry metrics in UserDB when Npgsql adds support
-  - Improve existing distributed tracing - baggage propagation, custom instrumentation implementation
-  - Improve existing log aggregation - performance of Fluentd, ElasticSearch index customizations
-* Deployment
-  - Create a redis cluster
 * Misc
   - Control sending notifications to SignalR connected clients as previously with gRPC clients
   - Improve monotonic clock skew and make snowflake ID generation to use it as `IdGen.ITimeSource`
-  - Improve error handling, resilience
