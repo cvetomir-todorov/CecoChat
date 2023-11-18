@@ -4,8 +4,8 @@ The technologies chosen are [cloud agnostic](https://codersociety.com/blog/artic
 
 * Integration - Kafka, gRPC, WebSocket, HTTP
 * Data storage - Yugabyte, Cassandra, Redis
-* Operations - OpenTelemetry, Docker, Kubernetes
-* Services - .NET, ASP.NET
+* Operations - OpenTelemetry, Docker, Kubernetes, Helm
+* Services - .NET, ASP.NET, SignalR, EF Core
 
 ![Technologies](images/cecochat-08-technologies.png)
 
@@ -36,7 +36,7 @@ Services communicate synchronously with each other via gRPC:
 ![Kafka](tech-images/kafka.png)
 ![Protocol buffers](tech-images/protocol-buffers.png)
 
-Services communicate asynchronously via the PUB/SUB backplane which is based on Apache Kafka:
+Services communicate asynchronously via the PUB/SUB backplane which is based on Kafka:
 * open-source software backed by Confluent
 * a linearly scalable message broker
 * enables a superb throughput due to its balanced distribution of partition leadership throughout the cluster
@@ -79,7 +79,7 @@ User cache is based on Redis:
 
 ![Cassandra](tech-images/cassandra.png)
 
-State and history are based on Apache Cassandra:
+State and history are based on Cassandra:
 * open-source software backed by DataStax
 * linearly scalable
 * distributed with auto-partitioning and auto-replication
@@ -89,7 +89,7 @@ State and history are based on Apache Cassandra:
 * suitable for time series
 * eliminates the need of caching
 * allows precise control over the consistency used for writes and reads
-* ensures data consistency via hinted hand-offs and read repairs
+* ensures data consistency via hinted handoffs and read repairs
 * needs regular anti-entropy repairs which are CPU-bound
 
 # Configuration database
