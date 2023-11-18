@@ -1,5 +1,7 @@
 # Observability
 
+![Observability](images/cecochat-10-observability.png)
+
 ## Health
 
 Various health checks are exposed via HTTP health endpoints:
@@ -38,24 +40,30 @@ Each service is represented as a separate resource with namespace, name and vers
 
 The following instrumentation is used:
 * Out-of-the-box
-  - ASP.NET Core (with gRPC support for incoming requests) which is out-of-the box
-  - gRPC client instrumentation
+  - ASP.NET Core with support for gRPC server-side
+  - gRPC client instrumentation for service-to-service communication
+  - Npgsql client instrumentation for YugabyteDB implementing the UserDB used in User service
 * Custom
-  - gRPC instrumentation for server streaming which wasn't present/working
-  - Kafka instrumentation for producers and consumers
-  - History and state app-level instrumentation for requests towards Cassandra - HistoryDB, StateDB
-
-Since OpenTelemetry is rather new in .NET there are fewer out-of-the box instrumentation libraries. This is the reason for the custom instrumentation implementation. Because of that it takes some shortcuts. E.g. it doesn't propagate the `Baggage` for now. OpenTelemetry specification lists a number of database, rpc, messaging (general) and Cassandra, gRPC, Kafka (specific) attributes that can be added to a span. The custom instrumentation implementation doesn't go into the detail of adding **all** of them, only the most important ones.
-
-The API used is the .NET one which is recommended for now, instead of the OpenTelemetry wrapper. Since it is a bleeding-edge tech that may change. The complexity of the instrumentation implementation is a result of specific details how spans are started/stopped, whether or not a span object is created based on sampling and how spans are tracked via a static execution context. These are intertwined with each other and propagating spans, using simultaneously running worker threads, probability-based sampling made doing it a challenge.
+  - Backplane instrumentation
+    - At the level of Kafka producers and consumers
+  - HistoryDB and StateDB instrumentation for Cassandra queries
+    - At the level of Cassandra but requiring code in the application
+  - Messaging instrumentation
+    - at the level of SignalR
 
 ### Sampling
 
-For `Debug` all traces are sampled. For `Release` this is true for 10% of them. The `/metrics` endpoint are excluded. Additionally, when health-check APIs are added they should be excluded as well. A configuration based approach is taken which allows a high degree of customization both during development and deployment.
+* During development all traces are sampled
+* For Docker and Minikube deployments only a custom percentage of traces are sampled - value is set in the configuration
+* The `/metrics` and health endpoints are excluded
 
 ### Exporting
 
-Jaeger is used in order to show traces and spans since an exporter for it is provided out-of-the-box. Additionally a few other ones could be used as well. The development environment uses the all-in-one Jaeger container which stores traces only in memory and that is enough. For production though a full deployment of Jaeger and all its components would have to be implemented.
+* Observable services use Open Telemetry and the agnostic OTLP exporter to send collected traces
+* The Open Telemetry OTel collector collects the traces and uses OTLP to push them to Jaeger
+* Jaeger stores and provides access to collected traces
+  - Currently the Docker image used stores traces in memory
+  - For production a full deployment of Jaeger and all its components needs to be implemented
 
 ## Log aggregation
 
