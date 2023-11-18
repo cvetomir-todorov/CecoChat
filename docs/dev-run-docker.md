@@ -11,6 +11,7 @@ Make sure that the [prerequisites](dev-run-prerequisites.md) have been met befor
   - Cassandra - 2 nodes, 1 Cassandra Web (separate)
   - Redis - 1 instance, 1 Redis Commander (separate)
 * Observability
+  - Telemetry - 1 OTel collector
   - Tracing - 1 Jaeger all-in-one
   - Metrics - 1 Prometheus, 1 cAdvisor, 1 Grafana
   - Logging - 1 ElasticSearch, 1 Fluentd, 1 Kibana
@@ -48,10 +49,6 @@ The convenience of `docker compose` makes it possible to run exactly what is nee
   - Run the IDGen service from the IDE
   - `docker compose -f redis.yml up -d`
   - `docker compose -f kafka.yml up -d`
-* Working on User service:
-  - `docker compose -f redis.yml up -d`
-  - `docker compose -f yugabyte.yml up -d`
-  - Run the BFF service from the IDE to make queries
 * Working on State/History service:
   - `docker compose -f redis.yml up -d`
   - `docker compose -f kafka.yml up -d`
@@ -59,6 +56,7 @@ The convenience of `docker compose` makes it possible to run exactly what is nee
   - Run the IDGen and Messaging services from the IDE to input messages into Kafka
   - Run the BFF service from the IDE to make queries
 * Working on observability:
+  - `docker compose -f telemetry.yml up -d`
   - `docker compose -f tracing.yml up -d`
   - `docker compose -f metrics.yml up -d`
   - `docker compose -f logging.yml up -d`
