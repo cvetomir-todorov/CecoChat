@@ -1,4 +1,4 @@
-[Chat engine](docs/intro-capabilities.md) for millions of users
+[Chat engine](docs/intro-capabilities.md) designed for millions of users
 
 * Messaging in real-time
   - Send and receive messages, (un)react with emojis
@@ -50,7 +50,7 @@ Check out [what next](docs/what-next.md) needs to be implemented. I appreciate a
 * Design
   - [Messaging](docs/design-messaging.md)
   - [User chats, chat history](docs/design-state-history.md)
-  - [User profiles](docs/design-users.md)
+  - [User profiles and connections](docs/design-users.md)
   - [Clients](docs/design-clients.md)
   - [Configuration](docs/design-configuration.md)
   - [Observability](docs/design-observability.md)

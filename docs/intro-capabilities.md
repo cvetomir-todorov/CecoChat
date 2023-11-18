@@ -22,12 +22,15 @@
 ## Technical
 
 * Reliability
-  - Durability is guaranteed by acknowledgement and replication
-  - Eventual consistency guarantees - once the sent message is processed it will eventually be persisted and delivered
+  - Server-processing client-side acknowledgement
+  - Replication including in-sync replicas
+  - Atomicity of message processing
+* Availability vs consistency
+  - Eventual consistency - once the message is processed it will eventually be persisted and delivered
 * Scalability
   - Designed for up to 10 mln of simultaneously active users
   - Unfortunately, expensive to validate due to the infrastructure required
-  - Linear scalability of the main technologies (Kafka, Cassandra, YugabyteDB)
+  - Linear scalability of the main technologies (Kafka, Cassandra, Yugabyte)
   - Supported by numbers from the [calculations](research-calculations.md)
   - Minimal [load test on 2 machines](load-test.md)
 * Security
@@ -45,7 +48,6 @@
   - Containerization
   - Orchestration
   - Load balancing
-  - High availability (partial)
 * Maintainability
   - Simple individual services
   - Code quality gate
