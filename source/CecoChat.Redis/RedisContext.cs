@@ -7,7 +7,7 @@ public interface IRedisContext : IDisposable, IAsyncDisposable
 {
     IConnectionMultiplexer Connection { get; }
 
-    IDatabase GetDatabase(int db = -1);
+    IDatabase GetDatabase();
 
     ISubscriber GetSubscriber();
 }
@@ -47,14 +47,9 @@ public sealed class RedisContext : IRedisContext
 
     public IConnectionMultiplexer Connection => _connection.Value;
 
-    public IDatabase GetDatabase(int db = -1)
+    public IDatabase GetDatabase()
     {
-        if (db < 0)
-        {
-            db = _redisOptions.DefaultDatabase;
-        }
-
-        return Connection.GetDatabase(db);
+        return Connection.GetDatabase();
     }
 
     public ISubscriber GetSubscriber()
@@ -66,8 +61,8 @@ public sealed class RedisContext : IRedisContext
     {
         ConfigurationOptions redisConfiguration = CreateRedisConfiguration();
         ConnectionMultiplexer connection = ConnectionMultiplexer.Connect(redisConfiguration);
-        _logger.LogInformation("Redis connection {Name} using '{ConnectionString}' with default database {DefaultDb} is {ConnectionState}",
-            _redisOptions.Name, connection.Configuration, _redisOptions.DefaultDatabase, connection.IsConnected ? "established" : "not established");
+        _logger.LogInformation("Redis connection {Name} using '{ConnectionString}' is {ConnectionState}",
+            _redisOptions.Name, connection.Configuration, connection.IsConnected ? "established" : "not established");
 
         connection.ConnectionFailed += (_, args) =>
         {
