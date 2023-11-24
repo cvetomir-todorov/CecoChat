@@ -1,4 +1,3 @@
-using System.Globalization;
 using CecoChat.Contracts.User;
 using CecoChat.Redis;
 using Google.Protobuf;
@@ -29,8 +28,8 @@ public class CachingConnectionQueryRepo : ICachingConnectionQueryRepo
 
     public async Task<Connection?> GetConnection(long userId, long connectionId)
     {
-        // we store all connections in a separate database, so we don't need to prefix the key
-        RedisKey key = new($"{userId}:{connectionId}");
+        // use hash tags to make sure the hash slot is determined only by the user ID
+        RedisKey key = new($"connections:{{{userId}}}:{connectionId}");
         RedisValue value = await _cache.StringGetAsync(key);
         Connection? connection;
 
@@ -57,8 +56,8 @@ public class CachingConnectionQueryRepo : ICachingConnectionQueryRepo
 
     public async Task<IReadOnlyCollection<Connection>> GetConnections(long userId)
     {
-        // we store all connections in a separate database, so we don't need to prefix the key
-        RedisKey key = new(userId.ToString(CultureInfo.InvariantCulture));
+        // use hash tags to make sure the hash slot is determined only by the user ID
+        RedisKey key = new($"connections:{{{userId}}}");
         RedisValue[] existingValues = await _cache.SetMembersAsync(key);
         IReadOnlyCollection<Connection> connections;
 
