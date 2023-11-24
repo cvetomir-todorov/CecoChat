@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.Threading.Channels;
 using CecoChat.Contracts.User;
 using CecoChat.Redis;
@@ -49,8 +48,7 @@ internal class ProfileCache : IProfileCache
 
     public RedisKey CreateKey(long userId)
     {
-        // we store all profiles in a separate database, so we don't need to prefix the key
-        return new RedisKey(userId.ToString(CultureInfo.InvariantCulture));
+        return new RedisKey($"profiles:{userId}");
     }
 
     public async Task<ProfilePublic?> GetOne(RedisKey key)
@@ -65,9 +63,36 @@ internal class ProfileCache : IProfileCache
         return profile;
     }
 
-    public Task<RedisValue[]> GetMany(RedisKey[] keys)
+    public async Task<RedisValue[]> GetMany(RedisKey[] keys)
     {
-        return _cache.StringGetAsync(keys);
+        // keys may be spread throughout many partitions and we need the values for all of them
+        // we can pipeline a request for each key individually which is wasteful
+        // instead we pipeline a request for our keys in each hash slot which is more optimal
+
+        IEnumerable<IGrouping<int, RedisKey>> keyGroups = keys.GroupBy(key => _cache.Multiplexer.GetHashSlot(key));
+
+        Task<RedisValue[]>[] tasks = keyGroups.Select(async keyGroup =>
+            {
+                _logger.LogTrace("Getting profiles from Redis hash slot {RedisHashSlot}", keyGroup.Key);
+                RedisKey[] keyGroupArray = keyGroup.ToArray();
+                RedisValue[] valuesGroup = await _cache.StringGetAsync(keyGroupArray);
+
+                return valuesGroup;
+            })
+            .ToArray();
+
+        await Task.WhenAll(tasks);
+        RedisValue[] values = new RedisValue[keys.Length];
+        int index = 0;
+
+        foreach (Task<RedisValue[]> task in tasks)
+        {
+            RedisValue[] valuesGroup = task.Result;
+            valuesGroup.CopyTo(values, index);
+            index += valuesGroup.Length;
+        }
+
+        return values;
     }
 
     public ValueTask SetOneAsynchronously(ProfilePublic profile)
