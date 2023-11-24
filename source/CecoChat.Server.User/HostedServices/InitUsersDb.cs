@@ -44,20 +44,20 @@ public sealed class InitUsersDb : IHostedService
 
             if (_options.SeedConsoleClientUsers)
             {
-                await SeedConsoleClientUsers(cancellationToken);
-                _logger.LogInformation("Seeded database with console client users.");
+                int userCount = await SeedConsoleClientUsers(cancellationToken);
+                _logger.LogInformation("Seeded database with {UserCount} console client users", userCount);
             }
             if (_options.SeedLoadTestingUsers)
             {
                 await SeedLoadTestingUsers(_options.SeedLoadTestingUserCount, cancellationToken);
-                _logger.LogInformation("Seeded database with {UserCount} load testing users.", _options.SeedLoadTestingUserCount);
+                _logger.LogInformation("Seeded database with {UserCount} load testing users", _options.SeedLoadTestingUserCount);
             }
         }
 
         _userDbInitHealthCheck.IsReady = true;
     }
 
-    private async Task SeedConsoleClientUsers(CancellationToken ct)
+    private async Task<int> SeedConsoleClientUsers(CancellationToken ct)
     {
         ProfileEntity[] profiles =
         {
@@ -104,6 +104,8 @@ public sealed class InitUsersDb : IHostedService
         _dbContext.Profiles.AddRange(profiles);
         await _dbContext.SaveChangesAsync(ct);
         _dbContext.ChangeTracker.Clear();
+
+        return profiles.Length;
     }
 
     private async Task SeedLoadTestingUsers(int userCount, CancellationToken ct)
