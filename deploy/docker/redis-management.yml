@@ -15,4 +15,4 @@ services:
         limits:
           memory: 128M
     environment:
-      - REDIS_HOSTS=redis:redis:6379
+      - REDIS_HOSTS=redis0:redis0:6379,redis1:redis1:6379,redis2:redis2:6379

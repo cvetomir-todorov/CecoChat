@@ -2,10 +2,10 @@ version: '3'
 networks:
   cecochat:
 services:
-  redis:
+  redis0:
     image: redis:7.0.12
-    container_name: cecochat-redis
-    hostname: redis
+    container_name: cecochat-redis0
+    hostname: redis0
     networks: &networks
       - cecochat
     ports:
@@ -16,8 +16,56 @@ services:
           memory: 64M
     volumes:
       - ./redis/redis.conf:/redis.conf
-      - cecochat-redis-data:/data
+      - cecochat-redis0-data:/data
     command: [ "redis-server", "/redis.conf" ]
+  redis1:
+    image: redis:7.0.12
+    container_name: cecochat-redis1
+    hostname: redis1
+    networks: *networks
+    ports:
+      - "6380:6379"
+    deploy:
+      resources:
+        limits:
+          memory: 64M
+    volumes:
+      - ./redis/redis.conf:/redis.conf
+      - cecochat-redis1-data:/data
+    command: [ "redis-server", "/redis.conf" ]
+  redis2:
+    image: redis:7.0.12
+    container_name: cecochat-redis2
+    hostname: redis2
+    networks: *networks
+    ports:
+      - "6381:6379"
+    deploy:
+      resources:
+        limits:
+          memory: 64M
+    volumes:
+      - ./redis/redis.conf:/redis.conf
+      - cecochat-redis2-data:/data
+    command: [ "redis-server", "/redis.conf" ]
+  redis-cluster-setup:
+    image: redis:7.0.12
+    container_name: cecochat-redis-cluster-setup
+    hostname: redis-cluster-setup
+    networks: *networks
+    deploy:
+      resources:
+        limits:
+          memory: 64M
+    entrypoint: "redis-cli --cluster create redis0:6379 redis1:6379 redis2:6379 --cluster-yes"
+    depends_on:
+      - redis0
+      - redis1
+      - redis2
 volumes:
-  cecochat-redis-data:
+  cecochat-redis0-data:
+    external: true
+  cecochat-redis1-data:
+    external: true
+  cecochat-redis2-data:
     external: true
