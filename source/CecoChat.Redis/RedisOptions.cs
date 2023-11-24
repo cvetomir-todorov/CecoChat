@@ -12,7 +12,5 @@ public sealed class RedisOptions
 
     public int KeepAlive { get; init; }
 
-    public int DefaultDatabase { get; init; }
-
     public TimeSpan HealthTimeout { get; init; }
 }

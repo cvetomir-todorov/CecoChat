@@ -23,7 +23,7 @@ public class CachingConnectionQueryRepo : ICachingConnectionQueryRepo
     {
         _logger = logger;
         _cacheOptions = userCacheOptions.Value;
-        _cache = redisContext.GetDatabase(_cacheOptions.ConnectionsDatabase);
+        _cache = redisContext.GetDatabase();
         _decoratedRepo = decoratedRepo;
     }
 
