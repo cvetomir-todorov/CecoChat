@@ -9,5 +9,6 @@ spec:
   selector:
     app: {{.Release.Name}}
   type: ClusterIP
+  clusterIP: None
   ports:
     - port: {{.Values.Networking.Port}}
