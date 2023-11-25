@@ -11,6 +11,7 @@ spec:
       app: {{.Release.Name}}
   serviceName: {{.Release.Name}}
   replicas: {{.Values.StatefulSet.Replicas}}
+  podManagementPolicy: Parallel
   template:
     metadata:
       labels:
@@ -26,8 +27,18 @@ spec:
             limits:
               memory: {{.Values.Resources.Limits.Memory}}
           volumeMounts:
+            - name: config
+              mountPath: {{.Values.ConfigFile.MountPath}}
+              subPath: {{.Values.ConfigFile.ConfigName}}
+              readOnly: true
             - name: data
               mountPath: /data
+          command: [ "redis-server", "{{.Values.ConfigFile.MountPath}}"] 
+      volumes:
+        - name: config
+          configMap:
+            name: {{.Release.Name}}
+            defaultMode: 0777
   volumeClaimTemplates:
     - metadata:
         name: data

@@ -1,11 +1,14 @@
 StatefulSet:
-  Replicas: 1
+  Replicas: 3
 Image:
   Name: redis
   Tag: 7.0.12
   PullPolicy: IfNotPresent
 Networking:
   Port: 6379
+ConfigFile:
+  ConfigName: redis.conf
+  MountPath: /redis.conf
 Resources:
   Limits:
     Memory: 128Mi
