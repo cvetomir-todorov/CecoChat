@@ -3,7 +3,7 @@ networks:
   cecochat:
 services:
   redis0:
-    image: redis:7.0.12
+    image: redis:7.2.3
     container_name: cecochat-redis0
     hostname: redis0
     networks: &networks
@@ -19,7 +19,7 @@ services:
       - cecochat-redis0-data:/data
     command: [ "redis-server", "/redis.conf" ]
   redis1:
-    image: redis:7.0.12
+    image: redis:7.2.3
     container_name: cecochat-redis1
     hostname: redis1
     networks: *networks
@@ -34,7 +34,7 @@ services:
       - cecochat-redis1-data:/data
     command: [ "redis-server", "/redis.conf" ]
   redis2:
-    image: redis:7.0.12
+    image: redis:7.2.3
     container_name: cecochat-redis2
     hostname: redis2
     networks: *networks
@@ -49,7 +49,7 @@ services:
       - cecochat-redis2-data:/data
     command: [ "redis-server", "/redis.conf" ]
   redis-cluster-setup:
-    image: redis:7.0.12
+    image: redis:7.2.3
     container_name: cecochat-redis-cluster-setup
     hostname: redis-cluster-setup
     networks: *networks
