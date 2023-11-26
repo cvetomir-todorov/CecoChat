@@ -9,7 +9,7 @@ Make sure that the [prerequisites](dev-run-prerequisites.md) have been met befor
 * Data storage
   - YugabyteDB - 2 masters, 2 tservers, local pgAdmin is needed for management
   - Cassandra - 2 nodes
-  - Redis - 1 instance
+  - Redis - 3 masters
 * Observability
   - Telemetry - 1 OTel collector
   - Tracing - 1 Jaeger all-in-one
@@ -50,9 +50,11 @@ Redis cluster is initialized manually by executing the content of the `cluster.s
 kubectl exec -it redis-0 -- bash
 ```
 
-Initial dynamic config is created manually from inside the Redis pod using the content of the `data.sh` script and lives as long as the same `PersistentVolume` is used:
+Initial dynamic config is created manually from inside the Redis pod using the content of the `data.sh` script and lives as long as the same `PersistentVolume` is used. Unfortunately, due to how Redis works, the contents of the script needs to be executed in each of the 3 instances of the cluster.
 ```shell
 kubectl exec -it redis-0 -- bash
+kubectl exec -it redis-1 -- bash
+kubectl exec -it redis-2 -- bash
 ```
 
 Initial Kafka topics are created manually from inside one of the Kafka broker pods using the content of the `kafka-topics.sh` script and live as long as the same `PersistentVolume` is used, but beware that successful start of Kafka may take a bit more than the other components, including 1-2 restarts of the pods:
