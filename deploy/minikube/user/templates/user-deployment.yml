@@ -71,7 +71,11 @@ spec:
             - name: CECOCHAT_UserCache__Enabled
               value: "{{.Values.Networking.UserCache.Enabled}}"
             - name: CECOCHAT_UserCache__Store__Endpoints__0
-              value: {{.Values.Networking.UserCache.Store.Endpoint}}
+              value: {{.Values.Networking.UserCache.Store.Endpoint0}}
+            - name: CECOCHAT_UserCache__Store__Endpoints__1
+              value: {{.Values.Networking.UserCache.Store.Endpoint1}}
+            - name: CECOCHAT_UserCache__Store__Endpoints__2
+              value: {{.Values.Networking.UserCache.Store.Endpoint2}}
             - name: CECOCHAT_UserCache__Store__ConnectRetry
               value: "{{.Values.Networking.UserCache.Store.ConnectRetry}}"
             - name: CECOCHAT_UserCache__Store__ConnectTimeout

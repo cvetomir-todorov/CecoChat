@@ -18,11 +18,12 @@ metadata:
   name: service-configdb
   namespace: cecochat
 data:
-  CECOCHAT_ConfigDb__Endpoints__0: "redis:6379"
+  CECOCHAT_ConfigDb__Endpoints__0: "redis-0.redis.cecochat.svc.cluster.local:6379"
+  CECOCHAT_ConfigDb__Endpoints__1: "redis-1.redis.cecochat.svc.cluster.local:6379"
+  CECOCHAT_ConfigDb__Endpoints__2: "redis-2.redis.cecochat.svc.cluster.local:6379"
   CECOCHAT_ConfigDb__ConnectRetry: "16"
   CECOCHAT_ConfigDb__ConnectTimeout: "5000"
   CECOCHAT_ConfigDb__KeepAlive: "2"
-  CECOCHAT_ConfigDb__DefaultDatabase: "0"
 ---
 
 apiVersion: v1
