@@ -20,6 +20,8 @@ namespace CecoChat.Server.IdGen;
 
 public class Startup
 {
+    private readonly IConfiguration _configuration;
+    private readonly IWebHostEnvironment _environment;
     private readonly RedisOptions _configDbOptions;
     private readonly OtelSamplingOptions _tracingSamplingOptions;
     private readonly OtlpOptions _tracingExportOptions;
@@ -27,25 +29,21 @@ public class Startup
 
     public Startup(IConfiguration configuration, IWebHostEnvironment environment)
     {
-        Configuration = configuration;
-        Environment = environment;
+        _configuration = configuration;
+        _environment = environment;
 
         _configDbOptions = new();
-        Configuration.GetSection("ConfigDb").Bind(_configDbOptions);
+        _configuration.GetSection("ConfigDb").Bind(_configDbOptions);
 
         _tracingSamplingOptions = new();
-        Configuration.GetSection("Telemetry:Tracing:Sampling").Bind(_tracingSamplingOptions);
+        _configuration.GetSection("Telemetry:Tracing:Sampling").Bind(_tracingSamplingOptions);
 
         _tracingExportOptions = new();
-        Configuration.GetSection("Telemetry:Tracing:Export").Bind(_tracingExportOptions);
+        _configuration.GetSection("Telemetry:Tracing:Export").Bind(_tracingExportOptions);
 
         _prometheusOptions = new();
-        Configuration.GetSection("Telemetry:Metrics:Prometheus").Bind(_prometheusOptions);
+        _configuration.GetSection("Telemetry:Metrics:Prometheus").Bind(_prometheusOptions);
     }
-
-    public IConfiguration Configuration { get; }
-
-    public IWebHostEnvironment Environment { get; }
 
     public void ConfigureServices(IServiceCollection services)
     {
@@ -55,7 +53,7 @@ public class Startup
         // clients
         services.AddGrpc(grpc =>
         {
-            grpc.EnableDetailedErrors = Environment.IsDevelopment();
+            grpc.EnableDetailedErrors = _environment.IsDevelopment();
             grpc.EnableMessageValidation();
         });
         services.AddGrpcValidation();
@@ -118,9 +116,9 @@ public class Startup
         builder.RegisterHostedService<InitDynamicConfig>();
 
         // configuration
-        IConfiguration configDbConfig = Configuration.GetSection("ConfigDb");
+        IConfiguration configDbConfig = _configuration.GetSection("ConfigDb");
         builder.RegisterModule(new ConfigDbAutofacModule(configDbConfig, registerSnowflake: true));
-        builder.RegisterOptions<ConfigOptions>(Configuration.GetSection("Config"));
+        builder.RegisterOptions<ConfigOptions>(_configuration.GetSection("Config"));
 
         // snowflake
         builder.RegisterType<SnowflakeGenerator>().As<IIdentityGenerator>().SingleInstance();

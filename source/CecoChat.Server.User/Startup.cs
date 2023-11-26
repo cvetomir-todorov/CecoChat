@@ -36,6 +36,8 @@ namespace CecoChat.Server.User;
 
 public class Startup
 {
+    private readonly IConfiguration _configuration;
+    private readonly IWebHostEnvironment _environment;
     private readonly RedisOptions _configDbOptions;
     private readonly UserDbOptions _userDbOptions;
     private readonly RedisOptions _userCacheStoreOptions;
@@ -48,41 +50,37 @@ public class Startup
 
     public Startup(IConfiguration configuration, IWebHostEnvironment environment)
     {
-        Configuration = configuration;
-        Environment = environment;
+        _configuration = configuration;
+        _environment = environment;
 
         _configDbOptions = new();
-        Configuration.GetSection("ConfigDb").Bind(_configDbOptions);
+        _configuration.GetSection("ConfigDb").Bind(_configDbOptions);
 
         _userDbOptions = new();
-        Configuration.GetSection("UserDb").Bind(_userDbOptions);
+        _configuration.GetSection("UserDb").Bind(_userDbOptions);
 
         _userCacheStoreOptions = new();
-        Configuration.GetSection("UserCache:Store").Bind(_userCacheStoreOptions);
+        _configuration.GetSection("UserCache:Store").Bind(_userCacheStoreOptions);
 
         _idGenOptions = new();
-        Configuration.GetSection("IdGen").Bind(_idGenOptions);
+        _configuration.GetSection("IdGen").Bind(_idGenOptions);
 
         _backplaneOptions = new();
-        Configuration.GetSection("Backplane").Bind(_backplaneOptions);
+        _configuration.GetSection("Backplane").Bind(_backplaneOptions);
 
         _jwtOptions = new();
-        Configuration.GetSection("Jwt").Bind(_jwtOptions);
+        _configuration.GetSection("Jwt").Bind(_jwtOptions);
 
         _tracingSamplingOptions = new();
-        Configuration.GetSection("Telemetry:Tracing:Sampling").Bind(_tracingSamplingOptions);
+        _configuration.GetSection("Telemetry:Tracing:Sampling").Bind(_tracingSamplingOptions);
 
         _tracingExportOptions = new();
-        Configuration.GetSection("Telemetry:Tracing:Export").Bind(_tracingExportOptions);
+        _configuration.GetSection("Telemetry:Tracing:Export").Bind(_tracingExportOptions);
 
         _prometheusOptions = new();
-        Configuration.GetSection("Telemetry:Metrics:Prometheus").Bind(_prometheusOptions);
+        _configuration.GetSection("Telemetry:Metrics:Prometheus").Bind(_prometheusOptions);
 
     }
-
-    public IConfiguration Configuration { get; }
-
-    public IWebHostEnvironment Environment { get; }
 
     public void ConfigureServices(IServiceCollection services)
     {
@@ -96,7 +94,7 @@ public class Startup
         // clients
         services.AddGrpc(grpc =>
         {
-            grpc.EnableDetailedErrors = Environment.IsDevelopment();
+            grpc.EnableDetailedErrors = _environment.IsDevelopment();
             grpc.EnableMessageValidation();
         });
         services.AddGrpcValidation();
@@ -197,7 +195,7 @@ public class Startup
         builder.RegisterHostedService<AsyncProfileCaching>();
 
         // config db
-        IConfiguration configDbConfig = Configuration.GetSection("ConfigDb");
+        IConfiguration configDbConfig = _configuration.GetSection("ConfigDb");
         builder.RegisterModule(new ConfigDbAutofacModule(configDbConfig, registerPartitioning: true));
 
         // backplane
@@ -206,16 +204,16 @@ public class Startup
         builder.RegisterFactory<KafkaProducer<Null, BackplaneMessage>, IKafkaProducer<Null, BackplaneMessage>>();
         builder.RegisterType<ConnectionNotifyProducer>().As<IConnectionNotifyProducer>().SingleInstance();
         builder.RegisterModule(new KafkaAutofacModule());
-        builder.RegisterOptions<BackplaneOptions>(Configuration.GetSection("Backplane"));
+        builder.RegisterOptions<BackplaneOptions>(_configuration.GetSection("Backplane"));
 
         // user db
-        IConfiguration userCacheConfig = Configuration.GetSection("UserCache");
+        IConfiguration userCacheConfig = _configuration.GetSection("UserCache");
         IConfiguration userCacheStoreConfig = userCacheConfig.GetSection("Store");
         builder.RegisterModule(new UserDbAutofacModule(userCacheConfig, userCacheStoreConfig));
-        builder.RegisterOptions<UserDbOptions>(Configuration.GetSection("UserDb"));
+        builder.RegisterOptions<UserDbOptions>(_configuration.GetSection("UserDb"));
 
         // id gen
-        IConfiguration idGenConfiguration = Configuration.GetSection("IdGen");
+        IConfiguration idGenConfiguration = _configuration.GetSection("IdGen");
         builder.RegisterModule(new IdGenAutofacModule(idGenConfiguration));
 
         // security
