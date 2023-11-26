@@ -1,6 +1,7 @@
 ﻿using Autofac;
 using CecoChat.Autofac;
 using Microsoft.Extensions.Configuration;
+using StackExchange.Redis;
 
 namespace CecoChat.Redis;
 
@@ -8,11 +9,13 @@ public sealed class RedisAutofacModule : Module
 {
     private readonly IConfiguration _redisConfiguration;
     private readonly string? _name;
+    private readonly bool _registerConnectionMultiplexer;
 
-    public RedisAutofacModule(IConfiguration redisConfiguration, string? name = null)
+    public RedisAutofacModule(IConfiguration redisConfiguration, string? name = null, bool registerConnectionMultiplexer = false)
     {
         _redisConfiguration = redisConfiguration;
         _name = name;
+        _registerConnectionMultiplexer = registerConnectionMultiplexer;
     }
 
     protected override void Load(ContainerBuilder builder)
@@ -27,6 +30,18 @@ public sealed class RedisAutofacModule : Module
                 .RegisterType<RedisContext>()
                 .As<IRedisContext>()
                 .SingleInstance();
+
+            if (_registerConnectionMultiplexer)
+            {
+                builder
+                    .Register(container =>
+                    {
+                        IRedisContext redisContext = container.Resolve<IRedisContext>();
+                        return redisContext.Connection;
+                    })
+                    .As<IConnectionMultiplexer>()
+                    .SingleInstance();
+            }
         }
         else
         {
@@ -41,6 +56,18 @@ public sealed class RedisAutofacModule : Module
                 .Named<IRedisContext>(_name)
                 .WithNamedParameter(typeof(RedisOptions), parameterName: optionsName)
                 .SingleInstance();
+
+            if (_registerConnectionMultiplexer)
+            {
+                builder
+                    .Register(container =>
+                    {
+                        IRedisContext redisContext = container.ResolveNamed<IRedisContext>(_name);
+                        return redisContext.Connection;
+                    })
+                    .As<IConnectionMultiplexer>()
+                    .SingleInstance();
+            }
         }
     }
 }
