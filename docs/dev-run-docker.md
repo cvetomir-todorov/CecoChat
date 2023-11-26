@@ -9,7 +9,7 @@ Make sure that the [prerequisites](dev-run-prerequisites.md) have been met befor
 * Data storage
   - YugabyteDB - 1 master, 1 tserver, local pgAdmin is needed for management
   - Cassandra - 2 nodes, 1 Cassandra Web (separate)
-  - Redis - 1 instance, 1 Redis Commander (separate)
+  - Redis - 3 masters, 1 Redis Commander (separate)
 * Observability
   - Telemetry - 1 OTel collector
   - Tracing - 1 Jaeger all-in-one
@@ -37,7 +37,7 @@ Make sure that the [prerequisites](dev-run-prerequisites.md) have been met befor
 * Integration:
   - Kafka create topics
 * Data storage:
-  - Redis initial dynamic configuration
+  - Redis initial dynamic configuration - unfortunately, due to how Redis works, the contents of the script needs to be executed in each of the 3 instances of the cluster
 * Observability
   - Grafana dashboards import
 
