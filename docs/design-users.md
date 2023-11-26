@@ -29,7 +29,7 @@ The profile gets created during registration and is returned when creating a new
 * Support for changing avatar would be added when uploading an avatar image gets implemented
 * Support for changing the phone and the email would require confirmation and would be added subsequently
 
-The issue of lost updates is considered in the implementation. This occurs when the same user authenticates from 2 different clients and tries to concurrently update his/hers profile. Optimistic concurrency is applied using a separate version column, a UUID/GUID which gets updated on each profile change.
+The issue of lost updates is considered in the implementation. This occurs when the same user authenticates from 2 different clients and tries to concurrently update his/hers profile. Optimistic concurrency is applied using a separate version column, a date-time value which gets updated on each profile change.
 
 ## Public profiles
 
