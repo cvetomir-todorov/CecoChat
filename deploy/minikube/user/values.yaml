@@ -20,7 +20,9 @@ Networking:
   UserCache:
     Enabled: true
     Store:
-      Endpoint: redis:6379
+      Endpoint0: redis-0.redis.cecochat.svc.cluster.local:6379
+      Endpoint1: redis-1.redis.cecochat.svc.cluster.local:6379
+      Endpoint2: redis-2.redis.cecochat.svc.cluster.local:6379
       ConnectRetry: 16
       ConnectTimeout: 5000
       KeepAlive: 2
