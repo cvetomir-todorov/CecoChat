@@ -138,6 +138,7 @@ public class Startup
                 });
                 tracing.AddKafkaInstrumentation();
                 tracing.AddNpgsql();
+                tracing.AddRedisInstrumentation();
                 tracing.ConfigureSampling(_tracingSamplingOptions);
                 tracing.ConfigureOtlpExporter(_tracingExportOptions);
             })

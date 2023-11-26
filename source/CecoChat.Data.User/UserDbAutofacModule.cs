@@ -25,7 +25,7 @@ public class UserDbAutofacModule : Module
     protected override void Load(ContainerBuilder builder)
     {
         builder.RegisterType<NpgsqlDbInitializer>().As<INpgsqlDbInitializer>().SingleInstance();
-        builder.RegisterModule(new RedisAutofacModule(_userCacheStoreConfig, RedisContextName));
+        builder.RegisterModule(new RedisAutofacModule(_userCacheStoreConfig, RedisContextName, registerConnectionMultiplexer: true));
         builder.RegisterOptions<UserCacheOptions>(_userCacheConfig);
         builder.RegisterType<DataUtility>().As<IDataUtility>().SingleInstance();
 
