@@ -45,6 +45,11 @@ kubens cecochat
 bash install-data-integration.sh
 ```
 
+Redis cluster is initialized manually by executing the content of the `cluster.sh` script from inside a Redis pod:
+```shell
+kubectl exec -it redis-0 -- bash
+```
+
 Initial dynamic config is created manually from inside the Redis pod using the content of the `data.sh` script and lives as long as the same `PersistentVolume` is used:
 ```shell
 kubectl exec -it redis-0 -- bash
@@ -134,6 +139,8 @@ idgen-1                                     1/1     Running   0             70s
 messaging-0                                 1/1     Running   0             70s
 messaging-1                                 1/1     Running   0             70s
 redis-0                                     1/1     Running   0             16m
+redis-1                                     1/1     Running   0             16m
+redis-2                                     1/1     Running   0             16m
 state-897f6746d-5p5hj                       1/1     Running   0             69s
 state-897f6746d-x4qlp                       1/1     Running   0             69s
 telemetry-otel-collector-7c67b95b6f-jbh9k   1/1     Running   0             92s
@@ -159,7 +166,7 @@ idgen                      ClusterIP   None             <none>        443/TCP   
 messaging                  ClusterIP   None             <none>        443/TCP                       113s
 messaging-0                ClusterIP   10.99.205.90     <none>        443/TCP                       113s
 messaging-1                ClusterIP   10.107.106.32    <none>        443/TCP                       113s
-redis                      ClusterIP   10.97.175.188    <none>        6379/TCP                      17m
+redis                      ClusterIP   None             <none>        6379/TCP                      17m
 state                      ClusterIP   10.98.129.160    <none>        443/TCP                       112s
 telemetry-otel-collector   ClusterIP   10.101.152.188   <none>        4317/TCP                      2m15s
 tracing-jaeger             ClusterIP   None             <none>        4317/TCP,5778/TCP,16686/TCP   2m15s
@@ -196,7 +203,7 @@ backplane-zk      2/2     19m
 cassandra         2/2     19m
 idgen             2/2     3m39s
 messaging         2/2     3m39s
-redis             1/1     19m
+redis             3/3     19m
 tracing-jaeger    1/1     4m1s
 yb-master         2/2     19m
 yb-tserver        2/2     19m
@@ -219,7 +226,9 @@ data-backplane-zk-0      Bound    pvc-31c3bc91-c0d0-49ed-be6f-ea55510918dd   128
 data-backplane-zk-1      Bound    pvc-fa857bb8-293d-433d-a5f2-b14930b88b74   128Mi      RWO            standard       21d
 data-cassandra-0         Bound    pvc-af36ee79-e457-4907-af23-c517b04ca99e   1Gi        RWO            standard       21d
 data-cassandra-1         Bound    pvc-1ab58971-9842-4fef-9277-6ec94d7715b6   1Gi        RWO            standard       21d
-data-redis-0             Bound    pvc-8da6950e-5256-491f-a5e7-67984166cbdc   128Mi      RWO            standard       21d
+data-redis-0             Bound    pvc-7352a4b6-38a9-4c90-82e9-fe06b56c9e75   128Mi      RWO            standard       26m
+data-redis-1             Bound    pvc-9a78bab0-1424-440e-818e-96f28bdce93d   128Mi      RWO            standard       26m
+data-redis-2             Bound    pvc-e9429b83-feea-4b85-8d42-973a8038b188   128Mi      RWO            standard       26m
 data-yb-master-0         Bound    pvc-75ccf31f-237d-4dde-b314-227737aa930c   1Gi        RWO            standard       21d
 data-yb-master-1         Bound    pvc-9acb60f4-e6c4-4962-971e-6838832e74f6   1Gi        RWO            standard       21d
 data-yb-tserver-0        Bound    pvc-0c0df721-75a2-42bf-b6fa-54190d017db7   1Gi        RWO            standard       21d
