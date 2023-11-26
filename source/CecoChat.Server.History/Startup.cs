@@ -32,6 +32,8 @@ namespace CecoChat.Server.History;
 
 public class Startup
 {
+    private readonly IConfiguration _configuration;
+    private readonly IWebHostEnvironment _environment;
     private readonly RedisOptions _configDbOptions;
     private readonly BackplaneOptions _backplaneOptions;
     private readonly CassandraOptions _historyDbOptions;
@@ -42,35 +44,31 @@ public class Startup
 
     public Startup(IConfiguration configuration, IWebHostEnvironment environment)
     {
-        Configuration = configuration;
-        Environment = environment;
+        _configuration = configuration;
+        _environment = environment;
 
         _configDbOptions = new();
-        Configuration.GetSection("ConfigDb").Bind(_configDbOptions);
+        _configuration.GetSection("ConfigDb").Bind(_configDbOptions);
 
         _backplaneOptions = new();
-        Configuration.GetSection("Backplane").Bind(_backplaneOptions);
+        _configuration.GetSection("Backplane").Bind(_backplaneOptions);
 
         _historyDbOptions = new();
-        Configuration.GetSection("HistoryDb").Bind(_historyDbOptions);
+        _configuration.GetSection("HistoryDb").Bind(_historyDbOptions);
 
         _jwtOptions = new();
-        Configuration.GetSection("Jwt").Bind(_jwtOptions);
+        _configuration.GetSection("Jwt").Bind(_jwtOptions);
 
         _tracingSamplingOptions = new();
-        Configuration.GetSection("Telemetry:Tracing:Sampling").Bind(_tracingSamplingOptions);
+        _configuration.GetSection("Telemetry:Tracing:Sampling").Bind(_tracingSamplingOptions);
 
         _tracingExportOptions = new();
-        Configuration.GetSection("Telemetry:Tracing:Export").Bind(_tracingExportOptions);
+        _configuration.GetSection("Telemetry:Tracing:Export").Bind(_tracingExportOptions);
 
         _prometheusOptions = new();
-        Configuration.GetSection("Telemetry:Metrics:Prometheus").Bind(_prometheusOptions);
+        _configuration.GetSection("Telemetry:Metrics:Prometheus").Bind(_prometheusOptions);
 
     }
-
-    public IConfiguration Configuration { get; }
-
-    public IWebHostEnvironment Environment { get; }
 
     public void ConfigureServices(IServiceCollection services)
     {
@@ -84,7 +82,7 @@ public class Startup
         // clients
         services.AddGrpc(grpc =>
         {
-            grpc.EnableDetailedErrors = Environment.IsDevelopment();
+            grpc.EnableDetailedErrors = _environment.IsDevelopment();
             grpc.EnableMessageValidation();
         });
         services.AddGrpcValidation();
@@ -169,11 +167,11 @@ public class Startup
         builder.RegisterHostedService<StartMaterializeMessages>();
 
         // configuration
-        IConfiguration configDbConfig = Configuration.GetSection("ConfigDb");
+        IConfiguration configDbConfig = _configuration.GetSection("ConfigDb");
         builder.RegisterModule(new ConfigDbAutofacModule(configDbConfig, registerHistory: true));
 
         // history db
-        IConfiguration historyDbConfig = Configuration.GetSection("HistoryDb");
+        IConfiguration historyDbConfig = _configuration.GetSection("HistoryDb");
         builder.RegisterModule(new HistoryDbAutofacModule(historyDbConfig));
         builder.RegisterModule(new CassandraHealthAutofacModule(historyDbConfig));
 
@@ -181,7 +179,7 @@ public class Startup
         builder.RegisterType<HistoryConsumer>().As<IHistoryConsumer>().SingleInstance();
         builder.RegisterFactory<KafkaConsumer<Null, BackplaneMessage>, IKafkaConsumer<Null, BackplaneMessage>>();
         builder.RegisterModule(new KafkaAutofacModule());
-        builder.RegisterOptions<BackplaneOptions>(Configuration.GetSection("Backplane"));
+        builder.RegisterOptions<BackplaneOptions>(_configuration.GetSection("Backplane"));
 
         // shared
         builder.RegisterType<ContractMapper>().As<IContractMapper>().SingleInstance();

@@ -32,6 +32,8 @@ namespace CecoChat.Server.Messaging;
 
 public class Startup
 {
+    private readonly IConfiguration _configuration;
+    private readonly IWebHostEnvironment _environment;
     private readonly RedisOptions _configDbOptions;
     private readonly ClientOptions _clientOptions;
     private readonly BackplaneOptions _backplaneOptions;
@@ -43,37 +45,33 @@ public class Startup
 
     public Startup(IConfiguration configuration, IWebHostEnvironment environment)
     {
-        Configuration = configuration;
-        Environment = environment;
+        _configuration = configuration;
+        _environment = environment;
 
         _configDbOptions = new();
-        Configuration.GetSection("ConfigDb").Bind(_configDbOptions);
+        _configuration.GetSection("ConfigDb").Bind(_configDbOptions);
 
         _clientOptions = new();
-        Configuration.GetSection("Clients").Bind(_clientOptions);
+        _configuration.GetSection("Clients").Bind(_clientOptions);
 
         _backplaneOptions = new();
-        Configuration.GetSection("Backplane").Bind(_backplaneOptions);
+        _configuration.GetSection("Backplane").Bind(_backplaneOptions);
 
         _idGenOptions = new();
-        Configuration.GetSection("IdGen").Bind(_idGenOptions);
+        _configuration.GetSection("IdGen").Bind(_idGenOptions);
 
         _jwtOptions = new();
-        Configuration.GetSection("Jwt").Bind(_jwtOptions);
+        _configuration.GetSection("Jwt").Bind(_jwtOptions);
 
         _tracingSamplingOptions = new();
-        Configuration.GetSection("Telemetry:Tracing:Sampling").Bind(_tracingSamplingOptions);
+        _configuration.GetSection("Telemetry:Tracing:Sampling").Bind(_tracingSamplingOptions);
 
         _tracingExportOptions = new();
-        Configuration.GetSection("Telemetry:Tracing:Export").Bind(_tracingExportOptions);
+        _configuration.GetSection("Telemetry:Tracing:Export").Bind(_tracingExportOptions);
 
         _prometheusOptions = new();
-        Configuration.GetSection("Telemetry:Metrics:Prometheus").Bind(_prometheusOptions);
+        _configuration.GetSection("Telemetry:Metrics:Prometheus").Bind(_prometheusOptions);
     }
-
-    public IConfiguration Configuration { get; }
-
-    public IWebHostEnvironment Environment { get; }
 
     public void ConfigureServices(IServiceCollection services)
     {
@@ -91,7 +89,7 @@ public class Startup
         services
             .AddSignalR(signalr =>
             {
-                signalr.EnableDetailedErrors = Environment.IsDevelopment();
+                signalr.EnableDetailedErrors = _environment.IsDevelopment();
                 // when clients don't send anything within this interval, server disconnects them in order to save resources
                 signalr.ClientTimeoutInterval = _clientOptions.TimeoutInterval;
                 // the server sends data to keep the connection alive
@@ -170,9 +168,9 @@ public class Startup
         builder.RegisterHostedService<InitBackplane>();
 
         // configuration
-        IConfiguration configDbConfig = Configuration.GetSection("ConfigDb");
+        IConfiguration configDbConfig = _configuration.GetSection("ConfigDb");
         builder.RegisterModule(new ConfigDbAutofacModule(configDbConfig, registerPartitioning: true));
-        builder.RegisterOptions<ConfigOptions>(Configuration.GetSection("Config"));
+        builder.RegisterOptions<ConfigOptions>(_configuration.GetSection("Config"));
 
         // clients
         builder.RegisterType<ClientContainer>().As<IClientContainer>().SingleInstance();
@@ -180,7 +178,7 @@ public class Startup
         builder.RegisterModule(new SignalRTelemetryAutofacModule());
 
         // idgen
-        IConfiguration idGenConfiguration = Configuration.GetSection("IdGen");
+        IConfiguration idGenConfiguration = _configuration.GetSection("IdGen");
         builder.RegisterModule(new IdGenAutofacModule(idGenConfiguration));
 
         // backplane
@@ -192,7 +190,7 @@ public class Startup
         builder.RegisterFactory<KafkaProducer<Null, BackplaneMessage>, IKafkaProducer<Null, BackplaneMessage>>();
         builder.RegisterFactory<KafkaConsumer<Null, BackplaneMessage>, IKafkaConsumer<Null, BackplaneMessage>>();
         builder.RegisterModule(new KafkaAutofacModule());
-        builder.RegisterOptions<BackplaneOptions>(Configuration.GetSection("Backplane"));
+        builder.RegisterOptions<BackplaneOptions>(_configuration.GetSection("Backplane"));
 
         // shared
         builder.RegisterType<MessagingTelemetry>().As<IMessagingTelemetry>().SingleInstance();

@@ -31,6 +31,8 @@ namespace CecoChat.Server.State;
 
 public class Startup
 {
+    private readonly IConfiguration _configuration;
+    private readonly IWebHostEnvironment _environment;
     private readonly RedisOptions _configDbOptions;
     private readonly BackplaneOptions _backplaneOptions;
     private readonly CassandraOptions _stateDbOptions;
@@ -41,8 +43,8 @@ public class Startup
 
     public Startup(IConfiguration configuration, IWebHostEnvironment environment)
     {
-        Configuration = configuration;
-        Environment = environment;
+        _configuration = configuration;
+        _environment = environment;
 
         _configDbOptions = new();
         configuration.GetSection("ConfigDb").Bind(_configDbOptions);
@@ -57,19 +59,15 @@ public class Startup
         configuration.GetSection("Jwt").Bind(_jwtOptions);
 
         _tracingSamplingOptions = new();
-        Configuration.GetSection("Telemetry:Tracing:Sampling").Bind(_tracingSamplingOptions);
+        _configuration.GetSection("Telemetry:Tracing:Sampling").Bind(_tracingSamplingOptions);
 
         _tracingExportOptions = new();
-        Configuration.GetSection("Telemetry:Tracing:Export").Bind(_tracingExportOptions);
+        _configuration.GetSection("Telemetry:Tracing:Export").Bind(_tracingExportOptions);
 
         _prometheusOptions = new();
-        Configuration.GetSection("Telemetry:Metrics:Prometheus").Bind(_prometheusOptions);
+        _configuration.GetSection("Telemetry:Metrics:Prometheus").Bind(_prometheusOptions);
 
     }
-
-    public IConfiguration Configuration { get; }
-
-    public IWebHostEnvironment Environment { get; }
 
     public void ConfigureServices(IServiceCollection services)
     {
@@ -83,7 +81,7 @@ public class Startup
         // clients
         services.AddGrpc(grpc =>
         {
-            grpc.EnableDetailedErrors = Environment.IsDevelopment();
+            grpc.EnableDetailedErrors = _environment.IsDevelopment();
             grpc.EnableMessageValidation();
         });
         services.AddGrpcValidation();
@@ -167,7 +165,7 @@ public class Startup
         builder.RegisterHostedService<StartBackplaneComponents>();
 
         // state db
-        IConfiguration stateDbConfig = Configuration.GetSection("StateDb");
+        IConfiguration stateDbConfig = _configuration.GetSection("StateDb");
         builder.RegisterModule(new StateDbAutofacModule(stateDbConfig));
         builder.RegisterModule(new CassandraHealthAutofacModule(stateDbConfig));
 
@@ -175,7 +173,7 @@ public class Startup
         builder.RegisterType<StateConsumer>().As<IStateConsumer>().SingleInstance();
         builder.RegisterFactory<KafkaConsumer<Null, BackplaneMessage>, IKafkaConsumer<Null, BackplaneMessage>>();
         builder.RegisterModule(new KafkaAutofacModule());
-        builder.RegisterOptions<BackplaneOptions>(Configuration.GetSection("Backplane"));
+        builder.RegisterOptions<BackplaneOptions>(_configuration.GetSection("Backplane"));
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

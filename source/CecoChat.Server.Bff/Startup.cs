@@ -29,6 +29,7 @@ namespace CecoChat.Server.Bff;
 
 public class Startup
 {
+    private readonly IConfiguration _configuration;
     private readonly RedisOptions _configDbOptions;
     private readonly HistoryOptions _historyOptions;
     private readonly StateOptions _stateOptions;
@@ -41,38 +42,36 @@ public class Startup
 
     public Startup(IConfiguration configuration)
     {
-        Configuration = configuration;
+        _configuration = configuration;
 
         _configDbOptions = new();
-        Configuration.GetSection("ConfigDb").Bind(_configDbOptions);
+        _configuration.GetSection("ConfigDb").Bind(_configDbOptions);
 
         _historyOptions = new();
-        Configuration.GetSection("HistoryClient").Bind(_historyOptions);
+        _configuration.GetSection("HistoryClient").Bind(_historyOptions);
 
         _stateOptions = new();
-        Configuration.GetSection("StateClient").Bind(_stateOptions);
+        _configuration.GetSection("StateClient").Bind(_stateOptions);
 
         _userOptions = new();
-        Configuration.GetSection("UserClient").Bind(_userOptions);
+        _configuration.GetSection("UserClient").Bind(_userOptions);
 
         _jwtOptions = new();
-        Configuration.GetSection("Jwt").Bind(_jwtOptions);
+        _configuration.GetSection("Jwt").Bind(_jwtOptions);
 
         _swaggerOptions = new();
-        Configuration.GetSection("Swagger").Bind(_swaggerOptions);
+        _configuration.GetSection("Swagger").Bind(_swaggerOptions);
 
         _tracingSamplingOptions = new();
-        Configuration.GetSection("Telemetry:Tracing:Sampling").Bind(_tracingSamplingOptions);
+        _configuration.GetSection("Telemetry:Tracing:Sampling").Bind(_tracingSamplingOptions);
 
         _tracingExportOptions = new();
-        Configuration.GetSection("Telemetry:Tracing:Export").Bind(_tracingExportOptions);
+        _configuration.GetSection("Telemetry:Tracing:Export").Bind(_tracingExportOptions);
 
         _prometheusOptions = new();
-        Configuration.GetSection("Telemetry:Metrics:Prometheus").Bind(_prometheusOptions);
+        _configuration.GetSection("Telemetry:Metrics:Prometheus").Bind(_prometheusOptions);
 
     }
-
-    public IConfiguration Configuration { get; }
 
     public void ConfigureServices(IServiceCollection services)
     {
@@ -179,22 +178,22 @@ public class Startup
         builder.RegisterHostedService<InitDynamicConfig>();
 
         // configuration
-        IConfiguration configDbConfig = Configuration.GetSection("ConfigDb");
+        IConfiguration configDbConfig = _configuration.GetSection("ConfigDb");
         builder.RegisterModule(new ConfigDbAutofacModule(configDbConfig, registerPartitioning: true));
 
         // backplane
         builder.RegisterModule(new PartitionUtilityAutofacModule());
 
         // downstream services
-        IConfiguration historyClientConfig = Configuration.GetSection("HistoryClient");
+        IConfiguration historyClientConfig = _configuration.GetSection("HistoryClient");
         builder.RegisterModule(new HistoryClientAutofacModule(historyClientConfig));
-        IConfiguration stateClientConfig = Configuration.GetSection("StateClient");
+        IConfiguration stateClientConfig = _configuration.GetSection("StateClient");
         builder.RegisterModule(new StateClientAutofacModule(stateClientConfig));
-        IConfiguration userClientConfig = Configuration.GetSection("UserClient");
+        IConfiguration userClientConfig = _configuration.GetSection("UserClient");
         builder.RegisterModule(new UserClientAutofacModule(userClientConfig));
 
         // security
-        builder.RegisterOptions<JwtOptions>(Configuration.GetSection("Jwt"));
+        builder.RegisterOptions<JwtOptions>(_configuration.GetSection("Jwt"));
 
         // shared
         builder.RegisterType<ContractMapper>().As<IContractMapper>().SingleInstance();
