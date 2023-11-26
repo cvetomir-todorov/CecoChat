@@ -10,7 +10,6 @@
 * Development
   - Setup versioning
 * Deployment
-  - Create a redis cluster
   - Setup aggregated logs storage
 
 ## Product features
@@ -73,7 +72,7 @@
   - Use allocation-free logging
   - Make a larger benchmark and improve configuration of backplane, client-server communication, databases
 * Observability
-  - Add Open Telemetry metrics and traces to Redis
+  - Add Open Telemetry metrics to Redis when StackExchange.Redis adds support
   - Add Open Telemetry metrics to UserDB when Npgsql adds support
   - Use Cassandra instrumentation from .NET contrib
 * Misc
