@@ -6,7 +6,7 @@ using Microsoft.Extensions.Options;
 
 namespace CecoChat.Server.User.HostedServices;
 
-public sealed class InitBackplane : IHostedService, ISubscriber<PartitionsChangedEventData>, IDisposable
+public sealed class InitBackplaneComponents : IHostedService, ISubscriber<PartitionsChangedEventData>, IDisposable
 {
     private readonly ILogger _logger;
     private readonly BackplaneOptions _backplaneOptions;
@@ -18,9 +18,9 @@ public sealed class InitBackplane : IHostedService, ISubscriber<PartitionsChange
     private readonly CancellationToken _appStoppingCt;
     private CancellationTokenSource? _stoppedCts;
 
-    public InitBackplane(
+    public InitBackplaneComponents(
         IHostApplicationLifetime applicationLifetime,
-        ILogger<InitBackplane> logger,
+        ILogger<InitBackplaneComponents> logger,
         IOptions<BackplaneOptions> backplaneOptions,
         IPartitioningConfig partitioningConfig,
         ITopicPartitionFlyweight topicPartitionFlyweight,

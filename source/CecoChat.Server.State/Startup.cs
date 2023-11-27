@@ -162,7 +162,7 @@ public class Startup
     {
         // ordered hosted services
         builder.RegisterHostedService<InitStateDb>();
-        builder.RegisterHostedService<StartBackplaneComponents>();
+        builder.RegisterHostedService<InitBackplaneComponents>();
 
         // state db
         IConfiguration stateDbConfig = _configuration.GetSection("StateDb");

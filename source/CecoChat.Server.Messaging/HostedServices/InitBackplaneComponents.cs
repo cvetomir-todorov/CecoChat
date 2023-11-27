@@ -9,7 +9,7 @@ using Microsoft.Extensions.Options;
 
 namespace CecoChat.Server.Messaging.HostedServices;
 
-public sealed class InitBackplane : IHostedService, ISubscriber<PartitionsChangedEventData>, IDisposable
+public sealed class InitBackplaneComponents : IHostedService, ISubscriber<PartitionsChangedEventData>, IDisposable
 {
     private readonly ILogger _logger;
     private readonly ConfigOptions _configOptions;
@@ -22,8 +22,8 @@ public sealed class InitBackplane : IHostedService, ISubscriber<PartitionsChange
     private readonly CancellationToken _appStoppingCt;
     private CancellationTokenSource? _stoppedCts;
 
-    public InitBackplane(
-        ILogger<InitBackplane> logger,
+    public InitBackplaneComponents(
+        ILogger<InitBackplaneComponents> logger,
         IHostApplicationLifetime applicationLifetime,
         IOptions<ConfigOptions> configOptions,
         IBackplaneComponents backplaneComponents,

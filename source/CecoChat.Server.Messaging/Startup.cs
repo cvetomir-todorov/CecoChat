@@ -165,7 +165,7 @@ public class Startup
     {
         // ordered hosted services
         builder.RegisterHostedService<InitDynamicConfig>();
-        builder.RegisterHostedService<InitBackplane>();
+        builder.RegisterHostedService<InitBackplaneComponents>();
 
         // configuration
         IConfiguration configDbConfig = _configuration.GetSection("ConfigDb");

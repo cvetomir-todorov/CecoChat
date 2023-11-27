@@ -191,7 +191,7 @@ public class Startup
     {
         // ordered hosted services
         builder.RegisterHostedService<InitDynamicConfig>();
-        builder.RegisterHostedService<InitBackplane>();
+        builder.RegisterHostedService<InitBackplaneComponents>();
         builder.RegisterHostedService<InitUsersDb>();
         builder.RegisterHostedService<AsyncProfileCaching>();
 

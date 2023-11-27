@@ -164,7 +164,7 @@ public class Startup
         // ordered hosted services
         builder.RegisterHostedService<InitDynamicConfig>();
         builder.RegisterHostedService<InitHistoryDb>();
-        builder.RegisterHostedService<StartMaterializeMessages>();
+        builder.RegisterHostedService<InitBackplaneComponents>();
 
         // configuration
         IConfiguration configDbConfig = _configuration.GetSection("ConfigDb");

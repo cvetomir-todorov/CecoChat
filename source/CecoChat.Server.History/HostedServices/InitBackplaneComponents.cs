@@ -3,7 +3,7 @@ using CecoChat.Threading;
 
 namespace CecoChat.Server.History.HostedServices;
 
-public sealed class StartMaterializeMessages : IHostedService, IDisposable
+public sealed class InitBackplaneComponents : IHostedService, IDisposable
 {
     private readonly ILogger _logger;
     private readonly IHistoryConsumer _historyConsumer;
@@ -12,8 +12,8 @@ public sealed class StartMaterializeMessages : IHostedService, IDisposable
     private CancellationTokenSource? _stoppedCts;
     private DedicatedThreadTaskScheduler? _historyConsumerTaskScheduler;
 
-    public StartMaterializeMessages(
-        ILogger<StartMaterializeMessages> logger,
+    public InitBackplaneComponents(
+        ILogger<InitBackplaneComponents> logger,
         IHistoryConsumer historyConsumer,
         HistoryConsumerHealthCheck historyConsumerHealthCheck,
         IHostApplicationLifetime applicationLifetime)
