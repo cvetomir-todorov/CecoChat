@@ -10,12 +10,10 @@ using CecoChat.Contracts.Backplane;
 using CecoChat.Data.Config;
 using CecoChat.Data.History;
 using CecoChat.Data.History.Telemetry;
-using CecoChat.Jwt;
 using CecoChat.Kafka;
 using CecoChat.Kafka.Health;
 using CecoChat.Kafka.Telemetry;
 using CecoChat.Otel;
-using CecoChat.Redis;
 using CecoChat.Redis.Health;
 using CecoChat.Server.Backplane;
 using CecoChat.Server.History.Backplane;
@@ -31,44 +29,24 @@ using OpenTelemetry.Trace;
 
 namespace CecoChat.Server.History;
 
-public class Startup
+public class Startup : StartupBase
 {
     private readonly IConfiguration _configuration;
     private readonly IWebHostEnvironment _environment;
-    private readonly RedisOptions _configDbOptions;
     private readonly BackplaneOptions _backplaneOptions;
     private readonly CassandraOptions _historyDbOptions;
-    private readonly JwtOptions _jwtOptions;
-    private readonly OtelSamplingOptions _tracingSamplingOptions;
-    private readonly OtlpOptions _tracingExportOptions;
-    private readonly PrometheusOptions _prometheusOptions;
 
     public Startup(IConfiguration configuration, IWebHostEnvironment environment)
+        : base(configuration)
     {
         _configuration = configuration;
         _environment = environment;
-
-        _configDbOptions = new();
-        _configuration.GetSection("ConfigDb").Bind(_configDbOptions);
 
         _backplaneOptions = new();
         _configuration.GetSection("Backplane").Bind(_backplaneOptions);
 
         _historyDbOptions = new();
         _configuration.GetSection("HistoryDb").Bind(_historyDbOptions);
-
-        _jwtOptions = new();
-        _configuration.GetSection("Jwt").Bind(_jwtOptions);
-
-        _tracingSamplingOptions = new();
-        _configuration.GetSection("Telemetry:Tracing:Sampling").Bind(_tracingSamplingOptions);
-
-        _tracingExportOptions = new();
-        _configuration.GetSection("Telemetry:Tracing:Export").Bind(_tracingExportOptions);
-
-        _prometheusOptions = new();
-        _configuration.GetSection("Telemetry:Metrics:Prometheus").Bind(_prometheusOptions);
-
     }
 
     public void ConfigureServices(IServiceCollection services)
@@ -77,7 +55,7 @@ public class Startup
         AddHealthServices(services);
 
         // security
-        services.AddJwtAuthentication(_jwtOptions);
+        services.AddJwtAuthentication(JwtOptions);
         services.AddUserPolicyAuthorization();
 
         // clients
@@ -110,21 +88,21 @@ public class Startup
                     aspnet.EnableGrpcAspNetCoreSupport = true;
                     HashSet<string> excludedPaths = new()
                     {
-                        _prometheusOptions.ScrapeEndpointPath, HealthPaths.Health, HealthPaths.Startup, HealthPaths.Live, HealthPaths.Ready
+                        PrometheusOptions.ScrapeEndpointPath, HealthPaths.Health, HealthPaths.Startup, HealthPaths.Live, HealthPaths.Ready
                     };
                     aspnet.Filter = httpContext => !excludedPaths.Contains(httpContext.Request.Path);
                 });
                 tracing.AddKafkaInstrumentation();
                 tracing.AddHistoryInstrumentation();
-                tracing.ConfigureSampling(_tracingSamplingOptions);
-                tracing.ConfigureOtlpExporter(_tracingExportOptions);
+                tracing.ConfigureSampling(TracingSamplingOptions);
+                tracing.ConfigureOtlpExporter(TracingExportOptions);
             })
             .WithMetrics(metrics =>
             {
                 metrics.SetResourceBuilder(serviceResourceBuilder);
                 metrics.AddAspNetCoreInstrumentation();
                 metrics.AddHistoryInstrumentation();
-                metrics.ConfigurePrometheusAspNetExporter(_prometheusOptions);
+                metrics.ConfigurePrometheusAspNetExporter(PrometheusOptions);
             });
     }
 
@@ -143,7 +121,7 @@ public class Startup
                 tags: new[] { HealthTags.Health, HealthTags.Startup, HealthTags.Live })
             .AddRedis(
                 "config-db",
-                _configDbOptions,
+                ConfigDbOptions,
                 tags: new[] { HealthTags.Health, HealthTags.Ready })
             .AddCassandra(
                 name: "history-db",
@@ -217,6 +195,6 @@ public class Startup
             });
         });
 
-        app.UseOpenTelemetryPrometheusScrapingEndpoint(context => context.Request.Path == _prometheusOptions.ScrapeEndpointPath);
+        app.UseOpenTelemetryPrometheusScrapingEndpoint(context => context.Request.Path == PrometheusOptions.ScrapeEndpointPath);
     }
 }
