@@ -3,7 +3,7 @@ using CecoChat.Threading;
 
 namespace CecoChat.Server.State.HostedServices;
 
-public sealed class StartBackplaneComponents : IHostedService, IDisposable
+public sealed class InitBackplaneComponents : IHostedService, IDisposable
 {
     private readonly ILogger _logger;
     private readonly IStateConsumer _stateConsumer;
@@ -14,8 +14,8 @@ public sealed class StartBackplaneComponents : IHostedService, IDisposable
     private DedicatedThreadTaskScheduler? _receiverMessagesTaskScheduler;
     private DedicatedThreadTaskScheduler? _senderMessagesTaskScheduler;
 
-    public StartBackplaneComponents(
-        ILogger<StartBackplaneComponents> logger,
+    public InitBackplaneComponents(
+        ILogger<InitBackplaneComponents> logger,
         IStateConsumer stateConsumer,
         ReceiversConsumerHealthCheck receiversConsumerHealthCheck,
         SendersConsumerHealthCheck sendersConsumerHealthCheck,
