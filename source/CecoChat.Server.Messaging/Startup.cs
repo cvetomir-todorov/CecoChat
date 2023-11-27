@@ -165,6 +165,7 @@ public class Startup
     {
         // ordered hosted services
         builder.RegisterHostedService<InitDynamicConfig>();
+        builder.RegisterHostedService<InitBackplane>();
         builder.RegisterHostedService<InitBackplaneComponents>();
 
         // configuration
@@ -182,6 +183,8 @@ public class Startup
         builder.RegisterModule(new IdGenAutofacModule(idGenConfiguration));
 
         // backplane
+        builder.RegisterType<KafkaAdmin>().As<IKafkaAdmin>().SingleInstance();
+        builder.RegisterOptions<KafkaOptions>(_configuration.GetSection("Backplane:Kafka"));
         builder.RegisterModule(new PartitionUtilityAutofacModule());
         builder.RegisterType<BackplaneComponents>().As<IBackplaneComponents>().SingleInstance();
         builder.RegisterType<TopicPartitionFlyweight>().As<ITopicPartitionFlyweight>().SingleInstance();

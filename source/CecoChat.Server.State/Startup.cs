@@ -16,6 +16,7 @@ using CecoChat.Kafka.Telemetry;
 using CecoChat.Otel;
 using CecoChat.Redis;
 using CecoChat.Redis.Health;
+using CecoChat.Server.Backplane;
 using CecoChat.Server.Identity;
 using CecoChat.Server.State.Backplane;
 using CecoChat.Server.State.Endpoints;
@@ -162,6 +163,7 @@ public class Startup
     {
         // ordered hosted services
         builder.RegisterHostedService<InitStateDb>();
+        builder.RegisterHostedService<InitBackplane>();
         builder.RegisterHostedService<InitBackplaneComponents>();
 
         // state db
@@ -170,6 +172,8 @@ public class Startup
         builder.RegisterModule(new CassandraHealthAutofacModule(stateDbConfig));
 
         // backplane
+        builder.RegisterType<KafkaAdmin>().As<IKafkaAdmin>().SingleInstance();
+        builder.RegisterOptions<KafkaOptions>(_configuration.GetSection("Backplane:Kafka"));
         builder.RegisterType<StateConsumer>().As<IStateConsumer>().SingleInstance();
         builder.RegisterFactory<KafkaConsumer<Null, BackplaneMessage>, IKafkaConsumer<Null, BackplaneMessage>>();
         builder.RegisterModule(new KafkaAutofacModule());

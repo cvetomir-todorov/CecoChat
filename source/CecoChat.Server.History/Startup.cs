@@ -17,6 +17,7 @@ using CecoChat.Kafka.Telemetry;
 using CecoChat.Otel;
 using CecoChat.Redis;
 using CecoChat.Redis.Health;
+using CecoChat.Server.Backplane;
 using CecoChat.Server.History.Backplane;
 using CecoChat.Server.History.Endpoints;
 using CecoChat.Server.History.HostedServices;
@@ -164,6 +165,7 @@ public class Startup
         // ordered hosted services
         builder.RegisterHostedService<InitDynamicConfig>();
         builder.RegisterHostedService<InitHistoryDb>();
+        builder.RegisterHostedService<InitBackplane>();
         builder.RegisterHostedService<InitBackplaneComponents>();
 
         // configuration
@@ -176,6 +178,8 @@ public class Startup
         builder.RegisterModule(new CassandraHealthAutofacModule(historyDbConfig));
 
         // backplane
+        builder.RegisterType<KafkaAdmin>().As<IKafkaAdmin>().SingleInstance();
+        builder.RegisterOptions<KafkaOptions>(_configuration.GetSection("Backplane:Kafka"));
         builder.RegisterType<HistoryConsumer>().As<IHistoryConsumer>().SingleInstance();
         builder.RegisterFactory<KafkaConsumer<Null, BackplaneMessage>, IKafkaConsumer<Null, BackplaneMessage>>();
         builder.RegisterModule(new KafkaAutofacModule());
