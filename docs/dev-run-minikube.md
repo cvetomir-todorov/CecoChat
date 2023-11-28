@@ -60,12 +60,7 @@ kubectl exec -it redis-1 -- bash
 kubectl exec -it redis-2 -- bash
 ```
 
-Initial Kafka topics are created manually from inside one of the Kafka broker pods using the content of the `kafka-topics.sh` script and live as long as the same `PersistentVolume` is used, but beware that successful start of Kafka may take a bit more than the other components, including 1-2 restarts of the pods:
-```shell
-kubectl exec -it backplane-kafka-0 -- bash
-```
-
-The databases in Cassandra and Yugabyte are created when the respective service is started, if they do not exist.
+The topics in Kafka and databases in Cassandra and Yugabyte are created when the respective service is started, if they do not exist.
 
 ### Observability
 
