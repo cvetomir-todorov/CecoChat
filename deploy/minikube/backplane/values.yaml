@@ -23,7 +23,7 @@ Kafka:
     Replicas: 2
   Image:
     Name: confluentinc/cp-kafka
-    Tag: 7.2.2
+    Tag: 7.5.2
     PullPolicy: IfNotPresent
   Networking:
     Port: 9092
