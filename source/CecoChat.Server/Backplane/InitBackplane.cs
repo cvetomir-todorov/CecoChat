@@ -12,7 +12,7 @@ public class InitBackplane : IHostedService
         _kafkaAdmin = kafkaAdmin;
     }
 
-    public Task StartAsync(CancellationToken cancellationToken)
+    public Task StartAsync(CancellationToken _)
     {
         KafkaTopicSpec[] topics =
         {
@@ -23,7 +23,7 @@ public class InitBackplane : IHostedService
         return _kafkaAdmin.CreateTopics(topics);
     }
 
-    public Task StopAsync(CancellationToken cancellationToken)
+    public Task StopAsync(CancellationToken _)
     {
         return Task.CompletedTask;
     }
