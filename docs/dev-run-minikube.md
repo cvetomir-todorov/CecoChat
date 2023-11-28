@@ -19,7 +19,10 @@ Make sure that the [prerequisites](dev-run-prerequisites.md) have been met befor
 
 ## Tools
 
-* `minikube` with the addons listed in `enable-minikube-addons.sh`
+* `minikube`
+  - Started using `minikube start --container-runtime=docker --kubernetes-version=stable`
+  - A previous minikube profile could be cleaned up using `minikube delete` 
+* Minikube addons listed in `enable-minikube-addons.sh`
 * `kubectl`, `kubens`, `helm`
 
 ## Deployment
