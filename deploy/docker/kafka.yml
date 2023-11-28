@@ -3,21 +3,21 @@ networks:
   cecochat:
 services:
   zookeeper:
-    image: zookeeper:3.4.14
+    image: zookeeper:3.9.1
     container_name: cecochat-zookeeper
     hostname: zookeeper
     networks: &networks
       - cecochat
     ports:
       - "2181:2181"
+      - "8080:8080"
     deploy:
       resources:
         limits:
           memory: 128M
     environment:
       ZOO_MY_ID: 1
-      ZOO_PORT: 2181
-      ZOO_SERVERS: server.1=zookeeper:2888:3888
+      ZOO_SERVERS: server.1=zookeeper:2888:3888;2181
     volumes:
       - cecochat-zookeeper-data:/data
       - cecochat-zookeeper-datalog:/datalog
