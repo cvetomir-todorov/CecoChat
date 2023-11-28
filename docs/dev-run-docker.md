@@ -34,8 +34,6 @@ Make sure that the [prerequisites](dev-run-prerequisites.md) have been met befor
 
 **After** running some of the containers they need to be prepared additionally using `docker exec -it <container-name> bash` with the content of the related scripts in the respective folder. This is a one time setup which persists data in the volume. If the volume is recreated it needs to be repeated.
 
-* Integration:
-  - Kafka create topics
 * Data storage:
   - Redis initial dynamic configuration - unfortunately, due to how Redis works, the contents of the script needs to be executed in each of the 3 instances of the cluster
 * Observability
