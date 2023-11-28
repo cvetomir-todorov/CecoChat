@@ -17,3 +17,5 @@ spec:
       name: follower
     - port: {{.Values.Zk.Networking.LeaderPort}}
       name: leader
+    - port: {{.Values.Zk.Networking.AdminPort}}
+      name: admin

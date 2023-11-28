@@ -3,12 +3,13 @@ Zk:
     Replicas: 2
   Image:
     Name: zookeeper
-    Tag: 3.4.14
+    Tag: 3.9.1
     PullPolicy: IfNotPresent
   Networking:
     ClientPort: 2181
     FollowerPort: 2888
     LeaderPort: 3888
+    AdminPort: 8080
   Entrypoint:
     ConfigName: entrypoint.sh
     MountPath: /bin/entrypoint.sh

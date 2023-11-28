@@ -25,6 +25,7 @@ spec:
             - containerPort: {{.Values.Zk.Networking.ClientPort}}
             - containerPort: {{.Values.Zk.Networking.FollowerPort}}
             - containerPort: {{.Values.Zk.Networking.LeaderPort}}
+            - containerPort: {{.Values.Zk.Networking.AdminPort}}
           resources:
             limits:
               memory: {{.Values.Zk.Resources.Limits.Memory}}
@@ -32,7 +33,7 @@ spec:
             - name: ZOO_PORT
               value: "{{.Values.Zk.Networking.ClientPort}}"
             - name: ZOO_SERVERS
-              value: server.0={{.Release.Name}}-zk-0.{{.Release.Name}}-zk.{{.Release.Namespace}}.svc.cluster.local:{{.Values.Zk.Networking.FollowerPort}}:{{.Values.Zk.Networking.LeaderPort}} server.1={{.Release.Name}}-zk-1.{{.Release.Name}}-zk.{{.Release.Namespace}}.svc.cluster.local:{{.Values.Zk.Networking.FollowerPort}}:{{.Values.Zk.Networking.LeaderPort}}
+              value: server.0={{.Release.Name}}-zk-0.{{.Release.Name}}-zk.{{.Release.Namespace}}.svc.cluster.local:{{.Values.Zk.Networking.FollowerPort}}:{{.Values.Zk.Networking.LeaderPort}};{{.Values.Zk.Networking.ClientPort}} server.1={{.Release.Name}}-zk-1.{{.Release.Name}}-zk.{{.Release.Namespace}}.svc.cluster.local:{{.Values.Zk.Networking.FollowerPort}}:{{.Values.Zk.Networking.LeaderPort}};{{.Values.Zk.Networking.ClientPort}}
           volumeMounts:
             - name: config
               mountPath: {{.Values.Zk.Entrypoint.MountPath}}
