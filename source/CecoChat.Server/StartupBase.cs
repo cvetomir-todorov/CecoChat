@@ -29,7 +29,6 @@ public abstract class StartupBase
     }
 
     protected IConfiguration Configuration { get; }
-    
     protected RedisOptions ConfigDbOptions { get; }
     protected JwtOptions JwtOptions { get; }
     protected OtelSamplingOptions TracingSamplingOptions { get; }

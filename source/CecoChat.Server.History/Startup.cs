@@ -31,7 +31,6 @@ namespace CecoChat.Server.History;
 
 public class Startup : StartupBase
 {
-    private readonly IConfiguration _configuration;
     private readonly IWebHostEnvironment _environment;
     private readonly BackplaneOptions _backplaneOptions;
     private readonly CassandraOptions _historyDbOptions;
@@ -39,14 +38,13 @@ public class Startup : StartupBase
     public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         : base(configuration)
     {
-        _configuration = configuration;
         _environment = environment;
 
         _backplaneOptions = new();
-        _configuration.GetSection("Backplane").Bind(_backplaneOptions);
+        Configuration.GetSection("Backplane").Bind(_backplaneOptions);
 
         _historyDbOptions = new();
-        _configuration.GetSection("HistoryDb").Bind(_historyDbOptions);
+        Configuration.GetSection("HistoryDb").Bind(_historyDbOptions);
     }
 
     public void ConfigureServices(IServiceCollection services)
@@ -147,21 +145,21 @@ public class Startup : StartupBase
         builder.RegisterHostedService<InitBackplaneComponents>();
 
         // configuration
-        IConfiguration configDbConfig = _configuration.GetSection("ConfigDb");
+        IConfiguration configDbConfig = Configuration.GetSection("ConfigDb");
         builder.RegisterModule(new ConfigDbAutofacModule(configDbConfig, registerHistory: true));
 
         // history db
-        IConfiguration historyDbConfig = _configuration.GetSection("HistoryDb");
+        IConfiguration historyDbConfig = Configuration.GetSection("HistoryDb");
         builder.RegisterModule(new HistoryDbAutofacModule(historyDbConfig));
         builder.RegisterModule(new CassandraHealthAutofacModule(historyDbConfig));
 
         // backplane
         builder.RegisterType<KafkaAdmin>().As<IKafkaAdmin>().SingleInstance();
-        builder.RegisterOptions<KafkaOptions>(_configuration.GetSection("Backplane:Kafka"));
+        builder.RegisterOptions<KafkaOptions>(Configuration.GetSection("Backplane:Kafka"));
         builder.RegisterType<HistoryConsumer>().As<IHistoryConsumer>().SingleInstance();
         builder.RegisterFactory<KafkaConsumer<Null, BackplaneMessage>, IKafkaConsumer<Null, BackplaneMessage>>();
         builder.RegisterModule(new KafkaAutofacModule());
-        builder.RegisterOptions<BackplaneOptions>(_configuration.GetSection("Backplane"));
+        builder.RegisterOptions<BackplaneOptions>(Configuration.GetSection("Backplane"));
 
         // shared
         builder.RegisterType<ContractMapper>().As<IContractMapper>().SingleInstance();

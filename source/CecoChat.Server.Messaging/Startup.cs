@@ -30,7 +30,6 @@ namespace CecoChat.Server.Messaging;
 
 public class Startup : StartupBase
 {
-    private readonly IConfiguration _configuration;
     private readonly IWebHostEnvironment _environment;
     private readonly ClientOptions _clientOptions;
     private readonly BackplaneOptions _backplaneOptions;
@@ -39,17 +38,16 @@ public class Startup : StartupBase
     public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         : base(configuration)
     {
-        _configuration = configuration;
         _environment = environment;
 
         _clientOptions = new();
-        _configuration.GetSection("Clients").Bind(_clientOptions);
+        Configuration.GetSection("Clients").Bind(_clientOptions);
 
         _backplaneOptions = new();
-        _configuration.GetSection("Backplane").Bind(_backplaneOptions);
+        Configuration.GetSection("Backplane").Bind(_backplaneOptions);
 
         _idGenOptions = new();
-        _configuration.GetSection("IdGen").Bind(_idGenOptions);
+        Configuration.GetSection("IdGen").Bind(_idGenOptions);
     }
 
     public void ConfigureServices(IServiceCollection services)
@@ -148,9 +146,9 @@ public class Startup : StartupBase
         builder.RegisterHostedService<InitBackplaneComponents>();
 
         // configuration
-        IConfiguration configDbConfig = _configuration.GetSection("ConfigDb");
+        IConfiguration configDbConfig = Configuration.GetSection("ConfigDb");
         builder.RegisterModule(new ConfigDbAutofacModule(configDbConfig, registerPartitioning: true));
-        builder.RegisterOptions<ConfigOptions>(_configuration.GetSection("Config"));
+        builder.RegisterOptions<ConfigOptions>(Configuration.GetSection("Config"));
 
         // clients
         builder.RegisterType<ClientContainer>().As<IClientContainer>().SingleInstance();
@@ -158,12 +156,12 @@ public class Startup : StartupBase
         builder.RegisterModule(new SignalRTelemetryAutofacModule());
 
         // idgen
-        IConfiguration idGenConfiguration = _configuration.GetSection("IdGen");
+        IConfiguration idGenConfiguration = Configuration.GetSection("IdGen");
         builder.RegisterModule(new IdGenAutofacModule(idGenConfiguration));
 
         // backplane
         builder.RegisterType<KafkaAdmin>().As<IKafkaAdmin>().SingleInstance();
-        builder.RegisterOptions<KafkaOptions>(_configuration.GetSection("Backplane:Kafka"));
+        builder.RegisterOptions<KafkaOptions>(Configuration.GetSection("Backplane:Kafka"));
         builder.RegisterModule(new PartitionUtilityAutofacModule());
         builder.RegisterType<BackplaneComponents>().As<IBackplaneComponents>().SingleInstance();
         builder.RegisterType<TopicPartitionFlyweight>().As<ITopicPartitionFlyweight>().SingleInstance();
@@ -172,7 +170,7 @@ public class Startup : StartupBase
         builder.RegisterFactory<KafkaProducer<Null, BackplaneMessage>, IKafkaProducer<Null, BackplaneMessage>>();
         builder.RegisterFactory<KafkaConsumer<Null, BackplaneMessage>, IKafkaConsumer<Null, BackplaneMessage>>();
         builder.RegisterModule(new KafkaAutofacModule());
-        builder.RegisterOptions<BackplaneOptions>(_configuration.GetSection("Backplane"));
+        builder.RegisterOptions<BackplaneOptions>(Configuration.GetSection("Backplane"));
 
         // shared
         builder.RegisterType<MessagingTelemetry>().As<IMessagingTelemetry>().SingleInstance();
