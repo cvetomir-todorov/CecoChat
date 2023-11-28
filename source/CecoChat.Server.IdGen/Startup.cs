@@ -19,13 +19,11 @@ namespace CecoChat.Server.IdGen;
 
 public class Startup : StartupBase
 {
-    private readonly IConfiguration _configuration;
     private readonly IWebHostEnvironment _environment;
 
     public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         : base(configuration)
     {
-        _configuration = configuration;
         _environment = environment;
     }
 
@@ -100,9 +98,9 @@ public class Startup : StartupBase
         builder.RegisterHostedService<InitDynamicConfig>();
 
         // configuration
-        IConfiguration configDbConfig = _configuration.GetSection("ConfigDb");
+        IConfiguration configDbConfig = Configuration.GetSection("ConfigDb");
         builder.RegisterModule(new ConfigDbAutofacModule(configDbConfig, registerSnowflake: true));
-        builder.RegisterOptions<ConfigOptions>(_configuration.GetSection("Config"));
+        builder.RegisterOptions<ConfigOptions>(Configuration.GetSection("Config"));
 
         // snowflake
         builder.RegisterType<SnowflakeGenerator>().As<IIdentityGenerator>().SingleInstance();

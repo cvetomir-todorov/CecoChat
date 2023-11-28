@@ -30,7 +30,6 @@ namespace CecoChat.Server.State;
 
 public class Startup : StartupBase
 {
-    private readonly IConfiguration _configuration;
     private readonly IWebHostEnvironment _environment;
     private readonly BackplaneOptions _backplaneOptions;
     private readonly CassandraOptions _stateDbOptions;
@@ -38,14 +37,13 @@ public class Startup : StartupBase
     public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         : base(configuration)
     {
-        _configuration = configuration;
         _environment = environment;
 
         _backplaneOptions = new();
-        configuration.GetSection("Backplane").Bind(_backplaneOptions);
+        Configuration.GetSection("Backplane").Bind(_backplaneOptions);
 
         _stateDbOptions = new();
-        configuration.GetSection("StateDb").Bind(_stateDbOptions);
+        Configuration.GetSection("StateDb").Bind(_stateDbOptions);
     }
 
     public void ConfigureServices(IServiceCollection services)
@@ -145,17 +143,17 @@ public class Startup : StartupBase
         builder.RegisterHostedService<InitBackplaneComponents>();
 
         // state db
-        IConfiguration stateDbConfig = _configuration.GetSection("StateDb");
+        IConfiguration stateDbConfig = Configuration.GetSection("StateDb");
         builder.RegisterModule(new StateDbAutofacModule(stateDbConfig));
         builder.RegisterModule(new CassandraHealthAutofacModule(stateDbConfig));
 
         // backplane
         builder.RegisterType<KafkaAdmin>().As<IKafkaAdmin>().SingleInstance();
-        builder.RegisterOptions<KafkaOptions>(_configuration.GetSection("Backplane:Kafka"));
+        builder.RegisterOptions<KafkaOptions>(Configuration.GetSection("Backplane:Kafka"));
         builder.RegisterType<StateConsumer>().As<IStateConsumer>().SingleInstance();
         builder.RegisterFactory<KafkaConsumer<Null, BackplaneMessage>, IKafkaConsumer<Null, BackplaneMessage>>();
         builder.RegisterModule(new KafkaAutofacModule());
-        builder.RegisterOptions<BackplaneOptions>(_configuration.GetSection("Backplane"));
+        builder.RegisterOptions<BackplaneOptions>(Configuration.GetSection("Backplane"));
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

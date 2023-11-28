@@ -28,7 +28,6 @@ namespace CecoChat.Server.Bff;
 
 public class Startup : StartupBase
 {
-    private readonly IConfiguration _configuration;
     private readonly HistoryOptions _historyOptions;
     private readonly StateOptions _stateOptions;
     private readonly UserOptions _userOptions;
@@ -37,19 +36,17 @@ public class Startup : StartupBase
     public Startup(IConfiguration configuration)
         : base(configuration)
     {
-        _configuration = configuration;
-
         _historyOptions = new();
-        _configuration.GetSection("HistoryClient").Bind(_historyOptions);
+        Configuration.GetSection("HistoryClient").Bind(_historyOptions);
 
         _stateOptions = new();
-        _configuration.GetSection("StateClient").Bind(_stateOptions);
+        Configuration.GetSection("StateClient").Bind(_stateOptions);
 
         _userOptions = new();
-        _configuration.GetSection("UserClient").Bind(_userOptions);
+        Configuration.GetSection("UserClient").Bind(_userOptions);
 
         _swaggerOptions = new();
-        _configuration.GetSection("Swagger").Bind(_swaggerOptions);
+        Configuration.GetSection("Swagger").Bind(_swaggerOptions);
     }
 
     public void ConfigureServices(IServiceCollection services)
@@ -157,22 +154,22 @@ public class Startup : StartupBase
         builder.RegisterHostedService<InitDynamicConfig>();
 
         // configuration
-        IConfiguration configDbConfig = _configuration.GetSection("ConfigDb");
+        IConfiguration configDbConfig = Configuration.GetSection("ConfigDb");
         builder.RegisterModule(new ConfigDbAutofacModule(configDbConfig, registerPartitioning: true));
 
         // backplane
         builder.RegisterModule(new PartitionUtilityAutofacModule());
 
         // downstream services
-        IConfiguration historyClientConfig = _configuration.GetSection("HistoryClient");
+        IConfiguration historyClientConfig = Configuration.GetSection("HistoryClient");
         builder.RegisterModule(new HistoryClientAutofacModule(historyClientConfig));
-        IConfiguration stateClientConfig = _configuration.GetSection("StateClient");
+        IConfiguration stateClientConfig = Configuration.GetSection("StateClient");
         builder.RegisterModule(new StateClientAutofacModule(stateClientConfig));
-        IConfiguration userClientConfig = _configuration.GetSection("UserClient");
+        IConfiguration userClientConfig = Configuration.GetSection("UserClient");
         builder.RegisterModule(new UserClientAutofacModule(userClientConfig));
 
         // security
-        builder.RegisterOptions<JwtOptions>(_configuration.GetSection("Jwt"));
+        builder.RegisterOptions<JwtOptions>(Configuration.GetSection("Jwt"));
 
         // shared
         builder.RegisterType<ContractMapper>().As<IContractMapper>().SingleInstance();

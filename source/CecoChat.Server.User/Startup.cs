@@ -35,7 +35,6 @@ namespace CecoChat.Server.User;
 
 public class Startup : StartupBase
 {
-    private readonly IConfiguration _configuration;
     private readonly IWebHostEnvironment _environment;
     private readonly UserDbOptions _userDbOptions;
     private readonly RedisOptions _userCacheStoreOptions;
@@ -45,20 +44,19 @@ public class Startup : StartupBase
     public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         : base(configuration)
     {
-        _configuration = configuration;
         _environment = environment;
 
         _userDbOptions = new();
-        _configuration.GetSection("UserDb").Bind(_userDbOptions);
+        Configuration.GetSection("UserDb").Bind(_userDbOptions);
 
         _userCacheStoreOptions = new();
-        _configuration.GetSection("UserCache:Store").Bind(_userCacheStoreOptions);
+        Configuration.GetSection("UserCache:Store").Bind(_userCacheStoreOptions);
 
         _idGenOptions = new();
-        _configuration.GetSection("IdGen").Bind(_idGenOptions);
+        Configuration.GetSection("IdGen").Bind(_idGenOptions);
 
         _backplaneOptions = new();
-        _configuration.GetSection("Backplane").Bind(_backplaneOptions);
+        Configuration.GetSection("Backplane").Bind(_backplaneOptions);
     }
 
     public void ConfigureServices(IServiceCollection services)
@@ -176,27 +174,27 @@ public class Startup : StartupBase
         builder.RegisterHostedService<AsyncProfileCaching>();
 
         // config db
-        IConfiguration configDbConfig = _configuration.GetSection("ConfigDb");
+        IConfiguration configDbConfig = Configuration.GetSection("ConfigDb");
         builder.RegisterModule(new ConfigDbAutofacModule(configDbConfig, registerPartitioning: true));
 
         // backplane
         builder.RegisterType<KafkaAdmin>().As<IKafkaAdmin>().SingleInstance();
-        builder.RegisterOptions<KafkaOptions>(_configuration.GetSection("Backplane:Kafka"));
+        builder.RegisterOptions<KafkaOptions>(Configuration.GetSection("Backplane:Kafka"));
         builder.RegisterModule(new PartitionUtilityAutofacModule());
         builder.RegisterType<TopicPartitionFlyweight>().As<ITopicPartitionFlyweight>().SingleInstance();
         builder.RegisterFactory<KafkaProducer<Null, BackplaneMessage>, IKafkaProducer<Null, BackplaneMessage>>();
         builder.RegisterType<ConnectionNotifyProducer>().As<IConnectionNotifyProducer>().SingleInstance();
         builder.RegisterModule(new KafkaAutofacModule());
-        builder.RegisterOptions<BackplaneOptions>(_configuration.GetSection("Backplane"));
+        builder.RegisterOptions<BackplaneOptions>(Configuration.GetSection("Backplane"));
 
         // user db
-        IConfiguration userCacheConfig = _configuration.GetSection("UserCache");
+        IConfiguration userCacheConfig = Configuration.GetSection("UserCache");
         IConfiguration userCacheStoreConfig = userCacheConfig.GetSection("Store");
         builder.RegisterModule(new UserDbAutofacModule(userCacheConfig, userCacheStoreConfig));
-        builder.RegisterOptions<UserDbOptions>(_configuration.GetSection("UserDb"));
+        builder.RegisterOptions<UserDbOptions>(Configuration.GetSection("UserDb"));
 
         // id gen
-        IConfiguration idGenConfiguration = _configuration.GetSection("IdGen");
+        IConfiguration idGenConfiguration = Configuration.GetSection("IdGen");
         builder.RegisterModule(new IdGenAutofacModule(idGenConfiguration));
 
         // security
