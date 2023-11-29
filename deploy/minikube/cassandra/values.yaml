@@ -11,7 +11,7 @@ StatefulSet:
   Replicas: 2
 Image:
   Name: cassandra
-  Tag: 3.11.13
+  Tag: 4.1.3
   PullPolicy: IfNotPresent
 Networking:
   IntraNodePort: 7000
