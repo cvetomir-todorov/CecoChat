@@ -43,6 +43,7 @@ The following instrumentation is used:
   - ASP.NET Core with support for gRPC server-side
   - gRPC client instrumentation for service-to-service communication
   - Npgsql client instrumentation for YugabyteDB implementing the UserDB used in User service
+  - Redis client instrumentation for User cache in User service
 * Custom
   - Backplane instrumentation
     - At the level of Kafka producers and consumers
