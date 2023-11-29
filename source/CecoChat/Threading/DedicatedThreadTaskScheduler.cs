@@ -26,6 +26,7 @@ public sealed class DedicatedThreadTaskScheduler : TaskScheduler, IDisposable
         if (!_disposed)
         {
             _cts.Cancel();
+            _cts.Dispose();
             _disposed = true;
         }
     }
