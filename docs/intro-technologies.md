@@ -4,7 +4,7 @@ The technologies chosen are [cloud agnostic](https://codersociety.com/blog/artic
 
 * Integration - Kafka, gRPC, WebSocket, HTTP
 * Data storage - Yugabyte, Cassandra, Redis
-* Operations - OpenTelemetry, Docker, Kubernetes, Helm
+* Operations - OpenTelemetry, Docker, Kubernetes
 * Services - .NET, ASP.NET, SignalR, EF Core
 
 ![Technologies](images/cecochat-08-technologies.png)
@@ -110,12 +110,11 @@ Configuration is based on Redis:
 ![Prometheus](tech-images/prometheus.png)
 ![Grafana](tech-images/grafana.png)
 ![ElasticSearch](tech-images/elasticsearch.png)
-![Fluentd](tech-images/fluentd.png)
 ![Kibana](tech-images/kibana.png)
 
 * Distributed tracing is based on OpenTelemetry and Jaeger is configured for viewing traces and spans
 * Metrics and monitoring is based on OpenTelemetry, Prometheus and Grafana
-* Log aggregation is based on the EFK stack (ElasticSearch, Fluentd, Kibana)
+* Log aggregation is based on OpenTelemetry, ElasticSearch and Kibana
 
 # Deployment
 
