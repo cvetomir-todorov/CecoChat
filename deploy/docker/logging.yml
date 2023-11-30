@@ -2,25 +2,12 @@ version: '3'
 networks:
   cecochat:
 services:
-  fluentd:
-    image: cecochat-fluentd:0.1
-    container_name: cecochat-fluentd
-    hostname: fluentd
-    networks: &networks
-      - cecochat
-    ports:
-      - 24224:24224
-    deploy:
-      resources:
-        limits:
-          memory: 128M
-    volumes:
-      - ./logging/fluent.conf:/fluentd/etc/fluent.conf
   es:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.12.0
     container_name: cecochat-es
     hostname: es
-    networks: *networks
+    networks: &networks
+      - cecochat
     ports:
       - 9200:9200
     deploy:
