@@ -2,13 +2,13 @@
 using Serilog;
 using Serilog.Enrichers.Span;
 using Serilog.Events;
-using Serilog.Formatting.Elasticsearch;
-using Serilog.Sinks.Elasticsearch;
 
 namespace CecoChat.Server;
 
 public static class SerilogConfig
 {
+    private const string LogEntryConsoleOutputTemplate = "[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext} | {Message:lj}{NewLine}{Exception}";
+
     public static void Setup(Assembly entryAssembly, string environment)
     {
         LoggerConfiguration configuration = CreateDefaultConfiguration(entryAssembly);
@@ -55,21 +55,17 @@ public static class SerilogConfig
         return configuration
             .MinimumLevel.Override("CecoChat", LogEventLevel.Verbose)
             .WriteTo.Console(
-                outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext} | {Message:lj}{NewLine}{Exception}")
-            .WriteTo.Elasticsearch(new ElasticsearchSinkOptions
-            {
-                CustomFormatter = new ElasticsearchJsonFormatter(renderMessageTemplate: false),
-                IndexFormat = "cecochat-logs-app"
-            })
+                outputTemplate: LogEntryConsoleOutputTemplate)
             .WriteTo.File(
                 path: filePath,
                 rollingInterval: RollingInterval.Day,
-                outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext} | {Message:lj}{NewLine}{Exception}");
+                outputTemplate: LogEntryConsoleOutputTemplate);
     }
 
     private static LoggerConfiguration ApplyProductionConfiguration(LoggerConfiguration configuration)
     {
         return configuration
-            .WriteTo.Console(new ElasticsearchJsonFormatter(renderMessageTemplate: false));
+            .WriteTo.Console(
+                outputTemplate: LogEntryConsoleOutputTemplate);
     }
 }
