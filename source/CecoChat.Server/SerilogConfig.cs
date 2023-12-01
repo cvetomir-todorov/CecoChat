@@ -2,6 +2,7 @@
 using Serilog;
 using Serilog.Enrichers.Span;
 using Serilog.Events;
+using Serilog.Sinks.OpenTelemetry;
 
 namespace CecoChat.Server;
 
@@ -42,7 +43,20 @@ public static class SerilogConfig
             .Enrich.FromLogContext()
             .Destructure.ToMaximumDepth(4)
             .Destructure.ToMaximumStringLength(1024)
-            .Destructure.ToMaximumCollectionCount(32);
+            .Destructure.ToMaximumCollectionCount(32)
+            .WriteTo.Console(
+                outputTemplate: LogEntryConsoleOutputTemplate)
+            .WriteTo.OpenTelemetry(otel =>
+            {
+                otel.Endpoint = "http://localhost:4317";
+                otel.Protocol = OtlpProtocol.Grpc;
+                otel.IncludedData = IncludedData.TraceIdField | IncludedData.SpanIdField;
+
+                otel.BatchingOptions.EagerlyEmitFirstEvent = true;
+                otel.BatchingOptions.Period = TimeSpan.FromSeconds(1);
+                otel.BatchingOptions.BatchSizeLimit = 1000;
+                otel.BatchingOptions.QueueLimit = 100_000;
+            });
     }
 
     private static LoggerConfiguration ApplyDevelopmentConfiguration(Assembly entryAssembly, LoggerConfiguration configuration)
@@ -54,8 +68,6 @@ public static class SerilogConfig
 
         return configuration
             .MinimumLevel.Override("CecoChat", LogEventLevel.Verbose)
-            .WriteTo.Console(
-                outputTemplate: LogEntryConsoleOutputTemplate)
             .WriteTo.File(
                 path: filePath,
                 rollingInterval: RollingInterval.Day,
@@ -64,8 +76,6 @@ public static class SerilogConfig
 
     private static LoggerConfiguration ApplyProductionConfiguration(LoggerConfiguration configuration)
     {
-        return configuration
-            .WriteTo.Console(
-                outputTemplate: LogEntryConsoleOutputTemplate);
+        return configuration;
     }
 }
