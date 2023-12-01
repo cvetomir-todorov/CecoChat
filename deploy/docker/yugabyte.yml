@@ -3,7 +3,7 @@ networks:
   cecochat:
 services:
   yb-master:
-    image: yugabytedb/yugabyte:2.16.1.0-b50
+    image: yugabytedb/yugabyte:2.20.0.0-b76
     container_name: cecochat-yb-master
     hostname: yb-master
     networks: &networks
@@ -14,7 +14,7 @@ services:
       resources:
         limits:
           memory: 256M
-    environment: &master-env
+    environment:
       GET_HOSTS_FROM: dns
     volumes:
       - cecochat-yb-master:/mnt/master
@@ -28,7 +28,7 @@ services:
         "--replication_factor=2",
         "--logtostderr" ]
   yb-tserver0:
-    image: yugabytedb/yugabyte:2.16.1.0-b50
+    image: yugabytedb/yugabyte:2.20.0.0-b76
     container_name: cecochat-yb-tserver0
     hostname: yb-tserver0
     networks: *networks
@@ -54,7 +54,7 @@ services:
     depends_on:
       - yb-master
   yb-tserver1:
-    image: yugabytedb/yugabyte:2.16.1.0-b50
+    image: yugabytedb/yugabyte:2.20.0.0-b76
     container_name: cecochat-yb-tserver1
     hostname: yb-tserver1
     networks: *networks
