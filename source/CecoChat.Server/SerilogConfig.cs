@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using CecoChat.Serilog;
 using Serilog;
 using Serilog.Enrichers.Span;
 using Serilog.Events;
@@ -10,9 +11,9 @@ public static class SerilogConfig
 {
     private const string LogEntryConsoleOutputTemplate = "[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext} | {Message:lj}{NewLine}{Exception}";
 
-    public static void Setup(Assembly entryAssembly, string environment)
+    public static void Setup(Assembly entryAssembly, string environment, SerilogOtlpOptions otlpOptions)
     {
-        LoggerConfiguration configuration = CreateDefaultConfiguration(entryAssembly);
+        LoggerConfiguration configuration = CreateDefaultConfiguration(entryAssembly, otlpOptions);
 
         switch (environment.ToLowerInvariant())
         {
@@ -29,7 +30,7 @@ public static class SerilogConfig
         Log.Logger = configuration.CreateLogger();
     }
 
-    private static LoggerConfiguration CreateDefaultConfiguration(Assembly entryAssembly)
+    private static LoggerConfiguration CreateDefaultConfiguration(Assembly entryAssembly, SerilogOtlpOptions otlpOptions)
     {
         return new LoggerConfiguration()
             .MinimumLevel.Is(LogEventLevel.Information)
@@ -48,14 +49,14 @@ public static class SerilogConfig
                 outputTemplate: LogEntryConsoleOutputTemplate)
             .WriteTo.OpenTelemetry(otel =>
             {
-                otel.Endpoint = "http://localhost:4317";
+                otel.Endpoint = $"http://{otlpOptions.TargetHost}:{otlpOptions.TargetPort}";
                 otel.Protocol = OtlpProtocol.Grpc;
                 otel.IncludedData = IncludedData.TraceIdField | IncludedData.SpanIdField;
 
                 otel.BatchingOptions.EagerlyEmitFirstEvent = true;
-                otel.BatchingOptions.Period = TimeSpan.FromSeconds(1);
-                otel.BatchingOptions.BatchSizeLimit = 1000;
-                otel.BatchingOptions.QueueLimit = 100_000;
+                otel.BatchingOptions.Period = otlpOptions.BatchPeriod;
+                otel.BatchingOptions.BatchSizeLimit = otlpOptions.BatchSizeLimit;
+                otel.BatchingOptions.QueueLimit = otlpOptions.BatchQueueLimit;
             });
     }
 

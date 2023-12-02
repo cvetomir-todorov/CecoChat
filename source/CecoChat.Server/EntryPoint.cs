@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using Autofac.Extensions.DependencyInjection;
+using CecoChat.Serilog;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -44,20 +45,10 @@ public static class EntryPoint
 
     public static void CreateAndRunHost(IHostBuilder hostBuilder, Type loggerContext)
     {
-        Assembly? entryAssembly = Assembly.GetEntryAssembly();
-        if (entryAssembly == null)
-        {
-            throw new InvalidOperationException("Entry assembly is null.");
-        }
+        Assembly entryAssembly = GetEntryAssembly();
+        string environment = GetEnvironment();
 
-        const string aspnetEnvVarName = "ASPNETCORE_ENVIRONMENT";
-        string? environment = Environment.GetEnvironmentVariable(aspnetEnvVarName);
-        if (string.IsNullOrWhiteSpace(environment))
-        {
-            throw new InvalidOperationException($"Environment variable '{aspnetEnvVarName}' is not set or is whitespace.");
-        }
-
-        SerilogConfig.Setup(entryAssembly, environment);
+        SetupSerilog(environment, entryAssembly);
         ILogger logger = Log.ForContext(loggerContext);
 
         try
@@ -74,5 +65,41 @@ public static class EntryPoint
             logger.Information("Ended");
             Log.CloseAndFlush();
         }
+    }
+
+    private static Assembly GetEntryAssembly()
+    {
+        Assembly? entryAssembly = Assembly.GetEntryAssembly();
+        if (entryAssembly == null)
+        {
+            throw new InvalidOperationException("Entry assembly is null.");
+        }
+
+        return entryAssembly;
+    }
+
+    private static string GetEnvironment()
+    {
+        const string aspnetEnvVarName = "ASPNETCORE_ENVIRONMENT";
+        string? environment = Environment.GetEnvironmentVariable(aspnetEnvVarName);
+        if (string.IsNullOrWhiteSpace(environment))
+        {
+            throw new InvalidOperationException($"Environment variable '{aspnetEnvVarName}' is not set or is whitespace.");
+        }
+
+        return environment;
+    }
+
+    private static void SetupSerilog(string environment, Assembly entryAssembly)
+    {
+        IConfiguration config = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json", optional: false)
+            .AddJsonFile($"appsettings.{environment}.json", optional: true)
+            .Build();
+
+        SerilogOtlpOptions otlpOptions = new();
+        config.GetSection("Telemetry:Logging:Export").Bind(otlpOptions);
+
+        SerilogConfig.Setup(entryAssembly, environment, otlpOptions);
     }
 }
