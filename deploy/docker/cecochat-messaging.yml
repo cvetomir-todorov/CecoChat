@@ -32,6 +32,8 @@ services:
       CECOCHAT_Telemetry__Tracing__Sampling__Probability: 0.1
       CECOCHAT_Telemetry__Tracing__Export__TargetHost: otel-collector
       CECOCHAT_Telemetry__Tracing__Export__TargetPort: 4317
+      CECOCHAT_Telemetry__Logging__Export__TargetHost: otel-collector
+      CECOCHAT_Telemetry__Logging__Export__TargetPort: 4317
   cecochat-messaging0:
     image: ceco.com/cecochat/messaging:0.1
     container_name: cecochat-messaging0
@@ -61,6 +63,8 @@ services:
       CECOCHAT_Telemetry__Tracing__Sampling__Probability: 0.1
       CECOCHAT_Telemetry__Tracing__Export__TargetHost: otel-collector
       CECOCHAT_Telemetry__Tracing__Export__TargetPort: 4317
+      CECOCHAT_Telemetry__Logging__Export__TargetHost: otel-collector
+      CECOCHAT_Telemetry__Logging__Export__TargetPort: 4317
   cecochat-messaging1:
     image: ceco.com/cecochat/messaging:0.1
     container_name: cecochat-messaging1
@@ -90,3 +94,5 @@ services:
       CECOCHAT_Telemetry__Tracing__Sampling__Probability: 0.1
       CECOCHAT_Telemetry__Tracing__Export__TargetHost: otel-collector
       CECOCHAT_Telemetry__Tracing__Export__TargetPort: 4317
+      CECOCHAT_Telemetry__Logging__Export__TargetHost: otel-collector
+      CECOCHAT_Telemetry__Logging__Export__TargetPort: 4317
