@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{.Release.Name}}-kibana
+  namespace: {{.Release.Namespace}}
+  labels:
+    app: {{.Release.Name}}-kibana
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - {{.Values.Kibana.Ingress.Host}}
+      secretName: {{.Values.Kibana.Ingress.SecretName}}
+  rules:
+    - host: {{.Values.Kibana.Ingress.Host}}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{.Release.Name}}-kibana
+                port:
+                  number: {{.Values.Kibana.Networking.AccessPort}}
