@@ -75,7 +75,9 @@ The following instrumentation is used:
 
 ## Metrics
 
-Since OpenTelemetry is maturing, its SDK and API for metrics is used with the appropriate exporters. For now this is Prometheus, but in the future InfluxDB or another database could be preferred. 
+* OpenTelemetry is used to provide an HTTP `/metrics` endpoint to application services and to collect the metrics
+* This endpoint is used by Prometheus to scrape the exposed metrics and store them
+* Grafana visualizes data from Prometheus in custom dashboards and panels
 
 The following metrics are exported from the servers:
 * Protocol level
@@ -86,13 +88,3 @@ The following metrics are exported from the servers:
     - Received count
     - Processed count
   - Online clients count
-
-## Monitoring
-
-* Collection
-  - OpenTelemetry is used to collect metrics and traces via push/pull methods
-  - Prometheus is used to scrape metrics via a `/metrics` endpoint
-  - Jaeger is used to collect traces pushed to it
-* Visualization
-  - Grafana adds data sources for the respective collectors
-  - It presents dashboards with panels to visualize the different metrics being provided to it
