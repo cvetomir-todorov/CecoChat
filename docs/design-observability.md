@@ -68,19 +68,10 @@ The following instrumentation is used:
 
 ## Log aggregation
 
-EFK stack is utilized to aggregate, store, view, search all logs and setup alerts.
-
-### Aggregation
-
-In Debug/Development mode services are configured to write logs directly to ElasticSearch. Serilog provides a specialized formatter using the JSON fields which ElasticSearch understands.
-
-In Release/Production mode the services simply write logs to `stdout`. The same Serilog formatter for ElasticSearch is used. Docker logging driver for Fluentd is configured in the docker-compose file. It enables sending the logs to a Fluentd container. It matches them by tag, parses them by using only the `log` JSON field and sends that data to ElasticSearch.
-
-Both modes are configured to create indexes with different names because there is a slight difference in the fields. Also it makes it easier to know where the logs came from.
-
-### Storage, view, alerts
-
-Once the logs are in the appropriate indexes in ElasticSearch Kibana can be used in order to search by whatever field is needed. Log streaming and alerts can also be used.
+* OpenTelemetry, ElasticSearch and Kibana are utilized in the process.
+* Applications services send their logs in batches to an OpenTelemetry collectors via OTLP
+* The collectors are sending them again in batches to an ElasticSearch backend in a dedicated index
+* Kibana is configured to access the ElasticSearch backend and provides ability to view and search logs
 
 ## Metrics
 
