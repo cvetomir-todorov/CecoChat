@@ -53,6 +53,8 @@ spec:
                 name: service-backplane
             - configMapRef:
                 name: service-tracing
+            - configMapRef:
+                name: service-logging
           env:
             - name: CECOCHAT_StateDb__ContactPoints__0
               value: {{.Values.Networking.StateDb.Host}}-0.{{.Values.Networking.StateDb.Service}}.{{.Release.Namespace}}.svc.cluster.local:9042

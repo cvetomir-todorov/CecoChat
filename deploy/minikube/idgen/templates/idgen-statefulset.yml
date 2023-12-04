@@ -54,6 +54,8 @@ spec:
                 name: service-configdb
             - configMapRef:
                 name: service-tracing
+            - configMapRef:
+                name: service-logging
           volumeMounts:
             - name: config
               mountPath: {{.Values.Entrypoint.MountPath}}
