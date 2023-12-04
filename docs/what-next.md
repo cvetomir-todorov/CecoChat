@@ -9,8 +9,6 @@
   - Mobile
 * Development
   - Setup versioning
-* Deployment
-  - Setup aggregated logs storage
 
 ## Product features
 
@@ -75,6 +73,7 @@
   - Add Open Telemetry metrics to Redis when StackExchange.Redis adds support
   - Add Open Telemetry metrics to UserDB when Npgsql adds support
   - Use Cassandra instrumentation from .NET contrib
+  - Add metrics infrastructure to Minikube deployment
 * Misc
   - Control sending notifications to SignalR connected clients as previously with gRPC clients
   - Improve monotonic clock skew and make snowflake ID generation to use it as `IdGen.ITimeSource`
