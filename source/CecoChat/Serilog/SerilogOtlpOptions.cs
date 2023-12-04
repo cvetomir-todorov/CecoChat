@@ -4,9 +4,9 @@ namespace CecoChat.Serilog;
 
 public sealed class SerilogOtlpOptions
 {
-    public string TargetHost { get; init; } = "localhost";
+    public string TargetHost { get; init; } = string.Empty;
 
-    public int TargetPort { get; init; } = 4317;
+    public int TargetPort { get; init; }
 
     public OtlpExportProtocol Protocol { get; init; }
 
