@@ -22,14 +22,14 @@ spec:
       http:
         paths:
           - path: /m0(/|$)(.*)
-            pathType: Prefix
+            pathType: ImplementationSpecific
             backend:
               service:
                 name: {{.Release.Name}}-0
                 port:
                   number: {{.Values.Networking.Port}}
           - path: /m1(/|$)(.*)
-            pathType: Prefix
+            pathType: ImplementationSpecific
             backend:
               service:
                 name: {{.Release.Name}}-1
