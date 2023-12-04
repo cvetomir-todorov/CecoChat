@@ -3,7 +3,7 @@
 ## Essential features
 
 * Users
-  - Search users by name
+  - Search users by name (pending full-text search support in YugabyteDB tracked in [this GitHub issue](https://github.com/yugabyte/yugabyte-db/issues/7850))
 * Clients
   - Web-based
   - Mobile
