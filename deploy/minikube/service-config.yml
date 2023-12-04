@@ -46,3 +46,13 @@ data:
   CECOCHAT_Telemetry__Tracing__Sampling__Probability: "0.1"
   CECOCHAT_Telemetry__Tracing__Export__TargetHost: "telemetry-otel-collector"
   CECOCHAT_Telemetry__Tracing__Export__TargetPort: "4317"
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: service-logging
+  namespace: cecochat
+data:
+  CECOCHAT_Telemetry__Logging__Export__TargetHost: "telemetry-otel-collector"
+  CECOCHAT_Telemetry__Logging__Export__TargetPort: "4317"

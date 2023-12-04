@@ -53,6 +53,8 @@ spec:
                 name: service-backplane
             - configMapRef:
                 name: service-tracing
+            - configMapRef:
+                name: service-logging
           env:
             - name: NAMESPACE
               valueFrom:
