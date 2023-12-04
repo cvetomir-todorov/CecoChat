@@ -23,6 +23,9 @@ data:
         timeout: 1s
 
     exporters:
+      elasticsearch/logs:
+        endpoints: [http://logging-es-0.logging-es.cecochat.svc.cluster.local:9200]
+        logs_index: logs-cecochat
       otlp/jaeger:
         endpoint: "tracing-jaeger-0.tracing-jaeger.cecochat.svc.cluster.local:4317" # export to jaeger instance at the standard OTLP gRPC port
         tls:
@@ -34,10 +37,14 @@ data:
     service:
       extensions: [health_check]
       pipelines:
+        logs:
+          receivers: [otlp]
+          processors: [memory_limiter, batch]
+          exporters: [elasticsearch/logs]
         traces:
-          receivers: [ otlp ]
-          processors: [ memory_limiter, batch ]
-          exporters: [ otlp/jaeger ]
+          receivers: [otlp]
+          processors: [memory_limiter, batch]
+          exporters: [otlp/jaeger]
       telemetry:
         logs:
           level: info
