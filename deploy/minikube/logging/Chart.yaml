@@ -1,0 +1,8 @@
+apiVersion: v2
+name: logging
+description: The logging components for CecoChat - ElasticSearch, Kibana
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+maintainers:
+  - name: CecoChat

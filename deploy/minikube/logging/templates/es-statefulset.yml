@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{.Release.Name}}-es
+  namespace: {{.Release.Namespace}}
+  labels:
+    app: {{.Release.Name}}-es
+    co.elastic.logs/module: elasticsearch
+spec:
+  selector:
+    matchLabels:
+      app: {{.Release.Name}}-es
+  serviceName: {{.Release.Name}}-es
+  replicas: {{.Values.ElasticSearch.StatefulSet.Replicas}}
+  podManagementPolicy: Parallel
+  template:
+    metadata:
+      labels:
+        app: {{.Release.Name}}-es
+    spec:
+      initContainers:
+        - name: increase-vm-max-map-count
+          image: busybox:1.36.1
+          imagePullPolicy: IfNotPresent
+          command:
+            - sysctl
+            - -w
+            - vm.max_map_count=262144
+          securityContext:
+            privileged: true
+        - name: increase-ulimit
+          image: busybox:1.36.1
+          imagePullPolicy: IfNotPresent
+          command:
+            - sh
+            - -c
+            - ulimit -n 65536
+          securityContext:
+            privileged: true
+      containers:
+        - name: {{.Release.Name}}-es
+          image: {{.Values.ElasticSearch.Image.Name}}:{{.Values.ElasticSearch.Image.Tag}}
+          imagePullPolicy: {{.Values.ElasticSearch.Image.PullPolicy}}
+          ports:
+            - containerPort: {{.Values.ElasticSearch.Networking.AccessPort}}
+          env:
+            - name: discovery.type
+              value: "single-node"
+            - name: xpack.security.enabled
+              value: "false"
+            - name: ES_JAVA_OPTS
+              value: {{.Values.ElasticSearch.Resources.JavaHeapSize}}
+          volumeMounts:
+            - name: data
+              mountPath: /usr/share/elasticsearch/data
+          resources:
+            requests:
+              memory: {{.Values.ElasticSearch.Resources.Requests.Memory}}
+            limits:
+              memory: {{.Values.ElasticSearch.Resources.Limits.Memory}}
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: [ReadWriteOnce]
+        resources:
+          requests:
+            storage: {{.Values.ElasticSearch.Resources.Requests.Storage}}
