@@ -10,18 +10,23 @@ namespace CecoChat.Server;
 
 public static class EntryPoint
 {
+    private const string EnvironmentVariablesPrefix = "CECOCHAT_";
+
     public static IHostBuilder CreateDefaultHostBuilder(
         string[] args,
         Type startupContext,
         bool useAutofac = true,
-        bool useSerilog = true,
-        string environmentVariablesPrefix = "CECOCHAT_")
+        bool useSerilog = true)
     {
         IHostBuilder hostBuilder = Host
             .CreateDefaultBuilder(args)
             .ConfigureWebHostDefaults(webBuilder =>
             {
                 webBuilder.UseStartup(startupContext);
+            })
+            .ConfigureAppConfiguration(configurationBuilder =>
+            {
+                configurationBuilder.AddEnvironmentVariables(EnvironmentVariablesPrefix);
             });
 
         if (useAutofac)
@@ -31,13 +36,6 @@ public static class EntryPoint
         if (useSerilog)
         {
             hostBuilder = hostBuilder.UseSerilog();
-        }
-        if (!string.IsNullOrWhiteSpace(environmentVariablesPrefix))
-        {
-            hostBuilder = hostBuilder.ConfigureAppConfiguration(configurationBuilder =>
-            {
-                configurationBuilder.AddEnvironmentVariables(environmentVariablesPrefix);
-            });
         }
 
         return hostBuilder;
@@ -95,6 +93,7 @@ public static class EntryPoint
         IConfiguration config = new ConfigurationBuilder()
             .AddJsonFile("appsettings.json", optional: false)
             .AddJsonFile($"appsettings.{environment}.json", optional: true)
+            .AddEnvironmentVariables(EnvironmentVariablesPrefix)
             .Build();
 
         SerilogOtlpOptions otlpOptions = new();
