@@ -5,13 +5,13 @@ namespace CecoChat.Otel;
 
 public sealed class OtlpOptions
 {
-    public string TargetHost { get; init; } = "localhost";
+    public string TargetHost { get; init; } = string.Empty;
 
-    public int TargetPort { get; init; } = 4317;
+    public int TargetPort { get; init; }
 
-    public OtlpExportProtocol Protocol { get; init; } = OtlpExportProtocol.Grpc;
+    public OtlpExportProtocol Protocol { get; init; }
 
-    public ExportProcessorType ExportProcessorType { get; init; } = ExportProcessorType.Batch;
+    public ExportProcessorType ExportProcessorType { get; init; }
 
-    public int BatchExportScheduledDelayMillis { get; init; } = 1000;
+    public int BatchExportScheduledDelayMillis { get; init; }
 }
