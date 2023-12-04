@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{.Release.Name}}-es
+  namespace: {{.Release.Namespace}}
+  labels:
+    app: {{.Release.Name}}-es
+spec:
+  selector:
+    app: {{.Release.Name}}-es
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - port: {{.Values.ElasticSearch.Networking.AccessPort}}

@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{.Release.Name}}-kibana
+  namespace: {{.Release.Namespace}}
+  labels:
+    app: {{.Release.Name}}-kibana
+spec:
+  selector:
+    matchLabels:
+      app: {{.Release.Name}}-kibana
+  serviceName: {{.Release.Name}}-kibana
+  replicas: {{.Values.Kibana.StatefulSet.Replicas}}
+  podManagementPolicy: Parallel
+  template:
+    metadata:
+      labels:
+        app: {{.Release.Name}}-kibana
+    spec:
+      containers:
+        - name: {{.Release.Name}}-kibana
+          image: {{.Values.Kibana.Image.Name}}:{{.Values.Kibana.Image.Tag}}
+          imagePullPolicy: {{.Values.Kibana.Image.PullPolicy}}
+          ports:
+            - containerPort: {{.Values.Kibana.Networking.AccessPort}}
+          env:
+            - name: ELASTICSEARCH_HOSTS
+              value: http://{{.Release.Name}}-es-0.{{.Release.Name}}-es.{{.Release.Namespace}}.svc.cluster.local:9200
+          volumeMounts:
+            - name: data
+              mountPath: /usr/share/kibana/data
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: [ReadWriteOnce]
+        resources:
+          requests:
+            storage: {{.Values.Kibana.Resources.Requests.Storage}}

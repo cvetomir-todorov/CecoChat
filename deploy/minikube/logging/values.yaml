@@ -1,0 +1,28 @@
+ElasticSearch:
+  StatefulSet:
+    Replicas: 1
+  Image:
+    Name: docker.elastic.co/elasticsearch/elasticsearch
+    Tag: 7.17.15
+    PullPolicy: IfNotPresent
+  Networking:
+    AccessPort: 9200
+  Resources:
+    Requests:
+      Storage: 1Gi
+      Memory: 512Mi
+    Limits:
+      Memory: 1024Mi
+    JavaHeapSize: -Xms256m -Xmx256m
+Kibana:
+  StatefulSet:
+    Replicas: 1
+  Image:
+    Name: docker.elastic.co/kibana/kibana
+    Tag: 7.17.15
+    PullPolicy: IfNotPresent
+  Networking:
+    AccessPort: 5601
+  Resources:
+    Requests:
+      Storage: 512Mi
