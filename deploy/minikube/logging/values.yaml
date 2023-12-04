@@ -23,6 +23,9 @@ Kibana:
     PullPolicy: IfNotPresent
   Networking:
     AccessPort: 5601
+  Ingress:
+    Host: kibana.cecochat.com
+    SecretName: ingress-tls
   Resources:
     Requests:
       Storage: 512Mi
