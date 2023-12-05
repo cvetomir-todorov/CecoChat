@@ -1,23 +1,23 @@
 ﻿{
   "$schema": "http://json.schemastore.org/launchsettings.json",
   "profiles": {
-    "Messaging0": {
+    "Messaging-0": {
       "commandName": "Project",
       "dotnetRunMessages": "true",
       "launchBrowser": false,
       "launchUrl": "",
-      "applicationUrl": "https://+:31001",
+      "applicationUrl": "https://+:31000",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "CECOCHAT_Config__ServerID": "0"
       }
     },
-    "Messaging1": {
+    "Messaging-1": {
       "commandName": "Project",
       "dotnetRunMessages": "true",
       "launchBrowser": false,
       "launchUrl": "",
-      "applicationUrl": "https://+:31011",
+      "applicationUrl": "https://+:31001",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "CECOCHAT_Config__ServerID": "1"
