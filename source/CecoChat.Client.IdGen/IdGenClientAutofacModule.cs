@@ -4,11 +4,11 @@ using Microsoft.Extensions.Configuration;
 
 namespace CecoChat.Client.IdGen;
 
-public sealed class IdGenAutofacModule : Module
+public sealed class IdGenClientAutofacModule : Module
 {
     private readonly IConfiguration _idGenConfiguration;
 
-    public IdGenAutofacModule(IConfiguration idGenConfiguration)
+    public IdGenClientAutofacModule(IConfiguration idGenConfiguration)
     {
         _idGenConfiguration = idGenConfiguration;
     }
@@ -17,6 +17,6 @@ public sealed class IdGenAutofacModule : Module
     {
         builder.RegisterType<IdGenClient>().As<IIdGenClient>().SingleInstance();
         builder.RegisterType<IdChannel>().As<IIdChannel>().SingleInstance();
-        builder.RegisterOptions<IdGenOptions>(_idGenConfiguration);
+        builder.RegisterOptions<IdGenClientOptions>(_idGenConfiguration);
     }
 }

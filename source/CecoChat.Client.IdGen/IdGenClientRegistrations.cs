@@ -4,9 +4,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace CecoChat.Client.IdGen;
 
-public static class IdGenRegistrations
+public static class IdGenClientRegistrations
 {
-    public static void AddIdGenClient(this IServiceCollection services, IdGenOptions options)
+    public static void AddIdGenClient(this IServiceCollection services, IdGenClientOptions options)
     {
         if (options.SocketsHttpHandler == null)
         {

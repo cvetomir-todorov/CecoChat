@@ -33,7 +33,7 @@ public class Startup : StartupBase
     private readonly IWebHostEnvironment _environment;
     private readonly ClientOptions _clientOptions;
     private readonly BackplaneOptions _backplaneOptions;
-    private readonly IdGenOptions _idGenOptions;
+    private readonly IdGenClientOptions _idGenClientOptions;
 
     public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         : base(configuration)
@@ -46,8 +46,8 @@ public class Startup : StartupBase
         _backplaneOptions = new();
         Configuration.GetSection("Backplane").Bind(_backplaneOptions);
 
-        _idGenOptions = new();
-        Configuration.GetSection("IdGen").Bind(_idGenOptions);
+        _idGenClientOptions = new();
+        Configuration.GetSection("IdGenClient").Bind(_idGenClientOptions);
     }
 
     public void ConfigureServices(IServiceCollection services)
@@ -60,7 +60,7 @@ public class Startup : StartupBase
         services.AddUserPolicyAuthorization();
 
         // idgen
-        services.AddIdGenClient(_idGenOptions);
+        services.AddIdGenClient(_idGenClientOptions);
 
         // clients
         services
@@ -129,9 +129,9 @@ public class Startup : StartupBase
                 tags: new[] { HealthTags.Health, HealthTags.Ready })
             .AddUri(
                 "idgen",
-                new Uri(_idGenOptions.Address!, _idGenOptions.HealthPath),
+                new Uri(_idGenClientOptions.Address!, _idGenClientOptions.HealthPath),
                 configureHttpClient: (_, client) => client.DefaultRequestVersion = new Version(2, 0),
-                timeout: _idGenOptions.HealthTimeout,
+                timeout: _idGenClientOptions.HealthTimeout,
                 tags: new[] { HealthTags.Health, HealthTags.Ready });
 
         services.AddSingleton<ConfigDbInitHealthCheck>();
@@ -156,8 +156,8 @@ public class Startup : StartupBase
         builder.RegisterModule(new SignalRTelemetryAutofacModule());
 
         // idgen
-        IConfiguration idGenConfiguration = Configuration.GetSection("IdGen");
-        builder.RegisterModule(new IdGenAutofacModule(idGenConfiguration));
+        IConfiguration idGenConfiguration = Configuration.GetSection("IdGenClient");
+        builder.RegisterModule(new IdGenClientAutofacModule(idGenConfiguration));
 
         // backplane
         builder.RegisterType<KafkaAdmin>().As<IKafkaAdmin>().SingleInstance();
