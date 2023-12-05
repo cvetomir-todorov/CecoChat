@@ -1,5 +1,5 @@
 using AutoMapper;
-using CecoChat.Client.History;
+using CecoChat.Client.Chats;
 using CecoChat.Client.User;
 using CecoChat.Contracts.Bff.Chats;
 using CecoChat.Contracts.Bff.Connections;
@@ -20,7 +20,7 @@ public class OneChatScreenController : ControllerBase
     private readonly ILogger _logger;
     private readonly IMapper _mapper;
     private readonly IContractMapper _contractMapper;
-    private readonly IHistoryClient _historyClient;
+    private readonly IChatsClient _chatsClient;
     private readonly IProfileClient _profileClient;
     private readonly IConnectionClient _connectionClient;
 
@@ -28,14 +28,14 @@ public class OneChatScreenController : ControllerBase
         ILogger<OneChatScreenController> logger,
         IMapper mapper,
         IContractMapper contractMapper,
-        IHistoryClient historyClient,
+        IChatsClient chatsClient,
         IProfileClient profileClient,
         IConnectionClient connectionClient)
     {
         _logger = logger;
         _mapper = mapper;
         _contractMapper = contractMapper;
-        _historyClient = historyClient;
+        _chatsClient = chatsClient;
         _profileClient = profileClient;
         _connectionClient = connectionClient;
     }
@@ -56,7 +56,7 @@ public class OneChatScreenController : ControllerBase
 
         LinkedList<Task> tasks = new();
 
-        Task<IReadOnlyCollection<Contracts.History.HistoryMessage>> messagesTask = _historyClient.GetHistory(userClaims.UserId, request.OtherUserId, request.MessagesOlderThan, accessToken, ct);
+        Task<IReadOnlyCollection<Contracts.Chats.HistoryMessage>> messagesTask = _chatsClient.GetHistory(userClaims.UserId, request.OtherUserId, request.MessagesOlderThan, accessToken, ct);
         tasks.AddLast(messagesTask);
 
         Task<Contracts.User.ProfilePublic>? profileTask = null;
@@ -75,7 +75,7 @@ public class OneChatScreenController : ControllerBase
 
         await Task.WhenAll(tasks);
 
-        IReadOnlyCollection<Contracts.History.HistoryMessage> serviceMessages = messagesTask.Result;
+        IReadOnlyCollection<Contracts.Chats.HistoryMessage> serviceMessages = messagesTask.Result;
         HistoryMessage[] messages = serviceMessages.Select(message => _contractMapper.MapMessage(message)).ToArray();
 
         ProfilePublic? profile = null;

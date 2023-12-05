@@ -1,5 +1,5 @@
 using AutoMapper;
-using CecoChat.Client.State;
+using CecoChat.Client.Chats;
 using CecoChat.Client.User;
 using CecoChat.Contracts.Bff.Chats;
 using CecoChat.Contracts.Bff.Connections;
@@ -20,7 +20,7 @@ public class AllChatsScreenController : ControllerBase
     private readonly ILogger _logger;
     private readonly IMapper _mapper;
     private readonly IContractMapper _contractMapper;
-    private readonly IStateClient _stateClient;
+    private readonly IChatsClient _chatsClient;
     private readonly IConnectionClient _connectionClient;
     private readonly IProfileClient _profileClient;
 
@@ -28,14 +28,14 @@ public class AllChatsScreenController : ControllerBase
         ILogger<AllChatsScreenController> logger,
         IMapper mapper,
         IContractMapper contractMapper,
-        IStateClient stateClient,
+        IChatsClient chatsClient,
         IConnectionClient connectionClient,
         IProfileClient profileClient)
     {
         _logger = logger;
         _mapper = mapper;
         _contractMapper = contractMapper;
-        _stateClient = stateClient;
+        _chatsClient = chatsClient;
         _connectionClient = connectionClient;
         _profileClient = profileClient;
     }
@@ -54,12 +54,12 @@ public class AllChatsScreenController : ControllerBase
             return Unauthorized();
         }
 
-        Task<IReadOnlyCollection<Contracts.State.ChatState>> chatsTask = _stateClient.GetChats(userClaims.UserId, request.ChatsNewerThan, accessToken, ct);
+        Task<IReadOnlyCollection<Contracts.Chats.ChatState>> chatsTask = _chatsClient.GetUserChats(userClaims.UserId, request.ChatsNewerThan, accessToken, ct);
         Task<IReadOnlyCollection<Contracts.User.Connection>> connectionsTask = _connectionClient.GetConnections(userClaims.UserId, accessToken, ct);
 
         await Task.WhenAll(chatsTask, connectionsTask);
 
-        IReadOnlyCollection<Contracts.State.ChatState> serviceChats = chatsTask.Result;
+        IReadOnlyCollection<Contracts.Chats.ChatState> serviceChats = chatsTask.Result;
         IReadOnlyCollection<Contracts.User.Connection> serviceConnections = connectionsTask.Result;
 
         ProfilePublic[] profiles = await GetProfiles(request.IncludeProfiles, serviceChats, serviceConnections, userClaims, accessToken, ct);
@@ -78,7 +78,7 @@ public class AllChatsScreenController : ControllerBase
 
     private async Task<ProfilePublic[]> GetProfiles(
         bool includeProfiles,
-        IReadOnlyCollection<Contracts.State.ChatState> chats,
+        IReadOnlyCollection<Contracts.Chats.ChatState> chats,
         IReadOnlyCollection<Contracts.User.Connection> connections,
         UserClaims userClaims,
         string accessToken,
