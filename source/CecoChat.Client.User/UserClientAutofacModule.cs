@@ -15,7 +15,7 @@ public sealed class UserClientAutofacModule : Module
 
     protected override void Load(ContainerBuilder builder)
     {
-        builder.RegisterOptions<UserOptions>(_userClientConfiguration);
+        builder.RegisterOptions<UserClientOptions>(_userClientConfiguration);
 
         builder.RegisterType<AuthClient>().As<IAuthClient>().SingleInstance();
         builder.RegisterType<ProfileClient>().As<IProfileClient>().SingleInstance();

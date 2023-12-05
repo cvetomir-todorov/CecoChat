@@ -10,14 +10,14 @@ namespace CecoChat.Client.User;
 internal sealed class ConnectionClient : IConnectionClient
 {
     private readonly ILogger _logger;
-    private readonly UserOptions _options;
+    private readonly UserClientOptions _options;
     private readonly ConnectionQuery.ConnectionQueryClient _connectionQueryClient;
     private readonly ConnectionCommand.ConnectionCommandClient _connectionCommandClient;
     private readonly IClock _clock;
 
     public ConnectionClient(
         ILogger<ConnectionClient> logger,
-        IOptions<UserOptions> options,
+        IOptions<UserClientOptions> options,
         ConnectionQuery.ConnectionQueryClient connectionQueryClient,
         ConnectionCommand.ConnectionCommandClient connectionCommandClient,
         IClock clock)

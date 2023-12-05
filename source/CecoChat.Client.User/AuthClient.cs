@@ -7,13 +7,13 @@ namespace CecoChat.Client.User;
 internal sealed class AuthClient : IAuthClient
 {
     private readonly ILogger _logger;
-    private readonly UserOptions _options;
+    private readonly UserClientOptions _options;
     private readonly IClock _clock;
     private readonly Auth.AuthClient _authClient;
 
     public AuthClient(
         ILogger<AuthClient> logger,
-        IOptions<UserOptions> options,
+        IOptions<UserClientOptions> options,
         IClock clock,
         Auth.AuthClient authClient)
     {

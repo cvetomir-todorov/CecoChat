@@ -3,7 +3,7 @@ using CecoChat.Polly;
 
 namespace CecoChat.Client.User;
 
-public class UserOptions
+public sealed class UserClientOptions
 {
     public Uri? Address { get; init; }
     public TimeSpan CallTimeout { get; init; }
