@@ -59,9 +59,9 @@ spec:
             - configMapRef:
                 name: service-logging
           env:
-            - name: CECOCHAT_IdGen__Address
+            - name: CECOCHAT_IdGenClient__Address
               value: https://{{.Values.Networking.IdGenService}}
-            - name: CECOCHAT_IdGen__RefreshIdsCount
+            - name: CECOCHAT_IdGenClient__RefreshIdsCount
               value: "{{.Values.Messaging.RefreshIdsCount}}"
           volumeMounts:
             - name: config
