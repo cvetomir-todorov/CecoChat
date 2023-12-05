@@ -136,26 +136,26 @@ public sealed class ChatClient : IAsyncDisposable
         return response;
     }
 
-    public async Task<IList<LocalStorage.Chat>> GetChats(DateTime newerThan)
+    public async Task<IList<LocalStorage.Chat>> GetUserChats(DateTime newerThan)
     {
-        GetChatsRequest request = new()
+        GetUserChatsRequest request = new()
         {
             NewerThan = newerThan
         };
-        GetChatsResponse response = await _bffClient.GetStateChats(request, _accessToken!);
+        GetUserChatsResponse response = await _bffClient.GetUserChats(request, _accessToken!);
         List<LocalStorage.Chat> chats = Map.BffChats(response.Chats, UserId);
 
         return chats;
     }
 
-    public async Task<IList<LocalStorage.Message>> GetHistory(long otherUserId, DateTime olderThan)
+    public async Task<IList<LocalStorage.Message>> GetChatHistory(long otherUserId, DateTime olderThan)
     {
-        GetHistoryRequest request = new()
+        GetChatHistoryRequest request = new()
         {
             OtherUserId = otherUserId,
             OlderThan = olderThan
         };
-        GetHistoryResponse response = await _bffClient.GetHistoryMessages(request, _accessToken!);
+        GetChatHistoryResponse response = await _bffClient.GetChatHistory(request, _accessToken!);
         List<LocalStorage.Message> messages = Map.BffMessages(response.Messages);
 
         return messages;

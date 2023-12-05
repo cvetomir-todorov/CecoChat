@@ -56,7 +56,7 @@ public class OneChatScreenController : ControllerBase
 
         LinkedList<Task> tasks = new();
 
-        Task<IReadOnlyCollection<Contracts.Chats.HistoryMessage>> messagesTask = _chatsClient.GetHistory(userClaims.UserId, request.OtherUserId, request.MessagesOlderThan, accessToken, ct);
+        Task<IReadOnlyCollection<Contracts.Chats.HistoryMessage>> messagesTask = _chatsClient.GetChatHistory(userClaims.UserId, request.OtherUserId, request.MessagesOlderThan, accessToken, ct);
         tasks.AddLast(messagesTask);
 
         Task<Contracts.User.ProfilePublic>? profileTask = null;

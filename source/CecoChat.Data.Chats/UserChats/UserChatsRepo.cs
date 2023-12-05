@@ -8,11 +8,11 @@ public interface IUserChatsRepo : IDisposable
 {
     void Prepare();
 
-    Task<IReadOnlyCollection<ChatState>> GetChats(long userId, DateTime newerThan);
+    Task<IReadOnlyCollection<ChatState>> GetUserChats(long userId, DateTime newerThan);
 
-    ChatState? GetChat(long userId, string chatId);
+    ChatState? GetUserChat(long userId, string chatId);
 
-    void UpdateChat(long userId, ChatState chat);
+    void UpdateUserChat(long userId, ChatState chat);
 }
 
 internal sealed class UserChatsRepo : IUserChatsRepo
@@ -67,7 +67,7 @@ internal sealed class UserChatsRepo : IUserChatsRepo
 #pragma warning restore IDE1006
     }
 
-    public async Task<IReadOnlyCollection<ChatState>> GetChats(long userId, DateTime newerThan)
+    public async Task<IReadOnlyCollection<ChatState>> GetUserChats(long userId, DateTime newerThan)
     {
         long newerThanSnowflake = newerThan.ToSnowflakeFloor();
         BoundStatement query = _chatsQuery.Value.Bind(userId, newerThanSnowflake);
@@ -94,7 +94,7 @@ internal sealed class UserChatsRepo : IUserChatsRepo
         return chats;
     }
 
-    public ChatState? GetChat(long userId, string chatId)
+    public ChatState? GetUserChat(long userId, string chatId)
     {
         BoundStatement query = _chatQuery.Value.Bind(userId, chatId);
         query.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
@@ -123,7 +123,7 @@ internal sealed class UserChatsRepo : IUserChatsRepo
         return chat;
     }
 
-    public void UpdateChat(long userId, ChatState chat)
+    public void UpdateUserChat(long userId, ChatState chat)
     {
         BoundStatement command = _updateChatCommand.Value.Bind(userId, chat.OtherUserId, chat.ChatId, chat.NewestMessage, chat.OtherUserDelivered, chat.OtherUserSeen);
         command.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);

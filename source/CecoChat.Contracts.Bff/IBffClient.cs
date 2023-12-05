@@ -39,14 +39,14 @@ public interface IBffClient : IDisposable
         [Query] GetOneChatScreenRequest request,
         [Authorize(AuthorizationScheme)] string accessToken);
 
-    [Get("/api/chats/state")]
-    Task<GetChatsResponse> GetStateChats(
-        [Query] GetChatsRequest request,
+    [Get("/api/chats/user")]
+    Task<GetUserChatsResponse> GetUserChats(
+        [Query] GetUserChatsRequest request,
         [Authorize(AuthorizationScheme)] string accessToken);
 
     [Get("/api/chats/history")]
-    Task<GetHistoryResponse> GetHistoryMessages(
-        [Query] GetHistoryRequest request,
+    Task<GetChatHistoryResponse> GetChatHistory(
+        [Query] GetChatHistoryRequest request,
         [Authorize(AuthorizationScheme)] string accessToken);
 
     [Get("/api/profiles/{id}")]

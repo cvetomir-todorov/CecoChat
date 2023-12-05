@@ -4,9 +4,9 @@ using FluentValidation;
 
 namespace CecoChat.Server.Bff.Endpoints.Chats;
 
-public sealed class GetHistoryRequestValidator : AbstractValidator<GetHistoryRequest>
+public sealed class GetChatHistoryRequestValidator : AbstractValidator<GetChatHistoryRequest>
 {
-    public GetHistoryRequestValidator()
+    public GetChatHistoryRequestValidator()
     {
         RuleFor(x => x.OtherUserId)
             .ValidUserId();
@@ -15,9 +15,9 @@ public sealed class GetHistoryRequestValidator : AbstractValidator<GetHistoryReq
     }
 }
 
-public sealed class GetChatsRequestValidator : AbstractValidator<GetChatsRequest>
+public sealed class GetUserChatsRequestValidator : AbstractValidator<GetUserChatsRequest>
 {
-    public GetChatsRequestValidator()
+    public GetUserChatsRequestValidator()
     {
         RuleFor(x => x.NewerThan)
             .ValidNewerThanDateTime();
