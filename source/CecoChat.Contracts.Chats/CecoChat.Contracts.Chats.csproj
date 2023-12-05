@@ -14,13 +14,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Protobuf Include="Backplane\BackplaneMessage.proto" />
-    <Protobuf Include="Backplane\ConnectionStatus.proto" />
-    <Protobuf Include="Backplane\DataType.proto" />
-    <Protobuf Include="Backplane\DeliveryStatus.proto" />
-    <Protobuf Include="Backplane\MessageType.proto" />
-    <Protobuf Include="IdGen\IdGenService.proto" GrpcServices="All" />
-    <Protobuf Include="Uuid.proto" />
+    <Protobuf Include="ChatState.proto" />
+    <Protobuf Include="DataMessage.proto" />
+    <Protobuf Include="DataType.proto" />
+    <Protobuf Include="HistoryMessage.proto" />
+    <Protobuf Include="ChatsService.proto" GrpcServices="All" />
+    <Protobuf Include="ReactionMessage.proto" />
   </ItemGroup>
 
 </Project>
