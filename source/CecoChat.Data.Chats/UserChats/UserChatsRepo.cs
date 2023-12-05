@@ -1,11 +1,10 @@
 using Cassandra;
 using CecoChat.Contracts.State;
-using CecoChat.Data.State.Telemetry;
 using Microsoft.Extensions.Logging;
 
-namespace CecoChat.Data.State.Repos;
+namespace CecoChat.Data.Chats.UserChats;
 
-public interface IChatStateRepo : IDisposable
+public interface IUserChatsRepo : IDisposable
 {
     void Prepare();
 
@@ -16,43 +15,43 @@ public interface IChatStateRepo : IDisposable
     void UpdateChat(long userId, ChatState chat);
 }
 
-internal sealed class ChatStateRepo : IChatStateRepo
+internal sealed class UserChatsRepo : IUserChatsRepo
 {
     private readonly ILogger _logger;
-    private readonly IStateTelemetry _stateTelemetry;
-    private readonly IStateDbContext _dbContext;
+    private readonly IUserChatsTelemetry _userChatsTelemetry;
+    private readonly IChatsDbContext _dbContext;
     private readonly Lazy<PreparedStatement> _chatsQuery;
     private readonly Lazy<PreparedStatement> _chatQuery;
-    private readonly Lazy<PreparedStatement> _updateQuery;
+    private readonly Lazy<PreparedStatement> _updateChatCommand;
 
-    public ChatStateRepo(
-        ILogger<ChatStateRepo> logger,
-        IStateTelemetry stateTelemetry,
-        IStateDbContext dbContext)
+    public UserChatsRepo(
+        ILogger<UserChatsRepo> logger,
+        IUserChatsTelemetry userChatsTelemetry,
+        IChatsDbContext dbContext)
     {
         _logger = logger;
-        _stateTelemetry = stateTelemetry;
+        _userChatsTelemetry = userChatsTelemetry;
         _dbContext = dbContext;
 
-        _chatsQuery = new Lazy<PreparedStatement>(() => _dbContext.PrepareQuery(SelectNewerChatsForUser));
-        _chatQuery = new Lazy<PreparedStatement>(() => _dbContext.PrepareQuery(SelectChatForUser));
-        _updateQuery = new Lazy<PreparedStatement>(() => _dbContext.PrepareQuery(UpdateChatForUser));
+        _chatsQuery = new Lazy<PreparedStatement>(() => _dbContext.PrepareQuery(ChatsQuery));
+        _chatQuery = new Lazy<PreparedStatement>(() => _dbContext.PrepareQuery(ChatQuery));
+        _updateChatCommand = new Lazy<PreparedStatement>(() => _dbContext.PrepareQuery(UpdateChatCommand));
     }
 
     public void Dispose()
     {
-        _stateTelemetry.Dispose();
+        _userChatsTelemetry.Dispose();
     }
 
-    private const string SelectNewerChatsForUser =
+    private const string ChatsQuery =
         "SELECT other_user_id, chat_id, newest_message, other_user_delivered, other_user_seen " +
         "FROM user_chats " +
         "WHERE user_id = ? AND newest_message > ? ALLOW FILTERING";
-    private const string SelectChatForUser =
+    private const string ChatQuery =
         "SELECT other_user_id, newest_message, other_user_delivered, other_user_seen " +
         "FROM user_chats " +
         "WHERE user_id = ? AND chat_id = ?;";
-    private const string UpdateChatForUser =
+    private const string UpdateChatCommand =
         "INSERT into user_chats " +
         "(user_id, other_user_id, chat_id, newest_message, other_user_delivered, other_user_seen) " +
         "VALUES (?, ?, ?, ?, ?, ?);";
@@ -63,7 +62,7 @@ internal sealed class ChatStateRepo : IChatStateRepo
 #pragma warning disable IDE1006
         PreparedStatement _ = _chatsQuery.Value;
         PreparedStatement __ = _chatQuery.Value;
-        PreparedStatement ___ = _updateQuery.Value;
+        PreparedStatement ___ = _updateChatCommand.Value;
 #pragma warning restore IDE0059
 #pragma warning restore IDE1006
     }
@@ -75,7 +74,7 @@ internal sealed class ChatStateRepo : IChatStateRepo
         query.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
         query.SetIdempotence(true);
 
-        RowSet rows = await _stateTelemetry.GetChatsAsync(_dbContext.Session, query, userId);
+        RowSet rows = await _userChatsTelemetry.GetChatsAsync(_dbContext.Session, query, userId);
         List<ChatState> chats = new();
 
         foreach (Row row in rows)
@@ -101,7 +100,7 @@ internal sealed class ChatStateRepo : IChatStateRepo
         query.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
         query.SetIdempotence(true);
 
-        RowSet rows = _stateTelemetry.GetChat(_dbContext.Session, query, userId, chatId);
+        RowSet rows = _userChatsTelemetry.GetChat(_dbContext.Session, query, userId, chatId);
         Row? row = rows.FirstOrDefault();
         ChatState? chat = null;
         if (row != null)
@@ -126,11 +125,11 @@ internal sealed class ChatStateRepo : IChatStateRepo
 
     public void UpdateChat(long userId, ChatState chat)
     {
-        BoundStatement query = _updateQuery.Value.Bind(userId, chat.OtherUserId, chat.ChatId, chat.NewestMessage, chat.OtherUserDelivered, chat.OtherUserSeen);
-        query.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
-        query.SetIdempotence(false);
+        BoundStatement command = _updateChatCommand.Value.Bind(userId, chat.OtherUserId, chat.ChatId, chat.NewestMessage, chat.OtherUserDelivered, chat.OtherUserSeen);
+        command.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
+        command.SetIdempotence(false);
 
-        _stateTelemetry.UpdateChat(_dbContext.Session, query, userId, chat.ChatId);
+        _userChatsTelemetry.UpdateChat(_dbContext.Session, command, userId, chat.ChatId);
         _logger.LogTrace("Persisted changes about chat {ChatId} for user {UserId}", chat.ChatId, userId);
     }
 }

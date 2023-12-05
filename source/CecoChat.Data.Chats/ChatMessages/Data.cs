@@ -1,6 +1,6 @@
 ﻿using CecoChat.Contracts.History;
 
-namespace CecoChat.Data.History.Repos;
+namespace CecoChat.Data.Chats.ChatMessages;
 
 internal enum DbDataType : sbyte
 {
@@ -9,14 +9,14 @@ internal enum DbDataType : sbyte
 
 internal interface IDataMapper
 {
-    sbyte MapHistoryToDbDataType(DataType dataType);
+    sbyte MapContractToDbDataType(DataType dataType);
 
-    DataType MapDbToHistoryDataType(sbyte dbDataType);
+    DataType MapDbToContractDataType(sbyte dbDataType);
 }
 
 internal sealed class DataMapper : IDataMapper
 {
-    public sbyte MapHistoryToDbDataType(DataType dataType)
+    public sbyte MapContractToDbDataType(DataType dataType)
     {
         switch (dataType)
         {
@@ -27,7 +27,7 @@ internal sealed class DataMapper : IDataMapper
         }
     }
 
-    public DataType MapDbToHistoryDataType(sbyte dbDataType)
+    public DataType MapDbToContractDataType(sbyte dbDataType)
     {
         DbDataType dbDataTypeAsEnum = (DbDataType)dbDataType;
 

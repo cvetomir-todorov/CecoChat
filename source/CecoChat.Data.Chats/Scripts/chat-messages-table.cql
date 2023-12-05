@@ -1,4 +1,4 @@
-﻿CREATE TABLE history.chat_messages
+﻿CREATE TABLE chats.chat_messages
 (
   chat_id text,
   message_id bigint,

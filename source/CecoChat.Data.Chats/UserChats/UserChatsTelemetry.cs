@@ -1,9 +1,10 @@
 using Cassandra;
 using CecoChat.Cassandra.Telemetry;
+using CecoChat.Data.Chats.Telemetry;
 
-namespace CecoChat.Data.State.Telemetry;
+namespace CecoChat.Data.Chats.UserChats;
 
-internal interface IStateTelemetry : IDisposable
+internal interface IUserChatsTelemetry : IDisposable
 {
     Task<RowSet> GetChatsAsync(ISession session, IStatement statement, long userId);
 
@@ -12,14 +13,14 @@ internal interface IStateTelemetry : IDisposable
     void UpdateChat(ISession session, IStatement statement, long userId, string chatId);
 }
 
-internal sealed class StateTelemetry : IStateTelemetry
+internal sealed class UserChatsTelemetry : IUserChatsTelemetry
 {
     private readonly ICassandraTelemetry _cassandraTelemetry;
 
-    public StateTelemetry(ICassandraTelemetry cassandraTelemetry)
+    public UserChatsTelemetry(ICassandraTelemetry cassandraTelemetry)
     {
         _cassandraTelemetry = cassandraTelemetry;
-        _cassandraTelemetry.EnableMetrics(StateInstrumentation.ActivitySource, "statedb.query.duration");
+        _cassandraTelemetry.EnableMetrics(ChatsInstrumentation.ActivitySource, "chats_db.query.duration");
     }
 
     public void Dispose()
@@ -32,9 +33,9 @@ internal sealed class StateTelemetry : IStateTelemetry
         return _cassandraTelemetry.ExecuteStatementAsync(
             session,
             statement,
-            StateInstrumentation.ActivitySource,
-            StateInstrumentation.ActivityName,
-            operationName: StateInstrumentation.Operations.GetChats,
+            ChatsInstrumentation.ActivitySource,
+            ChatsInstrumentation.ActivityName,
+            operationName: ChatsInstrumentation.Operations.GetChats,
             enrich: activity =>
             {
                 activity.SetTag("cecochat.user_id", userId);
@@ -46,9 +47,9 @@ internal sealed class StateTelemetry : IStateTelemetry
         return _cassandraTelemetry.ExecuteStatement(
             session,
             statement,
-            StateInstrumentation.ActivitySource,
-            StateInstrumentation.ActivityName,
-            operationName: StateInstrumentation.Operations.GetChat,
+            ChatsInstrumentation.ActivitySource,
+            ChatsInstrumentation.ActivityName,
+            operationName: ChatsInstrumentation.Operations.GetChat,
             enrich: activity =>
             {
                 activity.SetTag("cecochat.user_id", userId);
@@ -61,9 +62,9 @@ internal sealed class StateTelemetry : IStateTelemetry
         _cassandraTelemetry.ExecuteStatement(
             session,
             statement,
-            StateInstrumentation.ActivitySource,
-            StateInstrumentation.ActivityName,
-            operationName: StateInstrumentation.Operations.UpdateChat,
+            ChatsInstrumentation.ActivitySource,
+            ChatsInstrumentation.ActivityName,
+            operationName: ChatsInstrumentation.Operations.UpdateChat,
             enrich: activity =>
             {
                 activity.SetTag("cecochat.user_id", userId);
