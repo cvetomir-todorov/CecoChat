@@ -1,6 +1,6 @@
 apiVersion: v2
-name: state
-description: The State service in CecoChat
+name: chats
+description: The Chats service in CecoChat
 type: application
 version: 0.1.0
 appVersion: "0.1.0"
