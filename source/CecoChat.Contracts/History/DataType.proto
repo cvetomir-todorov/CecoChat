@@ -1,7 +1,0 @@
-syntax = "proto3";
-option csharp_namespace = "CecoChat.Contracts.History";
-package CecoChat.Contracts.History;
-
-enum DataType {
-  PLAIN_TEXT = 0;
-}

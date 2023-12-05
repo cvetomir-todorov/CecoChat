@@ -19,14 +19,13 @@
     <Protobuf Include="Backplane\DataType.proto" />
     <Protobuf Include="Backplane\DeliveryStatus.proto" />
     <Protobuf Include="Backplane\MessageType.proto" />
-    <Protobuf Include="History\DataType.proto" />
-    <Protobuf Include="History\HistoryMessage.proto" />
-    <Protobuf Include="History\HistoryService.proto" GrpcServices="All" />
-    <Protobuf Include="History\DataMessage.proto" />
-    <Protobuf Include="History\ReactionMessage.proto" />
+    <Protobuf Include="Chats\ChatState.proto" />
+    <Protobuf Include="Chats\DataMessage.proto" />
+    <Protobuf Include="Chats\DataType.proto" />
+    <Protobuf Include="Chats\HistoryMessage.proto" />
+    <Protobuf Include="Chats\ChatsService.proto" GrpcServices="All" />
+    <Protobuf Include="Chats\ReactionMessage.proto" />
     <Protobuf Include="IdGen\IdGenService.proto" GrpcServices="All" />
-    <Protobuf Include="State\ChatState.proto" />
-    <Protobuf Include="State\StateService.proto" GrpcServices="All" />
     <Protobuf Include="User\AuthService.proto" GrpcServices="All" />
     <Protobuf Include="User\Connection.proto" />
     <Protobuf Include="User\ConnectionCommandService.proto" GrpcServices="All" />

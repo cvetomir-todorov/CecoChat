@@ -1,0 +1,28 @@
+syntax = "proto3";
+option csharp_namespace = "CecoChat.Contracts.Chats";
+package CecoChat.Contracts.Chats;
+import "google/protobuf/timestamp.proto";
+import "Chats/HistoryMessage.proto";
+import "Chats/ChatState.proto";
+
+service Chats {
+  rpc GetUserChats(GetUserChatsRequest) returns (GetUserChatsResponse);
+  rpc GetHistory(GetHistoryRequest) returns (GetHistoryResponse);
+}
+
+message GetUserChatsRequest {
+  google.protobuf.Timestamp newer_than = 1;
+}
+
+message GetUserChatsResponse {
+  repeated ChatState chats = 1;
+}
+
+message GetHistoryRequest {
+  int64 other_user_id = 1;
+  google.protobuf.Timestamp older_than = 2;
+}
+
+message GetHistoryResponse {
+  repeated HistoryMessage messages = 1;
+}
