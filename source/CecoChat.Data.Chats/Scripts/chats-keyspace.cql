@@ -1,4 +1,4 @@
-﻿CREATE KEYSPACE state
+﻿CREATE KEYSPACE chats
   WITH REPLICATION =
   {
     'class' : 'NetworkTopologyStrategy',

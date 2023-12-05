@@ -1,9 +1,8 @@
 using Cassandra;
 using CecoChat.Contracts.History;
-using CecoChat.Data.History.Telemetry;
 using Microsoft.Extensions.Logging;
 
-namespace CecoChat.Data.History.Repos;
+namespace CecoChat.Data.Chats.ChatMessages;
 
 public interface IChatMessageRepo : IDisposable
 {
@@ -21,41 +20,41 @@ public interface IChatMessageRepo : IDisposable
 internal sealed class ChatMessageRepo : IChatMessageRepo
 {
     private readonly ILogger _logger;
-    private readonly IHistoryTelemetry _historyTelemetry;
-    private readonly IHistoryDbContext _dbContext;
+    private readonly IChatMessageTelemetry _chatMessageTelemetry;
+    private readonly IChatsDbContext _dbContext;
     private readonly IDataMapper _mapper;
     private readonly Lazy<PreparedStatement> _historyQuery;
-    private readonly Lazy<PreparedStatement> _messagesForChatQuery;
-    private readonly Lazy<PreparedStatement> _setReactionQuery;
-    private readonly Lazy<PreparedStatement> _unsetReactionQuery;
+    private readonly Lazy<PreparedStatement> _addMessageCommand;
+    private readonly Lazy<PreparedStatement> _setReactionCommand;
+    private readonly Lazy<PreparedStatement> _unsetReactionCommand;
 
     public ChatMessageRepo(
         ILogger<ChatMessageRepo> logger,
-        IHistoryTelemetry historyTelemetry,
-        IHistoryDbContext dbContext,
+        IChatMessageTelemetry chatMessageTelemetry,
+        IChatsDbContext dbContext,
         IDataMapper mapper)
     {
         _logger = logger;
-        _historyTelemetry = historyTelemetry;
+        _chatMessageTelemetry = chatMessageTelemetry;
         _dbContext = dbContext;
         _mapper = mapper;
 
-        _historyQuery = new Lazy<PreparedStatement>(() => _dbContext.PrepareQuery(SelectMessagesForChat));
-        _messagesForChatQuery = new Lazy<PreparedStatement>(() => _dbContext.PrepareQuery(InsertIntoMessagesForChat));
-        _setReactionQuery = new Lazy<PreparedStatement>(() => _dbContext.PrepareQuery(SetReactionCommand));
-        _unsetReactionQuery = new Lazy<PreparedStatement>(() => _dbContext.PrepareQuery(UnsetReactionCommand));
+        _historyQuery = new Lazy<PreparedStatement>(() => _dbContext.PrepareQuery(HistoryQuery));
+        _addMessageCommand = new Lazy<PreparedStatement>(() => _dbContext.PrepareQuery(AddMessageCommand));
+        _setReactionCommand = new Lazy<PreparedStatement>(() => _dbContext.PrepareQuery(SetReactionCommand));
+        _unsetReactionCommand = new Lazy<PreparedStatement>(() => _dbContext.PrepareQuery(UnsetReactionCommand));
     }
 
     public void Dispose()
     {
-        _historyTelemetry.Dispose();
+        _chatMessageTelemetry.Dispose();
     }
 
-    private const string SelectMessagesForChat =
+    private const string HistoryQuery =
         "SELECT message_id, sender_id, receiver_id, type, data, reactions " +
         "FROM chat_messages " +
         "WHERE chat_id = ? AND message_id < ? ORDER BY message_id DESC LIMIT ?";
-    private const string InsertIntoMessagesForChat =
+    private const string AddMessageCommand =
         "INSERT INTO chat_messages " +
         "(chat_id, message_id, sender_id, receiver_id, type, data) " +
         "VALUES (?, ?, ?, ?, ?, ?)";
@@ -73,9 +72,9 @@ internal sealed class ChatMessageRepo : IChatMessageRepo
 #pragma warning disable IDE0059
 #pragma warning disable IDE1006
         PreparedStatement _ = _historyQuery.Value;
-        PreparedStatement __ = _messagesForChatQuery.Value;
-        PreparedStatement ___ = _setReactionQuery.Value;
-        PreparedStatement ____ = _unsetReactionQuery.Value;
+        PreparedStatement __ = _addMessageCommand.Value;
+        PreparedStatement ___ = _setReactionCommand.Value;
+        PreparedStatement ____ = _unsetReactionCommand.Value;
 #pragma warning restore IDE0059
 #pragma warning restore IDE1006
     }
@@ -87,7 +86,7 @@ internal sealed class ChatMessageRepo : IChatMessageRepo
         query.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
         query.SetIdempotence(true);
 
-        RowSet rows = await _historyTelemetry.GetHistoryAsync(_dbContext.Session, query, userId);
+        RowSet rows = await _chatMessageTelemetry.GetHistoryAsync(_dbContext.Session, query, userId);
         List<HistoryMessage> messages = new(capacity: countLimit);
         ReadRows(rows, messages);
 
@@ -105,7 +104,7 @@ internal sealed class ChatMessageRepo : IChatMessageRepo
             message.SenderId = row.GetValue<long>("sender_id");
             message.ReceiverId = row.GetValue<long>("receiver_id");
             sbyte messageType = row.GetValue<sbyte>("type");
-            message.DataType = _mapper.MapDbToHistoryDataType(messageType);
+            message.DataType = _mapper.MapDbToContractDataType(messageType);
             message.Data = row.GetValue<string>("data");
             IDictionary<long, string> reactions = row.GetValue<IDictionary<long, string>>("reactions");
             if (reactions != null)
@@ -119,37 +118,37 @@ internal sealed class ChatMessageRepo : IChatMessageRepo
 
     public void AddMessage(DataMessage message)
     {
-        sbyte dbMessageType = _mapper.MapHistoryToDbDataType(message.DataType);
+        sbyte dbMessageType = _mapper.MapContractToDbDataType(message.DataType);
         string chatId = DataUtility.CreateChatId(message.SenderId, message.ReceiverId);
 
-        BoundStatement query = _messagesForChatQuery.Value.Bind(
+        BoundStatement command = _addMessageCommand.Value.Bind(
             chatId, message.MessageId, message.SenderId, message.ReceiverId, dbMessageType, message.Data);
-        query.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
-        query.SetIdempotence(false);
+        command.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
+        command.SetIdempotence(false);
 
-        _historyTelemetry.AddDataMessage(_dbContext.Session, query, message.MessageId);
+        _chatMessageTelemetry.AddDataMessage(_dbContext.Session, command, message.MessageId);
         _logger.LogTrace("Persisted message {MessageId} type {MessageType} for chat {ChatId}", message.MessageId, message.DataType, chatId);
     }
 
     public void SetReaction(ReactionMessage message)
     {
         string chatId = DataUtility.CreateChatId(message.SenderId, message.ReceiverId);
-        BoundStatement query = _setReactionQuery.Value.Bind(message.ReactorId, message.Reaction, chatId, message.MessageId);
-        query.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
-        query.SetIdempotence(false);
+        BoundStatement command = _setReactionCommand.Value.Bind(message.ReactorId, message.Reaction, chatId, message.MessageId);
+        command.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
+        command.SetIdempotence(false);
 
-        _historyTelemetry.SetReaction(_dbContext.Session, query, message.ReactorId);
+        _chatMessageTelemetry.SetReaction(_dbContext.Session, command, message.ReactorId);
         _logger.LogTrace("Persisted user {ReactorId} reaction {Reaction} to message {MessageId}", message.ReactorId, message.Reaction, message.MessageId);
     }
 
     public void UnsetReaction(ReactionMessage message)
     {
         string chatId = DataUtility.CreateChatId(message.SenderId, message.ReceiverId);
-        BoundStatement query = _unsetReactionQuery.Value.Bind(message.ReactorId, chatId, message.MessageId);
-        query.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
-        query.SetIdempotence(false);
+        BoundStatement command = _unsetReactionCommand.Value.Bind(message.ReactorId, chatId, message.MessageId);
+        command.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
+        command.SetIdempotence(false);
 
-        _historyTelemetry.UnsetReaction(_dbContext.Session, query, message.ReactorId);
+        _chatMessageTelemetry.UnsetReaction(_dbContext.Session, command, message.ReactorId);
         _logger.LogTrace("Persisted user {ReactorId} un-reaction to message {MessageId}", message.ReactorId, message.MessageId);
     }
 }

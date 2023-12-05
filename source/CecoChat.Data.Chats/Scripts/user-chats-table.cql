@@ -1,4 +1,4 @@
-﻿CREATE TABLE state.user_chats (
+﻿CREATE TABLE chats.user_chats (
     user_id bigint,
     other_user_id bigint,
     chat_id text,

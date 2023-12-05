@@ -1,9 +1,10 @@
 ﻿using Cassandra;
 using CecoChat.Cassandra.Telemetry;
+using CecoChat.Data.Chats.Telemetry;
 
-namespace CecoChat.Data.History.Telemetry;
+namespace CecoChat.Data.Chats.ChatMessages;
 
-internal interface IHistoryTelemetry : IDisposable
+internal interface IChatMessageTelemetry : IDisposable
 {
     void AddDataMessage(ISession session, IStatement statement, long messageId);
 
@@ -14,14 +15,14 @@ internal interface IHistoryTelemetry : IDisposable
     void UnsetReaction(ISession session, IStatement statement, long reactorId);
 }
 
-internal sealed class HistoryTelemetry : IHistoryTelemetry
+internal sealed class ChatMessageTelemetry : IChatMessageTelemetry
 {
     private readonly ICassandraTelemetry _cassandraTelemetry;
 
-    public HistoryTelemetry(ICassandraTelemetry cassandraTelemetry)
+    public ChatMessageTelemetry(ICassandraTelemetry cassandraTelemetry)
     {
         _cassandraTelemetry = cassandraTelemetry;
-        _cassandraTelemetry.EnableMetrics(HistoryInstrumentation.ActivitySource, "historydb.query.duration");
+        _cassandraTelemetry.EnableMetrics(ChatsInstrumentation.ActivitySource, "chats_db.query.duration");
     }
 
     public void Dispose()
@@ -34,9 +35,9 @@ internal sealed class HistoryTelemetry : IHistoryTelemetry
         _cassandraTelemetry.ExecuteStatement(
             session,
             statement,
-            HistoryInstrumentation.ActivitySource,
-            HistoryInstrumentation.ActivityName,
-            operationName: HistoryInstrumentation.Operations.AddDataMessage,
+            ChatsInstrumentation.ActivitySource,
+            ChatsInstrumentation.ActivityName,
+            operationName: ChatsInstrumentation.Operations.AddDataMessage,
             enrich: activity =>
             {
                 activity.SetTag("cecochat.message_id", messageId);
@@ -48,9 +49,9 @@ internal sealed class HistoryTelemetry : IHistoryTelemetry
         return _cassandraTelemetry.ExecuteStatementAsync(
             session,
             statement,
-            HistoryInstrumentation.ActivitySource,
-            HistoryInstrumentation.ActivityName,
-            operationName: HistoryInstrumentation.Operations.GetHistory,
+            ChatsInstrumentation.ActivitySource,
+            ChatsInstrumentation.ActivityName,
+            operationName: ChatsInstrumentation.Operations.GetHistory,
             enrich: activity =>
             {
                 activity.SetTag("cecochat.user_id", userId);
@@ -62,9 +63,9 @@ internal sealed class HistoryTelemetry : IHistoryTelemetry
         _cassandraTelemetry.ExecuteStatement(
             session,
             statement,
-            HistoryInstrumentation.ActivitySource,
-            HistoryInstrumentation.ActivityName,
-            operationName: HistoryInstrumentation.Operations.SetReaction,
+            ChatsInstrumentation.ActivitySource,
+            ChatsInstrumentation.ActivityName,
+            operationName: ChatsInstrumentation.Operations.SetReaction,
             enrich: activity =>
             {
                 activity.SetTag("cecochat.reactor_id", reactorId);
@@ -75,9 +76,9 @@ internal sealed class HistoryTelemetry : IHistoryTelemetry
     {
         _cassandraTelemetry.ExecuteStatement(session,
             statement,
-            HistoryInstrumentation.ActivitySource,
-            HistoryInstrumentation.ActivityName,
-            operationName: HistoryInstrumentation.Operations.UnsetReaction,
+            ChatsInstrumentation.ActivitySource,
+            ChatsInstrumentation.ActivityName,
+            operationName: ChatsInstrumentation.Operations.UnsetReaction,
             enrich: activity =>
             {
                 activity.SetTag("cecochat.reactor_id", reactorId);
