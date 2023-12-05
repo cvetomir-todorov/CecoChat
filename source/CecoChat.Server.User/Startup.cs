@@ -38,7 +38,7 @@ public class Startup : StartupBase
     private readonly IWebHostEnvironment _environment;
     private readonly UserDbOptions _userDbOptions;
     private readonly RedisOptions _userCacheStoreOptions;
-    private readonly IdGenOptions _idGenOptions;
+    private readonly IdGenClientOptions _idGenClientOptions;
     private readonly BackplaneOptions _backplaneOptions;
 
     public Startup(IConfiguration configuration, IWebHostEnvironment environment)
@@ -52,8 +52,8 @@ public class Startup : StartupBase
         _userCacheStoreOptions = new();
         Configuration.GetSection("UserCache:Store").Bind(_userCacheStoreOptions);
 
-        _idGenOptions = new();
-        Configuration.GetSection("IdGen").Bind(_idGenOptions);
+        _idGenClientOptions = new();
+        Configuration.GetSection("IdGenClient").Bind(_idGenClientOptions);
 
         _backplaneOptions = new();
         Configuration.GetSection("Backplane").Bind(_backplaneOptions);
@@ -80,7 +80,7 @@ public class Startup : StartupBase
         services.AddUserDb(_userDbOptions.Connect);
 
         // id gen
-        services.AddIdGenClient(_idGenOptions);
+        services.AddIdGenClient(_idGenClientOptions);
 
         // common
         services.AddAutoMapper(config =>
@@ -154,10 +154,10 @@ public class Startup : StartupBase
                 _userCacheStoreOptions,
                 tags: new[] { HealthTags.Health, HealthTags.Ready })
             .AddUri(
-                "id-gen",
-                new Uri(_idGenOptions.Address!, _idGenOptions.HealthPath),
+                "idgen",
+                new Uri(_idGenClientOptions.Address!, _idGenClientOptions.HealthPath),
                 configureHttpClient: (_, client) => client.DefaultRequestVersion = new Version(2, 0),
-                timeout: _idGenOptions.HealthTimeout,
+                timeout: _idGenClientOptions.HealthTimeout,
                 tags: new[] { HealthTags.Health, HealthTags.Ready });
 
         services.AddSingleton<ConfigDbInitHealthCheck>();
@@ -194,8 +194,8 @@ public class Startup : StartupBase
         builder.RegisterOptions<UserDbOptions>(Configuration.GetSection("UserDb"));
 
         // id gen
-        IConfiguration idGenConfiguration = Configuration.GetSection("IdGen");
-        builder.RegisterModule(new IdGenAutofacModule(idGenConfiguration));
+        IConfiguration idGenConfiguration = Configuration.GetSection("IdGenClient");
+        builder.RegisterModule(new IdGenClientAutofacModule(idGenConfiguration));
 
         // security
         builder.RegisterType<PasswordHasher>().As<IPasswordHasher>().SingleInstance();

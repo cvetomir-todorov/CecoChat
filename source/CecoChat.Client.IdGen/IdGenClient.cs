@@ -20,7 +20,7 @@ public readonly struct GetIdResult
 internal sealed class IdGenClient : IIdGenClient
 {
     private readonly ILogger _logger;
-    private readonly IdGenOptions _options;
+    private readonly IdGenClientOptions _options;
     private readonly Contracts.IdGen.IdGen.IdGenClient _client;
     private readonly IClock _clock;
     private readonly IIdChannel _idChannel;
@@ -31,7 +31,7 @@ internal sealed class IdGenClient : IIdGenClient
 
     public IdGenClient(
         ILogger<IdGenClient> logger,
-        IOptions<IdGenOptions> options,
+        IOptions<IdGenClientOptions> options,
         Contracts.IdGen.IdGen.IdGenClient client,
         IClock clock,
         IIdChannel idChannel)
