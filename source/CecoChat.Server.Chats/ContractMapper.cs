@@ -1,7 +1,7 @@
 using CecoChat.Contracts.Backplane;
-using CecoChat.Contracts.History;
+using CecoChat.Contracts.Chats;
 
-namespace CecoChat.Server.History;
+namespace CecoChat.Server.Chats;
 
 public interface IContractMapper
 {
@@ -29,7 +29,7 @@ public class ContractMapper : IContractMapper
         switch (backplaneMessage.Data.Type)
         {
             case Contracts.Backplane.DataType.PlainText:
-                dataMessage.DataType = Contracts.History.DataType.PlainText;
+                dataMessage.DataType = Contracts.Chats.DataType.PlainText;
                 dataMessage.Data = backplaneMessage.Data.Data;
                 break;
             default:

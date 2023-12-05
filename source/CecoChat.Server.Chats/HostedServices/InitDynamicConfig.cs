@@ -1,6 +1,6 @@
 ﻿using CecoChat.Data.Config.History;
 
-namespace CecoChat.Server.History.HostedServices;
+namespace CecoChat.Server.Chats.HostedServices;
 
 public sealed class InitDynamicConfig : IHostedService
 {
