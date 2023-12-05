@@ -1,7 +1,7 @@
 syntax = "proto3";
 option csharp_namespace = "CecoChat.Contracts.User";
 package CecoChat.Contracts.User;
-import "User/ProfilePublic.proto";
+import "ProfilePublic.proto";
 
 service ProfileQuery {
   rpc GetPublicProfile(GetPublicProfileRequest) returns (GetPublicProfileResponse);

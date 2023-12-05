@@ -1,8 +1,8 @@
 syntax = "proto3";
 option csharp_namespace = "CecoChat.Contracts.User";
 package CecoChat.Contracts.User;
-import "User/ProfileFull.proto";
-import "User/Registration.proto";
+import "ProfileFull.proto";
+import "Registration.proto";
 
 service Auth {
   rpc Register(RegisterRequest) returns (RegisterResponse);

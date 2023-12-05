@@ -21,10 +21,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CecoChat.Contracts.User\CecoChat.Contracts.User.csproj" />
     <ProjectReference Include="..\CecoChat.Npgsql\CecoChat.Npgsql.csproj" />
     <ProjectReference Include="..\CecoChat.Redis\CecoChat.Redis.csproj" />
     <ProjectReference Include="..\CecoChat\CecoChat.csproj" />
-    <ProjectReference Include="..\CecoChat.Contracts\CecoChat.Contracts.csproj" />
   </ItemGroup>
 
 </Project>

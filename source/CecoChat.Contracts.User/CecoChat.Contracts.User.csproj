@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Google.Protobuf" Version="3.24.4" />
+    <PackageReference Include="Grpc.Net.Client" Version="2.57.0" />
+    <PackageReference Include="Grpc.Tools" Version="2.58.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Protobuf Include="AuthService.proto" GrpcServices="All" />
+    <Protobuf Include="Connection.proto" />
+    <Protobuf Include="ConnectionCommandService.proto" GrpcServices="All" />
+    <Protobuf Include="ConnectionQueryService.proto" GrpcServices="All" />
+    <Protobuf Include="ProfileCommandService.proto" GrpcServices="All" />
+    <Protobuf Include="ProfileFull.proto" />
+    <Protobuf Include="ProfilePublic.proto" />
+    <Protobuf Include="ProfileUpdate.proto" />
+    <Protobuf Include="ProfileQueryService.proto" GrpcServices="All" />
+    <Protobuf Include="Registration.proto" />
+  </ItemGroup>
+
+</Project>
+
