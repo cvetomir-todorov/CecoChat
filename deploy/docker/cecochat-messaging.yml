@@ -9,7 +9,7 @@ services:
     networks: &networks
       - cecochat
     ports:
-      - "31004:443"
+      - "31002:443"
     healthcheck: &healthcheck
       test: "curl --fail https://localhost/healthz || exit 1"
       interval: 5s
@@ -40,7 +40,7 @@ services:
     hostname: messaging0
     networks: *networks
     ports:
-      - "31001:443"
+      - "31000:443"
     healthcheck: *healthcheck
     environment:
       ASPNETCORE_ENVIRONMENT: Production
@@ -57,8 +57,8 @@ services:
       CECOCHAT_ConfigDb__KeepAlive: 2
       CECOCHAT_Backplane__Kafka__BootstrapServers__0: kafka0:19091
       CECOCHAT_Backplane__Kafka__BootstrapServers__1: kafka1:19092
-      CECOCHAT_IdGen__Address: "https://idgen"
-      CECOCHAT_IdGen__RefreshIdsCount: 1024
+      CECOCHAT_IdGenClient__Address: "https://idgen"
+      CECOCHAT_IdGenClient__RefreshIdsCount: 1024
       CECOCHAT_Telemetry__Tracing__Sampling__Strategy: Probability
       CECOCHAT_Telemetry__Tracing__Sampling__Probability: 0.1
       CECOCHAT_Telemetry__Tracing__Export__TargetHost: otel-collector
@@ -71,7 +71,7 @@ services:
     hostname: messaging1
     networks: *networks
     ports:
-      - "31011:443"
+      - "31001:443"
     healthcheck: *healthcheck
     environment:
       ASPNETCORE_ENVIRONMENT: Production
@@ -88,8 +88,8 @@ services:
       CECOCHAT_ConfigDb__KeepAlive: 2
       CECOCHAT_Backplane__Kafka__BootstrapServers__0: kafka0:19091
       CECOCHAT_Backplane__Kafka__BootstrapServers__1: kafka1:19092
-      CECOCHAT_IdGen__Address: "https://idgen"
-      CECOCHAT_IdGen__RefreshIdsCount: 1024
+      CECOCHAT_IdGenClient__Address: "https://idgen"
+      CECOCHAT_IdGenClient__RefreshIdsCount: 1024
       CECOCHAT_Telemetry__Tracing__Sampling__Strategy: Probability
       CECOCHAT_Telemetry__Tracing__Sampling__Probability: 0.1
       CECOCHAT_Telemetry__Tracing__Export__TargetHost: otel-collector
