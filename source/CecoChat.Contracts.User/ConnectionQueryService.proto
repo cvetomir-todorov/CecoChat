@@ -1,7 +1,7 @@
 syntax = "proto3";
 option csharp_namespace = "CecoChat.Contracts.User";
 package CecoChat.Contracts.User;
-import "User/Connection.proto";
+import "Connection.proto";
 
 service ConnectionQuery {
   rpc GetConnection(GetConnectionRequest) returns (GetConnectionResponse);

@@ -2,7 +2,7 @@ syntax = "proto3";
 option csharp_namespace = "CecoChat.Contracts.User";
 package CecoChat.Contracts.User;
 import "google/protobuf/timestamp.proto";
-import "User/ProfileUpdate.proto";
+import "ProfileUpdate.proto";
 
 service ProfileCommand {
   rpc ChangePassword(ChangePasswordRequest) returns (ChangePasswordResponse);
