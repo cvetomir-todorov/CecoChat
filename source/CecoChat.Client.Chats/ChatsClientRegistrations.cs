@@ -2,11 +2,11 @@ using CecoChat.Http.Client;
 using CecoChat.Polly;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace CecoChat.Client.State;
+namespace CecoChat.Client.Chats;
 
-public static class StateRegistrations
+public static class ChatsClientRegistrations
 {
-    public static void AddStateClient(this IServiceCollection services, StateOptions options)
+    public static void AddChatsClient(this IServiceCollection services, ChatsClientOptions options)
     {
         if (options.SocketsHttpHandler == null)
         {
@@ -17,7 +17,7 @@ public static class StateRegistrations
             throw new ArgumentNullException(nameof(options), $"{nameof(options.Retry)}");
         }
 
-        services.AddGrpcClient<Contracts.State.State.StateClient>(grpc =>
+        services.AddGrpcClient<Contracts.Chats.Chats.ChatsClient>(grpc =>
             {
                 grpc.Address = options.Address;
             })

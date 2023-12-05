@@ -1,28 +1,30 @@
-using CecoChat.Contracts.History;
+using CecoChat.Contracts.Chats;
 using CecoChat.Grpc;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace CecoChat.Client.History;
+namespace CecoChat.Client.Chats;
 
-public interface IHistoryClient : IDisposable
+public interface IChatsClient : IDisposable
 {
+    Task<IReadOnlyCollection<ChatState>> GetUserChats(long userId, DateTime newerThan, string accessToken, CancellationToken ct);
+
     Task<IReadOnlyCollection<HistoryMessage>> GetHistory(long userId, long otherUserId, DateTime olderThan, string accessToken, CancellationToken ct);
 }
 
-internal sealed class HistoryClient : IHistoryClient
+internal sealed class ChatsClient : IChatsClient
 {
     private readonly ILogger _logger;
-    private readonly HistoryOptions _options;
-    private readonly Contracts.History.History.HistoryClient _client;
+    private readonly ChatsClientOptions _options;
+    private readonly Contracts.Chats.Chats.ChatsClient _client;
     private readonly IClock _clock;
 
-    public HistoryClient(
-        ILogger<HistoryClient> logger,
-        IOptions<HistoryOptions> options,
-        Contracts.History.History.HistoryClient client,
+    public ChatsClient(
+        ILogger<ChatsClient> logger,
+        IOptions<ChatsClientOptions> options,
+        Contracts.Chats.Chats.ChatsClient client,
         IClock clock)
     {
         _logger = logger;
@@ -30,12 +32,28 @@ internal sealed class HistoryClient : IHistoryClient
         _client = client;
         _clock = clock;
 
-        _logger.LogInformation("History address set to {Address}", _options.Address);
+        _logger.LogInformation("Chats address set to {Address}", _options.Address);
     }
 
     public void Dispose()
     {
         // nothing to dispose for now, but keep the IDisposable as part of the contract
+    }
+
+    public async Task<IReadOnlyCollection<ChatState>> GetUserChats(long userId, DateTime newerThan, string accessToken, CancellationToken ct)
+    {
+        GetUserChatsRequest request = new()
+        {
+            NewerThan = newerThan.ToTimestamp()
+        };
+
+        Metadata headers = new();
+        headers.AddAuthorization(accessToken);
+        DateTime deadline = _clock.GetNowUtc().Add(_options.CallTimeout);
+        GetUserChatsResponse response = await _client.GetUserChatsAsync(request, headers, deadline, ct);
+
+        _logger.LogTrace("Received {ChatCount} chats for user {UserId} which are newer than {NewerThan}", response.Chats.Count, userId, newerThan);
+        return response.Chats;
     }
 
     public async Task<IReadOnlyCollection<HistoryMessage>> GetHistory(long userId, long otherUserId, DateTime olderThan, string accessToken, CancellationToken ct)
