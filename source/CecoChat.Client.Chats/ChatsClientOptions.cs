@@ -1,9 +1,9 @@
 using CecoChat.Http.Client;
 using CecoChat.Polly;
 
-namespace CecoChat.Client.History;
+namespace CecoChat.Client.Chats;
 
-public sealed class HistoryOptions
+public sealed class ChatsClientOptions
 {
     public Uri? Address { get; init; }
     public TimeSpan CallTimeout { get; init; }
