@@ -56,17 +56,17 @@ spec:
             - configMapRef:
                 name: service-logging
           env:
-            - name: CECOCHAT_HistoryDb__ContactPoints__0
-              value: {{.Values.Networking.HistoryDb.Host}}-0.{{.Values.Networking.HistoryDb.Service}}.{{.Release.Namespace}}.svc.cluster.local:9042
-            - name: CECOCHAT_HistoryDb__ContactPoints__1
-              value: {{.Values.Networking.HistoryDb.Host}}-1.{{.Values.Networking.HistoryDb.Service}}.{{.Release.Namespace}}.svc.cluster.local:9042
-            - name: CECOCHAT_HistoryDb__LocalDc
-              value: {{.Values.Networking.HistoryDb.LocalDc}}
-            - name: CECOCHAT_HistoryDb__SocketConnectTimeout
-              value: {{.Values.Networking.HistoryDb.SocketConnectTimeout}}
-            - name: CECOCHAT_HistoryDb__ExponentialReconnectPolicy
-              value: "{{.Values.Networking.HistoryDb.ExponentialReconnectPolicy}}"
-            - name: CECOCHAT_HistoryDb__ExponentialReconnectPolicyBaseDelay
-              value: {{.Values.Networking.HistoryDb.ExponentialReconnectPolicyBaseDelay}}
-            - name: CECOCHAT_HistoryDb__ExponentialReconnectPolicyMaxDelay
-              value: {{.Values.Networking.HistoryDb.ExponentialReconnectPolicyMaxDelay}}
+            - name: CECOCHAT_ChatsDb__ContactPoints__0
+              value: {{.Values.Networking.ChatsDb.Host}}-0.{{.Values.Networking.ChatsDb.Service}}.{{.Release.Namespace}}.svc.cluster.local:9042
+            - name: CECOCHAT_ChatsDb__ContactPoints__1
+              value: {{.Values.Networking.ChatsDb.Host}}-1.{{.Values.Networking.ChatsDb.Service}}.{{.Release.Namespace}}.svc.cluster.local:9042
+            - name: CECOCHAT_ChatsDb__LocalDc
+              value: {{.Values.Networking.ChatsDb.LocalDc}}
+            - name: CECOCHAT_ChatsDb__SocketConnectTimeout
+              value: {{.Values.Networking.ChatsDb.SocketConnectTimeout}}
+            - name: CECOCHAT_ChatsDb__ExponentialReconnectPolicy
+              value: "{{.Values.Networking.ChatsDb.ExponentialReconnectPolicy}}"
+            - name: CECOCHAT_ChatsDb__ExponentialReconnectPolicyBaseDelay
+              value: {{.Values.Networking.ChatsDb.ExponentialReconnectPolicyBaseDelay}}
+            - name: CECOCHAT_ChatsDb__ExponentialReconnectPolicyMaxDelay
+              value: {{.Values.Networking.ChatsDb.ExponentialReconnectPolicyMaxDelay}}

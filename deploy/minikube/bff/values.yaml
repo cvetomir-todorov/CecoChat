@@ -7,8 +7,7 @@ Image:
 Networking:
   Port: 443
   UserService: user
-  StateService: state
-  HistoryService: history
+  ChatsService: chats
 Ingress:
   Host: bff.cecochat.com
   SecretName: ingress-tls

@@ -56,7 +56,5 @@ spec:
           env:
             - name: CECOCHAT_UserClient__Address
               value: https://{{.Values.Networking.UserService}}
-            - name: CECOCHAT_StateClient__Address
-              value: https://{{.Values.Networking.StateService}}
-            - name: CECOCHAT_HistoryClient__Address
-              value: https://{{.Values.Networking.HistoryService}}
+            - name: CECOCHAT_ChatsClient__Address
+              value: https://{{.Values.Networking.ChatsService}}
