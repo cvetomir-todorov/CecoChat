@@ -4,14 +4,14 @@ namespace CecoChat.Server.Bff;
 
 public interface IContractMapper
 {
-    ChatState MapChat(Contracts.State.ChatState fromService);
+    ChatState MapChat(Contracts.Chats.ChatState fromService);
 
-    HistoryMessage MapMessage(Contracts.History.HistoryMessage fromService);
+    HistoryMessage MapMessage(Contracts.Chats.HistoryMessage fromService);
 }
 
 public class ContractMapper : IContractMapper
 {
-    public ChatState MapChat(Contracts.State.ChatState fromService)
+    public ChatState MapChat(Contracts.Chats.ChatState fromService)
     {
         return new ChatState
         {
@@ -22,7 +22,7 @@ public class ContractMapper : IContractMapper
         };
     }
 
-    public HistoryMessage MapMessage(Contracts.History.HistoryMessage fromService)
+    public HistoryMessage MapMessage(Contracts.Chats.HistoryMessage fromService)
     {
         HistoryMessage toClient = new()
         {
@@ -33,7 +33,7 @@ public class ContractMapper : IContractMapper
 
         switch (fromService.DataType)
         {
-            case Contracts.History.DataType.PlainText:
+            case Contracts.Chats.DataType.PlainText:
                 toClient.DataType = DataType.PlainText;
                 toClient.Data = fromService.Data;
                 break;

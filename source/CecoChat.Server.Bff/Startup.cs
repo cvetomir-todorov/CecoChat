@@ -4,8 +4,7 @@ using CecoChat.AspNet.Health;
 using CecoChat.AspNet.Prometheus;
 using CecoChat.AspNet.Swagger;
 using CecoChat.Autofac;
-using CecoChat.Client.History;
-using CecoChat.Client.State;
+using CecoChat.Client.Chats;
 using CecoChat.Client.User;
 using CecoChat.Data.Config;
 using CecoChat.Http.Health;
@@ -28,19 +27,15 @@ namespace CecoChat.Server.Bff;
 
 public class Startup : StartupBase
 {
-    private readonly HistoryOptions _historyOptions;
-    private readonly StateOptions _stateOptions;
+    private readonly ChatsClientOptions _chatsClientOptions;
     private readonly UserOptions _userOptions;
     private readonly SwaggerOptions _swaggerOptions;
 
     public Startup(IConfiguration configuration)
         : base(configuration)
     {
-        _historyOptions = new();
-        Configuration.GetSection("HistoryClient").Bind(_historyOptions);
-
-        _stateOptions = new();
-        Configuration.GetSection("StateClient").Bind(_stateOptions);
+        _chatsClientOptions = new();
+        Configuration.GetSection("ChatsClient").Bind(_chatsClientOptions);
 
         _userOptions = new();
         Configuration.GetSection("UserClient").Bind(_userOptions);
@@ -67,8 +62,7 @@ public class Startup : StartupBase
         services.AddSwaggerServices(_swaggerOptions);
 
         // downstream services
-        services.AddHistoryClient(_historyOptions);
-        services.AddStateClient(_stateOptions);
+        services.AddChatsClient(_chatsClientOptions);
         services.AddUserClient(_userOptions);
 
         // common
@@ -127,16 +121,10 @@ public class Startup : StartupBase
                 ConfigDbOptions,
                 tags: new[] { HealthTags.Health, HealthTags.Ready })
             .AddUri(
-                "history",
-                new Uri(_historyOptions.Address!, _historyOptions.HealthPath),
+                "chats",
+                new Uri(_chatsClientOptions.Address!, _chatsClientOptions.HealthPath),
                 configureHttpClient: (_, client) => client.DefaultRequestVersion = new Version(2, 0),
-                timeout: _historyOptions.HealthTimeout,
-                tags: new[] { HealthTags.Health, HealthTags.Ready })
-            .AddUri(
-                "state",
-                new Uri(_stateOptions.Address!, _stateOptions.HealthPath),
-                configureHttpClient: (_, client) => client.DefaultRequestVersion = new Version(2, 0),
-                timeout: _stateOptions.HealthTimeout,
+                timeout: _chatsClientOptions.HealthTimeout,
                 tags: new[] { HealthTags.Health, HealthTags.Ready })
             .AddUri(
                 "user",
@@ -161,10 +149,8 @@ public class Startup : StartupBase
         builder.RegisterModule(new PartitionUtilityAutofacModule());
 
         // downstream services
-        IConfiguration historyClientConfig = Configuration.GetSection("HistoryClient");
-        builder.RegisterModule(new HistoryClientAutofacModule(historyClientConfig));
-        IConfiguration stateClientConfig = Configuration.GetSection("StateClient");
-        builder.RegisterModule(new StateClientAutofacModule(stateClientConfig));
+        IConfiguration chatsClientConfig = Configuration.GetSection("ChatsClient");
+        builder.RegisterModule(new ChatsClientAutofacModule(chatsClientConfig));
         IConfiguration userClientConfig = Configuration.GetSection("UserClient");
         builder.RegisterModule(new UserClientAutofacModule(userClientConfig));
 
