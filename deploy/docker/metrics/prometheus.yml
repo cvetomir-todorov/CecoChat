@@ -11,10 +11,9 @@ scrape_configs:
     metrics_path: /metrics
     static_configs:
       - targets:
-          - "host.docker.internal:31001" # messaging 1
-          - "host.docker.internal:31011" # messaging 2
-          - "host.docker.internal:31000" # bff
-          - "host.docker.internal:31002" # state
-          - "host.docker.internal:31003" # history
-          - "host.docker.internal:31004" # idgen
+          - "host.docker.internal:31000" # messaging-0
+          - "host.docker.internal:31001" # messaging-1
+          - "host.docker.internal:31002" # idgen
+          - "host.docker.internal:31003" # bff
+          - "host.docker.internal:31004" # chats
           - "host.docker.internal:31005" # user
