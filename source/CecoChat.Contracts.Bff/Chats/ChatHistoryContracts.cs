@@ -5,7 +5,7 @@ using Refit;
 
 namespace CecoChat.Contracts.Bff.Chats;
 
-public sealed class GetHistoryRequest
+public sealed class GetChatHistoryRequest
 {
     [JsonPropertyName("otherUserId")]
     [AliasAs("otherUserId")]
@@ -16,7 +16,7 @@ public sealed class GetHistoryRequest
     public DateTime OlderThan { get; init; }
 }
 
-public sealed class GetHistoryResponse
+public sealed class GetChatHistoryResponse
 {
     [JsonPropertyName("messages")]
     [AliasAs("messages")]

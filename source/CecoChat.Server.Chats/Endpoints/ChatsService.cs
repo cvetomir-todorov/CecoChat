@@ -29,7 +29,7 @@ public sealed class ChatsService : Contracts.Chats.Chats.ChatsBase
     }
 
     [Authorize(Policy = "user")]
-    public override async Task<GetHistoryResponse> GetHistory(GetHistoryRequest request, ServerCallContext context)
+    public override async Task<GetChatHistoryResponse> GetChatHistory(GetChatHistoryRequest request, ServerCallContext context)
     {
         UserClaims userClaims = context.GetUserClaimsGrpc(_logger);
 
@@ -38,7 +38,7 @@ public sealed class ChatsService : Contracts.Chats.Chats.ChatsBase
         IReadOnlyCollection<HistoryMessage> historyMessages = await _chatMessageRepo.GetHistory(
             userClaims.UserId, chatId, olderThan, _historyConfig.MessageCount);
 
-        GetHistoryResponse response = new();
+        GetChatHistoryResponse response = new();
         response.Messages.Add(historyMessages);
 
         _logger.LogTrace("Responding with {MessageCount} messages for chat {ChatId} which are older than {OlderThan}", response.Messages.Count, chatId, olderThan);
@@ -51,7 +51,7 @@ public sealed class ChatsService : Contracts.Chats.Chats.ChatsBase
         UserClaims userClaims = context.GetUserClaimsGrpc(_logger);
 
         DateTime newerThan = request.NewerThan.ToDateTime();
-        IReadOnlyCollection<ChatState> chats = await _userChatsRepo.GetChats(userClaims.UserId, newerThan);
+        IReadOnlyCollection<ChatState> chats = await _userChatsRepo.GetUserChats(userClaims.UserId, newerThan);
 
         GetUserChatsResponse response = new();
         response.Chats.Add(chats);

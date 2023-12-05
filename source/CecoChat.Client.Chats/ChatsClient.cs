@@ -11,7 +11,7 @@ public interface IChatsClient : IDisposable
 {
     Task<IReadOnlyCollection<ChatState>> GetUserChats(long userId, DateTime newerThan, string accessToken, CancellationToken ct);
 
-    Task<IReadOnlyCollection<HistoryMessage>> GetHistory(long userId, long otherUserId, DateTime olderThan, string accessToken, CancellationToken ct);
+    Task<IReadOnlyCollection<HistoryMessage>> GetChatHistory(long userId, long otherUserId, DateTime olderThan, string accessToken, CancellationToken ct);
 }
 
 internal sealed class ChatsClient : IChatsClient
@@ -56,9 +56,9 @@ internal sealed class ChatsClient : IChatsClient
         return response.Chats;
     }
 
-    public async Task<IReadOnlyCollection<HistoryMessage>> GetHistory(long userId, long otherUserId, DateTime olderThan, string accessToken, CancellationToken ct)
+    public async Task<IReadOnlyCollection<HistoryMessage>> GetChatHistory(long userId, long otherUserId, DateTime olderThan, string accessToken, CancellationToken ct)
     {
-        GetHistoryRequest request = new()
+        GetChatHistoryRequest request = new()
         {
             OtherUserId = otherUserId,
             OlderThan = olderThan.ToTimestamp()
@@ -67,7 +67,7 @@ internal sealed class ChatsClient : IChatsClient
         Metadata headers = new();
         headers.AddAuthorization(accessToken);
         DateTime deadline = _clock.GetNowUtc().Add(_options.CallTimeout);
-        GetHistoryResponse response = await _client.GetHistoryAsync(request, headers, deadline, ct);
+        GetChatHistoryResponse response = await _client.GetChatHistoryAsync(request, headers, deadline, ct);
 
         _logger.LogTrace("Received {MessageCount} messages for history between {UserId} and {OtherUserId} older than {OlderThan}", response.Messages.Count, userId, otherUserId, olderThan);
         return response.Messages;

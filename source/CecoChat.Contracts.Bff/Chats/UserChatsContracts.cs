@@ -3,14 +3,14 @@ using Refit;
 
 namespace CecoChat.Contracts.Bff.Chats;
 
-public sealed class GetChatsRequest
+public sealed class GetUserChatsRequest
 {
     [JsonPropertyName("newerThan")]
     [AliasAs("newerThan")]
     public DateTime NewerThan { get; init; }
 }
 
-public sealed class GetChatsResponse
+public sealed class GetUserChatsResponse
 {
     [JsonPropertyName("chats")]
     [AliasAs("chats")]

@@ -58,11 +58,11 @@ public sealed class ChatClient : IAsyncDisposable
 
     public async Task OpenAllChats(long[] userIds)
     {
-        GetChatsRequest request = new()
+        GetUserChatsRequest request = new()
         {
             NewerThan = _lastGetChats
         };
-        await _bffClient.GetStateChats(request, _accessToken!);
+        await _bffClient.GetUserChats(request, _accessToken!);
         _lastGetChats = DateTime.UtcNow;
 
         if (userIds.Length > 0)
@@ -75,12 +75,12 @@ public sealed class ChatClient : IAsyncDisposable
     {
         await _bffClient.GetPublicProfile(userId, _accessToken!);
 
-        GetHistoryRequest request = new()
+        GetChatHistoryRequest request = new()
         {
             OtherUserId = userId,
             OlderThan = DateTime.UtcNow
         };
-        await _bffClient.GetHistoryMessages(request, _accessToken!);
+        await _bffClient.GetChatHistory(request, _accessToken!);
     }
 
     public async Task SendPlainTextMessage(long receiverId, string text)
@@ -95,13 +95,13 @@ public sealed class ChatClient : IAsyncDisposable
         MessagesSent++;
     }
 
-    public async Task GetHistory(long userId, DateTime olderThan)
+    public async Task GetChatHistory(long userId, DateTime olderThan)
     {
-        GetHistoryRequest request = new()
+        GetChatHistoryRequest request = new()
         {
             OtherUserId = userId,
             OlderThan = olderThan
         };
-        await _bffClient.GetHistoryMessages(request, _accessToken!);
+        await _bffClient.GetChatHistory(request, _accessToken!);
     }
 }

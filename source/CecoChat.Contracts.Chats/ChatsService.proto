@@ -7,7 +7,7 @@ import "ChatState.proto";
 
 service Chats {
   rpc GetUserChats(GetUserChatsRequest) returns (GetUserChatsResponse);
-  rpc GetHistory(GetHistoryRequest) returns (GetHistoryResponse);
+  rpc GetChatHistory(GetChatHistoryRequest) returns (GetChatHistoryResponse);
 }
 
 message GetUserChatsRequest {
@@ -18,11 +18,11 @@ message GetUserChatsResponse {
   repeated ChatState chats = 1;
 }
 
-message GetHistoryRequest {
+message GetChatHistoryRequest {
   int64 other_user_id = 1;
   google.protobuf.Timestamp older_than = 2;
 }
 
-message GetHistoryResponse {
+message GetChatHistoryResponse {
   repeated HistoryMessage messages = 1;
 }

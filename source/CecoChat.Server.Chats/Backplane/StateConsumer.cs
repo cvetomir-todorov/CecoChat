@@ -146,7 +146,7 @@ public sealed class StateConsumer : IStateConsumer
         long targetUserId = backplaneMessage.ReceiverId;
         long otherUserId = backplaneMessage.SenderId;
         string chatId = DataUtility.CreateChatId(backplaneMessage.SenderId, backplaneMessage.ReceiverId);
-        ChatState receiverChat = GetChatFromDb(targetUserId, otherUserId, chatId);
+        ChatState receiverChat = GetUserChat(targetUserId, otherUserId, chatId);
 
         bool needsUpdate = false;
         if (backplaneMessage.MessageId > receiverChat.NewestMessage)
@@ -167,7 +167,7 @@ public sealed class StateConsumer : IStateConsumer
 
         if (needsUpdate)
         {
-            _chatsRepo.UpdateChat(targetUserId, receiverChat);
+            _chatsRepo.UpdateUserChat(targetUserId, receiverChat);
             _logger.LogTrace("Updated receiver state for user {TargetUserId} chat {ChatId} with message {MessageId}", targetUserId, chatId, backplaneMessage.MessageId);
         }
     }
@@ -177,7 +177,7 @@ public sealed class StateConsumer : IStateConsumer
         long targetUserId = backplaneMessage.SenderId;
         long otherUserId = backplaneMessage.ReceiverId;
         string chatId = DataUtility.CreateChatId(backplaneMessage.SenderId, backplaneMessage.ReceiverId);
-        ChatState senderChat = GetChatFromDb(targetUserId, otherUserId, chatId);
+        ChatState senderChat = GetUserChat(targetUserId, otherUserId, chatId);
 
         bool needsUpdate = false;
         if (backplaneMessage.MessageId > senderChat.NewestMessage)
@@ -188,14 +188,14 @@ public sealed class StateConsumer : IStateConsumer
 
         if (needsUpdate)
         {
-            _chatsRepo.UpdateChat(targetUserId, senderChat);
+            _chatsRepo.UpdateUserChat(targetUserId, senderChat);
             _logger.LogTrace("Updated sender state for user {TargetUserId} chat {ChatId} with message {MessageId}", targetUserId, chatId, backplaneMessage.MessageId);
         }
     }
 
-    private ChatState GetChatFromDb(long userId, long otherUserId, string chatId)
+    private ChatState GetUserChat(long userId, long otherUserId, string chatId)
     {
-        ChatState? chat = _chatsRepo.GetChat(userId, chatId);
+        ChatState? chat = _chatsRepo.GetUserChat(userId, chatId);
         chat ??= new ChatState
         {
             ChatId = chatId,
