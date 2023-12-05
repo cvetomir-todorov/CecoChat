@@ -1,6 +1,6 @@
 syntax = "proto3";
-option csharp_namespace = "CecoChat.Contracts.State";
-package CecoChat.Contracts.State;
+option csharp_namespace = "CecoChat.Contracts.Chats";
+package CecoChat.Contracts.Chats;
 
 message ChatState {
   string chat_id = 1;

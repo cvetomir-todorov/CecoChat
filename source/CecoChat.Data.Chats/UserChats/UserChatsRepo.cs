@@ -1,5 +1,5 @@
 using Cassandra;
-using CecoChat.Contracts.State;
+using CecoChat.Contracts.Chats;
 using Microsoft.Extensions.Logging;
 
 namespace CecoChat.Data.Chats.UserChats;

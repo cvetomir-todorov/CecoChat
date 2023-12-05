@@ -1,4 +1,4 @@
-﻿using CecoChat.Contracts.History;
+﻿using CecoChat.Contracts.Chats;
 
 namespace CecoChat.Data.Chats.ChatMessages;
 
