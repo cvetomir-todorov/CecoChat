@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
@@ -11,8 +11,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CecoChat.Data.Chats\CecoChat.Data.Chats.csproj" />
     <ProjectReference Include="..\CecoChat.Data.Config\CecoChat.Data.Config.csproj" />
-    <ProjectReference Include="..\CecoChat.Data.History\CecoChat.Data.History.csproj" />
     <ProjectReference Include="..\CecoChat.Server\CecoChat.Server.csproj" />
   </ItemGroup>
 

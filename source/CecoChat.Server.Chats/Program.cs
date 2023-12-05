@@ -1,4 +1,4 @@
-namespace CecoChat.Server.History;
+namespace CecoChat.Server.Chats;
 
 public static class Program
 {

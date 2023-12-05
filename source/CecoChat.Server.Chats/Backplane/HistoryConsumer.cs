@@ -1,12 +1,12 @@
 ﻿using CecoChat.Contracts.Backplane;
-using CecoChat.Contracts.History;
-using CecoChat.Data.History.Repos;
+using CecoChat.Contracts.Chats;
+using CecoChat.Data.Chats.ChatMessages;
 using CecoChat.Kafka;
 using CecoChat.Server.Backplane;
 using Confluent.Kafka;
 using Microsoft.Extensions.Options;
 
-namespace CecoChat.Server.History.Backplane;
+namespace CecoChat.Server.Chats.Backplane;
 
 public interface IHistoryConsumer : IDisposable
 {

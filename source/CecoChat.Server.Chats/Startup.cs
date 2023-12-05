@@ -7,18 +7,19 @@ using CecoChat.Autofac;
 using CecoChat.Cassandra;
 using CecoChat.Cassandra.Health;
 using CecoChat.Contracts.Backplane;
-using CecoChat.Data.State;
-using CecoChat.Data.State.Telemetry;
+using CecoChat.Data.Config;
+using CecoChat.Data.Chats;
+using CecoChat.Data.Chats.Telemetry;
 using CecoChat.Kafka;
 using CecoChat.Kafka.Health;
 using CecoChat.Kafka.Telemetry;
 using CecoChat.Otel;
 using CecoChat.Redis.Health;
 using CecoChat.Server.Backplane;
+using CecoChat.Server.Chats.Backplane;
+using CecoChat.Server.Chats.Endpoints;
+using CecoChat.Server.Chats.HostedServices;
 using CecoChat.Server.Identity;
-using CecoChat.Server.State.Backplane;
-using CecoChat.Server.State.Endpoints;
-using CecoChat.Server.State.HostedServices;
 using Confluent.Kafka;
 using FluentValidation;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -26,13 +27,13 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 
-namespace CecoChat.Server.State;
+namespace CecoChat.Server.Chats;
 
 public class Startup : StartupBase
 {
     private readonly IWebHostEnvironment _environment;
     private readonly BackplaneOptions _backplaneOptions;
-    private readonly CassandraOptions _stateDbOptions;
+    private readonly CassandraOptions _chatsDbOptions;
 
     public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         : base(configuration)
@@ -42,8 +43,8 @@ public class Startup : StartupBase
         _backplaneOptions = new();
         Configuration.GetSection("Backplane").Bind(_backplaneOptions);
 
-        _stateDbOptions = new();
-        Configuration.GetSection("StateDb").Bind(_stateDbOptions);
+        _chatsDbOptions = new();
+        Configuration.GetSection("ChatsDb").Bind(_chatsDbOptions);
     }
 
     public void ConfigureServices(IServiceCollection services)
@@ -72,7 +73,7 @@ public class Startup : StartupBase
     {
         ResourceBuilder serviceResourceBuilder = ResourceBuilder
             .CreateEmpty()
-            .AddService(serviceName: "State", serviceNamespace: "CecoChat", serviceVersion: "0.1")
+            .AddService(serviceName: "Chats", serviceNamespace: "CecoChat", serviceVersion: "0.1")
             .AddEnvironmentVariableDetector();
 
         services
@@ -90,7 +91,7 @@ public class Startup : StartupBase
                     aspnet.Filter = httpContext => !excludedPaths.Contains(httpContext.Request.Path);
                 });
                 tracing.AddKafkaInstrumentation();
-                tracing.AddStateInstrumentation();
+                tracing.AddChatsInstrumentation();
                 tracing.ConfigureSampling(TracingSamplingOptions);
                 tracing.ConfigureOtlpExporter(TracingExportOptions);
             })
@@ -98,7 +99,7 @@ public class Startup : StartupBase
             {
                 metrics.SetResourceBuilder(serviceResourceBuilder);
                 metrics.AddAspNetCoreInstrumentation();
-                metrics.AddStateInstrumentation();
+                metrics.AddChatsInstrumentation();
                 metrics.ConfigurePrometheusAspNetExporter(PrometheusOptions);
             });
     }
@@ -107,9 +108,15 @@ public class Startup : StartupBase
     {
         services
             .AddHealthChecks()
-            .AddCheck<StateDbInitHealthCheck>(
-                "state-db-init",
+            .AddCheck<ConfigDbInitHealthCheck>(
+                "config-db-init",
                 tags: new[] { HealthTags.Health, HealthTags.Startup })
+            .AddCheck<ChatsDbInitHealthCheck>(
+                "chats-db-init",
+                tags: new[] { HealthTags.Health, HealthTags.Startup })
+            .AddCheck<HistoryConsumerHealthCheck>(
+                "history-consumer",
+                tags: new[] { HealthTags.Health, HealthTags.Startup, HealthTags.Live })
             .AddCheck<ReceiversConsumerHealthCheck>(
                 "receivers-consumer",
                 tags: new[] { HealthTags.Health, HealthTags.Startup, HealthTags.Live })
@@ -121,8 +128,8 @@ public class Startup : StartupBase
                 ConfigDbOptions,
                 tags: new[] { HealthTags.Health, HealthTags.Ready })
             .AddCassandra(
-                name: "state-db",
-                timeout: _stateDbOptions.HealthTimeout,
+                name: "chats-db",
+                timeout: _chatsDbOptions.HealthTimeout,
                 tags: new[] { HealthTags.Health, HealthTags.Ready })
             .AddKafka(
                 "backplane",
@@ -130,7 +137,9 @@ public class Startup : StartupBase
                 _backplaneOptions.Health,
                 tags: new[] { HealthTags.Health });
 
-        services.AddSingleton<StateDbInitHealthCheck>();
+        services.AddSingleton<ConfigDbInitHealthCheck>();
+        services.AddSingleton<ChatsDbInitHealthCheck>();
+        services.AddSingleton<HistoryConsumerHealthCheck>();
         services.AddSingleton<ReceiversConsumerHealthCheck>();
         services.AddSingleton<SendersConsumerHealthCheck>();
     }
@@ -138,22 +147,31 @@ public class Startup : StartupBase
     public void ConfigureContainer(ContainerBuilder builder)
     {
         // ordered hosted services
-        builder.RegisterHostedService<InitStateDb>();
+        builder.RegisterHostedService<InitDynamicConfig>();
+        builder.RegisterHostedService<InitChatsDb>();
         builder.RegisterHostedService<InitBackplane>();
         builder.RegisterHostedService<InitBackplaneComponents>();
 
-        // state db
-        IConfiguration stateDbConfig = Configuration.GetSection("StateDb");
-        builder.RegisterModule(new StateDbAutofacModule(stateDbConfig));
-        builder.RegisterModule(new CassandraHealthAutofacModule(stateDbConfig));
+        // configuration
+        IConfiguration configDbConfig = Configuration.GetSection("ConfigDb");
+        builder.RegisterModule(new ConfigDbAutofacModule(configDbConfig, registerHistory: true));
+
+        // chats db
+        IConfiguration chatsDbConfig = Configuration.GetSection("ChatsDb");
+        builder.RegisterModule(new ChatsDbAutofacModule(chatsDbConfig));
+        builder.RegisterModule(new CassandraHealthAutofacModule(chatsDbConfig));
 
         // backplane
         builder.RegisterType<KafkaAdmin>().As<IKafkaAdmin>().SingleInstance();
         builder.RegisterOptions<KafkaOptions>(Configuration.GetSection("Backplane:Kafka"));
+        builder.RegisterType<HistoryConsumer>().As<IHistoryConsumer>().SingleInstance();
         builder.RegisterType<StateConsumer>().As<IStateConsumer>().SingleInstance();
         builder.RegisterFactory<KafkaConsumer<Null, BackplaneMessage>, IKafkaConsumer<Null, BackplaneMessage>>();
         builder.RegisterModule(new KafkaAutofacModule());
         builder.RegisterOptions<BackplaneOptions>(Configuration.GetSection("Backplane"));
+
+        // shared
+        builder.RegisterType<ContractMapper>().As<IContractMapper>().SingleInstance();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -163,15 +181,16 @@ public class Startup : StartupBase
             app.UseDeveloperExceptionPage();
         }
 
+        app.UseHttpsRedirection();
         app.UseRouting();
         app.UseAuthentication();
         app.UseAuthorization();
         app.UseEndpoints(endpoints =>
         {
-            endpoints.MapGrpcService<StateService>();
+            endpoints.MapGrpcService<ChatsService>();
             endpoints.MapHttpHealthEndpoints(setup =>
             {
-                Func<HttpContext, HealthReport, Task> responseWriter = (context, report) => CustomHealth.Writer(serviceName: "state", context, report);
+                Func<HttpContext, HealthReport, Task> responseWriter = (context, report) => CustomHealth.Writer(serviceName: "chats", context, report);
                 setup.Health.ResponseWriter = responseWriter;
 
                 if (env.IsDevelopment())

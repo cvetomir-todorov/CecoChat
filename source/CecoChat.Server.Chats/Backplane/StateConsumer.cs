@@ -1,13 +1,13 @@
 using CecoChat.Contracts.Backplane;
-using CecoChat.Contracts.State;
+using CecoChat.Contracts.Chats;
 using CecoChat.Data;
-using CecoChat.Data.State.Repos;
+using CecoChat.Data.Chats.UserChats;
 using CecoChat.Kafka;
 using CecoChat.Server.Backplane;
 using Confluent.Kafka;
 using Microsoft.Extensions.Options;
 
-namespace CecoChat.Server.State.Backplane;
+namespace CecoChat.Server.Chats.Backplane;
 
 public interface IStateConsumer : IDisposable
 {
@@ -28,26 +28,26 @@ public sealed class StateConsumer : IStateConsumer
     private readonly BackplaneOptions _backplaneOptions;
     private readonly IKafkaConsumer<Null, BackplaneMessage> _receiversConsumer;
     private readonly IKafkaConsumer<Null, BackplaneMessage> _sendersConsumer;
-    private readonly IChatStateRepo _repo;
+    private readonly IUserChatsRepo _chatsRepo;
 
     public StateConsumer(
         ILogger<StateConsumer> logger,
         IOptions<BackplaneOptions> backplaneOptions,
         IFactory<IKafkaConsumer<Null, BackplaneMessage>> consumerFactory,
-        IChatStateRepo repo)
+        IUserChatsRepo chatsRepo)
     {
         _logger = logger;
         _backplaneOptions = backplaneOptions.Value;
         _receiversConsumer = consumerFactory.Create();
         _sendersConsumer = consumerFactory.Create();
-        _repo = repo;
+        _chatsRepo = chatsRepo;
     }
 
     public void Dispose()
     {
         _receiversConsumer.Dispose();
         _sendersConsumer.Dispose();
-        _repo.Dispose();
+        _chatsRepo.Dispose();
     }
 
     public void Prepare()
@@ -167,7 +167,7 @@ public sealed class StateConsumer : IStateConsumer
 
         if (needsUpdate)
         {
-            _repo.UpdateChat(targetUserId, receiverChat);
+            _chatsRepo.UpdateChat(targetUserId, receiverChat);
             _logger.LogTrace("Updated receiver state for user {TargetUserId} chat {ChatId} with message {MessageId}", targetUserId, chatId, backplaneMessage.MessageId);
         }
     }
@@ -188,14 +188,14 @@ public sealed class StateConsumer : IStateConsumer
 
         if (needsUpdate)
         {
-            _repo.UpdateChat(targetUserId, senderChat);
+            _chatsRepo.UpdateChat(targetUserId, senderChat);
             _logger.LogTrace("Updated sender state for user {TargetUserId} chat {ChatId} with message {MessageId}", targetUserId, chatId, backplaneMessage.MessageId);
         }
     }
 
     private ChatState GetChatFromDb(long userId, long otherUserId, string chatId)
     {
-        ChatState? chat = _repo.GetChat(userId, chatId);
+        ChatState? chat = _chatsRepo.GetChat(userId, chatId);
         chat ??= new ChatState
         {
             ChatId = chatId,
