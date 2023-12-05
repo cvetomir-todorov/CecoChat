@@ -28,7 +28,7 @@ namespace CecoChat.Server.Bff;
 public class Startup : StartupBase
 {
     private readonly ChatsClientOptions _chatsClientOptions;
-    private readonly UserOptions _userOptions;
+    private readonly UserClientOptions _userClientOptions;
     private readonly SwaggerOptions _swaggerOptions;
 
     public Startup(IConfiguration configuration)
@@ -37,8 +37,8 @@ public class Startup : StartupBase
         _chatsClientOptions = new();
         Configuration.GetSection("ChatsClient").Bind(_chatsClientOptions);
 
-        _userOptions = new();
-        Configuration.GetSection("UserClient").Bind(_userOptions);
+        _userClientOptions = new();
+        Configuration.GetSection("UserClient").Bind(_userClientOptions);
 
         _swaggerOptions = new();
         Configuration.GetSection("Swagger").Bind(_swaggerOptions);
@@ -63,7 +63,7 @@ public class Startup : StartupBase
 
         // downstream services
         services.AddChatsClient(_chatsClientOptions);
-        services.AddUserClient(_userOptions);
+        services.AddUserClient(_userClientOptions);
 
         // common
         services.AddAutoMapper(config =>
@@ -128,9 +128,9 @@ public class Startup : StartupBase
                 tags: new[] { HealthTags.Health, HealthTags.Ready })
             .AddUri(
                 "user",
-                new Uri(_userOptions.Address!, _userOptions.HealthPath),
+                new Uri(_userClientOptions.Address!, _userClientOptions.HealthPath),
                 configureHttpClient: (_, client) => client.DefaultRequestVersion = new Version(2, 0),
-                timeout: _userOptions.HealthTimeout,
+                timeout: _userClientOptions.HealthTimeout,
                 tags: new[] { HealthTags.Health, HealthTags.Ready });
 
         services.AddSingleton<ConfigDbInitHealthCheck>();

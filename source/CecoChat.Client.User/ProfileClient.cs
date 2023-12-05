@@ -10,14 +10,14 @@ namespace CecoChat.Client.User;
 internal sealed class ProfileClient : IProfileClient
 {
     private readonly ILogger _logger;
-    private readonly UserOptions _options;
+    private readonly UserClientOptions _options;
     private readonly IClock _clock;
     private readonly ProfileQuery.ProfileQueryClient _profileQueryClient;
     private readonly ProfileCommand.ProfileCommandClient _profileCommandClient;
 
     public ProfileClient(
         ILogger<ProfileClient> logger,
-        IOptions<UserOptions> options,
+        IOptions<UserClientOptions> options,
         IClock clock,
         ProfileQuery.ProfileQueryClient profileQueryClient,
         ProfileCommand.ProfileCommandClient profileCommandClient)

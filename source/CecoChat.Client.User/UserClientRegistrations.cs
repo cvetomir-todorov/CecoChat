@@ -5,9 +5,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace CecoChat.Client.User;
 
-public static class UserRegistrations
+public static class UserClientRegistrations
 {
-    public static void AddUserClient(this IServiceCollection services, UserOptions options)
+    public static void AddUserClient(this IServiceCollection services, UserClientOptions options)
     {
         if (options.SocketsHttpHandler == null)
         {
