@@ -70,6 +70,7 @@ A short list of tasks to do next regarding product features, technical features,
 
 * Performance
   - Use allocation-free logging
+  - Use in-memory caching for user chat state consumer to avoid loading the chat state from the database each time
   - Make a larger benchmark and improve configuration of backplane, client-server communication, databases
 * Observability
   - Add Open Telemetry metrics to Redis when StackExchange.Redis adds support
