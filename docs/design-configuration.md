@@ -8,7 +8,7 @@ Static app configuration is stored in `appsettings.json` files as is typical for
 
 ### Dynamic
 
-Some parts of the configuration are designed to be changed while it is running. These parts are stored in Redis and read at start-up. The [prepare script](../deploy/docker/redis/data.sh) inputs the partitioning and history configuration values which need to be present and valid at all times. The configuration can be changed manually using the `redis-cli` command after attaching to the Redis container via `docker exec -it cecochat-redis bash`. Each service that is using dynamic configuration outputs at start-up the key names it reads and PUB/SUB channels which it subscribes to in order to get notified about changes. After the configuration is changed a dummy message needs to be sent to one of those PUB/SUB channels. The services validate the new configuration values and may reject the change. The validation output provides descriptive information which can be used to correct the values.
+Some parts of the configuration are designed to be changed while it is running. These parts are stored in Redis and read at start-up. The [prepare script](../deploy/docker/redis/data.sh) inputs the partitioning and chat history configuration values which need to be present and valid at all times. The configuration can be changed manually using the `redis-cli` command after attaching to the Redis container via `docker exec -it cecochat-redis bash`. Each service that is using dynamic configuration outputs at start-up the key names it reads and PUB/SUB channels which it subscribes to in order to get notified about changes. After the configuration is changed a dummy message needs to be sent to one of those PUB/SUB channels. The services validate the new configuration values and may reject the change. The validation output provides descriptive information which can be used to correct the values.
 
 In the future a UI-supported Configurator service should allow changing the configuration more easily.
 
@@ -24,8 +24,8 @@ The configuration database stores information related to server partition assign
 * Messaging service to:
   - Assign the partitions to the Kafka consumer in order to consume messages
 
-Redis conveniently supports simple keys for plain data such as partition count and history settings. Redis hashes (hash maps) are used to store key-value pairs like the `(server ID -> partitions)` and `(server ID -> address)`. After the configurator service applies configuration changes the Redis PUB/SUB is used to publish a notification to subscribers using the respective channels. Each interested service listens to changes for:
+Redis conveniently supports simple keys for plain data such as partition count and chat history settings. Redis hashes (hash maps) are used to store key-value pairs like the `(server ID -> partitions)` and `(server ID -> address)`. After the configurator service applies configuration changes the Redis PUB/SUB is used to publish a notification to subscribers using the respective channels. Each interested service listens to changes for:
 
 * BFF service - partition count, server partitions, server addresses
 * Messaging service - partition count, server partitions
-* History service - history settings
+* Chats service - chat history settings

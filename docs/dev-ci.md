@@ -10,7 +10,6 @@ A Github Actions workflow is set up to:
 * Build and push CecoChat containers to Docker Hub
     - [BFF](https://hub.docker.com/repository/docker/cvetomirtodorov/cecochat-bff)
     - [Messaging](https://hub.docker.com/repository/docker/cvetomirtodorov/cecochat-messaging)
-    - [State](https://hub.docker.com/repository/docker/cvetomirtodorov/cecochat-state)
-    - [History](https://hub.docker.com/repository/docker/cvetomirtodorov/cecochat-history)
+    - [Chats](https://hub.docker.com/repository/docker/cvetomirtodorov/cecochat-chats)
     - [ID Gen](https://hub.docker.com/repository/docker/cvetomirtodorov/cecochat-idgen)
     - [User](https://hub.docker.com/repository/docker/cvetomirtodorov/cecochat-user)

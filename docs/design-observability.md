@@ -47,7 +47,7 @@ The following instrumentation is used:
 * Custom
   - Backplane instrumentation
     - At the level of Kafka producers and consumers
-  - HistoryDB and StateDB instrumentation for Cassandra queries
+  - ChatsDB instrumentation for Cassandra queries
     - At the level of Cassandra but requiring code in the application
   - Messaging instrumentation
     - at the level of SignalR
