@@ -2,7 +2,7 @@
 
 Make sure that the [prerequisites](dev-run-prerequisites.md) have been met before continuing.
 
-## Instances
+# Instances
 
 * Integration
   - Kafka - 2 Zookeepers, 2 brokers
@@ -18,7 +18,7 @@ Make sure that the [prerequisites](dev-run-prerequisites.md) have been met befor
   - BFF branch - 2 BFF, 2 User, 2 Chats
   - Messaging branch - 2 Messaging, 2 IDGen
 
-## Tools
+# Tools
 
 * `minikube`
   - Started using `minikube start --container-runtime=docker --kubernetes-version=stable`
@@ -26,7 +26,7 @@ Make sure that the [prerequisites](dev-run-prerequisites.md) have been met befor
 * Minikube addons listed in `enable-minikube-addons.sh`
 * `kubectl`, `kubens`, `helm`
 
-## Deployment
+# Deployment
 
 The below commands assume:
 * The current dir is `/deploy/minikube`
@@ -35,7 +35,7 @@ The below commands assume:
 
 It should be taken into account that some of the docker images needed to be pulled are not small. Some of the 3rd party components and all of the CecoChat components have health probes. They could be used to ensure the component is running before moving onto the next one. Commands like `kubectl get all`, `kubectl describe pod <pod-name>`, `kubectl logs <pod-name>` could help inspect and troubleshoot a pod.
 
-### Initial
+## Namespace
 
 First and foremost the namespace needs to be created and the context needs to be switched to it:
 ```shell
@@ -43,7 +43,7 @@ kubectl apply -f namespace.yml
 kubens cecochat
 ```
 
-### Data and integration
+## Data and integration
 
 ```shell
 bash install-data-integration.sh
@@ -63,13 +63,13 @@ kubectl exec -it redis-2 -- bash
 
 The topics in Kafka and databases in Cassandra and Yugabyte are created when the respective service is started, if they do not exist.
 
-### Observability
+## Observability
 
 ```shell
 bash install-telemetry.sh
 ```
 
-### Services shared resources
+## Services
 
 * The certificate scripts rely on the correct working dir which require go-in-go-out approach
 * Appending the ingress certificate hostnames to `/etc/hosts` is required in order to be able to access the cluster
@@ -81,15 +81,10 @@ bash create-tls-secret.sh
 bash append-to-etc-hosts.sh
 cd ..
 kubectl apply -f service-config.yml
-```
-
-### Services
-
-```shell
 bash install-cecochat.sh
 ```
 
-## Cluster access
+# Cluster access
 
 The Kubernetes ingresses expose the following services via the respective domains:
 * `https://bff.cecochat.com` -> BFF service
@@ -104,7 +99,7 @@ Commands useful when troubleshooting and investigating issues include:
 * `kubectl exec -it <pod-name> -- bash` - log into a pod, investigate issues, check values of env vars, etc.
 * `curl https://bff.cecochat.com/healthz -v` - investigate any issues with the ingress certificate
 
-## Validate deployment
+# Validate deployment
 
 ```shell
 $ helm list

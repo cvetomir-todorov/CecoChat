@@ -1,6 +1,8 @@
 # Capabilities
 
-## Product
+The current product and technical features
+
+# Product
 
 * Messaging in real-time
   - Send and receive messages, (un)react with emojis
@@ -15,11 +17,9 @@
   - Profiles with full and public-only data
   - Connect with other users - invite/accept/cancel/remove
 
-#### Limitations
+Note: there is no web/mobile clients (only a client for development purposes)
 
-* No web/mobile clients (only a client for development purposes)
-
-## Technical
+# Technical
 
 * Reliability
   - Server-processing client-side acknowledgement

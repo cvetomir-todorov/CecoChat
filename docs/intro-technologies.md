@@ -107,14 +107,14 @@ Configuration is based on Redis:
 
 ![OpenTelemetry](tech-images/open-telemetry.png)
 ![Jaeger](tech-images/jaeger.png)
-![Prometheus](tech-images/prometheus.png)
-![Grafana](tech-images/grafana.png)
 ![ElasticSearch](tech-images/elasticsearch.png)
 ![Kibana](tech-images/kibana.png)
+![Prometheus](tech-images/prometheus.png)
+![Grafana](tech-images/grafana.png)
 
 * Distributed tracing is based on OpenTelemetry and Jaeger
-* Metrics is based on OpenTelemetry, Prometheus and Grafana
 * Log aggregation is based on OpenTelemetry, ElasticSearch and Kibana
+* Metrics is based on OpenTelemetry, Prometheus and Grafana
 
 # Deployment
 

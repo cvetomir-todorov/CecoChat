@@ -2,7 +2,7 @@
 
 Each message needs to have a unique ID. Additionally it is associated with a timestamp. There are a few ways to do it.
 
-## UUID/GUID + timestamp
+# UUID/GUID + timestamp
 
 UUID/GUID instances are globally unique and easily generated. Timestamps are easily generated as well. Unfortunately these two have larger size of 16 bytes for UUID/GUID and 8 bytes for timestamps. That means 24 bytes in total.
 
@@ -10,7 +10,7 @@ Cassandra is a KKV database. The V stands for value and the KK means that there 
 
 With these indexes in place if we want to make a query by message ID we won't be able to do so in Cassandra as there's no such an index. We can only make such a query by the clustering key which is a timestamp. Using timestamps instead of message IDs is dangerous due to their possible duplication and different representation in different systems. Ideally we would want to use message IDs which are guaranteed to be unique and are simpler. Unfortunately UUID/GUIDs are not simple. And even if they were we would need a secondary index for that kind of query. Cassandra secondary indexes are dangerous as they are spread throughout the nodes in the cluster. That means a query using a secondary index could affect much more nodes that we want to, reducing performance in result.
 
-## Snowflake
+# Snowflake
 
 Twitter snowflakes are 8-byte or int64 IDs which higher bits contain timestamp value. That means they are time sortable. Using snowflakes as time-sortable message IDs allow us to use them in Cassandra as a clustering key. That way we can make ranged time-based queries and also make queries by message ID. Since snowflakes are int64 their representation is determinate in different systems. Apart from the sign bit maybe, which is why some libs do not use it.
 

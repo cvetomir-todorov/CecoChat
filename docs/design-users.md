@@ -2,7 +2,7 @@
 
 ![Users](images/cecochat-users.png)
 
-## Registration and authentication
+# Registration and authentication
 
 Usernames are the unique element in terms of registration. They are always lower-case in order to avoid similarly named users. Avoiding phone and/or emails for this allows the users to change them easily.
 
@@ -21,7 +21,7 @@ When creating a session each user is provided:
 * The user full profile in order to allow managing it
 * The address of the messaging server to use in order to send messages, react etc.
 
-## Own profile
+# Own profile
 
 The profile gets created during registration and is returned when creating a new session. Profile management includes:
 * Changing the password
@@ -31,11 +31,11 @@ The profile gets created during registration and is returned when creating a new
 
 The issue of lost updates is considered in the implementation. This occurs when the same user authenticates from 2 different clients and tries to concurrently update his/hers profile. Optimistic concurrency is applied using a separate version column, a date-time value which gets updated on each profile change.
 
-## Public profiles
+# Public profiles
 
 Public profiles are obtained by the clients when opening all chats and a single chat. Since the public profile data doesn't change frequently, calling the User database is avoided if the requested public profiles are already in a User cache. This reduces latency and also reduces the load on the User database. The profile entries are added for a certain amount of time, after which they expire.
 
-## Connections
+# Connections
 
 Connections are obtained by the clients when opening all chats and a single chat. Since connection data doesn't change frequently, calling the User database is avoided if the user connections are already in a User cache. This reduces latency and also the load on the User database. The connections for a user are added for a certain amount of time, after which they expire.
 
