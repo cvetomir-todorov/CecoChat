@@ -17,7 +17,7 @@ internal static class ChatsInstrumentation
         public const string GetChats = "GetChats";
         public const string GetChat = "GetChat";
         public const string UpdateChat = "UpdateChat";
-        
+
         public const string AddDataMessage = "AddDataMessage";
         public const string GetHistory = "GetHistory";
         public const string SetReaction = "SetReaction";
