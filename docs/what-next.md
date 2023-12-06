@@ -1,6 +1,8 @@
 # What next
 
-## Essential features
+A short list of tasks to do next regarding product features, technical features, dev infrastructure, improvements etc.
+
+# Essential features
 
 * Users
   - Search users by name (pending full-text search support in YugabyteDB tracked in [this GitHub issue](https://github.com/yugabyte/yugabyte-db/issues/7850))
@@ -10,7 +12,7 @@
 * Development
   - Setup versioning
 
-## Product features
+# Product features
 
 * Users
   - Avatars
@@ -35,7 +37,7 @@
   - Away
   - Busy
 
-## Technical features
+# Technical features
 
 * Architecture
   - Design dynamic configuration
@@ -56,7 +58,7 @@
   - Infrastructure as code
   - Complete auto-scaling
 
-## Development
+# Development
 
 * Automated testing
   - Setup infrastructure for test running
@@ -64,7 +66,7 @@
   - Add unit tests for each service
   - Add low-level tests for components worth the effort
 
-## Improvements
+# Improvements
 
 * Performance
   - Use allocation-free logging

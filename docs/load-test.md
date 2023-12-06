@@ -1,4 +1,4 @@
-# Scenario
+# Load testing scenario
 
 The aim is to bring online as many clients as possible and each of them to behave like a real user. In the init phase each user is assigned friends to chat with.
 

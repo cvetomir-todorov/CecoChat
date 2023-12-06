@@ -2,7 +2,7 @@
 
 ![Observability](images/cecochat-observability.png)
 
-## Health
+# Health
 
 Various health checks are exposed via HTTP health endpoints:
 
@@ -28,15 +28,12 @@ Note: in Development mode all endpoints use detailed output
     - Message brokers
     - Downstream services
 
-## Distributed tracing
+# Distributed tracing
 
-OpenTelemetry is utilized to make flow of communication and data exchange observable and help resolve production issues.
+* OpenTelemetry is utilized to make flow of communication and data exchange observable and help resolve production issues.
+* Each service is represented as a separate OpenTelemetry resource with name, namespace and version.
 
-### Resources
-
-Each service is represented as a separate resource with namespace, name and version.
-
-### Instrumentation
+## Instrumentation
 
 The following instrumentation is used:
 * Out-of-the-box
@@ -52,13 +49,13 @@ The following instrumentation is used:
   - Messaging instrumentation
     - at the level of SignalR
 
-### Sampling
+## Sampling
 
 * During development all traces are sampled
 * For Docker and Minikube deployments only a custom percentage of traces are sampled - value is set in the configuration
 * The `/metrics` and health endpoints are excluded
 
-### Exporting
+## Exporting
 
 * Observable services use Open Telemetry and the agnostic OTLP exporter to send collected traces
 * The Open Telemetry OTel collector collects the traces and uses OTLP to push them to Jaeger
@@ -66,14 +63,14 @@ The following instrumentation is used:
   - Currently the Docker image used stores traces in memory
   - For production a full deployment of Jaeger and all its components needs to be implemented
 
-## Log aggregation
+# Log aggregation
 
 * OpenTelemetry, ElasticSearch and Kibana are utilized in the process.
 * Applications services send their logs in batches to an OpenTelemetry collectors via OTLP
 * The collectors are sending them again in batches to an ElasticSearch backend in a dedicated index
 * Kibana is configured to access the ElasticSearch backend and provides ability to view and search logs
 
-## Metrics
+# Metrics
 
 * OpenTelemetry is used to provide an HTTP `/metrics` endpoint to application services and to collect the metrics
 * This endpoint is used by Prometheus to scrape the exposed metrics and store them

@@ -2,7 +2,7 @@
 
 When two users are connected to different messaging servers the latter need to communicate somehow.
 
-## Approach #1 - direct communication
+# Approach #1 - direct communication
 
 Messaging servers exchange messages directly between each other.
 
@@ -23,7 +23,7 @@ Cons
     - Sending the message to its recipient(s) by calling one (or multiple for group chats) messaging server(s)
     - Persisting the message into the chats database
 
-## Approach #2 - indirect communication
+# Approach #2 - indirect communication
 
 Messaging servers exchange messages via a PUB/SUB backplane via a message broker.
 
@@ -40,6 +40,6 @@ Cons
 * Each messaging server is the only one responsible for specific clients. The deployment infrastructure can keep idle messaging servers ready to replace ones declared dead.
 * As a result the messaging servers become stateful and unique, but at least still easily replaced.
 
-## Decision
+# Decision
 
 The approach using a PUB/SUB backplane was chosen because of the pros listed at the cost of complexity increase in deployment and configuration. Kafka is particularly suitable to this approach, although partition assignment for the messaging server's Kafka consumer group need to be manual. There needs to be centralized dynamic configuration with mapping between messaging server and partitions assigned to it. Additionally the addresses of all messaging servers would need to be present so clients know where to connect to.
