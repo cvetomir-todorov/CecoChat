@@ -3,24 +3,24 @@ using StackExchange.Redis;
 
 namespace CecoChat.Data.Config.History;
 
-internal interface IHistoryConfigRepo
+internal interface IHistoryRepo
 {
-    Task<HistoryConfigValues> GetValues(HistoryConfigUsage usage);
+    Task<HistoryValues> GetValues(HistoryConfigUsage usage);
 }
 
-internal sealed class HistoryConfigRepo : IHistoryConfigRepo
+internal sealed class HistoryRepo : IHistoryRepo
 {
     private readonly IRedisContext _redisContext;
 
-    public HistoryConfigRepo(
+    public HistoryRepo(
         IRedisContext redisContext)
     {
         _redisContext = redisContext;
     }
 
-    public async Task<HistoryConfigValues> GetValues(HistoryConfigUsage usage)
+    public async Task<HistoryValues> GetValues(HistoryConfigUsage usage)
     {
-        HistoryConfigValues values = new();
+        HistoryValues values = new();
 
         if (usage.UseMessageCount)
         {

@@ -2,14 +2,14 @@ using FluentValidation;
 
 namespace CecoChat.Data.Config.Snowflake;
 
-internal sealed class SnowflakeConfigValidator : AbstractValidator<SnowflakeConfigValues>
+internal sealed class SnowflakeValidator : AbstractValidator<SnowflakeValues>
 {
-    public SnowflakeConfigValidator()
+    public SnowflakeValidator()
     {
         RuleFor(x => x.GeneratorIds).Custom(ValidateServerGeneratorIDs);
     }
 
-    private static void ValidateServerGeneratorIDs(IDictionary<string, List<short>> serverGeneratorIds, ValidationContext<SnowflakeConfigValues> context)
+    private static void ValidateServerGeneratorIDs(IDictionary<string, List<short>> serverGeneratorIds, ValidationContext<SnowflakeValues> context)
     {
         HashSet<string> uniqueServers = new(capacity: serverGeneratorIds.Count);
         HashSet<short> allUniqueIds = new(capacity: serverGeneratorIds.Count);

@@ -8,16 +8,16 @@ internal sealed class SnowflakeConfig : ISnowflakeConfig
 {
     private readonly ILogger _logger;
     private readonly IRedisContext _redisContext;
-    private readonly ISnowflakeConfigRepo _repo;
+    private readonly ISnowflakeRepo _repo;
     private readonly IConfigUtility _configUtility;
 
-    private SnowflakeConfigValidator? _validator;
-    private SnowflakeConfigValues? _values;
+    private SnowflakeValidator? _validator;
+    private SnowflakeValues? _values;
 
     public SnowflakeConfig(
         ILogger<SnowflakeConfig> logger,
         IRedisContext redisContext,
-        ISnowflakeConfigRepo repo,
+        ISnowflakeRepo repo,
         IConfigUtility configUtility)
     {
         _logger = logger;
@@ -47,7 +47,7 @@ internal sealed class SnowflakeConfig : ISnowflakeConfig
     {
         try
         {
-            _validator = new SnowflakeConfigValidator();
+            _validator = new SnowflakeValidator();
             await SubscribeForChanges();
             await LoadValidateValues();
         }
@@ -76,7 +76,7 @@ internal sealed class SnowflakeConfig : ISnowflakeConfig
     {
         EnsureInitialized();
 
-        SnowflakeConfigValues values = await _repo.GetValues();
+        SnowflakeValues values = await _repo.GetValues();
         _logger.LogInformation("Loading snowflake configuration succeeded");
 
         bool areValid = _configUtility.ValidateValues("snowflake", values, _validator!);
@@ -87,7 +87,7 @@ internal sealed class SnowflakeConfig : ISnowflakeConfig
         }
     }
 
-    private void PrintValues(SnowflakeConfigValues values)
+    private void PrintValues(SnowflakeValues values)
     {
         _logger.LogInformation("Total of {ServerCount} server(s) configured:", values.GeneratorIds.Count);
         foreach (KeyValuePair<string, List<short>> pair in values.GeneratorIds)

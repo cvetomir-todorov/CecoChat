@@ -8,17 +8,17 @@ internal sealed class HistoryConfig : IHistoryConfig
 {
     private readonly ILogger _logger;
     private readonly IRedisContext _redisContext;
-    private readonly IHistoryConfigRepo _repo;
+    private readonly IHistoryRepo _repo;
     private readonly IConfigUtility _configUtility;
 
     private HistoryConfigUsage? _usage;
-    private HistoryConfigValidator? _validator;
-    private HistoryConfigValues? _values;
+    private HistoryValidator? _validator;
+    private HistoryValues? _values;
 
     public HistoryConfig(
         ILogger<HistoryConfig> logger,
         IRedisContext redisContext,
-        IHistoryConfigRepo repo,
+        IHistoryRepo repo,
         IConfigUtility configUtility)
     {
         _logger = logger;
@@ -41,7 +41,7 @@ internal sealed class HistoryConfig : IHistoryConfig
         try
         {
             _usage = usage;
-            _validator = new HistoryConfigValidator(usage);
+            _validator = new HistoryValidator(usage);
             await SubscribeForChanges(usage);
             await LoadValidateValues(usage);
         }
@@ -78,7 +78,7 @@ internal sealed class HistoryConfig : IHistoryConfig
     {
         EnsureInitialized();
 
-        HistoryConfigValues values = await _repo.GetValues(usage);
+        HistoryValues values = await _repo.GetValues(usage);
         _logger.LogInformation("Loading history configuration succeeded");
 
         if (_configUtility.ValidateValues("history", values, _validator!))
@@ -88,7 +88,7 @@ internal sealed class HistoryConfig : IHistoryConfig
         }
     }
 
-    private void PrintValues(HistoryConfigUsage usage, HistoryConfigValues values)
+    private void PrintValues(HistoryConfigUsage usage, HistoryValues values)
     {
         if (usage.UseMessageCount)
         {

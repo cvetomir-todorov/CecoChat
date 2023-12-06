@@ -4,30 +4,30 @@ using StackExchange.Redis;
 
 namespace CecoChat.Data.Config.Snowflake;
 
-internal interface ISnowflakeConfigRepo
+internal interface ISnowflakeRepo
 {
-    Task<SnowflakeConfigValues> GetValues();
+    Task<SnowflakeValues> GetValues();
 }
 
-internal sealed class SnowflakeConfigRepo : ISnowflakeConfigRepo
+internal sealed class SnowflakeRepo : ISnowflakeRepo
 {
     private readonly ILogger _logger;
     private readonly IRedisContext _redisContext;
 
-    public SnowflakeConfigRepo(ILogger<SnowflakeConfigRepo> logger, IRedisContext redisContext)
+    public SnowflakeRepo(ILogger<SnowflakeRepo> logger, IRedisContext redisContext)
     {
         _logger = logger;
         _redisContext = redisContext;
     }
 
-    public async Task<SnowflakeConfigValues> GetValues()
+    public async Task<SnowflakeValues> GetValues()
     {
-        SnowflakeConfigValues values = new();
+        SnowflakeValues values = new();
         await GetGeneratorIds(values);
         return values;
     }
 
-    private async Task GetGeneratorIds(SnowflakeConfigValues values)
+    private async Task GetGeneratorIds(SnowflakeValues values)
     {
         IDatabase database = _redisContext.GetDatabase();
         HashEntry[] pairs = await database.HashGetAllAsync(SnowflakeKeys.GeneratorIds);

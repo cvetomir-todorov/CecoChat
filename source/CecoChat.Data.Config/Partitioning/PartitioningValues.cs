@@ -2,9 +2,9 @@
 
 namespace CecoChat.Data.Config.Partitioning;
 
-internal sealed class PartitioningConfigValues
+internal sealed class PartitioningValues
 {
-    public PartitioningConfigValues()
+    public PartitioningValues()
     {
         PartitionServerMap = new Dictionary<int, string>();
         ServerPartitionMap = new Dictionary<string, PartitionRange>();

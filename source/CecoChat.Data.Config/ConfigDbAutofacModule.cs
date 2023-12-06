@@ -41,8 +41,8 @@ public sealed class ConfigDbAutofacModule : Module
                 .WithNamedParameter(typeof(IRedisContext), RedisContextName)
                 .SingleInstance();
             builder
-                .RegisterType<HistoryConfigRepo>()
-                .As<IHistoryConfigRepo>()
+                .RegisterType<HistoryRepo>()
+                .As<IHistoryRepo>()
                 .WithNamedParameter(typeof(IRedisContext), RedisContextName)
                 .SingleInstance();
         }
@@ -54,8 +54,8 @@ public sealed class ConfigDbAutofacModule : Module
                 .WithNamedParameter(typeof(IRedisContext), RedisContextName)
                 .SingleInstance();
             builder
-                .RegisterType<PartitioningConfigRepo>()
-                .As<IPartitioningConfigRepo>()
+                .RegisterType<PartitioningRepo>()
+                .As<IPartitioningRepo>()
                 .WithNamedParameter(typeof(IRedisContext), RedisContextName)
                 .SingleInstance();
             builder.RegisterSingletonEvent<EventSource<PartitionsChangedEventData>, PartitionsChangedEventData>();
@@ -68,8 +68,8 @@ public sealed class ConfigDbAutofacModule : Module
                 .WithNamedParameter(typeof(IRedisContext), RedisContextName)
                 .SingleInstance();
             builder
-                .RegisterType<SnowflakeConfigRepo>()
-                .As<ISnowflakeConfigRepo>()
+                .RegisterType<SnowflakeRepo>()
+                .As<ISnowflakeRepo>()
                 .WithNamedParameter(typeof(IRedisContext), RedisContextName)
                 .SingleInstance();
         }

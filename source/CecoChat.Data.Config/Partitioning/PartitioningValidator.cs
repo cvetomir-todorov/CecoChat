@@ -3,12 +3,12 @@ using FluentValidation;
 
 namespace CecoChat.Data.Config.Partitioning;
 
-internal sealed class PartitioningConfigValidator : AbstractValidator<PartitioningConfigValues>
+internal sealed class PartitioningValidator : AbstractValidator<PartitioningValues>
 {
     private const int PartitionCountMin = 2;
     private const int PartitionCountMax = 10000;
 
-    public PartitioningConfigValidator(PartitioningConfigUsage usage)
+    public PartitioningValidator(PartitioningConfigUsage usage)
     {
         RuleFor(x => x.PartitionCount).InclusiveBetween(from: PartitionCountMin, to: PartitionCountMax);
         RuleFor(x => x.PartitionServerMap).Custom(ValidatePartitionServerMap);
@@ -23,9 +23,9 @@ internal sealed class PartitioningConfigValidator : AbstractValidator<Partitioni
         }
     }
 
-    private static void ValidatePartitionServerMap(IDictionary<int, string> partitionServerMap, ValidationContext<PartitioningConfigValues> context)
+    private static void ValidatePartitionServerMap(IDictionary<int, string> partitionServerMap, ValidationContext<PartitioningValues> context)
     {
-        PartitioningConfigValues values = context.InstanceToValidate;
+        PartitioningValues values = context.InstanceToValidate;
         if (!IsPartitionCountValid(values.PartitionCount))
         {
             return;
@@ -59,9 +59,9 @@ internal sealed class PartitioningConfigValidator : AbstractValidator<Partitioni
         }
     }
 
-    private static void ValidateServerPartitionMap(IDictionary<string, PartitionRange> serverPartitionRangeMap, ValidationContext<PartitioningConfigValues> context)
+    private static void ValidateServerPartitionMap(IDictionary<string, PartitionRange> serverPartitionRangeMap, ValidationContext<PartitioningValues> context)
     {
-        PartitioningConfigValues values = context.InstanceToValidate;
+        PartitioningValues values = context.InstanceToValidate;
         if (!IsPartitionCountValid(values.PartitionCount))
         {
             return;
@@ -80,7 +80,7 @@ internal sealed class PartitioningConfigValidator : AbstractValidator<Partitioni
     private static void ValidateSingleServerPartitions(
         string server, PartitionRange partitions,
         int partitionCount, HashSet<int> uniquePartitions,
-        ValidationContext<PartitioningConfigValues> context)
+        ValidationContext<PartitioningValues> context)
     {
         List<int> overlappingPartitions = new();
         List<int> invalidPartitions = new();
@@ -112,9 +112,9 @@ internal sealed class PartitioningConfigValidator : AbstractValidator<Partitioni
         }
     }
 
-    private static void ValidateServerAddressMap(IDictionary<string, string> serverAddressMap, ValidationContext<PartitioningConfigValues> context)
+    private static void ValidateServerAddressMap(IDictionary<string, string> serverAddressMap, ValidationContext<PartitioningValues> context)
     {
-        PartitioningConfigValues values = context.InstanceToValidate;
+        PartitioningValues values = context.InstanceToValidate;
         if (!IsPartitionCountValid(values.PartitionCount))
         {
             return;
