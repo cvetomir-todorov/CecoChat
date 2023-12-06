@@ -1,6 +1,6 @@
 # Overall design
 
-![Overall design](images/cecochat-01-overall.png)
+![Overall design](images/cecochat-overall.png)
 
 * Clients register and manage their profile in the User service via the BFF
 * Clients create their session using the User service via the BFF

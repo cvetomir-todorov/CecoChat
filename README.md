@@ -65,4 +65,4 @@ Check out [what next](docs/what-next.md) needs to be implemented. I appreciate a
 
 # Design
 
-![Design](docs/images/cecochat-01-overall.png)
+![Design](docs/images/cecochat-overall.png)

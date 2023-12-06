@@ -7,7 +7,7 @@ The technologies chosen are [cloud agnostic](https://codersociety.com/blog/artic
 * Operations - OpenTelemetry, Docker, Kubernetes
 * Services - .NET, ASP.NET, SignalR, EF Core
 
-![Technologies](images/cecochat-08-technologies.png)
+![Technologies](images/cecochat-technologies.png)
 
 # Client communication
 

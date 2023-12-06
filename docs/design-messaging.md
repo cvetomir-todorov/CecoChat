@@ -11,7 +11,7 @@ The hash function from the formula needs to be stable because it would be run on
 
 ## Send
 
-![Send messages](images/cecochat-02-message-send.png)
+![Send messages](images/cecochat-message-send.png)
 
 The Kafka producer doesn't use the default auto-partitioning when sending messages. Instead it is choosing a partition for the sent message manually. It is required since each messaging server is stateful - the clients connected to it are assigned to specific partitions. Fortunately the Kafka .NET client API has these capabilities.
 
@@ -19,7 +19,7 @@ Additionally we use the Kafka delivery handler in order to send the client a pos
 
 ## Receive
 
-![Receive messages](images/cecochat-03-message-receive.png)
+![Receive messages](images/cecochat-message-receive.png)
 
 Each messaging server contains a Kafka consumer which is manually assigned Kafka partitions and consumes messages only from them. Only clients whose hashed user ID value matches the assigned partitions according to the formula connects to that messaging server.
 

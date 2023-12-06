@@ -1,6 +1,6 @@
 # Deployment
 
-![Deployment](images/cecochat-07-deployment.png)
+![Deployment](images/cecochat-deployment.png)
 
 # Load-balancing
 
