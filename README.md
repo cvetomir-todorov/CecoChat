@@ -49,7 +49,7 @@ Check out [what next](docs/what-next.md) needs to be implemented. I appreciate a
   - [Reliable messaging and consistency](docs/research-reliable-messaging-consistency.md)
 * Design
   - [Messaging](docs/design-messaging.md)
-  - [User chats, chat history](docs/design-state-history.md)
+  - [Chats](docs/design-chats.md)
   - [User profiles and connections](docs/design-users.md)
   - [Clients](docs/design-clients.md)
   - [Configuration](docs/design-configuration.md)

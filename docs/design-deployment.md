@@ -4,14 +4,14 @@
 
 # Load-balancing
 
-* BFF, User, State, History, ID Gen services rely on the Kubernetes provided load balancer
+* BFF, User, Chats, ID Gen services rely on the Kubernetes provided load balancer
 * Messaging service instance is chosen when a session for the user is created
 
 # Auto-scaling
 
 ## Conventional services
 
-For BFF, User, State, History, ID Gen services Kubernetes adds/removes instances based on resource utilization with custom rules and the load balancer for each service gets updated.
+For BFF, User, Chats, ID Gen services Kubernetes adds/removes instances based on resource utilization with custom rules and the load balancer for each service gets updated.
 
 ## Messaging service
 

@@ -21,7 +21,7 @@ Cons
 * Messaging servers need to know when one of them fails, find about new nodes and establish connections to them.
 * Consistency of the data would be more challenging since the two main operations required for message processing would be separate:
     - Sending the message to its recipient(s) by calling one (or multiple for group chats) messaging server(s)
-    - Persisting the message into the history database
+    - Persisting the message into the chats database
 
 ## Approach #2 - indirect communication
 
@@ -30,7 +30,7 @@ Messaging servers exchange messages via a PUB/SUB backplane via a message broker
 Pros
 * Messaging servers need to know only the topic/queue/channel/etc. for the recipient. They still need to keep connections to the PUB/SUB backplane but that number is smaller.
 * Messaging servers do not need to know about and keep connection between each other.
-* Consistency problem could be solved since message processing when a message is received is a single action - placing the message in the PUB/SUB backplane. There would be 2 subscribers - one being the messaging server for the recipient and the other - the component for persisting the message into the history database. Of course at the very best what we would have is eventual consistency.
+* Consistency problem could be solved since message processing when a message is received is a single action - placing the message in the PUB/SUB backplane. There would be 2 subscribers - one being the messaging server for the recipient and the other - the component for persisting the message into the chats database. Of course at the very best what we would have is eventual consistency.
 * The PUB/SUB backplane would also act like an event log.
 
 Cons

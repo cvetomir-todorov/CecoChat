@@ -6,13 +6,13 @@
 * Clients create their session using the User service via the BFF
 * Clients acquire other users public profiles from the User service via the BFF
 * Clients manage their connections - invite/accept/cancel/remove from the User service via the BFF
-* Clients acquire user chats and chat history from the State and History services via the BFF
+* Clients acquire user chats and chat history from the Chats service via the BFF
 * Clients connect to Messaging service in order to chat with each other
 * Messaging service instances exchange data between each other indirectly using a PUB/SUB backplane
 * PUB/SUB backplane distributes the traffic between Messaging service instances
 * ID Gen service is used to generate Snowflake message IDs
-* State service transform the messages from the PUB/SUB backplane into State database which is the source of truth 
-* History service transform messages and reactions from the PUB/SUB backplane into a History database which is the source of truth
+* Chats service transforms the messages from the PUB/SUB backplane into the Chats database which is the source of truth 
+* Chats service transforms the messages and reactions from the PUB/SUB backplane into the Chats database which is the source of truth
 * Splitting the different responsibilities between separate services allows for independent scaling
 * The services use dynamic configuration which is updated centrally
 * Observability is achieved via health checks, distributed tracing, log aggregation and metrics with monitoring
@@ -21,7 +21,7 @@
 More details on the design of each aspect:
 
 * [Messaging](design-messaging.md)
-* [User chats, chat history](design-state-history.md)
+* [Chats](design-chats.md)
 * [User profiles and connections](design-users.md)
 * [Clients](design-clients.md)
 * [Configuration](design-configuration.md)

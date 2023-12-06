@@ -5,18 +5,18 @@ Make sure that the [prerequisites](dev-run-prerequisites.md) have been met befor
 # Instances
 
 * Integration
-  - Kafka - 1 Zookeeper, 2 brokers, 1 Kafdrop (separate)
+  - Kafka - 1 Zookeeper, 2 brokers
 * Data storage
-  - YugabyteDB - 1 master, 1 tserver, local pgAdmin is needed for management
-  - Cassandra - 2 nodes, 1 Cassandra Web (separate)
-  - Redis - 3 masters, 1 Redis Commander (separate)
+  - YugabyteDB - 1 master, 1 tserver
+  - Cassandra - 2 nodes
+  - Redis - 3 masters
 * Observability
   - Telemetry - 1 OTel collector
   - Tracing - 1 Jaeger all-in-one
   - Metrics - 1 Prometheus, 1 cAdvisor, 1 Grafana
-  - Logging - 1 ElasticSearch, 1 Fluentd, 1 Kibana
+  - Logging - 1 ElasticSearch, 1 Kibana
 * CecoChat
-  - BFF branch - 1 BFF, 1 User, 1 State, 1 History
+  - BFF branch - 1 BFF, 1 User, 1 Chats
   - Messaging branch - 2 Messaging, 1 IDGen
 
 # Manual setup
@@ -47,7 +47,7 @@ The convenience of `docker compose` makes it possible to run exactly what is nee
   - Run the IDGen service from the IDE
   - `docker compose -f redis.yml up -d`
   - `docker compose -f kafka.yml up -d`
-* Working on State/History service:
+* Working on Chats service:
   - `docker compose -f redis.yml up -d`
   - `docker compose -f kafka.yml up -d`
   - `docker compose -f cassandra.yml up -d`

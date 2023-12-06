@@ -7,15 +7,15 @@ Make sure that the [prerequisites](dev-run-prerequisites.md) have been met befor
 * Integration
   - Kafka - 2 Zookeepers, 2 brokers
 * Data storage
-  - YugabyteDB - 2 masters, 2 tservers, local pgAdmin is needed for management
+  - YugabyteDB - 2 masters, 2 tservers
   - Cassandra - 2 nodes
   - Redis - 3 masters
 * Observability
-  - Telemetry - 1 OTel collector
+  - Telemetry - 2 OTel collector
   - Tracing - 1 Jaeger all-in-one
   - Logging - 1 ElasticSearch, 1 Kibana
 * CecoChat
-  - BFF branch - 2 BFF, 2 User, 2 State, 2 History
+  - BFF branch - 2 BFF, 2 User, 2 Chats
   - Messaging branch - 2 Messaging, 2 IDGen
 
 ## Tools
@@ -112,12 +112,11 @@ NAME     	NAMESPACE	REVISION	UPDATED                                	STATUS  	CH
 backplane	cecochat 	1       	2023-12-04 18:09:22.658051056 +0200 EET	deployed	backplane-0.1.0	0.1.0      
 bff      	cecochat 	1       	2023-12-04 18:21:25.699465741 +0200 EET	deployed	bff-0.1.0      	0.1.0      
 cassandra	cecochat 	1       	2023-12-04 18:09:22.900641214 +0200 EET	deployed	cassandra-0.1.0	0.1.0      
-history  	cecochat 	1       	2023-12-04 18:19:07.051280032 +0200 EET	deployed	history-0.1.0  	0.1.0      
+chats   	cecochat 	1       	2023-12-04 18:19:07.051280032 +0200 EET	deployed	chats-0.1.0  	0.1.0      
 idgen    	cecochat 	1       	2023-12-04 18:14:52.595844209 +0200 EET	deployed	idgen-0.1.0    	0.1.0      
 logging  	cecochat 	1       	2023-12-04 18:11:35.508839327 +0200 EET	deployed	logging-0.1.0  	0.1.0      
 messaging	cecochat 	1       	2023-12-04 18:22:32.64885057 +0200 EET 	deployed	messaging-0.1.0	0.1.0      
 redis    	cecochat 	1       	2023-12-04 18:09:22.333514145 +0200 EET	deployed	redis-0.1.0    	0.1.0      
-state    	cecochat 	1       	2023-12-04 18:18:55.984341845 +0200 EET	deployed	state-0.1.0    	0.1.0      
 telemetry	cecochat 	1       	2023-12-04 18:13:05.904910673 +0200 EET	deployed	telemetry-0.1.0	0.1.0      
 tracing  	cecochat 	1       	2023-12-04 18:09:30.784510949 +0200 EET	deployed	tracing-0.1.0  	0.1.0      
 user     	cecochat 	1       	2023-12-04 18:15:07.401506135 +0200 EET	deployed	user-0.1.0     	0.1.0      
@@ -135,8 +134,8 @@ bff-767787c978-9g8xl                        1/1     Running   0             7m59
 bff-767787c978-gclk9                        1/1     Running   0             7m59s
 cassandra-0                                 1/1     Running   0             20m
 cassandra-1                                 1/1     Running   0             20m
-history-685876fb4f-2zq99                    1/1     Running   0             10m
-history-685876fb4f-b2twz                    1/1     Running   0             10m
+chats-685876fb4f-2zq99                      1/1     Running   0             10m
+chats-685876fb4f-b2twz                      1/1     Running   0             10m
 idgen-0                                     1/1     Running   0             14m
 idgen-1                                     1/1     Running   0             14m
 logging-es-0                                1/1     Running   0             17m
@@ -146,8 +145,6 @@ messaging-1                                 1/1     Running   0             6m52
 redis-0                                     1/1     Running   0             20m
 redis-1                                     1/1     Running   0             20m
 redis-2                                     1/1     Running   0             20m
-state-5bb85d4cb7-xk5zk                      1/1     Running   0             10m
-state-5bb85d4cb7-zgdzs                      1/1     Running   0             10m
 telemetry-otel-collector-6954b7b587-2mfkf   1/1     Running   0             16m
 telemetry-otel-collector-6954b7b587-6xf6p   1/1     Running   0             16m
 tracing-jaeger-0                            1/1     Running   0             19m
@@ -166,7 +163,7 @@ backplane-kafka            ClusterIP   None             <none>        9092/TCP  
 backplane-zk               ClusterIP   None             <none>        2181/TCP,2888/TCP,3888/TCP,8080/TCP   20m
 bff                        ClusterIP   10.100.214.108   <none>        443/TCP                               8m16s
 cassandra                  ClusterIP   None             <none>        9042/TCP                              20m
-history                    ClusterIP   10.104.95.42     <none>        443/TCP                               10m
+chats                      ClusterIP   10.104.95.42     <none>        443/TCP                               10m
 idgen                      ClusterIP   None             <none>        443/TCP                               14m
 logging-es                 ClusterIP   None             <none>        9200/TCP                              18m
 logging-kibana             ClusterIP   None             <none>        5601/TCP                              18m
@@ -174,7 +171,6 @@ messaging                  ClusterIP   None             <none>        443/TCP   
 messaging-0                ClusterIP   10.110.160.166   <none>        443/TCP                               7m9s
 messaging-1                ClusterIP   10.110.226.223   <none>        443/TCP                               7m9s
 redis                      ClusterIP   None             <none>        6379/TCP                              20m
-state                      ClusterIP   10.103.250.62    <none>        443/TCP                               10m
 telemetry-otel-collector   ClusterIP   10.103.130.30    <none>        4317/TCP                              16m
 tracing-jaeger             ClusterIP   None             <none>        4317/TCP,5778/TCP,16686/TCP           20m
 user                       ClusterIP   10.98.228.227    <none>        443/TCP                               14m
@@ -186,8 +182,7 @@ yb-tserver                 ClusterIP   None             <none>        5433/TCP,9
 $ kubectl get deployments
 NAME                       READY   UP-TO-DATE   AVAILABLE   AGE
 bff                        2/2     2            2           8m31s
-history                    2/2     2            2           10m
-state                      2/2     2            2           11m
+chats                      2/2     2            2           10m
 telemetry-otel-collector   2/2     2            2           16m
 user                       2/2     2            2           14m
 ```
@@ -196,8 +191,7 @@ user                       2/2     2            2           14m
 $ kubectl get replicasets
 NAME                                  DESIRED   CURRENT   READY   AGE
 bff-767787c978                        2         2         2       8m48s
-history-685876fb4f                    2         2         2       11m
-state-5bb85d4cb7                      2         2         2       11m
+chats-685876fb4f                      2         2         2       11m
 telemetry-otel-collector-6954b7b587   2         2         2       17m
 user-7f48d9b4d4                       2         2         2       15m
 ```

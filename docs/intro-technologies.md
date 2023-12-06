@@ -75,11 +75,11 @@ User cache is based on Redis:
 * lightweight and performant
 * easy to use and manage
 
-# State and History databases
+# Chats database
 
 ![Cassandra](tech-images/cassandra.png)
 
-State and history are based on Cassandra:
+Chats database is based on Cassandra:
 * open-source software backed by DataStax
 * linearly scalable
 * distributed with auto-partitioning and auto-replication
