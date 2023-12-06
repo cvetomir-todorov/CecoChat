@@ -1,6 +1,6 @@
 # Observability
 
-![Observability](images/cecochat-10-observability.png)
+![Observability](images/cecochat-observability.png)
 
 ## Health
 

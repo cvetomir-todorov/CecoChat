@@ -1,6 +1,6 @@
 # Chats design
 
-![Chats](images/cecochat-04-chats.png)
+![Chats](images/cecochat-chats.png)
 
 # User chats
 

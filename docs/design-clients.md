@@ -1,6 +1,6 @@
 # Clients
 
-![Clients](images/cecochat-05-clients.png)
+![Clients](images/cecochat-clients.png)
 
 Clients use the BFF for the following operations:
 * Register a new account by providing credentials and profile data.

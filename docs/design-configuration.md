@@ -14,7 +14,7 @@ In the future a UI-supported Configurator service should allow changing the conf
 
 ## Design
 
-![Configuration](images/cecochat-06-configuration.png)
+![Configuration](images/cecochat-configuration.png)
 
 The configuration database stores information related to server partition assignment. Each messaging server is assigned a server ID. The configuration database stores the address and partitions for each server ID. It is used by:
 

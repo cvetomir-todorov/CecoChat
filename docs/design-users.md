@@ -1,6 +1,6 @@
 # Users
 
-![Users](images/cecochat-09-users.png)
+![Users](images/cecochat-users.png)
 
 ## Registration and authentication
 
