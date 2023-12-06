@@ -43,10 +43,10 @@ jobs:
     - name: Chats image
       uses: docker/build-push-action@v2
       with:
-        file: package/cecochat/state.dockerfile
+        file: package/cecochat/chats.dockerfile
         context: ./source
         push: true
-        tags: cvetomirtodorov/cecochat-state:0.1
+        tags: cvetomirtodorov/cecochat-chats:0.1
 
     - name: IDGen image
       uses: docker/build-push-action@v2
