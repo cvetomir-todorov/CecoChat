@@ -1,0 +1,47 @@
+<mxfile host="Electron" modified="2023-12-05T19:43:03.532Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.1.2 Chrome/114.0.5735.289 Electron/25.9.4 Safari/537.36" etag="6prQyQir0UeW-BsoM8uz" version="22.1.2" type="device">
+  <diagram id="G4t1x3i_cumIOjZ8GDXV" name="Page-1">
+    <mxGraphModel dx="2020" dy="1203" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="4NMri5ObQx2eB0Vx6lmc-16" value="PUB messages and reactions" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;startArrow=none;startFill=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" parent="1" source="4NMri5ObQx2eB0Vx6lmc-4" target="4NMri5ObQx2eB0Vx6lmc-9" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="4NMri5ObQx2eB0Vx6lmc-4" value="&lt;font style=&quot;font-size: 12px&quot;&gt;Messaging&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;gradientColor=#ffa500;fillColor=#ffcd28;strokeColor=#d79b00;" parent="1" vertex="1">
+          <mxGeometry x="40" y="190" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Gfm62hS2zhEuvZ2v64Gk-10" value="Process messages into chat state&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Process messages and reactions into history" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;exitPerimeter=0;" parent="1" source="4NMri5ObQx2eB0Vx6lmc-9" target="ENQS6q1PjWJlhAXhEhIM-1" edge="1">
+          <mxGeometry x="-0.0256" relative="1" as="geometry">
+            <mxPoint as="offset" />
+            <Array as="points">
+              <mxPoint x="640" y="150" />
+              <mxPoint x="340" y="150" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="4NMri5ObQx2eB0Vx6lmc-9" value="PUB/SUB&lt;br&gt;backplane" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.direct_data;whiteSpace=wrap;gradientColor=#97d077;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="580" y="180" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="4NMri5ObQx2eB0Vx6lmc-20" value="Chats DB" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;gradientColor=#7ea6e0;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+          <mxGeometry x="580" y="40" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="4NMri5ObQx2eB0Vx6lmc-25" value="&lt;font style=&quot;font-size: 11px&quot;&gt;Get user chats&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Update user chats&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Get chat history&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Persist messages&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Persist reactions&lt;br&gt;&lt;/font&gt;" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;startArrow=none;startFill=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" parent="1" source="ENQS6q1PjWJlhAXhEhIM-1" target="4NMri5ObQx2eB0Vx6lmc-20" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="230" y="105" as="sourcePoint" />
+            <mxPoint x="460" y="250" as="targetPoint" />
+            <mxPoint as="offset" />
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="ENQS6q1PjWJlhAXhEhIM-1" value="&lt;font style=&quot;font-size: 12px&quot;&gt;Chats&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;gradientColor=#ffa500;fillColor=#ffcd28;strokeColor=#d79b00;" parent="1" vertex="1">
+          <mxGeometry x="280" y="50" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="O6rn1H-LB7xjsB4d8Ak8-1" value="Chats service is consuming&lt;br&gt;data from the PUB/SUB backplane:&lt;br&gt;- It is updating the user chats based on the incoming messages&lt;br&gt;- It is persisting new messages and reactions as chat history" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;align=left;gradientColor=#b3b3b3;fillColor=#f5f5f5;strokeColor=#666666;" parent="1" vertex="1">
+          <mxGeometry x="40" y="40" width="180" height="130" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
