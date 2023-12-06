@@ -10,18 +10,18 @@ internal sealed class PartitioningConfig : IPartitioningConfig
 {
     private readonly ILogger _logger;
     private readonly IRedisContext _redisContext;
-    private readonly IPartitioningConfigRepo _repo;
+    private readonly IPartitioningRepo _repo;
     private readonly IConfigUtility _configUtility;
     private readonly IEventSource<PartitionsChangedEventData> _partitionsChanged;
 
     private PartitioningConfigUsage? _usage;
-    private PartitioningConfigValidator? _validator;
-    private PartitioningConfigValues? _values;
+    private PartitioningValidator? _validator;
+    private PartitioningValues? _values;
 
     public PartitioningConfig(
         ILogger<PartitioningConfig> logger,
         IRedisContext redisContext,
-        IPartitioningConfigRepo repo,
+        IPartitioningRepo repo,
         IConfigUtility configUtility,
         IEventSource<PartitionsChangedEventData> partitionsChanged)
     {
@@ -79,7 +79,7 @@ internal sealed class PartitioningConfig : IPartitioningConfig
         try
         {
             _usage = usage;
-            _validator = new PartitioningConfigValidator(usage);
+            _validator = new PartitioningValidator(usage);
             await SubscribeForChanges(usage);
             await LoadValidateValues(usage);
         }
@@ -128,7 +128,7 @@ internal sealed class PartitioningConfig : IPartitioningConfig
 
         if (!string.IsNullOrWhiteSpace(_usage.ServerToWatch))
         {
-            PartitioningConfigValues values = _values!;
+            PartitioningValues values = _values!;
             if (values.ServerPartitionMap.TryGetValue(_usage.ServerToWatch, out PartitionRange partitions))
             {
                 PartitionsChangedEventData eventData = new()
@@ -146,7 +146,7 @@ internal sealed class PartitioningConfig : IPartitioningConfig
         }
         else
         {
-            PartitioningConfigValues values = _values!;
+            PartitioningValues values = _values!;
             PartitionsChangedEventData eventData = new()
             {
                 PartitionCount = values.PartitionCount,
@@ -171,7 +171,7 @@ internal sealed class PartitioningConfig : IPartitioningConfig
     {
         EnsureInitialized();
 
-        PartitioningConfigValues values = await _repo.GetValues(usage);
+        PartitioningValues values = await _repo.GetValues(usage);
         _logger.LogInformation("Loading partitioning configuration succeeded");
 
         bool areValid = _configUtility.ValidateValues("partitioning", values, _validator!);
@@ -184,7 +184,7 @@ internal sealed class PartitioningConfig : IPartitioningConfig
         return areValid;
     }
 
-    private void PrintValues(PartitioningConfigUsage usage, PartitioningConfigValues values)
+    private void PrintValues(PartitioningConfigUsage usage, PartitioningValues values)
     {
         _logger.LogInformation("Partition count set to {PartitionCount}", values.PartitionCount);
 

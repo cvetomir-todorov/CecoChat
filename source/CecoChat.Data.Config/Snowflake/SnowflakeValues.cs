@@ -1,8 +1,8 @@
 namespace CecoChat.Data.Config.Snowflake;
 
-internal sealed class SnowflakeConfigValues
+internal sealed class SnowflakeValues
 {
-    public SnowflakeConfigValues()
+    public SnowflakeValues()
     {
         GeneratorIds = new Dictionary<string, List<short>>();
     }

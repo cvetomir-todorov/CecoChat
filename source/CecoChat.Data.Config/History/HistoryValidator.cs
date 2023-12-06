@@ -2,9 +2,9 @@
 
 namespace CecoChat.Data.Config.History;
 
-internal sealed class HistoryConfigValidator : AbstractValidator<HistoryConfigValues>
+internal sealed class HistoryValidator : AbstractValidator<HistoryValues>
 {
-    public HistoryConfigValidator(HistoryConfigUsage usage)
+    public HistoryValidator(HistoryConfigUsage usage)
     {
         if (usage.UseMessageCount)
         {

@@ -5,27 +5,27 @@ using StackExchange.Redis;
 
 namespace CecoChat.Data.Config.Partitioning;
 
-internal interface IPartitioningConfigRepo
+internal interface IPartitioningRepo
 {
-    Task<PartitioningConfigValues> GetValues(PartitioningConfigUsage usage);
+    Task<PartitioningValues> GetValues(PartitioningConfigUsage usage);
 }
 
-internal sealed class PartitioningConfigRepo : IPartitioningConfigRepo
+internal sealed class PartitioningRepo : IPartitioningRepo
 {
     private readonly ILogger _logger;
     private readonly IRedisContext _redisContext;
 
-    public PartitioningConfigRepo(
-        ILogger<PartitioningConfigRepo> logger,
+    public PartitioningRepo(
+        ILogger<PartitioningRepo> logger,
         IRedisContext redisContext)
     {
         _logger = logger;
         _redisContext = redisContext;
     }
 
-    public async Task<PartitioningConfigValues> GetValues(PartitioningConfigUsage usage)
+    public async Task<PartitioningValues> GetValues(PartitioningConfigUsage usage)
     {
-        PartitioningConfigValues values = new();
+        PartitioningValues values = new();
 
         values.PartitionCount = await GetPartitionCount();
         await GetPartitions(usage, values);
@@ -42,7 +42,7 @@ internal sealed class PartitioningConfigRepo : IPartitioningConfigRepo
         return partitionCount;
     }
 
-    private async Task GetPartitions(PartitioningConfigUsage usage, PartitioningConfigValues values)
+    private async Task GetPartitions(PartitioningConfigUsage usage, PartitioningValues values)
     {
         if (!usage.UsePartitions && !usage.UseAddresses)
         {
@@ -75,7 +75,7 @@ internal sealed class PartitioningConfigRepo : IPartitioningConfigRepo
         }
     }
 
-    private async Task GetAddresses(PartitioningConfigUsage usage, PartitioningConfigValues values)
+    private async Task GetAddresses(PartitioningConfigUsage usage, PartitioningValues values)
     {
         if (!usage.UseAddresses)
         {
