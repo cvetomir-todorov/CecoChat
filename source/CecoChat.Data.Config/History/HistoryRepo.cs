@@ -5,7 +5,7 @@ namespace CecoChat.Data.Config.History;
 
 internal interface IHistoryRepo
 {
-    Task<HistoryValues> GetValues(HistoryConfigUsage usage);
+    Task<HistoryValues> GetValues();
 }
 
 internal sealed class HistoryRepo : IHistoryRepo
@@ -18,14 +18,11 @@ internal sealed class HistoryRepo : IHistoryRepo
         _redisContext = redisContext;
     }
 
-    public async Task<HistoryValues> GetValues(HistoryConfigUsage usage)
+    public async Task<HistoryValues> GetValues()
     {
         HistoryValues values = new();
 
-        if (usage.UseMessageCount)
-        {
-            values.MessageCount = await GetMessageCount();
-        }
+        values.MessageCount = await GetMessageCount();
 
         return values;
     }

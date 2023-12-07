@@ -17,11 +17,7 @@ public sealed class InitDynamicConfig : IHostedService
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        await _historyConfig.Initialize(new HistoryConfigUsage
-        {
-            UseMessageCount = true
-        });
-
+        await _historyConfig.Initialize();
         _configDbInitHealthCheck.IsReady = true;
     }
 
