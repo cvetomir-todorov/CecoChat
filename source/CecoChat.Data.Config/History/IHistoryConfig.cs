@@ -2,7 +2,7 @@
 
 public interface IHistoryConfig
 {
-    Task Initialize();
+    Task<bool> Initialize();
 
     int MessageCount { get; }
 }
