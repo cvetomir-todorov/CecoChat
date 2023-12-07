@@ -24,7 +24,7 @@ public class SessionController : ControllerBase
     private readonly ILogger _logger;
     private readonly IMapper _mapper;
     private readonly IAuthClient _authClient;
-    private readonly IPartitionUtility _partitionUtility;
+    private readonly IPartitioner _partitioner;
     private readonly IPartitioningConfig _partitioningConfig;
     private readonly JwtOptions _jwtOptions;
     private readonly IClock _clock;
@@ -37,7 +37,7 @@ public class SessionController : ControllerBase
         IAuthClient authClient,
         IOptions<JwtOptions> jwtOptions,
         IClock clock,
-        IPartitionUtility partitionUtility,
+        IPartitioner partitioner,
         IPartitioningConfig partitioningConfig)
     {
         _logger = logger;
@@ -45,7 +45,7 @@ public class SessionController : ControllerBase
         _authClient = authClient;
         _jwtOptions = jwtOptions.Value;
         _clock = clock;
-        _partitionUtility = partitionUtility;
+        _partitioner = partitioner;
         _partitioningConfig = partitioningConfig;
 
         byte[] secret = Encoding.UTF8.GetBytes(_jwtOptions.Secret);
@@ -78,7 +78,7 @@ public class SessionController : ControllerBase
         _logger.LogTrace("User {UserId} named {UserName} authenticated and assigned client ID {ClientId}",
             authenticateResult.Profile.UserId, authenticateResult.Profile.UserName, clientId);
 
-        int partition = _partitionUtility.ChoosePartition(authenticateResult.Profile.UserId, _partitioningConfig.PartitionCount);
+        int partition = _partitioner.ChoosePartition(authenticateResult.Profile.UserId, _partitioningConfig.PartitionCount);
         string messagingServerAddress = _partitioningConfig.GetAddress(partition);
         _logger.LogTrace("User {UserId} named {UserName} assigned to partition {Partition} and messaging server {MessagingServer}",
             authenticateResult.Profile.UserId, authenticateResult.Profile.UserName, partition, messagingServerAddress);

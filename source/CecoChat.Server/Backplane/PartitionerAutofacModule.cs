@@ -3,13 +3,13 @@ using CecoChat.Autofac;
 
 namespace CecoChat.Server.Backplane;
 
-public sealed class PartitionUtilityAutofacModule : Module
+public sealed class PartitionerAutofacModule : Module
 {
     protected override void Load(ContainerBuilder builder)
     {
-        string hashName = $"{nameof(PartitionUtility)}.{nameof(INonCryptoHash)}";
+        string hashName = $"{nameof(Partitioner)}.{nameof(INonCryptoHash)}";
 
-        builder.RegisterType<PartitionUtility>().As<IPartitionUtility>()
+        builder.RegisterType<Partitioner>().As<IPartitioner>()
             .WithNamedParameter(typeof(INonCryptoHash), hashName)
             .SingleInstance();
         builder.RegisterType<FnvHash>().Named<INonCryptoHash>(hashName).SingleInstance();

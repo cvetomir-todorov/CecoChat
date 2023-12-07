@@ -1,15 +1,15 @@
 ﻿namespace CecoChat.Server.Backplane;
 
-public interface IPartitionUtility
+public interface IPartitioner
 {
     int ChoosePartition(long userId, int partitionCount);
 }
 
-public sealed class PartitionUtility : IPartitionUtility
+public sealed class Partitioner : IPartitioner
 {
     private readonly INonCryptoHash _hash;
 
-    public PartitionUtility(
+    public Partitioner(
         INonCryptoHash hash)
     {
         _hash = hash;

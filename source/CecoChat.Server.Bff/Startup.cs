@@ -146,7 +146,7 @@ public class Startup : StartupBase
         builder.RegisterModule(new ConfigDbAutofacModule(configDbConfig, registerPartitioning: true));
 
         // backplane
-        builder.RegisterModule(new PartitionUtilityAutofacModule());
+        builder.RegisterModule(new PartitionerAutofacModule());
 
         // downstream services
         IConfiguration chatsClientConfig = Configuration.GetSection("ChatsClient");
