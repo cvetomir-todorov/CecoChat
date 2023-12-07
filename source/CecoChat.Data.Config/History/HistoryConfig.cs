@@ -35,17 +35,20 @@ internal sealed class HistoryConfig : IHistoryConfig
         }
     }
 
-    public async Task Initialize()
+    public async Task<bool> Initialize()
     {
         try
         {
             _validator = new HistoryValidator();
             await SubscribeForChanges();
-            await LoadValidateValues();
+            bool areValid = await LoadValidateValues();
+
+            return areValid;
         }
         catch (Exception exception)
         {
             _logger.LogError(exception, "Initializing history configuration failed");
+            return false;
         }
     }
 
@@ -62,22 +65,24 @@ internal sealed class HistoryConfig : IHistoryConfig
     private async Task HandleMessageCount(ChannelMessage _)
     {
         EnsureInitialized();
-
         await LoadValidateValues();
     }
 
-    private async Task LoadValidateValues()
+    private async Task<bool> LoadValidateValues()
     {
         EnsureInitialized();
 
         HistoryValues values = await _repo.GetValues();
         _logger.LogInformation("Loading history configuration succeeded");
 
-        if (_configUtility.ValidateValues("history", values, _validator!))
+        bool areValid = _configUtility.ValidateValues("history", values, _validator!);
+        if (areValid)
         {
             _values = values;
             PrintValues(values);
         }
+
+        return areValid;
     }
 
     private void PrintValues(HistoryValues values)
