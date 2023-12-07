@@ -25,11 +25,7 @@ public sealed class InitDynamicConfig : IHostedService
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         _logger.LogInformation("Configured server ID is {ServerId}", _configOptions.ServerId);
-
-        _configDbInitHealthCheck.IsReady = await _partitioningConfig.Initialize(new PartitioningConfigUsage
-        {
-            ServerToWatch = _configOptions.ServerId
-        });
+        _configDbInitHealthCheck.IsReady = await _partitioningConfig.Initialize();
     }
 
     public Task StopAsync(CancellationToken cancellationToken)

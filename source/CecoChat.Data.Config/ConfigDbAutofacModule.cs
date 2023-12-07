@@ -58,7 +58,7 @@ public sealed class ConfigDbAutofacModule : Module
                 .As<IPartitioningRepo>()
                 .WithNamedParameter(typeof(IRedisContext), RedisContextName)
                 .SingleInstance();
-            builder.RegisterSingletonEvent<EventSource<PartitionsChangedEventData>, PartitionsChangedEventData>();
+            builder.RegisterSingletonEvent<EventSource<EventArgs>, EventArgs>();
         }
         if (_registerSnowflake)
         {
