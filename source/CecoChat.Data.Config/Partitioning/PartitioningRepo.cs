@@ -7,7 +7,7 @@ namespace CecoChat.Data.Config.Partitioning;
 
 internal interface IPartitioningRepo
 {
-    Task<PartitioningValues> GetValues(PartitioningConfigUsage usage);
+    Task<PartitioningValues> GetValues();
 }
 
 internal sealed class PartitioningRepo : IPartitioningRepo
@@ -23,13 +23,13 @@ internal sealed class PartitioningRepo : IPartitioningRepo
         _redisContext = redisContext;
     }
 
-    public async Task<PartitioningValues> GetValues(PartitioningConfigUsage usage)
+    public async Task<PartitioningValues> GetValues()
     {
         PartitioningValues values = new();
 
         values.PartitionCount = await GetPartitionCount();
-        await GetPartitions(usage, values);
-        await GetAddresses(usage, values);
+        await GetPartitions(values);
+        await GetAddresses(values);
 
         return values;
     }
@@ -42,13 +42,8 @@ internal sealed class PartitioningRepo : IPartitioningRepo
         return partitionCount;
     }
 
-    private async Task GetPartitions(PartitioningConfigUsage usage, PartitioningValues values)
+    private async Task GetPartitions(PartitioningValues values)
     {
-        if (!usage.UsePartitions && !usage.UseAddresses)
-        {
-            return;
-        }
-
         IDatabase database = _redisContext.GetDatabase();
         HashEntry[] pairs = await database.HashGetAllAsync(PartitioningKeys.Partitions);
 
@@ -75,13 +70,8 @@ internal sealed class PartitioningRepo : IPartitioningRepo
         }
     }
 
-    private async Task GetAddresses(PartitioningConfigUsage usage, PartitioningValues values)
+    private async Task GetAddresses(PartitioningValues values)
     {
-        if (!usage.UseAddresses)
-        {
-            return;
-        }
-
         IDatabase database = _redisContext.GetDatabase();
         HashEntry[] pairs = await database.HashGetAllAsync(PartitioningKeys.Addresses);
 

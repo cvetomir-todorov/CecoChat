@@ -8,19 +8,12 @@ internal sealed class PartitioningValidator : AbstractValidator<PartitioningValu
     private const int PartitionCountMin = 2;
     private const int PartitionCountMax = 10000;
 
-    public PartitioningValidator(PartitioningConfigUsage usage)
+    public PartitioningValidator()
     {
         RuleFor(x => x.PartitionCount).InclusiveBetween(from: PartitionCountMin, to: PartitionCountMax);
         RuleFor(x => x.PartitionServerMap).Custom(ValidatePartitionServerMap);
-
-        if (usage.UsePartitions || usage.UseAddresses)
-        {
-            RuleFor(x => x.ServerPartitionMap).Custom(ValidateServerPartitionMap);
-        }
-        if (usage.UseAddresses)
-        {
-            RuleFor(x => x.ServerAddressMap).Custom(ValidateServerAddressMap);
-        }
+        RuleFor(x => x.ServerPartitionMap).Custom(ValidateServerPartitionMap);
+        RuleFor(x => x.ServerAddressMap).Custom(ValidateServerAddressMap);
     }
 
     private static void ValidatePartitionServerMap(IDictionary<int, string> partitionServerMap, ValidationContext<PartitioningValues> context)

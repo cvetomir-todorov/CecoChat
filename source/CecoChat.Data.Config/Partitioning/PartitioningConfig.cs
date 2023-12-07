@@ -79,9 +79,9 @@ internal sealed class PartitioningConfig : IPartitioningConfig
         try
         {
             _usage = usage;
-            _validator = new PartitioningValidator(usage);
-            await SubscribeForChanges(usage);
-            await LoadValidateValues(usage);
+            _validator = new PartitioningValidator();
+            await SubscribeForChanges();
+            await LoadValidateValues();
         }
         catch (Exception exception)
         {
@@ -89,44 +89,34 @@ internal sealed class PartitioningConfig : IPartitioningConfig
         }
     }
 
-    private async Task SubscribeForChanges(PartitioningConfigUsage usage)
+    private async Task SubscribeForChanges()
     {
         ISubscriber subscriber = _redisContext.GetSubscriber();
 
-        if (usage.UsePartitions || usage.UseAddresses)
-        {
-            RedisChannel channel = new($"notify:{PartitioningKeys.Partitions}", RedisChannel.PatternMode.Literal);
-            ChannelMessageQueue messageQueue = await subscriber.SubscribeAsync(channel);
-            messageQueue.OnMessage(channelMessage => _configUtility.HandleChange(channelMessage, HandlePartitions));
-            _logger.LogInformation("Subscribed for changes about {PartitionCount}, {ServerPartitions} from channel {Channel}",
-                PartitioningKeys.PartitionCount, PartitioningKeys.Partitions, messageQueue.Channel);
-        }
-        if (usage.UseAddresses)
-        {
-            RedisChannel channel = new($"notify:{PartitioningKeys.Addresses}", RedisChannel.PatternMode.Literal);
-            ChannelMessageQueue messageQueue = await subscriber.SubscribeAsync(channel);
-            messageQueue.OnMessage(channelMessage => _configUtility.HandleChange(channelMessage, HandleAddresses));
-            _logger.LogInformation("Subscribed for changes about {ServerAddresses} from channel {Channel}",
-                PartitioningKeys.Addresses, messageQueue.Channel);
-        }
+        RedisChannel partitionsChannel = new($"notify:{PartitioningKeys.Partitions}", RedisChannel.PatternMode.Literal);
+        ChannelMessageQueue partitionsMessageQueue = await subscriber.SubscribeAsync(partitionsChannel);
+        partitionsMessageQueue.OnMessage(channelMessage => _configUtility.HandleChange(channelMessage, HandlePartitions));
+        _logger.LogInformation("Subscribed for changes about {PartitionCount}, {ServerPartitions} from channel {Channel}",
+            PartitioningKeys.PartitionCount, PartitioningKeys.Partitions, partitionsMessageQueue.Channel);
+
+        RedisChannel addressesChannel = new($"notify:{PartitioningKeys.Addresses}", RedisChannel.PatternMode.Literal);
+        ChannelMessageQueue addressesMessageQueue = await subscriber.SubscribeAsync(addressesChannel);
+        addressesMessageQueue.OnMessage(channelMessage => _configUtility.HandleChange(channelMessage, HandleAddresses));
+        _logger.LogInformation("Subscribed for changes about {ServerAddresses} from channel {Channel}",
+            PartitioningKeys.Addresses, addressesMessageQueue.Channel);
     }
 
     private async Task HandlePartitions(ChannelMessage _)
     {
         EnsureInitialized();
 
-        if (!_usage!.UsePartitions && !_usage.UseAddresses)
-        {
-            return;
-        }
-
-        bool areValid = await LoadValidateValues(_usage);
+        bool areValid = await LoadValidateValues();
         if (!areValid)
         {
             return;
         }
 
-        if (!string.IsNullOrWhiteSpace(_usage.ServerToWatch))
+        if (!string.IsNullOrWhiteSpace(_usage!.ServerToWatch))
         {
             PartitioningValues values = _values!;
             if (values.ServerPartitionMap.TryGetValue(_usage.ServerToWatch, out PartitionRange partitions))
@@ -160,51 +150,42 @@ internal sealed class PartitioningConfig : IPartitioningConfig
     private async Task HandleAddresses(ChannelMessage _)
     {
         EnsureInitialized();
-
-        if (_usage!.UseAddresses)
-        {
-            await LoadValidateValues(_usage);
-        }
+        await LoadValidateValues();
     }
 
-    private async Task<bool> LoadValidateValues(PartitioningConfigUsage usage)
+    private async Task<bool> LoadValidateValues()
     {
         EnsureInitialized();
 
-        PartitioningValues values = await _repo.GetValues(usage);
+        PartitioningValues values = await _repo.GetValues();
         _logger.LogInformation("Loading partitioning configuration succeeded");
 
         bool areValid = _configUtility.ValidateValues("partitioning", values, _validator!);
         if (areValid)
         {
             _values = values;
-            PrintValues(usage, values);
+            PrintValues(values);
         }
 
         return areValid;
     }
 
-    private void PrintValues(PartitioningConfigUsage usage, PartitioningValues values)
+    private void PrintValues(PartitioningValues values)
     {
         _logger.LogInformation("Partition count set to {PartitionCount}", values.PartitionCount);
 
-        if (usage.UsePartitions || usage.UseAddresses)
+        foreach (KeyValuePair<string, PartitionRange> pair in values.ServerPartitionMap)
         {
-            foreach (KeyValuePair<string, PartitionRange> pair in values.ServerPartitionMap)
-            {
-                string server = pair.Key;
-                PartitionRange partitions = pair.Value;
-                _logger.LogInformation("Partitions {Partitions} are assigned to server {Server}", partitions, server);
-            }
+            string server = pair.Key;
+            PartitionRange partitions = pair.Value;
+            _logger.LogInformation("Partitions {Partitions} are assigned to server {Server}", partitions, server);
         }
-        if (usage.UseAddresses)
+
+        foreach (KeyValuePair<string, string> pair in values.ServerAddressMap)
         {
-            foreach (KeyValuePair<string, string> pair in values.ServerAddressMap)
-            {
-                string server = pair.Key;
-                string address = pair.Value;
-                _logger.LogInformation("Address {Address} is assigned to server {Server}", address, server);
-            }
+            string server = pair.Key;
+            string address = pair.Value;
+            _logger.LogInformation("Address {Address} is assigned to server {Server}", address, server);
         }
     }
 
