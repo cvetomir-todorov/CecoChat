@@ -21,7 +21,7 @@ public sealed class SendersProducer : ISendersProducer
 {
     private readonly ILogger _logger;
     private readonly BackplaneOptions _backplaneOptions;
-    private readonly IPartitionUtility _partitionUtility;
+    private readonly IPartitioner _partitioner;
     private readonly ITopicPartitionFlyweight _partitionFlyweight;
     private readonly IKafkaProducer<Null, BackplaneMessage> _producer;
     private readonly IClientContainer _clientContainer;
@@ -31,7 +31,7 @@ public sealed class SendersProducer : ISendersProducer
         ILogger<SendersProducer> logger,
         IOptions<BackplaneOptions> backplaneOptions,
         IHostApplicationLifetime applicationLifetime,
-        IPartitionUtility partitionUtility,
+        IPartitioner partitioner,
         ITopicPartitionFlyweight partitionFlyweight,
         IFactory<IKafkaProducer<Null, BackplaneMessage>> producerFactory,
         IClientContainer clientContainer,
@@ -39,7 +39,7 @@ public sealed class SendersProducer : ISendersProducer
     {
         _logger = logger;
         _backplaneOptions = backplaneOptions.Value;
-        _partitionUtility = partitionUtility;
+        _partitioner = partitioner;
         _partitionFlyweight = partitionFlyweight;
         _producer = producerFactory.Create();
         _clientContainer = clientContainer;
@@ -58,7 +58,7 @@ public sealed class SendersProducer : ISendersProducer
 
     public void ProduceMessage(BackplaneMessage message)
     {
-        int partition = _partitionUtility.ChoosePartition(message.TargetUserId, PartitionCount);
+        int partition = _partitioner.ChoosePartition(message.TargetUserId, PartitionCount);
         TopicPartition topicPartition = _partitionFlyweight.GetTopicPartition(_backplaneOptions.TopicMessagesByReceiver, partition);
         Message<Null, BackplaneMessage> kafkaMessage = new() { Value = message };
 

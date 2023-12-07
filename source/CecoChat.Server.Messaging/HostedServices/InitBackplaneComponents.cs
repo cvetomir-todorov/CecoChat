@@ -15,7 +15,7 @@ public sealed class InitBackplaneComponents : IHostedService, ISubscriber<Partit
     private readonly ConfigOptions _configOptions;
     private readonly IBackplaneComponents _backplaneComponents;
     private readonly IPartitioningConfig _partitioningConfig;
-    private readonly IPartitionUtility _partitionUtility;
+    private readonly IPartitioner _partitioner;
     private readonly IClientContainer _clientContainer;
     private readonly IEvent<PartitionsChangedEventData> _partitionsChanged;
     private readonly Guid _partitionsChangedToken;
@@ -28,7 +28,7 @@ public sealed class InitBackplaneComponents : IHostedService, ISubscriber<Partit
         IOptions<ConfigOptions> configOptions,
         IBackplaneComponents backplaneComponents,
         IPartitioningConfig partitioningConfig,
-        IPartitionUtility partitionUtility,
+        IPartitioner partitioner,
         IClientContainer clientContainer,
         IEvent<PartitionsChangedEventData> partitionsChanged)
     {
@@ -36,7 +36,7 @@ public sealed class InitBackplaneComponents : IHostedService, ISubscriber<Partit
         _configOptions = configOptions.Value;
         _backplaneComponents = backplaneComponents;
         _partitioningConfig = partitioningConfig;
-        _partitionUtility = partitionUtility;
+        _partitioner = partitioner;
         _clientContainer = clientContainer;
         _partitionsChanged = partitionsChanged;
 
@@ -85,7 +85,7 @@ public sealed class InitBackplaneComponents : IHostedService, ISubscriber<Partit
 
         foreach (long userId in _clientContainer.EnumerateUsers())
         {
-            int userPartition = _partitionUtility.ChoosePartition(userId, partitionCount);
+            int userPartition = _partitioner.ChoosePartition(userId, partitionCount);
             if (!partitions.Contains(userPartition))
             {
                 await _clientContainer.NotifyInGroup(notification, userId);

@@ -162,7 +162,7 @@ public class Startup : StartupBase
         // backplane
         builder.RegisterType<KafkaAdmin>().As<IKafkaAdmin>().SingleInstance();
         builder.RegisterOptions<KafkaOptions>(Configuration.GetSection("Backplane:Kafka"));
-        builder.RegisterModule(new PartitionUtilityAutofacModule());
+        builder.RegisterModule(new PartitionerAutofacModule());
         builder.RegisterType<BackplaneComponents>().As<IBackplaneComponents>().SingleInstance();
         builder.RegisterType<TopicPartitionFlyweight>().As<ITopicPartitionFlyweight>().SingleInstance();
         builder.RegisterType<SendersProducer>().As<ISendersProducer>().SingleInstance();
