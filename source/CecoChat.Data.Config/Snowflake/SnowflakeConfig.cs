@@ -43,17 +43,20 @@ internal sealed class SnowflakeConfig : ISnowflakeConfig
         return generatorIDs;
     }
 
-    public async Task Initialize()
+    public async Task<bool> Initialize()
     {
         try
         {
             _validator = new SnowflakeValidator();
             await SubscribeForChanges();
-            await LoadValidateValues();
+            bool areValid = await LoadValidateValues();
+
+            return areValid;
         }
         catch (Exception exception)
         {
             _logger.LogError(exception, "Initializing snowflake config failed");
+            return false;
         }
     }
 
@@ -72,7 +75,7 @@ internal sealed class SnowflakeConfig : ISnowflakeConfig
         return LoadValidateValues();
     }
 
-    private async Task LoadValidateValues()
+    private async Task<bool> LoadValidateValues()
     {
         EnsureInitialized();
 
@@ -85,6 +88,8 @@ internal sealed class SnowflakeConfig : ISnowflakeConfig
             _values = values;
             PrintValues(values);
         }
+
+        return areValid;
     }
 
     private void PrintValues(SnowflakeValues values)

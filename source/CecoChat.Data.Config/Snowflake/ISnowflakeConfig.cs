@@ -2,7 +2,7 @@ namespace CecoChat.Data.Config.Snowflake;
 
 public interface ISnowflakeConfig : IDisposable
 {
-    Task Initialize();
+    Task<bool> Initialize();
 
     IReadOnlyCollection<short> GetGeneratorIds(string server);
 }
