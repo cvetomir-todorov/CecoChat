@@ -12,9 +12,8 @@ internal sealed class PartitioningConfig : IPartitioningConfig
     private readonly IRedisContext _redisContext;
     private readonly IPartitioningRepo _repo;
     private readonly IConfigUtility _configUtility;
-    private readonly IEventSource<PartitionsChangedEventData> _partitionsChanged;
+    private readonly IEventSource<EventArgs> _partitionsChanged;
 
-    private PartitioningConfigUsage? _usage;
     private PartitioningValidator? _validator;
     private PartitioningValues? _values;
 
@@ -23,7 +22,7 @@ internal sealed class PartitioningConfig : IPartitioningConfig
         IRedisContext redisContext,
         IPartitioningRepo repo,
         IConfigUtility configUtility,
-        IEventSource<PartitionsChangedEventData> partitionsChanged)
+        IEventSource<EventArgs> partitionsChanged)
     {
         _logger = logger;
         _redisContext = redisContext;
@@ -74,11 +73,10 @@ internal sealed class PartitioningConfig : IPartitioningConfig
         return address;
     }
 
-    public async Task<bool> Initialize(PartitioningConfigUsage usage)
+    public async Task<bool> Initialize()
     {
         try
         {
-            _usage = usage;
             _validator = new PartitioningValidator();
             await SubscribeForChanges();
             bool areValid = await LoadValidateValues();
@@ -109,47 +107,15 @@ internal sealed class PartitioningConfig : IPartitioningConfig
             PartitioningKeys.Addresses, addressesMessageQueue.Channel);
     }
 
-    private async Task<bool> HandlePartitions(ChannelMessage _)
+    private async Task HandlePartitions(ChannelMessage _)
     {
         EnsureInitialized();
 
         bool areValid = await LoadValidateValues();
-        if (!areValid)
+        if (areValid)
         {
-            return false;
+            _partitionsChanged.Publish(EventArgs.Empty);
         }
-
-        if (!string.IsNullOrWhiteSpace(_usage!.ServerToWatch))
-        {
-            PartitioningValues values = _values!;
-            if (values.ServerPartitionMap.TryGetValue(_usage.ServerToWatch, out PartitionRange partitions))
-            {
-                PartitionsChangedEventData eventData = new()
-                {
-                    PartitionCount = values.PartitionCount,
-                    Partitions = partitions
-                };
-
-                _partitionsChanged.Publish(eventData);
-            }
-            else
-            {
-                _logger.LogError("After server partition changes there are no partitions for watched server {Server}", _usage.ServerToWatch);
-            }
-        }
-        else
-        {
-            PartitioningValues values = _values!;
-            PartitionsChangedEventData eventData = new()
-            {
-                PartitionCount = values.PartitionCount,
-                Partitions = PartitionRange.Empty
-            };
-
-            _partitionsChanged.Publish(eventData);
-        }
-
-        return true;
     }
 
     private async Task HandleAddresses(ChannelMessage _)
@@ -196,7 +162,7 @@ internal sealed class PartitioningConfig : IPartitioningConfig
 
     private void EnsureInitialized()
     {
-        if (_usage == null || _validator == null)
+        if (_validator == null)
         {
             throw new InvalidOperationException($"Call '{nameof(Initialize)}' to initialize the config.");
         }

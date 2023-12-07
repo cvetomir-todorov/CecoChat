@@ -8,6 +8,10 @@ public interface IBackplaneComponents : IDisposable
 {
     void ConfigurePartitioning(int partitionCount, PartitionRange partitions);
 
+    int CurrentPartitionCount { get; }
+
+    PartitionRange CurrentPartitions { get; }
+
     void StartConsumption(CancellationToken ct);
 }
 
@@ -57,9 +61,16 @@ public sealed class BackplaneComponents : IBackplaneComponents
         _sendersProducer.PartitionCount = partitionCount;
         _receiversConsumer.Prepare(partitions);
 
+        CurrentPartitionCount = partitionCount;
+        CurrentPartitions = partitions;
+
         _logger.LogInformation("Prepared backplane components for topic {TopicMessagesByReceiver} to use partitions {Partitions} from {PartitionCount} partitions",
             _backplaneOptions.TopicMessagesByReceiver, partitions, partitionCount);
     }
+
+    public int CurrentPartitionCount { get; private set; }
+
+    public PartitionRange CurrentPartitions { get; private set; }
 
     public void StartConsumption(CancellationToken ct)
     {

@@ -6,14 +6,14 @@ using Microsoft.Extensions.Options;
 
 namespace CecoChat.Server.User.HostedServices;
 
-public sealed class InitBackplaneComponents : IHostedService, ISubscriber<PartitionsChangedEventData>, IDisposable
+public sealed class InitBackplaneComponents : IHostedService, ISubscriber<EventArgs>, IDisposable
 {
     private readonly ILogger _logger;
     private readonly BackplaneOptions _backplaneOptions;
     private readonly IPartitioningConfig _partitioningConfig;
     private readonly ITopicPartitionFlyweight _topicPartitionFlyweight;
     private readonly IConnectionNotifyProducer _connectionNotifyProducer;
-    private readonly IEvent<PartitionsChangedEventData> _partitionsChanged;
+    private readonly IEvent<EventArgs> _partitionsChanged;
     private readonly Guid _partitionsChangedToken;
     private readonly CancellationToken _appStoppingCt;
     private CancellationTokenSource? _stoppedCts;
@@ -25,7 +25,7 @@ public sealed class InitBackplaneComponents : IHostedService, ISubscriber<Partit
         IPartitioningConfig partitioningConfig,
         ITopicPartitionFlyweight topicPartitionFlyweight,
         IConnectionNotifyProducer connectionNotifyProducer,
-        IEvent<PartitionsChangedEventData> partitionsChanged)
+        IEvent<EventArgs> partitionsChanged)
     {
         _logger = logger;
         _backplaneOptions = backplaneOptions.Value;
@@ -63,10 +63,11 @@ public sealed class InitBackplaneComponents : IHostedService, ISubscriber<Partit
         return Task.CompletedTask;
     }
 
-    public ValueTask Handle(PartitionsChangedEventData eventData)
+    public ValueTask Handle(EventArgs _)
     {
-        int newPartitionCount = eventData.PartitionCount;
+        int newPartitionCount = _partitioningConfig.PartitionCount;
         int currentPartitionCount = _topicPartitionFlyweight.GetTopicPartitionCount(_backplaneOptions.TopicMessagesByReceiver);
+
         if (currentPartitionCount < newPartitionCount)
         {
             _topicPartitionFlyweight.AddOrUpdate(_backplaneOptions.TopicMessagesByReceiver, newPartitionCount);

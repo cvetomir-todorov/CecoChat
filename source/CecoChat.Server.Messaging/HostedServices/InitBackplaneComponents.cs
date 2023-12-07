@@ -9,7 +9,7 @@ using Microsoft.Extensions.Options;
 
 namespace CecoChat.Server.Messaging.HostedServices;
 
-public sealed class InitBackplaneComponents : IHostedService, ISubscriber<PartitionsChangedEventData>, IDisposable
+public sealed class InitBackplaneComponents : IHostedService, ISubscriber<EventArgs>, IDisposable
 {
     private readonly ILogger _logger;
     private readonly ConfigOptions _configOptions;
@@ -17,7 +17,7 @@ public sealed class InitBackplaneComponents : IHostedService, ISubscriber<Partit
     private readonly IPartitioningConfig _partitioningConfig;
     private readonly IPartitioner _partitioner;
     private readonly IClientContainer _clientContainer;
-    private readonly IEvent<PartitionsChangedEventData> _partitionsChanged;
+    private readonly IEvent<EventArgs> _partitionsChanged;
     private readonly Guid _partitionsChangedToken;
     private readonly CancellationToken _appStoppingCt;
     private CancellationTokenSource? _stoppedCts;
@@ -30,7 +30,7 @@ public sealed class InitBackplaneComponents : IHostedService, ISubscriber<Partit
         IPartitioningConfig partitioningConfig,
         IPartitioner partitioner,
         IClientContainer clientContainer,
-        IEvent<PartitionsChangedEventData> partitionsChanged)
+        IEvent<EventArgs> partitionsChanged)
     {
         _logger = logger;
         _configOptions = configOptions.Value;
@@ -69,24 +69,30 @@ public sealed class InitBackplaneComponents : IHostedService, ISubscriber<Partit
         return Task.CompletedTask;
     }
 
-    public async ValueTask Handle(PartitionsChangedEventData eventData)
+    public async ValueTask Handle(EventArgs _)
     {
-        int partitionCount = eventData.PartitionCount;
-        PartitionRange partitions = eventData.Partitions;
+        await DisconnectClients(
+            previousPartitionCount: _backplaneComponents.CurrentPartitionCount,
+            previousPartitions: _backplaneComponents.CurrentPartitions);
 
-        await DisconnectClients(partitionCount, partitions);
-        _backplaneComponents.ConfigurePartitioning(partitionCount, partitions);
+        int newPartitionCount = _partitioningConfig.PartitionCount;
+        PartitionRange newPartitions = _partitioningConfig.GetPartitions(_configOptions.ServerId);
+
+        _backplaneComponents.ConfigurePartitioning(newPartitionCount, newPartitions);
     }
 
-    private async ValueTask DisconnectClients(int partitionCount, PartitionRange partitions)
+    private async ValueTask DisconnectClients(int previousPartitionCount, PartitionRange previousPartitions)
     {
-        ListenNotification notification = new() { Type = MessageType.Disconnect };
+        ListenNotification notification = new()
+        {
+            Type = MessageType.Disconnect
+        };
         int userCount = 0;
 
         foreach (long userId in _clientContainer.EnumerateUsers())
         {
-            int userPartition = _partitioner.ChoosePartition(userId, partitionCount);
-            if (!partitions.Contains(userPartition))
+            int userPartition = _partitioner.ChoosePartition(userId, previousPartitionCount);
+            if (!previousPartitions.Contains(userPartition))
             {
                 await _clientContainer.NotifyInGroup(notification, userId);
                 userCount++;
