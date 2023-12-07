@@ -9,7 +9,7 @@ public sealed class PartitioningConfigUsage
 
 public interface IPartitioningConfig : IDisposable
 {
-    Task Initialize(PartitioningConfigUsage usage);
+    Task<bool> Initialize(PartitioningConfigUsage usage);
 
     int PartitionCount { get; }
 

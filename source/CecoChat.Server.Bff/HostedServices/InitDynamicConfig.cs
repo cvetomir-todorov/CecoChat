@@ -17,8 +17,7 @@ public sealed class InitDynamicConfig : IHostedService
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        await _partitioningConfig.Initialize(new PartitioningConfigUsage());
-        _configDbInitHealthCheck.IsReady = true;
+        _configDbInitHealthCheck.IsReady = await _partitioningConfig.Initialize(new PartitioningConfigUsage());
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
