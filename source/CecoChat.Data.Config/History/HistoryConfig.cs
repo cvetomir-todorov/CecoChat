@@ -11,7 +11,6 @@ internal sealed class HistoryConfig : IHistoryConfig
     private readonly IHistoryRepo _repo;
     private readonly IConfigUtility _configUtility;
 
-    private HistoryConfigUsage? _usage;
     private HistoryValidator? _validator;
     private HistoryValues? _values;
 
@@ -36,14 +35,13 @@ internal sealed class HistoryConfig : IHistoryConfig
         }
     }
 
-    public async Task Initialize(HistoryConfigUsage usage)
+    public async Task Initialize()
     {
         try
         {
-            _usage = usage;
-            _validator = new HistoryValidator(usage);
-            await SubscribeForChanges(usage);
-            await LoadValidateValues(usage);
+            _validator = new HistoryValidator();
+            await SubscribeForChanges();
+            await LoadValidateValues();
         }
         catch (Exception exception)
         {
@@ -51,54 +49,45 @@ internal sealed class HistoryConfig : IHistoryConfig
         }
     }
 
-    private async Task SubscribeForChanges(HistoryConfigUsage usage)
+    private async Task SubscribeForChanges()
     {
         ISubscriber subscriber = _redisContext.GetSubscriber();
 
-        if (usage.UseMessageCount)
-        {
-            RedisChannel channel = new($"notify:{HistoryKeys.MessageCount}", RedisChannel.PatternMode.Literal);
-            ChannelMessageQueue messageQueue = await subscriber.SubscribeAsync(channel);
-            messageQueue.OnMessage(channelMessage => _configUtility.HandleChange(channelMessage, HandleMessageCount));
-            _logger.LogInformation("Subscribed for changes about {MessageCount} from channel {Channel}", HistoryKeys.MessageCount, messageQueue.Channel);
-        }
+        RedisChannel channel = new($"notify:{HistoryKeys.MessageCount}", RedisChannel.PatternMode.Literal);
+        ChannelMessageQueue messageQueue = await subscriber.SubscribeAsync(channel);
+        messageQueue.OnMessage(channelMessage => _configUtility.HandleChange(channelMessage, HandleMessageCount));
+        _logger.LogInformation("Subscribed for changes about {MessageCount} from channel {Channel}", HistoryKeys.MessageCount, messageQueue.Channel);
     }
 
     private async Task HandleMessageCount(ChannelMessage _)
     {
         EnsureInitialized();
 
-        if (_usage!.UseMessageCount)
-        {
-            await LoadValidateValues(_usage);
-        }
+        await LoadValidateValues();
     }
 
-    private async Task LoadValidateValues(HistoryConfigUsage usage)
+    private async Task LoadValidateValues()
     {
         EnsureInitialized();
 
-        HistoryValues values = await _repo.GetValues(usage);
+        HistoryValues values = await _repo.GetValues();
         _logger.LogInformation("Loading history configuration succeeded");
 
         if (_configUtility.ValidateValues("history", values, _validator!))
         {
             _values = values;
-            PrintValues(usage, values);
+            PrintValues(values);
         }
     }
 
-    private void PrintValues(HistoryConfigUsage usage, HistoryValues values)
+    private void PrintValues(HistoryValues values)
     {
-        if (usage.UseMessageCount)
-        {
-            _logger.LogInformation("Chat message count set to {MessageCount}", values.MessageCount);
-        }
+        _logger.LogInformation("Chat message count set to {MessageCount}", values.MessageCount);
     }
 
     private void EnsureInitialized()
     {
-        if (_usage == null || _validator == null)
+        if (_validator == null)
         {
             throw new InvalidOperationException($"Call '{nameof(Initialize)}' to initialize the config.");
         }
