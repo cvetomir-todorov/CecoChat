@@ -74,18 +74,21 @@ internal sealed class PartitioningConfig : IPartitioningConfig
         return address;
     }
 
-    public async Task Initialize(PartitioningConfigUsage usage)
+    public async Task<bool> Initialize(PartitioningConfigUsage usage)
     {
         try
         {
             _usage = usage;
             _validator = new PartitioningValidator();
             await SubscribeForChanges();
-            await LoadValidateValues();
+            bool areValid = await LoadValidateValues();
+
+            return areValid;
         }
         catch (Exception exception)
         {
             _logger.LogError(exception, "Initializing partitioning configuration failed");
+            return false;
         }
     }
 
@@ -106,14 +109,14 @@ internal sealed class PartitioningConfig : IPartitioningConfig
             PartitioningKeys.Addresses, addressesMessageQueue.Channel);
     }
 
-    private async Task HandlePartitions(ChannelMessage _)
+    private async Task<bool> HandlePartitions(ChannelMessage _)
     {
         EnsureInitialized();
 
         bool areValid = await LoadValidateValues();
         if (!areValid)
         {
-            return;
+            return false;
         }
 
         if (!string.IsNullOrWhiteSpace(_usage!.ServerToWatch))
@@ -145,6 +148,8 @@ internal sealed class PartitioningConfig : IPartitioningConfig
 
             _partitionsChanged.Publish(eventData);
         }
+
+        return true;
     }
 
     private async Task HandleAddresses(ChannelMessage _)
