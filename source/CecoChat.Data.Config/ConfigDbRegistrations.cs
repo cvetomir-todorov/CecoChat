@@ -13,8 +13,10 @@ public static class ConfigDbRegistrations
             {
                 builder.UseNpgsql(options.ConnectionString, npgsql =>
                 {
-                    // TODO: move these into NpgsqlOptions class
-                    npgsql.EnableRetryOnFailure(maxRetryCount: 3, maxRetryDelay: TimeSpan.FromSeconds(5), errorCodesToAdd: null);
+                    if (options.EnableRetryOnFailure)
+                    {
+                        npgsql.EnableRetryOnFailure(options.MaxRetryCount, options.MaxRetryDelay, errorCodesToAdd: null);
+                    }
                 });
             },
             poolSize: options.DbContextPoolSize);
