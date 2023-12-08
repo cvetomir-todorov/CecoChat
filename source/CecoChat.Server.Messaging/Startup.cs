@@ -10,8 +10,8 @@ using CecoChat.Http.Health;
 using CecoChat.Kafka;
 using CecoChat.Kafka.Health;
 using CecoChat.Kafka.Telemetry;
+using CecoChat.Npgsql.Health;
 using CecoChat.Otel;
-using CecoChat.Redis.Health;
 using CecoChat.Server.Backplane;
 using CecoChat.Server.Identity;
 using CecoChat.Server.Messaging.Backplane;
@@ -78,6 +78,9 @@ public class Startup : StartupBase
                 chatHub.AddFilter<SignalRTelemetryFilter>();
             });
 
+        // config db
+        services.AddConfigDb(ConfigDbOptions.Connect);
+
         // common
         services.AddOptions();
     }
@@ -118,9 +121,9 @@ public class Startup : StartupBase
             .AddCheck<ReceiversConsumerHealthCheck>(
                 "receivers-consumer",
                 tags: new[] { HealthTags.Health, HealthTags.Startup, HealthTags.Live })
-            .AddRedis(
+            .AddNpgsql(
                 "config-db",
-                ConfigDbOptions,
+                ConfigDbOptions.Connect,
                 tags: new[] { HealthTags.Health, HealthTags.Ready })
             .AddKafka(
                 "backplane",

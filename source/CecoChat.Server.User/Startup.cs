@@ -76,6 +76,9 @@ public class Startup : StartupBase
         });
         services.AddGrpcValidation();
 
+        // config db
+        services.AddConfigDb(ConfigDbOptions.Connect);
+
         // user db
         services.AddUserDb(_userDbOptions.Connect);
 
@@ -137,9 +140,9 @@ public class Startup : StartupBase
             .AddCheck<UserDbInitHealthCheck>(
                 "user-db-init",
                 tags: new[] { HealthTags.Health, HealthTags.Startup })
-            .AddRedis(
+            .AddNpgsql(
                 "config-db",
-                ConfigDbOptions,
+                ConfigDbOptions.Connect,
                 tags: new[] { HealthTags.Health, HealthTags.Ready })
             .AddKafka(
                 "backplane",

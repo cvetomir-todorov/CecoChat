@@ -5,8 +5,8 @@ using CecoChat.AspNet.Health;
 using CecoChat.AspNet.Prometheus;
 using CecoChat.Autofac;
 using CecoChat.Data.Config;
+using CecoChat.Npgsql.Health;
 using CecoChat.Otel;
-using CecoChat.Redis.Health;
 using CecoChat.Server.IdGen.Endpoints;
 using CecoChat.Server.IdGen.HostedServices;
 using FluentValidation;
@@ -39,6 +39,9 @@ public class Startup : StartupBase
             grpc.EnableMessageValidation();
         });
         services.AddGrpcValidation();
+        
+        // config db
+        services.AddConfigDb(ConfigDbOptions.Connect);
 
         // common
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
@@ -84,9 +87,9 @@ public class Startup : StartupBase
             .AddCheck<ConfigDbInitHealthCheck>(
                 "config-db-init",
                 tags: new[] { HealthTags.Health, HealthTags.Startup })
-            .AddRedis(
+            .AddNpgsql(
                 "config-db",
-                ConfigDbOptions,
+                ConfigDbOptions.Connect,
                 tags: new[] { HealthTags.Health, HealthTags.Ready });
 
         services.AddSingleton<ConfigDbInitHealthCheck>();
