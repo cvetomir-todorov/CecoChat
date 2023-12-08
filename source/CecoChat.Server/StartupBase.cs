@@ -1,7 +1,7 @@
 using CecoChat.AspNet.Prometheus;
+using CecoChat.Data.Config;
 using CecoChat.Jwt;
 using CecoChat.Otel;
-using CecoChat.Redis;
 using Microsoft.Extensions.Configuration;
 
 namespace CecoChat.Server;
@@ -29,7 +29,7 @@ public abstract class StartupBase
     }
 
     protected IConfiguration Configuration { get; }
-    protected RedisOptions ConfigDbOptions { get; }
+    protected ConfigDbOptions ConfigDbOptions { get; }
     protected JwtOptions JwtOptions { get; }
     protected OtelSamplingOptions TracingSamplingOptions { get; }
     protected OtlpOptions TracingExportOptions { get; }
