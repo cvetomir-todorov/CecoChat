@@ -1,29 +1,37 @@
-﻿using CecoChat.Events;
+﻿using System.Diagnostics.CodeAnalysis;
+using CecoChat.Data.Config.Common;
+using CecoChat.Events;
 using CecoChat.Kafka;
 using Microsoft.Extensions.Logging;
 
 namespace CecoChat.Data.Config.Partitioning;
 
+public interface IPartitioningConfig
+{
+    Task<bool> Initialize();
+
+    int PartitionCount { get; }
+
+    PartitionRange GetPartitions(string server);
+
+    string GetAddress(int partition);
+}
+
 internal sealed class PartitioningConfig : IPartitioningConfig
 {
     private readonly ILogger _logger;
-    private readonly IPartitioningRepo _repo;
-    private readonly IConfigUtility _configUtility;
+    private readonly IConfigSection<PartitioningValues> _section;
     // TODO: raise the event
     private readonly IEventSource<EventArgs> _partitionsChanged;
-
-    private PartitioningValidator? _validator;
     private PartitioningValues? _values;
 
     public PartitioningConfig(
         ILogger<PartitioningConfig> logger,
-        IPartitioningRepo repo,
-        IConfigUtility configUtility,
+        IConfigSection<PartitioningValues> section,
         IEventSource<EventArgs> partitionsChanged)
     {
         _logger = logger;
-        _repo = repo;
-        _configUtility = configUtility;
+        _section = section;
         _partitionsChanged = partitionsChanged;
     }
 
@@ -32,7 +40,7 @@ internal sealed class PartitioningConfig : IPartitioningConfig
         get
         {
             EnsureInitialized();
-            return _values!.PartitionCount;
+            return _values.PartitionCount;
         }
     }
 
@@ -40,7 +48,7 @@ internal sealed class PartitioningConfig : IPartitioningConfig
     {
         EnsureInitialized();
 
-        if (!_values!.ServerPartitionMap.TryGetValue(server, out PartitionRange partitions))
+        if (!_values.ServerPartitionMap.TryGetValue(server, out PartitionRange partitions))
         {
             throw new InvalidOperationException($"No partitions configured for server {server}.");
         }
@@ -52,7 +60,7 @@ internal sealed class PartitioningConfig : IPartitioningConfig
     {
         EnsureInitialized();
 
-        if (!_values!.PartitionServerMap.TryGetValue(partition, out string? server))
+        if (!_values.PartitionServerMap.TryGetValue(partition, out string? server))
         {
             throw new InvalidOperationException($"No server configured for partition {partition}.");
         }
@@ -66,35 +74,10 @@ internal sealed class PartitioningConfig : IPartitioningConfig
 
     public async Task<bool> Initialize()
     {
-        try
-        {
-            _validator = new PartitioningValidator();
-            bool areValid = await LoadValidateValues();
+        InitializeResult<PartitioningValues> result = await _section.Initialize(ConfigKeys.Partitioning.Section, PrintValues);
+        _values = result.Values;
 
-            return areValid;
-        }
-        catch (Exception exception)
-        {
-            _logger.LogError(exception, "Initializing partitioning configuration failed");
-            return false;
-        }
-    }
-
-    private async Task<bool> LoadValidateValues()
-    {
-        EnsureInitialized();
-
-        PartitioningValues values = await _repo.GetValues();
-        _logger.LogInformation("Loading partitioning configuration succeeded");
-
-        bool areValid = _configUtility.ValidateValues("partitioning", values, _validator!);
-        if (areValid)
-        {
-            _values = values;
-            PrintValues(values);
-        }
-
-        return areValid;
+        return result.Success;
     }
 
     private void PrintValues(PartitioningValues values)
@@ -116,9 +99,10 @@ internal sealed class PartitioningConfig : IPartitioningConfig
         }
     }
 
+    [MemberNotNull(nameof(_values))]
     private void EnsureInitialized()
     {
-        if (_validator == null)
+        if (_values == null)
         {
             throw new InvalidOperationException($"Call '{nameof(Initialize)}' to initialize the config.");
         }

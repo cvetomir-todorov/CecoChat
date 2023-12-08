@@ -1,14 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CecoChat.Data.Config.Common;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace CecoChat.Data.Config.History;
 
-internal interface IHistoryRepo
-{
-    Task<HistoryValues> GetValues();
-}
-
-internal sealed class HistoryRepo : IHistoryRepo
+internal sealed class HistoryRepo : IRepo<HistoryValues>
 {
     private readonly ILogger _logger;
     private readonly ConfigDbContext _dbContext;
@@ -21,7 +17,7 @@ internal sealed class HistoryRepo : IHistoryRepo
         _dbContext = dbContext;
     }
 
-    public async Task<HistoryValues> GetValues()
+    public async Task<HistoryValues> Load()
     {
         List<ElementEntity> elements = await _dbContext.Elements
             .Where(e => e.Name.StartsWith(ConfigKeys.History.Section))
