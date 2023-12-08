@@ -12,5 +12,11 @@
     <ProjectReference Include="..\CecoChat.Redis\CecoChat.Redis.csproj" />
     <ProjectReference Include="..\CecoChat\CecoChat.csproj" />
   </ItemGroup>
-  
+
+  <ItemGroup>
+    <EmbeddedResource Include="Scripts\database-config.sql" />
+    <EmbeddedResource Include="Scripts\table-01-elements.sql" />
+    <EmbeddedResource Include="Scripts\user-dev.sql" />
+  </ItemGroup>
+
 </Project>
