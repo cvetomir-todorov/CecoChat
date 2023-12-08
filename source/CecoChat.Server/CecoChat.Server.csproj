@@ -26,9 +26,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CecoChat.AspNet\CecoChat.AspNet.csproj" />
+    <ProjectReference Include="..\CecoChat.Data.Config\CecoChat.Data.Config.csproj" />
     <ProjectReference Include="..\CecoChat.Contracts\CecoChat.Contracts.csproj" />
     <ProjectReference Include="..\CecoChat.Kafka\CecoChat.Kafka.csproj" />
-    <ProjectReference Include="..\CecoChat.Redis\CecoChat.Redis.csproj" />
     <ProjectReference Include="..\CecoChat\CecoChat.csproj" />
   </ItemGroup>
 
