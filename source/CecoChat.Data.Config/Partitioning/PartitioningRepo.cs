@@ -1,7 +1,6 @@
 ﻿using CecoChat.Kafka;
-using CecoChat.Redis;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using StackExchange.Redis;
 
 namespace CecoChat.Data.Config.Partitioning;
 
@@ -13,78 +12,107 @@ internal interface IPartitioningRepo
 internal sealed class PartitioningRepo : IPartitioningRepo
 {
     private readonly ILogger _logger;
-    private readonly IRedisContext _redisContext;
+    private readonly ConfigDbContext _dbContext;
 
     public PartitioningRepo(
         ILogger<PartitioningRepo> logger,
-        IRedisContext redisContext)
+        ConfigDbContext dbContext)
     {
         _logger = logger;
-        _redisContext = redisContext;
+        _dbContext = dbContext;
     }
 
     public async Task<PartitioningValues> GetValues()
     {
+        List<ElementEntity> elements = await _dbContext.Elements
+            .Where(e => e.Name.StartsWith(PartitioningKeys.Section))
+            .ToListAsync();
+
         PartitioningValues values = new();
 
-        values.PartitionCount = await GetPartitionCount();
-        await GetPartitions(values);
-        await GetAddresses(values);
+        ElementEntity? partitionCount = elements.FirstOrDefault(e => string.Equals(e.Name, PartitioningKeys.PartitionCount, StringComparison.InvariantCultureIgnoreCase));
+        if (partitionCount != null)
+        {
+            values.PartitionCount = ParsePartitionCount(partitionCount);
+        }
+
+        ElementEntity? partitions = elements.FirstOrDefault(e => string.Equals(e.Name, PartitioningKeys.Partitions, StringComparison.InvariantCultureIgnoreCase));
+        if (partitions != null)
+        {
+            ParsePartitions(partitions, values);
+        }
+
+        ElementEntity? addresses = elements.FirstOrDefault(e => string.Equals(e.Name, PartitioningKeys.Addresses, StringComparison.InvariantCultureIgnoreCase));
+        if (addresses != null)
+        {
+            ParseAddresses(addresses, values);
+        }
 
         return values;
     }
 
-    private async Task<int> GetPartitionCount()
+    private int ParsePartitionCount(ElementEntity element)
     {
-        IDatabase database = _redisContext.GetDatabase();
-        RedisValue value = await database.StringGetAsync(PartitioningKeys.PartitionCount);
-        value.TryParse(out int partitionCount);
+        if (!int.TryParse(element.Value, out int partitionCount))
+        {
+            _logger.LogError("Config {ConfigName} has invalid value '{ConfigValue}'", element.Name, element.Value);
+        }
+
         return partitionCount;
     }
 
-    private async Task GetPartitions(PartitioningValues values)
+    private void ParsePartitions(ElementEntity element, PartitioningValues values)
     {
-        IDatabase database = _redisContext.GetDatabase();
-        HashEntry[] pairs = await database.HashGetAllAsync(PartitioningKeys.Partitions);
+        string[] pairs = element.Value.Split(separator: ';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
-        foreach (HashEntry pair in pairs)
+        foreach (string pair in pairs)
         {
-            string? server = pair.Name;
-            string? partitionsValue = pair.Value;
-
-            if (server == null || partitionsValue == null)
-            {
-                _logger.LogError("Empty values are present in hash config {HashConfig}", PartitioningKeys.Partitions);
-                continue;
-            }
-
-            if (PartitionRange.TryParse(partitionsValue, separator: '-', out PartitionRange partitions))
-            {
-                for (int partition = partitions.Lower; partition <= partitions.Upper; ++partition)
-                {
-                    values.PartitionServerMap[partition] = server;
-                }
-            }
-
-            values.ServerPartitionMap[server] = partitions;
+            ParsePartitionsValue(element, pair, values);
         }
     }
 
-    private async Task GetAddresses(PartitioningValues values)
+    private void ParsePartitionsValue(ElementEntity element, string pair, PartitioningValues values)
     {
-        IDatabase database = _redisContext.GetDatabase();
-        HashEntry[] pairs = await database.HashGetAllAsync(PartitioningKeys.Addresses);
-
-        foreach (HashEntry pair in pairs)
+        string[] parts = pair.Split(separator: '=', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        if (parts.Length != 2)
         {
-            string? server = pair.Name;
-            string? address = pair.Value;
+            _logger.LogError("Config {ConfigName} has an invalid pair '{Pair}'", element.Name, pair);
+            return;
+        }
 
-            if (server == null || address == null)
+        string server = parts[0];
+        string partitionsValue = parts[1];
+
+        if (PartitionRange.TryParse(partitionsValue, separator: '-', out PartitionRange partitions))
+        {
+            for (int partition = partitions.Lower; partition <= partitions.Upper; ++partition)
             {
-                _logger.LogError("Empty values are present in hash config {HashConfig}", PartitioningKeys.Addresses);
-                continue;
+                values.PartitionServerMap[partition] = server;
             }
+        }
+        else
+        {
+            _logger.LogError("Config {ConfigName} has an invalid partition range in '{Pair}'", element.Name, pair);
+            return;
+        }
+
+        values.ServerPartitionMap[server] = partitions;
+    }
+
+    private void ParseAddresses(ElementEntity element, PartitioningValues values)
+    {
+        string[] pairs = element.Value.Split(separator: ';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+        foreach (string pair in pairs)
+        {
+            string[] parts = pair.Split(separator: '=', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            if (parts.Length != 2)
+            {
+                _logger.LogError("Config {ConfigName} has an invalid pair '{Pair}'", element.Name, pair);
+            }
+
+            string server = parts[0];
+            string address = parts[1];
 
             values.ServerAddressMap[server] = address;
         }

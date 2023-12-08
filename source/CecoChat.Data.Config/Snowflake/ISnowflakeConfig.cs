@@ -1,6 +1,6 @@
 namespace CecoChat.Data.Config.Snowflake;
 
-public interface ISnowflakeConfig : IDisposable
+public interface ISnowflakeConfig
 {
     Task<bool> Initialize();
 

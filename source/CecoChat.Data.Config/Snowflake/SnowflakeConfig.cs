@@ -1,13 +1,10 @@
-using CecoChat.Redis;
 using Microsoft.Extensions.Logging;
-using StackExchange.Redis;
 
 namespace CecoChat.Data.Config.Snowflake;
 
 internal sealed class SnowflakeConfig : ISnowflakeConfig
 {
     private readonly ILogger _logger;
-    private readonly IRedisContext _redisContext;
     private readonly ISnowflakeRepo _repo;
     private readonly IConfigUtility _configUtility;
 
@@ -16,19 +13,12 @@ internal sealed class SnowflakeConfig : ISnowflakeConfig
 
     public SnowflakeConfig(
         ILogger<SnowflakeConfig> logger,
-        IRedisContext redisContext,
         ISnowflakeRepo repo,
         IConfigUtility configUtility)
     {
         _logger = logger;
-        _redisContext = redisContext;
         _repo = repo;
         _configUtility = configUtility;
-    }
-
-    public void Dispose()
-    {
-        _redisContext.Dispose();
     }
 
     public IReadOnlyCollection<short> GetGeneratorIds(string server)
@@ -48,7 +38,6 @@ internal sealed class SnowflakeConfig : ISnowflakeConfig
         try
         {
             _validator = new SnowflakeValidator();
-            await SubscribeForChanges();
             bool areValid = await LoadValidateValues();
 
             return areValid;
@@ -58,21 +47,6 @@ internal sealed class SnowflakeConfig : ISnowflakeConfig
             _logger.LogError(exception, "Initializing snowflake config failed");
             return false;
         }
-    }
-
-    private async Task SubscribeForChanges()
-    {
-        ISubscriber subscriber = _redisContext.GetSubscriber();
-
-        RedisChannel channel = new($"notify:{SnowflakeKeys.GeneratorIds}", RedisChannel.PatternMode.Literal);
-        ChannelMessageQueue messageQueue = await subscriber.SubscribeAsync(channel);
-        messageQueue.OnMessage(channelMessage => _configUtility.HandleChange(channelMessage, HandleGeneratorIDs));
-        _logger.LogInformation("Subscribed for changes about {ServerGeneratorIDs} from channel {Channel}", SnowflakeKeys.GeneratorIds, messageQueue.Channel);
-    }
-
-    private Task HandleGeneratorIDs(ChannelMessage _)
-    {
-        return LoadValidateValues();
     }
 
     private async Task<bool> LoadValidateValues()

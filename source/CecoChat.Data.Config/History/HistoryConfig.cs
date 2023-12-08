@@ -1,13 +1,10 @@
-﻿using CecoChat.Redis;
-using Microsoft.Extensions.Logging;
-using StackExchange.Redis;
+﻿using Microsoft.Extensions.Logging;
 
 namespace CecoChat.Data.Config.History;
 
 internal sealed class HistoryConfig : IHistoryConfig
 {
     private readonly ILogger _logger;
-    private readonly IRedisContext _redisContext;
     private readonly IHistoryRepo _repo;
     private readonly IConfigUtility _configUtility;
 
@@ -16,12 +13,10 @@ internal sealed class HistoryConfig : IHistoryConfig
 
     public HistoryConfig(
         ILogger<HistoryConfig> logger,
-        IRedisContext redisContext,
         IHistoryRepo repo,
         IConfigUtility configUtility)
     {
         _logger = logger;
-        _redisContext = redisContext;
         _repo = repo;
         _configUtility = configUtility;
     }
@@ -40,7 +35,6 @@ internal sealed class HistoryConfig : IHistoryConfig
         try
         {
             _validator = new HistoryValidator();
-            await SubscribeForChanges();
             bool areValid = await LoadValidateValues();
 
             return areValid;
@@ -50,22 +44,6 @@ internal sealed class HistoryConfig : IHistoryConfig
             _logger.LogError(exception, "Initializing history configuration failed");
             return false;
         }
-    }
-
-    private async Task SubscribeForChanges()
-    {
-        ISubscriber subscriber = _redisContext.GetSubscriber();
-
-        RedisChannel channel = new($"notify:{HistoryKeys.MessageCount}", RedisChannel.PatternMode.Literal);
-        ChannelMessageQueue messageQueue = await subscriber.SubscribeAsync(channel);
-        messageQueue.OnMessage(channelMessage => _configUtility.HandleChange(channelMessage, HandleMessageCount));
-        _logger.LogInformation("Subscribed for changes about {MessageCount} from channel {Channel}", HistoryKeys.MessageCount, messageQueue.Channel);
-    }
-
-    private async Task HandleMessageCount(ChannelMessage _)
-    {
-        EnsureInitialized();
-        await LoadValidateValues();
     }
 
     private async Task<bool> LoadValidateValues()
