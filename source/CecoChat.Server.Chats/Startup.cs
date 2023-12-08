@@ -13,8 +13,8 @@ using CecoChat.Data.Config;
 using CecoChat.Kafka;
 using CecoChat.Kafka.Health;
 using CecoChat.Kafka.Telemetry;
+using CecoChat.Npgsql.Health;
 using CecoChat.Otel;
-using CecoChat.Redis.Health;
 using CecoChat.Server.Backplane;
 using CecoChat.Server.Chats.Backplane;
 using CecoChat.Server.Chats.Endpoints;
@@ -63,6 +63,9 @@ public class Startup : StartupBase
             grpc.EnableMessageValidation();
         });
         services.AddGrpcValidation();
+
+        // config db
+        services.AddConfigDb(ConfigDbOptions.Connect);
 
         // common
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
@@ -123,9 +126,9 @@ public class Startup : StartupBase
             .AddCheck<SendersConsumerHealthCheck>(
                 "senders-consumer",
                 tags: new[] { HealthTags.Health, HealthTags.Startup, HealthTags.Live })
-            .AddRedis(
+            .AddNpgsql(
                 "config-db",
-                ConfigDbOptions,
+                ConfigDbOptions.Connect,
                 tags: new[] { HealthTags.Health, HealthTags.Ready })
             .AddCassandra(
                 name: "chats-db",

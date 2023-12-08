@@ -9,8 +9,8 @@ using CecoChat.Client.User;
 using CecoChat.Data.Config;
 using CecoChat.Http.Health;
 using CecoChat.Jwt;
+using CecoChat.Npgsql.Health;
 using CecoChat.Otel;
-using CecoChat.Redis.Health;
 using CecoChat.Server.Backplane;
 using CecoChat.Server.Bff.HostedServices;
 using CecoChat.Server.Bff.Infra;
@@ -65,6 +65,9 @@ public class Startup : StartupBase
         services.AddChatsClient(_chatsClientOptions);
         services.AddUserClient(_userClientOptions);
 
+        // config db
+        services.AddConfigDb(ConfigDbOptions.Connect);
+
         // common
         services.AddAutoMapper(config =>
         {
@@ -116,9 +119,9 @@ public class Startup : StartupBase
             .AddCheck<ConfigDbInitHealthCheck>(
                 "config-db-init",
                 tags: new[] { HealthTags.Health, HealthTags.Startup })
-            .AddRedis(
+            .AddNpgsql(
                 "config-db",
-                ConfigDbOptions,
+                ConfigDbOptions.Connect,
                 tags: new[] { HealthTags.Health, HealthTags.Ready })
             .AddUri(
                 "chats",
