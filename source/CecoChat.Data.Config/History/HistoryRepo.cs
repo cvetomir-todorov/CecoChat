@@ -1,5 +1,5 @@
-﻿using CecoChat.Redis;
-using StackExchange.Redis;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace CecoChat.Data.Config.History;
 
@@ -10,28 +10,41 @@ internal interface IHistoryRepo
 
 internal sealed class HistoryRepo : IHistoryRepo
 {
-    private readonly IRedisContext _redisContext;
+    private readonly ILogger _logger;
+    private readonly ConfigDbContext _dbContext;
 
     public HistoryRepo(
-        IRedisContext redisContext)
+        ILogger<HistoryRepo> logger,
+        ConfigDbContext dbContext)
     {
-        _redisContext = redisContext;
+        _logger = logger;
+        _dbContext = dbContext;
     }
 
     public async Task<HistoryValues> GetValues()
     {
+        List<ElementEntity> elements = await _dbContext.Elements
+            .Where(e => e.Name.StartsWith(HistoryKeys.Section))
+            .ToListAsync();
+
         HistoryValues values = new();
 
-        values.MessageCount = await GetMessageCount();
+        ElementEntity? messageCount = elements.FirstOrDefault(e => string.Equals(e.Name, HistoryKeys.MessageCount, StringComparison.InvariantCultureIgnoreCase));
+        if (messageCount != null)
+        {
+            values.MessageCount = ParseMessageCount(messageCount);
+        }
 
         return values;
     }
 
-    private async Task<int> GetMessageCount()
+    private int ParseMessageCount(ElementEntity element)
     {
-        IDatabase database = _redisContext.GetDatabase();
-        RedisValue value = await database.StringGetAsync(HistoryKeys.MessageCount);
-        value.TryParse(out int messageCount);
+        if (!int.TryParse(element.Value, out int messageCount))
+        {
+            _logger.LogError("Config {ConfigName} has invalid value '{ConfigValue}'", element.Name, element.Value);
+        }
+
         return messageCount;
     }
 }

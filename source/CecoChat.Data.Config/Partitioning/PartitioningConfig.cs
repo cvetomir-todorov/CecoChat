@@ -1,17 +1,15 @@
 ﻿using CecoChat.Events;
 using CecoChat.Kafka;
-using CecoChat.Redis;
 using Microsoft.Extensions.Logging;
-using StackExchange.Redis;
 
 namespace CecoChat.Data.Config.Partitioning;
 
 internal sealed class PartitioningConfig : IPartitioningConfig
 {
     private readonly ILogger _logger;
-    private readonly IRedisContext _redisContext;
     private readonly IPartitioningRepo _repo;
     private readonly IConfigUtility _configUtility;
+    // TODO: raise the event
     private readonly IEventSource<EventArgs> _partitionsChanged;
 
     private PartitioningValidator? _validator;
@@ -19,21 +17,14 @@ internal sealed class PartitioningConfig : IPartitioningConfig
 
     public PartitioningConfig(
         ILogger<PartitioningConfig> logger,
-        IRedisContext redisContext,
         IPartitioningRepo repo,
         IConfigUtility configUtility,
         IEventSource<EventArgs> partitionsChanged)
     {
         _logger = logger;
-        _redisContext = redisContext;
         _repo = repo;
         _configUtility = configUtility;
         _partitionsChanged = partitionsChanged;
-    }
-
-    public void Dispose()
-    {
-        _redisContext.Dispose();
     }
 
     public int PartitionCount
@@ -78,7 +69,6 @@ internal sealed class PartitioningConfig : IPartitioningConfig
         try
         {
             _validator = new PartitioningValidator();
-            await SubscribeForChanges();
             bool areValid = await LoadValidateValues();
 
             return areValid;
@@ -88,40 +78,6 @@ internal sealed class PartitioningConfig : IPartitioningConfig
             _logger.LogError(exception, "Initializing partitioning configuration failed");
             return false;
         }
-    }
-
-    private async Task SubscribeForChanges()
-    {
-        ISubscriber subscriber = _redisContext.GetSubscriber();
-
-        RedisChannel partitionsChannel = new($"notify:{PartitioningKeys.Partitions}", RedisChannel.PatternMode.Literal);
-        ChannelMessageQueue partitionsMessageQueue = await subscriber.SubscribeAsync(partitionsChannel);
-        partitionsMessageQueue.OnMessage(channelMessage => _configUtility.HandleChange(channelMessage, HandlePartitions));
-        _logger.LogInformation("Subscribed for changes about {PartitionCount}, {ServerPartitions} from channel {Channel}",
-            PartitioningKeys.PartitionCount, PartitioningKeys.Partitions, partitionsMessageQueue.Channel);
-
-        RedisChannel addressesChannel = new($"notify:{PartitioningKeys.Addresses}", RedisChannel.PatternMode.Literal);
-        ChannelMessageQueue addressesMessageQueue = await subscriber.SubscribeAsync(addressesChannel);
-        addressesMessageQueue.OnMessage(channelMessage => _configUtility.HandleChange(channelMessage, HandleAddresses));
-        _logger.LogInformation("Subscribed for changes about {ServerAddresses} from channel {Channel}",
-            PartitioningKeys.Addresses, addressesMessageQueue.Channel);
-    }
-
-    private async Task HandlePartitions(ChannelMessage _)
-    {
-        EnsureInitialized();
-
-        bool areValid = await LoadValidateValues();
-        if (areValid)
-        {
-            _partitionsChanged.Publish(EventArgs.Empty);
-        }
-    }
-
-    private async Task HandleAddresses(ChannelMessage _)
-    {
-        EnsureInitialized();
-        await LoadValidateValues();
     }
 
     private async Task<bool> LoadValidateValues()

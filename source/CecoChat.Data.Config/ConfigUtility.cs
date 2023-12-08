@@ -2,14 +2,11 @@
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.Extensions.Logging;
-using StackExchange.Redis;
 
 namespace CecoChat.Data.Config;
 
 internal interface IConfigUtility
 {
-    Task HandleChange(ChannelMessage channelMessage, Func<ChannelMessage, Task> handleAction);
-
     bool ValidateValues<TValues>(string configurationContext, TValues values, IValidator<TValues> validator);
 }
 
@@ -21,19 +18,6 @@ internal sealed class ConfigUtility : IConfigUtility
         ILogger<ConfigUtility> logger)
     {
         _logger = logger;
-    }
-
-    public async Task HandleChange(ChannelMessage channelMessage, Func<ChannelMessage, Task> handleAction)
-    {
-        try
-        {
-            _logger.LogInformation("Detected change {Change}", channelMessage);
-            await handleAction(channelMessage);
-        }
-        catch (Exception exception)
-        {
-            _logger.LogError(exception, "Error occurred while processing change {Change}", channelMessage);
-        }
     }
 
     public bool ValidateValues<TValues>(string configurationContext, TValues values, IValidator<TValues> validator)

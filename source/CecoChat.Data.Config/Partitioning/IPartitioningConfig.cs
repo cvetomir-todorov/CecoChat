@@ -2,7 +2,7 @@
 
 namespace CecoChat.Data.Config.Partitioning;
 
-public interface IPartitioningConfig : IDisposable
+public interface IPartitioningConfig
 {
     Task<bool> Initialize();
 

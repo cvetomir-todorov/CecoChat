@@ -1,6 +1,5 @@
-using CecoChat.Redis;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using StackExchange.Redis;
 
 namespace CecoChat.Data.Config.Snowflake;
 
@@ -12,47 +11,72 @@ internal interface ISnowflakeRepo
 internal sealed class SnowflakeRepo : ISnowflakeRepo
 {
     private readonly ILogger _logger;
-    private readonly IRedisContext _redisContext;
+    private readonly ConfigDbContext _dbContext;
 
-    public SnowflakeRepo(ILogger<SnowflakeRepo> logger, IRedisContext redisContext)
+    public SnowflakeRepo(
+        ILogger<SnowflakeRepo> logger,
+        ConfigDbContext dbContext)
     {
         _logger = logger;
-        _redisContext = redisContext;
+        _dbContext = dbContext;
     }
 
     public async Task<SnowflakeValues> GetValues()
     {
+        List<ElementEntity> elements = await _dbContext.Elements
+            .Where(e => e.Name.StartsWith(SnowflakeKeys.Section))
+            .ToListAsync();
+
         SnowflakeValues values = new();
-        await GetGeneratorIds(values);
+
+        ElementEntity? generatorIds = elements.FirstOrDefault(e => string.Equals(e.Name, SnowflakeKeys.GeneratorIds, StringComparison.InvariantCultureIgnoreCase));
+        if (generatorIds != null)
+        {
+            ParseGeneratorIds(generatorIds, values);
+        }
+
         return values;
     }
 
-    private async Task GetGeneratorIds(SnowflakeValues values)
+    private void ParseGeneratorIds(ElementEntity element, SnowflakeValues values)
     {
-        IDatabase database = _redisContext.GetDatabase();
-        HashEntry[] pairs = await database.HashGetAllAsync(SnowflakeKeys.GeneratorIds);
+        string[] pairs = element.Value.Split(separator: ';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
-        foreach (HashEntry pair in pairs)
+        foreach (string pair in pairs)
         {
-            string? server = pair.Name;
-            string? generatorIDsValue = pair.Value;
+            ParseGeneratorIdsValue(element, pair, values);
+        }
+    }
 
-            if (server == null || generatorIDsValue == null)
+    private void ParseGeneratorIdsValue(ElementEntity element, string pair, SnowflakeValues values)
+    {
+        string[] parts = pair.Split(separator: '=', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        if (parts.Length != 2)
+        {
+            _logger.LogError("Config {ConfigName} has an invalid pair '{Pair}'", element.Name, pair);
+            return;
+        }
+
+        string server = parts[0];
+        string generatorIdsValue = parts[1];
+
+        List<short> generatorIds = new();
+        if (!values.GeneratorIds.TryAdd(server, generatorIds))
+        {
+            _logger.LogError("Config {ConfigName} has duplicate server ID '{ServerId}'", element.Name, server);
+            return;
+        }
+
+        string[] generatorIdStrings = generatorIdsValue.Split(",", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        foreach (string generatorIdString in generatorIdStrings)
+        {
+            if (short.TryParse(generatorIdString, out short generatorId))
             {
-                _logger.LogError("Empty values are present in hash config {HashConfig}", SnowflakeKeys.GeneratorIds);
-                continue;
+                generatorIds.Add(generatorId);
             }
-
-            List<short> generatorIds = new();
-            values.GeneratorIds[server] = generatorIds;
-
-            string[] generatorIdStrings = generatorIDsValue.Split(",", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-            foreach (string generatorIdString in generatorIdStrings)
+            else
             {
-                if (short.TryParse(generatorIdString, out short generatorId))
-                {
-                    generatorIds.Add(generatorId);
-                }
+                _logger.LogError("Config {ConfigName} has invalid generator IDs in '{Pair}'", element.Name, pair);
             }
         }
     }

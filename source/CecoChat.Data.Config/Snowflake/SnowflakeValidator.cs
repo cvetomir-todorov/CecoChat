@@ -4,6 +4,9 @@ namespace CecoChat.Data.Config.Snowflake;
 
 internal sealed class SnowflakeValidator : AbstractValidator<SnowflakeValues>
 {
+    private const int GeneratorIdMin = 0;
+    private const int GeneratorIdMax = 255;
+
     public SnowflakeValidator()
     {
         RuleFor(x => x.GeneratorIds).Custom(ValidateServerGeneratorIDs);
@@ -40,6 +43,11 @@ internal sealed class SnowflakeValidator : AbstractValidator<SnowflakeValues>
 
             foreach (short generatorId in generatorIds)
             {
+                if (generatorId < GeneratorIdMin || generatorId > GeneratorIdMax)
+                {
+                    context.AddFailure($"Generator ID {generatorId} should be within [{GeneratorIdMin}, {GeneratorIdMax}].");
+                }
+
                 serverUniqueIds.Add(generatorId);
                 allUniqueIds.Add(generatorId);
             }
