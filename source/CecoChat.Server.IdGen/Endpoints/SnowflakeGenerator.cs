@@ -28,7 +28,7 @@ public sealed class SnowflakeGenerator : IIdentityGenerator
 
         // IdGen doesn't use the sign bit so the sum of bits is 63
         // we support:
-        // 2^8  = 128 generators
+        // 2^8  = 256 generators
         // 2^14 = 16384 IDs per tick per generator
         IdStructure idStructure = new(timestampBits: 41, generatorIdBits: 8, sequenceBits: 14);
         ITimeSource timeSource = new DefaultTimeSource(Snowflake.Epoch);
