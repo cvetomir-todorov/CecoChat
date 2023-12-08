@@ -1,24 +1,28 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Diagnostics.CodeAnalysis;
+using CecoChat.Data.Config.Common;
+using Microsoft.Extensions.Logging;
 
 namespace CecoChat.Data.Config.History;
+
+public interface IHistoryConfig
+{
+    Task<bool> Initialize();
+
+    int MessageCount { get; }
+}
 
 internal sealed class HistoryConfig : IHistoryConfig
 {
     private readonly ILogger _logger;
-    private readonly IHistoryRepo _repo;
-    private readonly IConfigUtility _configUtility;
-
-    private HistoryValidator? _validator;
+    private readonly IConfigSection<HistoryValues> _section;
     private HistoryValues? _values;
 
     public HistoryConfig(
         ILogger<HistoryConfig> logger,
-        IHistoryRepo repo,
-        IConfigUtility configUtility)
+        IConfigSection<HistoryValues> section)
     {
         _logger = logger;
-        _repo = repo;
-        _configUtility = configUtility;
+        _section = section;
     }
 
     public int MessageCount
@@ -26,41 +30,16 @@ internal sealed class HistoryConfig : IHistoryConfig
         get
         {
             EnsureInitialized();
-            return _values!.MessageCount;
+            return _values.MessageCount;
         }
     }
 
     public async Task<bool> Initialize()
     {
-        try
-        {
-            _validator = new HistoryValidator();
-            bool areValid = await LoadValidateValues();
+        InitializeResult<HistoryValues> result = await _section.Initialize(ConfigKeys.History.Section, PrintValues);
+        _values = result.Values;
 
-            return areValid;
-        }
-        catch (Exception exception)
-        {
-            _logger.LogError(exception, "Initializing history configuration failed");
-            return false;
-        }
-    }
-
-    private async Task<bool> LoadValidateValues()
-    {
-        EnsureInitialized();
-
-        HistoryValues values = await _repo.GetValues();
-        _logger.LogInformation("Loading history configuration succeeded");
-
-        bool areValid = _configUtility.ValidateValues("history", values, _validator!);
-        if (areValid)
-        {
-            _values = values;
-            PrintValues(values);
-        }
-
-        return areValid;
+        return result.Success;
     }
 
     private void PrintValues(HistoryValues values)
@@ -68,9 +47,10 @@ internal sealed class HistoryConfig : IHistoryConfig
         _logger.LogInformation("Chat message count set to {MessageCount}", values.MessageCount);
     }
 
+    [MemberNotNull(nameof(_values))]
     private void EnsureInitialized()
     {
-        if (_validator == null)
+        if (_values == null)
         {
             throw new InvalidOperationException($"Call '{nameof(Initialize)}' to initialize the config.");
         }

@@ -1,15 +1,11 @@
-﻿using CecoChat.Kafka;
+﻿using CecoChat.Data.Config.Common;
+using CecoChat.Kafka;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace CecoChat.Data.Config.Partitioning;
 
-internal interface IPartitioningRepo
-{
-    Task<PartitioningValues> GetValues();
-}
-
-internal sealed class PartitioningRepo : IPartitioningRepo
+internal sealed class PartitioningRepo : IRepo<PartitioningValues>
 {
     private readonly ILogger _logger;
     private readonly ConfigDbContext _dbContext;
@@ -22,7 +18,7 @@ internal sealed class PartitioningRepo : IPartitioningRepo
         _dbContext = dbContext;
     }
 
-    public async Task<PartitioningValues> GetValues()
+    public async Task<PartitioningValues> Load()
     {
         List<ElementEntity> elements = await _dbContext.Elements
             .Where(e => e.Name.StartsWith(ConfigKeys.Partitioning.Section))

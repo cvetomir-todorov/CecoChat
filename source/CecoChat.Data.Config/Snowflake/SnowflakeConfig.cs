@@ -1,31 +1,35 @@
+using System.Diagnostics.CodeAnalysis;
+using CecoChat.Data.Config.Common;
 using Microsoft.Extensions.Logging;
 
 namespace CecoChat.Data.Config.Snowflake;
 
+public interface ISnowflakeConfig
+{
+    Task<bool> Initialize();
+
+    IReadOnlyCollection<short> GetGeneratorIds(string server);
+}
+
 internal sealed class SnowflakeConfig : ISnowflakeConfig
 {
     private readonly ILogger _logger;
-    private readonly ISnowflakeRepo _repo;
-    private readonly IConfigUtility _configUtility;
-
-    private SnowflakeValidator? _validator;
+    private readonly IConfigSection<SnowflakeValues> _section;
     private SnowflakeValues? _values;
 
     public SnowflakeConfig(
         ILogger<SnowflakeConfig> logger,
-        ISnowflakeRepo repo,
-        IConfigUtility configUtility)
+        IConfigSection<SnowflakeValues> section)
     {
         _logger = logger;
-        _repo = repo;
-        _configUtility = configUtility;
+        _section = section;
     }
 
     public IReadOnlyCollection<short> GetGeneratorIds(string server)
     {
         EnsureInitialized();
 
-        if (!_values!.GeneratorIds.TryGetValue(server, out List<short>? generatorIDs))
+        if (!_values.GeneratorIds.TryGetValue(server, out List<short>? generatorIDs))
         {
             throw new InvalidOperationException($"No snowflake generator IDs configured for server {server}.");
         }
@@ -35,35 +39,10 @@ internal sealed class SnowflakeConfig : ISnowflakeConfig
 
     public async Task<bool> Initialize()
     {
-        try
-        {
-            _validator = new SnowflakeValidator();
-            bool areValid = await LoadValidateValues();
+        InitializeResult<SnowflakeValues> result = await _section.Initialize(ConfigKeys.Snowflake.Section, PrintValues);
+        _values = result.Values;
 
-            return areValid;
-        }
-        catch (Exception exception)
-        {
-            _logger.LogError(exception, "Initializing snowflake config failed");
-            return false;
-        }
-    }
-
-    private async Task<bool> LoadValidateValues()
-    {
-        EnsureInitialized();
-
-        SnowflakeValues values = await _repo.GetValues();
-        _logger.LogInformation("Loading snowflake configuration succeeded");
-
-        bool areValid = _configUtility.ValidateValues("snowflake", values, _validator!);
-        if (areValid)
-        {
-            _values = values;
-            PrintValues(values);
-        }
-
-        return areValid;
+        return result.Success;
     }
 
     private void PrintValues(SnowflakeValues values)
@@ -75,9 +54,10 @@ internal sealed class SnowflakeConfig : ISnowflakeConfig
         }
     }
 
+    [MemberNotNull(nameof(_values))]
     private void EnsureInitialized()
     {
-        if (_validator == null)
+        if (_values == null)
         {
             throw new InvalidOperationException($"Call '{nameof(Initialize)}' to initialize the config.");
         }

@@ -1,14 +1,10 @@
+using CecoChat.Data.Config.Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace CecoChat.Data.Config.Snowflake;
 
-internal interface ISnowflakeRepo
-{
-    Task<SnowflakeValues> GetValues();
-}
-
-internal sealed class SnowflakeRepo : ISnowflakeRepo
+internal sealed class SnowflakeRepo : IRepo<SnowflakeValues>
 {
     private readonly ILogger _logger;
     private readonly ConfigDbContext _dbContext;
@@ -21,7 +17,7 @@ internal sealed class SnowflakeRepo : ISnowflakeRepo
         _dbContext = dbContext;
     }
 
-    public async Task<SnowflakeValues> GetValues()
+    public async Task<SnowflakeValues> Load()
     {
         List<ElementEntity> elements = await _dbContext.Elements
             .Where(e => e.Name.StartsWith(ConfigKeys.Snowflake.Section))
