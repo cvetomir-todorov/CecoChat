@@ -26,6 +26,7 @@ internal sealed class PartitioningRepo : IPartitioningRepo
     {
         List<ElementEntity> elements = await _dbContext.Elements
             .Where(e => e.Name.StartsWith(ConfigKeys.Partitioning.Section))
+            .AsNoTracking()
             .ToListAsync();
 
         PartitioningValues values = new();

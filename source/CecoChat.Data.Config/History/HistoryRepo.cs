@@ -25,6 +25,7 @@ internal sealed class HistoryRepo : IHistoryRepo
     {
         List<ElementEntity> elements = await _dbContext.Elements
             .Where(e => e.Name.StartsWith(ConfigKeys.History.Section))
+            .AsNoTracking()
             .ToListAsync();
 
         HistoryValues values = new();

@@ -20,7 +20,6 @@ public class ConfigDbContext : DbContext
     }
 }
 
-// TODO: consider merging with CC.D.User
 public interface IVersionEntity
 {
     DateTime Version { get; set; }
