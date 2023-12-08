@@ -25,6 +25,7 @@ internal sealed class SnowflakeRepo : ISnowflakeRepo
     {
         List<ElementEntity> elements = await _dbContext.Elements
             .Where(e => e.Name.StartsWith(ConfigKeys.Snowflake.Section))
+            .AsNoTracking()
             .ToListAsync();
 
         SnowflakeValues values = new();
