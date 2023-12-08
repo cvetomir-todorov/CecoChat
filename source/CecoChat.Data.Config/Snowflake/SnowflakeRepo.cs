@@ -24,12 +24,12 @@ internal sealed class SnowflakeRepo : ISnowflakeRepo
     public async Task<SnowflakeValues> GetValues()
     {
         List<ElementEntity> elements = await _dbContext.Elements
-            .Where(e => e.Name.StartsWith(SnowflakeKeys.Section))
+            .Where(e => e.Name.StartsWith(ConfigKeys.Snowflake.Section))
             .ToListAsync();
 
         SnowflakeValues values = new();
 
-        ElementEntity? generatorIds = elements.FirstOrDefault(e => string.Equals(e.Name, SnowflakeKeys.GeneratorIds, StringComparison.InvariantCultureIgnoreCase));
+        ElementEntity? generatorIds = elements.FirstOrDefault(e => string.Equals(e.Name, ConfigKeys.Snowflake.GeneratorIds, StringComparison.InvariantCultureIgnoreCase));
         if (generatorIds != null)
         {
             ParseGeneratorIds(generatorIds, values);

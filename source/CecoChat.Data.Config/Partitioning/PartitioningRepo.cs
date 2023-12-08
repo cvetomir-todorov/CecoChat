@@ -25,24 +25,24 @@ internal sealed class PartitioningRepo : IPartitioningRepo
     public async Task<PartitioningValues> GetValues()
     {
         List<ElementEntity> elements = await _dbContext.Elements
-            .Where(e => e.Name.StartsWith(PartitioningKeys.Section))
+            .Where(e => e.Name.StartsWith(ConfigKeys.Partitioning.Section))
             .ToListAsync();
 
         PartitioningValues values = new();
 
-        ElementEntity? partitionCount = elements.FirstOrDefault(e => string.Equals(e.Name, PartitioningKeys.PartitionCount, StringComparison.InvariantCultureIgnoreCase));
+        ElementEntity? partitionCount = elements.FirstOrDefault(e => string.Equals(e.Name, ConfigKeys.Partitioning.Count, StringComparison.InvariantCultureIgnoreCase));
         if (partitionCount != null)
         {
             values.PartitionCount = ParsePartitionCount(partitionCount);
         }
 
-        ElementEntity? partitions = elements.FirstOrDefault(e => string.Equals(e.Name, PartitioningKeys.Partitions, StringComparison.InvariantCultureIgnoreCase));
+        ElementEntity? partitions = elements.FirstOrDefault(e => string.Equals(e.Name, ConfigKeys.Partitioning.Partitions, StringComparison.InvariantCultureIgnoreCase));
         if (partitions != null)
         {
             ParsePartitions(partitions, values);
         }
 
-        ElementEntity? addresses = elements.FirstOrDefault(e => string.Equals(e.Name, PartitioningKeys.Addresses, StringComparison.InvariantCultureIgnoreCase));
+        ElementEntity? addresses = elements.FirstOrDefault(e => string.Equals(e.Name, ConfigKeys.Partitioning.Addresses, StringComparison.InvariantCultureIgnoreCase));
         if (addresses != null)
         {
             ParseAddresses(addresses, values);

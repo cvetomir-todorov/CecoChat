@@ -24,12 +24,12 @@ internal sealed class HistoryRepo : IHistoryRepo
     public async Task<HistoryValues> GetValues()
     {
         List<ElementEntity> elements = await _dbContext.Elements
-            .Where(e => e.Name.StartsWith(HistoryKeys.Section))
+            .Where(e => e.Name.StartsWith(ConfigKeys.History.Section))
             .ToListAsync();
 
         HistoryValues values = new();
 
-        ElementEntity? messageCount = elements.FirstOrDefault(e => string.Equals(e.Name, HistoryKeys.MessageCount, StringComparison.InvariantCultureIgnoreCase));
+        ElementEntity? messageCount = elements.FirstOrDefault(e => string.Equals(e.Name, ConfigKeys.History.MessageCount, StringComparison.InvariantCultureIgnoreCase));
         if (messageCount != null)
         {
             values.MessageCount = ParseMessageCount(messageCount);
