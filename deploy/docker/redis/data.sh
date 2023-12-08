@@ -7,4 +7,4 @@ redis-cli HMSET partitioning.addresses 0 "https://localhost:31000" 1 "https://lo
 redis-cli SET history.message-count 32
 
 # snowflake
-redis-cli HSET snowflake.generator-ids 0 "1,2,3,4"
+redis-cli HSET snowflake.generator-ids 0 "0,1,2,3"
