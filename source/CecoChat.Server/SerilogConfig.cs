@@ -32,7 +32,9 @@ public static class SerilogConfig
 
     private static LoggerConfiguration CreateDefaultConfiguration(Assembly entryAssembly, SerilogOtlpOptions otlpOptions)
     {
-        return new LoggerConfiguration()
+        LoggerConfiguration configuration = new();
+
+        configuration
             .MinimumLevel.Is(LogEventLevel.Information)
             .MinimumLevel.Override("System.Net.Http.HttpClient", LogEventLevel.Warning)
             .MinimumLevel.Override("Grpc", LogEventLevel.Warning)
@@ -46,18 +48,25 @@ public static class SerilogConfig
             .Destructure.ToMaximumStringLength(1024)
             .Destructure.ToMaximumCollectionCount(32)
             .WriteTo.Console(
-                outputTemplate: LogEntryConsoleOutputTemplate)
-            .WriteTo.OpenTelemetry(otel =>
-            {
-                otel.Endpoint = $"http://{otlpOptions.TargetHost}:{otlpOptions.TargetPort}";
-                otel.Protocol = OtlpProtocol.Grpc;
-                otel.IncludedData = IncludedData.TraceIdField | IncludedData.SpanIdField;
+                outputTemplate: LogEntryConsoleOutputTemplate);
 
-                otel.BatchingOptions.EagerlyEmitFirstEvent = true;
-                otel.BatchingOptions.Period = otlpOptions.BatchPeriod;
-                otel.BatchingOptions.BatchSizeLimit = otlpOptions.BatchSizeLimit;
-                otel.BatchingOptions.QueueLimit = otlpOptions.BatchQueueLimit;
-            });
+        if (otlpOptions.TargetHost.Length > 0 && otlpOptions.TargetPort > 0)
+        {
+            configuration
+                .WriteTo.OpenTelemetry(otel =>
+                {
+                    otel.Endpoint = $"http://{otlpOptions.TargetHost}:{otlpOptions.TargetPort}";
+                    otel.Protocol = OtlpProtocol.Grpc;
+                    otel.IncludedData = IncludedData.TraceIdField | IncludedData.SpanIdField;
+
+                    otel.BatchingOptions.EagerlyEmitFirstEvent = true;
+                    otel.BatchingOptions.Period = otlpOptions.BatchPeriod;
+                    otel.BatchingOptions.BatchSizeLimit = otlpOptions.BatchSizeLimit;
+                    otel.BatchingOptions.QueueLimit = otlpOptions.BatchQueueLimit;
+                });
+        }
+
+        return configuration;
     }
 
     private static LoggerConfiguration ApplyDevelopmentConfiguration(Assembly entryAssembly, LoggerConfiguration configuration)
