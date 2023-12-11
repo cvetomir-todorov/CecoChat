@@ -1,6 +1,7 @@
 using CecoChat.AspNet.Health;
 using CecoChat.AspNet.ModelBinding;
 using CecoChat.AspNet.Swagger;
+using CecoChat.Data.Config;
 using CecoChat.Npgsql.Health;
 using CecoChat.Server.ExceptionHandling;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -21,12 +22,16 @@ public class Startup : StartupBase
     {
         AddHealthServices(services);
 
+        // web
         services.AddControllers(mvc =>
         {
             // insert it before the default one so that it takes effect
             mvc.ModelBinderProviders.Insert(0, new DateTimeModelBinderProvider());
         });
         services.AddSwaggerServices(_swaggerOptions);
+
+        // config db
+        services.AddConfigDb(ConfigDbOptions.Connect);
     }
 
     private void AddHealthServices(IServiceCollection services)
