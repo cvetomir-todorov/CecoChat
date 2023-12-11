@@ -10,6 +10,7 @@ namespace CecoChat.Server.Bff.Endpoints.Chats;
 [ApiController]
 [Route("api/chats")]
 [ApiExplorerSettings(GroupName = "Chats")]
+[ProducesResponseType(StatusCodes.Status500InternalServerError)]
 public class ChatsController : ControllerBase
 {
     private readonly ILogger _logger;
@@ -32,7 +33,6 @@ public class ChatsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetChatHistory([FromQuery][BindRequired] GetChatHistoryRequest request, CancellationToken ct)
     {
         if (!HttpContext.TryGetUserClaimsAndAccessToken(_logger, out UserClaims? userClaims, out string? accessToken))
@@ -57,7 +57,6 @@ public class ChatsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> GetUserChats([FromQuery][BindRequired] GetUserChatsRequest request, CancellationToken ct)
     {
         if (!HttpContext.TryGetUserClaimsAndAccessToken(_logger, out UserClaims? userClaims, out string? accessToken))
