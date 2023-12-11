@@ -11,6 +11,11 @@ public sealed class GetConfigResponse
     public ConfigElement[] Elements { get; init; } = Array.Empty<ConfigElement>();
 }
 
+public sealed class UpdateConfigElementsRequest
+{
+    public ConfigElement[] Elements { get; init; } = Array.Empty<ConfigElement>();
+}
+
 public sealed class ConfigElement
 {
     [JsonPropertyName("name")]

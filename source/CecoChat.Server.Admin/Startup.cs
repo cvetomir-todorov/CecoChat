@@ -1,9 +1,12 @@
+using System.Reflection;
 using CecoChat.AspNet.Health;
 using CecoChat.AspNet.ModelBinding;
 using CecoChat.AspNet.Swagger;
 using CecoChat.Data.Config;
 using CecoChat.Npgsql.Health;
 using CecoChat.Server.ExceptionHandling;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace CecoChat.Server.Admin;
@@ -32,6 +35,13 @@ public class Startup : StartupBase
 
         // config db
         services.AddConfigDb(ConfigDbOptions.Connect);
+
+        // common
+        services.AddFluentValidationAutoValidation(fluentValidation =>
+        {
+            fluentValidation.DisableDataAnnotationsValidation = true;
+        });
+        services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
     }
 
     private void AddHealthServices(IServiceCollection services)

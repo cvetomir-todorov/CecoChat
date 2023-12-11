@@ -1,7 +1,9 @@
 using CecoChat.Contracts.Admin;
 using CecoChat.Data.Config;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace CecoChat.Server.Admin.Endpoints;
 
@@ -51,5 +53,38 @@ public class ConfigController : ControllerBase
         {
             Elements = elements
         });
+    }
+
+    [HttpPut]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> UpdateConfigElements([FromBody] [BindRequired] UpdateConfigElementsRequest request, CancellationToken ct)
+    {
+        DateTime newVersion = DateTime.UtcNow;
+
+        foreach (ConfigElement element in request.Elements)
+        {
+            ElementEntity entity = new()
+            {
+                Name = element.Name,
+                Value = element.Value,
+                Version = newVersion
+            };
+
+            EntityEntry<ElementEntity> entry = _configDbContext.Attach(entity);
+            entry.Property(e => e.Version).OriginalValue = element.Version;
+            entry.Property(e => e.Value).IsModified = true;
+        }
+
+        try
+        {
+            await _configDbContext.SaveChangesAsync(ct);
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            return Conflict();
+        }
+
+        return Ok();
     }
 }
