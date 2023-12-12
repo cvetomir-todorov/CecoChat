@@ -1,9 +1,13 @@
 using System.Reflection;
+using Autofac;
 using CecoChat.AspNet.Health;
 using CecoChat.AspNet.ModelBinding;
 using CecoChat.AspNet.Swagger;
+using CecoChat.Autofac;
 using CecoChat.Data.Config;
+using CecoChat.Npgsql;
 using CecoChat.Npgsql.Health;
+using CecoChat.Server.Admin.HostedServices;
 using CecoChat.Server.ExceptionHandling;
 using FluentValidation;
 using FluentValidation.AspNetCore;
@@ -11,7 +15,7 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace CecoChat.Server.Admin;
 
-public class Startup : StartupBase 
+public class Startup : StartupBase
 {
     private readonly SwaggerOptions _swaggerOptions;
 
@@ -51,6 +55,17 @@ public class Startup : StartupBase
                 "config-db",
                 ConfigDbOptions.Connect,
                 tags: new[] { HealthTags.Health, HealthTags.Ready });
+    }
+
+    public void ConfigureContainer(ContainerBuilder builder)
+    {
+        // ordered hosted services
+        builder.RegisterHostedService<InitConfigDb>();
+
+        // config db
+        builder.RegisterType<NpgsqlDbInitializer>().As<INpgsqlDbInitializer>().SingleInstance();
+        IConfiguration configDbConfig = Configuration.GetSection("ConfigDb");
+        builder.RegisterOptions<ConfigDbOptions>(configDbConfig);
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
