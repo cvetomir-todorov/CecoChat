@@ -9,9 +9,13 @@ public sealed class UpdateConfigElementsRequestValidator : AbstractValidator<Upd
     {
         ConfigElementValidator configElementValidator = new();
 
-        RuleFor(x => x.Elements)
-            .NotEmpty()
+        RuleFor(x => x.ExistingElements)
             .ForEach(element => element.SetValidator(configElementValidator));
+        RuleFor(x => x.NewElements)
+            .ForEach(element => element.SetValidator(configElementValidator));
+        RuleFor(x => x)
+            .Must(request => request.ExistingElements.Length + request.NewElements.Length > 0)
+            .WithMessage("There should be at least 1 existing config element updated or new config element added when updating config.");
     }
 }
 
