@@ -61,39 +61,53 @@ public class ConfigController : ControllerBase
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<IActionResult> UpdateConfigElements([FromBody] [BindRequired] UpdateConfigElementsRequest request, CancellationToken ct)
     {
-        UpdateDbContext(request.ExistingElements, request.NewElements);
+        UpdateDbContext(request.ExistingElements, request.NewElements, request.DeletedElements);
         IActionResult result = await ExecuteUpdates(ct);
 
         return result;
     }
 
-    private void UpdateDbContext(IReadOnlyCollection<ConfigElement> existingElements, IReadOnlyCollection<ConfigElement> newElements)
+    private void UpdateDbContext(
+        IReadOnlyCollection<ConfigElement> existingElements,
+        IReadOnlyCollection<ConfigElement> newElements,
+        IReadOnlyCollection<ConfigElement> deletedElements)
     {
         DateTime newVersion = DateTime.UtcNow;
 
         foreach (ConfigElement existingElement in existingElements)
         {
-            ElementEntity entity = Map(existingElement, newVersion);
+            ElementEntity entity = new()
+            {
+                Name = existingElement.Name,
+                Value = existingElement.Value,
+                Version = newVersion
+            };
+
             EntityEntry<ElementEntity> entry = _configDbContext.Attach(entity);
             entry.Property(e => e.Version).OriginalValue = existingElement.Version;
             entry.Property(e => e.Value).IsModified = true;
         }
-
         foreach (ConfigElement newElement in newElements)
         {
-            ElementEntity entity = Map(newElement, newVersion);
+            ElementEntity entity = new()
+            {
+                Name = newElement.Name,
+                Value = newElement.Value,
+                Version = newVersion
+            };
+
             _configDbContext.Add(entity);
         }
-    }
-
-    private static ElementEntity Map(ConfigElement element, DateTime newVersion)
-    {
-        return new()
+        foreach (ConfigElement deletedElement in deletedElements)
         {
-            Name = element.Name,
-            Value = element.Value,
-            Version = newVersion
-        };
+            ElementEntity entity = new()
+            {
+                Name = deletedElement.Name,
+                Version = deletedElement.Version
+            };
+
+            _configDbContext.Remove(entity);
+        }
     }
 
     private async Task<IActionResult> ExecuteUpdates(CancellationToken ct)

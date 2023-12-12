@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using CecoChat.Contracts.Admin;
 using FluentValidation;
 
@@ -7,27 +8,38 @@ public sealed class UpdateConfigElementsRequestValidator : AbstractValidator<Upd
 {
     public UpdateConfigElementsRequestValidator()
     {
-        ConfigElementValidator configElementValidator = new();
+        ConfigElementValidator nameAndValueConfigElementValidator = new(validateName: true, validateValue: true);
+        ConfigElementValidator nameOnlyConfigElementValidator = new(validateName: true, validateValue: false);
 
         RuleFor(x => x.ExistingElements)
-            .ForEach(element => element.SetValidator(configElementValidator));
+            .ForEach(element => element.SetValidator(nameAndValueConfigElementValidator));
         RuleFor(x => x.NewElements)
-            .ForEach(element => element.SetValidator(configElementValidator));
+            .ForEach(element => element.SetValidator(nameAndValueConfigElementValidator));
+        RuleFor(x => x.DeletedElements)
+            .ForEach(element => element.SetValidator(nameOnlyConfigElementValidator));
         RuleFor(x => x)
-            .Must(request => request.ExistingElements.Length + request.NewElements.Length > 0)
-            .WithMessage("There should be at least 1 existing config element updated or new config element added when updating config.");
+            .Must(request => request.ExistingElements.Length + request.NewElements.Length + request.DeletedElements.Length > 0)
+            .WithMessage("There should be at least 1: a) existing config element updated or b) new config element added or c) existing config element deleted ...when updating config.");
     }
 }
 
 public sealed class ConfigElementValidator : AbstractValidator<ConfigElement>
 {
-    public ConfigElementValidator()
+    private static readonly Regex NameRegex = new("^([a-z\\-]{2,16}\\.[a-z\\-\\.]{2,128})$", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
+    public ConfigElementValidator(bool validateName, bool validateValue)
     {
-        RuleFor(x => x.Name)
-            .NotEmpty()
-            .Matches("^([a-z\\-]{2,16}\\.[a-z\\-\\.]{2,128})$")
-            .WithMessage("{PropertyName} should be a correct config element name such as 'section.sub-section' or 'section.sub-section.element', but '{PropertyValue}' was provided.");
-        RuleFor(x => x.Value)
-            .NotEmpty();
+        if (validateName)
+        {
+            RuleFor(x => x.Name)
+                .NotEmpty()
+                .Matches(NameRegex)
+                .WithMessage("{PropertyName} should be a correct config element name such as 'section.sub-section' or 'section.sub-section.element', but '{PropertyValue}' was provided.");
+        }
+        if (validateValue)
+        {
+            RuleFor(x => x.Value)
+                .NotEmpty();
+        }
     }
 }

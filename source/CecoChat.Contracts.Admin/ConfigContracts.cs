@@ -16,6 +16,8 @@ public sealed class UpdateConfigElementsRequest
     public ConfigElement[] ExistingElements { get; init; } = Array.Empty<ConfigElement>();
 
     public ConfigElement[] NewElements { get; init; } = Array.Empty<ConfigElement>();
+
+    public ConfigElement[] DeletedElements { get; init; } = Array.Empty<ConfigElement>();
 }
 
 public sealed class ConfigElement
