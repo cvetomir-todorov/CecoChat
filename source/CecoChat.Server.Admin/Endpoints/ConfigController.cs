@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Npgsql;
 
 namespace CecoChat.Server.Admin.Endpoints;
 
@@ -60,31 +61,68 @@ public class ConfigController : ControllerBase
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<IActionResult> UpdateConfigElements([FromBody] [BindRequired] UpdateConfigElementsRequest request, CancellationToken ct)
     {
+        UpdateDbContext(request.ExistingElements, request.NewElements);
+        IActionResult result = await ExecuteUpdates(ct);
+
+        return result;
+    }
+
+    private void UpdateDbContext(IReadOnlyCollection<ConfigElement> existingElements, IReadOnlyCollection<ConfigElement> newElements)
+    {
         DateTime newVersion = DateTime.UtcNow;
 
-        foreach (ConfigElement element in request.Elements)
+        foreach (ConfigElement existingElement in existingElements)
         {
-            ElementEntity entity = new()
-            {
-                Name = element.Name,
-                Value = element.Value,
-                Version = newVersion
-            };
-
+            ElementEntity entity = Map(existingElement, newVersion);
             EntityEntry<ElementEntity> entry = _configDbContext.Attach(entity);
-            entry.Property(e => e.Version).OriginalValue = element.Version;
+            entry.Property(e => e.Version).OriginalValue = existingElement.Version;
             entry.Property(e => e.Value).IsModified = true;
         }
 
+        foreach (ConfigElement newElement in newElements)
+        {
+            ElementEntity entity = Map(newElement, newVersion);
+            _configDbContext.Add(entity);
+        }
+    }
+
+    private static ElementEntity Map(ConfigElement element, DateTime newVersion)
+    {
+        return new()
+        {
+            Name = element.Name,
+            Value = element.Value,
+            Version = newVersion
+        };
+    }
+
+    private async Task<IActionResult> ExecuteUpdates(CancellationToken ct)
+    {
         try
         {
             await _configDbContext.SaveChangesAsync(ct);
+
+            _logger.LogInformation("Successfully updated config");
+            return Ok();
+        }
+        catch (DbUpdateException dbUpdateException)
+            when (dbUpdateException.InnerException is PostgresException postgresException &&
+                  postgresException.SqlState == "23505" &&
+                  postgresException.MessageText.Contains("Elements_pkey"))
+        {
+            _logger.LogError(dbUpdateException, "Failed to update config because some or all of the newly-added elements have keys that are already present");
+            return Conflict(new ProblemDetails
+            {
+                Detail = "New elements keys are already present"
+            });
         }
         catch (DbUpdateConcurrencyException)
         {
-            return Conflict();
+            _logger.LogError("Failed to update config because some or all of the elements have been concurrently updated");
+            return Conflict(new ProblemDetails
+            {
+                Detail = "Existing elements have been concurrently updated"
+            });
         }
-
-        return Ok();
     }
 }
