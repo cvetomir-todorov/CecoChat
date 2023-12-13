@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CecoChat.Server.ExceptionHandling;
+namespace CecoChat.Server;
 
 public static class ExceptionHandlingExtensions
 {

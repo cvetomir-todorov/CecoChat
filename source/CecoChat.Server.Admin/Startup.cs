@@ -8,7 +8,6 @@ using CecoChat.Data.Config;
 using CecoChat.Npgsql;
 using CecoChat.Npgsql.Health;
 using CecoChat.Server.Admin.HostedServices;
-using CecoChat.Server.ExceptionHandling;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
