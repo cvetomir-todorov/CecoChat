@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using CecoChat.Data.Config.Common;
+﻿using CecoChat.Data.Config.Common;
 using CecoChat.Events;
 using CecoChat.Kafka;
 using Microsoft.Extensions.Logging;
@@ -23,7 +22,6 @@ internal sealed class PartitioningConfig : IPartitioningConfig
     private readonly IConfigSection<PartitioningValues> _section;
     // TODO: raise the event
     private readonly IEventSource<EventArgs> _partitionsChanged;
-    private PartitioningValues? _values;
 
     public PartitioningConfig(
         ILogger<PartitioningConfig> logger,
@@ -40,7 +38,7 @@ internal sealed class PartitioningConfig : IPartitioningConfig
         get
         {
             EnsureInitialized();
-            return _values.PartitionCount;
+            return _section.Values!.PartitionCount;
         }
     }
 
@@ -48,7 +46,7 @@ internal sealed class PartitioningConfig : IPartitioningConfig
     {
         EnsureInitialized();
 
-        if (!_values.ServerPartitionMap.TryGetValue(server, out PartitionRange partitions))
+        if (!_section.Values!.ServerPartitionMap.TryGetValue(server, out PartitionRange partitions))
         {
             throw new InvalidOperationException($"No partitions configured for server {server}.");
         }
@@ -60,11 +58,11 @@ internal sealed class PartitioningConfig : IPartitioningConfig
     {
         EnsureInitialized();
 
-        if (!_values.PartitionServerMap.TryGetValue(partition, out string? server))
+        if (!_section.Values!.PartitionServerMap.TryGetValue(partition, out string? server))
         {
             throw new InvalidOperationException($"No server configured for partition {partition}.");
         }
-        if (!_values.ServerAddressMap.TryGetValue(server, out string? address))
+        if (!_section.Values.ServerAddressMap.TryGetValue(server, out string? address))
         {
             throw new InvalidOperationException($"No address configured for server {server}.");
         }
@@ -72,12 +70,17 @@ internal sealed class PartitioningConfig : IPartitioningConfig
         return address;
     }
 
+    private void EnsureInitialized()
+    {
+        if (_section.Values == null)
+        {
+            throw new InvalidOperationException($"Call '{nameof(Initialize)}' to initialize the config.");
+        }
+    }
+
     public async Task<bool> Initialize()
     {
-        InitializeResult<PartitioningValues> result = await _section.Initialize(ConfigKeys.Partitioning.Section, PrintValues);
-        _values = result.Values;
-
-        return result.Success;
+        return await _section.Initialize(ConfigKeys.Partitioning.Section, PrintValues);
     }
 
     private void PrintValues(PartitioningValues values)
@@ -96,15 +99,6 @@ internal sealed class PartitioningConfig : IPartitioningConfig
             string server = pair.Key;
             string address = pair.Value;
             _logger.LogInformation("Address {Address} is assigned to server {Server}", address, server);
-        }
-    }
-
-    [MemberNotNull(nameof(_values))]
-    private void EnsureInitialized()
-    {
-        if (_values == null)
-        {
-            throw new InvalidOperationException($"Call '{nameof(Initialize)}' to initialize the config.");
         }
     }
 }

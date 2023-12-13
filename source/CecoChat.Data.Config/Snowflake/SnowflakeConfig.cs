@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using CecoChat.Data.Config.Common;
 using Microsoft.Extensions.Logging;
 
@@ -15,7 +14,6 @@ internal sealed class SnowflakeConfig : ISnowflakeConfig
 {
     private readonly ILogger _logger;
     private readonly IConfigSection<SnowflakeValues> _section;
-    private SnowflakeValues? _values;
 
     public SnowflakeConfig(
         ILogger<SnowflakeConfig> logger,
@@ -29,7 +27,7 @@ internal sealed class SnowflakeConfig : ISnowflakeConfig
     {
         EnsureInitialized();
 
-        if (!_values.GeneratorIds.TryGetValue(server, out List<short>? generatorIDs))
+        if (!_section.Values!.GeneratorIds.TryGetValue(server, out List<short>? generatorIDs))
         {
             throw new InvalidOperationException($"No snowflake generator IDs configured for server {server}.");
         }
@@ -37,12 +35,17 @@ internal sealed class SnowflakeConfig : ISnowflakeConfig
         return generatorIDs;
     }
 
+    private void EnsureInitialized()
+    {
+        if (_section.Values == null)
+        {
+            throw new InvalidOperationException($"Call '{nameof(Initialize)}' to initialize the config.");
+        }
+    }
+
     public async Task<bool> Initialize()
     {
-        InitializeResult<SnowflakeValues> result = await _section.Initialize(ConfigKeys.Snowflake.Section, PrintValues);
-        _values = result.Values;
-
-        return result.Success;
+        return await _section.Initialize(ConfigKeys.Snowflake.Section, PrintValues);
     }
 
     private void PrintValues(SnowflakeValues values)
@@ -51,15 +54,6 @@ internal sealed class SnowflakeConfig : ISnowflakeConfig
         foreach (KeyValuePair<string, List<short>> pair in values.GeneratorIds)
         {
             _logger.LogInformation("Server {Server} is assigned generator IDs: [{GeneratorIds}]", pair.Key, string.Join(separator: ", ", pair.Value));
-        }
-    }
-
-    [MemberNotNull(nameof(_values))]
-    private void EnsureInitialized()
-    {
-        if (_values == null)
-        {
-            throw new InvalidOperationException($"Call '{nameof(Initialize)}' to initialize the config.");
         }
     }
 }
