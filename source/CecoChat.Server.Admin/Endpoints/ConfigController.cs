@@ -1,4 +1,5 @@
 using CecoChat.Data.Config;
+using CecoChat.Server.Admin.Backplane;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
@@ -15,13 +16,16 @@ public class ConfigController : ControllerBase
 {
     private readonly ILogger _logger;
     private readonly ConfigDbContext _configDbContext;
+    private readonly IConfigChangesProducer _configChangesProducer;
 
     public ConfigController(
         ILogger<ConfigController> logger,
-        ConfigDbContext configDbContext)
+        ConfigDbContext configDbContext,
+        IConfigChangesProducer configChangesProducer)
     {
         _logger = logger;
         _configDbContext = configDbContext;
+        _configChangesProducer = configChangesProducer;
     }
 
     [HttpGet]
@@ -61,7 +65,12 @@ public class ConfigController : ControllerBase
     public async Task<IActionResult> UpdateConfigElements([FromBody] [BindRequired] UpdateConfigElementsRequest request, CancellationToken ct)
     {
         UpdateDbContext(request.ExistingElements, request.NewElements, request.DeletedElements);
-        IActionResult result = await ExecuteUpdates(ct);
+        (bool success, IActionResult result) = await ExecuteUpdates(ct);
+
+        if (success)
+        {
+            NotifyChanges(request.ExistingElements.Union(request.NewElements).Union(request.DeletedElements));
+        }
 
         return result;
     }
@@ -109,14 +118,14 @@ public class ConfigController : ControllerBase
         }
     }
 
-    private async Task<IActionResult> ExecuteUpdates(CancellationToken ct)
+    private async Task<(bool, IActionResult)> ExecuteUpdates(CancellationToken ct)
     {
         try
         {
             await _configDbContext.SaveChangesAsync(ct);
 
             _logger.LogInformation("Successfully updated config");
-            return Ok();
+            return (true, Ok());
         }
         catch (DbUpdateException dbUpdateException)
             when (dbUpdateException.InnerException is PostgresException postgresException &&
@@ -124,18 +133,48 @@ public class ConfigController : ControllerBase
                   postgresException.MessageText.Contains("Elements_pkey"))
         {
             _logger.LogError(dbUpdateException, "Failed to update config because some or all of the newly-added elements have keys that are already present");
-            return Conflict(new ProblemDetails
+            ConflictObjectResult conflict = Conflict(new ProblemDetails
             {
                 Detail = "New elements keys are already present"
             });
+
+            return (false, conflict);
         }
         catch (DbUpdateConcurrencyException)
         {
             _logger.LogError("Failed to update config because some or all of the elements have been concurrently updated");
-            return Conflict(new ProblemDetails
+            ConflictObjectResult conflict = Conflict(new ProblemDetails
             {
                 Detail = "Existing elements have been concurrently updated"
             });
+
+            return (false, conflict);
+        }
+    }
+
+    private void NotifyChanges(IEnumerable<ConfigElement> allElements)
+    {
+        List<string> configSections = allElements
+            .Select(element => element.Name)
+            .Select(elementName =>
+            {
+                int dotIndex = elementName.IndexOf('.');
+                if (dotIndex <= 0)
+                {
+                    _logger.LogWarning("Config element name {ConfigElementName} doesn't have a section name", elementName);
+                    return string.Empty;
+                }
+
+                return elementName.Substring(0, dotIndex);
+            })
+            .Where(configSection => configSection.Length > 0)
+            .Distinct()
+            .ToList();
+
+        _logger.LogInformation("Changes in config sections: {ChangedConfigSections}", string.Join(separator: ',', configSections));
+        foreach (string configSection in configSections)
+        {
+            _configChangesProducer.NotifyChanges(configSection);
         }
     }
 }

@@ -7,5 +7,9 @@ public sealed class BackplaneOptions
 {
     public KafkaOptions Kafka { get; init; } = new();
 
+    public KafkaProducerOptions ConfigChangesProducer { get; init; } = new();
+
+    public string ConfigChangesTopic { get; init; } = string.Empty;
+
     public KafkaHealthOptions Health { get; init; } = new();
 }

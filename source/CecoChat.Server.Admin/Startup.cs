@@ -4,14 +4,17 @@ using CecoChat.AspNet.Health;
 using CecoChat.AspNet.ModelBinding;
 using CecoChat.AspNet.Swagger;
 using CecoChat.Autofac;
+using CecoChat.Contracts.Config;
 using CecoChat.Data.Config;
 using CecoChat.Kafka;
 using CecoChat.Kafka.Health;
+using CecoChat.Kafka.Telemetry;
 using CecoChat.Npgsql;
 using CecoChat.Npgsql.Health;
 using CecoChat.Server.Admin.Backplane;
 using CecoChat.Server.Admin.HostedServices;
 using CecoChat.Server.Backplane;
+using Confluent.Kafka;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -83,6 +86,10 @@ public class Startup : StartupBase
         // backplane
         builder.RegisterType<KafkaAdmin>().As<IKafkaAdmin>().SingleInstance();
         builder.RegisterOptions<KafkaOptions>(Configuration.GetSection("Backplane:Kafka"));
+        builder.RegisterType<ConfigChangesProducer>().As<IConfigChangesProducer>().SingleInstance();
+        builder.RegisterFactory<KafkaProducer<Null, ConfigChange>, IKafkaProducer<Null, ConfigChange>>();
+        builder.RegisterModule(new KafkaAutofacModule());
+        builder.RegisterOptions<BackplaneOptions>(Configuration.GetSection("Backplane"));
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
