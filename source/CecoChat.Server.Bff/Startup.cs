@@ -15,7 +15,6 @@ using CecoChat.Otel;
 using CecoChat.Server.Backplane;
 using CecoChat.Server.Bff.HostedServices;
 using CecoChat.Server.Bff.Infra;
-using CecoChat.Server.ExceptionHandling;
 using CecoChat.Server.Identity;
 using FluentValidation;
 using FluentValidation.AspNetCore;
