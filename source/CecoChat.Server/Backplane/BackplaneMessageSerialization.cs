@@ -1,9 +1,16 @@
-﻿using CecoChat.Contracts.Backplane;
+using CecoChat.Contracts.Backplane;
 using Confluent.Kafka;
 using Google.Protobuf;
-using SerializationContext = Confluent.Kafka.SerializationContext;
 
 namespace CecoChat.Server.Backplane;
+
+public sealed class BackplaneMessageSerializer : ISerializer<BackplaneMessage>
+{
+    public byte[] Serialize(BackplaneMessage data, SerializationContext context)
+    {
+        return data.ToByteArray();
+    }
+}
 
 public sealed class BackplaneMessageDeserializer : IDeserializer<BackplaneMessage>
 {
@@ -14,8 +21,6 @@ public sealed class BackplaneMessageDeserializer : IDeserializer<BackplaneMessag
             return null!;
         }
 
-        BackplaneMessage message = new();
-        message.MergeFrom(data.ToArray());
-        return message;
+        return BackplaneMessage.Parser.ParseFrom(data);
     }
 }
