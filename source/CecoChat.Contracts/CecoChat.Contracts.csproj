@@ -19,6 +19,7 @@
     <Protobuf Include="Backplane\DataType.proto" />
     <Protobuf Include="Backplane\DeliveryStatus.proto" />
     <Protobuf Include="Backplane\MessageType.proto" />
+    <Protobuf Include="Config\ConfigChange.proto" />
     <Protobuf Include="IdGen\IdGenService.proto" GrpcServices="All" />
     <Protobuf Include="Uuid.proto" />
   </ItemGroup>
