@@ -35,14 +35,15 @@ public class InitConfigDb : IHostedService
 
     private async Task Seed()
     {
-        int elementCount = await _configDbContext.Elements.CountAsync();
-        if (elementCount > 0)
+        ElementEntity[] elements = await _configDbContext.Elements.ToArrayAsync();
+        if (elements.Length > 0)
         {
-            _logger.LogInformation("{ConfigElementCount} config elements present, skip seeding", elementCount);
+            _logger.LogInformation("{ConfigElementCount} config elements present:", elements.Length);
+            LogConfig(elements);
             return;
         }
 
-        (string deploymentEnvironment, ElementEntity[] elements) = GetSeedValues();
+        (string deploymentEnvironment, elements) = GetSeedValues();
         if (elements.Length == 0)
         {
             _logger.LogCritical("Failed to seed default dynamic config for unknown deployment environment {DeploymentEnvironment}", deploymentEnvironment);
@@ -60,7 +61,11 @@ public class InitConfigDb : IHostedService
         _configDbContext.ChangeTracker.Clear();
 
         _logger.LogInformation("Seeded default dynamic config with {ConfigElementCount} values for deployment environment {DeploymentEnvironment}:", elements.Length, deploymentEnvironment);
+        LogConfig(elements);
+    }
 
+    private void LogConfig(ElementEntity[] elements)
+    {
         foreach (ElementEntity element in elements)
         {
             _logger.LogInformation("{ConfigElementName}: {ConfigElementValue}", element.Name, element.Value);
