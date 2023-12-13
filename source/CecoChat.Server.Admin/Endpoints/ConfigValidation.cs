@@ -1,5 +1,4 @@
 using System.Text.RegularExpressions;
-using CecoChat.Contracts.Admin;
 using FluentValidation;
 
 namespace CecoChat.Server.Admin.Endpoints;

@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using Refit;
 
-namespace CecoChat.Contracts.Admin;
+namespace CecoChat.Server.Admin.Endpoints;
 
 public sealed class GetConfigRequest
 { }
