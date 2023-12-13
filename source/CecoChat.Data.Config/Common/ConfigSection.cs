@@ -8,15 +8,9 @@ namespace CecoChat.Data.Config.Common;
 internal interface IConfigSection<TValues>
     where TValues: class
 {
-    Task<InitializeResult<TValues>> Initialize(string configContext, Action<TValues> printValues);
-}
+    Task<bool> Initialize(string configContext, Action<TValues> printValues);
 
-internal readonly struct InitializeResult<TValues>
-    where TValues: class
-{
-    public TValues? Values { get; init; }
-
-    public bool Success => Values != null;
+    TValues? Values { get; }
 }
 
 internal sealed class ConfigSection<TValues> : IConfigSection<TValues>
@@ -37,7 +31,7 @@ internal sealed class ConfigSection<TValues> : IConfigSection<TValues>
         _repo = repo;
     }
  
-    public async Task<InitializeResult<TValues>> Initialize(string configContext, Action<TValues> printValues)
+    public async Task<bool> Initialize(string configContext, Action<TValues> printValues)
     {
         try
         {
@@ -48,21 +42,21 @@ internal sealed class ConfigSection<TValues> : IConfigSection<TValues>
 
             if (!ValidateValues(values))
             {
-                return new InitializeResult<TValues>();
+                return false;
             }
 
             printValues(values);
-            return new InitializeResult<TValues>
-            {
-                Values = values
-            };
+            Values = values;
+            return true;
         }
         catch (Exception exception)
         {
             _logger.LogError(exception, "Initializing {ConfigContext} configuration failed", configContext);
-            return new InitializeResult<TValues>();
+            return false;
         }
     }
+
+    public TValues? Values { get; private set; }
 
     private bool ValidateValues(TValues values)
     {

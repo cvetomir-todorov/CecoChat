@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using CecoChat.Data.Config.Common;
+﻿using CecoChat.Data.Config.Common;
 using Microsoft.Extensions.Logging;
 
 namespace CecoChat.Data.Config.History;
@@ -15,7 +14,6 @@ internal sealed class HistoryConfig : IHistoryConfig
 {
     private readonly ILogger _logger;
     private readonly IConfigSection<HistoryValues> _section;
-    private HistoryValues? _values;
 
     public HistoryConfig(
         ILogger<HistoryConfig> logger,
@@ -30,29 +28,25 @@ internal sealed class HistoryConfig : IHistoryConfig
         get
         {
             EnsureInitialized();
-            return _values.MessageCount;
+            return _section.Values!.MessageCount;
+        }
+    }
+
+    private void EnsureInitialized()
+    {
+        if (_section.Values == null)
+        {
+            throw new InvalidOperationException($"Call '{nameof(Initialize)}' to initialize the config.");
         }
     }
 
     public async Task<bool> Initialize()
     {
-        InitializeResult<HistoryValues> result = await _section.Initialize(ConfigKeys.History.Section, PrintValues);
-        _values = result.Values;
-
-        return result.Success;
+        return await _section.Initialize(ConfigKeys.History.Section, PrintValues);
     }
 
     private void PrintValues(HistoryValues values)
     {
         _logger.LogInformation("Chat message count set to {MessageCount}", values.MessageCount);
-    }
-
-    [MemberNotNull(nameof(_values))]
-    private void EnsureInitialized()
-    {
-        if (_values == null)
-        {
-            throw new InvalidOperationException($"Call '{nameof(Initialize)}' to initialize the config.");
-        }
     }
 }
