@@ -1,19 +1,21 @@
 using CecoChat.AspNet.Prometheus;
-using CecoChat.Data.Config;
+using CecoChat.Client.Config;
 using CecoChat.Jwt;
 using CecoChat.Otel;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 
 namespace CecoChat.Server;
 
 public abstract class StartupBase
 {
-    protected StartupBase(IConfiguration configuration)
+    protected StartupBase(IConfiguration configuration, IWebHostEnvironment environment)
     {
         Configuration = configuration;
+        Environment = environment;
 
-        ConfigDbOptions = new();
-        Configuration.GetSection("ConfigDb").Bind(ConfigDbOptions);
+        ConfigClientOptions = new();
+        Configuration.GetSection("ConfigClient").Bind(ConfigClientOptions);
 
         JwtOptions = new();
         Configuration.GetSection("Jwt").Bind(JwtOptions);
@@ -28,8 +30,9 @@ public abstract class StartupBase
         Configuration.GetSection("Telemetry:Metrics:Prometheus").Bind(PrometheusOptions);
     }
 
+    protected IWebHostEnvironment Environment { get; }
     protected IConfiguration Configuration { get; }
-    protected ConfigDbOptions ConfigDbOptions { get; }
+    protected ConfigClientOptions ConfigClientOptions { get; }
     protected JwtOptions JwtOptions { get; }
     protected OtelSamplingOptions TracingSamplingOptions { get; }
     protected OtlpOptions TracingExportOptions { get; }
