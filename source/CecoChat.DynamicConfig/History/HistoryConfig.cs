@@ -1,11 +1,10 @@
-﻿using CecoChat.Data.Config.Common;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 
-namespace CecoChat.Data.Config.History;
+namespace CecoChat.DynamicConfig.History;
 
 public interface IHistoryConfig
 {
-    Task<bool> Initialize();
+    Task<bool> Initialize(CancellationToken ct);
 
     int MessageCount { get; }
 }
@@ -40,9 +39,9 @@ internal sealed class HistoryConfig : IHistoryConfig
         }
     }
 
-    public async Task<bool> Initialize()
+    public async Task<bool> Initialize(CancellationToken ct)
     {
-        return await _section.Initialize(ConfigKeys.History.Section, PrintValues);
+        return await _section.Initialize(ConfigKeys.History.Section, PrintValues, ct);
     }
 
     private void PrintValues(HistoryValues values)

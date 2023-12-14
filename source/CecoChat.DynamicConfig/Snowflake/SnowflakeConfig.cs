@@ -1,11 +1,10 @@
-using CecoChat.Data.Config.Common;
 using Microsoft.Extensions.Logging;
 
-namespace CecoChat.Data.Config.Snowflake;
+namespace CecoChat.DynamicConfig.Snowflake;
 
 public interface ISnowflakeConfig
 {
-    Task<bool> Initialize();
+    Task<bool> Initialize(CancellationToken ct);
 
     IReadOnlyCollection<short> GetGeneratorIds(string server);
 }
@@ -43,9 +42,9 @@ internal sealed class SnowflakeConfig : ISnowflakeConfig
         }
     }
 
-    public async Task<bool> Initialize()
+    public async Task<bool> Initialize(CancellationToken ct)
     {
-        return await _section.Initialize(ConfigKeys.Snowflake.Section, PrintValues);
+        return await _section.Initialize(ConfigKeys.Snowflake.Section, PrintValues, ct);
     }
 
     private void PrintValues(SnowflakeValues values)

@@ -1,45 +1,41 @@
-﻿using CecoChat.Data.Config.Common;
+﻿using CecoChat.Client.Config;
+using CecoChat.Contracts.Config;
 using CecoChat.Kafka;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace CecoChat.Data.Config.Partitioning;
+namespace CecoChat.DynamicConfig.Partitioning;
 
 internal sealed class PartitioningRepo : IRepo<PartitioningValues>
 {
     private readonly ILogger _logger;
-    private readonly ConfigDbContext _dbContext;
+    private readonly IConfigClient _configClient;
 
     public PartitioningRepo(
         ILogger<PartitioningRepo> logger,
-        ConfigDbContext dbContext)
+        ConfigClient configClient)
     {
         _logger = logger;
-        _dbContext = dbContext;
+        _configClient = configClient;
     }
 
-    public async Task<PartitioningValues> Load()
+    public async Task<PartitioningValues> Load(CancellationToken ct)
     {
-        List<ElementEntity> elements = await _dbContext.Elements
-            .Where(e => e.Name.StartsWith(ConfigKeys.Partitioning.Section))
-            .AsNoTracking()
-            .ToListAsync();
-
+        IReadOnlyCollection<ConfigElement> elements = await _configClient.GetConfigElements(ConfigKeys.Partitioning.Section, ct);
         PartitioningValues values = new();
 
-        ElementEntity? partitionCount = elements.FirstOrDefault(e => string.Equals(e.Name, ConfigKeys.Partitioning.Count, StringComparison.InvariantCultureIgnoreCase));
+        ConfigElement? partitionCount = elements.FirstOrDefault(e => string.Equals(e.Name, ConfigKeys.Partitioning.Count, StringComparison.InvariantCultureIgnoreCase));
         if (partitionCount != null)
         {
             values.PartitionCount = ParsePartitionCount(partitionCount);
         }
 
-        ElementEntity? partitions = elements.FirstOrDefault(e => string.Equals(e.Name, ConfigKeys.Partitioning.Partitions, StringComparison.InvariantCultureIgnoreCase));
+        ConfigElement? partitions = elements.FirstOrDefault(e => string.Equals(e.Name, ConfigKeys.Partitioning.Partitions, StringComparison.InvariantCultureIgnoreCase));
         if (partitions != null)
         {
             ParsePartitions(partitions, values);
         }
 
-        ElementEntity? addresses = elements.FirstOrDefault(e => string.Equals(e.Name, ConfigKeys.Partitioning.Addresses, StringComparison.InvariantCultureIgnoreCase));
+        ConfigElement? addresses = elements.FirstOrDefault(e => string.Equals(e.Name, ConfigKeys.Partitioning.Addresses, StringComparison.InvariantCultureIgnoreCase));
         if (addresses != null)
         {
             ParseAddresses(addresses, values);
@@ -48,7 +44,7 @@ internal sealed class PartitioningRepo : IRepo<PartitioningValues>
         return values;
     }
 
-    private int ParsePartitionCount(ElementEntity element)
+    private int ParsePartitionCount(ConfigElement element)
     {
         if (!int.TryParse(element.Value, out int partitionCount))
         {
@@ -58,7 +54,7 @@ internal sealed class PartitioningRepo : IRepo<PartitioningValues>
         return partitionCount;
     }
 
-    private void ParsePartitions(ElementEntity element, PartitioningValues values)
+    private void ParsePartitions(ConfigElement element, PartitioningValues values)
     {
         string[] pairs = element.Value.Split(separator: ';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
@@ -68,7 +64,7 @@ internal sealed class PartitioningRepo : IRepo<PartitioningValues>
         }
     }
 
-    private void ParsePartitionsValue(ElementEntity element, string pair, PartitioningValues values)
+    private void ParsePartitionsValue(ConfigElement element, string pair, PartitioningValues values)
     {
         string[] parts = pair.Split(separator: '=', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         if (parts.Length != 2)
@@ -96,7 +92,7 @@ internal sealed class PartitioningRepo : IRepo<PartitioningValues>
         values.ServerPartitionMap[server] = partitions;
     }
 
-    private void ParseAddresses(ElementEntity element, PartitioningValues values)
+    private void ParseAddresses(ConfigElement element, PartitioningValues values)
     {
         string[] pairs = element.Value.Split(separator: ';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 

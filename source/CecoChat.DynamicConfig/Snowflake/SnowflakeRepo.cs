@@ -1,32 +1,28 @@
-using CecoChat.Data.Config.Common;
-using Microsoft.EntityFrameworkCore;
+using CecoChat.Client.Config;
+using CecoChat.Contracts.Config;
 using Microsoft.Extensions.Logging;
 
-namespace CecoChat.Data.Config.Snowflake;
+namespace CecoChat.DynamicConfig.Snowflake;
 
 internal sealed class SnowflakeRepo : IRepo<SnowflakeValues>
 {
     private readonly ILogger _logger;
-    private readonly ConfigDbContext _dbContext;
+    private readonly IConfigClient _configClient;
 
     public SnowflakeRepo(
         ILogger<SnowflakeRepo> logger,
-        ConfigDbContext dbContext)
+        IConfigClient configClient)
     {
         _logger = logger;
-        _dbContext = dbContext;
+        _configClient = configClient;
     }
 
-    public async Task<SnowflakeValues> Load()
+    public async Task<SnowflakeValues> Load(CancellationToken ct)
     {
-        List<ElementEntity> elements = await _dbContext.Elements
-            .Where(e => e.Name.StartsWith(ConfigKeys.Snowflake.Section))
-            .AsNoTracking()
-            .ToListAsync();
-
+        IReadOnlyCollection<ConfigElement> elements = await _configClient.GetConfigElements(ConfigKeys.Snowflake.Section, ct);
         SnowflakeValues values = new();
 
-        ElementEntity? generatorIds = elements.FirstOrDefault(e => string.Equals(e.Name, ConfigKeys.Snowflake.GeneratorIds, StringComparison.InvariantCultureIgnoreCase));
+        ConfigElement? generatorIds = elements.FirstOrDefault(e => string.Equals(e.Name, ConfigKeys.Snowflake.GeneratorIds, StringComparison.InvariantCultureIgnoreCase));
         if (generatorIds != null)
         {
             ParseGeneratorIds(generatorIds, values);
@@ -35,7 +31,7 @@ internal sealed class SnowflakeRepo : IRepo<SnowflakeValues>
         return values;
     }
 
-    private void ParseGeneratorIds(ElementEntity element, SnowflakeValues values)
+    private void ParseGeneratorIds(ConfigElement element, SnowflakeValues values)
     {
         string[] pairs = element.Value.Split(separator: ';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
@@ -45,7 +41,7 @@ internal sealed class SnowflakeRepo : IRepo<SnowflakeValues>
         }
     }
 
-    private void ParseGeneratorIdsValue(ElementEntity element, string pair, SnowflakeValues values)
+    private void ParseGeneratorIdsValue(ConfigElement element, string pair, SnowflakeValues values)
     {
         string[] parts = pair.Split(separator: '=', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         if (parts.Length != 2)

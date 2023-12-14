@@ -1,4 +1,4 @@
-namespace CecoChat.Data.Config;
+namespace CecoChat.DynamicConfig;
 
 public static class ConfigKeys
 {

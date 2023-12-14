@@ -1,7 +1,7 @@
 ﻿using CecoChat.Kafka;
 using FluentValidation;
 
-namespace CecoChat.Data.Config.Partitioning;
+namespace CecoChat.DynamicConfig.Partitioning;
 
 internal sealed class PartitioningValidator : AbstractValidator<PartitioningValues>
 {

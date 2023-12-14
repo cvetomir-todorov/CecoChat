@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace CecoChat.Data.Config.History;
+namespace CecoChat.DynamicConfig.History;
 
 internal sealed class HistoryValidator : AbstractValidator<HistoryValues>
 {
