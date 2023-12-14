@@ -4,9 +4,15 @@ using Calzolari.Grpc.AspNetCore.Validation;
 using CecoChat.AspNet.Health;
 using CecoChat.AspNet.Prometheus;
 using CecoChat.Autofac;
-using CecoChat.Data.Config;
-using CecoChat.Npgsql.Health;
+using CecoChat.Client.Config;
+using CecoChat.DynamicConfig;
+using CecoChat.Http.Health;
+using CecoChat.Kafka;
+using CecoChat.Kafka.Health;
+using CecoChat.Kafka.Telemetry;
 using CecoChat.Otel;
+using CecoChat.Server.Backplane;
+using CecoChat.Server.IdGen.Backplane;
 using CecoChat.Server.IdGen.Endpoints;
 using CecoChat.Server.IdGen.HostedServices;
 using FluentValidation;
@@ -19,30 +25,31 @@ namespace CecoChat.Server.IdGen;
 
 public class Startup : StartupBase
 {
-    private readonly IWebHostEnvironment _environment;
+    private readonly BackplaneOptions _backplaneOptions;
 
     public Startup(IConfiguration configuration, IWebHostEnvironment environment)
-        : base(configuration)
+        : base(configuration, environment)
     {
-        _environment = environment;
+        _backplaneOptions = new();
+        Configuration.GetSection("Backplane").Bind(_backplaneOptions);
     }
 
     public void ConfigureServices(IServiceCollection services)
     {
         AddTelemetryServices(services);
         AddHealthServices(services);
+        
+        // dynamic config
+        services.AddConfigClient(ConfigClientOptions);
 
         // clients
         services.AddGrpc(grpc =>
         {
-            grpc.EnableDetailedErrors = _environment.IsDevelopment();
+            grpc.EnableDetailedErrors = Environment.IsDevelopment();
             grpc.EnableMessageValidation();
         });
         services.AddGrpcValidation();
         
-        // config db
-        services.AddConfigDb(ConfigDbOptions.Connect);
-
         // common
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
         services.AddOptions();
@@ -69,6 +76,8 @@ public class Startup : StartupBase
                     };
                     aspnet.Filter = httpContext => !excludedPaths.Contains(httpContext.Request.Path);
                 });
+                tracing.AddKafkaInstrumentation();
+                tracing.AddGrpcClientInstrumentation(grpc => grpc.SuppressDownstreamInstrumentation = true);
                 tracing.ConfigureSampling(TracingSamplingOptions);
                 tracing.ConfigureOtlpExporter(TracingExportOptions);
             })
@@ -84,29 +93,53 @@ public class Startup : StartupBase
     {
         services
             .AddHealthChecks()
-            .AddCheck<ConfigDbInitHealthCheck>(
-                "config-db-init",
+            .AddCheck<DynamicConfigInitHealthCheck>(
+                "dynamic-config-init",
                 tags: new[] { HealthTags.Health, HealthTags.Startup })
-            .AddNpgsql(
-                "config-db",
-                ConfigDbOptions.Connect,
-                tags: new[] { HealthTags.Health, HealthTags.Ready });
+            .AddCheck<ConfigChangesConsumerHealthCheck>(
+                "config-changes-consumer",
+                tags: new[] { HealthTags.Health, HealthTags.Startup, HealthTags.Live })
+            .AddUri(
+                "config-client",
+                new Uri(ConfigClientOptions.Address!, ConfigClientOptions.HealthPath),
+                configureHttpClient: (_, client) => client.DefaultRequestVersion = new Version(2, 0),
+                timeout: ConfigClientOptions.HealthTimeout,
+                tags: new[] { HealthTags.Health, HealthTags.Live })
+            .AddKafka(
+                "backplane",
+                _backplaneOptions.Kafka,
+                _backplaneOptions.Health,
+                tags: new[] { HealthTags.Health });
 
-        services.AddSingleton<ConfigDbInitHealthCheck>();
+        services.AddSingleton<DynamicConfigInitHealthCheck>();
+        services.AddSingleton<ConfigChangesConsumerHealthCheck>();
     }
 
     public void ConfigureContainer(ContainerBuilder builder)
     {
         // ordered hosted services
         builder.RegisterHostedService<InitDynamicConfig>();
+        builder.RegisterHostedService<InitBackplane>();
+        builder.RegisterHostedService<InitBackplaneComponents>();
 
-        // configuration
-        IConfiguration configDbConfig = Configuration.GetSection("ConfigDb");
-        builder.RegisterModule(new ConfigDbAutofacModule(configDbConfig, registerSnowflake: true));
+        // config
         builder.RegisterOptions<ConfigOptions>(Configuration.GetSection("Config"));
+
+        // dynamic config
+        IConfiguration backplaneConfiguration = Configuration.GetSection("Backplane");
+        builder.RegisterModule(new DynamicConfigAutofacModule(backplaneConfiguration, registerConfigChangesConsumer: true, registerSnowflake: true));
+        IConfiguration configClientConfiguration = Configuration.GetSection("ConfigClient");
+        builder.RegisterModule(new ConfigClientAutofacModule(configClientConfiguration));
+
+        // backplane
+        builder.RegisterType<KafkaAdmin>().As<IKafkaAdmin>().SingleInstance();
+        builder.RegisterOptions<KafkaOptions>(Configuration.GetSection("Backplane:Kafka"));
 
         // snowflake
         builder.RegisterType<SnowflakeGenerator>().As<IIdentityGenerator>().SingleInstance();
+
+        // shared
+        builder.RegisterType<MonotonicClock>().As<IClock>().SingleInstance();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -116,7 +149,9 @@ public class Startup : StartupBase
             app.UseDeveloperExceptionPage();
         }
 
+        app.UseCustomExceptionHandler();
         app.UseHttpsRedirection();
+
         app.UseRouting();
         app.UseEndpoints(endpoints =>
         {
