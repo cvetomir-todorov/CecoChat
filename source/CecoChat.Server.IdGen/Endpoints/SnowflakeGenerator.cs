@@ -1,4 +1,4 @@
-﻿using CecoChat.Data.Config.Snowflake;
+﻿using CecoChat.DynamicConfig.Snowflake;
 using CecoChat.Server.IdGen.HostedServices;
 using IdGen;
 using Microsoft.Extensions.Options;
