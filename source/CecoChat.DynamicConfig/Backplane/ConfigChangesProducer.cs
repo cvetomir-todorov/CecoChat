@@ -1,21 +1,22 @@
 using CecoChat.Contracts.Config;
 using CecoChat.Kafka;
-using CecoChat.Server.Backplane;
 using Confluent.Kafka;
 using Google.Protobuf.WellKnownTypes;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace CecoChat.Server.Admin.Backplane;
+namespace CecoChat.DynamicConfig.Backplane;
 
 public interface IConfigChangesProducer : IDisposable
 {
     void NotifyChanges(string configSection);
 }
 
-public sealed class ConfigChangesProducer : IConfigChangesProducer
+internal sealed class ConfigChangesProducer : IConfigChangesProducer
 {
     private readonly ILogger _logger;
-    private readonly BackplaneOptions _backplaneOptions;
+    private readonly BackplaneOptions _options;
     private readonly IKafkaProducer<Null, ConfigChange> _producer;
 
     public ConfigChangesProducer(
@@ -25,10 +26,10 @@ public sealed class ConfigChangesProducer : IConfigChangesProducer
         IFactory<IKafkaProducer<Null, ConfigChange>> producerFactory)
     {
         _logger = logger;
-        _backplaneOptions = backplaneOptions.Value;
+        _options = backplaneOptions.Value;
         _producer = producerFactory.Create();
 
-        _producer.Initialize(_backplaneOptions.Kafka, _backplaneOptions.ConfigChangesProducer, new ConfigChangeSerializer());
+        _producer.Initialize(_options.Kafka, _options.ConfigChangesProducer, new ConfigChangeSerializer());
         applicationLifetime.ApplicationStopping.Register(_producer.FlushPendingMessages);
     }
 
@@ -49,7 +50,7 @@ public sealed class ConfigChangesProducer : IConfigChangesProducer
             Value = configChange
         };
 
-        _producer.Produce(kafkaMessage, _backplaneOptions.ConfigChangesTopic);
+        _producer.Produce(kafkaMessage, _options.TopicConfigChanges);
         _logger.LogInformation("Notified about changes in config section {ConfigSection}", configSection);
     }
 }

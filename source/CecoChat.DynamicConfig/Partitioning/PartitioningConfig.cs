@@ -1,13 +1,12 @@
-﻿using CecoChat.Data.Config.Common;
-using CecoChat.Events;
+﻿using CecoChat.Events;
 using CecoChat.Kafka;
 using Microsoft.Extensions.Logging;
 
-namespace CecoChat.Data.Config.Partitioning;
+namespace CecoChat.DynamicConfig.Partitioning;
 
 public interface IPartitioningConfig
 {
-    Task<bool> Initialize();
+    Task<bool> Initialize(CancellationToken ct);
 
     int PartitionCount { get; }
 
@@ -78,9 +77,9 @@ internal sealed class PartitioningConfig : IPartitioningConfig
         }
     }
 
-    public async Task<bool> Initialize()
+    public async Task<bool> Initialize(CancellationToken ct)
     {
-        return await _section.Initialize(ConfigKeys.Partitioning.Section, PrintValues);
+        return await _section.Initialize(ConfigKeys.Partitioning.Section, PrintValues, ct);
     }
 
     private void PrintValues(PartitioningValues values)

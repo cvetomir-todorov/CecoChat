@@ -2,7 +2,7 @@ using CecoChat.Contracts.Config;
 using Confluent.Kafka;
 using Google.Protobuf;
 
-namespace CecoChat.Server.Backplane;
+namespace CecoChat.DynamicConfig.Backplane;
 
 public sealed class ConfigChangeSerializer : ISerializer<ConfigChange>
 {
