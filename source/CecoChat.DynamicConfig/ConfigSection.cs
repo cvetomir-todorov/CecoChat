@@ -19,17 +19,21 @@ internal sealed class ConfigSection<TValues> : IConfigSection<TValues>, IConfigC
     private readonly ILogger _logger;
     private readonly IValidator<TValues> _validator;
     private readonly IRepo<TValues> _repo;
+    private readonly IClock _clock;
     private string? _configContext;
     private Action<TValues>? _printValues;
+    private DateTime _version;
 
     public ConfigSection(
         ILogger<ConfigSection<TValues>> logger,
         IValidator<TValues> validator,
-        IRepo<TValues> repo)
+        IRepo<TValues> repo,
+        IClock clock)
     {
         _logger = logger;
         _validator = validator;
         _repo = repo;
+        _clock = clock;
     }
  
     public async Task<bool> Initialize(string configContext, Action<TValues> printValues, CancellationToken ct)
@@ -46,9 +50,11 @@ internal sealed class ConfigSection<TValues> : IConfigSection<TValues>, IConfigC
                 return false;
             }
 
-            printValues(values);
             Values = values;
+            _version = _clock.GetNowUtc();
+
             _printValues = printValues;
+            _printValues(values);
 
             return true;
         }
@@ -88,6 +94,8 @@ internal sealed class ConfigSection<TValues> : IConfigSection<TValues>, IConfigC
 
     string IConfigChangeSubscriber.ConfigSection => _configContext ?? string.Empty;
 
+    public DateTime ConfigVersion => _version;
+
     public async Task NotifyConfigChange(CancellationToken ct)
     {
         TValues changedValues = await _repo.Load(ct);
@@ -96,7 +104,10 @@ internal sealed class ConfigSection<TValues> : IConfigSection<TValues>, IConfigC
         if (ValidateValues(changedValues))
         {
             _logger.LogInformation("Using new {ConfigContext} configuration", _configContext);
+
             Values = changedValues;
+            _version = _clock.GetNowUtc();
+
             _printValues!(Values);
         }
         else

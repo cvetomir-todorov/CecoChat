@@ -63,8 +63,21 @@ internal sealed class ConfigChangesConsumer : IConfigChangesConsumer
 
     private void ProcessMessage(ConfigChange configChange, CancellationToken ct)
     {
+        TimeSpan delta = TimeSpan.FromSeconds(1);
+
         foreach (IConfigChangeSubscriber subscriber in _configChangeSubscribers)
         {
+            if (!string.Equals(subscriber.ConfigSection, configChange.ConfigSection, StringComparison.InvariantCultureIgnoreCase))
+            {
+                continue;
+            }
+            if (configChange.When.ToDateTime() < subscriber.ConfigVersion + delta)
+            {
+                _logger.LogInformation("Skip config change dated at {ConfigChangeDateTime} because current config values are newer {CurrentConfigDateTime}",
+                    configChange.When.ToDateTime(), subscriber.ConfigVersion);
+                continue;
+            }
+
             if (string.Equals(subscriber.ConfigSection, configChange.ConfigSection, StringComparison.InvariantCultureIgnoreCase))
             {
                 subscriber.NotifyConfigChange(ct).ContinueWith(task =>
