@@ -1,4 +1,5 @@
 using CecoChat.Data.Config;
+using CecoChat.DynamicConfig;
 using CecoChat.Npgsql;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -12,17 +13,20 @@ public class InitConfigDb : IHostedService
     private readonly ConfigDbOptions _configDbOptions;
     private readonly INpgsqlDbInitializer _initializer;
     private readonly ConfigDbContext _configDbContext;
+    private readonly ConfigDbInitHealthCheck _configDbInitHealthCheck;
 
     public InitConfigDb(
         ILogger<InitConfigDb> logger,
         IOptions<ConfigDbOptions> configDbOptions,
         ConfigDbContext configDbContext,
-        INpgsqlDbInitializer initializer)
+        INpgsqlDbInitializer initializer,
+        ConfigDbInitHealthCheck configDbInitHealthCheck)
     {
         _logger = logger;
         _configDbOptions = configDbOptions.Value;
         _configDbContext = configDbContext;
         _initializer = initializer;
+        _configDbInitHealthCheck = configDbInitHealthCheck;
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)
@@ -31,6 +35,8 @@ public class InitConfigDb : IHostedService
         _initializer.Initialize(_configDbOptions.Init, database, typeof(ConfigDbAutofacModule).Assembly);
 
         await Seed();
+
+        _configDbInitHealthCheck.IsReady = true;
     }
 
     private async Task Seed()

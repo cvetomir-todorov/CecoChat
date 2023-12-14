@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using CecoChat.Contracts.Config;
 using FluentValidation;
 
 namespace CecoChat.Server.Admin.Endpoints;
@@ -40,5 +41,18 @@ public sealed class ConfigElementValidator : AbstractValidator<ConfigElement>
             RuleFor(x => x.Value)
                 .NotEmpty();
         }
+    }
+}
+
+public sealed class GetConfigElementsRequestValidator : AbstractValidator<GetConfigElementsRequest>
+{
+    private static readonly Regex ConfigSectionRegex = new("^([a-z\\-]{2,16})$", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
+    public GetConfigElementsRequestValidator()
+    {
+        RuleFor(x => x.ConfigSection)
+            .NotEmpty()
+            .Matches(ConfigSectionRegex)
+            .WithMessage("{PropertyName} should be a correct config section such as 'partitioning', but {PropertyValue} was provided.");
     }
 }

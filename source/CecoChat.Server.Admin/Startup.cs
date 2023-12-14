@@ -1,33 +1,45 @@
 using System.Reflection;
 using Autofac;
+using Calzolari.Grpc.AspNetCore.Validation;
 using CecoChat.AspNet.Health;
 using CecoChat.AspNet.ModelBinding;
+using CecoChat.AspNet.Prometheus;
 using CecoChat.AspNet.Swagger;
 using CecoChat.Autofac;
-using CecoChat.Contracts.Config;
 using CecoChat.Data.Config;
+using CecoChat.DynamicConfig;
 using CecoChat.Kafka;
 using CecoChat.Kafka.Health;
 using CecoChat.Kafka.Telemetry;
 using CecoChat.Npgsql;
 using CecoChat.Npgsql.Health;
+using CecoChat.Otel;
 using CecoChat.Server.Admin.Backplane;
+using CecoChat.Server.Admin.Endpoints;
 using CecoChat.Server.Admin.HostedServices;
 using CecoChat.Server.Backplane;
-using Confluent.Kafka;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Npgsql;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 
 namespace CecoChat.Server.Admin;
 
 public class Startup : StartupBase
 {
+    private readonly ConfigDbOptions _configDbOptions;
     private readonly BackplaneOptions _backplaneOptions;
     private readonly SwaggerOptions _swaggerOptions;
 
-    public Startup(IConfiguration configuration) : base(configuration)
+    public Startup(IConfiguration configuration, IWebHostEnvironment environment)
+        : base(configuration, environment)
     {
+        _configDbOptions = new();
+        Configuration.GetSection("ConfigDb").Bind(_configDbOptions);
+
         _backplaneOptions = new();
         Configuration.GetSection("Backplane").Bind(_backplaneOptions);
 
@@ -37,7 +49,16 @@ public class Startup : StartupBase
 
     public void ConfigureServices(IServiceCollection services)
     {
+        AddTelemetryServices(services);
         AddHealthServices(services);
+
+        // clients
+        services.AddGrpc(grpc =>
+        {
+            grpc.EnableDetailedErrors = Environment.IsDevelopment();
+            grpc.EnableMessageValidation();
+        });
+        services.AddGrpcValidation();
 
         // web
         services.AddControllers(mvc =>
@@ -48,7 +69,7 @@ public class Startup : StartupBase
         services.AddSwaggerServices(_swaggerOptions);
 
         // config db
-        services.AddConfigDb(ConfigDbOptions.Connect);
+        services.AddConfigDb(_configDbOptions.Connect);
 
         // common
         services.AddFluentValidationAutoValidation(fluentValidation =>
@@ -58,18 +79,56 @@ public class Startup : StartupBase
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
     }
 
+    private void AddTelemetryServices(IServiceCollection services)
+    {
+        ResourceBuilder serviceResourceBuilder = ResourceBuilder
+            .CreateEmpty()
+            .AddService(serviceName: "Admin", serviceNamespace: "CecoChat", serviceVersion: "0.1")
+            .AddEnvironmentVariableDetector();
+
+        services
+            .AddOpenTelemetry()
+            .WithTracing(tracing =>
+            {
+                tracing.SetResourceBuilder(serviceResourceBuilder);
+                tracing.AddAspNetCoreInstrumentation(aspnet =>
+                {
+                    HashSet<string> excludedPaths = new()
+                    {
+                        PrometheusOptions.ScrapeEndpointPath, HealthPaths.Health, HealthPaths.Startup, HealthPaths.Live, HealthPaths.Ready
+                    };
+                    aspnet.Filter = httpContext => !excludedPaths.Contains(httpContext.Request.Path);
+                });
+                tracing.AddKafkaInstrumentation();
+                tracing.AddNpgsql();
+                tracing.ConfigureSampling(TracingSamplingOptions);
+                tracing.ConfigureOtlpExporter(TracingExportOptions);
+            })
+            .WithMetrics(metrics =>
+            {
+                metrics.SetResourceBuilder(serviceResourceBuilder);
+                metrics.AddAspNetCoreInstrumentation();
+                metrics.ConfigurePrometheusAspNetExporter(PrometheusOptions);
+            });
+    }
+
     private void AddHealthServices(IServiceCollection services)
     {
         services.AddHealthChecks()
+            .AddCheck<ConfigDbInitHealthCheck>(
+                "config-db-init",
+                tags: new[] { HealthTags.Health, HealthTags.Startup })
             .AddNpgsql(
                 "config-db",
-                ConfigDbOptions.Connect,
+                _configDbOptions.Connect,
                 tags: new[] { HealthTags.Health, HealthTags.Ready })
             .AddKafka(
                 "backplane",
                 _backplaneOptions.Kafka,
                 _backplaneOptions.Health,
                 tags: new[] { HealthTags.Health });
+
+        services.AddSingleton<ConfigDbInitHealthCheck>();
     }
 
     public void ConfigureContainer(ContainerBuilder builder)
@@ -83,13 +142,13 @@ public class Startup : StartupBase
         IConfiguration configDbConfig = Configuration.GetSection("ConfigDb");
         builder.RegisterOptions<ConfigDbOptions>(configDbConfig);
 
+        // dynamic config
+        IConfiguration backplaneConfiguration = Configuration.GetSection("Backplane");
+        builder.RegisterModule(new DynamicConfigAutofacModule(backplaneConfiguration, registerConfigChangesProducer: true));
+
         // backplane
         builder.RegisterType<KafkaAdmin>().As<IKafkaAdmin>().SingleInstance();
         builder.RegisterOptions<KafkaOptions>(Configuration.GetSection("Backplane:Kafka"));
-        builder.RegisterType<ConfigChangesProducer>().As<IConfigChangesProducer>().SingleInstance();
-        builder.RegisterFactory<KafkaProducer<Null, ConfigChange>, IKafkaProducer<Null, ConfigChange>>();
-        builder.RegisterModule(new KafkaAutofacModule());
-        builder.RegisterOptions<BackplaneOptions>(Configuration.GetSection("Backplane"));
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -107,6 +166,7 @@ public class Startup : StartupBase
         app.UseAuthorization();
         app.UseEndpoints(endpoints =>
         {
+            endpoints.MapGrpcService<ConfigService>();
             endpoints.MapControllers();
             endpoints.MapHttpHealthEndpoints(setup =>
             {
@@ -122,6 +182,7 @@ public class Startup : StartupBase
             });
         });
 
+        app.UseOpenTelemetryPrometheusScrapingEndpoint(context => context.Request.Path == PrometheusOptions.ScrapeEndpointPath);
         app.MapWhen(context => context.Request.Path.StartsWithSegments("/swagger"), _ =>
         {
             app.UseSwaggerMiddlewares(_swaggerOptions);
