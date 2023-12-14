@@ -12,7 +12,7 @@ internal sealed class PartitioningRepo : IRepo<PartitioningValues>
 
     public PartitioningRepo(
         ILogger<PartitioningRepo> logger,
-        ConfigClient configClient)
+        IConfigClient configClient)
     {
         _logger = logger;
         _configClient = configClient;

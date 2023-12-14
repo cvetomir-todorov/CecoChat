@@ -3,14 +3,14 @@ using CecoChat.AspNet.Health;
 using CecoChat.AspNet.Prometheus;
 using CecoChat.AspNet.SignalR.Telemetry;
 using CecoChat.Autofac;
+using CecoChat.Client.Config;
 using CecoChat.Client.IdGen;
 using CecoChat.Contracts.Backplane;
-using CecoChat.Data.Config;
+using CecoChat.DynamicConfig;
 using CecoChat.Http.Health;
 using CecoChat.Kafka;
 using CecoChat.Kafka.Health;
 using CecoChat.Kafka.Telemetry;
-using CecoChat.Npgsql.Health;
 using CecoChat.Otel;
 using CecoChat.Server.Backplane;
 using CecoChat.Server.Identity;
@@ -30,16 +30,13 @@ namespace CecoChat.Server.Messaging;
 
 public class Startup : StartupBase
 {
-    private readonly IWebHostEnvironment _environment;
     private readonly ClientOptions _clientOptions;
     private readonly BackplaneOptions _backplaneOptions;
     private readonly IdGenClientOptions _idGenClientOptions;
 
     public Startup(IConfiguration configuration, IWebHostEnvironment environment)
-        : base(configuration)
+        : base(configuration, environment)
     {
-        _environment = environment;
-
         _clientOptions = new();
         Configuration.GetSection("Clients").Bind(_clientOptions);
 
@@ -59,6 +56,9 @@ public class Startup : StartupBase
         services.AddJwtAuthentication(JwtOptions);
         services.AddUserPolicyAuthorization();
 
+        // dynamic config
+        services.AddConfigClient(ConfigClientOptions);
+
         // idgen
         services.AddIdGenClient(_idGenClientOptions);
 
@@ -66,7 +66,7 @@ public class Startup : StartupBase
         services
             .AddSignalR(signalr =>
             {
-                signalr.EnableDetailedErrors = _environment.IsDevelopment();
+                signalr.EnableDetailedErrors = Environment.IsDevelopment();
                 // when clients don't send anything within this interval, server disconnects them in order to save resources
                 signalr.ClientTimeoutInterval = _clientOptions.TimeoutInterval;
                 // the server sends data to keep the connection alive
@@ -77,9 +77,6 @@ public class Startup : StartupBase
             {
                 chatHub.AddFilter<SignalRTelemetryFilter>();
             });
-
-        // config db
-        services.AddConfigDb(ConfigDbOptions.Connect);
 
         // common
         services.AddOptions();
@@ -99,6 +96,7 @@ public class Startup : StartupBase
                 tracing.SetResourceBuilder(serviceResourceBuilder);
                 tracing.AddSignalRInstrumentation();
                 tracing.AddKafkaInstrumentation();
+                tracing.AddGrpcClientInstrumentation(grpc => grpc.SuppressDownstreamInstrumentation = true);
                 tracing.ConfigureSampling(TracingSamplingOptions);
                 tracing.ConfigureOtlpExporter(TracingExportOptions);
             })
@@ -115,16 +113,21 @@ public class Startup : StartupBase
     {
         services
             .AddHealthChecks()
-            .AddCheck<ConfigDbInitHealthCheck>(
-                "config-db-init",
+            .AddCheck<DynamicConfigInitHealthCheck>(
+                "dynamic-config-init",
                 tags: new[] { HealthTags.Health, HealthTags.Startup })
+            .AddCheck<ConfigChangesConsumerHealthCheck>(
+                "config-changes-consumer",
+                tags: new[] { HealthTags.Health, HealthTags.Startup, HealthTags.Live })
             .AddCheck<ReceiversConsumerHealthCheck>(
                 "receivers-consumer",
                 tags: new[] { HealthTags.Health, HealthTags.Startup, HealthTags.Live })
-            .AddNpgsql(
-                "config-db",
-                ConfigDbOptions.Connect,
-                tags: new[] { HealthTags.Health, HealthTags.Ready })
+            .AddUri(
+                "config-client",
+                new Uri(ConfigClientOptions.Address!, ConfigClientOptions.HealthPath),
+                configureHttpClient: (_, client) => client.DefaultRequestVersion = new Version(2, 0),
+                timeout: ConfigClientOptions.HealthTimeout,
+                tags: new[] { HealthTags.Health, HealthTags.Live })
             .AddKafka(
                 "backplane",
                 _backplaneOptions.Kafka,
@@ -137,7 +140,8 @@ public class Startup : StartupBase
                 timeout: _idGenClientOptions.HealthTimeout,
                 tags: new[] { HealthTags.Health, HealthTags.Ready });
 
-        services.AddSingleton<ConfigDbInitHealthCheck>();
+        services.AddSingleton<DynamicConfigInitHealthCheck>();
+        services.AddSingleton<ConfigChangesConsumerHealthCheck>();
         services.AddSingleton<ReceiversConsumerHealthCheck>();
     }
 
@@ -148,10 +152,14 @@ public class Startup : StartupBase
         builder.RegisterHostedService<InitBackplane>();
         builder.RegisterHostedService<InitBackplaneComponents>();
 
-        // configuration
-        IConfiguration configDbConfig = Configuration.GetSection("ConfigDb");
-        builder.RegisterModule(new ConfigDbAutofacModule(configDbConfig, registerPartitioning: true));
+        // config
         builder.RegisterOptions<ConfigOptions>(Configuration.GetSection("Config"));
+
+        // dynamic config
+        IConfiguration backplaneConfiguration = Configuration.GetSection("Backplane");
+        builder.RegisterModule(new DynamicConfigAutofacModule(backplaneConfiguration, registerConfigChangesConsumer: true, registerPartitioning: true));
+        IConfiguration configClientConfiguration = Configuration.GetSection("ConfigClient");
+        builder.RegisterModule(new ConfigClientAutofacModule(configClientConfiguration));
 
         // clients
         builder.RegisterType<ClientContainer>().As<IClientContainer>().SingleInstance();
@@ -188,7 +196,9 @@ public class Startup : StartupBase
             app.UseDeveloperExceptionPage();
         }
 
+        app.UseCustomExceptionHandler();
         app.UseHttpsRedirection();
+
         app.UseRouting();
         app.UseAuthentication();
         app.UseAuthorization();

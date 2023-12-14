@@ -1,4 +1,5 @@
-﻿using CecoChat.Kafka;
+﻿using CecoChat.DynamicConfig.Backplane;
+using CecoChat.Kafka;
 using CecoChat.Threading;
 using Microsoft.Extensions.Options;
 
@@ -22,7 +23,9 @@ public sealed class BackplaneComponents : IBackplaneComponents
     private readonly ITopicPartitionFlyweight _topicPartitionFlyweight;
     private readonly ISendersProducer _sendersProducer;
     private readonly IReceiversConsumer _receiversConsumer;
+    private readonly IConfigChangesConsumer _configChangesConsumer;
     private readonly ReceiversConsumerHealthCheck _receiversConsumerHealthCheck;
+    private readonly ConfigChangesConsumerHealthCheck _configChangesConsumerHealthCheck;
     private DedicatedThreadTaskScheduler? _receiversConsumerTaskScheduler;
 
     public BackplaneComponents(
@@ -31,14 +34,18 @@ public sealed class BackplaneComponents : IBackplaneComponents
         ITopicPartitionFlyweight topicPartitionFlyweight,
         ISendersProducer sendersProducer,
         IReceiversConsumer receiversConsumer,
-        ReceiversConsumerHealthCheck receiversConsumerHealthCheck)
+        IConfigChangesConsumer configChangesConsumer,
+        ReceiversConsumerHealthCheck receiversConsumerHealthCheck,
+        ConfigChangesConsumerHealthCheck configChangesConsumerHealthCheck)
     {
         _logger = logger;
         _backplaneOptions = backplaneOptions.Value;
         _topicPartitionFlyweight = topicPartitionFlyweight;
         _sendersProducer = sendersProducer;
         _receiversConsumer = receiversConsumer;
+        _configChangesConsumer = configChangesConsumer;
         _receiversConsumerHealthCheck = receiversConsumerHealthCheck;
+        _configChangesConsumerHealthCheck = configChangesConsumerHealthCheck;
     }
 
     public void Dispose()
@@ -46,6 +53,7 @@ public sealed class BackplaneComponents : IBackplaneComponents
         _receiversConsumerTaskScheduler?.Dispose();
         _sendersProducer.Dispose();
         _receiversConsumer.Dispose();
+        _configChangesConsumer.Dispose();
     }
 
     public void ConfigurePartitioning(int partitionCount, PartitionRange partitions)
@@ -73,6 +81,33 @@ public sealed class BackplaneComponents : IBackplaneComponents
     public PartitionRange CurrentPartitions { get; private set; }
 
     public void StartConsumption(CancellationToken ct)
+    {
+        StartConfigChangesConsumer(ct);
+        StartReceiversConsumer(ct);
+    }
+
+    private void StartConfigChangesConsumer(CancellationToken ct)
+    {
+        _configChangesConsumer.Prepare();
+        Task.Factory.StartNew(() =>
+        {
+            try
+            {
+                _configChangesConsumerHealthCheck.IsReady = true;
+                _configChangesConsumer.Start(ct);
+            }
+            catch (Exception exception)
+            {
+                _logger.LogCritical(exception, "Failure in config changes consumer");
+            }
+            finally
+            {
+                _configChangesConsumerHealthCheck.IsReady = false;
+            }
+        }, ct, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+    }
+
+    private void StartReceiversConsumer(CancellationToken ct)
     {
         _receiversConsumerTaskScheduler = new DedicatedThreadTaskScheduler();
         Task.Factory.StartNew(() =>

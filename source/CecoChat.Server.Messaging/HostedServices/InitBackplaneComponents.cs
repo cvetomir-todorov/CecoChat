@@ -1,5 +1,5 @@
 ﻿using CecoChat.Contracts.Messaging;
-using CecoChat.Data.Config.Partitioning;
+using CecoChat.DynamicConfig.Partitioning;
 using CecoChat.Events;
 using CecoChat.Kafka;
 using CecoChat.Server.Backplane;
