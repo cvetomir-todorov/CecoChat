@@ -11,10 +11,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="OpenTelemetry.Instrumentation.GrpcNetClient" Version="1.0.0-rc9.14" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\CecoChat.Client.Chats\CecoChat.Client.Chats.csproj" />
     <ProjectReference Include="..\CecoChat.Client.User\CecoChat.Client.User.csproj" />
     <ProjectReference Include="..\CecoChat.Contracts.Bff\CecoChat.Contracts.Bff.csproj" />
