@@ -66,7 +66,7 @@ public sealed class KafkaProducer<TKey, TValue> : IKafkaProducer<TKey, TValue>
             .SetValueSerializer(valueSerializer)
             .Build();
         _producerOptions = producerOptions;
-        _id = $"{producerOptions.ProducerId}_id{KafkaProducerIdGenerator.GetNextId()}";
+        _id = $"{producerOptions.ProducerId}-{KafkaProducerIdGenerator.GetNextId()}";
     }
 
     public void Produce(Message<TKey, TValue> message, TopicPartition topicPartition, DeliveryHandler<TKey, TValue>? deliveryHandler = null)
