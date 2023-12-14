@@ -1,0 +1,16 @@
+syntax = "proto3";
+option csharp_namespace = "CecoChat.Contracts.Config";
+package CecoChat.Contracts.Config;
+import "ConfigElement.proto";
+
+service Config {
+  rpc GetConfigElements(GetConfigElementsRequest) returns (GetConfigElementsResponse);
+}
+
+message GetConfigElementsRequest {
+  string config_section = 1;
+}
+
+message GetConfigElementsResponse {
+  repeated ConfigElement elements = 1;
+}

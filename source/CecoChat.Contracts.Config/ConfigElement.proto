@@ -1,0 +1,10 @@
+syntax = "proto3";
+option csharp_namespace = "CecoChat.Contracts.Config";
+package CecoChat.Contracts.Config;
+import "google/protobuf/timestamp.proto";
+
+message ConfigElement {
+  string name = 1;
+  string value = 2;
+  google.protobuf.Timestamp version = 3;
+}
