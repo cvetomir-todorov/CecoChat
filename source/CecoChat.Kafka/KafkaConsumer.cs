@@ -67,7 +67,7 @@ public sealed class KafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey, TValue>
             .SetValueDeserializer(valueDeserializer)
             .Build();
         _consumerOptions = consumerOptions;
-        _id = $"{consumerOptions.ConsumerGroupId}_id{KafkaConsumerIdGenerator.GetNextId()}";
+        _id = $"{consumerOptions.ConsumerGroupId}-{KafkaConsumerIdGenerator.GetNextId()}";
     }
 
     public void Subscribe(string topic)
