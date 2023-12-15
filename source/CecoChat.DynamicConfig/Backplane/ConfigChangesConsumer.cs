@@ -73,18 +73,15 @@ internal sealed class ConfigChangesConsumer : IConfigChangesConsumer
             }
             if (configChange.When.ToDateTime() < subscriber.ConfigVersion + delta)
             {
-                _logger.LogInformation("Skip config change dated at {ConfigChangeDateTime} because current config values are newer {CurrentConfigDateTime}",
-                    configChange.When.ToDateTime(), subscriber.ConfigVersion);
+                _logger.LogInformation("Skip config change for config section {ConfigSection} dated at {ConfigChangeDateTime} because current config values are newer {CurrentConfigDateTime}",
+                    configChange.ConfigSection, configChange.When.ToDateTime(), subscriber.ConfigVersion);
                 continue;
             }
 
-            if (string.Equals(subscriber.ConfigSection, configChange.ConfigSection, StringComparison.InvariantCultureIgnoreCase))
+            subscriber.NotifyConfigChange(ct).ContinueWith(task =>
             {
-                subscriber.NotifyConfigChange(ct).ContinueWith(task =>
-                {
-                    _logger.LogError(task.Exception, "Failed processing for config change for config section {ConfigSection}", configChange.ConfigSection);
-                }, TaskContinuationOptions.OnlyOnFaulted);
-            }
+                _logger.LogError(task.Exception, "Failed processing for config change for config section {ConfigSection}", configChange.ConfigSection);
+            }, TaskContinuationOptions.OnlyOnFaulted);
         }
     }
 }
