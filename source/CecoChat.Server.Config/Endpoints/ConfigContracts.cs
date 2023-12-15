@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace CecoChat.Server.Admin.Endpoints;
+namespace CecoChat.Server.Config.Endpoints;
 
 public sealed class GetConfigRequest
 { }

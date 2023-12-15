@@ -1,7 +1,7 @@
 using CecoChat.Kafka;
 using CecoChat.Kafka.Health;
 
-namespace CecoChat.Server.Admin.Backplane;
+namespace CecoChat.Server.Config.Backplane;
 
 public sealed class BackplaneOptions
 {

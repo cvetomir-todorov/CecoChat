@@ -4,9 +4,9 @@ using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Microsoft.EntityFrameworkCore;
 
-namespace CecoChat.Server.Admin.Endpoints;
+namespace CecoChat.Server.Config.Endpoints;
 
-public class ConfigService : Config.ConfigBase
+public class ConfigService : Contracts.Config.Config.ConfigBase
 {
     private readonly ILogger _logger;
     private readonly ConfigDbContext _configDbContext;

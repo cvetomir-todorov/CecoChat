@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Npgsql;
 
-namespace CecoChat.Server.Admin.HostedServices;
+namespace CecoChat.Server.Config.HostedServices;
 
 public class InitConfigDb : IHostedService
 {

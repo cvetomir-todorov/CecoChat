@@ -1,4 +1,4 @@
-namespace CecoChat.Server.Admin;
+namespace CecoChat.Server.Config;
 
 public static class Program
 {
