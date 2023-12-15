@@ -4,11 +4,12 @@ using Calzolari.Grpc.AspNetCore.Validation;
 using CecoChat.AspNet.Health;
 using CecoChat.AspNet.Prometheus;
 using CecoChat.Autofac;
+using CecoChat.Client.Config;
 using CecoChat.Client.IdGen;
 using CecoChat.Contracts.Backplane;
-using CecoChat.Data.Config;
 using CecoChat.Data.User;
 using CecoChat.Data.User.Infra;
+using CecoChat.DynamicConfig;
 using CecoChat.Http.Health;
 using CecoChat.Kafka;
 using CecoChat.Kafka.Health;
@@ -35,17 +36,14 @@ namespace CecoChat.Server.User;
 
 public class Startup : StartupBase
 {
-    private readonly IWebHostEnvironment _environment;
     private readonly UserDbOptions _userDbOptions;
     private readonly RedisOptions _userCacheStoreOptions;
     private readonly IdGenClientOptions _idGenClientOptions;
     private readonly BackplaneOptions _backplaneOptions;
 
     public Startup(IConfiguration configuration, IWebHostEnvironment environment)
-        : base(configuration)
+        : base(configuration, environment)
     {
-        _environment = environment;
-
         _userDbOptions = new();
         Configuration.GetSection("UserDb").Bind(_userDbOptions);
 
@@ -71,13 +69,13 @@ public class Startup : StartupBase
         // clients
         services.AddGrpc(grpc =>
         {
-            grpc.EnableDetailedErrors = _environment.IsDevelopment();
+            grpc.EnableDetailedErrors = Environment.IsDevelopment();
             grpc.EnableMessageValidation();
         });
         services.AddGrpcValidation();
 
-        // config db
-        services.AddConfigDb(ConfigDbOptions.Connect);
+        // dynamic config
+        services.AddConfigClient(ConfigClientOptions);
 
         // user db
         services.AddUserDb(_userDbOptions.Connect);
@@ -119,6 +117,7 @@ public class Startup : StartupBase
                 tracing.AddKafkaInstrumentation();
                 tracing.AddNpgsql();
                 tracing.AddRedisInstrumentation();
+                tracing.AddGrpcClientInstrumentation(grpc => grpc.SuppressDownstreamInstrumentation = true);
                 tracing.ConfigureSampling(TracingSamplingOptions);
                 tracing.ConfigureOtlpExporter(TracingExportOptions);
             })
@@ -134,16 +133,21 @@ public class Startup : StartupBase
     {
         services
             .AddHealthChecks()
-            .AddCheck<ConfigDbInitHealthCheck>(
+            .AddCheck<DynamicConfigInitHealthCheck>(
                 "config-db-init",
                 tags: new[] { HealthTags.Health, HealthTags.Startup })
             .AddCheck<UserDbInitHealthCheck>(
                 "user-db-init",
                 tags: new[] { HealthTags.Health, HealthTags.Startup })
-            .AddNpgsql(
-                "config-db",
-                ConfigDbOptions.Connect,
-                tags: new[] { HealthTags.Health, HealthTags.Ready })
+            .AddCheck<ConfigChangesConsumerHealthCheck>(
+                "config-changes-consumer",
+                tags: new[] { HealthTags.Health, HealthTags.Startup, HealthTags.Live })
+            .AddUri(
+                "config-client",
+                new Uri(ConfigClientOptions.Address!, ConfigClientOptions.HealthPath),
+                configureHttpClient: (_, client) => client.DefaultRequestVersion = new Version(2, 0),
+                timeout: ConfigClientOptions.HealthTimeout,
+                tags: new[] { HealthTags.Health, HealthTags.Live })
             .AddKafka(
                 "backplane",
                 _backplaneOptions.Kafka,
@@ -163,8 +167,9 @@ public class Startup : StartupBase
                 timeout: _idGenClientOptions.HealthTimeout,
                 tags: new[] { HealthTags.Health, HealthTags.Ready });
 
-        services.AddSingleton<ConfigDbInitHealthCheck>();
+        services.AddSingleton<DynamicConfigInitHealthCheck>();
         services.AddSingleton<UserDbInitHealthCheck>();
+        services.AddSingleton<ConfigChangesConsumerHealthCheck>();
     }
 
     public void ConfigureContainer(ContainerBuilder builder)
@@ -176,9 +181,11 @@ public class Startup : StartupBase
         builder.RegisterHostedService<InitUsersDb>();
         builder.RegisterHostedService<AsyncProfileCaching>();
 
-        // config db
-        IConfiguration configDbConfig = Configuration.GetSection("ConfigDb");
-        builder.RegisterModule(new ConfigDbAutofacModule(configDbConfig, registerPartitioning: true));
+        // dynamic config
+        IConfiguration backplaneConfiguration = Configuration.GetSection("Backplane");
+        builder.RegisterModule(new DynamicConfigAutofacModule(backplaneConfiguration, registerConfigChangesConsumer: true, registerPartitioning: true));
+        IConfiguration configClientConfiguration = Configuration.GetSection("ConfigClient");
+        builder.RegisterModule(new ConfigClientAutofacModule(configClientConfiguration));
 
         // backplane
         builder.RegisterType<KafkaAdmin>().As<IKafkaAdmin>().SingleInstance();
@@ -213,6 +220,9 @@ public class Startup : StartupBase
         {
             app.UseDeveloperExceptionPage();
         }
+
+        app.UseCustomExceptionHandler();
+        app.UseHttpsRedirection();
 
         app.UseRouting();
         app.UseAuthentication();

@@ -1,4 +1,5 @@
-using CecoChat.Data.Config.Partitioning;
+using CecoChat.DynamicConfig.Backplane;
+using CecoChat.DynamicConfig.Partitioning;
 using CecoChat.Events;
 using CecoChat.Kafka;
 using CecoChat.Server.User.Backplane;
@@ -13,6 +14,8 @@ public sealed class InitBackplaneComponents : IHostedService, ISubscriber<EventA
     private readonly IPartitioningConfig _partitioningConfig;
     private readonly ITopicPartitionFlyweight _topicPartitionFlyweight;
     private readonly IConnectionNotifyProducer _connectionNotifyProducer;
+    private readonly IConfigChangesConsumer _configChangesConsumer;
+    private readonly ConfigChangesConsumerHealthCheck _configChangesConsumerHealthCheck;
     private readonly IEvent<EventArgs> _partitionsChanged;
     private readonly Guid _partitionsChangedToken;
     private readonly CancellationToken _appStoppingCt;
@@ -25,6 +28,8 @@ public sealed class InitBackplaneComponents : IHostedService, ISubscriber<EventA
         IPartitioningConfig partitioningConfig,
         ITopicPartitionFlyweight topicPartitionFlyweight,
         IConnectionNotifyProducer connectionNotifyProducer,
+        IConfigChangesConsumer configChangesConsumer,
+        ConfigChangesConsumerHealthCheck configChangesConsumerHealthCheck,
         IEvent<EventArgs> partitionsChanged)
     {
         _logger = logger;
@@ -32,6 +37,8 @@ public sealed class InitBackplaneComponents : IHostedService, ISubscriber<EventA
         _partitioningConfig = partitioningConfig;
         _topicPartitionFlyweight = topicPartitionFlyweight;
         _connectionNotifyProducer = connectionNotifyProducer;
+        _configChangesConsumer = configChangesConsumer;
+        _configChangesConsumerHealthCheck = configChangesConsumerHealthCheck;
         _partitionsChanged = partitionsChanged;
 
         _partitionsChangedToken = _partitionsChanged.Subscribe(this);
@@ -42,11 +49,15 @@ public sealed class InitBackplaneComponents : IHostedService, ISubscriber<EventA
     {
         _stoppedCts?.Dispose();
         _partitionsChanged.Unsubscribe(_partitionsChangedToken);
+        _configChangesConsumer.Dispose();
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
         _stoppedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _appStoppingCt);
+
+        _configChangesConsumer.Prepare();
+        StartConfigChangesConsumer(_stoppedCts.Token);
 
         int partitionCount = _partitioningConfig.PartitionCount;
         _topicPartitionFlyweight.Add(_backplaneOptions.TopicMessagesByReceiver, partitionCount);
@@ -56,6 +67,26 @@ public sealed class InitBackplaneComponents : IHostedService, ISubscriber<EventA
             _backplaneOptions.TopicMessagesByReceiver, partitionCount);
 
         return Task.CompletedTask;
+    }
+
+    private void StartConfigChangesConsumer(CancellationToken ct)
+    {
+        Task.Factory.StartNew(() =>
+        {
+            try
+            {
+                _configChangesConsumerHealthCheck.IsReady = true;
+                _configChangesConsumer.Start(ct);
+            }
+            catch (Exception exception)
+            {
+                _logger.LogCritical(exception, "Failure in config changes consumer");
+            }
+            finally
+            {
+                _configChangesConsumerHealthCheck.IsReady = false;
+            }
+        }, ct, TaskCreationOptions.LongRunning, TaskScheduler.Current);
     }
 
     public Task StopAsync(CancellationToken cancellationToken)
