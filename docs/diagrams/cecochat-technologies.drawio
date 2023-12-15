@@ -1,14 +1,14 @@
-<mxfile host="Electron" modified="2023-12-06T07:38:51.445Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.1.2 Chrome/114.0.5735.289 Electron/25.9.4 Safari/537.36" etag="_Mhck7lw7t99vPeg1_tx" version="22.1.2" type="device">
+<mxfile host="Electron" modified="2023-12-15T16:08:37.279Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.1.2 Chrome/114.0.5735.289 Electron/25.9.4 Safari/537.36" etag="wTCMTwL2TSBkUuA_T6cC" version="22.1.2" type="device">
   <diagram id="G4t1x3i_cumIOjZ8GDXV" name="Page-1">
     <mxGraphModel dx="2020" dy="1203" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="9bIkWJb_8Kgto9eP_v_A-1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;startArrow=classic;startFill=1;" parent="1" source="9bIkWJb_8Kgto9eP_v_A-3" target="9bIkWJb_8Kgto9eP_v_A-7" edge="1">
+        <mxCell id="9bIkWJb_8Kgto9eP_v_A-1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.25;entryDx=0;entryDy=0;startArrow=classic;startFill=1;" parent="1" source="9bIkWJb_8Kgto9eP_v_A-3" target="9bIkWJb_8Kgto9eP_v_A-7" edge="1">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
               <mxPoint x="120" y="340" />
-              <mxPoint x="120" y="490" />
+              <mxPoint x="120" y="395" />
             </Array>
           </mxGeometry>
         </mxCell>
@@ -25,16 +25,16 @@
           <mxGeometry x="40" y="290" width="30" height="60" as="geometry" />
         </mxCell>
         <mxCell id="9bIkWJb_8Kgto9eP_v_A-4" value="WebSocket&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;MessagePack" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.75;entryDx=0;entryDy=0;startArrow=classic;startFill=1;" parent="1" source="9bIkWJb_8Kgto9eP_v_A-5" target="9bIkWJb_8Kgto9eP_v_A-7" edge="1">
-          <mxGeometry x="0.1351" relative="1" as="geometry">
+          <mxGeometry x="0.0909" relative="1" as="geometry">
             <mxPoint as="offset" />
             <Array as="points">
-              <mxPoint x="120" y="580" />
-              <mxPoint x="120" y="505" />
+              <mxPoint x="120" y="510" />
+              <mxPoint x="120" y="425" />
             </Array>
           </mxGeometry>
         </mxCell>
         <mxCell id="9bIkWJb_8Kgto9eP_v_A-5" value="Client" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" parent="1" vertex="1">
-          <mxGeometry x="40" y="540" width="30" height="60" as="geometry" />
+          <mxGeometry x="40" y="460" width="30" height="60" as="geometry" />
         </mxCell>
         <mxCell id="9bIkWJb_8Kgto9eP_v_A-6" value="&lt;span style=&quot;color: rgb(0, 0, 0); font-family: Helvetica; font-size: 11px; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; font-weight: 400; letter-spacing: normal; orphans: 2; text-align: center; text-indent: 0px; text-transform: none; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; background-color: rgb(255, 255, 255); text-decoration-thickness: initial; text-decoration-style: initial; text-decoration-color: initial; float: none; display: inline !important;&quot;&gt;Kafka client&lt;/span&gt;" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;startArrow=classic;startFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" parent="1" source="9bIkWJb_8Kgto9eP_v_A-7" target="9bIkWJb_8Kgto9eP_v_A-9" edge="1">
           <mxGeometry x="0.0527" y="-1" relative="1" as="geometry">
@@ -42,13 +42,13 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="9bIkWJb_8Kgto9eP_v_A-7" value="Messaging&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;&lt;font style=&quot;border-color: var(--border-color); font-size: 10px;&quot;&gt;ASP.NET&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;gradientColor=#ffa500;fillColor=#ffcd28;strokeColor=#d79b00;" parent="1" vertex="1">
-          <mxGeometry x="160" y="460" width="120" height="60" as="geometry" />
+          <mxGeometry x="160" y="380" width="120" height="60" as="geometry" />
         </mxCell>
         <mxCell id="9bIkWJb_8Kgto9eP_v_A-8" value="Kafka client" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;" parent="1" source="9bIkWJb_8Kgto9eP_v_A-9" target="9bIkWJb_8Kgto9eP_v_A-15" edge="1">
-          <mxGeometry x="0.564" relative="1" as="geometry">
+          <mxGeometry x="0.5224" relative="1" as="geometry">
             <mxPoint as="offset" />
             <Array as="points">
-              <mxPoint x="780" y="490" />
+              <mxPoint x="780" y="410" />
               <mxPoint x="780" y="140" />
               <mxPoint x="440" y="140" />
             </Array>
@@ -56,7 +56,7 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="9bIkWJb_8Kgto9eP_v_A-9" value="PUB/SUB&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;backplane&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;&lt;font style=&quot;border-color: var(--border-color); font-size: 10px;&quot;&gt;Kafka&lt;/font&gt;" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.direct_data;whiteSpace=wrap;gradientColor=#97d077;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
-          <mxGeometry x="640" y="450" width="120" height="80" as="geometry" />
+          <mxGeometry x="640" y="370" width="120" height="80" as="geometry" />
         </mxCell>
         <mxCell id="9bIkWJb_8Kgto9eP_v_A-10" value="Chats DB&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;&lt;font style=&quot;border-color: var(--border-color); font-size: 10px;&quot;&gt;Cassandra&lt;/font&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;gradientColor=#7ea6e0;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
           <mxGeometry x="640" y="40" width="120" height="80" as="geometry" />
@@ -69,22 +69,22 @@
             <Array as="points" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="9bIkWJb_8Kgto9eP_v_A-12" value="Redis client" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" parent="1" source="9bIkWJb_8Kgto9eP_v_A-13" target="9bIkWJb_8Kgto9eP_v_A-14" edge="1">
+        <mxCell id="9bIkWJb_8Kgto9eP_v_A-12" value="Postgres client" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" parent="1" source="9bIkWJb_8Kgto9eP_v_A-13" target="9bIkWJb_8Kgto9eP_v_A-14" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="9bIkWJb_8Kgto9eP_v_A-13" value="Configurator&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;&lt;font style=&quot;border-color: var(--border-color); font-size: 10px;&quot;&gt;ASP.NET&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;gradientColor=#ffa500;fillColor=#ffcd28;strokeColor=#d79b00;" parent="1" vertex="1">
-          <mxGeometry x="380" y="550" width="120" height="60" as="geometry" />
+        <mxCell id="9bIkWJb_8Kgto9eP_v_A-13" value="Config&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;&lt;font style=&quot;border-color: var(--border-color); font-size: 10px;&quot;&gt;ASP.NET&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;gradientColor=#ffa500;fillColor=#ffcd28;strokeColor=#d79b00;" parent="1" vertex="1">
+          <mxGeometry x="380" y="510" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="9bIkWJb_8Kgto9eP_v_A-14" value="Config DB&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;&lt;font style=&quot;border-color: var(--border-color); font-size: 10px;&quot;&gt;Redis&lt;/font&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;gradientColor=#7ea6e0;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
-          <mxGeometry x="640" y="540" width="120" height="80" as="geometry" />
+        <mxCell id="9bIkWJb_8Kgto9eP_v_A-14" value="Config DB&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;&lt;span style=&quot;font-size: 10px;&quot;&gt;YugabyteDB&lt;/span&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;gradientColor=#7ea6e0;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+          <mxGeometry x="640" y="500" width="120" height="80" as="geometry" />
         </mxCell>
         <mxCell id="9bIkWJb_8Kgto9eP_v_A-15" value="Chats&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;&lt;font style=&quot;border-color: var(--border-color); font-size: 10px;&quot;&gt;ASP.NET&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;gradientColor=#ffa500;fillColor=#ffcd28;strokeColor=#d79b00;" parent="1" vertex="1">
           <mxGeometry x="380" y="50" width="120" height="60" as="geometry" />
         </mxCell>
         <mxCell id="9bIkWJb_8Kgto9eP_v_A-16" value="ID Gen&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;&lt;font style=&quot;border-color: var(--border-color); font-size: 10px;&quot;&gt;ASP.NET&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;gradientColor=#ffa500;fillColor=#ffcd28;strokeColor=#d79b00;" parent="1" vertex="1">
-          <mxGeometry x="380" y="380" width="120" height="60" as="geometry" />
+          <mxGeometry x="380" y="440" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="9bIkWJb_8Kgto9eP_v_A-17" value="gRPC" style="endArrow=classic;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;rounded=0;edgeStyle=orthogonalEdgeStyle;" parent="1" source="9bIkWJb_8Kgto9eP_v_A-7" target="9bIkWJb_8Kgto9eP_v_A-16" edge="1">
+        <mxCell id="9bIkWJb_8Kgto9eP_v_A-17" value="gRPC" style="endArrow=classic;html=1;exitX=1;exitY=0.75;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;rounded=0;edgeStyle=orthogonalEdgeStyle;" parent="1" source="9bIkWJb_8Kgto9eP_v_A-7" target="9bIkWJb_8Kgto9eP_v_A-16" edge="1">
           <mxGeometry x="0.0303" width="50" height="50" relative="1" as="geometry">
             <mxPoint x="530" y="225" as="sourcePoint" />
             <mxPoint x="290" y="415" as="targetPoint" />
@@ -130,7 +130,7 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="9bIkWJb_8Kgto9eP_v_A-29" value="User cache&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;&lt;font style=&quot;border-color: var(--border-color); font-size: 10px;&quot;&gt;Redis&lt;/font&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;gradientColor=#7ea6e0;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
-          <mxGeometry x="640" y="270" width="120" height="80" as="geometry" />
+          <mxGeometry x="640" y="260" width="120" height="80" as="geometry" />
         </mxCell>
         <mxCell id="9bIkWJb_8Kgto9eP_v_A-30" value="Redis client" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;exitX=1;exitY=0.75;exitDx=0;exitDy=0;edgeStyle=orthogonalEdgeStyle;" parent="1" source="9bIkWJb_8Kgto9eP_v_A-25" target="9bIkWJb_8Kgto9eP_v_A-29" edge="1">
           <mxGeometry x="0.3778" relative="1" as="geometry">
@@ -138,27 +138,18 @@
             <mxPoint x="590" y="150" as="targetPoint" />
             <mxPoint as="offset" />
             <Array as="points">
-              <mxPoint x="510" y="225" />
-              <mxPoint x="510" y="310" />
+              <mxPoint x="520" y="225" />
+              <mxPoint x="520" y="300" />
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="9bIkWJb_8Kgto9eP_v_A-31" value="gRPC" style="endArrow=classic;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;rounded=0;edgeStyle=orthogonalEdgeStyle;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="9bIkWJb_8Kgto9eP_v_A-25" target="9bIkWJb_8Kgto9eP_v_A-16" edge="1">
-          <mxGeometry width="50" height="50" relative="1" as="geometry">
-            <mxPoint x="290" y="495" as="sourcePoint" />
-            <mxPoint x="290" y="350" as="targetPoint" />
-            <mxPoint as="offset" />
-            <Array as="points" />
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="9bIkWJb_8Kgto9eP_v_A-32" value="Kafka client" style="endArrow=classic;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;rounded=0;edgeStyle=orthogonalEdgeStyle;entryPerimeter=0;exitX=0.75;exitY=1;exitDx=0;exitDy=0;" parent="1" source="9bIkWJb_8Kgto9eP_v_A-25" target="9bIkWJb_8Kgto9eP_v_A-9" edge="1">
-          <mxGeometry x="-0.0222" width="50" height="50" relative="1" as="geometry">
+        <mxCell id="9bIkWJb_8Kgto9eP_v_A-32" value="Kafka client" style="endArrow=classic;html=1;rounded=0;edgeStyle=orthogonalEdgeStyle;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" parent="1" source="9bIkWJb_8Kgto9eP_v_A-25" target="9bIkWJb_8Kgto9eP_v_A-9" edge="1">
+          <mxGeometry x="-0.3714" width="50" height="50" relative="1" as="geometry">
             <mxPoint x="310" y="330" as="sourcePoint" />
-            <mxPoint x="450" y="420" as="targetPoint" />
+            <mxPoint x="610" y="390" as="targetPoint" />
             <mxPoint as="offset" />
             <Array as="points">
-              <mxPoint x="470" y="360" />
-              <mxPoint x="700" y="360" />
+              <mxPoint x="440" y="390" />
             </Array>
           </mxGeometry>
         </mxCell>
