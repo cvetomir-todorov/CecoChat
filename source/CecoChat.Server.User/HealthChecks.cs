@@ -2,8 +2,11 @@ using CecoChat.Health;
 
 namespace CecoChat.Server.User;
 
-public class ConfigDbInitHealthCheck : StatusHealthCheck
+public class DynamicConfigInitHealthCheck : StatusHealthCheck
 { }
 
 public class UserDbInitHealthCheck : StatusHealthCheck
+{ }
+
+public class ConfigChangesConsumerHealthCheck : StatusHealthCheck
 { }
