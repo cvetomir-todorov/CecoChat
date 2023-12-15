@@ -14,10 +14,10 @@ using CecoChat.Kafka.Telemetry;
 using CecoChat.Npgsql;
 using CecoChat.Npgsql.Health;
 using CecoChat.Otel;
-using CecoChat.Server.Admin.Backplane;
-using CecoChat.Server.Admin.Endpoints;
-using CecoChat.Server.Admin.HostedServices;
 using CecoChat.Server.Backplane;
+using CecoChat.Server.Config.Backplane;
+using CecoChat.Server.Config.Endpoints;
+using CecoChat.Server.Config.HostedServices;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -26,7 +26,7 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 
-namespace CecoChat.Server.Admin;
+namespace CecoChat.Server.Config;
 
 public class Startup : StartupBase
 {
