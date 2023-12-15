@@ -1,4 +1,5 @@
-﻿using CecoChat.Server.Chats.Backplane;
+﻿using CecoChat.DynamicConfig.Backplane;
+using CecoChat.Server.Chats.Backplane;
 using CecoChat.Threading;
 
 namespace CecoChat.Server.Chats.HostedServices;
@@ -8,9 +9,11 @@ public sealed class InitBackplaneComponents : IHostedService, IDisposable
     private readonly ILogger _logger;
     private readonly IHistoryConsumer _historyConsumer;
     private readonly IStateConsumer _stateConsumer;
+    private readonly IConfigChangesConsumer _configChangesConsumer;
     private readonly HistoryConsumerHealthCheck _historyConsumerHealthCheck;
     private readonly ReceiversConsumerHealthCheck _receiversConsumerHealthCheck;
     private readonly SendersConsumerHealthCheck _sendersConsumerHealthCheck;
+    private readonly ConfigChangesConsumerHealthCheck _configChangesConsumerHealthCheck;
     private readonly CancellationToken _appStoppingCt;
     private CancellationTokenSource? _stoppedCts;
     private DedicatedThreadTaskScheduler? _historyConsumerTaskScheduler;
@@ -21,17 +24,21 @@ public sealed class InitBackplaneComponents : IHostedService, IDisposable
         ILogger<InitBackplaneComponents> logger,
         IHistoryConsumer historyConsumer,
         IStateConsumer stateConsumer,
+        IConfigChangesConsumer configChangesConsumer,
         HistoryConsumerHealthCheck historyConsumerHealthCheck,
         ReceiversConsumerHealthCheck receiversConsumerHealthCheck,
         SendersConsumerHealthCheck sendersConsumerHealthCheck,
+        ConfigChangesConsumerHealthCheck configChangesConsumerHealthCheck,
         IHostApplicationLifetime applicationLifetime)
     {
         _logger = logger;
         _historyConsumer = historyConsumer;
         _stateConsumer = stateConsumer;
+        _configChangesConsumer = configChangesConsumer;
         _historyConsumerHealthCheck = historyConsumerHealthCheck;
         _receiversConsumerHealthCheck = receiversConsumerHealthCheck;
         _sendersConsumerHealthCheck = sendersConsumerHealthCheck;
+        _configChangesConsumerHealthCheck = configChangesConsumerHealthCheck;
 
         _appStoppingCt = applicationLifetime.ApplicationStopping;
     }
@@ -46,6 +53,7 @@ public sealed class InitBackplaneComponents : IHostedService, IDisposable
 
         _historyConsumer.Dispose();
         _stateConsumer.Dispose();
+        _configChangesConsumer.Dispose();
     }
 
     public Task StartAsync(CancellationToken cancellationToken)
@@ -54,10 +62,12 @@ public sealed class InitBackplaneComponents : IHostedService, IDisposable
 
         _historyConsumer.Prepare();
         _stateConsumer.Prepare();
+        _configChangesConsumer.Prepare();
 
         StartHistoryConsumer(_stoppedCts.Token);
         StartReceiverMessagesConsumer(_stoppedCts.Token);
         StartSenderMessagesConsumer(_stoppedCts.Token);
+        StartConfigChangesConsumer(_stoppedCts.Token);
 
         return Task.CompletedTask;
     }
@@ -123,6 +133,26 @@ public sealed class InitBackplaneComponents : IHostedService, IDisposable
                 _sendersConsumerHealthCheck.IsReady = false;
             }
         }, ct, TaskCreationOptions.LongRunning, _senderMessagesTaskScheduler);
+    }
+
+    private void StartConfigChangesConsumer(CancellationToken ct)
+    {
+        Task.Factory.StartNew(() =>
+        {
+            try
+            {
+                _configChangesConsumerHealthCheck.IsReady = true;
+                _configChangesConsumer.Start(ct);
+            }
+            catch (Exception exception)
+            {
+                _logger.LogCritical(exception, "Failure in config changes consumer");
+            }
+            finally
+            {
+                _configChangesConsumerHealthCheck.IsReady = false;
+            }
+        }, ct, TaskCreationOptions.LongRunning, TaskScheduler.Current);
     }
 
     public Task StopAsync(CancellationToken cancellationToken)

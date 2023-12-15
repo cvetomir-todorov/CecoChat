@@ -1,23 +1,23 @@
-﻿using CecoChat.Data.Config.History;
+﻿using CecoChat.DynamicConfig.History;
 
 namespace CecoChat.Server.Chats.HostedServices;
 
 public sealed class InitDynamicConfig : IHostedService
 {
     private readonly IHistoryConfig _historyConfig;
-    private readonly ConfigDbInitHealthCheck _configDbInitHealthCheck;
+    private readonly DynamicConfigInitHealthCheck _dynamicConfigInitHealthCheck;
 
     public InitDynamicConfig(
         IHistoryConfig historyConfig,
-        ConfigDbInitHealthCheck configDbInitHealthCheck)
+        DynamicConfigInitHealthCheck dynamicConfigInitHealthCheck)
     {
         _historyConfig = historyConfig;
-        _configDbInitHealthCheck = configDbInitHealthCheck;
+        _dynamicConfigInitHealthCheck = dynamicConfigInitHealthCheck;
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        _configDbInitHealthCheck.IsReady = await _historyConfig.Initialize();
+        _dynamicConfigInitHealthCheck.IsReady = await _historyConfig.Initialize(cancellationToken);
     }
 
     public Task StopAsync(CancellationToken cancellationToken)

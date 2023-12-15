@@ -6,14 +6,15 @@ using CecoChat.AspNet.Prometheus;
 using CecoChat.Autofac;
 using CecoChat.Cassandra;
 using CecoChat.Cassandra.Health;
+using CecoChat.Client.Config;
 using CecoChat.Contracts.Backplane;
 using CecoChat.Data.Chats;
 using CecoChat.Data.Chats.Telemetry;
-using CecoChat.Data.Config;
+using CecoChat.DynamicConfig;
+using CecoChat.Http.Health;
 using CecoChat.Kafka;
 using CecoChat.Kafka.Health;
 using CecoChat.Kafka.Telemetry;
-using CecoChat.Npgsql.Health;
 using CecoChat.Otel;
 using CecoChat.Server.Backplane;
 using CecoChat.Server.Chats.Backplane;
@@ -31,15 +32,12 @@ namespace CecoChat.Server.Chats;
 
 public class Startup : StartupBase
 {
-    private readonly IWebHostEnvironment _environment;
     private readonly BackplaneOptions _backplaneOptions;
     private readonly CassandraOptions _chatsDbOptions;
 
     public Startup(IConfiguration configuration, IWebHostEnvironment environment)
-        : base(configuration)
+        : base(configuration, environment)
     {
-        _environment = environment;
-
         _backplaneOptions = new();
         Configuration.GetSection("Backplane").Bind(_backplaneOptions);
 
@@ -56,16 +54,16 @@ public class Startup : StartupBase
         services.AddJwtAuthentication(JwtOptions);
         services.AddUserPolicyAuthorization();
 
+        // dynamic config
+        services.AddConfigClient(ConfigClientOptions);
+
         // clients
         services.AddGrpc(grpc =>
         {
-            grpc.EnableDetailedErrors = _environment.IsDevelopment();
+            grpc.EnableDetailedErrors = Environment.IsDevelopment();
             grpc.EnableMessageValidation();
         });
         services.AddGrpcValidation();
-
-        // config db
-        services.AddConfigDb(ConfigDbOptions.Connect);
 
         // common
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
@@ -94,6 +92,7 @@ public class Startup : StartupBase
                     aspnet.Filter = httpContext => !excludedPaths.Contains(httpContext.Request.Path);
                 });
                 tracing.AddKafkaInstrumentation();
+                tracing.AddGrpcClientInstrumentation(grpc => grpc.SuppressDownstreamInstrumentation = true);
                 tracing.AddChatsInstrumentation();
                 tracing.ConfigureSampling(TracingSamplingOptions);
                 tracing.ConfigureOtlpExporter(TracingExportOptions);
@@ -111,12 +110,15 @@ public class Startup : StartupBase
     {
         services
             .AddHealthChecks()
-            .AddCheck<ConfigDbInitHealthCheck>(
+            .AddCheck<DynamicConfigInitHealthCheck>(
                 "config-db-init",
                 tags: new[] { HealthTags.Health, HealthTags.Startup })
             .AddCheck<ChatsDbInitHealthCheck>(
                 "chats-db-init",
                 tags: new[] { HealthTags.Health, HealthTags.Startup })
+            .AddCheck<ConfigChangesConsumerHealthCheck>(
+                "config-changes-consumer",
+                tags: new[] { HealthTags.Health, HealthTags.Startup, HealthTags.Live })
             .AddCheck<HistoryConsumerHealthCheck>(
                 "history-consumer",
                 tags: new[] { HealthTags.Health, HealthTags.Startup, HealthTags.Live })
@@ -126,10 +128,12 @@ public class Startup : StartupBase
             .AddCheck<SendersConsumerHealthCheck>(
                 "senders-consumer",
                 tags: new[] { HealthTags.Health, HealthTags.Startup, HealthTags.Live })
-            .AddNpgsql(
-                "config-db",
-                ConfigDbOptions.Connect,
-                tags: new[] { HealthTags.Health, HealthTags.Ready })
+            .AddUri(
+                "config-client",
+                new Uri(ConfigClientOptions.Address!, ConfigClientOptions.HealthPath),
+                configureHttpClient: (_, client) => client.DefaultRequestVersion = new Version(2, 0),
+                timeout: ConfigClientOptions.HealthTimeout,
+                tags: new[] { HealthTags.Health, HealthTags.Live })
             .AddCassandra(
                 name: "chats-db",
                 timeout: _chatsDbOptions.HealthTimeout,
@@ -140,8 +144,9 @@ public class Startup : StartupBase
                 _backplaneOptions.Health,
                 tags: new[] { HealthTags.Health });
 
-        services.AddSingleton<ConfigDbInitHealthCheck>();
+        services.AddSingleton<DynamicConfigInitHealthCheck>();
         services.AddSingleton<ChatsDbInitHealthCheck>();
+        services.AddSingleton<ConfigChangesConsumerHealthCheck>();
         services.AddSingleton<HistoryConsumerHealthCheck>();
         services.AddSingleton<ReceiversConsumerHealthCheck>();
         services.AddSingleton<SendersConsumerHealthCheck>();
@@ -155,9 +160,11 @@ public class Startup : StartupBase
         builder.RegisterHostedService<InitBackplane>();
         builder.RegisterHostedService<InitBackplaneComponents>();
 
-        // configuration
-        IConfiguration configDbConfig = Configuration.GetSection("ConfigDb");
-        builder.RegisterModule(new ConfigDbAutofacModule(configDbConfig, registerHistory: true));
+        // dynamic config
+        IConfiguration backplaneConfiguration = Configuration.GetSection("Backplane");
+        builder.RegisterModule(new DynamicConfigAutofacModule(backplaneConfiguration, registerConfigChangesConsumer: true, registerHistory: true));
+        IConfiguration configClientConfiguration = Configuration.GetSection("ConfigClient");
+        builder.RegisterModule(new ConfigClientAutofacModule(configClientConfiguration));
 
         // chats db
         IConfiguration chatsDbConfig = Configuration.GetSection("ChatsDb");
@@ -175,6 +182,7 @@ public class Startup : StartupBase
 
         // shared
         builder.RegisterType<ContractMapper>().As<IContractMapper>().SingleInstance();
+        builder.RegisterType<MonotonicClock>().As<IClock>().SingleInstance();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -184,7 +192,9 @@ public class Startup : StartupBase
             app.UseDeveloperExceptionPage();
         }
 
+        app.UseCustomExceptionHandler();
         app.UseHttpsRedirection();
+
         app.UseRouting();
         app.UseAuthentication();
         app.UseAuthorization();
