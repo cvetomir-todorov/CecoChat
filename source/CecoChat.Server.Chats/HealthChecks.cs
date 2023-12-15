@@ -2,10 +2,13 @@ using CecoChat.Health;
 
 namespace CecoChat.Server.Chats;
 
-public class ConfigDbInitHealthCheck : StatusHealthCheck
+public class DynamicConfigInitHealthCheck : StatusHealthCheck
 { }
 
 public class ChatsDbInitHealthCheck : StatusHealthCheck
+{ }
+
+public class ConfigChangesConsumerHealthCheck : StatusHealthCheck
 { }
 
 public class HistoryConsumerHealthCheck : StatusHealthCheck
