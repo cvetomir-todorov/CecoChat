@@ -53,7 +53,7 @@ public class ConnectionCommandService : ConnectionCommand.ConnectionCommandBase
         AddConnectionResult result = await _commandRepo.AddConnection(userId, connection);
         if (result.Success)
         {
-            await NotifyConnectionChange(userId, connection, result.Version);
+            NotifyConnectionChange(userId, connection, result.Version);
 
             _logger.LogTrace("Responding with a successful invite from {UserId} to {ConnectionId}", userId, connectionId);
             return new InviteResponse
@@ -99,7 +99,7 @@ public class ConnectionCommandService : ConnectionCommand.ConnectionCommandBase
         UpdateConnectionResult result = await _commandRepo.UpdateConnection(userId, existingConnection);
         if (result.Success)
         {
-            await NotifyConnectionChange(userId, existingConnection, result.NewVersion);
+            NotifyConnectionChange(userId, existingConnection, result.NewVersion);
 
             _logger.LogTrace("Responding with a successful invite from {UserId} to {ConnectionId}", userId, existingConnection.ConnectionId);
             return new InviteResponse
@@ -149,7 +149,7 @@ public class ConnectionCommandService : ConnectionCommand.ConnectionCommandBase
         UpdateConnectionResult result = await _commandRepo.UpdateConnection(userClaims.UserId, existingConnection);
         if (result.Success)
         {
-            await NotifyConnectionChange(userClaims.UserId, existingConnection, result.NewVersion);
+            NotifyConnectionChange(userClaims.UserId, existingConnection, result.NewVersion);
 
             _logger.LogTrace("Responding with a successful approval from {UserId} to {ConnectionId}", userClaims.UserId, request.ConnectionId);
             return new ApproveResponse
@@ -199,7 +199,7 @@ public class ConnectionCommandService : ConnectionCommand.ConnectionCommandBase
         UpdateConnectionResult result = await _commandRepo.UpdateConnection(userClaims.UserId, existingConnection);
         if (result.Success)
         {
-            await NotifyConnectionChange(userClaims.UserId, existingConnection, result.NewVersion);
+            NotifyConnectionChange(userClaims.UserId, existingConnection, result.NewVersion);
 
             _logger.LogTrace("Responding with a successful cancel from {UserId} to {ConnectionId}", userClaims.UserId, request.ConnectionId);
             return new CancelResponse
@@ -249,7 +249,7 @@ public class ConnectionCommandService : ConnectionCommand.ConnectionCommandBase
         UpdateConnectionResult result = await _commandRepo.UpdateConnection(userClaims.UserId, existingConnection);
         if (result.Success)
         {
-            await NotifyConnectionChange(userClaims.UserId, existingConnection, result.NewVersion);
+            NotifyConnectionChange(userClaims.UserId, existingConnection, result.NewVersion);
 
             _logger.LogTrace("Responding with a successful removal from {UserId} to {ConnectionId}", userClaims.UserId, request.ConnectionId);
             return new RemoveResponse
@@ -270,9 +270,9 @@ public class ConnectionCommandService : ConnectionCommand.ConnectionCommandBase
         throw new ProcessingFailureException(typeof(RemoveConnectionResult));
     }
 
-    private Task NotifyConnectionChange(long userId, Connection changedConnection, DateTime newVersion)
+    private void NotifyConnectionChange(long userId, Connection changedConnection, DateTime newVersion)
     {
         changedConnection.Version = newVersion.ToTimestamp();
-        return _producer.NotifyConnectionChange(userId, changedConnection, CancellationToken.None);
+        _producer.NotifyConnectionChange(userId, changedConnection);
     }
 }

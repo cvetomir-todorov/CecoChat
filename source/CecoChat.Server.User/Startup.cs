@@ -5,7 +5,6 @@ using CecoChat.AspNet.Health;
 using CecoChat.AspNet.Prometheus;
 using CecoChat.Autofac;
 using CecoChat.Client.Config;
-using CecoChat.Client.IdGen;
 using CecoChat.Contracts.Backplane;
 using CecoChat.Data.User;
 using CecoChat.Data.User.Infra;
@@ -38,7 +37,6 @@ public class Startup : StartupBase
 {
     private readonly UserDbOptions _userDbOptions;
     private readonly RedisOptions _userCacheStoreOptions;
-    private readonly IdGenClientOptions _idGenClientOptions;
     private readonly BackplaneOptions _backplaneOptions;
 
     public Startup(IConfiguration configuration, IWebHostEnvironment environment)
@@ -49,9 +47,6 @@ public class Startup : StartupBase
 
         _userCacheStoreOptions = new();
         Configuration.GetSection("UserCache:Store").Bind(_userCacheStoreOptions);
-
-        _idGenClientOptions = new();
-        Configuration.GetSection("IdGenClient").Bind(_idGenClientOptions);
 
         _backplaneOptions = new();
         Configuration.GetSection("Backplane").Bind(_backplaneOptions);
@@ -79,9 +74,6 @@ public class Startup : StartupBase
 
         // user db
         services.AddUserDb(_userDbOptions.Connect);
-
-        // id gen
-        services.AddIdGenClient(_idGenClientOptions);
 
         // common
         services.AddAutoMapper(config =>
@@ -159,12 +151,6 @@ public class Startup : StartupBase
                 tags: new[] { HealthTags.Health, HealthTags.Ready })
             .AddRedis("user-cache",
                 _userCacheStoreOptions,
-                tags: new[] { HealthTags.Health, HealthTags.Ready })
-            .AddUri(
-                "idgen",
-                new Uri(_idGenClientOptions.Address!, _idGenClientOptions.HealthPath),
-                configureHttpClient: (_, client) => client.DefaultRequestVersion = new Version(2, 0),
-                timeout: _idGenClientOptions.HealthTimeout,
                 tags: new[] { HealthTags.Health, HealthTags.Ready });
 
         services.AddSingleton<DynamicConfigInitHealthCheck>();
@@ -202,10 +188,6 @@ public class Startup : StartupBase
         IConfiguration userCacheStoreConfig = userCacheConfig.GetSection("Store");
         builder.RegisterModule(new UserDbAutofacModule(userCacheConfig, userCacheStoreConfig));
         builder.RegisterOptions<UserDbOptions>(Configuration.GetSection("UserDb"));
-
-        // id gen
-        IConfiguration idGenConfiguration = Configuration.GetSection("IdGenClient");
-        builder.RegisterModule(new IdGenClientAutofacModule(idGenConfiguration));
 
         // security
         builder.RegisterType<PasswordHasher>().As<IPasswordHasher>().SingleInstance();
