@@ -1,6 +1,6 @@
 using Google.Protobuf.WellKnownTypes;
 
-namespace CecoChat.Server.Bff.Infra;
+namespace CecoChat.Server.Bff;
 
 public class AutoMapperProfile : AutoMapper.Profile
 {

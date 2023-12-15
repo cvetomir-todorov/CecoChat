@@ -6,15 +6,18 @@ using CecoChat.AspNet.Prometheus;
 using CecoChat.AspNet.Swagger;
 using CecoChat.Autofac;
 using CecoChat.Client.Chats;
+using CecoChat.Client.Config;
 using CecoChat.Client.User;
-using CecoChat.Data.Config;
+using CecoChat.DynamicConfig;
 using CecoChat.Http.Health;
 using CecoChat.Jwt;
-using CecoChat.Npgsql.Health;
+using CecoChat.Kafka;
+using CecoChat.Kafka.Health;
+using CecoChat.Kafka.Telemetry;
 using CecoChat.Otel;
 using CecoChat.Server.Backplane;
+using CecoChat.Server.Bff.Backplane;
 using CecoChat.Server.Bff.HostedServices;
-using CecoChat.Server.Bff.Infra;
 using CecoChat.Server.Identity;
 using FluentValidation;
 using FluentValidation.AspNetCore;
@@ -27,13 +30,17 @@ namespace CecoChat.Server.Bff;
 
 public class Startup : StartupBase
 {
+    private readonly BackplaneOptions _backplaneOptions;
     private readonly ChatsClientOptions _chatsClientOptions;
     private readonly UserClientOptions _userClientOptions;
     private readonly SwaggerOptions _swaggerOptions;
 
-    public Startup(IConfiguration configuration)
-        : base(configuration)
+    public Startup(IConfiguration configuration, IWebHostEnvironment environment)
+        : base(configuration, environment)
     {
+        _backplaneOptions = new();
+        Configuration.GetSection("Backplane").Bind(_backplaneOptions);
+
         _chatsClientOptions = new();
         Configuration.GetSection("ChatsClient").Bind(_chatsClientOptions);
 
@@ -53,6 +60,9 @@ public class Startup : StartupBase
         services.AddJwtAuthentication(JwtOptions);
         services.AddUserPolicyAuthorization();
 
+        // dynamic config
+        services.AddConfigClient(ConfigClientOptions);
+
         // web
         services.AddControllers(mvc =>
         {
@@ -64,9 +74,6 @@ public class Startup : StartupBase
         // downstream services
         services.AddChatsClient(_chatsClientOptions);
         services.AddUserClient(_userClientOptions);
-
-        // config db
-        services.AddConfigDb(ConfigDbOptions.Connect);
 
         // common
         services.AddAutoMapper(config =>
@@ -101,6 +108,7 @@ public class Startup : StartupBase
                     };
                     aspnet.Filter = httpContext => !excludedPaths.Contains(httpContext.Request.Path);
                 });
+                tracing.AddKafkaInstrumentation();
                 tracing.AddGrpcClientInstrumentation(grpc => grpc.SuppressDownstreamInstrumentation = true);
                 tracing.ConfigureSampling(TracingSamplingOptions);
                 tracing.ConfigureOtlpExporter(TracingExportOptions);
@@ -116,12 +124,22 @@ public class Startup : StartupBase
     private void AddHealthServices(IServiceCollection services)
     {
         services.AddHealthChecks()
-            .AddCheck<ConfigDbInitHealthCheck>(
+            .AddCheck<DynamicConfigInitHealthCheck>(
                 "config-db-init",
                 tags: new[] { HealthTags.Health, HealthTags.Startup })
-            .AddNpgsql(
-                "config-db",
-                ConfigDbOptions.Connect,
+            .AddCheck<ConfigChangesConsumerHealthCheck>(
+                "config-changes-consumer",
+                tags: new[] { HealthTags.Health, HealthTags.Startup, HealthTags.Live })
+            .AddUri(
+                "config-client",
+                new Uri(ConfigClientOptions.Address!, ConfigClientOptions.HealthPath),
+                configureHttpClient: (_, client) => client.DefaultRequestVersion = new Version(2, 0),
+                timeout: ConfigClientOptions.HealthTimeout,
+                tags: new[] { HealthTags.Health, HealthTags.Live })
+            .AddKafka(
+                "backplane",
+                _backplaneOptions.Kafka,
+                _backplaneOptions.Health,
                 tags: new[] { HealthTags.Health, HealthTags.Ready })
             .AddUri(
                 "chats",
@@ -136,19 +154,26 @@ public class Startup : StartupBase
                 timeout: _userClientOptions.HealthTimeout,
                 tags: new[] { HealthTags.Health, HealthTags.Ready });
 
-        services.AddSingleton<ConfigDbInitHealthCheck>();
+        services.AddSingleton<DynamicConfigInitHealthCheck>();
+        services.AddSingleton<ConfigChangesConsumerHealthCheck>();
     }
 
     public void ConfigureContainer(ContainerBuilder builder)
     {
         // ordered hosted services
         builder.RegisterHostedService<InitDynamicConfig>();
+        builder.RegisterHostedService<InitBackplane>();
+        builder.RegisterHostedService<InitBackplaneComponents>();
 
-        // configuration
-        IConfiguration configDbConfig = Configuration.GetSection("ConfigDb");
-        builder.RegisterModule(new ConfigDbAutofacModule(configDbConfig, registerPartitioning: true));
+        // dynamic config
+        IConfiguration backplaneConfiguration = Configuration.GetSection("Backplane");
+        builder.RegisterModule(new DynamicConfigAutofacModule(backplaneConfiguration, registerConfigChangesConsumer: true, registerPartitioning: true));
+        IConfiguration configClientConfiguration = Configuration.GetSection("ConfigClient");
+        builder.RegisterModule(new ConfigClientAutofacModule(configClientConfiguration));
 
         // backplane
+        builder.RegisterType<KafkaAdmin>().As<IKafkaAdmin>().SingleInstance();
+        builder.RegisterOptions<KafkaOptions>(Configuration.GetSection("Backplane:Kafka"));
         builder.RegisterModule(new PartitionerAutofacModule());
 
         // downstream services
