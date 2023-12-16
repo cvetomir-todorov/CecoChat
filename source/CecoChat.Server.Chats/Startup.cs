@@ -12,7 +12,6 @@ using CecoChat.Data.Chats;
 using CecoChat.Data.Chats.Telemetry;
 using CecoChat.DynamicConfig;
 using CecoChat.Kafka;
-using CecoChat.Kafka.Health;
 using CecoChat.Kafka.Telemetry;
 using CecoChat.Otel;
 using CecoChat.Server.Backplane;
@@ -31,15 +30,11 @@ namespace CecoChat.Server.Chats;
 
 public class Startup : StartupBase
 {
-    private readonly BackplaneOptions _backplaneOptions;
     private readonly CassandraOptions _chatsDbOptions;
 
     public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         : base(configuration, environment)
     {
-        _backplaneOptions = new();
-        Configuration.GetSection("Backplane").Bind(_backplaneOptions);
-
         _chatsDbOptions = new();
         Configuration.GetSection("ChatsDb").Bind(_chatsDbOptions);
     }
@@ -112,6 +107,7 @@ public class Startup : StartupBase
             .AddDynamicConfigInit()
             .AddConfigChangesConsumer()
             .AddConfigService(ConfigClientOptions)
+            .AddBackplane(Configuration)
             .AddCheck<ChatsDbInitHealthCheck>(
                 "chats-db-init",
                 tags: new[] { HealthTags.Health, HealthTags.Startup })
@@ -124,11 +120,6 @@ public class Startup : StartupBase
             .AddCheck<SendersConsumerHealthCheck>(
                 "senders-consumer",
                 tags: new[] { HealthTags.Health, HealthTags.Startup, HealthTags.Live })
-            .AddKafka(
-                "backplane",
-                _backplaneOptions.Kafka,
-                _backplaneOptions.Health,
-                tags: new[] { HealthTags.Health, HealthTags.Ready })
             .AddCassandra(
                 name: "chats-db",
                 timeout: _chatsDbOptions.HealthTimeout,

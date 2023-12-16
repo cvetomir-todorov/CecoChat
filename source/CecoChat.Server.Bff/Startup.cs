@@ -12,11 +12,9 @@ using CecoChat.DynamicConfig;
 using CecoChat.Http.Health;
 using CecoChat.Jwt;
 using CecoChat.Kafka;
-using CecoChat.Kafka.Health;
 using CecoChat.Kafka.Telemetry;
 using CecoChat.Otel;
 using CecoChat.Server.Backplane;
-using CecoChat.Server.Bff.Backplane;
 using CecoChat.Server.Bff.HostedServices;
 using CecoChat.Server.Identity;
 using FluentValidation;
@@ -30,7 +28,6 @@ namespace CecoChat.Server.Bff;
 
 public class Startup : StartupBase
 {
-    private readonly BackplaneOptions _backplaneOptions;
     private readonly ChatsClientOptions _chatsClientOptions;
     private readonly UserClientOptions _userClientOptions;
     private readonly SwaggerOptions _swaggerOptions;
@@ -38,9 +35,6 @@ public class Startup : StartupBase
     public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         : base(configuration, environment)
     {
-        _backplaneOptions = new();
-        Configuration.GetSection("Backplane").Bind(_backplaneOptions);
-
         _chatsClientOptions = new();
         Configuration.GetSection("ChatsClient").Bind(_chatsClientOptions);
 
@@ -123,15 +117,12 @@ public class Startup : StartupBase
 
     private void AddHealthServices(IServiceCollection services)
     {
-        services.AddHealthChecks()
+        services
+            .AddHealthChecks()
             .AddDynamicConfigInit()
             .AddConfigChangesConsumer()
             .AddConfigService(ConfigClientOptions)
-            .AddKafka(
-                "backplane",
-                _backplaneOptions.Kafka,
-                _backplaneOptions.Health,
-                tags: new[] { HealthTags.Health, HealthTags.Ready })
+            .AddBackplane(Configuration)
             .AddUri(
                 "chats-svc",
                 new Uri(_chatsClientOptions.Address!, _chatsClientOptions.HealthPath),

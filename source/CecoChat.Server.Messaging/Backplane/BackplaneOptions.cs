@@ -1,5 +1,4 @@
 ﻿using CecoChat.Kafka;
-using CecoChat.Kafka.Health;
 
 namespace CecoChat.Server.Messaging.Backplane;
 
@@ -12,6 +11,4 @@ public sealed class BackplaneOptions
     public KafkaConsumerOptions ReceiversConsumer { get; init; } = new();
 
     public string TopicMessagesByReceiver { get; init; } = string.Empty;
-
-    public KafkaHealthOptions Health { get; init; } = new();
 }

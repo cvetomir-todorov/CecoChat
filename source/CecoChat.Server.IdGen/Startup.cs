@@ -7,11 +7,9 @@ using CecoChat.Autofac;
 using CecoChat.Client.Config;
 using CecoChat.DynamicConfig;
 using CecoChat.Kafka;
-using CecoChat.Kafka.Health;
 using CecoChat.Kafka.Telemetry;
 using CecoChat.Otel;
 using CecoChat.Server.Backplane;
-using CecoChat.Server.IdGen.Backplane;
 using CecoChat.Server.IdGen.Endpoints;
 using CecoChat.Server.IdGen.HostedServices;
 using FluentValidation;
@@ -24,14 +22,9 @@ namespace CecoChat.Server.IdGen;
 
 public class Startup : StartupBase
 {
-    private readonly BackplaneOptions _backplaneOptions;
-
     public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         : base(configuration, environment)
-    {
-        _backplaneOptions = new();
-        Configuration.GetSection("Backplane").Bind(_backplaneOptions);
-    }
+    { }
 
     public void ConfigureServices(IServiceCollection services)
     {
@@ -95,11 +88,7 @@ public class Startup : StartupBase
             .AddDynamicConfigInit()
             .AddConfigChangesConsumer()
             .AddConfigService(ConfigClientOptions)
-            .AddKafka(
-                "backplane",
-                _backplaneOptions.Kafka,
-                _backplaneOptions.Health,
-                tags: new[] { HealthTags.Health, HealthTags.Ready });
+            .AddBackplane(Configuration);
     }
 
     public void ConfigureContainer(ContainerBuilder builder)
