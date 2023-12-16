@@ -126,7 +126,7 @@ public class Startup : StartupBase
                 "backplane",
                 _backplaneOptions.Kafka,
                 _backplaneOptions.Health,
-                tags: new[] { HealthTags.Health });
+                tags: new[] { HealthTags.Health, HealthTags.Ready });
 
         services.AddSingleton<ConfigDbInitHealthCheck>();
     }
