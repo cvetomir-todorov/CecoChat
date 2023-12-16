@@ -9,13 +9,11 @@ using CecoChat.Autofac;
 using CecoChat.Data.Config;
 using CecoChat.DynamicConfig;
 using CecoChat.Kafka;
-using CecoChat.Kafka.Health;
 using CecoChat.Kafka.Telemetry;
 using CecoChat.Npgsql;
 using CecoChat.Npgsql.Health;
 using CecoChat.Otel;
 using CecoChat.Server.Backplane;
-using CecoChat.Server.Config.Backplane;
 using CecoChat.Server.Config.Endpoints;
 using CecoChat.Server.Config.HostedServices;
 using FluentValidation;
@@ -31,7 +29,6 @@ namespace CecoChat.Server.Config;
 public class Startup : StartupBase
 {
     private readonly ConfigDbOptions _configDbOptions;
-    private readonly BackplaneOptions _backplaneOptions;
     private readonly SwaggerOptions _swaggerOptions;
 
     public Startup(IConfiguration configuration, IWebHostEnvironment environment)
@@ -39,9 +36,6 @@ public class Startup : StartupBase
     {
         _configDbOptions = new();
         Configuration.GetSection("ConfigDb").Bind(_configDbOptions);
-
-        _backplaneOptions = new();
-        Configuration.GetSection("Backplane").Bind(_backplaneOptions);
 
         _swaggerOptions = new();
         Configuration.GetSection("Swagger").Bind(_swaggerOptions);
@@ -114,18 +108,15 @@ public class Startup : StartupBase
 
     private void AddHealthServices(IServiceCollection services)
     {
-        services.AddHealthChecks()
+        services
+            .AddHealthChecks()
+            .AddBackplane(Configuration)
             .AddCheck<ConfigDbInitHealthCheck>(
                 "config-db-init",
                 tags: new[] { HealthTags.Health, HealthTags.Startup })
             .AddNpgsql(
                 "config-db",
                 _configDbOptions.Connect,
-                tags: new[] { HealthTags.Health, HealthTags.Ready })
-            .AddKafka(
-                "backplane",
-                _backplaneOptions.Kafka,
-                _backplaneOptions.Health,
                 tags: new[] { HealthTags.Health, HealthTags.Ready });
 
         services.AddSingleton<ConfigDbInitHealthCheck>();

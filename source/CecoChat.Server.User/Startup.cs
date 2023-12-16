@@ -10,7 +10,6 @@ using CecoChat.Data.User;
 using CecoChat.Data.User.Infra;
 using CecoChat.DynamicConfig;
 using CecoChat.Kafka;
-using CecoChat.Kafka.Health;
 using CecoChat.Kafka.Telemetry;
 using CecoChat.Npgsql.Health;
 using CecoChat.Otel;
@@ -36,7 +35,6 @@ public class Startup : StartupBase
 {
     private readonly UserDbOptions _userDbOptions;
     private readonly RedisOptions _userCacheStoreOptions;
-    private readonly BackplaneOptions _backplaneOptions;
 
     public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         : base(configuration, environment)
@@ -46,9 +44,6 @@ public class Startup : StartupBase
 
         _userCacheStoreOptions = new();
         Configuration.GetSection("UserCache:Store").Bind(_userCacheStoreOptions);
-
-        _backplaneOptions = new();
-        Configuration.GetSection("Backplane").Bind(_backplaneOptions);
     }
 
     public void ConfigureServices(IServiceCollection services)
@@ -127,14 +122,10 @@ public class Startup : StartupBase
             .AddDynamicConfigInit()
             .AddConfigChangesConsumer()
             .AddConfigService(ConfigClientOptions)
+            .AddBackplane(Configuration)
             .AddCheck<UserDbInitHealthCheck>(
                 "user-db-init",
                 tags: new[] { HealthTags.Health, HealthTags.Startup })
-            .AddKafka(
-                "backplane",
-                _backplaneOptions.Kafka,
-                _backplaneOptions.Health,
-                tags: new[] { HealthTags.Health, HealthTags.Ready })
             .AddNpgsql(
                 "user-db",
                 _userDbOptions.Connect,

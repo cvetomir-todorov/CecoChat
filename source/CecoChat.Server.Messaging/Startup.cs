@@ -9,7 +9,6 @@ using CecoChat.Contracts.Backplane;
 using CecoChat.DynamicConfig;
 using CecoChat.Http.Health;
 using CecoChat.Kafka;
-using CecoChat.Kafka.Health;
 using CecoChat.Kafka.Telemetry;
 using CecoChat.Otel;
 using CecoChat.Server.Backplane;
@@ -31,7 +30,6 @@ namespace CecoChat.Server.Messaging;
 public class Startup : StartupBase
 {
     private readonly ClientOptions _clientOptions;
-    private readonly BackplaneOptions _backplaneOptions;
     private readonly IdGenClientOptions _idGenClientOptions;
 
     public Startup(IConfiguration configuration, IWebHostEnvironment environment)
@@ -39,9 +37,6 @@ public class Startup : StartupBase
     {
         _clientOptions = new();
         Configuration.GetSection("Clients").Bind(_clientOptions);
-
-        _backplaneOptions = new();
-        Configuration.GetSection("Backplane").Bind(_backplaneOptions);
 
         _idGenClientOptions = new();
         Configuration.GetSection("IdGenClient").Bind(_idGenClientOptions);
@@ -116,14 +111,10 @@ public class Startup : StartupBase
             .AddDynamicConfigInit()
             .AddConfigChangesConsumer()
             .AddConfigService(ConfigClientOptions)
+            .AddBackplane(Configuration)
             .AddCheck<ReceiversConsumerHealthCheck>(
                 "receivers-consumer",
                 tags: new[] { HealthTags.Health, HealthTags.Startup, HealthTags.Live })
-            .AddKafka(
-                "backplane",
-                _backplaneOptions.Kafka,
-                _backplaneOptions.Health,
-                tags: new[] { HealthTags.Health, HealthTags.Ready })
             .AddUri(
                 "idgen-svc",
                 new Uri(_idGenClientOptions.Address!, _idGenClientOptions.HealthPath),

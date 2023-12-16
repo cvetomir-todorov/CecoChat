@@ -2,6 +2,9 @@ using CecoChat.AspNet.Health;
 using CecoChat.Client.Config;
 using CecoChat.Health;
 using CecoChat.Http.Health;
+using CecoChat.Kafka;
+using CecoChat.Kafka.Health;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CecoChat.Server;
@@ -42,6 +45,22 @@ public static class HealthRegistrations
             timeout: configClientOptions.HealthTimeout,
             tags: new[] { HealthTags.Health, HealthTags.Ready });
     }
+
+    public static IHealthChecksBuilder AddBackplane(
+        this IHealthChecksBuilder builder,
+        IConfiguration configuration,
+        string configSectionName = "Backplane",
+        string healthCheckName = "backplane")
+    {
+        BackplaneOptions backplaneOptions = new();
+        configuration.GetSection(configSectionName).Bind(backplaneOptions);
+
+        return builder.AddKafka(
+            healthCheckName,
+            backplaneOptions.Kafka,
+            backplaneOptions.Health,
+            tags: new[] { HealthTags.Health, HealthTags.Ready });
+    }
 }
 
 public class DynamicConfigInitHealthCheck : StatusHealthCheck
@@ -49,3 +68,10 @@ public class DynamicConfigInitHealthCheck : StatusHealthCheck
 
 public class ConfigChangesConsumerHealthCheck : StatusHealthCheck
 { }
+
+internal sealed class BackplaneOptions
+{
+    public KafkaOptions Kafka { get; init; } = new();
+
+    public KafkaHealthOptions Health { get; init; } = new();
+}
