@@ -125,9 +125,7 @@ public class Startup : StartupBase
     {
         services
             .AddHealthChecks()
-            .AddCheck<DynamicConfigInitHealthCheck>(
-                "dynamic-config-init",
-                tags: new[] { HealthTags.Health, HealthTags.Startup })
+            .AddDynamicConfigInit()
             .AddCheck<UserDbInitHealthCheck>(
                 "user-db-init",
                 tags: new[] { HealthTags.Health, HealthTags.Startup })
@@ -154,7 +152,6 @@ public class Startup : StartupBase
                 _userCacheStoreOptions,
                 tags: new[] { HealthTags.Health, HealthTags.Ready });
 
-        services.AddSingleton<DynamicConfigInitHealthCheck>();
         services.AddSingleton<UserDbInitHealthCheck>();
         services.AddSingleton<ConfigChangesConsumerHealthCheck>();
     }

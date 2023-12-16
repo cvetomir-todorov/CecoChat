@@ -110,9 +110,7 @@ public class Startup : StartupBase
     {
         services
             .AddHealthChecks()
-            .AddCheck<DynamicConfigInitHealthCheck>(
-                "dynamic-config-init",
-                tags: new[] { HealthTags.Health, HealthTags.Startup })
+            .AddDynamicConfigInit()
             .AddCheck<ChatsDbInitHealthCheck>(
                 "chats-db-init",
                 tags: new[] { HealthTags.Health, HealthTags.Startup })
@@ -144,7 +142,6 @@ public class Startup : StartupBase
                 timeout: _chatsDbOptions.HealthTimeout,
                 tags: new[] { HealthTags.Health, HealthTags.Ready });
 
-        services.AddSingleton<DynamicConfigInitHealthCheck>();
         services.AddSingleton<ChatsDbInitHealthCheck>();
         services.AddSingleton<ConfigChangesConsumerHealthCheck>();
         services.AddSingleton<HistoryConsumerHealthCheck>();
