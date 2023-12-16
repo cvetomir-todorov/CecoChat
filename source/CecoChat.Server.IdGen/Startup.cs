@@ -93,9 +93,7 @@ public class Startup : StartupBase
     {
         services
             .AddHealthChecks()
-            .AddCheck<DynamicConfigInitHealthCheck>(
-                "dynamic-config-init",
-                tags: new[] { HealthTags.Health, HealthTags.Startup })
+            .AddDynamicConfigInit()
             .AddCheck<ConfigChangesConsumerHealthCheck>(
                 "config-changes-consumer",
                 tags: new[] { HealthTags.Health, HealthTags.Startup, HealthTags.Live })
@@ -111,7 +109,6 @@ public class Startup : StartupBase
                 _backplaneOptions.Health,
                 tags: new[] { HealthTags.Health, HealthTags.Ready });
 
-        services.AddSingleton<DynamicConfigInitHealthCheck>();
         services.AddSingleton<ConfigChangesConsumerHealthCheck>();
     }
 
