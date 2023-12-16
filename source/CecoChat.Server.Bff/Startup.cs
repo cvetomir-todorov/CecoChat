@@ -125,30 +125,30 @@ public class Startup : StartupBase
     {
         services.AddHealthChecks()
             .AddCheck<DynamicConfigInitHealthCheck>(
-                "config-db-init",
+                "dynamic-config-init",
                 tags: new[] { HealthTags.Health, HealthTags.Startup })
             .AddCheck<ConfigChangesConsumerHealthCheck>(
                 "config-changes-consumer",
                 tags: new[] { HealthTags.Health, HealthTags.Startup, HealthTags.Live })
             .AddUri(
-                "config-client",
+                "config-svc",
                 new Uri(ConfigClientOptions.Address!, ConfigClientOptions.HealthPath),
                 configureHttpClient: (_, client) => client.DefaultRequestVersion = new Version(2, 0),
                 timeout: ConfigClientOptions.HealthTimeout,
-                tags: new[] { HealthTags.Health, HealthTags.Live })
+                tags: new[] { HealthTags.Health, HealthTags.Ready })
             .AddKafka(
                 "backplane",
                 _backplaneOptions.Kafka,
                 _backplaneOptions.Health,
                 tags: new[] { HealthTags.Health, HealthTags.Ready })
             .AddUri(
-                "chats",
+                "chats-svc",
                 new Uri(_chatsClientOptions.Address!, _chatsClientOptions.HealthPath),
                 configureHttpClient: (_, client) => client.DefaultRequestVersion = new Version(2, 0),
                 timeout: _chatsClientOptions.HealthTimeout,
                 tags: new[] { HealthTags.Health, HealthTags.Ready })
             .AddUri(
-                "user",
+                "user-svc",
                 new Uri(_userClientOptions.Address!, _userClientOptions.HealthPath),
                 configureHttpClient: (_, client) => client.DefaultRequestVersion = new Version(2, 0),
                 timeout: _userClientOptions.HealthTimeout,

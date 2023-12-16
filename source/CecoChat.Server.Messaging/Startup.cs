@@ -123,18 +123,18 @@ public class Startup : StartupBase
                 "receivers-consumer",
                 tags: new[] { HealthTags.Health, HealthTags.Startup, HealthTags.Live })
             .AddUri(
-                "config-client",
+                "config-svc",
                 new Uri(ConfigClientOptions.Address!, ConfigClientOptions.HealthPath),
                 configureHttpClient: (_, client) => client.DefaultRequestVersion = new Version(2, 0),
                 timeout: ConfigClientOptions.HealthTimeout,
-                tags: new[] { HealthTags.Health, HealthTags.Live })
+                tags: new[] { HealthTags.Health, HealthTags.Ready })
             .AddKafka(
                 "backplane",
                 _backplaneOptions.Kafka,
                 _backplaneOptions.Health,
                 tags: new[] { HealthTags.Health, HealthTags.Ready })
             .AddUri(
-                "idgen",
+                "idgen-svc",
                 new Uri(_idGenClientOptions.Address!, _idGenClientOptions.HealthPath),
                 configureHttpClient: (_, client) => client.DefaultRequestVersion = new Version(2, 0),
                 timeout: _idGenClientOptions.HealthTimeout,

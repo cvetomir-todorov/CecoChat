@@ -100,16 +100,16 @@ public class Startup : StartupBase
                 "config-changes-consumer",
                 tags: new[] { HealthTags.Health, HealthTags.Startup, HealthTags.Live })
             .AddUri(
-                "config-client",
+                "config-svc",
                 new Uri(ConfigClientOptions.Address!, ConfigClientOptions.HealthPath),
                 configureHttpClient: (_, client) => client.DefaultRequestVersion = new Version(2, 0),
                 timeout: ConfigClientOptions.HealthTimeout,
-                tags: new[] { HealthTags.Health, HealthTags.Live })
+                tags: new[] { HealthTags.Health, HealthTags.Ready })
             .AddKafka(
                 "backplane",
                 _backplaneOptions.Kafka,
                 _backplaneOptions.Health,
-                tags: new[] { HealthTags.Health });
+                tags: new[] { HealthTags.Health, HealthTags.Ready });
 
         services.AddSingleton<DynamicConfigInitHealthCheck>();
         services.AddSingleton<ConfigChangesConsumerHealthCheck>();
