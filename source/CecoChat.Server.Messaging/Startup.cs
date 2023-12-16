@@ -114,9 +114,7 @@ public class Startup : StartupBase
         services
             .AddHealthChecks()
             .AddDynamicConfigInit()
-            .AddCheck<ConfigChangesConsumerHealthCheck>(
-                "config-changes-consumer",
-                tags: new[] { HealthTags.Health, HealthTags.Startup, HealthTags.Live })
+            .AddConfigChangesConsumer()
             .AddCheck<ReceiversConsumerHealthCheck>(
                 "receivers-consumer",
                 tags: new[] { HealthTags.Health, HealthTags.Startup, HealthTags.Live })
@@ -138,7 +136,6 @@ public class Startup : StartupBase
                 timeout: _idGenClientOptions.HealthTimeout,
                 tags: new[] { HealthTags.Health, HealthTags.Ready });
 
-        services.AddSingleton<ConfigChangesConsumerHealthCheck>();
         services.AddSingleton<ReceiversConsumerHealthCheck>();
     }
 

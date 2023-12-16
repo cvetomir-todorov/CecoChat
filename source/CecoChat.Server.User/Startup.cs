@@ -126,12 +126,10 @@ public class Startup : StartupBase
         services
             .AddHealthChecks()
             .AddDynamicConfigInit()
+            .AddConfigChangesConsumer()
             .AddCheck<UserDbInitHealthCheck>(
                 "user-db-init",
                 tags: new[] { HealthTags.Health, HealthTags.Startup })
-            .AddCheck<ConfigChangesConsumerHealthCheck>(
-                "config-changes-consumer",
-                tags: new[] { HealthTags.Health, HealthTags.Startup, HealthTags.Live })
             .AddUri(
                 "config-svc",
                 new Uri(ConfigClientOptions.Address!, ConfigClientOptions.HealthPath),
@@ -153,7 +151,6 @@ public class Startup : StartupBase
                 tags: new[] { HealthTags.Health, HealthTags.Ready });
 
         services.AddSingleton<UserDbInitHealthCheck>();
-        services.AddSingleton<ConfigChangesConsumerHealthCheck>();
     }
 
     public void ConfigureContainer(ContainerBuilder builder)

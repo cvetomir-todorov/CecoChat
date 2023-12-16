@@ -16,7 +16,21 @@ public static class HealthRegistrations
             name,
             tags: new[] { HealthTags.Health, HealthTags.Startup });
     }
+
+    public static IHealthChecksBuilder AddConfigChangesConsumer(
+        this IHealthChecksBuilder builder,
+        string name = "config-changes-consumer")
+    {
+        builder.Services.AddSingleton<ConfigChangesConsumerHealthCheck>();
+
+        return builder.AddCheck<ConfigChangesConsumerHealthCheck>(
+            name,
+            tags: new[] { HealthTags.Health, HealthTags.Startup, HealthTags.Live });
+    }
 }
 
 public class DynamicConfigInitHealthCheck : StatusHealthCheck
+{ }
+
+public class ConfigChangesConsumerHealthCheck : StatusHealthCheck
 { }

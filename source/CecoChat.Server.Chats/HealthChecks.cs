@@ -5,9 +5,6 @@ namespace CecoChat.Server.Chats;
 public class ChatsDbInitHealthCheck : StatusHealthCheck
 { }
 
-public class ConfigChangesConsumerHealthCheck : StatusHealthCheck
-{ }
-
 public class HistoryConsumerHealthCheck : StatusHealthCheck
 { }
 
