@@ -111,12 +111,10 @@ public class Startup : StartupBase
         services
             .AddHealthChecks()
             .AddDynamicConfigInit()
+            .AddConfigChangesConsumer()
             .AddCheck<ChatsDbInitHealthCheck>(
                 "chats-db-init",
                 tags: new[] { HealthTags.Health, HealthTags.Startup })
-            .AddCheck<ConfigChangesConsumerHealthCheck>(
-                "config-changes-consumer",
-                tags: new[] { HealthTags.Health, HealthTags.Startup, HealthTags.Live })
             .AddCheck<HistoryConsumerHealthCheck>(
                 "history-consumer",
                 tags: new[] { HealthTags.Health, HealthTags.Startup, HealthTags.Live })
@@ -143,7 +141,6 @@ public class Startup : StartupBase
                 tags: new[] { HealthTags.Health, HealthTags.Ready });
 
         services.AddSingleton<ChatsDbInitHealthCheck>();
-        services.AddSingleton<ConfigChangesConsumerHealthCheck>();
         services.AddSingleton<HistoryConsumerHealthCheck>();
         services.AddSingleton<ReceiversConsumerHealthCheck>();
         services.AddSingleton<SendersConsumerHealthCheck>();

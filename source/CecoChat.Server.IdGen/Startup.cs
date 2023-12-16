@@ -94,9 +94,7 @@ public class Startup : StartupBase
         services
             .AddHealthChecks()
             .AddDynamicConfigInit()
-            .AddCheck<ConfigChangesConsumerHealthCheck>(
-                "config-changes-consumer",
-                tags: new[] { HealthTags.Health, HealthTags.Startup, HealthTags.Live })
+            .AddConfigChangesConsumer()
             .AddUri(
                 "config-svc",
                 new Uri(ConfigClientOptions.Address!, ConfigClientOptions.HealthPath),
@@ -108,8 +106,6 @@ public class Startup : StartupBase
                 _backplaneOptions.Kafka,
                 _backplaneOptions.Health,
                 tags: new[] { HealthTags.Health, HealthTags.Ready });
-
-        services.AddSingleton<ConfigChangesConsumerHealthCheck>();
     }
 
     public void ConfigureContainer(ContainerBuilder builder)
