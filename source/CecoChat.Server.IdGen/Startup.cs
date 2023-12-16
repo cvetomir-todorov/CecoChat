@@ -6,7 +6,6 @@ using CecoChat.AspNet.Prometheus;
 using CecoChat.Autofac;
 using CecoChat.Client.Config;
 using CecoChat.DynamicConfig;
-using CecoChat.Http.Health;
 using CecoChat.Kafka;
 using CecoChat.Kafka.Health;
 using CecoChat.Kafka.Telemetry;
@@ -95,12 +94,7 @@ public class Startup : StartupBase
             .AddHealthChecks()
             .AddDynamicConfigInit()
             .AddConfigChangesConsumer()
-            .AddUri(
-                "config-svc",
-                new Uri(ConfigClientOptions.Address!, ConfigClientOptions.HealthPath),
-                configureHttpClient: (_, client) => client.DefaultRequestVersion = new Version(2, 0),
-                timeout: ConfigClientOptions.HealthTimeout,
-                tags: new[] { HealthTags.Health, HealthTags.Ready })
+            .AddConfigService(ConfigClientOptions)
             .AddKafka(
                 "backplane",
                 _backplaneOptions.Kafka,

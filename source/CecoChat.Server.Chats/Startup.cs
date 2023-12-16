@@ -11,7 +11,6 @@ using CecoChat.Contracts.Backplane;
 using CecoChat.Data.Chats;
 using CecoChat.Data.Chats.Telemetry;
 using CecoChat.DynamicConfig;
-using CecoChat.Http.Health;
 using CecoChat.Kafka;
 using CecoChat.Kafka.Health;
 using CecoChat.Kafka.Telemetry;
@@ -112,6 +111,7 @@ public class Startup : StartupBase
             .AddHealthChecks()
             .AddDynamicConfigInit()
             .AddConfigChangesConsumer()
+            .AddConfigService(ConfigClientOptions)
             .AddCheck<ChatsDbInitHealthCheck>(
                 "chats-db-init",
                 tags: new[] { HealthTags.Health, HealthTags.Startup })
@@ -124,12 +124,6 @@ public class Startup : StartupBase
             .AddCheck<SendersConsumerHealthCheck>(
                 "senders-consumer",
                 tags: new[] { HealthTags.Health, HealthTags.Startup, HealthTags.Live })
-            .AddUri(
-                "config-svc",
-                new Uri(ConfigClientOptions.Address!, ConfigClientOptions.HealthPath),
-                configureHttpClient: (_, client) => client.DefaultRequestVersion = new Version(2, 0),
-                timeout: ConfigClientOptions.HealthTimeout,
-                tags: new[] { HealthTags.Health, HealthTags.Ready })
             .AddKafka(
                 "backplane",
                 _backplaneOptions.Kafka,

@@ -115,15 +115,10 @@ public class Startup : StartupBase
             .AddHealthChecks()
             .AddDynamicConfigInit()
             .AddConfigChangesConsumer()
+            .AddConfigService(ConfigClientOptions)
             .AddCheck<ReceiversConsumerHealthCheck>(
                 "receivers-consumer",
                 tags: new[] { HealthTags.Health, HealthTags.Startup, HealthTags.Live })
-            .AddUri(
-                "config-svc",
-                new Uri(ConfigClientOptions.Address!, ConfigClientOptions.HealthPath),
-                configureHttpClient: (_, client) => client.DefaultRequestVersion = new Version(2, 0),
-                timeout: ConfigClientOptions.HealthTimeout,
-                tags: new[] { HealthTags.Health, HealthTags.Ready })
             .AddKafka(
                 "backplane",
                 _backplaneOptions.Kafka,

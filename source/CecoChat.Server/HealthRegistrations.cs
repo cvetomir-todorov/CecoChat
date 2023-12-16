@@ -1,5 +1,7 @@
 using CecoChat.AspNet.Health;
+using CecoChat.Client.Config;
 using CecoChat.Health;
+using CecoChat.Http.Health;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CecoChat.Server;
@@ -26,6 +28,19 @@ public static class HealthRegistrations
         return builder.AddCheck<ConfigChangesConsumerHealthCheck>(
             name,
             tags: new[] { HealthTags.Health, HealthTags.Startup, HealthTags.Live });
+    }
+
+    public static IHealthChecksBuilder AddConfigService(
+        this IHealthChecksBuilder builder,
+        ConfigClientOptions configClientOptions,
+        string name = "config-svc")
+    {
+        return builder.AddUri(
+            name,
+            new Uri(configClientOptions.Address!, configClientOptions.HealthPath),
+            configureHttpClient: (_, client) => client.DefaultRequestVersion = new Version(2, 0),
+            timeout: configClientOptions.HealthTimeout,
+            tags: new[] { HealthTags.Health, HealthTags.Ready });
     }
 }
 
