@@ -49,14 +49,13 @@ public static class HealthRegistrations
     public static IHealthChecksBuilder AddBackplane(
         this IHealthChecksBuilder builder,
         IConfiguration configuration,
-        string configSectionName = "Backplane",
-        string healthCheckName = "backplane")
+        string name = "backplane")
     {
         BackplaneOptions backplaneOptions = new();
-        configuration.GetSection(configSectionName).Bind(backplaneOptions);
+        configuration.Bind(backplaneOptions);
 
         return builder.AddKafka(
-            healthCheckName,
+            name,
             backplaneOptions.Kafka,
             backplaneOptions.Health,
             tags: new[] { HealthTags.Health, HealthTags.Ready });

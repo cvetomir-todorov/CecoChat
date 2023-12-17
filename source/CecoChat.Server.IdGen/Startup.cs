@@ -82,7 +82,7 @@ public class Startup : StartupBase
             .AddDynamicConfigInit()
             .AddConfigChangesConsumer()
             .AddConfigService(ConfigClientOptions)
-            .AddBackplane(Configuration);
+            .AddBackplane(Configuration.GetSection("Backplane"));
     }
 
     public void ConfigureContainer(ContainerBuilder builder)

@@ -106,7 +106,7 @@ public class Startup : StartupBase
     {
         services
             .AddHealthChecks()
-            .AddBackplane(Configuration)
+            .AddBackplane(Configuration.GetSection("Backplane"))
             .AddCheck<ConfigDbInitHealthCheck>(
                 "config-db-init",
                 tags: new[] { HealthTags.Health, HealthTags.Startup })
