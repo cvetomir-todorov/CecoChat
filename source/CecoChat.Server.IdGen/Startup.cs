@@ -30,7 +30,7 @@ public class Startup : StartupBase
     {
         AddTelemetryServices(services);
         AddHealthServices(services);
-        
+
         // dynamic config
         services.AddConfigClient(ConfigClientOptions);
 
@@ -41,7 +41,7 @@ public class Startup : StartupBase
             grpc.EnableMessageValidation();
         });
         services.AddGrpcValidation();
-        
+
         // common
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
         services.AddOptions();

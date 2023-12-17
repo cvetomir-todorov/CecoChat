@@ -62,7 +62,7 @@ public class ConfigController : ControllerBase
     [HttpPut]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
-    public async Task<IActionResult> UpdateConfigElements([FromBody] [BindRequired] UpdateConfigElementsRequest request, CancellationToken ct)
+    public async Task<IActionResult> UpdateConfigElements([FromBody][BindRequired] UpdateConfigElementsRequest request, CancellationToken ct)
     {
         UpdateDbContext(request.ExistingElements, request.NewElements, request.DeletedElements);
         (bool success, IActionResult result) = await ExecuteUpdates(ct);
