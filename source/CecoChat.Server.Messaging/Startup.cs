@@ -54,10 +54,7 @@ public class Startup : StartupBase
         // dynamic config
         services.AddConfigClient(ConfigClientOptions);
 
-        // idgen
-        services.AddIdGenClient(_idGenClientOptions);
-
-        // clients
+        // signalr
         services
             .AddSignalR(signalr =>
             {
@@ -72,6 +69,9 @@ public class Startup : StartupBase
             {
                 chatHub.AddFilter<SignalRTelemetryFilter>();
             });
+
+        // idgen
+        services.AddIdGenClient(_idGenClientOptions);
 
         // common
         services.AddOptions();

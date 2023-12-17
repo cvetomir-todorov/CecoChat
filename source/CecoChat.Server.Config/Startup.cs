@@ -46,7 +46,7 @@ public class Startup : StartupBase
         AddTelemetryServices(services);
         AddHealthServices(services);
 
-        // clients
+        // grpc
         services.AddGrpc(grpc =>
         {
             grpc.EnableDetailedErrors = Environment.IsDevelopment();
@@ -54,7 +54,7 @@ public class Startup : StartupBase
         });
         services.AddGrpcValidation();
 
-        // web
+        // rest
         services.AddControllers(mvc =>
         {
             // insert it before the default one so that it takes effect
@@ -71,6 +71,7 @@ public class Startup : StartupBase
             fluentValidation.DisableDataAnnotationsValidation = true;
         });
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+        services.AddOptions();
     }
 
     private void AddTelemetryServices(IServiceCollection services)

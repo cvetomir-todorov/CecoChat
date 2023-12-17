@@ -51,7 +51,7 @@ public class Startup : StartupBase
         // dynamic config
         services.AddConfigClient(ConfigClientOptions);
 
-        // clients
+        // grpc
         services.AddGrpc(grpc =>
         {
             grpc.EnableDetailedErrors = Environment.IsDevelopment();
