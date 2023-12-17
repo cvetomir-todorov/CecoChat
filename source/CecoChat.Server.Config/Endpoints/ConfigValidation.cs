@@ -25,15 +25,13 @@ public sealed class UpdateConfigElementsRequestValidator : AbstractValidator<Upd
 
 public sealed class ConfigElementValidator : AbstractValidator<ConfigElement>
 {
-    private static readonly Regex NameRegex = new("^([a-z\\-]{2,16}\\.[a-z\\-\\.]{2,128})$", RegexOptions.Compiled | RegexOptions.CultureInvariant);
-
     public ConfigElementValidator(bool validateName, bool validateValue)
     {
         if (validateName)
         {
             RuleFor(x => x.Name)
                 .NotEmpty()
-                .Matches(NameRegex)
+                .Matches(ConfigRegexes.ConfigElementNameRegex())
                 .WithMessage("{PropertyName} should be a correct config element name such as 'section.sub-section' or 'section.sub-section.element', but '{PropertyValue}' was provided.");
         }
         if (validateValue)
@@ -46,13 +44,26 @@ public sealed class ConfigElementValidator : AbstractValidator<ConfigElement>
 
 public sealed class GetConfigElementsRequestValidator : AbstractValidator<GetConfigElementsRequest>
 {
-    private static readonly Regex ConfigSectionRegex = new("^([a-z\\-]{2,16})$", RegexOptions.Compiled | RegexOptions.CultureInvariant);
-
     public GetConfigElementsRequestValidator()
     {
         RuleFor(x => x.ConfigSection)
             .NotEmpty()
-            .Matches(ConfigSectionRegex)
+            .Matches(ConfigRegexes.ConfigSectionNameRegex())
             .WithMessage("{PropertyName} should be a correct config section such as 'partitioning', but {PropertyValue} was provided.");
     }
+}
+
+internal static partial class ConfigRegexes
+{
+    [GeneratedRegex(
+        pattern: "^([a-z\\-]{2,16}\\.[a-z\\-\\.]{2,128})$",
+        RegexOptions.CultureInvariant,
+        matchTimeoutMilliseconds: 1000)]
+    public static partial Regex ConfigElementNameRegex();
+
+    [GeneratedRegex(
+        pattern: "^([a-z\\-]{2,16})$",
+        RegexOptions.CultureInvariant,
+        matchTimeoutMilliseconds: 1000)]
+    public static partial Regex ConfigSectionNameRegex();
 }
