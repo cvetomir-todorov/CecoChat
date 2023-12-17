@@ -101,10 +101,14 @@ public class Startup : StartupBase
             .AddDynamicConfigInit()
             .AddConfigChangesConsumer()
             .AddConfigService(ConfigClientOptions)
-            .AddBackplane(Configuration)
+            .AddBackplane(Configuration.GetSection("Backplane"))
             .AddCheck<ChatsDbInitHealthCheck>(
                 "chats-db-init",
                 tags: new[] { HealthTags.Health, HealthTags.Startup })
+            .AddCassandra(
+                name: "chats-db",
+                timeout: _chatsDbOptions.HealthTimeout,
+                tags: new[] { HealthTags.Health, HealthTags.Ready })
             .AddCheck<HistoryConsumerHealthCheck>(
                 "history-consumer",
                 tags: new[] { HealthTags.Health, HealthTags.Startup, HealthTags.Live })
@@ -113,11 +117,7 @@ public class Startup : StartupBase
                 tags: new[] { HealthTags.Health, HealthTags.Startup, HealthTags.Live })
             .AddCheck<SendersConsumerHealthCheck>(
                 "senders-consumer",
-                tags: new[] { HealthTags.Health, HealthTags.Startup, HealthTags.Live })
-            .AddCassandra(
-                name: "chats-db",
-                timeout: _chatsDbOptions.HealthTimeout,
-                tags: new[] { HealthTags.Health, HealthTags.Ready });
+                tags: new[] { HealthTags.Health, HealthTags.Startup, HealthTags.Live });
 
         services.AddSingleton<ChatsDbInitHealthCheck>();
         services.AddSingleton<HistoryConsumerHealthCheck>();

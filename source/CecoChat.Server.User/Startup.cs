@@ -116,7 +116,7 @@ public class Startup : StartupBase
             .AddDynamicConfigInit()
             .AddConfigChangesConsumer()
             .AddConfigService(ConfigClientOptions)
-            .AddBackplane(Configuration)
+            .AddBackplane(Configuration.GetSection("Backplane"))
             .AddCheck<UserDbInitHealthCheck>(
                 "user-db-init",
                 tags: new[] { HealthTags.Health, HealthTags.Startup })

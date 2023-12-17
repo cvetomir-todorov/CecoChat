@@ -117,7 +117,7 @@ public class Startup : StartupBase
             .AddDynamicConfigInit()
             .AddConfigChangesConsumer()
             .AddConfigService(ConfigClientOptions)
-            .AddBackplane(Configuration)
+            .AddBackplane(Configuration.GetSection("Backplane"))
             .AddUri(
                 "chats-svc",
                 new Uri(_chatsClientOptions.Address!, _chatsClientOptions.HealthPath),
