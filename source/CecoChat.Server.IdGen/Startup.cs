@@ -96,10 +96,11 @@ public class Startup : StartupBase
         builder.RegisterOptions<ConfigOptions>(Configuration.GetSection("Config"));
 
         // dynamic config
-        IConfiguration backplaneConfiguration = Configuration.GetSection("Backplane");
-        builder.RegisterModule(new DynamicConfigAutofacModule(backplaneConfiguration, registerConfigChangesConsumer: true, registerSnowflake: true));
-        IConfiguration configClientConfiguration = Configuration.GetSection("ConfigClient");
-        builder.RegisterModule(new ConfigClientAutofacModule(configClientConfiguration));
+        builder.RegisterModule(new DynamicConfigAutofacModule(
+            Configuration.GetSection("Backplane"),
+            registerConfigChangesConsumer: true,
+            registerSnowflake: true));
+        builder.RegisterModule(new ConfigClientAutofacModule(Configuration.GetSection("ConfigClient")));
 
         // backplane
         builder.RegisterType<KafkaAdmin>().As<IKafkaAdmin>().SingleInstance();

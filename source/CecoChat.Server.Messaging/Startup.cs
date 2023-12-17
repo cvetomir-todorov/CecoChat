@@ -138,10 +138,11 @@ public class Startup : StartupBase
         builder.RegisterOptions<ConfigOptions>(Configuration.GetSection("Config"));
 
         // dynamic config
-        IConfiguration backplaneConfiguration = Configuration.GetSection("Backplane");
-        builder.RegisterModule(new DynamicConfigAutofacModule(backplaneConfiguration, registerConfigChangesConsumer: true, registerPartitioning: true));
-        IConfiguration configClientConfiguration = Configuration.GetSection("ConfigClient");
-        builder.RegisterModule(new ConfigClientAutofacModule(configClientConfiguration));
+        builder.RegisterModule(new DynamicConfigAutofacModule(
+            Configuration.GetSection("Backplane"),
+            registerConfigChangesConsumer: true,
+            registerPartitioning: true));
+        builder.RegisterModule(new ConfigClientAutofacModule(Configuration.GetSection("ConfigClient")));
 
         // clients
         builder.RegisterType<ClientContainer>().As<IClientContainer>().SingleInstance();
@@ -149,8 +150,7 @@ public class Startup : StartupBase
         builder.RegisterModule(new SignalRTelemetryAutofacModule());
 
         // idgen
-        IConfiguration idGenConfiguration = Configuration.GetSection("IdGenClient");
-        builder.RegisterModule(new IdGenClientAutofacModule(idGenConfiguration));
+        builder.RegisterModule(new IdGenClientAutofacModule(Configuration.GetSection("IdGenClient")));
 
         // backplane
         builder.RegisterType<KafkaAdmin>().As<IKafkaAdmin>().SingleInstance();
