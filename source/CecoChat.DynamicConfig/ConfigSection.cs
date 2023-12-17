@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 namespace CecoChat.DynamicConfig;
 
 internal interface IConfigSection<TValues>
-    where TValues: class
+    where TValues : class
 {
     Task<bool> Initialize(string configContext, Action<TValues> printValues, CancellationToken ct);
 
@@ -14,7 +14,7 @@ internal interface IConfigSection<TValues>
 }
 
 internal sealed class ConfigSection<TValues> : IConfigSection<TValues>, IConfigChangeSubscriber
-    where TValues: class
+    where TValues : class
 {
     private readonly ILogger _logger;
     private readonly IValidator<TValues> _validator;
@@ -35,7 +35,7 @@ internal sealed class ConfigSection<TValues> : IConfigSection<TValues>, IConfigC
         _repo = repo;
         _clock = clock;
     }
- 
+
     public async Task<bool> Initialize(string configContext, Action<TValues> printValues, CancellationToken ct)
     {
         try
