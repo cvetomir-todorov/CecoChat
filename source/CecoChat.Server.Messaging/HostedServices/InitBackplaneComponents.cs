@@ -9,7 +9,7 @@ using Microsoft.Extensions.Options;
 
 namespace CecoChat.Server.Messaging.HostedServices;
 
-public sealed class InitBackplaneComponents : IHostedService, ISubscriber<EventArgs>, IDisposable
+public sealed class InitBackplaneComponents : IHostedService, ISubscriber<PartitionsChangedEventArgs>, IDisposable
 {
     private readonly ILogger _logger;
     private readonly ConfigOptions _configOptions;
@@ -17,7 +17,7 @@ public sealed class InitBackplaneComponents : IHostedService, ISubscriber<EventA
     private readonly IPartitioningConfig _partitioningConfig;
     private readonly IPartitioner _partitioner;
     private readonly IClientContainer _clientContainer;
-    private readonly IEvent<EventArgs> _partitionsChanged;
+    private readonly IEvent<PartitionsChangedEventArgs> _partitionsChanged;
     private readonly Guid _partitionsChangedToken;
     private readonly CancellationToken _appStoppingCt;
     private CancellationTokenSource? _stoppedCts;
@@ -30,7 +30,7 @@ public sealed class InitBackplaneComponents : IHostedService, ISubscriber<EventA
         IPartitioningConfig partitioningConfig,
         IPartitioner partitioner,
         IClientContainer clientContainer,
-        IEvent<EventArgs> partitionsChanged)
+        IEvent<PartitionsChangedEventArgs> partitionsChanged)
     {
         _logger = logger;
         _configOptions = configOptions.Value;
@@ -69,7 +69,7 @@ public sealed class InitBackplaneComponents : IHostedService, ISubscriber<EventA
         return Task.CompletedTask;
     }
 
-    public async ValueTask Handle(EventArgs _)
+    public async ValueTask Handle(PartitionsChangedEventArgs _)
     {
         await DisconnectClients(
             previousPartitionCount: _backplaneComponents.CurrentPartitionCount,

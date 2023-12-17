@@ -7,7 +7,7 @@ using Microsoft.Extensions.Options;
 
 namespace CecoChat.Server.User.HostedServices;
 
-public sealed class InitBackplaneComponents : IHostedService, ISubscriber<EventArgs>, IDisposable
+public sealed class InitBackplaneComponents : IHostedService, ISubscriber<PartitionsChangedEventArgs>, IDisposable
 {
     private readonly ILogger _logger;
     private readonly BackplaneOptions _backplaneOptions;
@@ -16,7 +16,7 @@ public sealed class InitBackplaneComponents : IHostedService, ISubscriber<EventA
     private readonly IConnectionNotifyProducer _connectionNotifyProducer;
     private readonly IConfigChangesConsumer _configChangesConsumer;
     private readonly ConfigChangesConsumerHealthCheck _configChangesConsumerHealthCheck;
-    private readonly IEvent<EventArgs> _partitionsChanged;
+    private readonly IEvent<PartitionsChangedEventArgs> _partitionsChanged;
     private readonly Guid _partitionsChangedToken;
     private readonly CancellationToken _appStoppingCt;
     private CancellationTokenSource? _stoppedCts;
@@ -30,7 +30,7 @@ public sealed class InitBackplaneComponents : IHostedService, ISubscriber<EventA
         IConnectionNotifyProducer connectionNotifyProducer,
         IConfigChangesConsumer configChangesConsumer,
         ConfigChangesConsumerHealthCheck configChangesConsumerHealthCheck,
-        IEvent<EventArgs> partitionsChanged)
+        IEvent<PartitionsChangedEventArgs> partitionsChanged)
     {
         _logger = logger;
         _backplaneOptions = backplaneOptions.Value;
@@ -94,7 +94,7 @@ public sealed class InitBackplaneComponents : IHostedService, ISubscriber<EventA
         return Task.CompletedTask;
     }
 
-    public ValueTask Handle(EventArgs _)
+    public ValueTask Handle(PartitionsChangedEventArgs _)
     {
         int newPartitionCount = _partitioningConfig.PartitionCount;
         int currentPartitionCount = _topicPartitionFlyweight.GetTopicPartitionCount(_backplaneOptions.TopicMessagesByReceiver);

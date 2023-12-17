@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 
 namespace CecoChat.DynamicConfig.Partitioning;
 
-public interface IPartitioningConfig
+public interface IPartitioningConfig : IDisposable
 {
     Task<bool> Initialize(CancellationToken ct);
 
@@ -15,21 +15,38 @@ public interface IPartitioningConfig
     string GetAddress(int partition);
 }
 
+public sealed class PartitionsChangedEventArgs
+{
+    public static readonly PartitionsChangedEventArgs Empty = new();
+}
+
 internal sealed class PartitioningConfig : IPartitioningConfig
 {
     private readonly ILogger _logger;
     private readonly IConfigSection<PartitioningValues> _section;
-    // TODO: raise the event
-    private readonly IEventSource<EventArgs> _partitionsChanged;
+    private readonly IEventSource<PartitionsChangedEventArgs> _partitionsChanged;
 
     public PartitioningConfig(
         ILogger<PartitioningConfig> logger,
         IConfigSection<PartitioningValues> section,
-        IEventSource<EventArgs> partitionsChanged)
+        IEventSource<PartitionsChangedEventArgs> partitionsChanged)
     {
         _logger = logger;
         _section = section;
         _partitionsChanged = partitionsChanged;
+
+        _section.ValuesChanged += SectionOnValuesChanged;
+    }
+
+    public void Dispose()
+    {
+        _section.ValuesChanged -= SectionOnValuesChanged;
+        _partitionsChanged.Dispose();
+    }
+
+    private void SectionOnValuesChanged(object? sender, EventArgs e)
+    {
+        _partitionsChanged.Publish(PartitionsChangedEventArgs.Empty);
     }
 
     public int PartitionCount

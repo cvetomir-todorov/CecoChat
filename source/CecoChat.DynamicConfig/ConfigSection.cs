@@ -11,6 +11,8 @@ internal interface IConfigSection<TValues>
     Task<bool> Initialize(string configContext, Action<TValues> printValues, CancellationToken ct);
 
     TValues? Values { get; }
+
+    event EventHandler ValuesChanged;
 }
 
 internal sealed class ConfigSection<TValues> : IConfigSection<TValues>, IConfigChangeSubscriber
@@ -67,6 +69,8 @@ internal sealed class ConfigSection<TValues> : IConfigSection<TValues>, IConfigC
 
     public TValues? Values { get; private set; }
 
+    public event EventHandler? ValuesChanged;
+
     private bool ValidateValues(TValues values)
     {
         ValidationResult validationResult = _validator.Validate(values);
@@ -101,18 +105,18 @@ internal sealed class ConfigSection<TValues> : IConfigSection<TValues>, IConfigC
         TValues changedValues = await _repo.Load(ct);
         _logger.LogInformation("Loading changed {ConfigContext} configuration succeeded", _configContext);
 
-        if (ValidateValues(changedValues))
-        {
-            _logger.LogInformation("Using new {ConfigContext} configuration", _configContext);
-
-            Values = changedValues;
-            _version = _clock.GetNowUtc();
-
-            _printValues!(Values);
-        }
-        else
+        if (!ValidateValues(changedValues))
         {
             _logger.LogError("Using existing config for {ConfigContext}", _configContext);
         }
+
+        _logger.LogInformation("Using new {ConfigContext} configuration", _configContext);
+
+        Values = changedValues;
+        _version = _clock.GetNowUtc();
+
+        _printValues!(Values);
+
+        ValuesChanged?.Invoke(this, EventArgs.Empty);
     }
 }
