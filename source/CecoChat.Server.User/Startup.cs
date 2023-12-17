@@ -55,16 +55,16 @@ public class Startup : StartupBase
         services.AddJwtAuthentication(JwtOptions);
         services.AddUserPolicyAuthorization();
 
-        // clients
+        // dynamic config
+        services.AddConfigClient(ConfigClientOptions);
+
+        // grpc
         services.AddGrpc(grpc =>
         {
             grpc.EnableDetailedErrors = Environment.IsDevelopment();
             grpc.EnableMessageValidation();
         });
         services.AddGrpcValidation();
-
-        // dynamic config
-        services.AddConfigClient(ConfigClientOptions);
 
         // user db
         services.AddUserDb(_userDbOptions.Connect);

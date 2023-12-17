@@ -57,7 +57,7 @@ public class Startup : StartupBase
         // dynamic config
         services.AddConfigClient(ConfigClientOptions);
 
-        // web
+        // rest
         services.AddControllers(mvc =>
         {
             // insert it before the default one so that it takes effect
