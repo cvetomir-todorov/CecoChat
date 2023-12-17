@@ -88,19 +88,21 @@ public class Startup : StartupBase
             .AddOpenTelemetry()
             .WithTracing(tracing =>
             {
-                tracing.SetResourceBuilder(serviceResourceBuilder);
-                tracing.AddSignalRInstrumentation();
-                tracing.AddKafkaInstrumentation();
-                tracing.AddGrpcClientInstrumentation(grpc => grpc.SuppressDownstreamInstrumentation = true);
-                tracing.ConfigureSampling(TracingSamplingOptions);
-                tracing.ConfigureOtlpExporter(TracingExportOptions);
+                tracing
+                    .SetResourceBuilder(serviceResourceBuilder)
+                    .AddSignalRInstrumentation()
+                    .AddKafkaInstrumentation()
+                    .AddGrpcClientInstrumentation(grpc => grpc.SuppressDownstreamInstrumentation = true)
+                    .ConfigureSampling(TracingSamplingOptions)
+                    .ConfigureOtlpExporter(TracingExportOptions);
             })
             .WithMetrics(metrics =>
             {
-                metrics.SetResourceBuilder(serviceResourceBuilder);
-                metrics.AddSignalRInstrumentation();
-                metrics.AddMessagingInstrumentation();
-                metrics.ConfigurePrometheusAspNetExporter(PrometheusOptions);
+                metrics
+                    .SetResourceBuilder(serviceResourceBuilder)
+                    .AddSignalRInstrumentation()
+                    .AddMessagingInstrumentation()
+                    .ConfigurePrometheusAspNetExporter(PrometheusOptions);
             });
     }
 
