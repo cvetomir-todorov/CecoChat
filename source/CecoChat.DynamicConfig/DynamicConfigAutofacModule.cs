@@ -84,7 +84,7 @@ public sealed class DynamicConfigAutofacModule : Module
                 .SingleInstance();
             builder.RegisterType<PartitioningRepo>().As<IRepo<PartitioningValues>>().SingleInstance();
             builder.RegisterType<PartitioningValidator>().As<IValidator<PartitioningValues>>().SingleInstance();
-            builder.RegisterSingletonEvent<EventSource<EventArgs>, EventArgs>();
+            builder.RegisterSingletonEvent<EventSource<PartitionsChangedEventArgs>, PartitionsChangedEventArgs>();
         }
         if (_registerSnowflake)
         {
