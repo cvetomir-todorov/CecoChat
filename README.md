@@ -50,9 +50,9 @@ Check out [what next](docs/what-next.md) needs to be implemented. I appreciate a
 * Design
   - [Messaging](docs/design-messaging.md)
   - [Chats](docs/design-chats.md)
-  - [User profiles and connections](docs/design-users.md)
+  - [User (profiles and connections)](docs/design-users.md)
   - [Clients](docs/design-clients.md)
-  - [Configuration](docs/design-configuration.md)
+  - [Configuration (static and dynamic)](docs/design-configuration.md)
   - [Observability](docs/design-observability.md)
   - [Deployment](docs/design-deployment.md)
 * Development

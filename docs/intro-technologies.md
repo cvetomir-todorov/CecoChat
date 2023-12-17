@@ -92,16 +92,19 @@ Chats database is based on Cassandra:
 * ensures data consistency via hinted handoffs and read repairs
 * needs regular anti-entropy repairs which are CPU-bound
 
-# Configuration database
+# Dynamic configuration
 
-![Redis](tech-images/redis.png)
+![Yugabyte](tech-images/yugabyte.png)
+![Postgres](tech-images/postgres.webp)
+![Kafka](tech-images/kafka.png)
+![gRPC](tech-images/grpc.png)
+![Protocol Buffers](tech-images/protocol-buffers.png)
 
-Configuration is based on Redis:
-* open-source software
-* lightweight and performant
-* easy to use and manage
-* has a built-in PUB/SUB mechanism
-* should be replaced by a more reliable technology in the future, e.g. a relational DB for storage and Kafka for notifications
+Dynamic configuration is based on multiple technologies:
+* storage is based on Yugabyte DB which is Postgres driver-compatible
+* services are notified for configuration changes via dedicated Kafka topic
+* services acquire configuration both initially and when changed using gRPC
+* both Kafka and gRPC data format is Protocol Buffers
 
 # Observability
 

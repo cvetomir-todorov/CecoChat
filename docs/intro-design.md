@@ -13,7 +13,10 @@
 * ID Gen service is used to generate Snowflake message IDs
 * Chats service transforms the messages from the PUB/SUB backplane into the Chats database which is the source of truth 
 * Chats service transforms the messages and reactions from the PUB/SUB backplane into the Chats database which is the source of truth
-* Splitting the different responsibilities between separate services allows for independent scaling
+
+In terms of development and operations:
+
+* Splitting the different responsibilities between separate services enables independent development, testing, versioning, deployment, scaling
 * The services use dynamic configuration which is updated centrally
 * Observability is achieved via health checks, distributed tracing, log aggregation and metrics with monitoring
 * Deployment infrastructure takes care of load balancing, auto-scaling

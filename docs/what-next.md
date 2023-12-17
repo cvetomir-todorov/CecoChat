@@ -40,7 +40,6 @@ A short list of tasks to do next regarding product features, technical features,
 # Technical features
 
 * Architecture
-  - Design dynamic configuration
   - Design cross-region communication
 * Security
   - Introduce an auth service
@@ -78,5 +77,6 @@ A short list of tasks to do next regarding product features, technical features,
   - Use Cassandra instrumentation from .NET contrib
   - Add metrics infrastructure to Minikube deployment
 * Misc
+  - Clean up periodically the empty consumer groups for config-changes Kafka topic
   - Control sending notifications to SignalR connected clients as previously with gRPC clients
   - Improve monotonic clock skew and make snowflake ID generation to use it as `IdGen.ITimeSource`
