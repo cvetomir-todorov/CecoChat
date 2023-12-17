@@ -93,25 +93,20 @@ public class Startup : StartupBase
             .AddOpenTelemetry()
             .WithTracing(tracing =>
             {
-                tracing.SetResourceBuilder(serviceResourceBuilder);
-                tracing.AddAspNetCoreInstrumentation(aspnet =>
-                {
-                    HashSet<string> excludedPaths = new()
-                    {
-                        PrometheusOptions.ScrapeEndpointPath, HealthPaths.Health, HealthPaths.Startup, HealthPaths.Live, HealthPaths.Ready
-                    };
-                    aspnet.Filter = httpContext => !excludedPaths.Contains(httpContext.Request.Path);
-                });
-                tracing.AddKafkaInstrumentation();
-                tracing.AddGrpcClientInstrumentation(grpc => grpc.SuppressDownstreamInstrumentation = true);
-                tracing.ConfigureSampling(TracingSamplingOptions);
-                tracing.ConfigureOtlpExporter(TracingExportOptions);
+                tracing
+                    .SetResourceBuilder(serviceResourceBuilder)
+                    .AddAspNetCoreServer(enableGrpcSupport: false, PrometheusOptions)
+                    .AddKafkaInstrumentation()
+                    .AddGrpcClientInstrumentation(grpc => grpc.SuppressDownstreamInstrumentation = true)
+                    .ConfigureSampling(TracingSamplingOptions)
+                    .ConfigureOtlpExporter(TracingExportOptions);
             })
             .WithMetrics(metrics =>
             {
-                metrics.SetResourceBuilder(serviceResourceBuilder);
-                metrics.AddAspNetCoreInstrumentation();
-                metrics.ConfigurePrometheusAspNetExporter(PrometheusOptions);
+                metrics
+                    .SetResourceBuilder(serviceResourceBuilder)
+                    .AddAspNetCoreInstrumentation()
+                    .ConfigurePrometheusAspNetExporter(PrometheusOptions);
             });
     }
 
