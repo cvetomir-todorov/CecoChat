@@ -126,12 +126,12 @@ public class Startup : StartupBase
 
         // config db
         builder.RegisterType<NpgsqlDbInitializer>().As<INpgsqlDbInitializer>().SingleInstance();
-        IConfiguration configDbConfig = Configuration.GetSection("ConfigDb");
-        builder.RegisterOptions<ConfigDbOptions>(configDbConfig);
+        builder.RegisterOptions<ConfigDbOptions>(Configuration.GetSection("ConfigDb"));
 
         // dynamic config
-        IConfiguration backplaneConfiguration = Configuration.GetSection("Backplane");
-        builder.RegisterModule(new DynamicConfigAutofacModule(backplaneConfiguration, registerConfigChangesProducer: true));
+        builder.RegisterModule(new DynamicConfigAutofacModule(
+            Configuration.GetSection("Backplane"),
+            registerConfigChangesProducer: true));
 
         // backplane
         builder.RegisterType<KafkaAdmin>().As<IKafkaAdmin>().SingleInstance();

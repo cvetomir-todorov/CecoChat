@@ -134,15 +134,15 @@ public class Startup : StartupBase
         builder.RegisterHostedService<InitBackplaneComponents>();
 
         // dynamic config
-        IConfiguration backplaneConfiguration = Configuration.GetSection("Backplane");
-        builder.RegisterModule(new DynamicConfigAutofacModule(backplaneConfiguration, registerConfigChangesConsumer: true, registerHistory: true));
-        IConfiguration configClientConfiguration = Configuration.GetSection("ConfigClient");
-        builder.RegisterModule(new ConfigClientAutofacModule(configClientConfiguration));
+        builder.RegisterModule(new DynamicConfigAutofacModule(
+            Configuration.GetSection("Backplane"),
+            registerConfigChangesConsumer: true,
+            registerHistory: true));
+        builder.RegisterModule(new ConfigClientAutofacModule(Configuration.GetSection("ConfigClient")));
 
         // chats db
-        IConfiguration chatsDbConfig = Configuration.GetSection("ChatsDb");
-        builder.RegisterModule(new ChatsDbAutofacModule(chatsDbConfig));
-        builder.RegisterModule(new CassandraHealthAutofacModule(chatsDbConfig));
+        builder.RegisterModule(new ChatsDbAutofacModule(Configuration.GetSection("ChatsDb")));
+        builder.RegisterModule(new CassandraHealthAutofacModule(Configuration.GetSection("ChatsDb")));
 
         // backplane
         builder.RegisterType<KafkaAdmin>().As<IKafkaAdmin>().SingleInstance();

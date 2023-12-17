@@ -140,10 +140,11 @@ public class Startup : StartupBase
         builder.RegisterHostedService<InitBackplaneComponents>();
 
         // dynamic config
-        IConfiguration backplaneConfiguration = Configuration.GetSection("Backplane");
-        builder.RegisterModule(new DynamicConfigAutofacModule(backplaneConfiguration, registerConfigChangesConsumer: true, registerPartitioning: true));
-        IConfiguration configClientConfiguration = Configuration.GetSection("ConfigClient");
-        builder.RegisterModule(new ConfigClientAutofacModule(configClientConfiguration));
+        builder.RegisterModule(new DynamicConfigAutofacModule(
+            Configuration.GetSection("Backplane"),
+            registerConfigChangesConsumer: true,
+            registerPartitioning: true));
+        builder.RegisterModule(new ConfigClientAutofacModule(Configuration.GetSection("ConfigClient")));
 
         // backplane
         builder.RegisterType<KafkaAdmin>().As<IKafkaAdmin>().SingleInstance();
@@ -151,10 +152,8 @@ public class Startup : StartupBase
         builder.RegisterModule(new PartitionerAutofacModule());
 
         // downstream services
-        IConfiguration chatsClientConfig = Configuration.GetSection("ChatsClient");
-        builder.RegisterModule(new ChatsClientAutofacModule(chatsClientConfig));
-        IConfiguration userClientConfig = Configuration.GetSection("UserClient");
-        builder.RegisterModule(new UserClientAutofacModule(userClientConfig));
+        builder.RegisterModule(new ChatsClientAutofacModule(Configuration.GetSection("ChatsClient")));
+        builder.RegisterModule(new UserClientAutofacModule(Configuration.GetSection("UserClient")));
 
         // security
         builder.RegisterOptions<JwtOptions>(Configuration.GetSection("Jwt"));
