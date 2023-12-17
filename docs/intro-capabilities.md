@@ -44,6 +44,9 @@ Note: there is no web/mobile clients (only a client for development purposes)
   - Log aggregation
   - Metrics
   - Monitoring
+* Configuration
+  - Static
+  - Dynamic via dedicated infrastructure
 * Deployment
   - Containerization
   - Orchestration

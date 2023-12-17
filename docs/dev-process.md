@@ -9,7 +9,7 @@ Most services have the following layers and/or libraries associated with them:
 .NET projects are grouped into solution folders depending on the functionality:
 * `Contracts` contains the contracts for the different parts of the system
 * `Data` projects are tasked with data access for the different data stores
-* `Server` contains the services which are ran from the IDE or are being containerized
+* `Server` contains the services which are ran from the IDE or are being containerized, and shared server-side projects
 * `Clients` projects are the .NET clients for calling a specific service
 * `Shared` contains technology-oriented functionality, which could also be reusable in a different project
 * `ClientApp` contains the console client used for testing and the load testing app
@@ -17,6 +17,7 @@ Most services have the following layers and/or libraries associated with them:
 # Running
 
 * Each service contains a customized `launchSettings.json` file which should be used in order to start it locally from the IDE
+* All services depend on the Config service which needs to be started prior to the others, so they obtain the configuration elements they need
 * The messaging service has 2 profiles in order to simulate realistic communication between user clients connected to different instances
 * Ports for each service are defined in [server addresses file](../source/server-addresses.txt)
 

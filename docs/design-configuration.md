@@ -4,26 +4,37 @@
 
 # Static configuration
 
-Static app configuration is stored in `appsettings.json` files as is typical for .NET applications. For some services it is overriden for the `Development` environment via the `appsettings.ENVIRONMENT.json` approach. The [CecoChat docker-compose files](../deploy/docker) uses environment variables with specific prefixes in order to push static configuration values to the services at start-up. [ASP.NET documentation](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-5.0#environment-variables) describes how to name the environment variables in order to override both ASP.NET and app-specific values.
+* Static app configuration is stored in `appsettings.json` files as is typical for .NET applications
+* For some services it is overriden for the `Development` environment via the `appsettings.ENVIRONMENT.json` approach
+* The [CecoChat docker-compose files](../deploy/docker) use environment variables with specific prefixes in order to push static configuration values to the services at start-up
+* [ASP.NET documentation](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-5.0#environment-variables) describes how to name the environment variables in order to override both ASP.NET and app-specific values
 
 # Dynamic configuration
 
-Some parts of the configuration are designed to be changed while it is running. These parts are stored in Redis and read at start-up. The [prepare script](../deploy/docker/redis/data.sh) inputs the partitioning and chat history configuration values which need to be present and valid at all times. The configuration can be changed manually using the `redis-cli` command after attaching to the Redis container via `docker exec -it cecochat-redis bash`. Each service that is using dynamic configuration outputs at start-up the key names it reads and PUB/SUB channels which it subscribes to in order to get notified about changes. After the configuration is changed a dummy message needs to be sent to one of those PUB/SUB channels. The services validate the new configuration values and may reject the change. The validation output provides descriptive information which can be used to correct the values.
+Some parts of the configuration are designed to be changed while it is running.
 
-In the future a UI-supported Configurator service should allow changing the configuration more easily.
+## Seeding
 
-# Design
+Dynamic configuration is stored in Yugabyte DB which can be seeded manually using scripts for the [docker](../deploy/docker/yugabyte/config.sql) or [minikube](../deploy/minikube/yugabyte/config.sql) deployments, respectively. Alternatively, if there are no values, the Config service seeds the configuration at startup with values depending on the environment the service is configured for.
 
-The configuration database stores information related to server partition assignment. Each messaging server is assigned a server ID. The configuration database stores the address and partitions for each server ID. It is used by:
+## Changing
 
-* BFF service to:
-  - Get the user partition by the user ID
-  - Get the server address for that partition
-* Messaging service to:
-  - Assign the partitions to the Kafka consumer in order to consume messages
+The configuration can be changed manually using the SQL shell inside the container or the pgAdmin tool. But that would not be the correct approach for an environment that has services already running since they will not be notified about the configuration changes. For now, there are Swagger-enabled endpoints to view existing configuration and to update it. Updating it in this way sends notifications to subscribed services and allows for modifying existing elements, adding new ones, deleting existing ones.
 
-Redis conveniently supports simple keys for plain data such as partition count and chat history settings. Redis hashes (hash maps) are used to store key-value pairs like the `(server ID -> partitions)` and `(server ID -> address)`. After the configurator service applies configuration changes the Redis PUB/SUB is used to publish a notification to subscribers using the respective channels. Each interested service listens to changes for:
+## Change notifications
+
+When a configuration update is successful a notification message is sent in a dedicated topic in the Kafka backplane to all services subscribed to configuration changes. The message contains the configuration section which is changed. There are multiple messages if more than 1 configuration section is changed in a single update. The services subscribed to configuration changes can then query the Config service via a gRPC endpoint to obtain all the elements in the updated configuration section, if they are interested in it. 
+
+## Service behavior
+
+Each service that is using dynamic configuration loads, validates and outputs the elements it needs when starting. After being started, if the configuration is changed, the service repeats the process of loading, validating and outputting. If the new configuration values are not valid the service will reject the change. The validation output provides descriptive information which can be used to correct the values.
+
+## Configuration elements usage
+
+Here is a mapping of each service and the configuration elements it uses:
 
 * BFF service - partition count, server partitions, server addresses
 * Messaging service - partition count, server partitions
 * Chats service - chat history settings
+* ID Gen service - snowflake generator IDs
+* User service - partition count, server partitions
