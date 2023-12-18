@@ -1,0 +1,33 @@
+version: '3'
+networks:
+  cecochat:
+services:
+  cecochat-config:
+    image: ceco.com/cecochat/config:0.1
+    container_name: cecochat-config
+    hostname: config
+    networks:
+      - cecochat
+    ports:
+      - "31006:443"
+    healthcheck:
+      test: "curl --fail https://localhost/healthz || exit 1"
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: https://+
+      ASPNETCORE_HTTPS_PORT: 443
+      ASPNETCORE_Kestrel__Certificates__Default__Path: "/app/services.pfx"
+      ASPNETCORE_Kestrel__Certificates__Default__Password: "cecochat"
+      CECOCHAT_ConfigDb__Init__ConnectionString: "Host=yb-tserver0,yb-tserver1;Port=5433;Database=postgres;Username=yugabyte;Password=yugabyte;"
+      CECOCHAT_ConfigDb__Connect__ConnectionString: "Host=yb-tserver0,yb-tserver1;Port=5433;Database=config;Username=cecochat_dev;Password=secret;Keepalive=30;Load Balance Hosts=true;"
+      CECOCHAT_Backplane__Kafka__BootstrapServers__0: kafka0:19091
+      CECOCHAT_Backplane__Kafka__BootstrapServers__1: kafka1:19092
+      CECOCHAT_Telemetry__Tracing__Sampling__Strategy: Probability
+      CECOCHAT_Telemetry__Tracing__Sampling__Probability: 0.1
+      CECOCHAT_Telemetry__Tracing__Export__TargetHost: otel-collector
+      CECOCHAT_Telemetry__Tracing__Export__TargetPort: 4317
+      CECOCHAT_Telemetry__Logging__Export__TargetHost: otel-collector
+      CECOCHAT_Telemetry__Logging__Export__TargetPort: 4317
