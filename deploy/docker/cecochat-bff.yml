@@ -21,12 +21,9 @@ services:
       ASPNETCORE_HTTPS_PORT: 443
       ASPNETCORE_Kestrel__Certificates__Default__Path: "/app/services.pfx"
       ASPNETCORE_Kestrel__Certificates__Default__Password: "cecochat"
-      CECOCHAT_ConfigDb__Endpoints__0: redis0:6379
-      CECOCHAT_ConfigDb__Endpoints__1: redis1:6379
-      CECOCHAT_ConfigDb__Endpoints__2: redis2:6379
-      CECOCHAT_ConfigDb__ConnectRetry: 16
-      CECOCHAT_ConfigDb__ConnectTimeout: 5000
-      CECOCHAT_ConfigDb__KeepAlive: 2
+      CECOCHAT_ConfigClient__Address: "https://config"
+      CECOCHAT_Backplane__Kafka__BootstrapServers__0: kafka0:19091
+      CECOCHAT_Backplane__Kafka__BootstrapServers__1: kafka1:19092
       CECOCHAT_UserClient__Address: "https://user"
       CECOCHAT_ChatsClient__Address: "https://chats"
       CECOCHAT_Telemetry__Tracing__Sampling__Strategy: Probability
@@ -49,12 +46,7 @@ services:
       ASPNETCORE_HTTPS_PORT: 443
       ASPNETCORE_Kestrel__Certificates__Default__Path: "/app/services.pfx"
       ASPNETCORE_Kestrel__Certificates__Default__Password: "cecochat"
-      CECOCHAT_ConfigDb__Endpoints__0: redis0:6379
-      CECOCHAT_ConfigDb__Endpoints__1: redis1:6379
-      CECOCHAT_ConfigDb__Endpoints__2: redis2:6379
-      CECOCHAT_ConfigDb__ConnectRetry: 16
-      CECOCHAT_ConfigDb__ConnectTimeout: 5000
-      CECOCHAT_ConfigDb__KeepAlive: 2
+      CECOCHAT_ConfigClient__Address: "https://config"
       CECOCHAT_Backplane__Kafka__BootstrapServers__0: kafka0:19091
       CECOCHAT_Backplane__Kafka__BootstrapServers__1: kafka1:19092
       CECOCHAT_ChatsDb__ContactPoints__0: cassandra0:9042
@@ -84,12 +76,7 @@ services:
       ASPNETCORE_HTTPS_PORT: 443
       ASPNETCORE_Kestrel__Certificates__Default__Path: "/app/services.pfx"
       ASPNETCORE_Kestrel__Certificates__Default__Password: "cecochat"
-      CECOCHAT_ConfigDb__Endpoints__0: redis0:6379
-      CECOCHAT_ConfigDb__Endpoints__1: redis1:6379
-      CECOCHAT_ConfigDb__Endpoints__2: redis2:6379
-      CECOCHAT_ConfigDb__ConnectRetry: 16
-      CECOCHAT_ConfigDb__ConnectTimeout: 5000
-      CECOCHAT_ConfigDb__KeepAlive: 2
+      CECOCHAT_ConfigClient__Address: "https://config"
       CECOCHAT_Backplane__Kafka__BootstrapServers__0: kafka0:19091
       CECOCHAT_Backplane__Kafka__BootstrapServers__1: kafka1:19092
       CECOCHAT_UserDb__Init__ConnectionString: "Host=yb-tserver0,yb-tserver1;Port=5433;Database=postgres;Username=yugabyte;Password=yugabyte;"
@@ -103,8 +90,6 @@ services:
       CECOCHAT_UserCache__Store__ConnectRetry: 16
       CECOCHAT_UserCache__Store__ConnectTimeout: 5000
       CECOCHAT_UserCache__Store__KeepAlive: 2
-      CECOCHAT_IdGenClient__Address: "https://idgen"
-      CECOCHAT_IdGenClient__RefreshIdsCount: 32
       CECOCHAT_Telemetry__Tracing__Sampling__Strategy: Probability
       CECOCHAT_Telemetry__Tracing__Sampling__Probability: 0.1
       CECOCHAT_Telemetry__Tracing__Export__TargetHost: otel-collector
