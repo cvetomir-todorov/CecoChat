@@ -1,5 +1,4 @@
 using System.Diagnostics.Metrics;
-using CecoChat.Server.Messaging.HostedServices;
 using Microsoft.Extensions.Options;
 
 namespace CecoChat.Server.Messaging.Telemetry;

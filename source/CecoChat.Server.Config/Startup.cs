@@ -2,6 +2,7 @@ using System.Reflection;
 using Autofac;
 using Calzolari.Grpc.AspNetCore.Validation;
 using CecoChat.AspNet.Health;
+using CecoChat.AspNet.Init;
 using CecoChat.AspNet.ModelBinding;
 using CecoChat.AspNet.Prometheus;
 using CecoChat.AspNet.Swagger;
@@ -15,7 +16,7 @@ using CecoChat.Npgsql.Health;
 using CecoChat.Otel;
 using CecoChat.Server.Backplane;
 using CecoChat.Server.Config.Endpoints;
-using CecoChat.Server.Config.HostedServices;
+using CecoChat.Server.Config.Init;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -120,9 +121,9 @@ public class Startup : StartupBase
 
     public void ConfigureContainer(ContainerBuilder builder)
     {
-        // ordered hosted services
-        builder.RegisterHostedService<InitConfigDb>();
-        builder.RegisterHostedService<InitBackplane>();
+        // init
+        builder.RegisterInitStep<ConfigDbInit>();
+        builder.RegisterInitStep<BackplaneInit>();
 
         // config db
         builder.RegisterType<NpgsqlDbInitializer>().As<INpgsqlDbInitializer>().SingleInstance();

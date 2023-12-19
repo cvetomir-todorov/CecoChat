@@ -2,9 +2,9 @@ namespace CecoChat.Server.Chats;
 
 public static class Program
 {
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
         IHostBuilder hostBuilder = EntryPoint.CreateDefaultHostBuilder(args, startupContext: typeof(Startup));
-        EntryPoint.CreateAndRunHost(hostBuilder, loggerContext: typeof(Program));
+        await EntryPoint.CreateAndRunHost(hostBuilder, loggerContext: typeof(Program));
     }
 }

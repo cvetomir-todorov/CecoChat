@@ -1,4 +1,5 @@
-﻿using CecoChat.Contracts.Messaging;
+﻿using CecoChat.AspNet.Init;
+using CecoChat.Contracts.Messaging;
 using CecoChat.DynamicConfig.Partitioning;
 using CecoChat.Events;
 using CecoChat.Kafka;
@@ -7,9 +8,9 @@ using CecoChat.Server.Messaging.Backplane;
 using CecoChat.Server.Messaging.Clients;
 using Microsoft.Extensions.Options;
 
-namespace CecoChat.Server.Messaging.HostedServices;
+namespace CecoChat.Server.Messaging.Init;
 
-public sealed class InitBackplaneComponents : IHostedService, ISubscriber<PartitionsChangedEventArgs>, IDisposable
+public sealed class BackplaneComponentsInit : InitStep, ISubscriber<PartitionsChangedEventArgs>
 {
     private readonly ILogger _logger;
     private readonly ConfigOptions _configOptions;
@@ -19,11 +20,9 @@ public sealed class InitBackplaneComponents : IHostedService, ISubscriber<Partit
     private readonly IClientContainer _clientContainer;
     private readonly IEvent<PartitionsChangedEventArgs> _partitionsChanged;
     private readonly Guid _partitionsChangedToken;
-    private readonly CancellationToken _appStoppingCt;
-    private CancellationTokenSource? _stoppedCts;
 
-    public InitBackplaneComponents(
-        ILogger<InitBackplaneComponents> logger,
+    public BackplaneComponentsInit(
+        ILogger<BackplaneComponentsInit> logger,
         IHostApplicationLifetime applicationLifetime,
         IOptions<ConfigOptions> configOptions,
         IBackplaneComponents backplaneComponents,
@@ -31,6 +30,7 @@ public sealed class InitBackplaneComponents : IHostedService, ISubscriber<Partit
         IPartitioner partitioner,
         IClientContainer clientContainer,
         IEvent<PartitionsChangedEventArgs> partitionsChanged)
+        : base(applicationLifetime)
     {
         _logger = logger;
         _configOptions = configOptions.Value;
@@ -40,33 +40,27 @@ public sealed class InitBackplaneComponents : IHostedService, ISubscriber<Partit
         _clientContainer = clientContainer;
         _partitionsChanged = partitionsChanged;
 
-        _appStoppingCt = applicationLifetime.ApplicationStopping;
         _partitionsChangedToken = _partitionsChanged.Subscribe(this);
     }
 
-    public void Dispose()
+    protected override void Dispose(bool disposing)
     {
-        _stoppedCts?.Dispose();
-        _partitionsChanged.Unsubscribe(_partitionsChangedToken);
-        _backplaneComponents.Dispose();
+        if (disposing)
+        {
+            _partitionsChanged.Unsubscribe(_partitionsChangedToken);
+            _backplaneComponents.Dispose();
+        }
     }
 
-    public Task StartAsync(CancellationToken cancellationToken)
+    protected override Task<bool> DoExecute(CancellationToken ct)
     {
-        _stoppedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _appStoppingCt);
-
         int partitionCount = _partitioningConfig.PartitionCount;
         PartitionRange partitions = _partitioningConfig.GetPartitions(_configOptions.ServerId);
 
         _backplaneComponents.ConfigurePartitioning(partitionCount, partitions);
-        _backplaneComponents.StartConsumption(_stoppedCts.Token);
+        _backplaneComponents.StartConsumption(ct);
 
-        return Task.CompletedTask;
-    }
-
-    public Task StopAsync(CancellationToken cancellationToken)
-    {
-        return Task.CompletedTask;
+        return Task.FromResult(true);
     }
 
     public async ValueTask Handle(PartitionsChangedEventArgs _)

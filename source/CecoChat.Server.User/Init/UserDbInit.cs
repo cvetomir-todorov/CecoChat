@@ -1,3 +1,4 @@
+using CecoChat.AspNet.Init;
 using CecoChat.Data.User;
 using CecoChat.Npgsql;
 using CecoChat.Server.User.Security;
@@ -5,9 +6,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Npgsql;
 
-namespace CecoChat.Server.User.HostedServices;
+namespace CecoChat.Server.User.Init;
 
-public sealed class InitUsersDb : IHostedService
+public sealed class UserDbInit : InitStep
 {
     private readonly ILogger _logger;
     private readonly UserDbOptions _options;
@@ -15,12 +16,14 @@ public sealed class InitUsersDb : IHostedService
     private readonly UserDbContext _dbContext;
     private readonly UserDbInitHealthCheck _userDbInitHealthCheck;
 
-    public InitUsersDb(
-        ILogger<InitUsersDb> logger,
+    public UserDbInit(
+        ILogger<UserDbInit> logger,
         IOptions<UserDbOptions> options,
         INpgsqlDbInitializer initializer,
         UserDbContext dbContext,
-        UserDbInitHealthCheck userDbInitHealthCheck)
+        UserDbInitHealthCheck userDbInitHealthCheck,
+        IHostApplicationLifetime applicationLifetime)
+        : base(applicationLifetime)
     {
         _logger = logger;
         _options = options.Value;
@@ -29,7 +32,7 @@ public sealed class InitUsersDb : IHostedService
         _userDbInitHealthCheck = userDbInitHealthCheck;
     }
 
-    public async Task StartAsync(CancellationToken cancellationToken)
+    protected override async Task<bool> DoExecute(CancellationToken ct)
     {
         string database = new NpgsqlConnectionStringBuilder(_options.Connect.ConnectionString).Database!;
         _initializer.Initialize(_options.Init, database, typeof(UserDbContext).Assembly);
@@ -38,23 +41,24 @@ public sealed class InitUsersDb : IHostedService
         {
             _logger.LogInformation("Seeding the database...");
 
-            int connectionCount = await DeleteAllConnections(cancellationToken);
-            int profileCount = await DeleteAllProfiles(cancellationToken);
+            int connectionCount = await DeleteAllConnections(ct);
+            int profileCount = await DeleteAllProfiles(ct);
             _logger.LogInformation("Deleted {ProfileCount} profiles and {ConnectionCount} connections", profileCount, connectionCount);
 
             if (_options.SeedConsoleClientUsers)
             {
-                int userCount = await SeedConsoleClientUsers(cancellationToken);
+                int userCount = await SeedConsoleClientUsers(ct);
                 _logger.LogInformation("Seeded database with {UserCount} console client users", userCount);
             }
             if (_options.SeedLoadTestingUsers)
             {
-                await SeedLoadTestingUsers(_options.SeedLoadTestingUserCount, cancellationToken);
+                await SeedLoadTestingUsers(_options.SeedLoadTestingUserCount, ct);
                 _logger.LogInformation("Seeded database with {UserCount} load testing users", _options.SeedLoadTestingUserCount);
             }
         }
 
         _userDbInitHealthCheck.IsReady = true;
+        return _userDbInitHealthCheck.IsReady;
     }
 
     private async Task<int> SeedConsoleClientUsers(CancellationToken ct)
@@ -138,10 +142,5 @@ public sealed class InitUsersDb : IHostedService
     private Task<int> DeleteAllProfiles(CancellationToken ct)
     {
         return _dbContext.Database.ExecuteSqlRawAsync("DELETE from public.\"Profiles\"", ct);
-    }
-
-    public Task StopAsync(CancellationToken cancellationToken)
-    {
-        return Task.CompletedTask;
     }
 }

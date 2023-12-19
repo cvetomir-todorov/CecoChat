@@ -1,38 +1,36 @@
+using CecoChat.AspNet.Init;
 using CecoChat.DynamicConfig.Backplane;
 
-namespace CecoChat.Server.IdGen.HostedServices;
+namespace CecoChat.Server.Bff.Init;
 
-public sealed class InitBackplaneComponents : IHostedService, IDisposable
+public sealed class BackplaneComponentsInit : InitStep
 {
     private readonly ILogger _logger;
     private readonly IConfigChangesConsumer _configChangesConsumer;
     private readonly ConfigChangesConsumerHealthCheck _configChangesConsumerHealthCheck;
-    private readonly CancellationToken _appStoppingCt;
-    private CancellationTokenSource? _stoppedCts;
 
-    public InitBackplaneComponents(
-        ILogger<InitBackplaneComponents> logger,
+    public BackplaneComponentsInit(
+        ILogger<BackplaneComponentsInit> logger,
         IConfigChangesConsumer configChangesConsumer,
         ConfigChangesConsumerHealthCheck configChangesConsumerHealthCheck,
         IHostApplicationLifetime applicationLifetime)
+        : base(applicationLifetime)
     {
         _logger = logger;
         _configChangesConsumer = configChangesConsumer;
         _configChangesConsumerHealthCheck = configChangesConsumerHealthCheck;
-
-        _appStoppingCt = applicationLifetime.ApplicationStopping;
     }
 
-    public void Dispose()
+    protected override void Dispose(bool disposing)
     {
-        _stoppedCts?.Dispose();
-        _configChangesConsumer.Dispose();
+        if (disposing)
+        {
+            _configChangesConsumer.Dispose();
+        }
     }
 
-    public Task StartAsync(CancellationToken cancellationToken)
+    protected override Task<bool> DoExecute(CancellationToken ct)
     {
-        _stoppedCts = CancellationTokenSource.CreateLinkedTokenSource(_appStoppingCt, cancellationToken);
-
         _configChangesConsumer.Prepare();
 
         Task.Factory.StartNew(() =>
@@ -40,7 +38,7 @@ public sealed class InitBackplaneComponents : IHostedService, IDisposable
             try
             {
                 _configChangesConsumerHealthCheck.IsReady = true;
-                _configChangesConsumer.Start(_stoppedCts.Token);
+                _configChangesConsumer.Start(ct);
             }
             catch (Exception exception)
             {
@@ -50,13 +48,8 @@ public sealed class InitBackplaneComponents : IHostedService, IDisposable
             {
                 _configChangesConsumerHealthCheck.IsReady = false;
             }
-        }, _stoppedCts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Current);
+        }, ct, TaskCreationOptions.LongRunning, TaskScheduler.Current);
 
-        return Task.CompletedTask;
-    }
-
-    public Task StopAsync(CancellationToken cancellationToken)
-    {
-        return Task.CompletedTask;
+        return Task.FromResult(true);
     }
 }

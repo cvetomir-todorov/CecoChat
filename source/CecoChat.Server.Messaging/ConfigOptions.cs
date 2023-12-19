@@ -1,4 +1,4 @@
-namespace CecoChat.Server.Messaging.HostedServices;
+namespace CecoChat.Server.Messaging;
 
 public sealed class ConfigOptions
 {

@@ -1,6 +1,6 @@
 using CecoChat.Npgsql;
 
-namespace CecoChat.Server.User.HostedServices;
+namespace CecoChat.Server.User;
 
 public sealed class UserDbOptions
 {

@@ -1,5 +1,6 @@
 using Autofac;
 using CecoChat.AspNet.Health;
+using CecoChat.AspNet.Init;
 using CecoChat.AspNet.Prometheus;
 using CecoChat.AspNet.SignalR.Telemetry;
 using CecoChat.Autofac;
@@ -16,7 +17,7 @@ using CecoChat.Server.Identity;
 using CecoChat.Server.Messaging.Backplane;
 using CecoChat.Server.Messaging.Clients;
 using CecoChat.Server.Messaging.Endpoints;
-using CecoChat.Server.Messaging.HostedServices;
+using CecoChat.Server.Messaging.Init;
 using CecoChat.Server.Messaging.Telemetry;
 using Confluent.Kafka;
 using Microsoft.AspNetCore.SignalR;
@@ -129,10 +130,10 @@ public class Startup : StartupBase
 
     public void ConfigureContainer(ContainerBuilder builder)
     {
-        // ordered hosted services
-        builder.RegisterHostedService<InitDynamicConfig>();
-        builder.RegisterHostedService<InitBackplane>();
-        builder.RegisterHostedService<InitBackplaneComponents>();
+        // init
+        builder.RegisterInitStep<DynamicConfigInit>();
+        builder.RegisterInitStep<BackplaneInit>();
+        builder.RegisterInitStep<BackplaneComponentsInit>();
 
         // config
         builder.RegisterOptions<ConfigOptions>(Configuration.GetSection("Config"));

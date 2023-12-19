@@ -1,10 +1,11 @@
-﻿using CecoChat.DynamicConfig.Backplane;
+﻿using CecoChat.AspNet.Init;
+using CecoChat.DynamicConfig.Backplane;
 using CecoChat.Server.Chats.Backplane;
 using CecoChat.Threading;
 
-namespace CecoChat.Server.Chats.HostedServices;
+namespace CecoChat.Server.Chats.Init;
 
-public sealed class InitBackplaneComponents : IHostedService, IDisposable
+public sealed class BackplaneComponentsInit : InitStep
 {
     private readonly ILogger _logger;
     private readonly IHistoryConsumer _historyConsumer;
@@ -14,14 +15,12 @@ public sealed class InitBackplaneComponents : IHostedService, IDisposable
     private readonly ReceiversConsumerHealthCheck _receiversConsumerHealthCheck;
     private readonly SendersConsumerHealthCheck _sendersConsumerHealthCheck;
     private readonly ConfigChangesConsumerHealthCheck _configChangesConsumerHealthCheck;
-    private readonly CancellationToken _appStoppingCt;
-    private CancellationTokenSource? _stoppedCts;
     private DedicatedThreadTaskScheduler? _historyConsumerTaskScheduler;
     private DedicatedThreadTaskScheduler? _receiverMessagesTaskScheduler;
     private DedicatedThreadTaskScheduler? _senderMessagesTaskScheduler;
 
-    public InitBackplaneComponents(
-        ILogger<InitBackplaneComponents> logger,
+    public BackplaneComponentsInit(
+        ILogger<BackplaneComponentsInit> logger,
         IHistoryConsumer historyConsumer,
         IStateConsumer stateConsumer,
         IConfigChangesConsumer configChangesConsumer,
@@ -30,6 +29,7 @@ public sealed class InitBackplaneComponents : IHostedService, IDisposable
         SendersConsumerHealthCheck sendersConsumerHealthCheck,
         ConfigChangesConsumerHealthCheck configChangesConsumerHealthCheck,
         IHostApplicationLifetime applicationLifetime)
+        : base(applicationLifetime)
     {
         _logger = logger;
         _historyConsumer = historyConsumer;
@@ -39,37 +39,34 @@ public sealed class InitBackplaneComponents : IHostedService, IDisposable
         _receiversConsumerHealthCheck = receiversConsumerHealthCheck;
         _sendersConsumerHealthCheck = sendersConsumerHealthCheck;
         _configChangesConsumerHealthCheck = configChangesConsumerHealthCheck;
-
-        _appStoppingCt = applicationLifetime.ApplicationStopping;
     }
 
-    public void Dispose()
+    protected override void Dispose(bool disposing)
     {
-        _historyConsumerTaskScheduler?.Dispose();
-        _senderMessagesTaskScheduler?.Dispose();
-        _receiverMessagesTaskScheduler?.Dispose();
+        if (disposing)
+        {
+            _historyConsumerTaskScheduler?.Dispose();
+            _senderMessagesTaskScheduler?.Dispose();
+            _receiverMessagesTaskScheduler?.Dispose();
 
-        _stoppedCts?.Dispose();
-
-        _historyConsumer.Dispose();
-        _stateConsumer.Dispose();
-        _configChangesConsumer.Dispose();
+            _historyConsumer.Dispose();
+            _stateConsumer.Dispose();
+            _configChangesConsumer.Dispose();
+        }
     }
 
-    public Task StartAsync(CancellationToken cancellationToken)
+    protected override Task<bool> DoExecute(CancellationToken ct)
     {
-        _stoppedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _appStoppingCt);
-
         _historyConsumer.Prepare();
         _stateConsumer.Prepare();
         _configChangesConsumer.Prepare();
 
-        StartHistoryConsumer(_stoppedCts.Token);
-        StartReceiverMessagesConsumer(_stoppedCts.Token);
-        StartSenderMessagesConsumer(_stoppedCts.Token);
-        StartConfigChangesConsumer(_stoppedCts.Token);
+        StartHistoryConsumer(ct);
+        StartReceiverMessagesConsumer(ct);
+        StartSenderMessagesConsumer(ct);
+        StartConfigChangesConsumer(ct);
 
-        return Task.CompletedTask;
+        return Task.FromResult(true);
     }
 
     private void StartHistoryConsumer(CancellationToken ct)
@@ -153,10 +150,5 @@ public sealed class InitBackplaneComponents : IHostedService, IDisposable
                 _configChangesConsumerHealthCheck.IsReady = false;
             }
         }, ct, TaskCreationOptions.LongRunning, TaskScheduler.Current);
-    }
-
-    public Task StopAsync(CancellationToken cancellationToken)
-    {
-        return Task.CompletedTask;
     }
 }
