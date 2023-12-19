@@ -1,0 +1,1 @@
+helm uninstall config
