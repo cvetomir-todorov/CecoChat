@@ -1,3 +1,4 @@
+using CecoChat.AspNet.Init;
 using CecoChat.Data.Config;
 using CecoChat.DynamicConfig;
 using CecoChat.Npgsql;
@@ -5,9 +6,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Npgsql;
 
-namespace CecoChat.Server.Config.HostedServices;
+namespace CecoChat.Server.Config.Init;
 
-public class InitConfigDb : IHostedService
+public class ConfigDbInit : InitStep
 {
     private readonly ILogger _logger;
     private readonly ConfigDbOptions _configDbOptions;
@@ -15,12 +16,14 @@ public class InitConfigDb : IHostedService
     private readonly ConfigDbContext _configDbContext;
     private readonly ConfigDbInitHealthCheck _configDbInitHealthCheck;
 
-    public InitConfigDb(
-        ILogger<InitConfigDb> logger,
+    public ConfigDbInit(
+        ILogger<ConfigDbInit> logger,
         IOptions<ConfigDbOptions> configDbOptions,
         ConfigDbContext configDbContext,
         INpgsqlDbInitializer initializer,
-        ConfigDbInitHealthCheck configDbInitHealthCheck)
+        ConfigDbInitHealthCheck configDbInitHealthCheck,
+        IHostApplicationLifetime applicationLifetime)
+        : base(applicationLifetime)
     {
         _logger = logger;
         _configDbOptions = configDbOptions.Value;
@@ -29,19 +32,20 @@ public class InitConfigDb : IHostedService
         _configDbInitHealthCheck = configDbInitHealthCheck;
     }
 
-    public async Task StartAsync(CancellationToken cancellationToken)
+    protected override async Task<bool> DoExecute(CancellationToken ct)
     {
         string database = new NpgsqlConnectionStringBuilder(_configDbOptions.Connect.ConnectionString).Database!;
         _initializer.Initialize(_configDbOptions.Init, database, typeof(ConfigDbAutofacModule).Assembly);
 
-        await Seed();
+        await Seed(ct);
 
         _configDbInitHealthCheck.IsReady = true;
+        return true;
     }
 
-    private async Task Seed()
+    private async Task Seed(CancellationToken ct)
     {
-        ElementEntity[] elements = await _configDbContext.Elements.ToArrayAsync();
+        ElementEntity[] elements = await _configDbContext.Elements.ToArrayAsync(ct);
         if (elements.Length > 0)
         {
             _logger.LogInformation("{ConfigElementCount} config elements present:", elements.Length);
@@ -63,7 +67,7 @@ public class InitConfigDb : IHostedService
         }
 
         _configDbContext.Elements.AddRange(elements);
-        await _configDbContext.SaveChangesAsync();
+        await _configDbContext.SaveChangesAsync(ct);
         _configDbContext.ChangeTracker.Clear();
 
         _logger.LogInformation("Seeded default dynamic config with {ConfigElementCount} values for deployment environment {DeploymentEnvironment}:", elements.Length, deploymentEnvironment);
@@ -117,10 +121,5 @@ public class InitConfigDb : IHostedService
         }
 
         return (deploymentEnvironment, elements);
-    }
-
-    public Task StopAsync(CancellationToken cancellationToken)
-    {
-        return Task.CompletedTask;
     }
 }

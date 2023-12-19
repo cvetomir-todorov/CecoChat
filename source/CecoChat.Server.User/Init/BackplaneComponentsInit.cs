@@ -1,3 +1,4 @@
+using CecoChat.AspNet.Init;
 using CecoChat.DynamicConfig.Backplane;
 using CecoChat.DynamicConfig.Partitioning;
 using CecoChat.Events;
@@ -5,9 +6,9 @@ using CecoChat.Kafka;
 using CecoChat.Server.User.Backplane;
 using Microsoft.Extensions.Options;
 
-namespace CecoChat.Server.User.HostedServices;
+namespace CecoChat.Server.User.Init;
 
-public sealed class InitBackplaneComponents : IHostedService, ISubscriber<PartitionsChangedEventArgs>, IDisposable
+public sealed class BackplaneComponentsInit : InitStep, ISubscriber<PartitionsChangedEventArgs>
 {
     private readonly ILogger _logger;
     private readonly BackplaneOptions _backplaneOptions;
@@ -18,12 +19,10 @@ public sealed class InitBackplaneComponents : IHostedService, ISubscriber<Partit
     private readonly ConfigChangesConsumerHealthCheck _configChangesConsumerHealthCheck;
     private readonly IEvent<PartitionsChangedEventArgs> _partitionsChanged;
     private readonly Guid _partitionsChangedToken;
-    private readonly CancellationToken _appStoppingCt;
-    private CancellationTokenSource? _stoppedCts;
 
-    public InitBackplaneComponents(
+    public BackplaneComponentsInit(
         IHostApplicationLifetime applicationLifetime,
-        ILogger<InitBackplaneComponents> logger,
+        ILogger<BackplaneComponentsInit> logger,
         IOptions<BackplaneOptions> backplaneOptions,
         IPartitioningConfig partitioningConfig,
         ITopicPartitionFlyweight topicPartitionFlyweight,
@@ -31,6 +30,7 @@ public sealed class InitBackplaneComponents : IHostedService, ISubscriber<Partit
         IConfigChangesConsumer configChangesConsumer,
         ConfigChangesConsumerHealthCheck configChangesConsumerHealthCheck,
         IEvent<PartitionsChangedEventArgs> partitionsChanged)
+        : base(applicationLifetime)
     {
         _logger = logger;
         _backplaneOptions = backplaneOptions.Value;
@@ -42,22 +42,21 @@ public sealed class InitBackplaneComponents : IHostedService, ISubscriber<Partit
         _partitionsChanged = partitionsChanged;
 
         _partitionsChangedToken = _partitionsChanged.Subscribe(this);
-        _appStoppingCt = applicationLifetime.ApplicationStopping;
     }
 
-    public void Dispose()
+    protected override void Dispose(bool disposing)
     {
-        _stoppedCts?.Dispose();
-        _partitionsChanged.Unsubscribe(_partitionsChangedToken);
-        _configChangesConsumer.Dispose();
+        if (disposing)
+        {
+            _partitionsChanged.Unsubscribe(_partitionsChangedToken);
+            _configChangesConsumer.Dispose();
+        }
     }
 
-    public Task StartAsync(CancellationToken cancellationToken)
+    protected override Task<bool> DoExecute(CancellationToken ct)
     {
-        _stoppedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _appStoppingCt);
-
         _configChangesConsumer.Prepare();
-        StartConfigChangesConsumer(_stoppedCts.Token);
+        StartConfigChangesConsumer(ct);
 
         int partitionCount = _partitioningConfig.PartitionCount;
         _topicPartitionFlyweight.Add(_backplaneOptions.TopicMessagesByReceiver, partitionCount);
@@ -66,7 +65,7 @@ public sealed class InitBackplaneComponents : IHostedService, ISubscriber<Partit
         _logger.LogInformation("Prepared backplane components for topic {TopicMessagesByReceiver} with {PartitionCount} partitions",
             _backplaneOptions.TopicMessagesByReceiver, partitionCount);
 
-        return Task.CompletedTask;
+        return Task.FromResult(true);
     }
 
     private void StartConfigChangesConsumer(CancellationToken ct)
@@ -87,11 +86,6 @@ public sealed class InitBackplaneComponents : IHostedService, ISubscriber<Partit
                 _configChangesConsumerHealthCheck.IsReady = false;
             }
         }, ct, TaskCreationOptions.LongRunning, TaskScheduler.Current);
-    }
-
-    public Task StopAsync(CancellationToken cancellationToken)
-    {
-        return Task.CompletedTask;
     }
 
     public ValueTask Handle(PartitionsChangedEventArgs _)

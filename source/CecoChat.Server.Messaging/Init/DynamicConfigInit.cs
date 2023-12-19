@@ -1,20 +1,23 @@
-﻿using CecoChat.DynamicConfig.Partitioning;
+﻿using CecoChat.AspNet.Init;
+using CecoChat.DynamicConfig.Partitioning;
 using Microsoft.Extensions.Options;
 
-namespace CecoChat.Server.Messaging.HostedServices;
+namespace CecoChat.Server.Messaging.Init;
 
-public sealed class InitDynamicConfig : IHostedService
+public sealed class DynamicConfigInit : InitStep
 {
     private readonly ILogger _logger;
     private readonly ConfigOptions _configOptions;
     private readonly IPartitioningConfig _partitioningConfig;
     private readonly DynamicConfigInitHealthCheck _dynamicConfigInitHealthCheck;
 
-    public InitDynamicConfig(
-        ILogger<InitDynamicConfig> logger,
+    public DynamicConfigInit(
+        ILogger<DynamicConfigInit> logger,
         IOptions<ConfigOptions> configOptions,
         IPartitioningConfig partitioningConfig,
-        DynamicConfigInitHealthCheck dynamicConfigInitHealthCheck)
+        DynamicConfigInitHealthCheck dynamicConfigInitHealthCheck,
+        IHostApplicationLifetime applicationLifetime)
+        : base(applicationLifetime)
     {
         _logger = logger;
         _configOptions = configOptions.Value;
@@ -22,14 +25,11 @@ public sealed class InitDynamicConfig : IHostedService
         _dynamicConfigInitHealthCheck = dynamicConfigInitHealthCheck;
     }
 
-    public async Task StartAsync(CancellationToken cancellationToken)
+    protected override async Task<bool> DoExecute(CancellationToken ct)
     {
         _logger.LogInformation("Configured server ID is {ServerId}", _configOptions.ServerId);
-        _dynamicConfigInitHealthCheck.IsReady = await _partitioningConfig.Initialize(cancellationToken);
-    }
+        _dynamicConfigInitHealthCheck.IsReady = await _partitioningConfig.Initialize(ct);
 
-    public Task StopAsync(CancellationToken cancellationToken)
-    {
-        return Task.CompletedTask;
+        return _dynamicConfigInitHealthCheck.IsReady;
     }
 }

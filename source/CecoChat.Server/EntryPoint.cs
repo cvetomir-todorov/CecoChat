@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using Autofac.Extensions.DependencyInjection;
+using CecoChat.AspNet.Init;
 using CecoChat.Serilog;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -41,7 +42,7 @@ public static class EntryPoint
         return hostBuilder;
     }
 
-    public static void CreateAndRunHost(IHostBuilder hostBuilder, Type loggerContext)
+    public static async Task CreateAndRunHost(IHostBuilder hostBuilder, Type loggerContext)
     {
         Assembly entryAssembly = GetEntryAssembly();
         string environment = GetEnvironment();
@@ -52,7 +53,16 @@ public static class EntryPoint
         try
         {
             logger.Information("Starting in {Environment} environment...", environment);
-            hostBuilder.Build().Run();
+            IHost host = hostBuilder.Build();
+
+            bool initialized = await host.Init();
+            if (!initialized)
+            {
+                logger.Fatal("Failed to initialize");
+                return;
+            }
+
+            await host.RunAsync();
         }
         catch (Exception exception)
         {
@@ -61,7 +71,7 @@ public static class EntryPoint
         finally
         {
             logger.Information("Ended");
-            Log.CloseAndFlush();
+            await Log.CloseAndFlushAsync();
         }
     }
 
