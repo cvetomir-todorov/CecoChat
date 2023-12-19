@@ -16,5 +16,8 @@ Networking:
     Normal:
       User: cecochat_dev
       Pass: secret
+Ingress:
+  Host: config.cecochat.com
+  SecretName: ingress-tls
 Probes:
   Scheme: HTTPS
