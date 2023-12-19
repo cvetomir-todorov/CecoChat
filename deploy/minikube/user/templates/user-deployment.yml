@@ -80,8 +80,3 @@ spec:
               value: "{{.Values.Networking.UserCache.Store.ConnectTimeout}}"
             - name: CECOCHAT_UserCache__Store__KeepAlive
               value: "{{.Values.Networking.UserCache.Store.KeepAlive}}"
-            # ID Gen
-            - name: CECOCHAT_IdGenClient__Address
-              value: https://{{.Values.Networking.IdGenService}}
-            - name: CECOCHAT_IdGenClient__RefreshIdsCount
-              value: "{{.Values.Messaging.RefreshIdsCount}}"

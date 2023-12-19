@@ -26,7 +26,5 @@ Networking:
       ConnectRetry: 16
       ConnectTimeout: 5000
       KeepAlive: 2
-Messaging:
-  RefreshIdsCount: 32
 Probes:
   Scheme: HTTPS
