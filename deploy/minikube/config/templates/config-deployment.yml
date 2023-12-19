@@ -63,3 +63,6 @@ spec:
               value: Host={{.Values.Networking.ConfigDb.Host}}-0.{{.Values.Networking.ConfigDb.Service}}.$(NAMESPACE).svc.cluster.local;Port={{.Values.Networking.ConfigDb.Port}};Database=postgres;Username={{.Values.Networking.ConfigDb.Root.User}};Password={{.Values.Networking.ConfigDb.Root.Pass}};
             - name: CECOCHAT_ConfigDb__Connect__ConnectionString
               value: Host={{.Values.Networking.ConfigDb.Host}}-0.{{.Values.Networking.ConfigDb.Service}}.$(NAMESPACE).svc.cluster.local,{{.Values.Networking.ConfigDb.Host}}-1.{{.Values.Networking.ConfigDb.Service}}.$(NAMESPACE).svc.cluster.local;Port={{.Values.Networking.ConfigDb.Port}};Database=config;Username={{.Values.Networking.ConfigDb.Normal.User}};Password={{.Values.Networking.ConfigDb.Normal.Pass}};Keepalive=30;Load Balance Hosts=true;
+            # Seed
+            - name: CECOCHAT_ConfigDb__DeploymentEnvironment
+              value: minikube
