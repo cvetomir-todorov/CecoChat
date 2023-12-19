@@ -48,7 +48,9 @@ spec:
             - configMapRef:
                 name: service-aspnet
             - configMapRef:
-                name: service-configdb
+                name: service-config-client
+            - configMapRef:
+                name: service-backplane
             - configMapRef:
                 name: service-tracing
             - configMapRef:
