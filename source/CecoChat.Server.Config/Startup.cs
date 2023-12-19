@@ -78,7 +78,7 @@ public class Startup : StartupBase
     {
         ResourceBuilder serviceResourceBuilder = ResourceBuilder
             .CreateEmpty()
-            .AddService(serviceName: "Admin", serviceNamespace: "CecoChat", serviceVersion: "0.1")
+            .AddService(serviceName: "Config", serviceNamespace: "CecoChat", serviceVersion: "0.1")
             .AddEnvironmentVariableDetector();
 
         services
@@ -157,7 +157,7 @@ public class Startup : StartupBase
             endpoints.MapControllers();
             endpoints.MapHttpHealthEndpoints(setup =>
             {
-                Func<HttpContext, HealthReport, Task> responseWriter = (context, report) => CustomHealth.Writer(serviceName: "admin", context, report);
+                Func<HttpContext, HealthReport, Task> responseWriter = (context, report) => CustomHealth.Writer(serviceName: "config", context, report);
                 setup.Health.ResponseWriter = responseWriter;
 
                 if (env.IsDevelopment())
