@@ -45,7 +45,7 @@ public static class Program
         builder.Configuration.GetSection("UserDb").Bind(_userDbOptions);
         _userCacheStoreOptions = new();
         builder.Configuration.GetSection("UserCache:Store").Bind(_userCacheStoreOptions);
-        
+
         ConfigureServices(builder, options);
         builder.Host.ConfigureContainer<ContainerBuilder>(ConfigureContainer);
 

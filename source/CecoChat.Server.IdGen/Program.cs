@@ -25,7 +25,7 @@ public static class Program
     {
         WebApplicationBuilder builder = EntryPoint.CreateWebAppBuilder(args);
         CommonOptions options = new(builder.Configuration);
-        
+
         ConfigureServices(builder, options);
         builder.Host.ConfigureContainer<ContainerBuilder>(ConfigureContainer);
 
