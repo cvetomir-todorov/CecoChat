@@ -21,7 +21,6 @@ using CecoChat.Server.Messaging.Init;
 using CecoChat.Server.Messaging.Telemetry;
 using Confluent.Kafka;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
@@ -195,18 +194,7 @@ public static class Program
         app.UseAuthorization();
 
         app.MapHub<ChatHub>("/chat");
-        app.MapHttpHealthEndpoints(setup =>
-        {
-            Func<HttpContext, HealthReport, Task> responseWriter = (context, report) => CustomHealth.Writer(serviceName: "messaging", context, report);
-            setup.Health.ResponseWriter = responseWriter;
-
-            if (app.Environment.IsDevelopment())
-            {
-                setup.Startup.ResponseWriter = responseWriter;
-                setup.Live.ResponseWriter = responseWriter;
-                setup.Ready.ResponseWriter = responseWriter;
-            }
-        });
+        app.MapCustomHttpHealthEndpoints(app.Environment, serviceName: "messaging");
 
         app.UseOpenTelemetryPrometheusScrapingEndpoint(context => context.Request.Path == options.Prometheus.ScrapeEndpointPath);
     }

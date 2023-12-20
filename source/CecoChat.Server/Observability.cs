@@ -1,15 +1,42 @@
 using CecoChat.AspNet.Health;
+using CecoChat.AspNet.Prometheus;
 using CecoChat.Client.Config;
 using CecoChat.Health;
 using CecoChat.Http.Health;
 using CecoChat.Kafka;
 using CecoChat.Kafka.Health;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Hosting;
+using OpenTelemetry.Trace;
 
 namespace CecoChat.Server;
 
-public static class HealthRegistrations
+public static class TelemetryExtensions
+{
+    public static TracerProviderBuilder AddAspNetCoreServer(
+        this TracerProviderBuilder tracing,
+        bool enableGrpcSupport,
+        PrometheusOptions prometheusOptions)
+    {
+        return tracing.AddAspNetCoreInstrumentation(aspnet =>
+        {
+            aspnet.EnableGrpcAspNetCoreSupport = enableGrpcSupport;
+
+            HashSet<string> excludedPaths = new()
+            {
+                prometheusOptions.ScrapeEndpointPath, HealthPaths.Health, HealthPaths.Startup, HealthPaths.Live, HealthPaths.Ready
+            };
+            aspnet.Filter = httpContext => !excludedPaths.Contains(httpContext.Request.Path);
+        });
+    }
+}
+
+public static class HealthExtensions
 {
     public static IHealthChecksBuilder AddDynamicConfigInit(
         this IHealthChecksBuilder builder,
@@ -59,6 +86,25 @@ public static class HealthRegistrations
             backplaneOptions.Kafka,
             backplaneOptions.Health,
             tags: new[] { HealthTags.Health, HealthTags.Ready });
+    }
+
+    public static void MapCustomHttpHealthEndpoints(
+        this IEndpointRouteBuilder endpoints,
+        IWebHostEnvironment environment,
+        string serviceName)
+    {
+        endpoints.MapHttpHealthEndpoints(setup =>
+        {
+            Func<HttpContext, HealthReport, Task> responseWriter = (context, report) => CustomHealth.Writer(serviceName, context, report);
+            setup.Health.ResponseWriter = responseWriter;
+
+            if (environment.IsDevelopment())
+            {
+                setup.Startup.ResponseWriter = responseWriter;
+                setup.Live.ResponseWriter = responseWriter;
+                setup.Ready.ResponseWriter = responseWriter;
+            }
+        });
     }
 }
 

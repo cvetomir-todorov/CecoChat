@@ -20,7 +20,6 @@ using CecoChat.Server.Bff.Init;
 using CecoChat.Server.Identity;
 using FluentValidation;
 using FluentValidation.AspNetCore;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
@@ -186,18 +185,7 @@ public static class Program
         app.UseAuthorization();
 
         app.MapControllers();
-        app.MapHttpHealthEndpoints(setup =>
-        {
-            Func<HttpContext, HealthReport, Task> responseWriter = (context, report) => CustomHealth.Writer(serviceName: "bff", context, report);
-            setup.Health.ResponseWriter = responseWriter;
-
-            if (app.Environment.IsDevelopment())
-            {
-                setup.Startup.ResponseWriter = responseWriter;
-                setup.Live.ResponseWriter = responseWriter;
-                setup.Ready.ResponseWriter = responseWriter;
-            }
-        });
+        app.MapCustomHttpHealthEndpoints(app.Environment, serviceName: "bff");
 
         app.UseOpenTelemetryPrometheusScrapingEndpoint(context => context.Request.Path == options.Prometheus.ScrapeEndpointPath);
         app.MapWhen(context => context.Request.Path.StartsWithSegments("/swagger"), _ =>

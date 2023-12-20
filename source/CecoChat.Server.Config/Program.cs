@@ -19,7 +19,6 @@ using CecoChat.Server.Config.Endpoints;
 using CecoChat.Server.Config.Init;
 using FluentValidation;
 using FluentValidation.AspNetCore;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Npgsql;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
@@ -163,18 +162,7 @@ public static class Program
 
         app.MapGrpcService<ConfigService>();
         app.MapControllers();
-        app.MapHttpHealthEndpoints(setup =>
-        {
-            Func<HttpContext, HealthReport, Task> responseWriter = (context, report) => CustomHealth.Writer(serviceName: "config", context, report);
-            setup.Health.ResponseWriter = responseWriter;
-
-            if (app.Environment.IsDevelopment())
-            {
-                setup.Startup.ResponseWriter = responseWriter;
-                setup.Live.ResponseWriter = responseWriter;
-                setup.Ready.ResponseWriter = responseWriter;
-            }
-        });
+        app.MapCustomHttpHealthEndpoints(app.Environment, serviceName: "config");
 
         app.UseOpenTelemetryPrometheusScrapingEndpoint(context => context.Request.Path == options.Prometheus.ScrapeEndpointPath);
         app.MapWhen(context => context.Request.Path.StartsWithSegments("/swagger"), _ =>
