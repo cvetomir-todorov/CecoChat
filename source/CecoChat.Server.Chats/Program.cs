@@ -22,7 +22,6 @@ using CecoChat.Server.Chats.Init;
 using CecoChat.Server.Identity;
 using Confluent.Kafka;
 using FluentValidation;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
@@ -183,18 +182,7 @@ public static class Program
         app.UseAuthorization();
 
         app.MapGrpcService<ChatsService>();
-        app.MapHttpHealthEndpoints(setup =>
-        {
-            Func<HttpContext, HealthReport, Task> responseWriter = (context, report) => CustomHealth.Writer(serviceName: "chats", context, report);
-            setup.Health.ResponseWriter = responseWriter;
-
-            if (app.Environment.IsDevelopment())
-            {
-                setup.Startup.ResponseWriter = responseWriter;
-                setup.Live.ResponseWriter = responseWriter;
-                setup.Ready.ResponseWriter = responseWriter;
-            }
-        });
+        app.MapCustomHttpHealthEndpoints(app.Environment, serviceName: "chats");
 
         app.UseOpenTelemetryPrometheusScrapingEndpoint(context => context.Request.Path == options.Prometheus.ScrapeEndpointPath);
     }

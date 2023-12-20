@@ -1,7 +1,6 @@
 using System.Reflection;
 using Autofac;
 using Calzolari.Grpc.AspNetCore.Validation;
-using CecoChat.AspNet.Health;
 using CecoChat.AspNet.Init;
 using CecoChat.AspNet.Prometheus;
 using CecoChat.Autofac;
@@ -14,7 +13,6 @@ using CecoChat.Server.Backplane;
 using CecoChat.Server.IdGen.Endpoints;
 using CecoChat.Server.IdGen.Init;
 using FluentValidation;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
@@ -136,18 +134,7 @@ public static class Program
         app.UseRouting();
 
         app.MapGrpcService<IdGenService>();
-        app.MapHttpHealthEndpoints(setup =>
-        {
-            Func<HttpContext, HealthReport, Task> responseWriter = (context, report) => CustomHealth.Writer(serviceName: "idgen", context, report);
-            setup.Health.ResponseWriter = responseWriter;
-
-            if (app.Environment.IsDevelopment())
-            {
-                setup.Startup.ResponseWriter = responseWriter;
-                setup.Live.ResponseWriter = responseWriter;
-                setup.Ready.ResponseWriter = responseWriter;
-            }
-        });
+        app.MapCustomHttpHealthEndpoints(app.Environment, serviceName: "idgen");
 
         app.UseOpenTelemetryPrometheusScrapingEndpoint(context => context.Request.Path == options.Prometheus.ScrapeEndpointPath);
     }
