@@ -1,10 +1,217 @@
+using System.Reflection;
+using Autofac;
+using Calzolari.Grpc.AspNetCore.Validation;
+using CecoChat.AspNet.Health;
+using CecoChat.AspNet.Init;
+using CecoChat.AspNet.Prometheus;
+using CecoChat.Autofac;
+using CecoChat.Client.Config;
+using CecoChat.Contracts.Backplane;
+using CecoChat.Data.User;
+using CecoChat.Data.User.Infra;
+using CecoChat.DynamicConfig;
+using CecoChat.Kafka;
+using CecoChat.Kafka.Telemetry;
+using CecoChat.Npgsql.Health;
+using CecoChat.Otel;
+using CecoChat.Redis;
+using CecoChat.Redis.Health;
+using CecoChat.Server.Backplane;
+using CecoChat.Server.Identity;
+using CecoChat.Server.User.Backplane;
+using CecoChat.Server.User.Endpoints;
+using CecoChat.Server.User.Init;
+using CecoChat.Server.User.Security;
+using Confluent.Kafka;
+using FluentValidation;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Npgsql;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
+
 namespace CecoChat.Server.User;
 
 public static class Program
 {
-    public static async Task Main(string[] args)
+    private static UserDbOptions _userDbOptions = null!;
+    private static RedisOptions _userCacheStoreOptions = null!;
+
+    public static async Task Main(params string[] args)
     {
-        IHostBuilder hostBuilder = EntryPoint.CreateDefaultHostBuilder(args, startupContext: typeof(Startup));
-        await EntryPoint.CreateAndRunHost(hostBuilder, loggerContext: typeof(Program));
+        WebApplicationBuilder builder = EntryPoint.CreateWebAppBuilder(args);
+        CommonOptions options = new(builder.Configuration);
+
+        _userDbOptions = new();
+        builder.Configuration.GetSection("UserDb").Bind(_userDbOptions);
+        _userCacheStoreOptions = new();
+        builder.Configuration.GetSection("UserCache:Store").Bind(_userCacheStoreOptions);
+        
+        ConfigureServices(builder, options);
+        builder.Host.ConfigureContainer<ContainerBuilder>(ConfigureContainer);
+
+        WebApplication app = builder.Build();
+        ConfigurePipeline(app, options);
+        await EntryPoint.RunWebApp(app, typeof(Program));
+    }
+
+    private static void ConfigureServices(WebApplicationBuilder builder, CommonOptions options)
+    {
+        AddTelemetry(builder, options);
+        AddHealth(builder, options);
+
+        // security
+        builder.Services.AddJwtAuthentication(options.Jwt);
+        builder.Services.AddUserPolicyAuthorization();
+
+        // dynamic config
+        builder.Services.AddConfigClient(options.ConfigClient);
+
+        // grpc
+        builder.Services.AddGrpc(grpc =>
+        {
+            grpc.EnableDetailedErrors = builder.Environment.IsDevelopment();
+            grpc.EnableMessageValidation();
+        });
+        builder.Services.AddGrpcValidation();
+
+        // user db
+        builder.Services.AddUserDb(_userDbOptions.Connect);
+
+        // common
+        builder.Services.AddAutoMapper(config =>
+        {
+            config.AddMaps(typeof(AutoMapperProfile));
+        });
+        builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+        builder.Services.AddHttpContextAccessor();
+        builder.Services.AddOptions();
+    }
+
+    private static void AddTelemetry(WebApplicationBuilder builder, CommonOptions options)
+    {
+        ResourceBuilder serviceResourceBuilder = ResourceBuilder
+            .CreateEmpty()
+            .AddService(serviceName: "User", serviceNamespace: "CecoChat", serviceVersion: "0.1")
+            .AddEnvironmentVariableDetector();
+
+        builder.Services
+            .AddOpenTelemetry()
+            .WithTracing(tracing =>
+            {
+                tracing
+                    .SetResourceBuilder(serviceResourceBuilder)
+                    .AddAspNetCoreServer(enableGrpcSupport: true, options.Prometheus)
+                    .AddKafkaInstrumentation()
+                    .AddNpgsql()
+                    .AddRedisInstrumentation()
+                    .AddGrpcClientInstrumentation(grpc => grpc.SuppressDownstreamInstrumentation = true)
+                    .ConfigureSampling(options.TracingSampling)
+                    .ConfigureOtlpExporter(options.TracingExport);
+            })
+            .WithMetrics(metrics =>
+            {
+                metrics
+                    .SetResourceBuilder(serviceResourceBuilder)
+                    .AddAspNetCoreInstrumentation()
+                    .ConfigurePrometheusAspNetExporter(options.Prometheus);
+            });
+    }
+
+    private static void AddHealth(WebApplicationBuilder builder, CommonOptions options)
+    {
+        builder.Services
+            .AddHealthChecks()
+            .AddDynamicConfigInit()
+            .AddConfigChangesConsumer()
+            .AddConfigService(options.ConfigClient)
+            .AddBackplane(builder.Configuration.GetSection("Backplane"))
+            .AddCheck<UserDbInitHealthCheck>(
+                "user-db-init",
+                tags: new[] { HealthTags.Health, HealthTags.Startup })
+            .AddNpgsql(
+                "user-db",
+                _userDbOptions.Connect,
+                tags: new[] { HealthTags.Health, HealthTags.Ready })
+            .AddRedis(
+                "user-cache",
+                _userCacheStoreOptions,
+                tags: new[] { HealthTags.Health, HealthTags.Ready });
+
+        builder.Services.AddSingleton<UserDbInitHealthCheck>();
+    }
+
+    private static void ConfigureContainer(HostBuilderContext host, ContainerBuilder builder)
+    {
+        // init
+        builder.RegisterInitStep<DynamicConfigInit>();
+        builder.RegisterInitStep<BackplaneInit>();
+        builder.RegisterInitStep<BackplaneComponentsInit>();
+        builder.RegisterInitStep<UserDbInit>();
+        builder.RegisterInitStep<AsyncProfileCachingInit>();
+
+        // dynamic config
+        builder.RegisterModule(new DynamicConfigAutofacModule(
+            host.Configuration.GetSection("Backplane"),
+            registerConfigChangesConsumer: true,
+            registerPartitioning: true));
+        builder.RegisterModule(new ConfigClientAutofacModule(host.Configuration.GetSection("ConfigClient")));
+
+        // backplane
+        builder.RegisterType<KafkaAdmin>().As<IKafkaAdmin>().SingleInstance();
+        builder.RegisterOptions<KafkaOptions>(host.Configuration.GetSection("Backplane:Kafka"));
+        builder.RegisterModule(new PartitionerAutofacModule());
+        builder.RegisterType<TopicPartitionFlyweight>().As<ITopicPartitionFlyweight>().SingleInstance();
+        builder.RegisterFactory<KafkaProducer<Null, BackplaneMessage>, IKafkaProducer<Null, BackplaneMessage>>();
+        builder.RegisterType<ConnectionNotifyProducer>().As<IConnectionNotifyProducer>().SingleInstance();
+        builder.RegisterModule(new KafkaAutofacModule());
+        builder.RegisterOptions<BackplaneOptions>(host.Configuration.GetSection("Backplane"));
+
+        // user db
+        builder.RegisterModule(new UserDbAutofacModule(
+            userCacheConfig: host.Configuration.GetSection("UserCache"),
+            userCacheStoreConfig: host.Configuration.GetSection("UserCache:Store")));
+        builder.RegisterOptions<UserDbOptions>(host.Configuration.GetSection("UserDb"));
+
+        // security
+        builder.RegisterType<PasswordHasher>().As<IPasswordHasher>().SingleInstance();
+
+        // shared
+        builder.RegisterType<MonotonicClock>().As<IClock>().SingleInstance();
+    }
+
+    private static void ConfigurePipeline(WebApplication app, CommonOptions options)
+    {
+        if (app.Environment.IsDevelopment())
+        {
+            app.UseDeveloperExceptionPage();
+        }
+
+        app.UseCustomExceptionHandler();
+        app.UseHttpsRedirection();
+
+        app.UseRouting();
+        app.UseAuthentication();
+        app.UseAuthorization();
+
+        app.MapGrpcService<AuthService>();
+        app.MapGrpcService<ProfileCommandService>();
+        app.MapGrpcService<ProfileQueryService>();
+        app.MapGrpcService<ConnectionCommandService>();
+        app.MapGrpcService<ConnectionQueryService>();
+        app.MapHttpHealthEndpoints(setup =>
+        {
+            Func<HttpContext, HealthReport, Task> responseWriter = (context, report) => CustomHealth.Writer(serviceName: "user", context, report);
+            setup.Health.ResponseWriter = responseWriter;
+
+            if (app.Environment.IsDevelopment())
+            {
+                setup.Startup.ResponseWriter = responseWriter;
+                setup.Live.ResponseWriter = responseWriter;
+                setup.Ready.ResponseWriter = responseWriter;
+            }
+        });
+
+        app.UseOpenTelemetryPrometheusScrapingEndpoint(context => context.Request.Path == options.Prometheus.ScrapeEndpointPath);
     }
 }
