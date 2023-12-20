@@ -4,6 +4,7 @@ using CecoChat.Server.Identity;
 using CecoChat.Server.User.Backplane;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CecoChat.Server.User.Endpoints;
 
@@ -26,6 +27,7 @@ public class ConnectionCommandService : ConnectionCommand.ConnectionCommandBase
         _producer = producer;
     }
 
+    [Authorize(Policy = "user")]
     public override async Task<InviteResponse> Invite(InviteRequest request, ServerCallContext context)
     {
         UserClaims userClaims = context.GetUserClaimsGrpc(_logger);
@@ -120,6 +122,7 @@ public class ConnectionCommandService : ConnectionCommand.ConnectionCommandBase
         throw new ProcessingFailureException(typeof(UpdateConnectionResult));
     }
 
+    [Authorize(Policy = "user")]
     public override async Task<ApproveResponse> Approve(ApproveRequest request, ServerCallContext context)
     {
         UserClaims userClaims = context.GetUserClaimsGrpc(_logger);
@@ -170,6 +173,7 @@ public class ConnectionCommandService : ConnectionCommand.ConnectionCommandBase
         throw new ProcessingFailureException(typeof(UpdateConnectionResult));
     }
 
+    [Authorize(Policy = "user")]
     public override async Task<CancelResponse> Cancel(CancelRequest request, ServerCallContext context)
     {
         UserClaims userClaims = context.GetUserClaimsGrpc(_logger);
@@ -220,6 +224,7 @@ public class ConnectionCommandService : ConnectionCommand.ConnectionCommandBase
         throw new ProcessingFailureException(typeof(RemoveConnectionResult));
     }
 
+    [Authorize(Policy = "user")]
     public override async Task<RemoveResponse> Remove(RemoveRequest request, ServerCallContext context)
     {
         UserClaims userClaims = context.GetUserClaimsGrpc(_logger);

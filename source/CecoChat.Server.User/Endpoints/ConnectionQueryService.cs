@@ -2,6 +2,7 @@ using CecoChat.Contracts.User;
 using CecoChat.Data.User.Connections;
 using CecoChat.Server.Identity;
 using Grpc.Core;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CecoChat.Server.User.Endpoints;
 
@@ -16,6 +17,7 @@ public class ConnectionQueryService : ConnectionQuery.ConnectionQueryBase
         _repo = repo;
     }
 
+    [Authorize(Policy = "user")]
     public override async Task<GetConnectionResponse> GetConnection(GetConnectionRequest request, ServerCallContext context)
     {
         UserClaims userClaims = context.GetUserClaimsGrpc(_logger);
@@ -30,6 +32,7 @@ public class ConnectionQueryService : ConnectionQuery.ConnectionQueryBase
         return response;
     }
 
+    [Authorize(Policy = "user")]
     public override async Task<GetConnectionsResponse> GetConnections(GetConnectionsRequest request, ServerCallContext context)
     {
         UserClaims userClaims = context.GetUserClaimsGrpc(_logger);
