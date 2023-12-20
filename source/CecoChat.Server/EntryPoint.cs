@@ -2,9 +2,8 @@
 using Autofac.Extensions.DependencyInjection;
 using CecoChat.AspNet.Init;
 using CecoChat.Serilog;
-using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
 using Serilog;
 
 namespace CecoChat.Server;
@@ -13,36 +12,18 @@ public static class EntryPoint
 {
     private const string EnvironmentVariablesPrefix = "CECOCHAT_";
 
-    public static IHostBuilder CreateDefaultHostBuilder(
-        string[] args,
-        Type startupContext,
-        bool useAutofac = true,
-        bool useSerilog = true)
+    public static WebApplicationBuilder CreateWebAppBuilder(string[] args)
     {
-        IHostBuilder hostBuilder = Host
-            .CreateDefaultBuilder(args)
-            .ConfigureWebHostDefaults(webBuilder =>
-            {
-                webBuilder.UseStartup(startupContext);
-            })
-            .ConfigureAppConfiguration(configurationBuilder =>
-            {
-                configurationBuilder.AddEnvironmentVariables(EnvironmentVariablesPrefix);
-            });
+        WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-        if (useAutofac)
-        {
-            hostBuilder = hostBuilder.UseServiceProviderFactory(new AutofacServiceProviderFactory());
-        }
-        if (useSerilog)
-        {
-            hostBuilder = hostBuilder.UseSerilog();
-        }
+        builder.Configuration.AddEnvironmentVariables(EnvironmentVariablesPrefix);
+        builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
+        builder.Host.UseSerilog(dispose: true);
 
-        return hostBuilder;
+        return builder;
     }
 
-    public static async Task CreateAndRunHost(IHostBuilder hostBuilder, Type loggerContext)
+    public static async Task RunWebApp(WebApplication app, Type loggerContext)
     {
         Assembly entryAssembly = GetEntryAssembly();
         string environment = GetEnvironment();
@@ -53,16 +34,15 @@ public static class EntryPoint
         try
         {
             logger.Information("Starting in {Environment} environment...", environment);
-            IHost host = hostBuilder.Build();
 
-            bool initialized = await host.Init();
+            bool initialized = await app.Services.Init();
             if (!initialized)
             {
                 logger.Fatal("Failed to initialize");
                 return;
             }
 
-            await host.RunAsync();
+            await app.RunAsync();
         }
         catch (Exception exception)
         {
