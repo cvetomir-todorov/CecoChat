@@ -44,7 +44,9 @@ public static class Program
         _swaggerOptions = new();
         builder.Configuration.GetSection("Swagger").Bind(_swaggerOptions);
 
-        ConfigureServices(builder, options);
+        AddServices(builder, options);
+        AddTelemetry(builder, options);
+        AddHealth(builder, options);
         builder.Host.ConfigureContainer<ContainerBuilder>(ConfigureContainer);
 
         WebApplication app = builder.Build();
@@ -52,11 +54,8 @@ public static class Program
         await EntryPoint.RunWebApp(app, typeof(Program));
     }
 
-    private static void ConfigureServices(WebApplicationBuilder builder, CommonOptions options)
+    private static void AddServices(WebApplicationBuilder builder, CommonOptions options)
     {
-        AddTelemetry(builder, options);
-        AddHealth(builder, options);
-
         // security
         builder.Services.AddJwtAuthentication(options.Jwt);
         builder.Services.AddUserPolicyAuthorization();
