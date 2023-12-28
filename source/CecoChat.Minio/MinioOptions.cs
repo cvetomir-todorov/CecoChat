@@ -1,0 +1,8 @@
+namespace CecoChat.Minio;
+
+public sealed class MinioOptions
+{
+    public Uri Endpoint { get; init; } = null!;
+    public string AccessKey { get; init; } = string.Empty;
+    public string Secret { get; init; } = string.Empty;
+}
