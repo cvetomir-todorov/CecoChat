@@ -14,6 +14,7 @@ using CecoChat.Http.Health;
 using CecoChat.Jwt;
 using CecoChat.Kafka;
 using CecoChat.Kafka.Telemetry;
+using CecoChat.Minio;
 using CecoChat.Otel;
 using CecoChat.Server.Backplane;
 using CecoChat.Server.Bff.Init;
@@ -124,6 +125,9 @@ public static class Program
             .AddConfigChangesConsumer()
             .AddConfigService(options.ConfigClient)
             .AddBackplane(builder.Configuration.GetSection("Backplane"))
+            .AddCheck<FileStorageInitHealthCheck>(
+                "file-storage-init",
+                tags: new[] { HealthTags.Health, HealthTags.Startup })
             .AddUri(
                 "chats-svc",
                 new Uri(_chatsClientOptions.Address!, _chatsClientOptions.HealthPath),
@@ -136,6 +140,8 @@ public static class Program
                 configureHttpClient: (_, client) => client.DefaultRequestVersion = new Version(2, 0),
                 timeout: _userClientOptions.HealthTimeout,
                 tags: new[] { HealthTags.Health, HealthTags.Ready });
+
+        builder.Services.AddSingleton<FileStorageInitHealthCheck>();
     }
 
     private static void ConfigureContainer(HostBuilderContext host, ContainerBuilder builder)
@@ -144,6 +150,7 @@ public static class Program
         builder.RegisterInitStep<DynamicConfigInit>();
         builder.RegisterInitStep<BackplaneInit>();
         builder.RegisterInitStep<BackplaneComponentsInit>();
+        builder.RegisterInitStep<FileStorageInit>();
 
         // dynamic config
         builder.RegisterModule(new DynamicConfigAutofacModule(
@@ -160,6 +167,9 @@ public static class Program
         // downstream services
         builder.RegisterModule(new ChatsClientAutofacModule(host.Configuration.GetSection("ChatsClient")));
         builder.RegisterModule(new UserClientAutofacModule(host.Configuration.GetSection("UserClient")));
+
+        // files
+        builder.RegisterModule(new MinioAutofacModule(host.Configuration.GetSection("FileStorage")));
 
         // security
         builder.RegisterOptions<JwtOptions>(host.Configuration.GetSection("Jwt"));
