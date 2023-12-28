@@ -6,24 +6,28 @@
 
 # Certificates
 
-Security is part of modern development with an ever-growing importance. Both the .NET services and the Minikube deployment use TLS certificates. Below are their locations:
+Security is a part of the modern development with an ever-growing importance. Both the .NET services and the Minikube deployment use TLS certificates.
 
 * [.NET services certificate](../source/certificates)
 * [Minikube ingress certificate](../deploy/minikube/certificates)
 
-For a setup follow the steps and use the related scripts:
+Security considerations:
 
-* The certificates are git-ignored and should be generated after initial clone of the repo
-  - Adding to git the certificates which are self-signed and should be trusted is a security vulnerability
-  - The script `create-certificate.sh` could be used to generate them
-  - Everyone should generate their own certificates - that is what happens even during each build
-  - Creating the certificates is achieved via [openssl](https://www.openssl.org/) and its default `.conf` file copied locally, renamed and edited
-  - Trusting the certificates is achieved via the `trust-certificate.sh` script
-* Windows (and possibly other OS-es)
-  - The Ubuntu-based `.conf` file may not work for Windows or `openssl` may not be present
-  - Powershell could certainly be used to create a self-signed certificate with multiple domains
-  - Look for the `[ alt_names ]` section in the respective `.conf` file to know which domains to include
-  - Trusting a certificate is different on Windows so that would definitely require the OS-specific approach
+* Adding to git the certificates which are self-signed and should be trusted is a security vulnerability
+* The certificates are git-ignored and should be generated after the initial clone of the repo
+* Everyone should generate their own certificates - that is what happens even during each build
+
+Ubuntu/Debian setup:
+
+* The script `create-certificate.sh` could be used to generate the certificates
+* Creating the certificates is achieved via [openssl](https://www.openssl.org/) and its default `.conf` file (which was copied locally, renamed and edited)
+* Trusting the certificates is achieved via the `trust-certificate.sh` script
+
+Other systems:
+
+* Other *nix systems and Windows have their own approach of generating certificates and trusting them
+* There is an important detail which is required when generating certificates using a different `.conf` file or even a different toolset
+* Look for the `[ alt_names ]` section in the respective `.conf` file to know which domains to include for the respective certificate
 
 # Containerization
 
