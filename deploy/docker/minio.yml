@@ -1,0 +1,26 @@
+version: '3'
+networks:
+  cecochat:
+services:
+  minio0:
+    image: minio/minio:RELEASE.2023-12-20T01-00-02Z
+    container_name: cecochat-minio0
+    hostname: minio0
+    networks:
+      - cecochat
+    ports:
+      - "9010:9000"
+      - "9090:9090"
+    command:
+      - server
+      - --console-address
+      - ":9090"
+    environment:
+      MINIO_ROOT_USER: "admin"
+      MINIO_ROOT_PASSWORD: "secret12"
+      MINIO_VOLUMES: "/mnt/data"
+    volumes:
+      - cecochat-minio0-data:/mnt/data
+volumes:
+  cecochat-minio0-data:
+    external: true
