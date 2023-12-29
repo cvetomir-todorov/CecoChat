@@ -1,0 +1,10 @@
+syntax = "proto3";
+option csharp_namespace = "CecoChat.Contracts.User";
+package CecoChat.Contracts.User;
+import "google/protobuf/timestamp.proto";
+
+message File {
+  string bucket = 1;
+  string path = 2;
+  google.protobuf.Timestamp version = 3;
+}
