@@ -3,6 +3,7 @@ using CecoChat.Contracts.Bff.Chats;
 using CecoChat.Contracts.Bff.Connections;
 using CecoChat.Contracts.Bff.Profiles;
 using Refit;
+using File = CecoChat.Contracts.Bff.Files.File;
 
 namespace CecoChat.Contracts.Bff.Screens;
 
@@ -26,6 +27,10 @@ public sealed class GetAllChatsScreenResponse
     [JsonPropertyName("connections")]
     [AliasAs("connections")]
     public Connection[] Connections { get; init; } = Array.Empty<Connection>();
+
+    [JsonPropertyName("files")]
+    [AliasAs("files")]
+    public File[] Files { get; init; } = Array.Empty<File>();
 
     [JsonPropertyName("profiles")]
     [AliasAs("profiles")]

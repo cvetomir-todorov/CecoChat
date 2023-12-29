@@ -9,6 +9,7 @@ using CecoChat.Server.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using File = CecoChat.Contracts.Bff.Files.File;
 
 namespace CecoChat.Server.Bff.Endpoints.Screens;
 
@@ -23,6 +24,7 @@ public class AllChatsScreenController : ControllerBase
     private readonly IChatsClient _chatsClient;
     private readonly IConnectionClient _connectionClient;
     private readonly IProfileClient _profileClient;
+    private readonly IFileClient _fileClient;
 
     public AllChatsScreenController(
         ILogger<AllChatsScreenController> logger,
@@ -30,7 +32,8 @@ public class AllChatsScreenController : ControllerBase
         IContractMapper contractMapper,
         IChatsClient chatsClient,
         IConnectionClient connectionClient,
-        IProfileClient profileClient)
+        IProfileClient profileClient,
+        IFileClient fileClient)
     {
         _logger = logger;
         _mapper = mapper;
@@ -38,6 +41,7 @@ public class AllChatsScreenController : ControllerBase
         _chatsClient = chatsClient;
         _connectionClient = connectionClient;
         _profileClient = profileClient;
+        _fileClient = fileClient;
     }
 
     [Authorize(Policy = "user")]
@@ -56,22 +60,26 @@ public class AllChatsScreenController : ControllerBase
 
         Task<IReadOnlyCollection<Contracts.Chats.ChatState>> chatsTask = _chatsClient.GetUserChats(userClaims.UserId, request.ChatsNewerThan, accessToken, ct);
         Task<IReadOnlyCollection<Contracts.User.Connection>> connectionsTask = _connectionClient.GetConnections(userClaims.UserId, accessToken, ct);
+        Task<IReadOnlyCollection<Contracts.User.File>> filesTask = _fileClient.GetUserFiles(userClaims.UserId, accessToken, ct);
 
-        await Task.WhenAll(chatsTask, connectionsTask);
+        await Task.WhenAll(chatsTask, connectionsTask, filesTask);
 
         IReadOnlyCollection<Contracts.Chats.ChatState> serviceChats = chatsTask.Result;
         IReadOnlyCollection<Contracts.User.Connection> serviceConnections = connectionsTask.Result;
+        IReadOnlyCollection<Contracts.User.File> serviceFiles = filesTask.Result;
 
         ProfilePublic[] profiles = await GetProfiles(request.IncludeProfiles, serviceChats, serviceConnections, userClaims, accessToken, ct);
         ChatState[] chats = serviceChats.Select(chat => _contractMapper.MapChat(chat)).ToArray();
         Connection[] connections = _mapper.Map<Connection[]>(serviceConnections);
+        File[] files = _mapper.Map<File[]>(serviceFiles);
 
-        _logger.LogTrace("Responding with {ChatCount} chats newer than {NewerThan}, {ConnectionCount} connections and {ProfileCount} profiles for all-chats-screen requested by user {UserId}",
-            chats.Length, request.ChatsNewerThan, connections.Length, profiles.Length, userClaims.UserId);
+        _logger.LogTrace("Responding with {ChatCount} chats newer than {NewerThan}, {ConnectionCount} connections, {FileCount} files, {ProfileCount} profiles for all-chats-screen requested by user {UserId}",
+            chats.Length, request.ChatsNewerThan, connections.Length, files.Length, profiles.Length, userClaims.UserId);
         return Ok(new GetAllChatsScreenResponse
         {
             Chats = chats,
             Connections = connections,
+            Files = files,
             Profiles = profiles
         });
     }

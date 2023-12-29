@@ -36,5 +36,10 @@ public class AutoMapperProfile : AutoMapper.Profile
                             throw new EnumValueNotSupportedException(connectionContract.Status);
                     }
                 }));
+
+        CreateMap<Contracts.User.File, Contracts.Bff.Files.File>()
+            .ForMember(
+                fileBff => fileBff.Version,
+                options => options.MapFrom(fileContract => fileContract.Version.ToDateTime()));
     }
 }
