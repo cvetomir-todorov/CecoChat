@@ -1,6 +1,7 @@
 using CecoChat.Contracts.Bff.Auth;
 using CecoChat.Contracts.Bff.Chats;
 using CecoChat.Contracts.Bff.Connections;
+using CecoChat.Contracts.Bff.Files;
 using CecoChat.Contracts.Bff.Profiles;
 using CecoChat.Contracts.Bff.Screens;
 using Refit;
@@ -10,6 +11,7 @@ namespace CecoChat.Contracts.Bff;
 public interface IBffClient : IDisposable
 {
     private const string AuthorizationScheme = "Bearer";
+    public const string HeaderUploadedFileSize = "Uploaded-File-Size";
 
     [Post("/api/registration")]
     Task<IApiResponse> Register(
@@ -81,5 +83,12 @@ public interface IBffClient : IDisposable
     Task<IApiResponse<RemoveConnectionResponse>> RemoveConnection(
         [AliasAs("id")] long connectionId,
         [Body] RemoveConnectionRequest request,
+        [Authorize(AuthorizationScheme)] string accessToken);
+
+    [Post("/api/files")]
+    [Multipart(boundaryText: "----UserFileBoundary")]
+    Task<IApiResponse<UploadFileResponse>> UploadFile(
+        [Header(HeaderUploadedFileSize)] long fileSize,
+        [AliasAs("file")] StreamPart stream,
         [Authorize(AuthorizationScheme)] string accessToken);
 }

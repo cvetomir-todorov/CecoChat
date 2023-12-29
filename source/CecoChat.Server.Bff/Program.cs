@@ -17,6 +17,7 @@ using CecoChat.Kafka.Telemetry;
 using CecoChat.Minio;
 using CecoChat.Otel;
 using CecoChat.Server.Backplane;
+using CecoChat.Server.Bff.Files;
 using CecoChat.Server.Bff.Init;
 using CecoChat.Server.Identity;
 using FluentValidation;
@@ -170,6 +171,7 @@ public static class Program
 
         // files
         builder.RegisterModule(new MinioAutofacModule(host.Configuration.GetSection("FileStorage")));
+        builder.RegisterType<FileStorage>().As<IFileStorage>().SingleInstance();
 
         // security
         builder.RegisterOptions<JwtOptions>(host.Configuration.GetSection("Jwt"));

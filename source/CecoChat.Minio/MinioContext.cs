@@ -1,6 +1,8 @@
 using Microsoft.Extensions.Logging;
 using Minio;
 using Minio.DataModel.Args;
+using Minio.DataModel.Response;
+using Minio.DataModel.Tags;
 using Minio.Exceptions;
 
 namespace CecoChat.Minio;
@@ -8,6 +10,8 @@ namespace CecoChat.Minio;
 public interface IMinioContext
 {
     Task<bool> EnsureBucketExists(string bucketName, CancellationToken ct);
+
+    Task<string> UploadFile(string bucketName, string objectName, IDictionary<string, string>? tags, Stream dataStream, long dataLength, CancellationToken ct);
 }
 
 internal class MinioContext : IMinioContext
@@ -48,5 +52,22 @@ internal class MinioContext : IMinioContext
             _logger.LogError(minioException, "Failed to create bucket {BucketName}", bucketName);
             return false;
         }
+    }
+
+    public async Task<string> UploadFile(string bucketName, string objectName, IDictionary<string, string>? tags, Stream dataStream, long dataLength, CancellationToken ct)
+    {
+        PutObjectArgs putObjectArgs = new PutObjectArgs()
+            .WithBucket(bucketName)
+            .WithObject(objectName)
+            .WithStreamData(dataStream)
+            .WithObjectSize(dataLength);
+
+        if (tags != null && tags.Count > 0)
+        {
+            putObjectArgs.WithTagging(new Tagging(tags, isObjects: true));
+        }
+
+        PutObjectResponse response = await _minio.PutObjectAsync(putObjectArgs, ct);
+        return response.ObjectName;
     }
 }
