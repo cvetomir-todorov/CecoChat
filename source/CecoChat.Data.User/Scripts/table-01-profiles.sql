@@ -10,7 +10,8 @@ CREATE TABLE IF NOT EXISTS public."Profiles"
     "Email" text COLLATE pg_catalog."default" NOT NULL,
     PRIMARY KEY ("UserId" HASH)
 )
-WITH (
+WITH
+(
     OIDS = FALSE
 )
 TABLESPACE pg_default;
