@@ -18,6 +18,7 @@
     <Protobuf Include="Connection.proto" />
     <Protobuf Include="ConnectionCommandService.proto" GrpcServices="All" />
     <Protobuf Include="ConnectionQueryService.proto" GrpcServices="All" />
+    <Protobuf Include="File.proto" />
     <Protobuf Include="FileCommandService.proto" GrpcServices="All" />
     <Protobuf Include="ProfileCommandService.proto" GrpcServices="All" />
     <Protobuf Include="ProfileFull.proto" />

@@ -83,5 +83,9 @@ public class UserDbAutofacModule : Module
             .RegisterType<FileCommandRepo>()
             .As<IFileCommandRepo>()
             .InstancePerLifetimeScope();
+        builder
+            .RegisterType<FileQueryRepo>()
+            .As<IFileQueryRepo>()
+            .InstancePerLifetimeScope();
     }
 }
