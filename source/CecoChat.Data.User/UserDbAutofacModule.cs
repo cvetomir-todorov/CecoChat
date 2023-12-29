@@ -1,6 +1,7 @@
 using Autofac;
 using CecoChat.Autofac;
 using CecoChat.Data.User.Connections;
+using CecoChat.Data.User.Files;
 using CecoChat.Data.User.Infra;
 using CecoChat.Data.User.Profiles;
 using CecoChat.Npgsql;
@@ -31,6 +32,7 @@ public class UserDbAutofacModule : Module
 
         RegisterProfileRepos(builder);
         RegisterConnectionRepos(builder);
+        RegisterFileRepos(builder);
     }
 
     private static void RegisterProfileRepos(ContainerBuilder builder)
@@ -72,6 +74,14 @@ public class UserDbAutofacModule : Module
             .RegisterType<CachingConnectionQueryRepo>()
             .As<ICachingConnectionQueryRepo>()
             .WithNamedParameter(typeof(IRedisContext), RedisContextName)
+            .InstancePerLifetimeScope();
+    }
+
+    private static void RegisterFileRepos(ContainerBuilder builder)
+    {
+        builder
+            .RegisterType<FileCommandRepo>()
+            .As<IFileCommandRepo>()
             .InstancePerLifetimeScope();
     }
 }

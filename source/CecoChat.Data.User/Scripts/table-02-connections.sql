@@ -7,7 +7,8 @@ CREATE TABLE IF NOT EXISTS public."Connections"
     "TargetId" bigint NOT NULL,
     CONSTRAINT "Connections_pkey" PRIMARY KEY ("User1Id", "User2Id")
 )
-WITH (
+WITH
+(
     OIDS = FALSE
 )
 TABLESPACE pg_default;

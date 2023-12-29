@@ -11,6 +11,8 @@ public class UserDbContext : DbContext
 
     public DbSet<ConnectionEntity> Connections { get; set; } = null!;
 
+    public DbSet<FileEntity> Files { get; set; } = null!;
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasDefaultSchema("public");
@@ -25,6 +27,9 @@ public class UserDbContext : DbContext
                 status => status.ToString(),
                 statusString => (ConnectionEntityStatus)Enum.Parse(typeof(ConnectionEntityStatus), statusString));
         modelBuilder.Entity<ConnectionEntity>().Property(e => e.Version).IsConcurrencyToken();
+
+        modelBuilder.Entity<FileEntity>().HasKey(nameof(FileEntity.Bucket), nameof(FileEntity.Path));
+        modelBuilder.Entity<FileEntity>().Property(e => e.Version).IsConcurrencyToken();
 
         base.OnModelCreating(modelBuilder);
     }
@@ -61,4 +66,12 @@ public enum ConnectionEntityStatus
     NotConnected,
     Pending,
     Connected
+}
+
+public sealed class FileEntity : IVersionEntity
+{
+    public string Bucket { get; set; } = string.Empty;
+    public string Path { get; set; } = string.Empty;
+    public long UserId { get; set; }
+    public DateTime Version { get; set; }
 }
