@@ -20,5 +20,6 @@ public sealed class UserClientAutofacModule : Module
         builder.RegisterType<AuthClient>().As<IAuthClient>().SingleInstance();
         builder.RegisterType<ProfileClient>().As<IProfileClient>().SingleInstance();
         builder.RegisterType<ConnectionClient>().As<IConnectionClient>().SingleInstance();
+        builder.RegisterType<FileClient>().As<IFileClient>().SingleInstance();
     }
 }

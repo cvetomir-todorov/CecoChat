@@ -1,0 +1,19 @@
+syntax = "proto3";
+option csharp_namespace = "CecoChat.Contracts.User";
+package CecoChat.Contracts.User;
+import "google/protobuf/timestamp.proto";
+
+service FileCommand {
+  rpc AddFile(AddFileRequest) returns (AddFileResponse);
+}
+
+message AddFileRequest {
+  string bucket = 1;
+  string path = 2;
+}
+
+message AddFileResponse {
+  bool success = 1;
+  google.protobuf.Timestamp version = 2;
+  bool duplicate_file = 3;
+}

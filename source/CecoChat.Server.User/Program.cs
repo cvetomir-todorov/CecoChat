@@ -197,6 +197,7 @@ public static class Program
         app.MapGrpcService<ProfileQueryService>();
         app.MapGrpcService<ConnectionCommandService>();
         app.MapGrpcService<ConnectionQueryService>();
+        app.MapGrpcService<FileCommandService>();
         app.MapCustomHttpHealthEndpoints(app.Environment, serviceName: "user");
 
         app.UseOpenTelemetryPrometheusScrapingEndpoint(context => context.Request.Path == options.Prometheus.ScrapeEndpointPath);
