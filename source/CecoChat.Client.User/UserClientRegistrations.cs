@@ -58,5 +58,11 @@ public static class UserClientRegistrations
                 grpc.Address = options.Address;
             }).ConfigureSocketsPrimaryHttpClientHandler(options.SocketsHttpHandler)
             .AddGrpcRetryPolicy(options.Retry);
+
+        services.AddGrpcClient<FileQuery.FileQueryClient>(grpc =>
+            {
+                grpc.Address = options.Address;
+            }).ConfigureSocketsPrimaryHttpClientHandler(options.SocketsHttpHandler)
+            .AddGrpcRetryPolicy(options.Retry);
     }
 }
