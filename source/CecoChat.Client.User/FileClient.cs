@@ -3,7 +3,6 @@ using CecoChat.Grpc;
 using Grpc.Core;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using File = CecoChat.Contracts.User.File;
 
 namespace CecoChat.Client.User;
 
@@ -29,7 +28,7 @@ internal sealed class FileClient : IFileClient
         _clock = clock;
     }
 
-    public async Task<IReadOnlyCollection<File>> GetUserFiles(long userId, string accessToken, CancellationToken ct)
+    public async Task<IReadOnlyCollection<FileRef>> GetUserFiles(long userId, string accessToken, CancellationToken ct)
     {
         GetUserFilesRequest request = new();
 

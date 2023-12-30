@@ -37,7 +37,7 @@ public class AutoMapperProfile : AutoMapper.Profile
                     }
                 }));
 
-        CreateMap<Contracts.User.File, Contracts.Bff.Files.File>()
+        CreateMap<Contracts.User.FileRef, Contracts.Bff.Files.FileRef>()
             .ForMember(
                 fileBff => fileBff.Version,
                 options => options.MapFrom(fileContract => fileContract.Version.ToDateTime()));

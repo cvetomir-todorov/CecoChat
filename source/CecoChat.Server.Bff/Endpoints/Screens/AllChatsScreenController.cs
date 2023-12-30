@@ -3,13 +3,13 @@ using CecoChat.Client.Chats;
 using CecoChat.Client.User;
 using CecoChat.Contracts.Bff.Chats;
 using CecoChat.Contracts.Bff.Connections;
+using CecoChat.Contracts.Bff.Files;
 using CecoChat.Contracts.Bff.Profiles;
 using CecoChat.Contracts.Bff.Screens;
 using CecoChat.Server.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using File = CecoChat.Contracts.Bff.Files.File;
 
 namespace CecoChat.Server.Bff.Endpoints.Screens;
 
@@ -60,18 +60,18 @@ public class AllChatsScreenController : ControllerBase
 
         Task<IReadOnlyCollection<Contracts.Chats.ChatState>> chatsTask = _chatsClient.GetUserChats(userClaims.UserId, request.ChatsNewerThan, accessToken, ct);
         Task<IReadOnlyCollection<Contracts.User.Connection>> connectionsTask = _connectionClient.GetConnections(userClaims.UserId, accessToken, ct);
-        Task<IReadOnlyCollection<Contracts.User.File>> filesTask = _fileClient.GetUserFiles(userClaims.UserId, accessToken, ct);
+        Task<IReadOnlyCollection<Contracts.User.FileRef>> filesTask = _fileClient.GetUserFiles(userClaims.UserId, accessToken, ct);
 
         await Task.WhenAll(chatsTask, connectionsTask, filesTask);
 
         IReadOnlyCollection<Contracts.Chats.ChatState> serviceChats = chatsTask.Result;
         IReadOnlyCollection<Contracts.User.Connection> serviceConnections = connectionsTask.Result;
-        IReadOnlyCollection<Contracts.User.File> serviceFiles = filesTask.Result;
+        IReadOnlyCollection<Contracts.User.FileRef> serviceFiles = filesTask.Result;
 
         ProfilePublic[] profiles = await GetProfiles(request.IncludeProfiles, serviceChats, serviceConnections, userClaims, accessToken, ct);
         ChatState[] chats = serviceChats.Select(chat => _contractMapper.MapChat(chat)).ToArray();
         Connection[] connections = _mapper.Map<Connection[]>(serviceConnections);
-        File[] files = _mapper.Map<File[]>(serviceFiles);
+        FileRef[] files = _mapper.Map<FileRef[]>(serviceFiles);
 
         _logger.LogTrace("Responding with {ChatCount} chats newer than {NewerThan}, {ConnectionCount} connections, {FileCount} files, {ProfileCount} profiles for all-chats-screen requested by user {UserId}",
             chats.Length, request.ChatsNewerThan, connections.Length, files.Length, profiles.Length, userClaims.UserId);

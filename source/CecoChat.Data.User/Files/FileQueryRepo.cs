@@ -1,7 +1,7 @@
+using CecoChat.Contracts.User;
 using Google.Protobuf.WellKnownTypes;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using File = CecoChat.Contracts.User.File;
 
 namespace CecoChat.Data.User.Files;
 
@@ -18,9 +18,9 @@ internal sealed class FileQueryRepo : IFileQueryRepo
         _dbContext = dbContext;
     }
 
-    public async Task<IReadOnlyCollection<File>> GetUserFiles(long userId)
+    public async Task<IReadOnlyCollection<FileRef>> GetUserFiles(long userId)
     {
-        List<File> files = await _dbContext.Files
+        List<FileRef> files = await _dbContext.Files
             .Where(entity => entity.UserId == userId)
             .Select(entity => MapFile(entity))
             .AsNoTracking()
@@ -30,9 +30,9 @@ internal sealed class FileQueryRepo : IFileQueryRepo
         return files;
     }
 
-    private static File MapFile(FileEntity entity)
+    private static FileRef MapFile(FileEntity entity)
     {
-        return new File
+        return new FileRef
         {
             Bucket = entity.Bucket,
             Path = entity.Path,

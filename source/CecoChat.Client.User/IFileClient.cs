@@ -1,10 +1,10 @@
-using File = CecoChat.Contracts.User.File;
+using CecoChat.Contracts.User;
 
 namespace CecoChat.Client.User;
 
 public interface IFileClient
 {
-    Task<IReadOnlyCollection<File>> GetUserFiles(long userId, string accessToken, CancellationToken ct);
+    Task<IReadOnlyCollection<FileRef>> GetUserFiles(long userId, string accessToken, CancellationToken ct);
 
     Task<AddFileResult> AddFile(long userId, string bucket, string path, string accessToken, CancellationToken ct);
 }
