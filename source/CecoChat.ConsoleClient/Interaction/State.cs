@@ -15,6 +15,7 @@ public abstract class State
     protected MessageStorage MessageStorage => States.MessageStorage;
     protected ConnectionStorage ConnectionStorage => States.ConnectionStorage;
     protected ProfileStorage ProfileStorage => States.ProfileStorage;
+    protected FileStorage UserFiles => States.FileStorage;
     protected ChatClient Client => States.Client;
     protected StateContext Context => States.Context;
 
@@ -30,5 +31,18 @@ public abstract class State
         Console.WriteLine("You: {0} | ID={1} | user name={2} | email={3} | phone={4} | avatar={5}",
             Client.UserProfile.DisplayName, Client.UserId, Client.UserProfile.UserName,
             Client.UserProfile.Email, Client.UserProfile.Phone, Client.UserProfile.AvatarUrl);
+    }
+
+    protected void DisplayUserFiles()
+    {
+        foreach (FileRef userFile in UserFiles.EnumerateUserFiles().OrderByDescending(f => f.Version))
+        {
+            Console.WriteLine("{0}   {1:F}", userFile.Name, userFile.Version);
+        }
+    }
+
+    protected static void DisplaySplitter()
+    {
+        Console.WriteLine("=================================================================================================");
     }
 }

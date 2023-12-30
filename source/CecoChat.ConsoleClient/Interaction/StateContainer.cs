@@ -5,12 +5,18 @@ namespace CecoChat.ConsoleClient.Interaction;
 
 public sealed class StateContainer
 {
-    public StateContainer(ChatClient client, MessageStorage messageStorage, ConnectionStorage connectionStorage, ProfileStorage profileStorageStorage)
+    public StateContainer(
+        ChatClient client,
+        MessageStorage messageStorage,
+        ConnectionStorage connectionStorage,
+        ProfileStorage profileStorageStorage,
+        FileStorage fileStorage)
     {
         Client = client;
         ConnectionStorage = connectionStorage;
         MessageStorage = messageStorage;
         ProfileStorage = profileStorageStorage;
+        FileStorage = fileStorage;
         Context = new StateContext();
 
         AllChats = new AllChatsState(this);
@@ -19,6 +25,7 @@ public sealed class StateContainer
         SendMessage = new SendMessageState(this);
         React = new ReactState(this);
         ManageConnection = new ManageConnectionState(this);
+        UploadFile = new UploadFileState(this);
 
         ChangePassword = new ChangePasswordState(this);
         EditProfile = new EditProfileState(this);
@@ -30,6 +37,7 @@ public sealed class StateContainer
     public ConnectionStorage ConnectionStorage { get; }
     public MessageStorage MessageStorage { get; }
     public ProfileStorage ProfileStorage { get; }
+    public FileStorage FileStorage { get; }
     public StateContext Context { get; }
 
     public State AllChats { get; }
@@ -38,6 +46,7 @@ public sealed class StateContainer
     public State SendMessage { get; }
     public State React { get; }
     public State ManageConnection { get; }
+    public State UploadFile { get; }
 
     public State ChangePassword { get; }
     public State EditProfile { get; }
