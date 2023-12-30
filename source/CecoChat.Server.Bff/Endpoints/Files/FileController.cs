@@ -65,12 +65,15 @@ public class FileController : ControllerBase
             return failure;
         }
 
-        return Ok(new UploadFileResponse
+        UploadFileResponse response = new();
+        response.File = new FileRef
         {
             Bucket = uploadFileResult.Bucket,
             Path = uploadFileResult.Path,
             Version = fileVersion
-        });
+        };
+
+        return Ok(response);
     }
 
     private struct UploadFileResult
