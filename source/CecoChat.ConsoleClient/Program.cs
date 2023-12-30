@@ -147,7 +147,9 @@ public static class Program
     private static async Task RunStateMachine(ChatClient client, MessageStorage messageStorage, ConnectionStorage connectionStorage)
     {
         ProfileStorage profileStorage = new();
-        StateContainer states = new(client, messageStorage, connectionStorage, profileStorage);
+        FileStorage fileStorage = new();
+        StateContainer states = new(client, messageStorage, connectionStorage, profileStorage, fileStorage);
+
         states.Context.ReloadData = true;
         State currentState = states.AllChats;
 

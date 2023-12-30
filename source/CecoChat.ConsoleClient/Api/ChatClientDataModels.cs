@@ -18,6 +18,7 @@ public sealed class AllChatsScreen
     public List<Chat> Chats { get; init; } = new();
     public List<Connection> Connections { get; init; } = new();
     public List<ProfilePublic> Profiles { get; init; } = new();
+    public List<FileRef> Files { get; init; } = new();
 }
 
 public sealed class OneChatScreen

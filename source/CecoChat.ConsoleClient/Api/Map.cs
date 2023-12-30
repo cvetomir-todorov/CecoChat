@@ -114,4 +114,18 @@ public static class Map
             AvatarUrl = bffProfile.AvatarUrl
         };
     }
+
+    public static List<LocalStorage.FileRef> Files(Contracts.Bff.Files.FileRef[] bffFiles)
+    {
+        return bffFiles.Select(File).ToList();
+    }
+
+    public static LocalStorage.FileRef File(Contracts.Bff.Files.FileRef bffFile)
+    {
+        return new LocalStorage.FileRef
+        {
+            Name = Path.Combine(bffFile.Bucket, bffFile.Path),
+            Version = bffFile.Version
+        };
+    }
 }

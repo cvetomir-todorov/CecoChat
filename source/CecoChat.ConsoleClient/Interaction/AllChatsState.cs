@@ -22,10 +22,11 @@ public sealed class AllChatsState : State
         Console.Clear();
         DisplayUserData();
         Console.WriteLine("Chat with a user (press '0'...'9') | New (press 'n') | Refresh (press 'f') | Local refresh (press 'l')");
-        Console.WriteLine("Change password (press 'p') | Edit profile (press 'e')");
+        Console.WriteLine("Change password (press 'p') | Edit profile (press 'e') | Upload file (press 'u')");
         Console.WriteLine("Exit (press 'x')");
-        Console.WriteLine("=================================================================================================");
-
+        DisplaySplitter();
+        DisplayUserFiles();
+        DisplaySplitter();
         List<long> userIds = DisplayUsers();
 
         ConsoleKeyInfo keyInfo = Console.ReadKey(intercept: true);
@@ -33,12 +34,12 @@ public sealed class AllChatsState : State
         {
             return ProcessNumberKey(keyInfo, userIds);
         }
-        else if (keyInfo.KeyChar == 'n' || keyInfo.KeyChar == 'N')
+        else if (keyInfo.KeyChar == 'n')
         {
             Context.ReloadData = false;
             return States.FindUser;
         }
-        else if (keyInfo.KeyChar == 'f' || keyInfo.KeyChar == 'F')
+        else if (keyInfo.KeyChar == 'f')
         {
             Context.ReloadData = true;
             return States.AllChats;
@@ -51,7 +52,11 @@ public sealed class AllChatsState : State
         {
             return States.EditProfile;
         }
-        else if (keyInfo.KeyChar == 'x' || keyInfo.KeyChar == 'X')
+        else if (keyInfo.KeyChar == 'u')
+        {
+            return States.UploadFile;
+        }
+        else if (keyInfo.KeyChar == 'x')
         {
             return States.Final;
         }
@@ -79,6 +84,8 @@ public sealed class AllChatsState : State
         {
             ProfileStorage.AddOrUpdateProfile(profile);
         }
+        
+        UserFiles.UpdateUserFiles(screen.Files);
 
         _lastKnownChatState = currentState;
     }

@@ -3,6 +3,7 @@ using CecoChat.Contracts.Bff;
 using CecoChat.Contracts.Bff.Auth;
 using CecoChat.Contracts.Bff.Chats;
 using CecoChat.Contracts.Bff.Connections;
+using CecoChat.Contracts.Bff.Files;
 using CecoChat.Contracts.Bff.Profiles;
 using CecoChat.Contracts.Bff.Screens;
 using CecoChat.Contracts.Messaging;
@@ -230,12 +231,14 @@ public sealed class ChatClient : IAsyncDisposable
         List<LocalStorage.Chat> chats = Map.BffChats(response.Chats, UserId);
         List<LocalStorage.Connection> connections = Map.Connections(response.Connections);
         List<LocalStorage.ProfilePublic> profiles = Map.PublicProfiles(response.Profiles);
+        List<LocalStorage.FileRef> files = Map.Files(response.Files);
 
         return new AllChatsScreen
         {
             Chats = chats,
             Connections = connections,
-            Profiles = profiles
+            Profiles = profiles,
+            Files = files
         };
     }
 
@@ -339,6 +342,24 @@ public sealed class ChatClient : IAsyncDisposable
         IApiResponse<RemoveConnectionResponse> apiResponse = await _bffClient.RemoveConnection(connectionId, request, _accessToken!);
 
         ClientResponse<RemoveConnectionResponse> response = new();
+        ProcessApiResponse(apiResponse, response);
+
+        if (response.Success)
+        {
+            response.Content = apiResponse.Content;
+        }
+
+        return response;
+    }
+
+    public async Task<ClientResponse<UploadFileResponse>> UploadFile(string filePath, string contentType)
+    {
+        Stream file = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+        string fileName = Path.GetFileName(filePath);
+        StreamPart part = new(file, fileName, contentType, fileName);
+        IApiResponse<UploadFileResponse> apiResponse = await _bffClient.UploadFile(file.Length, part, _accessToken!);
+
+        ClientResponse<UploadFileResponse> response = new();
         ProcessApiResponse(apiResponse, response);
 
         if (response.Success)
