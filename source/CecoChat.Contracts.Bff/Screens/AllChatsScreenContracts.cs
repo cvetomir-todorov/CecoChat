@@ -1,9 +1,9 @@
 using System.Text.Json.Serialization;
 using CecoChat.Contracts.Bff.Chats;
 using CecoChat.Contracts.Bff.Connections;
+using CecoChat.Contracts.Bff.Files;
 using CecoChat.Contracts.Bff.Profiles;
 using Refit;
-using File = CecoChat.Contracts.Bff.Files.File;
 
 namespace CecoChat.Contracts.Bff.Screens;
 
@@ -30,7 +30,7 @@ public sealed class GetAllChatsScreenResponse
 
     [JsonPropertyName("files")]
     [AliasAs("files")]
-    public File[] Files { get; init; } = Array.Empty<File>();
+    public FileRef[] Files { get; init; } = Array.Empty<FileRef>();
 
     [JsonPropertyName("profiles")]
     [AliasAs("profiles")]

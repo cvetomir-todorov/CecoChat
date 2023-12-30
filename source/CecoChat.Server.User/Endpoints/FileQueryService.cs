@@ -3,7 +3,6 @@ using CecoChat.Data.User.Files;
 using CecoChat.Server.Identity;
 using Grpc.Core;
 using Microsoft.AspNetCore.Authorization;
-using File = CecoChat.Contracts.User.File;
 
 namespace CecoChat.Server.User.Endpoints;
 
@@ -25,7 +24,7 @@ public class FileQueryService : FileQuery.FileQueryBase
     {
         UserClaims userClaims = context.GetUserClaimsGrpc(_logger);
 
-        IEnumerable<File> files = await _queryRepo.GetUserFiles(userClaims.UserId);
+        IEnumerable<FileRef> files = await _queryRepo.GetUserFiles(userClaims.UserId);
 
         GetUserFilesResponse response = new();
         response.Files.AddRange(files);

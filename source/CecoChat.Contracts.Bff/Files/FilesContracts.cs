@@ -19,7 +19,7 @@ public sealed class UploadFileResponse
     public DateTime Version { get; init; }
 }
 
-public sealed class File
+public sealed class FileRef
 {
     [JsonPropertyName("bucket")]
     [AliasAs("bucket")]
