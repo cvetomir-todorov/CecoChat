@@ -3,12 +3,25 @@
   "profiles": {
     "Bff": {
       "commandName": "Project",
-      "dotnetRunMessages": "true",
+      "dotnetRunMessages": true,
       "launchBrowser": false,
       "launchUrl": "",
       "applicationUrl": "https://+:31003",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    "Bff-pigpen": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": false,
+      "launchUrl": "",
+      "applicationUrl": "https://+:31003",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "CECOCHAT_Backplane__Kafka__BootstrapServers__0": "pigpen:9091",
+        "CECOCHAT_Backplane__Kafka__BootstrapServers__1": "pigpen:9092",
+        "CECOCHAT_FileStorage__Endpoint": "http://pigpen:9010"
       }
     }
   }
