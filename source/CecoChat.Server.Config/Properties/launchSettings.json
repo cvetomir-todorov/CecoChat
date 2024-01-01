@@ -1,14 +1,28 @@
 ﻿{
   "$schema": "https://json.schemastore.org/launchsettings.json",
   "profiles": {
-    "https": {
+    "Config": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": false,
       "launchUrl": "",
-      "applicationUrl": "https://localhost:31006",
+      "applicationUrl": "https://+:31006",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    "Config-pigpen": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": false,
+      "launchUrl": "",
+      "applicationUrl": "https://+:31006",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "CECOCHAT_ConfigDb__Init__ConnectionString": "Host=pigpen:5433,pigpen:5434;Database=postgres;Username=yugabyte;Password=yugabyte;",
+        "CECOCHAT_ConfigDb__Connect__ConnectionString": "Host=pigpen:5433,pigpen:5434;Database=config;Username=cecochat_dev;Password=secret;Keepalive=30;Load Balance Hosts=true;",
+        "CECOCHAT_Backplane__Kafka__BootstrapServers__0": "pigpen:9091",
+        "CECOCHAT_Backplane__Kafka__BootstrapServers__1": "pigpen:9092"
       }
     }
   }

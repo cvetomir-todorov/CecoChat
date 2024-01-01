@@ -1,9 +1,9 @@
 ﻿{
-  "$schema": "http://json.schemastore.org/launchsettings.json",
+  "$schema": "https://json.schemastore.org/launchsettings.json",
   "profiles": {
     "Messaging-0": {
       "commandName": "Project",
-      "dotnetRunMessages": "true",
+      "dotnetRunMessages": true,
       "launchBrowser": false,
       "launchUrl": "",
       "applicationUrl": "https://+:31000",
@@ -15,7 +15,7 @@
     },
     "Messaging-1": {
       "commandName": "Project",
-      "dotnetRunMessages": "true",
+      "dotnetRunMessages": true,
       "launchBrowser": false,
       "launchUrl": "",
       "applicationUrl": "https://+:31001",
@@ -23,6 +23,34 @@
         "ASPNETCORE_ENVIRONMENT": "Development",
         "CECOCHAT_Config__ServerID": "1",
         "CECOCHAT_Backplane__ConfigChangesConsumer__ConsumerGroupId": "messaging1"
+      }
+    },
+    "Messaging-0-pigpen": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": false,
+      "launchUrl": "",
+      "applicationUrl": "https://+:31000",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "CECOCHAT_Config__ServerID": "0",
+        "CECOCHAT_Backplane__ConfigChangesConsumer__ConsumerGroupId": "messaging0",
+        "CECOCHAT_Backplane__Kafka__BootstrapServers__0": "pigpen:9091",
+        "CECOCHAT_Backplane__Kafka__BootstrapServers__1": "pigpen:9092"
+      }
+    },
+    "Messaging-1-pigpen": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": false,
+      "launchUrl": "",
+      "applicationUrl": "https://+:31001",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "CECOCHAT_Config__ServerID": "1",
+        "CECOCHAT_Backplane__ConfigChangesConsumer__ConsumerGroupId": "messaging1",
+        "CECOCHAT_Backplane__Kafka__BootstrapServers__0": "pigpen:9091",
+        "CECOCHAT_Backplane__Kafka__BootstrapServers__1": "pigpen:9092"
       }
     }
   }
