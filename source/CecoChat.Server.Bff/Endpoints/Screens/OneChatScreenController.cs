@@ -59,7 +59,7 @@ public class OneChatScreenController : ControllerBase
         Task<IReadOnlyCollection<Contracts.Chats.HistoryMessage>> messagesTask = _chatsClient.GetChatHistory(userClaims.UserId, request.OtherUserId, request.MessagesOlderThan, accessToken, ct);
         tasks.AddLast(messagesTask);
 
-        Task<Contracts.User.ProfilePublic>? profileTask = null;
+        Task<Contracts.User.ProfilePublic?>? profileTask = null;
         if (request.IncludeProfile)
         {
             profileTask = _profileClient.GetPublicProfile(userClaims.UserId, request.OtherUserId, accessToken, ct);
@@ -81,8 +81,11 @@ public class OneChatScreenController : ControllerBase
         ProfilePublic? profile = null;
         if (request.IncludeProfile)
         {
-            Contracts.User.ProfilePublic serviceProfile = profileTask!.Result;
-            profile = _mapper.Map<ProfilePublic>(serviceProfile);
+            Contracts.User.ProfilePublic? serviceProfile = profileTask!.Result;
+            if (serviceProfile != null)
+            {
+                profile = _mapper.Map<ProfilePublic>(serviceProfile);
+            }
         }
 
         Connection? connection = null;
@@ -95,7 +98,7 @@ public class OneChatScreenController : ControllerBase
             }
         }
 
-        _logger.LogTrace("Responding with {MessageCount} message(s) older than {OlderThan} for chat between {UserId} and {OtherUserId} and (if requested) the profile of and the connection with the other user {OtherUserId}",
+        _logger.LogTrace("Responding with {MessageCount} message(s) older than {OlderThan} for chat between {UserId} and {OtherUserId} and, if requested and existing - the profile of and the connection with the other user {OtherUserId}",
             messages.Length, request.MessagesOlderThan, userClaims.UserId, request.OtherUserId, request.OtherUserId);
         return Ok(new GetOneChatScreenResponse
         {

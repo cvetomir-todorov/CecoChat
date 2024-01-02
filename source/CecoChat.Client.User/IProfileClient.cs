@@ -8,7 +8,7 @@ public interface IProfileClient
 
     Task<UpdateProfileResult> UpdateProfile(ProfileUpdate profile, long userId, string accessToken, CancellationToken ct);
 
-    Task<ProfilePublic> GetPublicProfile(long userId, long requestedUserId, string accessToken, CancellationToken ct);
+    Task<ProfilePublic?> GetPublicProfile(long userId, long requestedUserId, string accessToken, CancellationToken ct);
 
     Task<IReadOnlyCollection<ProfilePublic>> GetPublicProfiles(long userId, IEnumerable<long> requestedUserIds, string accessToken, CancellationToken ct);
 }

@@ -254,16 +254,11 @@ public sealed class ChatClient : IAsyncDisposable
         };
         GetOneChatScreenResponse response = await _bffClient.GetOneChatScreen(request, _accessToken!);
 
-        if (includeProfile && response.Profile == null)
-        {
-            throw new InvalidOperationException("Loading one chat screen requested a profile, but it was not returned.");
-        }
-
         List<LocalStorage.Message> messages = Map.BffMessages(response.Messages);
         LocalStorage.ProfilePublic? profile = null;
-        if (includeProfile)
+        if (includeProfile && response.Profile != null)
         {
-            profile = Map.PublicProfile(response.Profile!);
+            profile = Map.PublicProfile(response.Profile);
         }
 
         LocalStorage.Connection? connection = null;
