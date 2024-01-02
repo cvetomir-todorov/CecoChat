@@ -15,6 +15,14 @@ public sealed class MessageStorage
         _chatMap = new();
     }
 
+    public void AddOrUpdateChats(IEnumerable<Chat> chats)
+    {
+        foreach (Chat chat in chats)
+        {
+            AddOrUpdateChat(chat);
+        }
+    }
+
     public void AddOrUpdateChat(Chat chat)
     {
         Chat targetChat = _chatMap.GetOrAdd(chat.OtherUserId, _ => chat);
