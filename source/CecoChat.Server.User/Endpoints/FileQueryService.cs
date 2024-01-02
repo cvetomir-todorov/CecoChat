@@ -24,12 +24,12 @@ public class FileQueryService : FileQuery.FileQueryBase
     {
         UserClaims userClaims = context.GetUserClaimsGrpc(_logger);
 
-        IEnumerable<FileRef> files = await _queryRepo.GetUserFiles(userClaims.UserId);
+        IEnumerable<FileRef> files = await _queryRepo.GetUserFiles(userClaims.UserId, request.NewerThan.ToDateTime());
 
         GetUserFilesResponse response = new();
         response.Files.AddRange(files);
 
-        _logger.LogTrace("Responding with {FileCount} files for user {UserId}", response.Files.Count, userClaims.UserId);
+        _logger.LogTrace("Responding with {FileCount} files for user {UserId} which are newer than {NewerThan}", response.Files.Count, userClaims.UserId, request.NewerThan);
         return response;
     }
 }

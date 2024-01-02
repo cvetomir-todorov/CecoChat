@@ -18,15 +18,15 @@ internal sealed class FileQueryRepo : IFileQueryRepo
         _dbContext = dbContext;
     }
 
-    public async Task<IReadOnlyCollection<FileRef>> GetUserFiles(long userId)
+    public async Task<IReadOnlyCollection<FileRef>> GetUserFiles(long userId, DateTime newerThan)
     {
         List<FileRef> files = await _dbContext.Files
-            .Where(entity => entity.UserId == userId)
+            .Where(entity => entity.UserId == userId && entity.Version > newerThan)
             .Select(entity => MapFile(entity))
             .AsNoTracking()
             .ToListAsync();
 
-        _logger.LogTrace("Fetched {FileCount} files for user {UserId}", files.Count, userId);
+        _logger.LogTrace("Fetched {FileCount} files for user {UserId} which are newer than {NewerThan}", files.Count, userId, newerThan);
         return files;
     }
 

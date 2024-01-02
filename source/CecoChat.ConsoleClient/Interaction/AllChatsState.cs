@@ -70,8 +70,8 @@ public sealed class AllChatsState : State
 
     private async Task Load()
     {
-        DateTime currentState = DateTime.UtcNow;
-        AllChatsScreen screen = await Client.LoadAllChatsScreen(_lastKnownChatState, includeProfiles: true);
+        DateTime newLastKnownState = DateTime.UtcNow;
+        AllChatsScreen screen = await Client.LoadAllChatsScreen(chatsNewerThan: _lastKnownChatState, filesNewerThan: _lastKnownChatState, includeProfiles: true);
 
         foreach (Chat chat in screen.Chats)
         {
@@ -87,7 +87,7 @@ public sealed class AllChatsState : State
         
         UserFiles.UpdateUserFiles(screen.Files);
 
-        _lastKnownChatState = currentState;
+        _lastKnownChatState = newLastKnownState;
     }
 
     private List<long> DisplayUsers()

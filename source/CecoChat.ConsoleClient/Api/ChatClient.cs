@@ -214,11 +214,12 @@ public sealed class ChatClient : IAsyncDisposable
         return profiles;
     }
 
-    public async Task<AllChatsScreen> LoadAllChatsScreen(DateTime chatsNewerThan, bool includeProfiles)
+    public async Task<AllChatsScreen> LoadAllChatsScreen(DateTime chatsNewerThan, DateTime filesNewerThan, bool includeProfiles)
     {
         GetAllChatsScreenRequest request = new()
         {
             ChatsNewerThan = chatsNewerThan,
+            FilesNewerThan = filesNewerThan,
             IncludeProfiles = includeProfiles
         };
         GetAllChatsScreenResponse response = await _bffClient.GetAllChatsScreen(request, _accessToken!);

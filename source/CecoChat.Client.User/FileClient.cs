@@ -1,5 +1,6 @@
 using CecoChat.Contracts.User;
 using CecoChat.Grpc;
+using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -28,16 +29,17 @@ internal sealed class FileClient : IFileClient
         _clock = clock;
     }
 
-    public async Task<IReadOnlyCollection<FileRef>> GetUserFiles(long userId, string accessToken, CancellationToken ct)
+    public async Task<IReadOnlyCollection<FileRef>> GetUserFiles(long userId, DateTime newerThan, string accessToken, CancellationToken ct)
     {
         GetUserFilesRequest request = new();
+        request.NewerThan = newerThan.ToTimestamp();
 
         Metadata headers = new();
         headers.AddAuthorization(accessToken);
         DateTime deadline = _clock.GetNowUtc().Add(_options.CallTimeout);
         GetUserFilesResponse response = await _fileQueryClient.GetUserFilesAsync(request, headers, deadline, ct);
 
-        _logger.LogTrace("Received {FileCount} files for user {UserId}", response.Files.Count, userId);
+        _logger.LogTrace("Received {FileCount} files for user {UserId} which are newer than {NewerThan}", response.Files.Count, userId, newerThan);
         return response.Files;
     }
 
