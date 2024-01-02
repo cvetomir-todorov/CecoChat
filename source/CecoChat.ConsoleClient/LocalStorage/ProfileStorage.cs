@@ -19,6 +19,14 @@ public class ProfileStorage
         }
     }
 
+    public void AddOrUpdateProfiles(IEnumerable<ProfilePublic> profiles)
+    {
+        foreach (ProfilePublic profile in profiles)
+        {
+            AddOrUpdateProfile(profile);
+        }
+    }
+
     public void AddOrUpdateProfile(ProfilePublic profile)
     {
         if (!_profilesMap.TryAdd(profile.UserId, profile))

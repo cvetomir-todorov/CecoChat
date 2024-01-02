@@ -73,18 +73,9 @@ public sealed class AllChatsState : State
         DateTime newLastKnownState = DateTime.UtcNow;
         AllChatsScreen screen = await Client.LoadAllChatsScreen(chatsNewerThan: _lastKnownChatState, filesNewerThan: _lastKnownChatState, includeProfiles: true);
 
-        foreach (Chat chat in screen.Chats)
-        {
-            MessageStorage.AddOrUpdateChat(chat);
-        }
-
+        MessageStorage.AddOrUpdateChats(screen.Chats);
         ConnectionStorage.UpdateConnections(screen.Connections);
-
-        foreach (ProfilePublic profile in screen.Profiles)
-        {
-            ProfileStorage.AddOrUpdateProfile(profile);
-        }
-        
+        ProfileStorage.AddOrUpdateProfiles(screen.Profiles);
         UserFiles.UpdateUserFiles(screen.Files);
 
         _lastKnownChatState = newLastKnownState;
