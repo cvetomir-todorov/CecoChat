@@ -22,10 +22,12 @@
         "CECOCHAT_Backplane__Kafka__BootstrapServers__0": "pigpen:9091",
         "CECOCHAT_Backplane__Kafka__BootstrapServers__1": "pigpen:9092",
         "CECOCHAT_UserDb__Init__ConnectionString": "Host=pigpen:5433,pigpen:5434;Database=postgres;Username=yugabyte;Password=yugabyte;",
-        "CECOCHAT_UserDb__Connect__ConnectionString": "Host=pigpen:5433,pigpen:5434;Database=users;Username=cecochat_dev;Password=secret;Keepalive=30;Load Balance Hosts=true;",
-        "CECOCHAT_UserCache__Store__Endpoints__0": "pigpen:6379",
-        "CECOCHAT_UserCache__Store__Endpoints__1": "pigpen:6380",
-        "CECOCHAT_UserCache__Store__Endpoints__2": "pigpen:6381"
+        "CECOCHAT_UserDb__Connect__ConnectionString": "Host=pigpen:5433,pigpen:5434;Database=users;Username=cecochat_dev;Password=secret;Keepalive=30;Load Balance Hosts=true;"
+        // avoid using these until Redis team actually fixes the issue with accessing a Redis cluster behind NAT
+        // https://github.com/redis/redis/issues/7460
+        //"CECOCHAT_UserCache__Store__Endpoints__0": "pigpen:6379",
+        //"CECOCHAT_UserCache__Store__Endpoints__1": "pigpen:6380",
+        //"CECOCHAT_UserCache__Store__Endpoints__2": "pigpen:6381"
       }
     }
   }
