@@ -60,7 +60,7 @@ public class AllChatsScreenController : ControllerBase
 
         Task<IReadOnlyCollection<Contracts.Chats.ChatState>> chatsTask = _chatsClient.GetUserChats(userClaims.UserId, request.ChatsNewerThan, accessToken, ct);
         Task<IReadOnlyCollection<Contracts.User.Connection>> connectionsTask = _connectionClient.GetConnections(userClaims.UserId, accessToken, ct);
-        Task<IReadOnlyCollection<Contracts.User.FileRef>> filesTask = _fileClient.GetUserFiles(userClaims.UserId, accessToken, ct);
+        Task<IReadOnlyCollection<Contracts.User.FileRef>> filesTask = _fileClient.GetUserFiles(userClaims.UserId, request.FilesNewerThan, accessToken, ct);
 
         await Task.WhenAll(chatsTask, connectionsTask, filesTask);
 
@@ -73,8 +73,8 @@ public class AllChatsScreenController : ControllerBase
         Connection[] connections = _mapper.Map<Connection[]>(serviceConnections);
         FileRef[] files = _mapper.Map<FileRef[]>(serviceFiles);
 
-        _logger.LogTrace("Responding with {ChatCount} chats newer than {NewerThan}, {ConnectionCount} connections, {FileCount} files, {ProfileCount} profiles for all-chats-screen requested by user {UserId}",
-            chats.Length, request.ChatsNewerThan, connections.Length, files.Length, profiles.Length, userClaims.UserId);
+        _logger.LogTrace("Responding with {ChatCount} chats newer than {ChatsNewerThan}, {ConnectionCount} connections, {FileCount} files newer than {FilesNewerThan}, {ProfileCount} profiles for all-chats-screen requested by user {UserId}",
+            chats.Length, request.ChatsNewerThan, connections.Length, files.Length, request.FilesNewerThan, profiles.Length, userClaims.UserId);
         return Ok(new GetAllChatsScreenResponse
         {
             Chats = chats,

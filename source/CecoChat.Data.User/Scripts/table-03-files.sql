@@ -12,9 +12,9 @@ WITH
 )
 TABLESPACE pg_default;
 
-CREATE INDEX "Files_UserId_index"
+CREATE INDEX "Files_UserId_Version_index"
     ON public."Files" USING btree
-        ("UserId" ASC NULLS LAST);
+        ("UserId" ASC NULLS LAST, "Version" ASC NULLS LAST);
 
 ALTER TABLE IF EXISTS public."Files"
     ADD CONSTRAINT "Files_UserId_foreign"

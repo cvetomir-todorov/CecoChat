@@ -13,6 +13,10 @@ public sealed class GetAllChatsScreenRequest
     [AliasAs("chatsNewerThan")]
     public DateTime ChatsNewerThan { get; init; }
 
+    [JsonPropertyName("filesNewerThan")]
+    [AliasAs("filesNewerThan")]
+    public DateTime FilesNewerThan { get; init; }
+
     [JsonPropertyName("includeProfiles")]
     [AliasAs("includeProfiles")]
     public bool IncludeProfiles { get; init; }

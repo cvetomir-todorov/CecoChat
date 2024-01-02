@@ -4,6 +4,5 @@ namespace CecoChat.Data.User.Files;
 
 public interface IFileQueryRepo
 {
-    // TODO: add date time filter
-    Task<IReadOnlyCollection<FileRef>> GetUserFiles(long userId);
+    Task<IReadOnlyCollection<FileRef>> GetUserFiles(long userId, DateTime newerThan);
 }
