@@ -94,7 +94,7 @@ internal sealed class ProfileClient : IProfileClient
         throw new ProcessingFailureException(typeof(UpdateProfileResponse));
     }
 
-    public async Task<ProfilePublic> GetPublicProfile(long userId, long requestedUserId, string accessToken, CancellationToken ct)
+    public async Task<ProfilePublic?> GetPublicProfile(long userId, long requestedUserId, string accessToken, CancellationToken ct)
     {
         GetPublicProfileRequest request = new();
         request.UserId = requestedUserId;
@@ -102,10 +102,19 @@ internal sealed class ProfileClient : IProfileClient
         Metadata headers = new();
         headers.AddAuthorization(accessToken);
         DateTime deadline = _clock.GetNowUtc().Add(_options.CallTimeout);
-        GetPublicProfileResponse response = await _profileQueryClient.GetPublicProfileAsync(request, headers, deadline, ct);
 
-        _logger.LogTrace("Received profile for user {RequestedUserId} requested by user {UserId}", requestedUserId, userId);
-        return response.Profile;
+        try
+        {
+            GetPublicProfileResponse response = await _profileQueryClient.GetPublicProfileAsync(request, headers, deadline, ct);
+
+            _logger.LogTrace("Received profile for user {RequestedUserId} requested by user {UserId}", requestedUserId, userId);
+            return response.Profile;
+        }
+        catch (RpcException rpcException) when (rpcException.Status.StatusCode == StatusCode.NotFound)
+        {
+            _logger.LogTrace("Received missing profile for user {RequestedUserId} requested by user {UserId}", requestedUserId, userId);
+            return null;
+        }
     }
 
     public async Task<IReadOnlyCollection<ProfilePublic>> GetPublicProfiles(long userId, IEnumerable<long> requestedUserIds, string accessToken, CancellationToken ct)

@@ -13,7 +13,13 @@ public sealed class OneChatState : State
     {
         if (Context.ReloadData)
         {
-            await Load(Context.UserId);
+            bool userExists = await Load(Context.UserId);
+            if (!userExists)
+            {
+                Console.WriteLine("User with ID {0} doesn't exist, press ENTER to return to all chats", Context.UserId);
+                Console.ReadLine();
+                return States.AllChats;
+            }
         }
 
         List<Message> messages = MessageStorage.GetChatMessages(Context.UserId);
@@ -70,23 +76,27 @@ public sealed class OneChatState : State
         }
     }
 
-    private async Task Load(long otherUserId)
+    private async Task<bool> Load(long otherUserId)
     {
         OneChatScreen screen = await Client.LoadOneChatScreen(otherUserId, messagesOlderThan: DateTime.UtcNow, includeProfile: true, includeConnection: true);
+        if (screen.Profile == null)
+        {
+            return false;
+        }
 
         foreach (Message message in screen.Messages)
         {
             MessageStorage.AddMessage(message);
         }
 
-        if (screen.Profile != null)
-        {
-            ProfileStorage.AddOrUpdateProfile(screen.Profile);
-        }
+        ProfileStorage.AddOrUpdateProfile(screen.Profile);
+
         if (screen.Connection != null)
         {
             ConnectionStorage.UpdateConnection(screen.Connection);
         }
+
+        return true;
     }
 
     private void DisplayMessage(Message message, ProfilePublic profilePublic)

@@ -34,6 +34,7 @@ public class ProfileController : ControllerBase
     [Authorize(Policy = "user")]
     [HttpGet("{id}", Name = "GetPublicProfile")]
     [ProducesResponseType(typeof(GetPublicProfileResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetPublicProfile([FromRoute(Name = "id")] long requestedUserId, CancellationToken ct)
     {
         if (!HttpContext.TryGetUserClaimsAndAccessToken(_logger, out UserClaims? userClaims, out string? accessToken))
@@ -41,8 +42,17 @@ public class ProfileController : ControllerBase
             return Unauthorized();
         }
 
-        Contracts.User.ProfilePublic profile = await _profileClient.GetPublicProfile(userClaims.UserId, requestedUserId, accessToken, ct);
-        GetPublicProfileResponse response = new() { Profile = _mapper.Map<ProfilePublic>(profile) };
+        Contracts.User.ProfilePublic? profile = await _profileClient.GetPublicProfile(userClaims.UserId, requestedUserId, accessToken, ct);
+        if (profile == null)
+        {
+            _logger.LogTrace("Responding with missing profile for user {RequestedUserId} requested by user {UserId}", requestedUserId, userClaims.UserId);
+            return NotFound();
+        }
+
+        GetPublicProfileResponse response = new()
+        {
+            Profile = _mapper.Map<ProfilePublic>(profile)
+        };
 
         _logger.LogTrace("Responding with profile for user {RequestedUserId} requested by user {UserId}", requestedUserId, userClaims.UserId);
         return Ok(response);
