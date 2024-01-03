@@ -91,4 +91,9 @@ public interface IBffClient : IDisposable
         [Header(HeaderUploadedFileSize)] long fileSize,
         [AliasAs("file")] StreamPart stream,
         [Authorize(AuthorizationScheme)] string accessToken);
+
+    [Get("/api/files")]
+    Task<IApiResponse<HttpContent>> DownloadFile(
+        [Query] DownloadFileRequest request,
+        [Authorize(AuthorizationScheme)] string accessToken);
 }

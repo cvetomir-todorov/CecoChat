@@ -20,7 +20,7 @@ namespace CecoChat.Server.Bff.Endpoints.Files;
 [ProducesResponseType(StatusCodes.Status401Unauthorized)]
 [ProducesResponseType(StatusCodes.Status403Forbidden)]
 [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-public class FileController : ControllerBase
+public class UploadFileController : ControllerBase
 {
     private const int FileSizeLimitBytes = 512 * 1024; // 512KB
     private readonly ILogger _logger;
@@ -28,8 +28,8 @@ public class FileController : ControllerBase
     private readonly IFileStorage _fileStorage;
     private readonly IFileClient _fileClient;
 
-    public FileController(
-        ILogger<FileController> logger,
+    public UploadFileController(
+        ILogger<UploadFileController> logger,
         IMinioContext minio,
         IFileStorage fileStorage,
         IFileClient fileClient)
