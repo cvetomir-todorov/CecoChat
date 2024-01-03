@@ -62,6 +62,7 @@ public sealed class StateContext
 {
     public bool ReloadData { get; set; }
     public long UserId { get; set; }
-    public string DownloadFileBucket { get; set; } = string.Empty;
-    public string DownloadFilePath { get; set; } = string.Empty;
+    public DateTime LastKnownChatsState { get; set; }
+    public DateTime LastKnownFilesState { get; set; }
+    public FileRef DownloadFile { get; set; } = null!;
 }

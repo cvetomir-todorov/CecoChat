@@ -7,16 +7,16 @@ public class FilesState : State
     public FilesState(StateContainer states) : base(states)
     { }
 
-    public override Task<State> Execute()
+    public override async Task<State> Execute()
     {
         if (Context.ReloadData)
         {
-            // TODO: load files
+            await Load();
         }
 
         Console.Clear();
         DisplayUserData();
-        Console.WriteLine("Download a file (press '0'...'9') | Upload a file (press 'u')");
+        Console.WriteLine("Download a file (press '0'...'9') | Upload a file (press 'u') | Refresh (press 'f')");
         Console.WriteLine("Exit (press 'x')");
         DisplaySplitter();
         List<FileRef> userFiles = DisplayUserFiles();
@@ -25,34 +25,49 @@ public class FilesState : State
         if (char.IsNumber(keyInfo.KeyChar))
         {
             State state = ProcessNumberKey(keyInfo, userFiles);
-            return Task.FromResult(state);
+            return state;
         }
         else if (keyInfo.KeyChar == 'u')
         {
             Context.ReloadData = true;
-            return Task.FromResult(States.UploadFile);
+            return States.UploadFile;
+        }
+        else if (keyInfo.KeyChar == 'f')
+        {
+            Context.ReloadData = true;
+            return States.Files;
         }
         else if (keyInfo.KeyChar == 'x')
         {
             Context.ReloadData = true;
-            return Task.FromResult(States.AllChats);
+            return States.AllChats;
         }
         else
         {
             // includes local refresh
             Context.ReloadData = false;
-            return Task.FromResult(States.Files);
+            return States.Files;
         }
     }
 
-    private new List<FileRef> DisplayUserFiles()
+    private async Task Load()
+    {
+        DateTime newLastKnownState = DateTime.UtcNow;
+
+        List<FileRef> userFiles = await Client.GetUserFiles(newerThan: Context.LastKnownFilesState);
+        UserFiles.UpdateUserFiles(userFiles);
+
+        Context.LastKnownFilesState = newLastKnownState;
+    }
+
+    private List<FileRef> DisplayUserFiles()
     {
         List<FileRef> userFiles = new();
         int key = 0;
 
-        foreach (FileRef userFile in UserFiles.EnumerateUserFiles())
+        foreach (FileRef userFile in UserFiles.EnumerateUserFiles().OrderByDescending(file => file.Version))
         {
-            DisplayUserFile(userFile, key);
+            Console.WriteLine("Press '{0}' for: {1}/{2}    {3:F}", key, userFile.Bucket, userFile.Path, userFile.Version);
             userFiles.Add(userFile);
             key++;
         }
@@ -70,9 +85,7 @@ public class FilesState : State
         }
         else
         {
-            Context.DownloadFileBucket = userFiles[index].Bucket;
-            Context.DownloadFilePath = userFiles[index].Path;
-
+            Context.DownloadFile = userFiles[index];
             Context.ReloadData = true;
             return States.DownloadFile;
         }

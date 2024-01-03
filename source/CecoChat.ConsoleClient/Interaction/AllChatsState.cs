@@ -5,11 +5,10 @@ namespace CecoChat.ConsoleClient.Interaction;
 
 public sealed class AllChatsState : State
 {
-    private DateTime _lastKnownChatState;
-
     public AllChatsState(StateContainer states) : base(states)
     {
-        _lastKnownChatState = Snowflake.Epoch;
+        Context.LastKnownChatsState = Snowflake.Epoch;
+        Context.LastKnownFilesState = Snowflake.Epoch;
     }
 
     public override async Task<State> Execute()
@@ -24,8 +23,6 @@ public sealed class AllChatsState : State
         Console.WriteLine("Chat with a user (press '0'...'9') | New (press 'n') | Refresh (press 'f') | Local refresh (press 'l')");
         Console.WriteLine("Change password (press 'p') | Edit profile (press 'e') | Files (press 'i')");
         Console.WriteLine("Exit (press 'x')");
-        DisplaySplitter();
-        DisplayUserFiles();
         DisplaySplitter();
         List<long> userIds = DisplayUsers();
 
@@ -71,14 +68,19 @@ public sealed class AllChatsState : State
     private async Task Load()
     {
         DateTime newLastKnownState = DateTime.UtcNow;
-        AllChatsScreen screen = await Client.LoadAllChatsScreen(chatsNewerThan: _lastKnownChatState, filesNewerThan: _lastKnownChatState, includeProfiles: true);
+
+        AllChatsScreen screen = await Client.LoadAllChatsScreen(
+            chatsNewerThan: Context.LastKnownChatsState,
+            filesNewerThan: Context.LastKnownFilesState,
+            includeProfiles: true);
 
         MessageStorage.AddOrUpdateChats(screen.Chats);
         ConnectionStorage.UpdateConnections(screen.Connections);
         ProfileStorage.AddOrUpdateProfiles(screen.Profiles);
         UserFiles.UpdateUserFiles(screen.Files);
 
-        _lastKnownChatState = newLastKnownState;
+        Context.LastKnownChatsState = newLastKnownState;
+        Context.LastKnownFilesState = newLastKnownState;
     }
 
     private List<long> DisplayUsers()
