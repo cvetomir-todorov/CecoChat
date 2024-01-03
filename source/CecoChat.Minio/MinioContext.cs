@@ -12,7 +12,7 @@ public interface IMinioContext
 {
     Task<bool> EnsureBucketExists(string bucketName, CancellationToken ct);
 
-    Task<string> UploadFile(string bucketName, string objectName, IDictionary<string, string>? tags, Stream dataStream, long dataLength, CancellationToken ct);
+    Task<string> UploadFile(string bucketName, string objectName, string contentType, IDictionary<string, string>? tags, Stream dataStream, long dataLength, CancellationToken ct);
 
     Task<DownloadFileResult> DownloadFile(string bucketName, string objectName, CancellationToken ct);
 }
@@ -64,11 +64,12 @@ internal class MinioContext : IMinioContext
         }
     }
 
-    public async Task<string> UploadFile(string bucketName, string objectName, IDictionary<string, string>? tags, Stream dataStream, long dataLength, CancellationToken ct)
+    public async Task<string> UploadFile(string bucketName, string objectName, string contentType, IDictionary<string, string>? tags, Stream dataStream, long dataLength, CancellationToken ct)
     {
         PutObjectArgs putObjectArgs = new PutObjectArgs()
             .WithBucket(bucketName)
             .WithObject(objectName)
+            .WithContentType(contentType)
             .WithStreamData(dataStream)
             .WithObjectSize(dataLength);
 

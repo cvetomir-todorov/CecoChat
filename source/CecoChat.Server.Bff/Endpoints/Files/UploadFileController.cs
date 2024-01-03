@@ -98,7 +98,7 @@ public class UploadFileController : ControllerBase
         MultipartReader reader = new(boundary, body);
         MultipartSection? section = await reader.ReadNextSectionAsync(ct);
         FileMultipartSection? fileSection = section?.AsFileSection();
-        if (fileSection == null || fileSection.FileStream == null)
+        if (section == null || fileSection == null || fileSection.FileStream == null)
         {
             ModelState.AddModelError("File", "There is no file multipart section.");
             return new UploadFileResult
@@ -110,11 +110,13 @@ public class UploadFileController : ControllerBase
         string bucketName = _fileStorage.GetCurrentBucketName();
         string extensionWithDot = Path.GetExtension(fileSection.FileName);
         string plannedObjectName = _fileStorage.CreateObjectName(userClaims.UserId, extensionWithDot);
+        string fileContentType = section.ContentType ?? "application/octet-stream";
         IDictionary<string, string> tags = new SortedList<string, string>(capacity: 1);
         tags.Add("user-id", userClaims.UserId.ToString(CultureInfo.InvariantCulture));
 
-        string actualObjectName = await _minio.UploadFile(bucketName, plannedObjectName, tags, fileSection.FileStream, fileSize, ct);
-        _logger.LogTrace("Uploaded successfully a new file sized {FileSize} bytes to bucket {Bucket} with path {Path} for user {UserId}", fileSize, bucketName, actualObjectName, userClaims.UserId);
+        string actualObjectName = await _minio.UploadFile(bucketName, plannedObjectName, fileContentType, tags, fileSection.FileStream, fileSize, ct);
+        _logger.LogTrace("Uploaded successfully a new file with content type {ContentType} sized {FileSize} B to bucket {Bucket} with path {Path} for user {UserId}",
+            fileContentType, fileSize, bucketName, actualObjectName, userClaims.UserId);
 
         return new UploadFileResult
         {
