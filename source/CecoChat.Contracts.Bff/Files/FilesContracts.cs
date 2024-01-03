@@ -3,6 +3,20 @@ using Refit;
 
 namespace CecoChat.Contracts.Bff.Files;
 
+public sealed class GetUserFilesRequest
+{
+    [JsonPropertyName("newerThan")]
+    [AliasAs("newerThan")]
+    public DateTime NewerThan { get; init; }
+}
+
+public sealed class GetUserFilesResponse
+{
+    [JsonPropertyName("files")]
+    [AliasAs("files")]
+    public FileRef[] Files { get; init; } = Array.Empty<FileRef>();
+}
+
 public sealed class UploadFileResponse
 {
     [JsonPropertyName("file")]

@@ -85,6 +85,11 @@ public interface IBffClient : IDisposable
         [Body] RemoveConnectionRequest request,
         [Authorize(AuthorizationScheme)] string accessToken);
 
+    [Get("/api/files/list")]
+    Task<GetUserFilesResponse> GetUserFiles(
+        [Query] GetUserFilesRequest request,
+        [Authorize(AuthorizationScheme)] string accessToken);
+
     [Post("/api/files")]
     [Multipart(boundaryText: "----UserFileBoundary")]
     Task<IApiResponse<UploadFileResponse>> UploadFile(
