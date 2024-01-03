@@ -1,4 +1,4 @@
-using CecoChat.Contracts.Bff.Files;
+using System.Web;
 using CecoChat.Minio;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -27,15 +27,21 @@ public class DownloadFileController : ControllerBase
     }
 
     [Authorize(Policy = "user")]
-    [HttpGet]
+    [HttpGet("{bucket}/{path}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DownloadFile([FromQuery][BindRequired] DownloadFileRequest request, CancellationToken ct)
+    public async Task<IActionResult> DownloadFile(
+        [FromRoute(Name = "bucket")][BindRequired] string urlEncodedBucket,
+        [FromRoute(Name = "path")][BindRequired] string urlEncodedPath,
+        CancellationToken ct)
     {
-        DownloadFileResult result = await _minio.DownloadFile(request.Bucket, request.Path, ct);
+        string bucket = HttpUtility.UrlDecode(urlEncodedBucket);
+        string path = HttpUtility.UrlDecode(urlEncodedPath);
+
+        DownloadFileResult result = await _minio.DownloadFile(bucket, path, ct);
         if (!result.IsFound)
         {
-            _logger.LogTrace("Failed to find file in bucket {Bucket} with path {Path}", request.Bucket, request.Path);
+            _logger.LogTrace("Failed to find file in bucket {Bucket} with path {Path}", bucket, path);
             return NotFound();
         }
 

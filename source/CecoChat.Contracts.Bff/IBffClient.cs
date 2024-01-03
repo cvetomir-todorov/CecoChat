@@ -92,8 +92,9 @@ public interface IBffClient : IDisposable
         [AliasAs("file")] StreamPart stream,
         [Authorize(AuthorizationScheme)] string accessToken);
 
-    [Get("/api/files")]
+    [Get("/api/files/{bucket}/{path}")]
     Task<IApiResponse<HttpContent>> DownloadFile(
-        [Query] DownloadFileRequest request,
+        [AliasAs("bucket")] string bucket,
+        [AliasAs("path")] string path,
         [Authorize(AuthorizationScheme)] string accessToken);
 }

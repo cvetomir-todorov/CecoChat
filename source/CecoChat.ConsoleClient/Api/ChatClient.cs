@@ -366,13 +366,7 @@ public sealed class ChatClient : IAsyncDisposable
 
     public async Task<ClientResponse<Stream>> DownloadFile(string bucket, string path)
     {
-        DownloadFileRequest request = new()
-        {
-            Bucket = bucket,
-            Path = path
-        };
-
-        IApiResponse<HttpContent> apiResponse = await _bffClient.DownloadFile(request, _accessToken!);
+        IApiResponse<HttpContent> apiResponse = await _bffClient.DownloadFile(bucket, path, _accessToken!);
 
         ClientResponse<Stream> response = new();
         ProcessApiResponse(apiResponse, response);
