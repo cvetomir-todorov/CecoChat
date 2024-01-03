@@ -24,3 +24,14 @@ public sealed class FileRef
     [AliasAs("version")]
     public DateTime Version { get; init; }
 }
+
+public sealed class DownloadFileRequest
+{
+    [JsonPropertyName("bucket")]
+    [AliasAs("bucket")]
+    public string Bucket { get; init; } = string.Empty;
+
+    [JsonPropertyName("path")]
+    [AliasAs("path")]
+    public string Path { get; init; } = string.Empty;
+}
