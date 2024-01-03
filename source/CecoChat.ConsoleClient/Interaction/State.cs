@@ -37,12 +37,33 @@ public abstract class State
     {
         foreach (FileRef userFile in UserFiles.EnumerateUserFiles().OrderByDescending(f => f.Version))
         {
-            Console.WriteLine("{0}   {1:F}", userFile.Name, userFile.Version);
+            DisplayUserFile(userFile);
         }
+    }
+
+    protected static void DisplayUserFile(FileRef userFile, int? key = null)
+    {
+        Console.WriteLine("{0}{1}/{2}   {3:F}", key != null ? $"Press '{key}' for: " : string.Empty, userFile.Bucket, userFile.Path, userFile.Version);
     }
 
     protected static void DisplaySplitter()
     {
         Console.WriteLine("=================================================================================================");
+    }
+
+    protected static void DisplayErrors(ClientResponse response)
+    {
+        if (response.Success)
+        {
+            throw new ArgumentException("Response should not be successful when errors are being displayed.", paramName: nameof(response));
+        }
+
+        foreach (string error in response.Errors)
+        {
+            Console.WriteLine(error);
+        }
+
+        Console.WriteLine("Press ENTER to return.");
+        Console.ReadLine();
     }
 }

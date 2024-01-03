@@ -25,7 +25,9 @@ public sealed class StateContainer
         SendMessage = new SendMessageState(this);
         React = new ReactState(this);
         ManageConnection = new ManageConnectionState(this);
+        Files = new FilesState(this);
         UploadFile = new UploadFileState(this);
+        DownloadFile = new DownloadFileState(this);
 
         ChangePassword = new ChangePasswordState(this);
         EditProfile = new EditProfileState(this);
@@ -46,7 +48,9 @@ public sealed class StateContainer
     public State SendMessage { get; }
     public State React { get; }
     public State ManageConnection { get; }
+    public State Files { get; }
     public State UploadFile { get; }
+    public State DownloadFile { get; }
 
     public State ChangePassword { get; }
     public State EditProfile { get; }
@@ -58,4 +62,6 @@ public sealed class StateContext
 {
     public bool ReloadData { get; set; }
     public long UserId { get; set; }
+    public string DownloadFileBucket { get; set; } = string.Empty;
+    public string DownloadFilePath { get; set; } = string.Empty;
 }

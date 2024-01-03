@@ -10,7 +10,7 @@ public class UploadFileState : State
     public UploadFileState(StateContainer states) : base(states)
     {
         _contentTypes = new Dictionary<string, string>();
-        
+
         _contentTypes.Add(".png", "image/png");
         _contentTypes.Add(".jpg", "image/jpg");
         _contentTypes.Add(".jpeg", "image/jpeg");
@@ -23,15 +23,13 @@ public class UploadFileState : State
     {
         Console.Clear();
         DisplayUserData();
-        DisplaySplitter();
-        DisplayUserFiles();
 
         Console.Write("Enter the path to the file to be uploaded or leave empty to exit: ");
         string? filePath = Console.ReadLine();
         if (string.IsNullOrWhiteSpace(filePath))
         {
             Context.ReloadData = true;
-            return States.AllChats;
+            return States.Files;
         }
 
         if (!File.Exists(filePath))
@@ -40,17 +38,19 @@ public class UploadFileState : State
             Console.ReadLine();
 
             Context.ReloadData = true;
-            return States.AllChats;
+            return States.Files;
         }
 
         string contentType = GetContentType(filePath);
 
         Console.WriteLine("Sending file {0} with content type {1}...", filePath, contentType);
-        ClientResponse<Contracts.Bff.Files.UploadFileResponse> response = await Client.UploadFile(filePath, contentType);
+        await using Stream fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+        string fileName = Path.GetFileName(filePath);
+        ClientResponse<Contracts.Bff.Files.UploadFileResponse> response = await Client.UploadFile(fileStream, fileName, contentType);
 
         if (response.Success)
         {
-            Console.WriteLine("Uploaded file to {0}/{1} successfully!", response.Content!.File.Bucket, response.Content!.File.Path);
+            Console.WriteLine("Uploaded file {0}/{1} successfully.", response.Content!.File.Bucket, response.Content!.File.Path);
         }
         else
         {
@@ -63,7 +63,7 @@ public class UploadFileState : State
 
         Console.Write("Press ENTER to continue...");
         Console.ReadLine();
-        return States.AllChats;
+        return States.Files;
     }
 
     private string GetContentType(string filePath)

@@ -124,7 +124,8 @@ public static class Map
     {
         return new LocalStorage.FileRef
         {
-            Name = Path.Combine(bffFile.Bucket, bffFile.Path),
+            Bucket = bffFile.Bucket,
+            Path = bffFile.Path,
             Version = bffFile.Version
         };
     }

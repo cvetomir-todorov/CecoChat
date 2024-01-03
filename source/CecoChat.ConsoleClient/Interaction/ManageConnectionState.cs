@@ -140,17 +140,6 @@ public class ManageConnectionState : State
         }
     }
 
-    private static void DisplayErrors(ClientResponse response)
-    {
-        foreach (string error in response.Errors)
-        {
-            Console.WriteLine(error);
-        }
-
-        Console.WriteLine("If the error persists, try logging again. Press ENTER to return.");
-        Console.ReadLine();
-    }
-
     private static void DisplaySuccess(string successMessage)
     {
         Console.WriteLine(successMessage);
