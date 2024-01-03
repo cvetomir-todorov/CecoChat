@@ -33,19 +33,6 @@ public abstract class State
             Client.UserProfile.Email, Client.UserProfile.Phone, Client.UserProfile.AvatarUrl);
     }
 
-    protected void DisplayUserFiles()
-    {
-        foreach (FileRef userFile in UserFiles.EnumerateUserFiles().OrderByDescending(f => f.Version))
-        {
-            DisplayUserFile(userFile);
-        }
-    }
-
-    protected static void DisplayUserFile(FileRef userFile, int? key = null)
-    {
-        Console.WriteLine("{0}{1}/{2}   {3:F}", key != null ? $"Press '{key}' for: " : string.Empty, userFile.Bucket, userFile.Path, userFile.Version);
-    }
-
     protected static void DisplaySplitter()
     {
         Console.WriteLine("=================================================================================================");

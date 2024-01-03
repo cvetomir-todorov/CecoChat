@@ -29,8 +29,8 @@ public class DownloadFileState : State
             return States.Files;
         }
 
-        Console.WriteLine("Downloading file {0}/{1}...", Context.DownloadFileBucket, Context.DownloadFilePath, filePath);
-        ClientResponse<Stream> response = await Client.DownloadFile(Context.DownloadFileBucket, Context.DownloadFilePath);
+        Console.WriteLine("Downloading file {0}/{1}...", Context.DownloadFile.Bucket, Context.DownloadFile.Path);
+        ClientResponse<Stream> response = await Client.DownloadFile(Context.DownloadFile.Bucket, Context.DownloadFile.Path);
         if (!response.Success)
         {
             DisplayErrors(response);

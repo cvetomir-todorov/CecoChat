@@ -348,6 +348,18 @@ public sealed class ChatClient : IAsyncDisposable
         return response;
     }
 
+    public async Task<List<LocalStorage.FileRef>> GetUserFiles(DateTime newerThan)
+    {
+        GetUserFilesRequest request = new()
+        {
+            NewerThan = newerThan
+        };
+        GetUserFilesResponse response = await _bffClient.GetUserFiles(request, _accessToken!);
+
+        List<LocalStorage.FileRef> files = Map.Files(response.Files);
+        return files;
+    }
+
     public async Task<ClientResponse<UploadFileResponse>> UploadFile(Stream fileStream, string fileName, string contentType)
     {
         StreamPart part = new(fileStream, fileName, contentType, fileName);
