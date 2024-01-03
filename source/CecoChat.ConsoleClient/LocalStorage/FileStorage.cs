@@ -30,7 +30,7 @@ public class FileStorage
     public void UpdateUserFile(FileRef file)
     {
         _userFiles.AddOrUpdate(
-            key: file.Name,
+            key: $"{file.Bucket}/{file.Path}",
             addValueFactory: _ => file,
             updateValueFactory: (_, existing) =>
             {

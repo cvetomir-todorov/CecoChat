@@ -22,7 +22,7 @@ public sealed class AllChatsState : State
         Console.Clear();
         DisplayUserData();
         Console.WriteLine("Chat with a user (press '0'...'9') | New (press 'n') | Refresh (press 'f') | Local refresh (press 'l')");
-        Console.WriteLine("Change password (press 'p') | Edit profile (press 'e') | Upload file (press 'u')");
+        Console.WriteLine("Change password (press 'p') | Edit profile (press 'e') | Files (press 'i')");
         Console.WriteLine("Exit (press 'x')");
         DisplaySplitter();
         DisplayUserFiles();
@@ -52,9 +52,9 @@ public sealed class AllChatsState : State
         {
             return States.EditProfile;
         }
-        else if (keyInfo.KeyChar == 'u')
+        else if (keyInfo.KeyChar == 'i')
         {
-            return States.UploadFile;
+            return States.Files;
         }
         else if (keyInfo.KeyChar == 'x')
         {

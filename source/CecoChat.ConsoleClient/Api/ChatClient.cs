@@ -348,12 +348,10 @@ public sealed class ChatClient : IAsyncDisposable
         return response;
     }
 
-    public async Task<ClientResponse<UploadFileResponse>> UploadFile(string filePath, string contentType)
+    public async Task<ClientResponse<UploadFileResponse>> UploadFile(Stream fileStream, string fileName, string contentType)
     {
-        Stream file = new FileStream(filePath, FileMode.Open, FileAccess.Read);
-        string fileName = Path.GetFileName(filePath);
-        StreamPart part = new(file, fileName, contentType, fileName);
-        IApiResponse<UploadFileResponse> apiResponse = await _bffClient.UploadFile(file.Length, part, _accessToken!);
+        StreamPart part = new(fileStream, fileName, contentType, fileName);
+        IApiResponse<UploadFileResponse> apiResponse = await _bffClient.UploadFile(fileStream.Length, part, _accessToken!);
 
         ClientResponse<UploadFileResponse> response = new();
         ProcessApiResponse(apiResponse, response);
@@ -361,6 +359,27 @@ public sealed class ChatClient : IAsyncDisposable
         if (response.Success)
         {
             response.Content = apiResponse.Content;
+        }
+
+        return response;
+    }
+
+    public async Task<ClientResponse<Stream>> DownloadFile(string bucket, string path)
+    {
+        DownloadFileRequest request = new()
+        {
+            Bucket = bucket,
+            Path = path
+        };
+
+        IApiResponse<HttpContent> apiResponse = await _bffClient.DownloadFile(request, _accessToken!);
+
+        ClientResponse<Stream> response = new();
+        ProcessApiResponse(apiResponse, response);
+
+        if (response.Success)
+        {
+            response.Content = await apiResponse.Content!.ReadAsStreamAsync();
         }
 
         return response;
