@@ -1,5 +1,6 @@
 using System.Web;
 using CecoChat.Minio;
+using CecoChat.Server.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -35,6 +36,11 @@ public class DownloadFileController : ControllerBase
         [FromRoute(Name = "path")][BindRequired] string urlEncodedPath,
         CancellationToken ct)
     {
+        if (!HttpContext.TryGetUserClaimsAndAccessToken(_logger, out UserClaims? userClaims, out _))
+        {
+            return Unauthorized();
+        }
+
         string bucket = HttpUtility.UrlDecode(urlEncodedBucket);
         string path = HttpUtility.UrlDecode(urlEncodedPath);
 
@@ -47,6 +53,7 @@ public class DownloadFileController : ControllerBase
 
         // TODO: verify the current user has access to the file
 
+        _logger.LogTrace("Responding with file from bucket {Bucket} with path {Path} requested by user {UserId}", bucket, path, userClaims.UserId);
         return File(result.Stream, result.ContentType);
     }
 }

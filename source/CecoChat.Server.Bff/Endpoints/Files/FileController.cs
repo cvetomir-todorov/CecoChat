@@ -49,6 +49,7 @@ public class FileController : ControllerBase
             Files = files
         };
 
+        _logger.LogTrace("Responding with {FileCount} files for user {UserId} which are newer than {NewerThan}", files.Length, userClaims.UserId, request.NewerThan);
         return Ok(response);
     }
 }
