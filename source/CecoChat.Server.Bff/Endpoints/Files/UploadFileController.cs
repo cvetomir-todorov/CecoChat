@@ -119,7 +119,7 @@ public class UploadFileController : ControllerBase
         string plannedObjectName = _fileStorage.CreateObjectName(userClaims.UserId, extensionWithDot);
         string fileContentType = section.ContentType ?? "application/octet-stream";
         IDictionary<string, string> tags = new SortedList<string, string>(capacity: 1);
-        tags.Add("user-id", userClaims.UserId.ToString(CultureInfo.InvariantCulture));
+        tags.Add("users", userClaims.UserId.ToString(CultureInfo.InvariantCulture));
 
         string actualObjectName = await _minio.UploadFile(bucketName, plannedObjectName, fileContentType, tags, fileSection.FileStream, fileSize, ct);
         _logger.LogTrace("Uploaded successfully a new file with content type {ContentType} sized {FileSize} B to bucket {Bucket} with path {Path} for user {UserId}",

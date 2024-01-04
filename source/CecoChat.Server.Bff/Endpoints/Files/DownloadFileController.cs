@@ -55,16 +55,53 @@ public class DownloadFileController : ControllerBase
         string bucket = request.BucketUrlDecoded;
         string path = request.PathUrlDecoded;
 
-        DownloadFileResult result = await _minio.DownloadFile(bucket, path, ct);
-        if (!result.IsFound)
+        ObjectTagsResult objectTagsResult = await _minio.GetObjectTags(bucket, path, ct);
+        if (!objectTagsResult.IsFound)
+        {
+            _logger.LogTrace("Failed to find file in bucket {Bucket} with path {Path}", bucket, path);
+            return NotFound();
+        }
+        if (!objectTagsResult.Tags.TryGetValue("users", out string? usersTag))
+        {
+            _logger.LogWarning("File in bucket {Bucket} with path {Path} is missing the users tag", bucket, path);
+            return Forbid();
+        }
+
+        bool containsCurrentUserId = ContainsCurrentUserId(usersTag, userClaims.UserId);
+        if (!containsCurrentUserId)
+        {
+            _logger.LogWarning("File in bucket {Bucket} with path {Path} is being requested by user {UserId} but doesn't have the expected users tag", bucket, path, userClaims.UserId);
+            return Forbid();
+        }
+
+        DownloadFileResult downloadFileResult = await _minio.DownloadFile(bucket, path, ct);
+        if (!downloadFileResult.IsFound)
         {
             _logger.LogTrace("Failed to find file in bucket {Bucket} with path {Path}", bucket, path);
             return NotFound();
         }
 
-        // TODO: verify the current user has access to the file
-
         _logger.LogTrace("Responding with file from bucket {Bucket} with path {Path} requested by user {UserId}", bucket, path, userClaims.UserId);
-        return File(result.Stream, result.ContentType);
+        return File(downloadFileResult.Stream, downloadFileResult.ContentType);
+    }
+
+    private static bool ContainsCurrentUserId(string usersTag, long currentUserId)
+    {
+        string[] userIdStrings = usersTag.Split(separator: '_', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+
+        bool containsCurrentUserId = userIdStrings
+            .Select(userIdString =>
+            {
+                if (!long.TryParse(userIdString, out long userId))
+                {
+                    userId = 0;
+                }
+
+                return userId;
+            })
+            .Where(userId => userId > 0)
+            .Any(userId => userId == currentUserId);
+
+        return containsCurrentUserId;
     }
 }
