@@ -9,9 +9,16 @@ using CecoChat.Server.Bff.Files;
 using CecoChat.Server.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.WebUtilities;
 
 namespace CecoChat.Server.Bff.Endpoints.Files;
+
+public sealed class UploadFileRequest
+{
+    [FromHeader(Name = IBffClient.HeaderUploadedFileSize)]
+    public long FileSize { get; init; }
+}
 
 [ApiController]
 [Route("api/files")]
@@ -46,14 +53,14 @@ public class UploadFileController : ControllerBase
     [RequestFormLimits(MultipartBodyLengthLimit = FileSizeLimitBytes)]
     [DisableFormValueModelBinding]
     [ProducesResponseType(typeof(UploadFileResponse), StatusCodes.Status200OK)]
-    public async Task<IActionResult> UploadFile([FromHeader(Name = IBffClient.HeaderUploadedFileSize)] long fileSize, CancellationToken ct)
+    public async Task<IActionResult> UploadFile([FromHeader][BindRequired] UploadFileRequest request, CancellationToken ct)
     {
         if (!HttpContext.TryGetUserClaimsAndAccessToken(_logger, out UserClaims? userClaims, out string? accessToken))
         {
             return Unauthorized();
         }
 
-        UploadFileResult uploadFileResult = await UploadFile(userClaims, Request.ContentType, Request.Body, fileSize, ct);
+        UploadFileResult uploadFileResult = await UploadFile(userClaims, Request.ContentType, Request.Body, request.FileSize, ct);
         if (uploadFileResult.Failure != null)
         {
             return uploadFileResult.Failure;
