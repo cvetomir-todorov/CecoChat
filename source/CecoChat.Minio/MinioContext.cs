@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using Microsoft.Extensions.Logging;
 using Minio;
 using Minio.DataModel;
@@ -12,9 +13,17 @@ public interface IMinioContext
 {
     Task<bool> EnsureBucketExists(string bucketName, CancellationToken ct);
 
+    Task<ObjectTagsResult> GetObjectTags(string bucketName, string objectName, CancellationToken ct);
+
     Task<string> UploadFile(string bucketName, string objectName, string contentType, IDictionary<string, string>? tags, Stream dataStream, long dataLength, CancellationToken ct);
 
     Task<DownloadFileResult> DownloadFile(string bucketName, string objectName, CancellationToken ct);
+}
+
+public readonly struct ObjectTagsResult
+{
+    public bool IsFound { get; init; }
+    public IReadOnlyDictionary<string, string> Tags { get; init; }
 }
 
 public readonly struct DownloadFileResult
@@ -61,6 +70,39 @@ internal class MinioContext : IMinioContext
         {
             _logger.LogError(minioException, "Failed to create bucket {BucketName}", bucketName);
             return false;
+        }
+    }
+
+    public async Task<ObjectTagsResult> GetObjectTags(string bucketName, string objectName, CancellationToken ct)
+    {
+        try
+        {
+            GetObjectTagsArgs getObjectTagsArgs = new GetObjectTagsArgs()
+                .WithBucket(bucketName)
+                .WithObject(objectName);
+            Tagging tagging = await _minio.GetObjectTagsAsync(getObjectTagsArgs, ct);
+
+            return new ObjectTagsResult
+            {
+                IsFound = true,
+                Tags = new ReadOnlyDictionary<string, string>(tagging.Tags)
+            };
+        }
+        catch (BucketNotFoundException bucketNotFoundException)
+        {
+            _logger.LogError(bucketNotFoundException, "Error when getting tags from bucket {Bucket} for the object {Object}", bucketName, objectName);
+            return new ObjectTagsResult
+            {
+                IsFound = false
+            };
+        }
+        catch (ObjectNotFoundException objectNotFoundException)
+        {
+            _logger.LogError(objectNotFoundException, "Error when getting tags from bucket {Bucket} for the object {Object}", bucketName, objectName);
+            return new ObjectTagsResult
+            {
+                IsFound = false
+            };
         }
     }
 
