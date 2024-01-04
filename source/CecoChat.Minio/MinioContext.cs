@@ -95,26 +95,42 @@ internal class MinioContext : IMinioContext
         const int initialBufferSize = 256 * 1024; // 256 KB
         MemoryStream memoryStream = new(capacity: initialBufferSize);
 
-        GetObjectArgs getObjectArgs = new GetObjectArgs()
-            .WithBucket(bucketName)
-            .WithObject(objectName)
-            .WithCallbackStream(async (minioStream, token) =>
-            {
-                const int bufferSize = 64 * 1024; // 64 KB
-                await minioStream.CopyToAsync(memoryStream, bufferSize, token);
-            });
-
-        // TODO: catch exceptions when bucket/object doesn't exist
-
-        ObjectStat stat = await _minio.GetObjectAsync(getObjectArgs, ct);
-        // reset the stream so it can be read from the beginning by the client
-        memoryStream.Seek(offset: 0, SeekOrigin.Begin);
-
-        return new DownloadFileResult
+        try
         {
-            IsFound = true,
-            Stream = memoryStream,
-            ContentType = stat.ContentType
-        };
+            GetObjectArgs getObjectArgs = new GetObjectArgs()
+                .WithBucket(bucketName)
+                .WithObject(objectName)
+                .WithCallbackStream(async (minioStream, token) =>
+                {
+                    const int bufferSize = 64 * 1024; // 64 KB
+                    await minioStream.CopyToAsync(memoryStream, bufferSize, token);
+                });
+            ObjectStat stat = await _minio.GetObjectAsync(getObjectArgs, ct);
+            // reset the stream so it can be read from the beginning by the client
+            memoryStream.Seek(offset: 0, SeekOrigin.Begin);
+
+            return new DownloadFileResult
+            {
+                IsFound = true,
+                Stream = memoryStream,
+                ContentType = stat.ContentType
+            };
+        }
+        catch (BucketNotFoundException bucketNotFoundException)
+        {
+            _logger.LogError(bucketNotFoundException, "Error when downloading from bucket {Bucket} the object {Object}", bucketName, objectName);
+            return new DownloadFileResult
+            {
+                IsFound = false
+            };
+        }
+        catch (ObjectNotFoundException objectNotFoundException)
+        {
+            _logger.LogError(objectNotFoundException, "Error when downloading from bucket {Bucket} the object {Object}", bucketName, objectName);
+            return new DownloadFileResult
+            {
+                IsFound = false
+            };
+        }
     }
 }
