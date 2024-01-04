@@ -41,7 +41,7 @@ public static class Program
         _swaggerOptions = new();
         builder.Configuration.GetSection("Swagger").Bind(_swaggerOptions);
 
-        AddServices(builder, options);
+        AddServices(builder);
         AddTelemetry(builder, options);
         AddHealth(builder);
         builder.Host.ConfigureContainer<ContainerBuilder>(ConfigureContainer);
@@ -51,7 +51,7 @@ public static class Program
         await EntryPoint.RunWebApp(app, typeof(Program));
     }
 
-    private static void AddServices(WebApplicationBuilder builder, CommonOptions options)
+    private static void AddServices(WebApplicationBuilder builder)
     {
         // grpc
         builder.Services.AddGrpc(grpc =>
