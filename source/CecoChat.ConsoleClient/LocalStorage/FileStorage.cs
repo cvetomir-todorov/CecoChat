@@ -13,7 +13,7 @@ public class FileStorage
 
     public IEnumerable<FileRef> EnumerateUserFiles()
     {
-        foreach (KeyValuePair<string,FileRef> pair in _userFiles)
+        foreach (KeyValuePair<string, FileRef> pair in _userFiles)
         {
             yield return pair.Value;
         }

@@ -4,7 +4,6 @@ namespace CecoChat.AspNet;
 
 public static class MultipartUtility
 {
-        
     public static bool IsMultipartContentType(string? contentType)
     {
         if (string.IsNullOrWhiteSpace(contentType))

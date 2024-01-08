@@ -89,5 +89,5 @@ public class FilesState : State
             Context.ReloadData = true;
             return States.DownloadFile;
         }
-    } 
+    }
 }
