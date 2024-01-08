@@ -11,7 +11,7 @@ public static class MultipartUtility
             return false;
         }
 
-        return contentType.IndexOf("multipart/", StringComparison.OrdinalIgnoreCase) >= 0;
+        return contentType.Contains("multipart/", StringComparison.OrdinalIgnoreCase);
     }
 
     // Content-Type: multipart/form-data; boundary="----WebKitFormBoundarymx2fSWqWSd0OxQqq"
