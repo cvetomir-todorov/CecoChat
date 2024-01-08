@@ -190,7 +190,7 @@ public class UploadFileController : ControllerBase
 
     private async Task<AssociateFileResult> AssociateFile(UserClaims userClaims, string bucket, string path, string accessToken, CancellationToken ct)
     {
-        AddFileResult result = await _fileClient.AddFile(userClaims.UserId, bucket, path, accessToken, ct);
+        Client.User.AssociateFileResult result = await _fileClient.AssociateFile(userClaims.UserId, bucket, path, accessToken, ct);
 
         if (result.Success)
         {
@@ -200,9 +200,9 @@ public class UploadFileController : ControllerBase
                 FileVersion = result.Version
             };
         }
-        if (result.DuplicateFile)
+        if (result.Duplicate)
         {
-            _logger.LogTrace("Association failed for a duplicate file in bucket {Bucket} with path {Path} and user {UserId}", bucket, path, userClaims.UserId);
+            _logger.LogTrace("Association already exists between a file in bucket {Bucket} with path {Path} and user {UserId}", bucket, path, userClaims.UserId);
             IActionResult failure = Conflict(new ProblemDetails
             {
                 Detail = "Duplicate file"
@@ -214,6 +214,6 @@ public class UploadFileController : ControllerBase
             };
         }
 
-        throw new ProcessingFailureException(typeof(AddFileResult));
+        throw new ProcessingFailureException(typeof(Client.User.AssociateFileResult));
     }
 }

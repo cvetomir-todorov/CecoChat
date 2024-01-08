@@ -4,16 +4,16 @@ package CecoChat.Contracts.User;
 import "google/protobuf/timestamp.proto";
 
 service FileCommand {
-  rpc AddFile(AddFileRequest) returns (AddFileResponse);
+  rpc AssociateFile(AssociateFileRequest) returns (AssociateFileResponse);
 }
 
-message AddFileRequest {
+message AssociateFileRequest {
   string bucket = 1;
   string path = 2;
 }
 
-message AddFileResponse {
+message AssociateFileResponse {
   bool success = 1;
   google.protobuf.Timestamp version = 2;
-  bool duplicate_file = 3;
+  bool duplicate = 3;
 }

@@ -17,7 +17,7 @@ internal class FileCommandRepo : IFileCommandRepo
         _dbContext = dbContext;
     }
 
-    public async Task<AddFileResult> AddFile(long userId, string bucket, string path)
+    public async Task<AssociateFileResult> AssociateFile(long userId, string bucket, string path)
     {
         FileEntity entity = new()
         {
@@ -32,8 +32,8 @@ internal class FileCommandRepo : IFileCommandRepo
         try
         {
             await _dbContext.SaveChangesAsync();
-            _logger.LogTrace("Added a new file to bucket {Bucket} with path {Path} for user {UserId}", bucket, path, userId);
-            return new AddFileResult
+            _logger.LogTrace("Associated a file in bucket {Bucket} with path {Path} and user {UserId}", bucket, path, userId);
+            return new AssociateFileResult
             {
                 Success = true,
                 Version = entity.Version
@@ -46,9 +46,10 @@ internal class FileCommandRepo : IFileCommandRepo
             {
                 if (postgresException.MessageText.Contains("Files_pkey"))
                 {
-                    return new AddFileResult
+                    _logger.LogTrace("Duplicate association between the file in bucket {Bucket} with path {Path} and user {UserId}", bucket, path, userId);
+                    return new AssociateFileResult
                     {
-                        DuplicateFile = true
+                        Duplicate = true
                     };
                 }
             }
