@@ -6,6 +6,9 @@ Clients use the BFF for the following operations:
 * Register a new account by providing credentials and profile data.
 * Create a new session which returns a session ID, access token, full profile, messaging server address based on the supplied credentials.
 * Manage their own profile including changing password, editing trivial profile data.
+* Manage their connections - invite, accept, cancel, remove.
+* Upload new and download existing files.
+* Get the full list of their files or the files newer than a specified timestamp.
 * Get user chats returns all the chats for a user which have a message newer than a specified timestamp.
 * Get chat messages returns all messages and reactions to them for a given chat which are older than a specified timestamp.
 

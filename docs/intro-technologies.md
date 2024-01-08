@@ -3,7 +3,7 @@
 The technologies chosen are [cloud agnostic](https://codersociety.com/blog/articles/cloud-agnostic) which makes the solution independent from a specific cloud provider.
 
 * Integration - Kafka, gRPC, WebSocket, HTTP
-* Data storage - Yugabyte, Cassandra, Redis
+* Data storage - Yugabyte, Cassandra, MinIO, Redis
 * Operations - OpenTelemetry, Docker, Kubernetes
 * Services - .NET, ASP.NET, SignalR, EF Core
 
@@ -91,6 +91,22 @@ Chats database is based on Cassandra:
 * allows precise control over the consistency used for writes and reads
 * ensures data consistency via hinted handoffs and read repairs
 * needs regular anti-entropy repairs which are CPU-bound
+
+# File storage
+
+![Minio](tech-images/minio.webp)
+
+File storage is based on MinIO:
+* object store - stores both file and metadata
+* horizontally scalable
+* supports multi-site replication
+* has global identity and access management
+* supports bucket encryption
+* supports immutability and versioning of objects
+* provides tools for monitoring
+* provides data-management interfaces
+* HTTP-accessible with a native client out of the box
+* AWS S3-compatible
 
 # Dynamic configuration
 

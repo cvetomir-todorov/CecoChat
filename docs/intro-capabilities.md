@@ -16,6 +16,7 @@ The current product and technical features
   - Change password, edit trivial profile data
   - Profiles with full and public-only data
   - Connect with other users - invite/accept/cancel/remove
+  - Store small user files - images, text, PDF
 
 Note: there is no web/mobile clients (only a client for development purposes)
 

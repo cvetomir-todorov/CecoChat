@@ -40,3 +40,9 @@ Public profiles are obtained by the clients when opening all chats and a single 
 Connections are obtained by the clients when opening all chats and a single chat. Since connection data doesn't change frequently, calling the User database is avoided if the user connections are already in a User cache. This reduces latency and also the load on the User database. The connections for a user are added for a certain amount of time, after which they expire.
 
 Connections can be created and managed using the following actions - invite/accept/cancel/remove. For each valid and successful action there is a notification for the initiating and targeted users for all their connected clients. Cache is not updated so if a notification is lost the connection data cached would not be up-to-date. Considering the reduced usage of this feature and the low likelihood for a notification to get lost, that's an acceptable compromise for now.
+
+# User files
+
+User files are uploaded to and downloaded from a dedicated file storage. They cannot be edited and are immutable. File limitations enforced include size of up to 512KB. File download access is controlled by dedicated object tags - `users` which includes user IDs and `groups` which includes group names. Files are stored in separate buckets for each day. Within each bucket there is a folder for the specific user. This allows for grouping files primarily by time, not by user, resulting into more predictable bucket sizes.
+
+The user-file association is stored in a dedicated table in the User DB. It stores the bucket name and path which link to the file storage. Associations are queried using a timestamp - all user files newer than a specific date. Since associations are immutable and because of the ability to query them via a timestamp, dedicated cache is not needed. Clients initially load the full list of files for the current user and subsequently request only the newer ones.

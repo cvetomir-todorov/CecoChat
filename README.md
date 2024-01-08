@@ -12,6 +12,7 @@
   - Change password, edit trivial profile data
   - Profiles with full and public-only data
   - Connect with other users - invite/accept/cancel/remove
+  - Store small user files - images, text, PDF
 
 Check out [what next](docs/what-next.md) needs to be implemented. I appreciate all comments so feel free to use the `Discussions` tab.
 
@@ -50,9 +51,9 @@ Check out [what next](docs/what-next.md) needs to be implemented. I appreciate a
 * Design
   - [Messaging](docs/design-messaging.md)
   - [Chats](docs/design-chats.md)
-  - [User (profiles and connections)](docs/design-users.md)
+  - [User - profiles, connections, files](docs/design-users.md)
   - [Clients](docs/design-clients.md)
-  - [Configuration (static and dynamic)](docs/design-configuration.md)
+  - [Configuration - static and dynamic](docs/design-configuration.md)
   - [Observability](docs/design-observability.md)
   - [Deployment](docs/design-deployment.md)
 * Development
