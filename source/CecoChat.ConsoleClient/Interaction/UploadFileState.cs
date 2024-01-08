@@ -1,22 +1,15 @@
 using CecoChat.ConsoleClient.Api;
+using CecoChat.Data;
 
 namespace CecoChat.ConsoleClient.Interaction;
 
 public class UploadFileState : State
 {
-    private readonly IDictionary<string, string> _contentTypes;
-    private readonly string _defaultContentType;
+    private readonly IFileUtility _fileUtility;
 
     public UploadFileState(StateContainer states) : base(states)
     {
-        _contentTypes = new Dictionary<string, string>();
-
-        _contentTypes.Add(".png", "image/png");
-        _contentTypes.Add(".jpg", "image/jpg");
-        _contentTypes.Add(".jpeg", "image/jpeg");
-        _contentTypes.Add(".txt", "text/plain");
-
-        _defaultContentType = "application/octet-stream";
+        _fileUtility = new FileUtility();
     }
 
     public override async Task<State> Execute()
@@ -69,11 +62,6 @@ public class UploadFileState : State
     private string GetContentType(string filePath)
     {
         string extension = Path.GetExtension(filePath);
-        if (!_contentTypes.TryGetValue(extension, out string? contentType))
-        {
-            contentType = _defaultContentType;
-        }
-
-        return contentType;
+        return _fileUtility.GetContentType(extension);
     }
 }

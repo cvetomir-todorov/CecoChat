@@ -9,6 +9,7 @@ using CecoChat.Autofac;
 using CecoChat.Client.Chats;
 using CecoChat.Client.Config;
 using CecoChat.Client.User;
+using CecoChat.Data;
 using CecoChat.DynamicConfig;
 using CecoChat.Http.Health;
 using CecoChat.Jwt;
@@ -172,6 +173,7 @@ public static class Program
         // files
         builder.RegisterModule(new MinioAutofacModule(host.Configuration.GetSection("FileStorage")));
         builder.RegisterType<FileStorage>().As<IFileStorage>().SingleInstance();
+        builder.RegisterType<FileUtility>().As<IFileUtility>().SingleInstance();
 
         // security
         builder.RegisterOptions<JwtOptions>(host.Configuration.GetSection("Jwt"));
