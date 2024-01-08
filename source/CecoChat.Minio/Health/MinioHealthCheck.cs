@@ -30,7 +30,7 @@ public class MinioHealthCheck : IHealthCheck
         {
             BucketExistsArgs bucketExistsArgs = new BucketExistsArgs()
                 .WithBucket(_bucket);
-            bool _ = await _minio.BucketExistsAsync(bucketExistsArgs, cancellationToken);
+            await _minio.BucketExistsAsync(bucketExistsArgs, cancellationToken);
             return HealthCheckResult.Healthy();
         }
         catch (Exception exception)
