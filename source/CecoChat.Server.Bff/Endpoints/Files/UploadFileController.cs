@@ -30,7 +30,6 @@ public sealed class UploadFileRequest
 [ProducesResponseType(StatusCodes.Status500InternalServerError)]
 public class UploadFileController : ControllerBase
 {
-    private const int FileSizeLimitBytes = 512 * 1024; // 512KB
     private readonly ILogger _logger;
     private readonly IMinioContext _minio;
     private readonly IFileUtility _fileUtility;
@@ -53,8 +52,6 @@ public class UploadFileController : ControllerBase
 
     [Authorize(Policy = "user")]
     [HttpPost]
-    [RequestSizeLimit(FileSizeLimitBytes)]
-    [RequestFormLimits(MultipartBodyLengthLimit = FileSizeLimitBytes)]
     [DisableFormValueModelBinding]
     [ProducesResponseType(typeof(UploadFileResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> UploadFile([FromHeader][BindRequired] UploadFileRequest request, CancellationToken ct)
