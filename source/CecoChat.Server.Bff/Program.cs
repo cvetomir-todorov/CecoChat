@@ -16,6 +16,7 @@ using CecoChat.Jwt;
 using CecoChat.Kafka;
 using CecoChat.Kafka.Telemetry;
 using CecoChat.Minio;
+using CecoChat.Minio.Health;
 using CecoChat.Otel;
 using CecoChat.Server.Backplane;
 using CecoChat.Server.Bff.Files;
@@ -34,6 +35,7 @@ public static class Program
 {
     private static ChatsClientOptions _chatsClientOptions = null!;
     private static UserClientOptions _userClientOptions = null!;
+    private static MinioOptions _minioOptions = null!;
     private static FilesOptions _filesOptions = null!;
     private static SwaggerOptions _swaggerOptions = null!;
 
@@ -46,6 +48,8 @@ public static class Program
         builder.Configuration.GetSection("ChatsClient").Bind(_chatsClientOptions);
         _userClientOptions = new();
         builder.Configuration.GetSection("UserClient").Bind(_userClientOptions);
+        _minioOptions = new();
+        builder.Configuration.GetSection("FileStorage").Bind(_minioOptions);
         _filesOptions = new();
         builder.Configuration.GetSection("Files").Bind(_filesOptions);
         _swaggerOptions = new();
@@ -154,6 +158,11 @@ public static class Program
                 new Uri(_userClientOptions.Address!, _userClientOptions.HealthPath),
                 configureHttpClient: (_, client) => client.DefaultRequestVersion = new Version(2, 0),
                 timeout: _userClientOptions.HealthTimeout,
+                tags: new[] { HealthTags.Health, HealthTags.Ready })
+            .AddMinio(
+                "file-storage",
+                bucket: _minioOptions.HealthBucket,
+                timeout: _minioOptions.HealthTimeout,
                 tags: new[] { HealthTags.Health, HealthTags.Ready });
 
         builder.Services.AddSingleton<FileStorageInitHealthCheck>();
