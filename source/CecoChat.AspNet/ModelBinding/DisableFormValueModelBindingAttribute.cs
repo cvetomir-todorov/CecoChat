@@ -6,6 +6,7 @@ namespace CecoChat.AspNet.ModelBinding;
 /// <summary>
 /// Disables form model binding in order to avoid the request being buffered into memory.
 /// </summary>
+[AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
 public class DisableFormValueModelBindingAttribute : Attribute, IResourceFilter
 {
     public void OnResourceExecuting(ResourceExecutingContext context)
