@@ -18,7 +18,7 @@ public static class MinioHealthRegistrations
         IEnumerable<string>? tags = null,
         TimeSpan? timeout = null)
     {
-        ArgumentException.ThrowIfNullOrEmpty(name, nameof(name));
+        ArgumentException.ThrowIfNullOrEmpty(name);
 
         return builder.Add(new HealthCheckRegistration(
             name,

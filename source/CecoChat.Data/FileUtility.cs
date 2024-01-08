@@ -32,14 +32,14 @@ public class FileUtility : IFileUtility
 
     public bool IsExtensionKnown(string extension)
     {
-        ArgumentException.ThrowIfNullOrEmpty(extension, nameof(extension));
+        ArgumentException.ThrowIfNullOrEmpty(extension);
 
         return _extMap.ContainsKey(extension);
     }
 
     public string GetContentType(string extension)
     {
-        ArgumentException.ThrowIfNullOrEmpty(extension, nameof(extension));
+        ArgumentException.ThrowIfNullOrEmpty(extension);
 
         if (!_extMap.TryGetValue(extension, out string? contentType))
         {
