@@ -185,7 +185,7 @@ public static class Program
 
         // files
         builder.RegisterModule(new MinioAutofacModule(host.Configuration.GetSection("FileStorage")));
-        builder.RegisterType<FileStorage>().As<IFileStorage>().SingleInstance();
+        builder.RegisterType<ObjectNaming>().As<IObjectNaming>().SingleInstance();
         builder.RegisterType<FileUtility>().As<IFileUtility>().SingleInstance();
         builder.RegisterOptions<FilesOptions>(host.Configuration.GetSection("Files"));
 
