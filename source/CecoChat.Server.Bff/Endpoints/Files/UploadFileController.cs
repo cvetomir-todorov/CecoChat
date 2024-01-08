@@ -4,6 +4,7 @@ using CecoChat.AspNet.ModelBinding;
 using CecoChat.Client.User;
 using CecoChat.Contracts.Bff;
 using CecoChat.Contracts.Bff.Files;
+using CecoChat.Data;
 using CecoChat.Minio;
 using CecoChat.Server.Bff.Files;
 using CecoChat.Server.Identity;
@@ -32,17 +33,20 @@ public class UploadFileController : ControllerBase
     private const int FileSizeLimitBytes = 512 * 1024; // 512KB
     private readonly ILogger _logger;
     private readonly IMinioContext _minio;
+    private readonly IFileUtility _fileUtility;
     private readonly IFileStorage _fileStorage;
     private readonly IFileClient _fileClient;
 
     public UploadFileController(
         ILogger<UploadFileController> logger,
         IMinioContext minio,
+        IFileUtility fileUtility,
         IFileStorage fileStorage,
         IFileClient fileClient)
     {
         _logger = logger;
         _minio = minio;
+        _fileUtility = fileUtility;
         _fileStorage = fileStorage;
         _fileClient = fileClient;
     }
@@ -60,11 +64,13 @@ public class UploadFileController : ControllerBase
             return Unauthorized();
         }
 
-        UploadFileResult uploadFileResult = await UploadFile(userClaims, Request.ContentType, Request.Body, request.FileSize, ct);
-        if (uploadFileResult.Failure != null)
+        PrepareUploadResult prepareUploadResult = await PrepareUpload(Request.ContentType ?? string.Empty, Request.Body, ct);
+        if (prepareUploadResult.Failure != null)
         {
-            return uploadFileResult.Failure;
+            return prepareUploadResult.Failure;
         }
+
+        UploadFileResult uploadFileResult = await UploadFile(userClaims, prepareUploadResult.FileExtension, prepareUploadResult.FileContentType, prepareUploadResult.FileStream, request.FileSize, ct);
 
         AssociateFileResult associateFileResult = await AssociateFile(userClaims, uploadFileResult.Bucket, uploadFileResult.Path, accessToken, ct);
         if (associateFileResult.Failure != null)
@@ -83,46 +89,90 @@ public class UploadFileController : ControllerBase
         return Ok(response);
     }
 
-    private struct UploadFileResult
+    private struct PrepareUploadResult
     {
-        public string Bucket { get; init; }
-        public string Path { get; init; }
+        public string FileExtension { get; init; }
+        public string FileContentType { get; init; }
+        public Stream FileStream { get; init; }
         public IActionResult? Failure { get; init; }
     }
 
-    private async Task<UploadFileResult> UploadFile(UserClaims userClaims, string? contentType, Stream body, long fileSize, CancellationToken ct)
+    private async Task<PrepareUploadResult> PrepareUpload(string requestContentType, Stream requestBody, CancellationToken ct)
     {
-        if (!MultipartUtility.IsMultipartContentType(contentType))
+        if (!MultipartUtility.IsMultipartContentType(requestContentType))
         {
-            ModelState.AddModelError("File", "The request content-type should be multipart.");
-            return new UploadFileResult
+            ModelState.AddModelError("File", "The request content type should be multipart.");
+            return new PrepareUploadResult
             {
                 Failure = BadRequest(ModelState)
             };
         }
 
-        string boundary = MultipartUtility.GetMultipartBoundary(contentType);
-        MultipartReader reader = new(boundary, body);
+        string boundary = MultipartUtility.GetMultipartBoundary(requestContentType);
+        MultipartReader reader = new(boundary, requestBody);
         MultipartSection? section = await reader.ReadNextSectionAsync(ct);
         FileMultipartSection? fileSection = section?.AsFileSection();
         if (section == null || fileSection == null || fileSection.FileStream == null)
         {
             ModelState.AddModelError("File", "There is no file multipart section.");
-            return new UploadFileResult
+            return new PrepareUploadResult
             {
                 Failure = BadRequest(ModelState)
             };
         }
 
+        string extension = Path.GetExtension(fileSection.FileName);
+        if (!_fileUtility.IsExtensionKnown(extension))
+        {
+            ModelState.AddModelError("File", $"File extension '{extension}' is not supported.");
+            return new PrepareUploadResult
+            {
+                Failure = BadRequest(ModelState)
+            };
+        }
+
+        if (string.IsNullOrWhiteSpace(section.ContentType))
+        {
+            ModelState.AddModelError("File", "File content type is not specified.");
+            return new PrepareUploadResult
+            {
+                Failure = BadRequest(ModelState)
+            };
+        }
+
+        string correspondingContentType = _fileUtility.GetContentType(extension);
+        if (!string.Equals(section.ContentType, correspondingContentType, StringComparison.OrdinalIgnoreCase))
+        {
+            ModelState.AddModelError("File", $"Provided content type '{section.ContentType}' doesn't have the correct value.");
+            return new PrepareUploadResult
+            {
+                Failure = BadRequest(ModelState)
+            };
+        }
+
+        return new PrepareUploadResult
+        {
+            FileExtension = extension,
+            FileContentType = correspondingContentType,
+            FileStream = fileSection.FileStream
+        };
+    }
+
+    private struct UploadFileResult
+    {
+        public string Bucket { get; init; }
+        public string Path { get; init; }
+    }
+
+    private async Task<UploadFileResult> UploadFile(UserClaims userClaims, string fileExtension, string fileContentType, Stream fileStream, long fileSize, CancellationToken ct)
+    {
         string bucketName = _fileStorage.GetCurrentBucketName();
-        string extensionWithDot = Path.GetExtension(fileSection.FileName);
-        string plannedObjectName = _fileStorage.CreateObjectName(userClaims.UserId, extensionWithDot);
-        string fileContentType = section.ContentType ?? "application/octet-stream";
+        string plannedObjectName = _fileStorage.CreateObjectName(userClaims.UserId, fileExtension);
         IDictionary<string, string> tags = new SortedList<string, string>(capacity: 1);
         tags.Add("users", userClaims.UserId.ToString(CultureInfo.InvariantCulture));
 
-        string actualObjectName = await _minio.UploadFile(bucketName, plannedObjectName, fileContentType, tags, fileSection.FileStream, fileSize, ct);
-        _logger.LogTrace("Uploaded successfully a new file with content type {ContentType} sized {FileSize} B to bucket {Bucket} with path {Path} for user {UserId}",
+        string actualObjectName = await _minio.UploadFile(bucketName, plannedObjectName, fileContentType, tags, fileStream, fileSize, ct);
+        _logger.LogTrace("Uploaded successfully a new file with content type {ContentType} sized {FileSize}B to bucket {Bucket} with path {Path} for user {UserId}",
             fileContentType, fileSize, bucketName, actualObjectName, userClaims.UserId);
 
         return new UploadFileResult
