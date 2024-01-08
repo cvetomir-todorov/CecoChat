@@ -43,6 +43,11 @@ public sealed class OneChatState : State
         Console.WriteLine("Write (press 'w') | React (press 'r') | Refresh (press 'f') | Local refresh (press 'l')");
 
         ConsoleKeyInfo keyInfo = Console.ReadKey(intercept: true);
+        return HandleKey(keyInfo);
+    }
+
+    private State HandleKey(ConsoleKeyInfo keyInfo)
+    {
         if (keyInfo.KeyChar == 'w' || keyInfo.KeyChar == 'W')
         {
             Context.ReloadData = false;
