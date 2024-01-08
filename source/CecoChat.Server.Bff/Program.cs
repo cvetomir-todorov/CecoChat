@@ -23,6 +23,7 @@ using CecoChat.Server.Bff.Init;
 using CecoChat.Server.Identity;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Mvc;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
@@ -33,6 +34,7 @@ public static class Program
 {
     private static ChatsClientOptions _chatsClientOptions = null!;
     private static UserClientOptions _userClientOptions = null!;
+    private static FilesOptions _filesOptions = null!;
     private static SwaggerOptions _swaggerOptions = null!;
 
     public static async Task Main(params string[] args)
@@ -44,8 +46,15 @@ public static class Program
         builder.Configuration.GetSection("ChatsClient").Bind(_chatsClientOptions);
         _userClientOptions = new();
         builder.Configuration.GetSection("UserClient").Bind(_userClientOptions);
+        _filesOptions = new();
+        builder.Configuration.GetSection("Files").Bind(_filesOptions);
         _swaggerOptions = new();
         builder.Configuration.GetSection("Swagger").Bind(_swaggerOptions);
+
+        builder.WebHost.ConfigureKestrel(kestrel =>
+        {
+            kestrel.Limits.MaxRequestBodySize = _filesOptions.MaxRequestBodyBytes;
+        });
 
         AddServices(builder, options);
         AddTelemetry(builder, options);
@@ -69,6 +78,10 @@ public static class Program
         // rest
         builder.Services.AddControllers(mvc =>
         {
+            mvc.Filters.Add(new RequestFormLimitsAttribute
+            {
+                MultipartBodyLengthLimit = _filesOptions.MaxMultipartBodyBytes
+            });
             // insert it before the default one so that it takes effect
             mvc.ModelBinderProviders.Insert(0, new DateTimeModelBinderProvider());
         });
@@ -174,6 +187,7 @@ public static class Program
         builder.RegisterModule(new MinioAutofacModule(host.Configuration.GetSection("FileStorage")));
         builder.RegisterType<FileStorage>().As<IFileStorage>().SingleInstance();
         builder.RegisterType<FileUtility>().As<IFileUtility>().SingleInstance();
+        builder.RegisterOptions<FilesOptions>(host.Configuration.GetSection("Files"));
 
         // security
         builder.RegisterOptions<JwtOptions>(host.Configuration.GetSection("Jwt"));
