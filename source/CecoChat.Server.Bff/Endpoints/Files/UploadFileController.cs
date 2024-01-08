@@ -33,20 +33,20 @@ public class UploadFileController : ControllerBase
     private readonly ILogger _logger;
     private readonly IMinioContext _minio;
     private readonly IFileUtility _fileUtility;
-    private readonly IFileStorage _fileStorage;
+    private readonly IObjectNaming _objectNaming;
     private readonly IFileClient _fileClient;
 
     public UploadFileController(
         ILogger<UploadFileController> logger,
         IMinioContext minio,
         IFileUtility fileUtility,
-        IFileStorage fileStorage,
+        IObjectNaming objectNaming,
         IFileClient fileClient)
     {
         _logger = logger;
         _minio = minio;
         _fileUtility = fileUtility;
-        _fileStorage = fileStorage;
+        _objectNaming = objectNaming;
         _fileClient = fileClient;
     }
 
@@ -163,8 +163,8 @@ public class UploadFileController : ControllerBase
 
     private async Task<UploadFileResult> UploadFile(UserClaims userClaims, string fileExtension, string fileContentType, Stream fileStream, long fileSize, CancellationToken ct)
     {
-        string bucketName = _fileStorage.GetCurrentBucketName();
-        string plannedObjectName = _fileStorage.CreateObjectName(userClaims.UserId, fileExtension);
+        string bucketName = _objectNaming.GetCurrentBucketName();
+        string plannedObjectName = _objectNaming.CreateObjectName(userClaims.UserId, fileExtension);
         IDictionary<string, string> tags = new SortedList<string, string>(capacity: 1);
         tags.Add("users", userClaims.UserId.ToString(CultureInfo.InvariantCulture));
 

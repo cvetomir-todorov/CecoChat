@@ -7,24 +7,24 @@ namespace CecoChat.Server.Bff.Init;
 public class FileStorageInit : InitStep
 {
     private readonly IMinioContext _minio;
-    private readonly IFileStorage _fileStorage;
+    private readonly IObjectNaming _objectNaming;
     private readonly FileStorageInitHealthCheck _fileStorageInitHealthCheck;
 
     public FileStorageInit(
         IMinioContext minio,
-        IFileStorage fileStorage,
+        IObjectNaming objectNaming,
         FileStorageInitHealthCheck fileStorageInitHealthCheck,
         IHostApplicationLifetime applicationLifetime)
         : base(applicationLifetime)
     {
         _minio = minio;
-        _fileStorage = fileStorage;
+        _objectNaming = objectNaming;
         _fileStorageInitHealthCheck = fileStorageInitHealthCheck;
     }
 
     protected override async Task<bool> DoExecute(CancellationToken ct)
     {
-        string bucketName = _fileStorage.GetCurrentBucketName();
+        string bucketName = _objectNaming.GetCurrentBucketName();
         _fileStorageInitHealthCheck.IsReady = await _minio.EnsureBucketExists(bucketName, ct);
 
         return _fileStorageInitHealthCheck.IsReady;

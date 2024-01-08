@@ -1,17 +1,17 @@
 namespace CecoChat.Server.Bff.Files;
 
-public interface IFileStorage
+public interface IObjectNaming
 {
     string GetCurrentBucketName();
 
     string CreateObjectName(long userId, string extensionWithDot);
 }
 
-public class FileStorage : IFileStorage
+public class ObjectNaming : IObjectNaming
 {
     private readonly IClock _clock;
 
-    public FileStorage(IClock clock)
+    public ObjectNaming(IClock clock)
     {
         _clock = clock;
     }
