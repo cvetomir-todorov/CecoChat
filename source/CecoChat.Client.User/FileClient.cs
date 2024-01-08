@@ -43,35 +43,35 @@ internal sealed class FileClient : IFileClient
         return response.Files;
     }
 
-    public async Task<AddFileResult> AddFile(long userId, string bucket, string path, string accessToken, CancellationToken ct)
+    public async Task<AssociateFileResult> AssociateFile(long userId, string bucket, string path, string accessToken, CancellationToken ct)
     {
-        AddFileRequest request = new();
+        AssociateFileRequest request = new();
         request.Bucket = bucket;
         request.Path = path;
 
         Metadata headers = new();
         headers.AddAuthorization(accessToken);
         DateTime deadline = _clock.GetNowUtc().Add(_options.CallTimeout);
-        AddFileResponse response = await _fileCommandClient.AddFileAsync(request, headers, deadline, ct);
+        AssociateFileResponse response = await _fileCommandClient.AssociateFileAsync(request, headers, deadline, ct);
 
         if (response.Success)
         {
-            _logger.LogTrace("Received a successful addition of file to bucket {Bucket} with path {Path} for user {UserId}", bucket, path, userId);
-            return new AddFileResult
+            _logger.LogTrace("Received a successful association between file in bucket {Bucket} with path {Path} and user {UserId}", bucket, path, userId);
+            return new AssociateFileResult
             {
                 Success = true,
                 Version = response.Version.ToDateTime()
             };
         }
-        if (response.DuplicateFile)
+        if (response.Duplicate)
         {
-            _logger.LogTrace("Received a failed addition of duplicate file to bucket {Bucket} with path {Path} for user {UserId}", bucket, path, userId);
-            return new AddFileResult
+            _logger.LogTrace("Received a duplicate association between file in bucket {Bucket} with path {Path} and user {UserId}", bucket, path, userId);
+            return new AssociateFileResult
             {
-                DuplicateFile = true
+                Duplicate = true
             };
         }
 
-        throw new ProcessingFailureException(typeof(AddFileResponse));
+        throw new ProcessingFailureException(typeof(AssociateFileResponse));
     }
 }

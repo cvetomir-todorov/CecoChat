@@ -21,30 +21,30 @@ public class FileCommandService : FileCommand.FileCommandBase
     }
 
     [Authorize(Policy = "user")]
-    public override async Task<AddFileResponse> AddFile(AddFileRequest request, ServerCallContext context)
+    public override async Task<AssociateFileResponse> AssociateFile(AssociateFileRequest request, ServerCallContext context)
     {
         UserClaims userClaims = context.GetUserClaimsGrpc(_logger);
 
-        AddFileResult result = await _commandRepo.AddFile(userClaims.UserId, request.Bucket, request.Path);
+        AssociateFileResult result = await _commandRepo.AssociateFile(userClaims.UserId, request.Bucket, request.Path);
 
         if (result.Success)
         {
-            _logger.LogTrace("Responding with successful addition of file to bucket {Bucket} with path {Path} for user {UserId}", request.Bucket, request.Path, userClaims.UserId);
-            return new AddFileResponse
+            _logger.LogTrace("Responding with a successful association between a file in bucket {Bucket} with path {Path} and user {UserId}", request.Bucket, request.Path, userClaims.UserId);
+            return new AssociateFileResponse
             {
                 Success = true,
                 Version = result.Version.ToTimestamp()
             };
         }
-        if (result.DuplicateFile)
+        if (result.Duplicate)
         {
-            _logger.LogTrace("Responding with failed addition of duplicate file to bucket {Bucket} with path {Path} for user {UserId}", request.Bucket, request.Path, userClaims.UserId);
-            return new AddFileResponse
+            _logger.LogTrace("Responding with a duplicate association between the file in bucket {Bucket} with path {Path} and user {UserId}", request.Bucket, request.Path, userClaims.UserId);
+            return new AssociateFileResponse
             {
-                DuplicateFile = true
+                Duplicate = true
             };
         }
 
-        throw new ProcessingFailureException(typeof(AddFileResult));
+        throw new ProcessingFailureException(typeof(AssociateFileResult));
     }
 }
