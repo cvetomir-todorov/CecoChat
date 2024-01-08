@@ -71,6 +71,9 @@ A short list of tasks to do next regarding product features, technical features,
   - Use allocation-free logging
   - Use in-memory caching for user chat state consumer to avoid loading the chat state from the database each time
   - Make a larger benchmark and improve configuration of backplane, client-server communication, databases
+* Files
+  - Verify file signatures and scan file content
+  - Store files in quarantine buckets initially
 * Observability
   - Add Open Telemetry metrics to Redis when StackExchange.Redis adds support
   - Add Open Telemetry metrics to UserDB when Npgsql adds support

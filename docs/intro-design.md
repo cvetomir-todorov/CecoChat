@@ -6,6 +6,8 @@
 * Clients create their session using the User service via the BFF
 * Clients acquire other users public profiles from the User service via the BFF
 * Clients manage their connections - invite/accept/cancel/remove from the User service via the BFF
+* Clients upload/download their files to/from the File storage via the BFF
+* Clients get the list of their files from the User service via the BFF
 * Clients acquire user chats and chat history from the Chats service via the BFF
 * Clients connect to Messaging service in order to chat with each other
 * Messaging service instances exchange data between each other indirectly using a PUB/SUB backplane
