@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="AspNetCore.HealthChecks.NpgSql" Version="7.1.0" />
-    <PackageReference Include="Npgsql" Version="7.0.6" />
+    <PackageReference Include="Npgsql" Version="8.0.1" />
   </ItemGroup>
 
 </Project>
