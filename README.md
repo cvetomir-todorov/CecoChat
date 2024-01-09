@@ -67,3 +67,9 @@ Check out [what next](docs/what-next.md) needs to be implemented. I appreciate a
 # Design
 
 ![Design](docs/images/cecochat-overall.png)
+
+# License
+
+* [Server Side Public License (SSPL)](https://www.mongodb.com/licensing/server-side-public-license)
+* [FAQ about SSPL](https://www.mongodb.com/licensing/server-side-public-license/faq)
+* [Comparison of AGPL to SSPL](https://webassets.mongodb.com/_com_assets/legal/SSPL-compared-to-AGPL.pdf)
