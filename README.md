@@ -16,6 +16,10 @@
 
 Check out [what next](docs/what-next.md) needs to be implemented. I appreciate all comments so feel free to use the `Discussions` tab.
 
+# Ban
+
+Any use of this project's code and assets for training LLMs, generative AI, or any other similar tools in the past, the present or the future, is done **without our permission**.
+
 # Code
 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=cvetomir-todorov_CecoChat&metric=alert_status)](https://sonarcloud.io/dashboard?id=cvetomir-todorov_CecoChat)
