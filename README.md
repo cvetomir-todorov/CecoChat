@@ -16,12 +16,6 @@
 
 Check out [what next](docs/what-next.md) needs to be implemented. I appreciate all comments so feel free to use the `Discussions` tab.
 
-# Technology
-
-* [System design](docs/intro-design.md) based on [microservice architecture](https://microservices.io/)
-* [Implementation](source) based on [cloud agnostic technologies](docs/intro-technologies.md)
-* [Configurable](docs/design-configuration.md), [observable](docs/design-observability.md), [containerized and runnable](docs/dev-run-prerequisites.md), [deployable](docs/design-deployment.md) local environment
-
 # Code
 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=cvetomir-todorov_CecoChat&metric=alert_status)](https://sonarcloud.io/dashboard?id=cvetomir-todorov_CecoChat)
@@ -35,6 +29,21 @@ Check out [what next](docs/what-next.md) needs to be implemented. I appreciate a
 [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=cvetomir-todorov_CecoChat&metric=code_smells)](https://sonarcloud.io/dashboard?id=cvetomir-todorov_CecoChat)
 [![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=cvetomir-todorov_CecoChat&metric=duplicated_lines_density)](https://sonarcloud.io/dashboard?id=cvetomir-todorov_CecoChat)
 [![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=cvetomir-todorov_CecoChat&metric=sqale_index)](https://sonarcloud.io/dashboard?id=cvetomir-todorov_CecoChat)
+
+# Technology
+
+* [System design](docs/intro-design.md) based on [microservice architecture](https://microservices.io/)
+* [Implementation](source) based on [cloud agnostic technologies](docs/intro-technologies.md)
+* [Configurable](docs/design-configuration.md), [observable](docs/design-observability.md), [containerized and runnable](docs/dev-run-prerequisites.md), [deployable](docs/design-deployment.md) local environment
+* [Main technologies](docs/intro-technologies.md)
+  - Integration - Kafka, gRPC, WebSocket, HTTP
+  - Data storage - Yugabyte, Cassandra, MinIO, Redis
+  - Operations - OpenTelemetry, Docker, Kubernetes
+  - Services - .NET, ASP.NET, SignalR, EF Core
+
+# Design
+
+![Design](docs/images/cecochat-overall.png)
 
 # Documentation
 
@@ -63,10 +72,6 @@ Check out [what next](docs/what-next.md) needs to be implemented. I appreciate a
   - [Development process](docs/dev-process.md)
 * [Load test using 2 machines](docs/load-test.md)
 * [What next](docs/what-next.md)
-
-# Design
-
-![Design](docs/images/cecochat-overall.png)
 
 # License
 
