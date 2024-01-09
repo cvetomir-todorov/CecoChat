@@ -25,7 +25,8 @@ public static class TelemetryExtensions
     {
         return tracing.AddAspNetCoreInstrumentation(aspnet =>
         {
-            aspnet.EnableGrpcAspNetCoreSupport = enableGrpcSupport;
+            // TODO: enable using OTEL_DOTNET_EXPERIMENTAL_ASPNETCORE_ENABLE_GRPC_INSTRUMENTATION
+            //aspnet.EnableGrpcAspNetCoreSupport = enableGrpcSupport;
 
             HashSet<string> excludedPaths = new()
             {
