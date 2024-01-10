@@ -121,7 +121,7 @@ public static class Program
             {
                 tracing
                     .SetResourceBuilder(serviceResourceBuilder)
-                    .AddAspNetCoreServer(enableGrpcSupport: false, options.Prometheus)
+                    .AddAspNetCoreServer(options.Prometheus)
                     .AddKafkaInstrumentation()
                     .AddGrpcClientInstrumentation(grpc => grpc.SuppressDownstreamInstrumentation = true)
                     .ConfigureSampling(options.TracingSampling)
