@@ -5,6 +5,7 @@ using CecoChat.Health;
 using CecoChat.Http.Health;
 using CecoChat.Kafka;
 using CecoChat.Kafka.Health;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
@@ -20,20 +21,25 @@ public static class TelemetryExtensions
 {
     public static TracerProviderBuilder AddAspNetCoreServer(
         this TracerProviderBuilder tracing,
-        bool enableGrpcSupport,
         PrometheusOptions prometheusOptions)
     {
         return tracing.AddAspNetCoreInstrumentation(aspnet =>
         {
-            // TODO: enable using OTEL_DOTNET_EXPERIMENTAL_ASPNETCORE_ENABLE_GRPC_INSTRUMENTATION
-            //aspnet.EnableGrpcAspNetCoreSupport = enableGrpcSupport;
-
             HashSet<string> excludedPaths = new()
             {
                 prometheusOptions.ScrapeEndpointPath, HealthPaths.Health, HealthPaths.Startup, HealthPaths.Live, HealthPaths.Ready
             };
             aspnet.Filter = httpContext => !excludedPaths.Contains(httpContext.Request.Path);
         });
+    }
+
+    public static void EnableGrpcInstrumentationForAspNet(this WebApplicationBuilder builder)
+    {
+        KeyValuePair<string, string?>[] pairs =
+        [
+            new("OTEL_DOTNET_EXPERIMENTAL_ASPNETCORE_ENABLE_GRPC_INSTRUMENTATION", "true")
+        ];
+        builder.Configuration.AddInMemoryCollection(pairs);
     }
 }
 

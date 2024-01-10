@@ -83,9 +83,10 @@ public static class Program
             .AddOpenTelemetry()
             .WithTracing(tracing =>
             {
+                builder.EnableGrpcInstrumentationForAspNet();
                 tracing
                     .SetResourceBuilder(serviceResourceBuilder)
-                    .AddAspNetCoreServer(enableGrpcSupport: true, options.Prometheus)
+                    .AddAspNetCoreServer(options.Prometheus)
                     .AddKafkaInstrumentation()
                     .AddGrpcClientInstrumentation(grpc => grpc.SuppressDownstreamInstrumentation = true)
                     .AddChatsInstrumentation()
