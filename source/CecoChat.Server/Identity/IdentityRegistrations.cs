@@ -17,8 +17,8 @@ public static class IdentityRegistrations
             .AddJwtBearer(jwt =>
             {
                 JwtSecurityTokenHandler jwtHandler = new() { MapInboundClaims = false };
-                jwt.SecurityTokenValidators.Clear();
-                jwt.SecurityTokenValidators.Add(jwtHandler);
+                jwt.TokenHandlers.Clear();
+                jwt.TokenHandlers.Add(jwtHandler);
 
                 byte[] issuerSigningKey = Encoding.UTF8.GetBytes(jwtOptions.Secret);
 
