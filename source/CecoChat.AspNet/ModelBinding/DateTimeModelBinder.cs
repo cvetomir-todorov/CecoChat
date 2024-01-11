@@ -13,10 +13,7 @@ public class DateTimeModelBinder : IModelBinder
 
     public Task BindModelAsync(ModelBindingContext bindingContext)
     {
-        if (bindingContext == null)
-        {
-            throw new ArgumentNullException(nameof(bindingContext));
-        }
+        ArgumentNullException.ThrowIfNull(bindingContext);
 
         string? textValue = bindingContext.ValueProvider.GetValue(bindingContext.ModelName).FirstValue;
         if (bindingContext.ModelType == typeof(DateTime?) && string.IsNullOrEmpty(textValue))
