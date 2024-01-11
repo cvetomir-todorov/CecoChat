@@ -26,6 +26,7 @@ services:
       CECOCHAT_Backplane__Kafka__BootstrapServers__1: kafka1:19092
       CECOCHAT_UserClient__Address: "https://user"
       CECOCHAT_ChatsClient__Address: "https://chats"
+      CECOCHAT_FileStorage__Endpoint: "http://minio0:9000"
       CECOCHAT_Telemetry__Tracing__Sampling__Strategy: Probability
       CECOCHAT_Telemetry__Tracing__Sampling__Probability: 0.1
       CECOCHAT_Telemetry__Tracing__Export__TargetHost: otel-collector
