@@ -1,15 +1,15 @@
 # Configuration
 
-![Configuration](images/cecochat-configuration.png)
-
 # Static configuration
 
 * Static app configuration is stored in `appsettings.json` files as is typical for .NET applications
 * For some services it is overriden for the `Development` environment via the `appsettings.ENVIRONMENT.json` approach
-* The [CecoChat docker-compose files](../deploy/docker) use environment variables with specific prefixes in order to push static configuration values to the services at start-up
-* [ASP.NET documentation](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-5.0#environment-variables) describes how to name the environment variables in order to override both ASP.NET and app-specific values
+* The [docker-compose files](../deploy/docker) and the [Kubernetes deployments](../deploy/minikube) for the application services use environment variables with specific prefixes in order to push static configuration values to the services at start-up
+* [ASP.NET documentation](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-5.0#environment-variables) describes how to name the environment variables in order to override both ASP.NET and application-specific values
 
 # Dynamic configuration
+
+![Configuration](images/cecochat-configuration.png)
 
 Some parts of the configuration are designed to be changed while it is running.
 
