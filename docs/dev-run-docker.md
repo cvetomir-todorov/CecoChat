@@ -10,6 +10,7 @@ Make sure that the [prerequisites](dev-run-prerequisites.md) have been met befor
   - YugabyteDB - 1 master, 1 tserver
   - Cassandra - 2 nodes
   - Redis - 3 masters
+  - MinIO - 1 node
 * Observability
   - Telemetry - 1 OTel collector
   - Tracing - 1 Jaeger all-in-one
@@ -28,6 +29,7 @@ Make sure that the [prerequisites](dev-run-prerequisites.md) have been met befor
 * Cassandra
 * YugabyteDB
 * Redis
+* MinIO
 * Logging
 
 **After** the containers are ran the following steps need to be performed manually:
@@ -66,6 +68,7 @@ The convenience of `docker compose` makes it possible to run exactly what is nee
   - `docker compose -f kafka.yml up -d`
   - `docker compose -f yugabyte.yml up -d`
   - `docker compose -f redis.yml up -d`
+  - `docker compose -f minio.yml up -d`
   - Run the BFF service from the IDE to make queries
   - Run the Messaging services to receive connection notifications
 * Working on observability:
@@ -74,6 +77,7 @@ The convenience of `docker compose` makes it possible to run exactly what is nee
   - `docker compose -f metrics.yml up -d`
   - `docker compose -f logging.yml up -d`
 * Start all CecoChat containers for the services in docker:
+  - `docker compose -f cecochat-config.yml up -d`
   - `docker compose -f cecochat-messaging.yml up -d`
   - `docker compose -f cecochat-bff.yml up -d`
 * In order to stop containers or destroy them:
