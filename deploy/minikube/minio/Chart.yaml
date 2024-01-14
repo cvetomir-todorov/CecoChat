@@ -1,0 +1,8 @@
+apiVersion: v2
+name: minio
+description: The MinIO file storage for CecoChat
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+maintainers:
+  - name: CecoChat
