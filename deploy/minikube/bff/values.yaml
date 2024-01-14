@@ -8,6 +8,12 @@ Networking:
   Port: 443
   UserService: user
   ChatsService: chats
+  FileStorage:
+    Host: minio
+    Service: minio
+    Port: 9000
+    AccessKey: admin
+    Secret: secret12
 Ingress:
   Host: bff.cecochat.com
   SecretName: ingress-tls
