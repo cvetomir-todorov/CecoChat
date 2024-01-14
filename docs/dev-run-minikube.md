@@ -10,8 +10,9 @@ Make sure that the [prerequisites](dev-run-prerequisites.md) have been met befor
   - YugabyteDB - 2 masters, 2 tservers
   - Cassandra - 2 nodes
   - Redis - 3 masters
+  - MinIO - 1 node
 * Observability
-  - Telemetry - 2 OTel collector
+  - Telemetry - 2 OTel collectors
   - Tracing - 1 Jaeger all-in-one
   - Logging - 1 ElasticSearch, 1 Kibana
 * CecoChat
@@ -67,7 +68,7 @@ Redis cluster is initialized manually by executing the content of the `cluster.s
 kubectl exec -it redis-0 -- bash
 ```
 
-The topics in Kafka, the keyspaces in Cassandra, the databases in Yugabyte, are all created when the respective service is started, if they do not exist.
+The topics in Kafka, the keyspaces in Cassandra, the databases in Yugabyte, the buckets in MinIO, are all created when the respective service is started, if they do not exist.
 
 ## Observability
 
@@ -105,6 +106,8 @@ The Kubernetes ingresses expose the following services via the respective domain
   - `https://config.cecochat.com/swagger` - the dynamic configuration Swagger interface 
   - `https://jaeger.cecochat.com` - traces in Jaeger
   - `https://kibana.cecochat.com` - logs in Kibana
+* Data
+  - `https://minio.cecochat.com` - MinIO files
 * Client
   - `https://bff.cecochat.com` - BFF service
   - `https://messaging.cecochat.com` - Messaging service
@@ -129,6 +132,7 @@ config   	cecochat 	1       	2023-12-19 12:08:51.637466328 +0200 EET	deployed	co
 idgen    	cecochat 	1       	2023-12-19 12:11:17.040213258 +0200 EET	deployed	idgen-0.1.0    	0.1.0      
 logging  	cecochat 	1       	2023-12-19 12:43:29.96052056 +0200 EET 	deployed	logging-0.1.0  	0.1.0      
 messaging	cecochat 	1       	2023-12-19 12:11:16.811841518 +0200 EET	deployed	messaging-0.1.0	0.1.0      
+minio   	cecochat 	1       	2023-12-19 12:13:26.551841517 +0200 EET	deployed	minio-0.1.0	    0.1.0      
 redis    	cecochat 	1       	2023-12-19 11:24:25.946219644 +0200 EET	deployed	redis-0.1.0    	0.1.0      
 telemetry	cecochat 	1       	2023-12-19 12:43:29.632952485 +0200 EET	deployed	telemetry-0.1.0	0.1.0      
 tracing  	cecochat 	1       	2023-12-19 12:43:29.798445504 +0200 EET	deployed	tracing-0.1.0  	0.1.0      
@@ -157,6 +161,7 @@ logging-es-0                                1/1     Running   0             88s
 logging-kibana-0                            1/1     Running   0             88s
 messaging-0                                 1/1     Running   0             33m
 messaging-1                                 1/1     Running   0             33m
+minio-0                                     1/1     Running   0             37m
 redis-0                                     1/1     Running   0             80m
 redis-1                                     1/1     Running   0             80m
 redis-2                                     1/1     Running   0             80m
@@ -186,6 +191,7 @@ logging-kibana             ClusterIP   None             <none>        5601/TCP  
 messaging                  ClusterIP   None             <none>        443/TCP                               34m
 messaging-0                ClusterIP   10.97.159.51     <none>        443/TCP                               34m
 messaging-1                ClusterIP   10.100.37.180    <none>        443/TCP                               34m
+minio                      ClusterIP   None             <none>        9000/TCP,9090/TCP                     37m
 redis                      ClusterIP   None             <none>        6379/TCP                              81m
 telemetry-otel-collector   ClusterIP   10.109.140.197   <none>        4317/TCP                              2m8s
 tracing-jaeger             ClusterIP   None             <none>        4317/TCP,5778/TCP,16686/TCP           2m8s
@@ -224,6 +230,7 @@ idgen             2/2     35m
 logging-es        1/1     3m2s
 logging-kibana    1/1     3m2s
 messaging         2/2     35m
+minio             1/1     37m
 redis             3/3     82m
 tracing-jaeger    1/1     3m3s
 yb-master         2/2     86m
@@ -237,6 +244,7 @@ bff              nginx   bff.cecochat.com         192.168.49.2   80, 443   35m
 config           nginx   config.cecochat.com      192.168.49.2   80, 443   37m
 logging-kibana   nginx   kibana.cecochat.com      192.168.49.2   80, 443   3m19s
 messaging        nginx   messaging.cecochat.com   192.168.49.2   80, 443   35m
+minio            nginx   minio.cecochat.com       192.168.49.2   80, 443   37m
 tracing-jaeger   nginx   jaeger.cecochat.com      192.168.49.2   80, 443   3m20s
 ```
 
@@ -275,6 +283,7 @@ data-cassandra-0         Bound    pvc-f94f74de-008f-446f-8003-f44cf2b65d4b   1Gi
 data-cassandra-1         Bound    pvc-2aa65930-bef4-4e85-8bab-c5abb0568456   1Gi        RWO            standard       17d
 data-logging-es-0        Bound    pvc-9f6817a1-5f5c-4961-ba8f-c16f57c24cf9   1Gi        RWO            standard       15d
 data-logging-kibana-0    Bound    pvc-f4946348-2db1-48d7-b489-911e577c5190   512Mi      RWO            standard       15d
+data-minio-0             Bound    pvc-aa2bc4d4-cd32-4bd6-8040-cc90e544a2df   1Gi        RWO            standard       38m
 data-redis-0             Bound    pvc-e9fbdc04-6b5b-48a4-a724-6d2f4f0516cd   128Mi      RWO            standard       82m
 data-redis-1             Bound    pvc-5b28d789-1829-4bc9-8f48-c26d6e3d29d6   128Mi      RWO            standard       82m
 data-redis-2             Bound    pvc-8f75ae4d-20fe-400e-acff-d8745cff42d7   128Mi      RWO            standard       82m
