@@ -56,7 +56,17 @@ spec:
             - configMapRef:
                 name: service-logging
           env:
+            - name: NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
             - name: CECOCHAT_UserClient__Address
               value: https://{{.Values.Networking.UserService}}
             - name: CECOCHAT_ChatsClient__Address
               value: https://{{.Values.Networking.ChatsService}}
+            - name: CECOCHAT_FileStorage__Endpoint
+              value: "http://{{.Values.Networking.FileStorage.Host}}-0.{{.Values.Networking.FileStorage.Service}}.$(NAMESPACE).svc.cluster.local:{{.Values.Networking.FileStorage.Port}}"
+            - name: CECOCHAT_FileStorage__AccessKey
+              value: {{.Values.Networking.FileStorage.AccessKey}}
+            - name: CECOCHAT_FileStorage__Secret
+              value: {{.Values.Networking.FileStorage.Secret}}
