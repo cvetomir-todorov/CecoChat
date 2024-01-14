@@ -1,0 +1,15 @@
+StatefulSet:
+  Replicas: 1
+Image:
+  Name: minio/minio
+  Tag: RELEASE.2023-12-20T01-00-02Z
+  PullPolicy: IfNotPresent
+Networking:
+  AccessPort: 9000
+  ConsolePort: 9090
+Access:
+  RootUser: admin
+  RootPass: secret12
+Resources:
+  Requests:
+    Storage: 1Gi
