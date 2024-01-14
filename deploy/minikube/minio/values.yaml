@@ -10,6 +10,9 @@ Networking:
 Access:
   RootUser: admin
   RootPass: secret12
+Ingress:
+  Host: minio.cecochat.com
+  SecretName: ingress-tls
 Resources:
   Requests:
     Storage: 1Gi
