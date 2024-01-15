@@ -6,6 +6,7 @@ The technologies chosen are [cloud agnostic](https://codersociety.com/blog/artic
 * Data storage - Yugabyte, Cassandra, MinIO, Redis
 * Operations - OpenTelemetry, Docker, Kubernetes
 * Services - .NET, ASP.NET, SignalR, EF Core
+* Libraries - Autofac, Serilog, FluentValidation, AutoMapper, Polly, IdGen
 
 ![Technologies](images/cecochat-technologies.png)
 
@@ -152,7 +153,7 @@ Dynamic configuration is based on multiple technologies:
 ![EFCore](tech-images/efcore.png)
 ![SignalR](tech-images/signalr.webp)
 
-The services are based on .NET 6, ASP.NET, SignalR and Entity Framework Core:
+The services are based on .NET, ASP.NET, SignalR and Entity Framework Core:
 * open-source software backed by Microsoft
 * very mature, feature-rich, lots of tools
 * widely-used with a big community
@@ -160,17 +161,18 @@ The services are based on .NET 6, ASP.NET, SignalR and Entity Framework Core:
 
 ![Autofac](tech-images/autofac.png)
 ![Serilog](tech-images/serilog.png)
-![AutoMapper](tech-images/automapper.webp)
 ![FluentValidation](tech-images/fluent-validation.png)
+![AutoMapper](tech-images/automapper.webp)
 ![Polly](tech-images/polly.png)
 ![Refit](tech-images/refit.png)
 
 Additional libraries which are all open-source and created, supported and developed by the community:
 * Autofac is the most popular DI container
 * Serilog is one of the most popular logging frameworks
-* AutoMapper is the most popular mapping library
 * FluentValidation is the most popular data validation library
+* AutoMapper is the most popular mapping library
 * Polly is a popular HTTP client policies library
+* IdGen is used to generate Snowflake IDs
 * Refit is one of the most popular REST clients
 
 # Tools

@@ -8,9 +8,8 @@
   - Indication for new messages
   - Review history at a random point in time
 * Users
-  - Registration and authentication
-  - Change password, edit trivial profile data
-  - Profiles with full and public-only data
+  - Register, authenticate, change password, edit trivial profile data
+  - Profiles with static full/public-only data
   - Connect with other users - invite/accept/cancel/remove
   - Store small user files - images, text, PDF
 
@@ -18,7 +17,7 @@ Check out [what next](docs/what-next.md) needs to be implemented. I appreciate a
 
 # Ban
 
-Any use of this project's code and assets for training LLMs, generative AI, or any other similar tools in the past, the present or the future, is done **without our permission**.
+Any use of the project for training large language models, generative AI, or any other similar tools in the past/present/future is done without our permission.
 
 # Code
 
@@ -44,6 +43,7 @@ Any use of this project's code and assets for training LLMs, generative AI, or a
   - Data storage - Yugabyte, Cassandra, MinIO, Redis
   - Operations - OpenTelemetry, Docker, Kubernetes
   - Services - .NET, ASP.NET, SignalR, EF Core
+  - Libraries - Autofac, Serilog, FluentValidation, AutoMapper, Polly, IdGen
 
 # Design
 
