@@ -12,9 +12,8 @@ The current product and technical features
   - Indication for new messages
   - Review history at a random point in time
 * Users
-  - Registration and authentication
-  - Change password, edit trivial profile data
-  - Profiles with full and public-only data
+  - Register, authenticate, change password, edit trivial profile data
+  - Profiles with static full/public-only data
   - Connect with other users - invite/accept/cancel/remove
   - Store small user files - images, text, PDF
 
