@@ -208,7 +208,7 @@ public sealed class ChatClient : IAsyncDisposable
 
     public async Task<List<LocalStorage.ProfilePublic>> GetPublicProfiles(IEnumerable<long> userIds)
     {
-        GetPublicProfilesResponse response = await _bffClient.GetPublicProfiles(userIds.ToArray(), _accessToken!);
+        GetPublicProfilesResponse response = await _bffClient.GetPublicProfiles(userIds.ToArray(), searchPattern: null, _accessToken!);
         List<LocalStorage.ProfilePublic> profiles = Map.PublicProfiles(response.Profiles);
 
         return profiles;

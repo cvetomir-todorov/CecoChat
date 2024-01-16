@@ -61,37 +61,53 @@ public class ProfileController : ControllerBase
     [Authorize(Policy = "user")]
     [HttpGet(Name = "GetPublicProfiles")]
     [ProducesResponseType(typeof(GetPublicProfilesResponse), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetPublicProfiles(CancellationToken ct)
+    public async Task<IActionResult> GetPublicProfiles([FromQuery(Name = "searchPattern")] string? searchPattern, CancellationToken ct)
     {
+        // TODO: validate input, and/or consider model binding the request from the query string
+
         if (!HttpContext.TryGetUserClaimsAndAccessToken(_logger, out UserClaims? userClaims, out string? accessToken))
         {
             return Unauthorized();
         }
-        if (!TryParseUserIds("userIds", out long[]? requestedUserIds))
+
+        string? userIdsString = Request.Query["userIds"].FirstOrDefault();
+
+        IReadOnlyCollection<Contracts.User.ProfilePublic>? profiles = null;
+        string source = string.Empty;
+
+        if (!string.IsNullOrWhiteSpace(userIdsString) && string.IsNullOrWhiteSpace(searchPattern))
         {
+            if (!TryParseUserIds(userIdsString, out long[]? requestedUserIds))
+            {
+                return BadRequest(ModelState);
+            }
+
+            profiles = await _profileClient.GetPublicProfiles(userClaims.UserId, requestedUserIds, accessToken, ct);
+            source = "in the ID list";
+        }
+        if (!string.IsNullOrWhiteSpace(searchPattern) && string.IsNullOrWhiteSpace(userIdsString))
+        {
+            profiles = await _profileClient.GetPublicProfiles(userClaims.UserId, searchPattern, accessToken, ct);
+            source = "matching the search pattern";
+        }
+
+        if (profiles == null)
+        {
+            ModelState.AddModelError("query", "Either user IDs or a search pattern should be specified.");
             return BadRequest(ModelState);
         }
 
-        IEnumerable<Contracts.User.ProfilePublic> profiles = await _profileClient.GetPublicProfiles(userClaims.UserId, requestedUserIds, accessToken, ct);
         GetPublicProfilesResponse response = new()
         {
             Profiles = profiles.Select(profile => _mapper.Map<ProfilePublic>(profile)).ToArray()
         };
 
-        _logger.LogTrace("Responding with {PublicProfileCount} public profiles requested by user {UserId}", response.Profiles.Length, userClaims.UserId);
+        _logger.LogTrace("Responding with {PublicProfileCount} public profiles {PublicProfilesSource} requested by user {UserId}", response.Profiles.Length, source, userClaims.UserId);
         return Ok(response);
     }
 
-    private bool TryParseUserIds(string paramName, [NotNullWhen(true)] out long[]? userIds)
+    private bool TryParseUserIds(string paramValue, [NotNullWhen(true)] out long[]? userIds)
     {
-        string? paramValue = Request.Query[paramName].FirstOrDefault();
-        if (string.IsNullOrWhiteSpace(paramValue))
-        {
-            ModelState.AddModelError(nameof(paramName), "Missing user IDs");
-            userIds = null;
-            return false;
-        }
-
         string[] userIdStrings = paramValue.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         userIds = new long[userIdStrings.Length];
         int invalidCount = 0;
@@ -110,7 +126,7 @@ public class ProfileController : ControllerBase
 
         if (invalidCount > 0)
         {
-            ModelState.AddModelError(nameof(paramName), "Invalid user IDs");
+            ModelState.AddModelError("userIds", "Invalid user IDs");
             return false;
         }
 
