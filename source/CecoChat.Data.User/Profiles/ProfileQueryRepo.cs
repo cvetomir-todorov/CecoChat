@@ -75,4 +75,32 @@ internal class ProfileQueryRepo : IProfileQueryRepo
             .AsNoTracking()
             .ToListAsync();
     }
+
+    public async Task<IEnumerable<ProfilePublic>> GetPublicProfiles(string searchPattern, long userId)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(searchPattern);
+
+        // TODO: consider reusing the regex in the user service
+        if (searchPattern.Length < 3)
+        {
+            throw new ArgumentException("Search pattern should be at least 3 letters long.", nameof(searchPattern));
+        }
+        if (searchPattern.Any(c => !char.IsLetter(c)))
+        {
+            throw new ArgumentException("Search pattern should contain only letters.", nameof(searchPattern));
+        }
+
+        // TODO: limit the number of returned users
+        string likePattern = $"%{searchPattern}%";
+        List<ProfilePublic> profiles = await _dbContext.Profiles
+            .Where(entity => EF.Functions.Like(entity.UserName, likePattern))
+            .Select(entity => _mapper.Map<ProfilePublic>(entity))
+            .AsNoTracking()
+            .ToListAsync();
+
+        _logger.LogTrace(
+            "Fetched {PublicProfileCount} public profiles matching the search pattern {ProfileSearchPattern} as requested by user {UserId}",
+            profiles.Count, likePattern, userId);
+        return profiles;
+    }
 }

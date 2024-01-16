@@ -9,6 +9,8 @@ public interface IProfileQueryRepo
     Task<ProfilePublic?> GetPublicProfile(long requestedUserId, long userId);
 
     Task<IEnumerable<ProfilePublic>> GetPublicProfiles(IList<long> requestedUserIds, long userId);
+
+    Task<IEnumerable<ProfilePublic>> GetPublicProfiles(string searchPattern, long userId);
 }
 
 public readonly struct FullProfileResult
