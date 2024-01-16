@@ -119,15 +119,31 @@ internal sealed class ProfileClient : IProfileClient
 
     public async Task<IReadOnlyCollection<ProfilePublic>> GetPublicProfiles(long userId, IEnumerable<long> requestedUserIds, string accessToken, CancellationToken ct)
     {
-        GetPublicProfilesRequest request = new();
+        GetPublicProfilesByIdListRequest request = new();
         request.UserIds.Add(requestedUserIds);
 
         Metadata headers = new();
         headers.AddAuthorization(accessToken);
         DateTime deadline = _clock.GetNowUtc().Add(_options.CallTimeout);
-        GetPublicProfilesResponse response = await _profileQueryClient.GetPublicProfilesAsync(request, headers, deadline, ct);
+        GetPublicProfilesByIdListResponse response = await _profileQueryClient.GetPublicProfilesByIdListAsync(request, headers, deadline, ct);
 
-        _logger.LogTrace("Received {PublicProfileCount} public profiles requested by user {UserId}", response.Profiles.Count, userId);
+        _logger.LogTrace("Received {PublicProfileCount} public profiles in the ID list requested by user {UserId}", response.Profiles.Count, userId);
+        return response.Profiles;
+    }
+
+    public async Task<IReadOnlyCollection<ProfilePublic>> GetPublicProfiles(long userId, string searchPattern, string accessToken, CancellationToken ct)
+    {
+        GetPublicProfilesByPatternRequest request = new();
+        request.SearchPattern = searchPattern;
+
+        Metadata headers = new();
+        headers.AddAuthorization(accessToken);
+        DateTime deadline = _clock.GetNowUtc().Add(_options.CallTimeout);
+        GetPublicProfilesByPatternResponse response = await _profileQueryClient.GetPublicProfilesByPatternAsync(request, headers, deadline, ct);
+
+        _logger.LogTrace(
+            "Received {PublicProfileCount} public profiles matching the search pattern {ProfileSearchPattern} as requested by user {UserId}",
+            response.Profiles.Count, request.SearchPattern, userId);
         return response.Profiles;
     }
 }

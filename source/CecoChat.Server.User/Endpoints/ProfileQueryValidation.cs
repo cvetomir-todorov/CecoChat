@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using CecoChat.Contracts.User;
 using CecoChat.Data;
 using FluentValidation;
@@ -13,9 +14,9 @@ public sealed class GetPublicProfileRequestValidator : AbstractValidator<GetPubl
     }
 }
 
-public sealed class GetPublicProfilesRequestValidator : AbstractValidator<GetPublicProfilesRequest>
+public sealed class GetPublicProfilesByIdListRequestValidator : AbstractValidator<GetPublicProfilesByIdListRequest>
 {
-    public GetPublicProfilesRequestValidator()
+    public GetPublicProfilesByIdListRequestValidator()
     {
         RuleFor(x => x.UserIds)
             .NotEmpty()
@@ -23,4 +24,24 @@ public sealed class GetPublicProfilesRequestValidator : AbstractValidator<GetPub
             .WithMessage("{PropertyName} count must not exceed 128, but {PropertyValue} was provided.")
             .ForEach(userId => userId.ValidUserId());
     }
+}
+
+public sealed class GetPublicProfilesByPatternRequestValidator : AbstractValidator<GetPublicProfilesByPatternRequest>
+{
+    public GetPublicProfilesByPatternRequestValidator()
+    {
+        RuleFor(x => x.SearchPattern)
+            .NotEmpty()
+            .Matches(ProfileQueryRegexes.UserNameSearchPatternRegex())
+            .WithMessage("{PropertyName} should be a string with length [3, 32] which contains only characters, but '{PropertyValue}' was provided.");
+    }
+}
+
+internal static partial class ProfileQueryRegexes
+{
+    [GeneratedRegex(
+        pattern: "^([\\w]{3,32})$",
+        RegexOptions.CultureInvariant,
+        matchTimeoutMilliseconds: 1000)]
+    public static partial Regex UserNameSearchPatternRegex();
 }

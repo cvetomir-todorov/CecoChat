@@ -33,16 +33,32 @@ public class ProfileQueryService : ProfileQuery.ProfileQueryBase
     }
 
     [Authorize(Policy = "user")]
-    public override async Task<GetPublicProfilesResponse> GetPublicProfiles(GetPublicProfilesRequest request, ServerCallContext context)
+    public override async Task<GetPublicProfilesByIdListResponse> GetPublicProfilesByIdList(GetPublicProfilesByIdListRequest request, ServerCallContext context)
     {
         UserClaims userClaims = context.GetUserClaimsGrpc(_logger);
 
         IEnumerable<ProfilePublic> profiles = await _repo.GetPublicProfiles(request.UserIds, userClaims.UserId);
 
-        GetPublicProfilesResponse response = new();
+        GetPublicProfilesByIdListResponse response = new();
         response.Profiles.Add(profiles);
 
-        _logger.LogTrace("Responding with {PublicProfileCount} public profiles requested by user {UserId}", response.Profiles.Count, userClaims.UserId);
+        _logger.LogTrace("Responding with {PublicProfileCount} public profiles in the ID list requested by user {UserId}", response.Profiles.Count, userClaims.UserId);
+        return response;
+    }
+
+    [Authorize(Policy = "user")]
+    public override async Task<GetPublicProfilesByPatternResponse> GetPublicProfilesByPattern(GetPublicProfilesByPatternRequest request, ServerCallContext context)
+    {
+        UserClaims userClaims = context.GetUserClaimsGrpc(_logger);
+
+        IEnumerable<ProfilePublic> profiles = await _repo.GetPublicProfiles(request.SearchPattern, userClaims.UserId);
+
+        GetPublicProfilesByPatternResponse response = new();
+        response.Profiles.Add(profiles);
+
+        _logger.LogTrace(
+            "Responding with {PublicProfileCount} public profiles matching the search pattern {ProfileSearchPattern} as requested by user {UserId}",
+            response.Profiles.Count, request.SearchPattern, userClaims.UserId);
         return response;
     }
 }
