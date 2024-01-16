@@ -1,12 +1,23 @@
-using System.Diagnostics.CodeAnalysis;
 using AutoMapper;
+using CecoChat.AspNet.ModelBinding;
 using CecoChat.Client.User;
 using CecoChat.Contracts.Bff.Profiles;
 using CecoChat.Server.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace CecoChat.Server.Bff.Endpoints.Profiles;
+
+public sealed class GetPublicProfilesRequest
+{
+    [FromQuery(Name = "userIds")]
+    [ModelBinder(BinderType = typeof(LongArrayCsvModelBinder))]
+    public long[] UserIds { get; init; } = Array.Empty<long>();
+
+    [FromQuery(Name = "searchPattern")]
+    public string SearchPattern { get; init; } = string.Empty;
+}
 
 [ApiController]
 [Route("api/profiles")]
@@ -61,33 +72,26 @@ public class ProfileController : ControllerBase
     [Authorize(Policy = "user")]
     [HttpGet(Name = "GetPublicProfiles")]
     [ProducesResponseType(typeof(GetPublicProfilesResponse), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetPublicProfiles([FromQuery(Name = "searchPattern")] string? searchPattern, CancellationToken ct)
+    public async Task<IActionResult> GetPublicProfiles([FromMultiSource][BindRequired] GetPublicProfilesRequest request, CancellationToken ct)
     {
-        // TODO: validate input, and/or consider model binding the request from the query string
+        // TODO: validate input
 
         if (!HttpContext.TryGetUserClaimsAndAccessToken(_logger, out UserClaims? userClaims, out string? accessToken))
         {
             return Unauthorized();
         }
 
-        string? userIdsString = Request.Query["userIds"].FirstOrDefault();
-
         IReadOnlyCollection<Contracts.User.ProfilePublic>? profiles = null;
         string source = string.Empty;
 
-        if (!string.IsNullOrWhiteSpace(userIdsString) && string.IsNullOrWhiteSpace(searchPattern))
+        if (request.UserIds.Length > 0 && string.IsNullOrWhiteSpace(request.SearchPattern))
         {
-            if (!TryParseUserIds(userIdsString, out long[]? requestedUserIds))
-            {
-                return BadRequest(ModelState);
-            }
-
-            profiles = await _profileClient.GetPublicProfiles(userClaims.UserId, requestedUserIds, accessToken, ct);
+            profiles = await _profileClient.GetPublicProfiles(userClaims.UserId, request.UserIds, accessToken, ct);
             source = "in the ID list";
         }
-        if (!string.IsNullOrWhiteSpace(searchPattern) && string.IsNullOrWhiteSpace(userIdsString))
+        if (!string.IsNullOrWhiteSpace(request.SearchPattern) && request.UserIds.Length == 0)
         {
-            profiles = await _profileClient.GetPublicProfiles(userClaims.UserId, searchPattern, accessToken, ct);
+            profiles = await _profileClient.GetPublicProfiles(userClaims.UserId, request.SearchPattern, accessToken, ct);
             source = "matching the search pattern";
         }
 
@@ -104,32 +108,5 @@ public class ProfileController : ControllerBase
 
         _logger.LogTrace("Responding with {PublicProfileCount} public profiles {PublicProfilesSource} requested by user {UserId}", response.Profiles.Length, source, userClaims.UserId);
         return Ok(response);
-    }
-
-    private bool TryParseUserIds(string paramValue, [NotNullWhen(true)] out long[]? userIds)
-    {
-        string[] userIdStrings = paramValue.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        userIds = new long[userIdStrings.Length];
-        int invalidCount = 0;
-
-        for (int i = 0; i < userIdStrings.Length; ++i)
-        {
-            if (!long.TryParse(userIdStrings[i], out long userId))
-            {
-                invalidCount++;
-            }
-            else
-            {
-                userIds[i] = userId;
-            }
-        }
-
-        if (invalidCount > 0)
-        {
-            ModelState.AddModelError("userIds", "Invalid user IDs");
-            return false;
-        }
-
-        return true;
     }
 }
