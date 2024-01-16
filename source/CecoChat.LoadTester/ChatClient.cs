@@ -67,7 +67,7 @@ public sealed class ChatClient : IAsyncDisposable
 
         if (userIds.Length > 0)
         {
-            await _bffClient.GetPublicProfiles(userIds, _accessToken!);
+            await _bffClient.GetPublicProfiles(userIds, searchPattern: null, _accessToken!);
         }
     }
 
