@@ -11,6 +11,8 @@ public interface IProfileClient
     Task<ProfilePublic?> GetPublicProfile(long userId, long requestedUserId, string accessToken, CancellationToken ct);
 
     Task<IReadOnlyCollection<ProfilePublic>> GetPublicProfiles(long userId, IEnumerable<long> requestedUserIds, string accessToken, CancellationToken ct);
+
+    Task<IReadOnlyCollection<ProfilePublic>> GetPublicProfiles(long userId, string searchPattern, string accessToken, CancellationToken ct);
 }
 
 public readonly struct ChangePasswordResult

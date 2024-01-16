@@ -5,7 +5,8 @@ import "ProfilePublic.proto";
 
 service ProfileQuery {
   rpc GetPublicProfile(GetPublicProfileRequest) returns (GetPublicProfileResponse);
-  rpc GetPublicProfiles(GetPublicProfilesRequest) returns (GetPublicProfilesResponse);
+  rpc GetPublicProfilesByIdList(GetPublicProfilesByIdListRequest) returns (GetPublicProfilesByIdListResponse);
+  rpc GetPublicProfilesByPattern(GetPublicProfilesByPatternRequest) returns (GetPublicProfilesByPatternResponse);
 }
 
 message GetPublicProfileRequest {
@@ -16,10 +17,18 @@ message GetPublicProfileResponse {
   ProfilePublic profile = 1;
 }
 
-message GetPublicProfilesRequest {
+message GetPublicProfilesByIdListRequest {
   repeated int64 user_ids = 1;
 }
 
-message GetPublicProfilesResponse {
+message GetPublicProfilesByIdListResponse {
+  repeated ProfilePublic profiles = 1;
+}
+
+message GetPublicProfilesByPatternRequest {
+  string search_pattern = 1;
+}
+
+message GetPublicProfilesByPatternResponse {
   repeated ProfilePublic profiles = 1;
 }
