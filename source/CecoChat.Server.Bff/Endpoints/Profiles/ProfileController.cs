@@ -74,28 +74,25 @@ public class ProfileController : ControllerBase
     [ProducesResponseType(typeof(GetPublicProfilesResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetPublicProfiles([FromMultiSource][BindRequired] GetPublicProfilesRequest request, CancellationToken ct)
     {
-        // TODO: validate input
-
         if (!HttpContext.TryGetUserClaimsAndAccessToken(_logger, out UserClaims? userClaims, out string? accessToken))
         {
             return Unauthorized();
         }
 
-        IReadOnlyCollection<Contracts.User.ProfilePublic>? profiles = null;
-        string source = string.Empty;
+        IReadOnlyCollection<Contracts.User.ProfilePublic>? profiles;
+        string source;
 
-        if (request.UserIds.Length > 0 && string.IsNullOrWhiteSpace(request.SearchPattern))
+        if (request.UserIds.Length > 0)
         {
             profiles = await _profileClient.GetPublicProfiles(userClaims.UserId, request.UserIds, accessToken, ct);
             source = "in the ID list";
         }
-        if (!string.IsNullOrWhiteSpace(request.SearchPattern) && request.UserIds.Length == 0)
+        else if (!string.IsNullOrWhiteSpace(request.SearchPattern))
         {
             profiles = await _profileClient.GetPublicProfiles(userClaims.UserId, request.SearchPattern, accessToken, ct);
             source = "matching the search pattern";
         }
-
-        if (profiles == null)
+        else
         {
             ModelState.AddModelError("query", "Either user IDs or a search pattern should be specified.");
             return BadRequest(ModelState);
