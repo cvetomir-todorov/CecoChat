@@ -69,4 +69,14 @@ public static class ProfileValidationRules
             .NotEmpty()
             .EmailAddress();
     }
+
+    public static IRuleBuilderOptions<T, IEnumerable<long>> ValidUserIdList<T>(this IRuleBuilderInitial<T, ICollection<long>> ruleBuilder)
+    {
+        return ruleBuilder
+            .NotEmpty()
+            .Must(userIds => userIds.Count < 128)
+            .WithMessage("{PropertyName} count must not exceed 128, but {PropertyValue} was provided.")
+            .ForEach(userId => userId.ValidUserId());
+        //.ForEach(userId => userId.ValidUserId());
+    }
 }
