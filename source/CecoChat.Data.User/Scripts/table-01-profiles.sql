@@ -23,6 +23,11 @@ CREATE INDEX "Profiles_UserName_index"
 ALTER TABLE IF EXISTS public."Profiles"
     ADD CONSTRAINT "Profiles_UserName_unique" UNIQUE ("UserName");
 
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+CREATE INDEX "Profiles_UserName_trgm"
+    ON public."Profiles" USING gin
+        ("UserName" gin_trgm_ops);
+
 ALTER TABLE IF EXISTS public."Profiles"
     OWNER to yugabyte;
 GRANT ALL ON TABLE public."Profiles" TO cecochat_dev;

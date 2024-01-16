@@ -102,10 +102,16 @@ public class CachingProfileQueryRepo : IProfileQueryRepo
         return resultProfiles;
     }
 
+    public async Task<IEnumerable<ProfilePublic>> GetPublicProfiles(string searchPattern, long userId)
+    {
+        // TODO: add caching
+        return await _decoratedRepo.GetPublicProfiles(searchPattern, userId);
+    }
+
     private void LogFetchedPublicProfiles(int totalCount, int fromCacheCount, int fromDbCount, long userId)
     {
         _logger.LogTrace(
-            "Fetched {PublicProfileCount} public profiles in total ({FromCacheCount} from cache, {FromDbCount} from DB) as requested by user {UserId}",
+            "Fetched {PublicProfileCount} public profiles in total ({FromCacheCount} from cache, {FromDbCount} from DB) in the ID list as requested by user {UserId}",
             totalCount, fromCacheCount, fromDbCount, userId);
     }
 
