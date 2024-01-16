@@ -19,10 +19,7 @@ public sealed class GetPublicProfilesByIdListRequestValidator : AbstractValidato
     public GetPublicProfilesByIdListRequestValidator()
     {
         RuleFor(x => x.UserIds)
-            .NotEmpty()
-            .Must(userIds => userIds.Count < 128)
-            .WithMessage("{PropertyName} count must not exceed 128, but {PropertyValue} was provided.")
-            .ForEach(userId => userId.ValidUserId());
+            .ValidUserIdList();
     }
 }
 

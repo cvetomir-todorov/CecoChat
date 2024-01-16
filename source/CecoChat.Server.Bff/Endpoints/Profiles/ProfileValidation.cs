@@ -1,3 +1,4 @@
+using CecoChat.Data;
 using FluentValidation;
 
 namespace CecoChat.Server.Bff.Endpoints.Profiles;
@@ -16,6 +17,8 @@ public sealed class GetPublicProfilesRequestValidator : AbstractValidator<GetPub
                 return isValid;
             })
             .WithMessage("Either user IDs or a search pattern should be specified.");
-        // TODO: validate user IDs and search pattern
+        RuleFor(x => x.UserIds)
+            .ValidUserIdList();
+        // TODO: validate search pattern
     }
 }
