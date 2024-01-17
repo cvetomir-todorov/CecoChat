@@ -148,11 +148,11 @@ public class CachingProfileQueryRepo : IProfileQueryRepo
         }
     }
 
-    public async Task<IReadOnlyCollection<ProfilePublic>> GetPublicProfiles(string searchPattern, long userId)
+    public async Task<IReadOnlyCollection<ProfilePublic>> GetPublicProfiles(string searchPattern, int profileCount, long userId)
     {
         if (!_cacheOptions.Enabled)
         {
-            IReadOnlyCollection<ProfilePublic> profiles = await _decoratedRepo.GetPublicProfiles(searchPattern, userId);
+            IReadOnlyCollection<ProfilePublic> profiles = await _decoratedRepo.GetPublicProfiles(searchPattern, profileCount, userId);
             LogProfileSearch(dataSourceAndAction: "DB", profiles.Count, searchPattern, userId);
             return profiles;
         }
@@ -163,7 +163,7 @@ public class CachingProfileQueryRepo : IProfileQueryRepo
 
         if (value.IsNullOrEmpty)
         {
-            cachedProfiles = await _decoratedRepo.GetPublicProfiles(searchPattern, userId);
+            cachedProfiles = await _decoratedRepo.GetPublicProfiles(searchPattern, profileCount, userId);
             ProfileSearchResult searchResult = new();
             searchResult.Profiles.Add(cachedProfiles);
 
