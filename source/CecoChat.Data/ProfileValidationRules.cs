@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using CecoChat.FluentValidation;
 using FluentValidation;
 
@@ -69,14 +70,27 @@ public static class ProfileValidationRules
             .NotEmpty()
             .EmailAddress();
     }
+}
 
-    public static IRuleBuilderOptions<T, IEnumerable<long>> ValidUserIdList<T>(this IRuleBuilderInitial<T, ICollection<long>> ruleBuilder)
+public static class ProfileConstants
+{
+    public static class UserIds
     {
-        return ruleBuilder
-            .NotEmpty()
-            .Must(userIds => userIds.Count < 128)
-            .WithMessage("{PropertyName} count must not exceed 128, but {PropertyValue} was provided.")
-            .ForEach(userId => userId.ValidUserId());
-        //.ForEach(userId => userId.ValidUserId());
+        public static readonly int MaxCount = 128;
+        public static readonly string MaxCountError = "{PropertyName} count must not exceed 128, but {PropertyValue} was provided.";
     }
+
+    public static class UserName
+    {
+        public static readonly string SearchPatternError = "{PropertyName} should be a string with length [3, 32] which contains only characters, but '{PropertyValue}' was provided.";
+    }
+}
+
+public static partial class ProfileRegexes
+{
+    [GeneratedRegex(
+        pattern: "^([\\p{L}]{3,32})$",
+        RegexOptions.CultureInvariant,
+        matchTimeoutMilliseconds: 1000)]
+    public static partial Regex UserNameSearchPatternRegex();
 }

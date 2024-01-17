@@ -80,16 +80,6 @@ internal class ProfileQueryRepo : IProfileQueryRepo
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(searchPattern);
 
-        // TODO: consider reusing the regex in the user service
-        if (searchPattern.Length < 3)
-        {
-            throw new ArgumentException("Search pattern should be at least 3 letters long.", nameof(searchPattern));
-        }
-        if (searchPattern.Any(c => !char.IsLetter(c)))
-        {
-            throw new ArgumentException("Search pattern should contain only letters.", nameof(searchPattern));
-        }
-
         // TODO: limit the number of returned users
         string likePattern = $"%{searchPattern}%";
         List<ProfilePublic> profiles = await _dbContext.Profiles
