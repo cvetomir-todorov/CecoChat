@@ -153,7 +153,8 @@ public static class Program
         builder.RegisterModule(new DynamicConfigAutofacModule(
             host.Configuration.GetSection("Backplane"),
             registerConfigChangesConsumer: true,
-            registerPartitioning: true));
+            registerPartitioning: true,
+            registerUser: true));
         builder.RegisterModule(new ConfigClientAutofacModule(host.Configuration.GetSection("ConfigClient")));
 
         // backplane

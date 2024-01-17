@@ -1,5 +1,6 @@
 using CecoChat.Contracts.User;
 using CecoChat.Data.User.Profiles;
+using CecoChat.DynamicConfig.User;
 using CecoChat.Server.Identity;
 using Grpc.Core;
 using Microsoft.AspNetCore.Authorization;
@@ -10,11 +11,16 @@ public class ProfileQueryService : ProfileQuery.ProfileQueryBase
 {
     private readonly ILogger _logger;
     private readonly IProfileQueryRepo _repo;
+    private readonly IUserConfig _userConfig;
 
-    public ProfileQueryService(ILogger<ProfileQueryService> logger, IProfileQueryRepo repo)
+    public ProfileQueryService(
+        ILogger<ProfileQueryService> logger,
+        IProfileQueryRepo repo,
+        IUserConfig userConfig)
     {
         _logger = logger;
         _repo = repo;
+        _userConfig = userConfig;
     }
 
     [Authorize(Policy = "user")]
@@ -51,7 +57,7 @@ public class ProfileQueryService : ProfileQuery.ProfileQueryBase
     {
         UserClaims userClaims = context.GetUserClaimsGrpc(_logger);
 
-        IEnumerable<ProfilePublic> profiles = await _repo.GetPublicProfiles(request.SearchPattern, userClaims.UserId);
+        IEnumerable<ProfilePublic> profiles = await _repo.GetPublicProfiles(request.SearchPattern, _userConfig.ProfileCount, userClaims.UserId);
 
         GetPublicProfilesByPatternResponse response = new();
         response.Profiles.Add(profiles);
