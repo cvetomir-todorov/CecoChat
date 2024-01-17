@@ -1,4 +1,5 @@
-﻿using CecoChat.ConsoleClient.Api;
+﻿using CecoChat.Client.Messaging;
+using CecoChat.ConsoleClient.Api;
 using CecoChat.ConsoleClient.Interaction;
 using CecoChat.ConsoleClient.LocalStorage;
 
@@ -17,17 +18,19 @@ public static class Program
         MessageStorage messageStorage = new(client.UserId);
         ConnectionStorage connectionStorage = new();
         ChangeHandler changeHandler = new(client.UserId, messageStorage, connectionStorage);
+        IMessagingClient messagingClient = new MessagingClient(client.AccessToken, client.MessagingServerAddress);
 
-        client.Disconnected += (_, _) => Console.WriteLine("Disconnected.");
-        client.MessageReceived += (_, notification) => changeHandler.AddReceivedMessage(notification);
-        client.MessageDelivered += (_, notification) => changeHandler.UpdateDeliveryStatus(notification);
-        client.ReactionReceived += (_, notification) => changeHandler.HandleReaction(notification);
-        client.ConnectionNotificationReceived += (_, notification) => changeHandler.HandleConnectionChange(notification);
-        await client.StartMessaging(CancellationToken.None);
+        messagingClient.Disconnected += (_, _) => Console.WriteLine("Disconnected.");
+        messagingClient.MessageReceived += (_, notification) => changeHandler.AddReceivedMessage(notification);
+        messagingClient.MessageDelivered += (_, notification) => changeHandler.UpdateDeliveryStatus(notification);
+        messagingClient.ReactionReceived += (_, notification) => changeHandler.HandleReaction(notification);
+        messagingClient.ConnectionNotificationReceived += (_, notification) => changeHandler.HandleConnectionChange(notification);
+        await messagingClient.Connect(CancellationToken.None);
 
-        await RunStateMachine(client, messageStorage, connectionStorage);
+        await RunStateMachine(client, messagingClient, messageStorage, connectionStorage);
 
-        await client.DisposeAsync();
+        await messagingClient.DisposeAsync();
+        client.Dispose();
         Console.WriteLine("Bye!");
     }
 
@@ -144,11 +147,11 @@ public static class Program
 
     private sealed record Credentials(string UserName, string Password);
 
-    private static async Task RunStateMachine(ChatClient client, MessageStorage messageStorage, ConnectionStorage connectionStorage)
+    private static async Task RunStateMachine(ChatClient client, IMessagingClient messagingClient, MessageStorage messageStorage, ConnectionStorage connectionStorage)
     {
         ProfileStorage profileStorage = new();
         FileStorage fileStorage = new();
-        StateContainer states = new(client, messageStorage, connectionStorage, profileStorage, fileStorage);
+        StateContainer states = new(client, messagingClient, messageStorage, connectionStorage, profileStorage, fileStorage);
 
         states.Context.ReloadData = true;
         State currentState = states.AllChats;

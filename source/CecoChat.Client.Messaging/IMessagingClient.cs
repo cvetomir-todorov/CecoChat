@@ -4,13 +4,13 @@ namespace CecoChat.Client.Messaging;
 
 public interface IMessagingClient : IAsyncDisposable
 {
-    Task Connect(string messagingServerAddress, string accessToken, CancellationToken ct);
+    Task Connect(CancellationToken ct);
 
-    Task<SendMessageResponse> SendMessage(SendMessageRequest request);
+    Task<long> SendPlainTextMessage(long receiverId, string text);
 
-    Task<ReactResponse> React(ReactRequest request);
+    Task React(long messageId, long senderId, long receiverId, string reaction);
 
-    Task<UnReactResponse> UnReact(UnReactRequest request);
+    Task UnReact(long messageId, long senderId, long receiverId);
 
     event EventHandler<ListenNotification>? MessageReceived;
 

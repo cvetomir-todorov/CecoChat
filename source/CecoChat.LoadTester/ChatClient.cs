@@ -2,7 +2,6 @@ using CecoChat.Client.Messaging;
 using CecoChat.Contracts.Bff;
 using CecoChat.Contracts.Bff.Auth;
 using CecoChat.Contracts.Bff.Chats;
-using CecoChat.Contracts.Messaging;
 using Refit;
 
 namespace CecoChat.LoadTester;
@@ -10,21 +9,26 @@ namespace CecoChat.LoadTester;
 public sealed class ChatClient : IAsyncDisposable
 {
     private readonly IBffClient _bffClient;
-    private readonly IMessagingClient _messagingClient;
+    private IMessagingClient? _messagingClient;
     private DateTime _lastGetChats;
     private string? _accessToken;
 
     public ChatClient(string bffAddress)
     {
         _bffClient = RestService.For<IBffClient>(bffAddress);
-        _messagingClient = new MessagingClient();
         _lastGetChats = Snowflake.Epoch;
     }
 
     public ValueTask DisposeAsync()
     {
         _bffClient.Dispose();
-        return _messagingClient.DisposeAsync();
+
+        if (_messagingClient != null)
+        {
+            return _messagingClient.DisposeAsync();
+        }
+
+        return ValueTask.CompletedTask;
     }
 
     public int MessagesSent { get; private set; }
@@ -47,11 +51,12 @@ public sealed class ChatClient : IAsyncDisposable
             throw new InvalidOperationException("Unexpected API error.", apiResponse.Error);
         }
 
+        CreateSessionResponse response = apiResponse.Content;
+        _messagingClient = new MessagingClient(response.AccessToken, response.MessagingServerAddress);
         _messagingClient.MessageDelivered += (_, _) => MessagesProcessed++;
         _messagingClient.MessageReceived += (_, _) => MessagesReceived++;
 
-        CreateSessionResponse response = apiResponse.Content;
-        await _messagingClient.Connect(response.MessagingServerAddress, response.AccessToken, ct);
+        await _messagingClient.Connect(ct);
 
         _accessToken = response.AccessToken;
     }
@@ -85,13 +90,12 @@ public sealed class ChatClient : IAsyncDisposable
 
     public async Task SendPlainTextMessage(long receiverId, string text)
     {
-        SendMessageRequest request = new()
+        if (_messagingClient == null)
         {
-            ReceiverId = receiverId,
-            DataType = Contracts.Messaging.DataType.PlainText,
-            Data = text
-        };
-        await _messagingClient.SendMessage(request);
+            throw new InvalidOperationException($"Messaging client is not connected. Call {nameof(Connect)} first.");
+        }
+
+        await _messagingClient.SendPlainTextMessage(receiverId, text);
         MessagesSent++;
     }
 
