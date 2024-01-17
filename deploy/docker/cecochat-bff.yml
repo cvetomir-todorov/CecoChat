@@ -84,6 +84,7 @@ services:
       CECOCHAT_UserDb__Connect__ConnectionString: "Host=yb-tserver0,yb-tserver1;Port=5433;Database=users;Username=cecochat_dev;Password=secret;Keepalive=30;Load Balance Hosts=true;"
       CECOCHAT_UserCache__Enabled: "true"
       CECOCHAT_UserCache__ProfileEntryDuration: "00:00:30.0"
+      CECOCHAT_UserCache__ProfileSearchDuration: "00:00:30.0"
       CECOCHAT_UserCache__ConnectionEntriesDuration: "00:00:30.0"
       CECOCHAT_UserCache__Store__Endpoints__0: redis0:6379
       CECOCHAT_UserCache__Store__Endpoints__1: redis1:6379
