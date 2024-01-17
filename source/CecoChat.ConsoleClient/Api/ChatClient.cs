@@ -214,6 +214,14 @@ public sealed class ChatClient : IAsyncDisposable
         return profiles;
     }
 
+    public async Task<List<LocalStorage.ProfilePublic>> GetPublicProfiles(string searchPattern)
+    {
+        GetPublicProfilesResponse response = await _bffClient.GetPublicProfiles(Array.Empty<long>(), searchPattern, _accessToken!);
+        List<LocalStorage.ProfilePublic> profiles = Map.PublicProfiles(response.Profiles);
+
+        return profiles;
+    }
+
     public async Task<AllChatsScreen> LoadAllChatsScreen(DateTime chatsNewerThan, DateTime filesNewerThan, bool includeProfiles)
     {
         GetAllChatsScreenRequest request = new()
