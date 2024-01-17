@@ -1,0 +1,8 @@
+syntax = "proto3";
+option csharp_namespace = "CecoChat.Contracts.User";
+package CecoChat.Contracts.User;
+import "ProfilePublic.proto";
+
+message ProfileSearchResult {
+  repeated ProfilePublic profiles = 1;
+}

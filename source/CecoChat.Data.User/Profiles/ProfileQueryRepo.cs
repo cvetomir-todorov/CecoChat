@@ -67,7 +67,7 @@ internal class ProfileQueryRepo : IProfileQueryRepo
         return profile;
     }
 
-    public async Task<IEnumerable<ProfilePublic>> GetPublicProfiles(IList<long> requestedUserIds, long userId)
+    public async Task<IReadOnlyCollection<ProfilePublic>> GetPublicProfiles(IList<long> requestedUserIds, long userId)
     {
         return await _dbContext.Profiles
             .Where(entity => requestedUserIds.Contains(entity.UserId))
@@ -76,21 +76,16 @@ internal class ProfileQueryRepo : IProfileQueryRepo
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<ProfilePublic>> GetPublicProfiles(string searchPattern, long userId)
+    public async Task<IReadOnlyCollection<ProfilePublic>> GetPublicProfiles(string searchPattern, long userId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(searchPattern);
 
         // TODO: limit the number of returned users
         string likePattern = $"%{searchPattern}%";
-        List<ProfilePublic> profiles = await _dbContext.Profiles
+        return await _dbContext.Profiles
             .Where(entity => EF.Functions.Like(entity.UserName, likePattern))
             .Select(entity => _mapper.Map<ProfilePublic>(entity))
             .AsNoTracking()
             .ToListAsync();
-
-        _logger.LogTrace(
-            "Fetched {PublicProfileCount} public profiles matching the search pattern {ProfileSearchPattern} as requested by user {UserId}",
-            profiles.Count, likePattern, userId);
-        return profiles;
     }
 }

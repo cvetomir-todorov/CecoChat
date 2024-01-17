@@ -47,6 +47,7 @@ public class UserDbAutofacModule : Module
         builder
             .RegisterType<CachingProfileQueryRepo>()
             .Named<IProfileQueryRepo>("ca-pr-repo")
+            .WithNamedParameter(typeof(IRedisContext), RedisContextName)
             .InstancePerLifetimeScope();
         builder
             .RegisterType<ProfileQueryRepo>()
