@@ -20,7 +20,7 @@ public sealed class StateContainer
         Context = new StateContext();
 
         AllChats = new AllChatsState(this);
-        FindUser = new FindUserState(this);
+        EnterUserId = new EnterUserIdState(this);
         OneChat = new OneChatState(this);
         SendMessage = new SendMessageState(this);
         React = new ReactState(this);
@@ -43,7 +43,7 @@ public sealed class StateContainer
     public StateContext Context { get; }
 
     public State AllChats { get; }
-    public State FindUser { get; }
+    public State EnterUserId { get; }
     public State OneChat { get; }
     public State SendMessage { get; }
     public State React { get; }

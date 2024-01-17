@@ -34,7 +34,7 @@ public sealed class AllChatsState : State
         else if (keyInfo.KeyChar == 'n')
         {
             Context.ReloadData = false;
-            return States.FindUser;
+            return States.EnterUserId;
         }
         else if (keyInfo.KeyChar == 'f')
         {
