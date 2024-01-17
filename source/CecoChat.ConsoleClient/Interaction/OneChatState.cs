@@ -11,6 +11,10 @@ public sealed class OneChatState : State
 
     public override async Task<State> Execute()
     {
+        Console.Clear();
+        DisplayUserData();
+        DisplaySplitter();
+
         if (Context.ReloadData)
         {
             bool userExists = await Load(Context.UserId);
@@ -18,6 +22,8 @@ public sealed class OneChatState : State
             {
                 Console.WriteLine("User with ID {0} doesn't exist, press ENTER to return to all chats", Context.UserId);
                 Console.ReadLine();
+
+                Context.ReloadData = true;
                 return States.AllChats;
             }
         }
@@ -25,22 +31,23 @@ public sealed class OneChatState : State
         List<Message> messages = MessageStorage.GetChatMessages(Context.UserId);
         messages.Sort((left, right) => left.MessageId.CompareTo(right.MessageId));
 
-        Console.Clear();
-        DisplayUserData();
-
         ProfilePublic profile = ProfileStorage.GetProfile(Context.UserId);
         Connection? connection = ConnectionStorage.GetConnection(Context.UserId);
 
         string status = connection != null ? connection.Status.ToString() : ConnectionStatus.NotConnected.ToString();
         Console.WriteLine("Chatting with: {0} | ID={1} | user name={2} | {3} | avatar={4}",
             profile.DisplayName, profile.UserId, profile.UserName, status, profile.AvatarUrl);
-        Console.WriteLine("Manage connection - invite/accept/cancel/remove (press 'm') | Return (press 'x')");
+        Console.WriteLine("Manage connection - invite/accept/cancel/remove (press 'm')");
+        Console.WriteLine("Refresh (press 'f') | Local refresh (press 'l') | Return (press 'x')");
+        DisplaySplitter();
 
         foreach (Message message in messages)
         {
             DisplayMessage(message, profile);
         }
-        Console.WriteLine("Write (press 'w') | React (press 'r') | Refresh (press 'f') | Local refresh (press 'l')");
+
+        DisplaySplitter();
+        Console.WriteLine("Write (press 'w') | React (press 'r')");
 
         ConsoleKeyInfo keyInfo = Console.ReadKey(intercept: true);
         return HandleKey(keyInfo);
@@ -48,27 +55,27 @@ public sealed class OneChatState : State
 
     private State HandleKey(ConsoleKeyInfo keyInfo)
     {
-        if (keyInfo.KeyChar == 'w' || keyInfo.KeyChar == 'W')
+        if (keyInfo.KeyChar == 'w')
         {
             Context.ReloadData = false;
             return States.SendMessage;
         }
-        else if (keyInfo.KeyChar == 'r' || keyInfo.KeyChar == 'R')
+        else if (keyInfo.KeyChar == 'r')
         {
             Context.ReloadData = false;
             return States.React;
         }
-        else if (keyInfo.KeyChar == 'f' || keyInfo.KeyChar == 'F')
+        else if (keyInfo.KeyChar == 'f')
         {
             Context.ReloadData = true;
             return States.OneChat;
         }
-        else if (keyInfo.KeyChar == 'm' || keyInfo.KeyChar == 'M')
+        else if (keyInfo.KeyChar == 'm')
         {
             Context.ReloadData = true;
             return States.ManageConnection;
         }
-        else if (keyInfo.KeyChar == 'x' || keyInfo.KeyChar == 'X')
+        else if (keyInfo.KeyChar == 'x')
         {
             Context.ReloadData = true;
             return States.AllChats;

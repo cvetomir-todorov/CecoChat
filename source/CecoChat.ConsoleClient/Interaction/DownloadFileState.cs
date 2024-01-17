@@ -11,6 +11,7 @@ public class DownloadFileState : State
     {
         Console.Clear();
         DisplayUserData();
+        DisplaySplitter();
 
         Console.Write("Enter the path to where the file downloaded should be saved or leave empty to exit: ");
         string? filePath = Console.ReadLine();

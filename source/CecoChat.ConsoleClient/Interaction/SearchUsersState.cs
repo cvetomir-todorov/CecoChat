@@ -11,7 +11,6 @@ public sealed class SearchUsersState : State
     {
         Console.Clear();
         DisplayUserData();
-        Console.WriteLine("Exit (press 'x')");
         DisplaySplitter();
 
         if (Context.ReloadData)
@@ -20,6 +19,8 @@ public sealed class SearchUsersState : State
         }
 
         DisplayUsers(Context.UserSearchResult);
+        DisplaySplitter();
+        Console.WriteLine("Exit (press 'x')");
 
         ConsoleKeyInfo keyInfo = Console.ReadKey(intercept: true);
         if (char.IsNumber(keyInfo.KeyChar))

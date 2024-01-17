@@ -17,6 +17,7 @@ public class ChangePasswordState : State
         }
 
         DisplayUserData();
+        DisplaySplitter();
         Console.Write("Enter new password: ");
         string newPassword = Console.ReadLine() ?? string.Empty;
 

@@ -9,7 +9,13 @@ public sealed class EnterSearchPatternState : State
     {
         Console.Clear();
         DisplayUserData();
-        Console.Write("Enter user search pattern (letters, no other symbols allowed) or press ENTER to exit: ");
+        DisplaySplitter();
+
+        Console.WriteLine("Enter user search pattern which should be:");
+        Console.WriteLine("1) letters including Unicode, no other symbols");
+        Console.WriteLine("2) at least 3 symbols-long");
+        Console.Write("Enter search pattern or press ENTER to exit: ");
+
         string? searchPattern = Console.ReadLine();
         if (string.IsNullOrWhiteSpace(searchPattern))
         {
