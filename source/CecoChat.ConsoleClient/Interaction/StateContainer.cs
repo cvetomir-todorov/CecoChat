@@ -21,6 +21,8 @@ public sealed class StateContainer
 
         AllChats = new AllChatsState(this);
         EnterUserId = new EnterUserIdState(this);
+        EnterSearchPattern = new EnterSearchPatternState(this);
+        SearchUsers = new SearchUsersState(this);
         OneChat = new OneChatState(this);
         SendMessage = new SendMessageState(this);
         React = new ReactState(this);
@@ -44,6 +46,8 @@ public sealed class StateContainer
 
     public State AllChats { get; }
     public State EnterUserId { get; }
+    public State EnterSearchPattern { get; }
+    public State SearchUsers { get; }
     public State OneChat { get; }
     public State SendMessage { get; }
     public State React { get; }
@@ -65,4 +69,6 @@ public sealed class StateContext
     public DateTime LastKnownChatsState { get; set; }
     public DateTime LastKnownFilesState { get; set; }
     public FileRef DownloadFile { get; set; } = null!;
+    public string SearchPattern { get; set; } = string.Empty;
+    public List<ProfilePublic> UserSearchResult { get; set; } = new(capacity: 0);
 }

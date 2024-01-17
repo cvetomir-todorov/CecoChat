@@ -20,7 +20,7 @@ public sealed class AllChatsState : State
 
         Console.Clear();
         DisplayUserData();
-        Console.WriteLine("Chat with a user (press '0'...'9') | New (press 'n') | Refresh (press 'f') | Local refresh (press 'l')");
+        Console.WriteLine("Chat with a user (press '0'...'9') | New (press 'n') | Search users (press 's') | Refresh (press 'f') | Local refresh (press 'l')");
         Console.WriteLine("Change password (press 'p') | Edit profile (press 'e') | Files (press 'i')");
         Console.WriteLine("Exit (press 'x')");
         DisplaySplitter();
@@ -33,8 +33,13 @@ public sealed class AllChatsState : State
         }
         else if (keyInfo.KeyChar == 'n')
         {
-            Context.ReloadData = false;
+            Context.ReloadData = true;
             return States.EnterUserId;
+        }
+        else if (keyInfo.KeyChar == 's')
+        {
+            Context.ReloadData = true;
+            return States.EnterSearchPattern;
         }
         else if (keyInfo.KeyChar == 'f')
         {
@@ -43,14 +48,17 @@ public sealed class AllChatsState : State
         }
         else if (keyInfo.KeyChar == 'p')
         {
+            Context.ReloadData = true;
             return States.ChangePassword;
         }
         else if (keyInfo.KeyChar == 'e')
         {
+            Context.ReloadData = true;
             return States.EditProfile;
         }
         else if (keyInfo.KeyChar == 'i')
         {
+            Context.ReloadData = true;
             return States.Files;
         }
         else if (keyInfo.KeyChar == 'x')

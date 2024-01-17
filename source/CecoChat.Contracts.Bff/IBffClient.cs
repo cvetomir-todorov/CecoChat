@@ -58,7 +58,7 @@ public interface IBffClient : IDisposable
 
     [Get("/api/profiles")]
     Task<GetPublicProfilesResponse> GetPublicProfiles(
-        [Query(CollectionFormat.Csv)][AliasAs("userIds")] long[]? userIds,
+        [Query(CollectionFormat.Csv)][AliasAs("userIds")] long[] userIds,
         [Query][AliasAs("searchPattern")] string? searchPattern,
         [Authorize(AuthorizationScheme)] string accessToken);
 
