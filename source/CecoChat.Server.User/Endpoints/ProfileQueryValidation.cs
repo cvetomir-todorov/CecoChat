@@ -1,5 +1,6 @@
 using CecoChat.Contracts.User;
 using CecoChat.Data;
+using CecoChat.DynamicConfig.User;
 using FluentValidation;
 
 namespace CecoChat.Server.User.Endpoints;
@@ -15,11 +16,11 @@ public sealed class GetPublicProfileRequestValidator : AbstractValidator<GetPubl
 
 public sealed class GetPublicProfilesByIdListRequestValidator : AbstractValidator<GetPublicProfilesByIdListRequest>
 {
-    public GetPublicProfilesByIdListRequestValidator()
+    public GetPublicProfilesByIdListRequestValidator(IUserConfig userConfig)
     {
         RuleFor(x => x.UserIds)
             .NotEmpty()
-            .Must(userIds => userIds.Count < ProfileConstants.UserIds.MaxCount)
+            .Must(userIds => userIds.Count <= userConfig.ProfileCount)
             .WithMessage(ProfileConstants.UserIds.MaxCountError)
             .ForEach(userId => userId.ValidUserId());
     }

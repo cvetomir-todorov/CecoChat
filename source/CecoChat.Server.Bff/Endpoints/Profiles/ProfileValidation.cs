@@ -1,11 +1,12 @@
 using CecoChat.Data;
+using CecoChat.DynamicConfig.User;
 using FluentValidation;
 
 namespace CecoChat.Server.Bff.Endpoints.Profiles;
 
 public sealed class GetPublicProfilesRequestValidator : AbstractValidator<GetPublicProfilesRequest>
 {
-    public GetPublicProfilesRequestValidator()
+    public GetPublicProfilesRequestValidator(IUserConfig userConfig)
     {
         RuleFor(x => x)
             .Must(x =>
@@ -18,7 +19,7 @@ public sealed class GetPublicProfilesRequestValidator : AbstractValidator<GetPub
             })
             .WithMessage("Either user IDs or a search pattern should be specified.");
         RuleFor(x => x.UserIds)
-            .Must(userIds => userIds.Length < ProfileConstants.UserIds.MaxCount)
+            .Must(userIds => userIds.Length < userConfig.ProfileCount)
             .WithMessage(ProfileConstants.UserIds.MaxCountError)
             .ForEach(userId => userId.ValidUserId());
         RuleFor(x => x.SearchPattern)

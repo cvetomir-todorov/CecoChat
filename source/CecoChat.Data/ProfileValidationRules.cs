@@ -76,7 +76,6 @@ public static class ProfileConstants
 {
     public static class UserIds
     {
-        public static readonly int MaxCount = 128;
         public static readonly string MaxCountError = "{PropertyName} count must not exceed 128, but {PropertyValue} was provided.";
     }
 
