@@ -39,9 +39,9 @@ internal sealed class HistoryConfig : IHistoryConfig
         }
     }
 
-    public async Task<bool> Initialize(CancellationToken ct)
+    public Task<bool> Initialize(CancellationToken ct)
     {
-        return await _section.Initialize(ConfigKeys.History.Section, PrintValues, ct);
+        return _section.Initialize(ConfigKeys.History.Section, PrintValues, ct);
     }
 
     private void PrintValues(HistoryValues values)
