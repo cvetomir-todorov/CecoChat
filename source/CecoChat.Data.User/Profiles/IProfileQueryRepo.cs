@@ -10,7 +10,7 @@ public interface IProfileQueryRepo
 
     Task<IReadOnlyCollection<ProfilePublic>> GetPublicProfiles(IList<long> requestedUserIds, long userId);
 
-    Task<IReadOnlyCollection<ProfilePublic>> GetPublicProfiles(string searchPattern, long userId);
+    Task<IReadOnlyCollection<ProfilePublic>> GetPublicProfiles(string searchPattern, int profileCount, long userId);
 }
 
 public readonly struct FullProfileResult

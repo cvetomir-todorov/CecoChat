@@ -76,14 +76,14 @@ internal class ProfileQueryRepo : IProfileQueryRepo
             .ToListAsync();
     }
 
-    public async Task<IReadOnlyCollection<ProfilePublic>> GetPublicProfiles(string searchPattern, long userId)
+    public async Task<IReadOnlyCollection<ProfilePublic>> GetPublicProfiles(string searchPattern, int profileCount, long userId)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(searchPattern);
 
-        // TODO: limit the number of returned users
         string likePattern = $"%{searchPattern}%";
         return await _dbContext.Profiles
             .Where(entity => EF.Functions.Like(entity.UserName, likePattern))
+            .Take(profileCount)
             .Select(entity => _mapper.Map<ProfilePublic>(entity))
             .AsNoTracking()
             .ToListAsync();
