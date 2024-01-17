@@ -11,10 +11,13 @@ public class ManageConnectionState : State
 
     public override async Task<State> Execute()
     {
+        Console.Clear();
+        DisplayUserData();
+        DisplaySplitter();
+
         ProfilePublic profile = ProfileStorage.GetProfile(Context.UserId);
         LocalStorage.Connection? connection = ConnectionStorage.GetConnection(Context.UserId);
 
-        Console.Clear();
         Console.WriteLine("Profile for: {0} | ID={1} | user name={2} | avatar={3}",
             profile.DisplayName, profile.UserId, profile.UserName, profile.AvatarUrl);
         DisplayConnection(connection);

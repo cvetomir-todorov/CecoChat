@@ -16,6 +16,7 @@ public class UploadFileState : State
     {
         Console.Clear();
         DisplayUserData();
+        DisplaySplitter();
 
         Console.Write("Enter the path to the file to be uploaded or leave empty to exit: ");
         string? filePath = Console.ReadLine();

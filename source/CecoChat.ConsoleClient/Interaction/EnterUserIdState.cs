@@ -9,6 +9,8 @@ public sealed class EnterUserIdState : State
     {
         Console.Clear();
         DisplayUserData();
+        DisplaySplitter();
+
         Console.Write("Enter user ID ('0' to exit): ");
 
         string? userIdString = Console.ReadLine();

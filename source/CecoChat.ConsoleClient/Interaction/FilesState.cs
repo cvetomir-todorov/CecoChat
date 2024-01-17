@@ -16,16 +16,17 @@ public class FilesState : State
 
         Console.Clear();
         DisplayUserData();
-        Console.WriteLine("Download a file (press '0'...'9') | Upload a file (press 'u') | Refresh (press 'f')");
-        Console.WriteLine("Exit (press 'x')");
+        DisplaySplitter();
+
+        Console.WriteLine("Download a file (press '0'...'9') | Upload a file (press 'u')");
+        Console.WriteLine("Refresh (press 'f') | Exit (press 'x')");
         DisplaySplitter();
         List<FileRef> userFiles = DisplayUserFiles();
 
         ConsoleKeyInfo keyInfo = Console.ReadKey(intercept: true);
         if (char.IsNumber(keyInfo.KeyChar))
         {
-            State state = ProcessNumberKey(keyInfo, userFiles);
-            return state;
+            return ProcessNumberKey(keyInfo, userFiles);
         }
         else if (keyInfo.KeyChar == 'u')
         {

@@ -17,6 +17,7 @@ public class EditProfileState : State
         }
 
         DisplayUserData();
+        DisplaySplitter();
         Console.WriteLine("Edit your profile - press empty without entering anything to preserve current.");
 
         Console.Write("Enter display name, current is '{0}': ", Client.UserProfile.DisplayName);

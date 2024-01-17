@@ -20,9 +20,10 @@ public sealed class AllChatsState : State
 
         Console.Clear();
         DisplayUserData();
-        Console.WriteLine("Chat with a user (press '0'...'9') | New (press 'n') | Search users (press 's') | Refresh (press 'f') | Local refresh (press 'l')");
-        Console.WriteLine("Change password (press 'p') | Edit profile (press 'e') | Files (press 'i')");
-        Console.WriteLine("Exit (press 'x')");
+        DisplaySplitter();
+        Console.WriteLine("Chat with a user (press '0'...'9') | Enter user ID (press 'n') | Search users (press 's')");
+        Console.WriteLine("Show user files (press 'i') | Edit profile (press 'e') | Change password (press 'p')");
+        Console.WriteLine("Refresh (press 'f') | Local refresh (press 'l') | Exit (press 'x')");
         DisplaySplitter();
         List<long> userIds = DisplayUsers();
 
@@ -41,25 +42,25 @@ public sealed class AllChatsState : State
             Context.ReloadData = true;
             return States.EnterSearchPattern;
         }
-        else if (keyInfo.KeyChar == 'f')
+        else if (keyInfo.KeyChar == 'i')
         {
             Context.ReloadData = true;
-            return States.AllChats;
-        }
-        else if (keyInfo.KeyChar == 'p')
-        {
-            Context.ReloadData = true;
-            return States.ChangePassword;
+            return States.Files;
         }
         else if (keyInfo.KeyChar == 'e')
         {
             Context.ReloadData = true;
             return States.EditProfile;
         }
-        else if (keyInfo.KeyChar == 'i')
+        else if (keyInfo.KeyChar == 'p')
         {
             Context.ReloadData = true;
-            return States.Files;
+            return States.ChangePassword;
+        }
+        else if (keyInfo.KeyChar == 'f')
+        {
+            Context.ReloadData = true;
+            return States.AllChats;
         }
         else if (keyInfo.KeyChar == 'x')
         {
