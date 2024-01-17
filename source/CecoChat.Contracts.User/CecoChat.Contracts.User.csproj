@@ -24,6 +24,7 @@
     <Protobuf Include="ProfileCommandService.proto" GrpcServices="All" />
     <Protobuf Include="ProfileFull.proto" />
     <Protobuf Include="ProfilePublic.proto" />
+    <Protobuf Include="ProfileSearchResult.proto" />
     <Protobuf Include="ProfileUpdate.proto" />
     <Protobuf Include="ProfileQueryService.proto" GrpcServices="All" />
     <Protobuf Include="Registration.proto" />

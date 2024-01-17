@@ -1,4 +1,6 @@
 using CecoChat.Contracts.User;
+using CecoChat.Redis;
+using Google.Protobuf;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using StackExchange.Redis;
@@ -9,17 +11,20 @@ public class CachingProfileQueryRepo : IProfileQueryRepo
 {
     private readonly ILogger _logger;
     private readonly UserCacheOptions _cacheOptions;
+    private readonly IDatabase _cache;
     private readonly IProfileCache _profileCache;
     private readonly IProfileQueryRepo _decoratedRepo;
 
     public CachingProfileQueryRepo(
         ILogger<CachingProfileQueryRepo> logger,
         IOptions<UserCacheOptions> cacheOptions,
+        IRedisContext redisContext,
         IProfileCache profileCache,
         IProfileQueryRepo decoratedRepo)
     {
         _logger = logger;
         _cacheOptions = cacheOptions.Value;
+        _cache = redisContext.GetDatabase();
         _profileCache = profileCache;
         _decoratedRepo = decoratedRepo;
     }
@@ -78,11 +83,11 @@ public class CachingProfileQueryRepo : IProfileQueryRepo
         }
     }
 
-    public async Task<IEnumerable<ProfilePublic>> GetPublicProfiles(IList<long> requestedUserIds, long userId)
+    public async Task<IReadOnlyCollection<ProfilePublic>> GetPublicProfiles(IList<long> requestedUserIds, long userId)
     {
         if (!_cacheOptions.Enabled)
         {
-            IEnumerable<ProfilePublic> profiles = await _decoratedRepo.GetPublicProfiles(requestedUserIds, userId);
+            IReadOnlyCollection<ProfilePublic> profiles = await _decoratedRepo.GetPublicProfiles(requestedUserIds, userId);
             LogFetchedPublicProfiles(totalCount: requestedUserIds.Count, fromCacheCount: 0, fromDbCount: requestedUserIds.Count, userId);
             return profiles;
         }
@@ -100,12 +105,6 @@ public class CachingProfileQueryRepo : IProfileQueryRepo
 
         LogFetchedPublicProfiles(totalCount: requestedUserIds.Count, fromCacheCount: profilesFromCacheCount, fromDbCount: uncachedUserIds?.Count ?? 0, userId);
         return resultProfiles;
-    }
-
-    public async Task<IEnumerable<ProfilePublic>> GetPublicProfiles(string searchPattern, long userId)
-    {
-        // TODO: add caching
-        return await _decoratedRepo.GetPublicProfiles(searchPattern, userId);
     }
 
     private void LogFetchedPublicProfiles(int totalCount, int fromCacheCount, int fromDbCount, long userId)
@@ -147,5 +146,45 @@ public class CachingProfileQueryRepo : IProfileQueryRepo
             output.Add(uncachedProfile);
             await _profileCache.SetOneAsynchronously(uncachedProfile);
         }
+    }
+
+    public async Task<IReadOnlyCollection<ProfilePublic>> GetPublicProfiles(string searchPattern, long userId)
+    {
+        if (!_cacheOptions.Enabled)
+        {
+            IReadOnlyCollection<ProfilePublic> profiles = await _decoratedRepo.GetPublicProfiles(searchPattern, userId);
+            LogProfileSearch(dataSourceAndAction: "DB", profiles.Count, searchPattern, userId);
+            return profiles;
+        }
+
+        RedisKey key = $"profile-search:{searchPattern}";
+        RedisValue value = await _cache.StringGetAsync(key);
+        IReadOnlyCollection<ProfilePublic> cachedProfiles;
+
+        if (value.IsNullOrEmpty)
+        {
+            cachedProfiles = await _decoratedRepo.GetPublicProfiles(searchPattern, userId);
+            ProfileSearchResult searchResult = new();
+            searchResult.Profiles.Add(cachedProfiles);
+
+            byte[] searchResultBytes = searchResult.ToByteArray();
+            await _cache.StringSetAsync(key, searchResultBytes, expiry: _cacheOptions.ProfileSearchDuration);
+            LogProfileSearch(dataSourceAndAction: "DB and then cached", cachedProfiles.Count, searchPattern, userId);
+        }
+        else
+        {
+            ProfileSearchResult searchResult = ProfileSearchResult.Parser.ParseFrom(value);
+            cachedProfiles = searchResult.Profiles;
+            LogProfileSearch(dataSourceAndAction: "cache", cachedProfiles.Count, searchPattern, userId);
+        }
+
+        return cachedProfiles;
+    }
+
+    private void LogProfileSearch(string dataSourceAndAction, int profileCount, string searchPattern, long userId)
+    {
+        _logger.LogTrace(
+            "Fetched from {DataSourceAndAction} {PublicProfileCount} public profiles matching the search pattern {ProfileSearchPattern} as requested by user {UserId}",
+            dataSourceAndAction, profileCount, searchPattern, userId);
     }
 }

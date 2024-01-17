@@ -10,6 +10,8 @@ public sealed class UserCacheOptions
 
     public TimeSpan ProfileEntryDuration { get; init; }
 
+    public TimeSpan ProfileSearchDuration { get; init; }
+
     public TimeSpan ConnectionEntriesDuration { get; init; }
 
     public RedisOptions Store { get; init; } = new();
