@@ -5,6 +5,7 @@ using CecoChat.DynamicConfig.Backplane;
 using CecoChat.DynamicConfig.History;
 using CecoChat.DynamicConfig.Partitioning;
 using CecoChat.DynamicConfig.Snowflake;
+using CecoChat.DynamicConfig.User;
 using CecoChat.Events;
 using CecoChat.Kafka;
 using CecoChat.Kafka.Telemetry;
@@ -22,6 +23,7 @@ public sealed class DynamicConfigAutofacModule : Module
     private readonly bool _registerHistory;
     private readonly bool _registerPartitioning;
     private readonly bool _registerSnowflake;
+    private readonly bool _registerUser;
 
     public DynamicConfigAutofacModule(
         IConfiguration? backplaneConfiguration = null,
@@ -29,14 +31,18 @@ public sealed class DynamicConfigAutofacModule : Module
         bool registerConfigChangesConsumer = false,
         bool registerHistory = false,
         bool registerPartitioning = false,
-        bool registerSnowflake = false)
+        bool registerSnowflake = false,
+        bool registerUser = false)
     {
         _backplaneConfiguration = backplaneConfiguration;
+
         _registerConfigChangesProducer = registerConfigChangesProducer;
         _registerConfigChangesConsumer = registerConfigChangesConsumer;
+
         _registerHistory = registerHistory;
         _registerPartitioning = registerPartitioning;
         _registerSnowflake = registerSnowflake;
+        _registerUser = registerUser;
     }
 
     protected override void Load(ContainerBuilder builder)
@@ -95,6 +101,16 @@ public sealed class DynamicConfigAutofacModule : Module
                 .SingleInstance();
             builder.RegisterType<SnowflakeRepo>().As<IRepo<SnowflakeValues>>().SingleInstance();
             builder.RegisterType<SnowflakeValidator>().As<IValidator<SnowflakeValues>>().SingleInstance();
+        }
+        if (_registerUser)
+        {
+            builder.RegisterType<UserConfig>().As<IUserConfig>().SingleInstance();
+            builder.RegisterType<ConfigSection<UserValues>>()
+                .As<IConfigSection<UserValues>>()
+                .As<IConfigChangeSubscriber>()
+                .SingleInstance();
+            builder.RegisterType<UserRepo>().As<IRepo<UserValues>>().SingleInstance();
+            builder.RegisterType<UserValidator>().As<IValidator<UserValues>>().SingleInstance();
         }
     }
 }

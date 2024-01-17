@@ -21,4 +21,10 @@ public static class ConfigKeys
         public static readonly string Section = "snowflake";
         public static readonly string GeneratorIds = "snowflake.generator-ids";
     }
+
+    public static class User
+    {
+        public static readonly string Section = "user";
+        public static readonly string ProfileCount = "user.profile-count";
+    }
 }
