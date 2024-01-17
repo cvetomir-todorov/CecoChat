@@ -18,7 +18,12 @@ public sealed class GetPublicProfilesRequestValidator : AbstractValidator<GetPub
             })
             .WithMessage("Either user IDs or a search pattern should be specified.");
         RuleFor(x => x.UserIds)
-            .ValidUserIdList();
-        // TODO: validate search pattern
+            .Must(userIds => userIds.Length < ProfileConstants.UserIds.MaxCount)
+            .WithMessage(ProfileConstants.UserIds.MaxCountError)
+            .ForEach(userId => userId.ValidUserId());
+        RuleFor(x => x.SearchPattern)
+            .Matches(ProfileRegexes.UserNameSearchPatternRegex())
+            .When(request => !string.IsNullOrEmpty(request.SearchPattern))
+            .WithMessage(ProfileConstants.UserName.SearchPatternError);
     }
 }

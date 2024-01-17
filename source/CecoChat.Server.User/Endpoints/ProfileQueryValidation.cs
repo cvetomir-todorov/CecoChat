@@ -1,4 +1,3 @@
-using System.Text.RegularExpressions;
 using CecoChat.Contracts.User;
 using CecoChat.Data;
 using FluentValidation;
@@ -19,7 +18,10 @@ public sealed class GetPublicProfilesByIdListRequestValidator : AbstractValidato
     public GetPublicProfilesByIdListRequestValidator()
     {
         RuleFor(x => x.UserIds)
-            .ValidUserIdList();
+            .NotEmpty()
+            .Must(userIds => userIds.Count < ProfileConstants.UserIds.MaxCount)
+            .WithMessage(ProfileConstants.UserIds.MaxCountError)
+            .ForEach(userId => userId.ValidUserId());
     }
 }
 
@@ -28,17 +30,7 @@ public sealed class GetPublicProfilesByPatternRequestValidator : AbstractValidat
     public GetPublicProfilesByPatternRequestValidator()
     {
         RuleFor(x => x.SearchPattern)
-            .NotEmpty()
-            .Matches(ProfileQueryRegexes.UserNameSearchPatternRegex())
-            .WithMessage("{PropertyName} should be a string with length [3, 32] which contains only characters, but '{PropertyValue}' was provided.");
+            .Matches(ProfileRegexes.UserNameSearchPatternRegex())
+            .WithMessage(ProfileConstants.UserName.SearchPatternError);
     }
-}
-
-internal static partial class ProfileQueryRegexes
-{
-    [GeneratedRegex(
-        pattern: "^([\\w]{3,32})$",
-        RegexOptions.CultureInvariant,
-        matchTimeoutMilliseconds: 1000)]
-    public static partial Regex UserNameSearchPatternRegex();
 }
