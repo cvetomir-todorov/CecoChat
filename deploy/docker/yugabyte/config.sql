@@ -13,5 +13,7 @@ $body$
         INSERT INTO "Elements" VALUES ('history.message-count', '32', version);
         -- snowflake
         INSERT INTO "Elements" VALUES ('snowflake.generator-ids', '0=0,1,2,3', version);
+        -- user
+        INSERT INTO "Elements" VALUES ('user.profile-count', '32', version);
     END
 $body$
