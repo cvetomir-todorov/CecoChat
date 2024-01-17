@@ -94,9 +94,9 @@ internal sealed class PartitioningConfig : IPartitioningConfig
         }
     }
 
-    public async Task<bool> Initialize(CancellationToken ct)
+    public Task<bool> Initialize(CancellationToken ct)
     {
-        return await _section.Initialize(ConfigKeys.Partitioning.Section, PrintValues, ct);
+        return _section.Initialize(ConfigKeys.Partitioning.Section, PrintValues, ct);
     }
 
     private void PrintValues(PartitioningValues values)

@@ -42,9 +42,9 @@ internal sealed class SnowflakeConfig : ISnowflakeConfig
         }
     }
 
-    public async Task<bool> Initialize(CancellationToken ct)
+    public Task<bool> Initialize(CancellationToken ct)
     {
-        return await _section.Initialize(ConfigKeys.Snowflake.Section, PrintValues, ct);
+        return _section.Initialize(ConfigKeys.Snowflake.Section, PrintValues, ct);
     }
 
     private void PrintValues(SnowflakeValues values)
