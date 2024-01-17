@@ -1,3 +1,4 @@
+using CecoChat.Client.Messaging;
 using CecoChat.ConsoleClient.Api;
 using CecoChat.ConsoleClient.LocalStorage;
 
@@ -17,6 +18,7 @@ public abstract class State
     protected ProfileStorage ProfileStorage => States.ProfileStorage;
     protected FileStorage UserFiles => States.FileStorage;
     protected ChatClient Client => States.Client;
+    protected IMessagingClient MessagingClient => States.MessagingClient;
     protected StateContext Context => States.Context;
 
     public abstract Task<State> Execute();

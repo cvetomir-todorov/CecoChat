@@ -1,3 +1,4 @@
+using CecoChat.Client.Messaging;
 using CecoChat.ConsoleClient.Api;
 using CecoChat.ConsoleClient.LocalStorage;
 
@@ -7,12 +8,14 @@ public sealed class StateContainer
 {
     public StateContainer(
         ChatClient client,
+        IMessagingClient messagingClient,
         MessageStorage messageStorage,
         ConnectionStorage connectionStorage,
         ProfileStorage profileStorageStorage,
         FileStorage fileStorage)
     {
         Client = client;
+        MessagingClient = messagingClient;
         ConnectionStorage = connectionStorage;
         MessageStorage = messageStorage;
         ProfileStorage = profileStorageStorage;
@@ -38,6 +41,7 @@ public sealed class StateContainer
     }
 
     public ChatClient Client { get; }
+    public IMessagingClient MessagingClient { get; }
     public ConnectionStorage ConnectionStorage { get; }
     public MessageStorage MessageStorage { get; }
     public ProfileStorage ProfileStorage { get; }

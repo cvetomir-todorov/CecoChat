@@ -6,21 +6,19 @@ namespace CecoChat.Client.Messaging;
 
 public sealed class MessagingClient : IMessagingClient
 {
-    private HubConnection? _messagingClient;
+    private readonly HubConnection _client;
 
-    private const string NotConnectedExMsg = "Client should be connected first.";
+    public MessagingClient(string accessToken, string messagingServerAddress)
+    {
+        _client = CreateClient(accessToken, messagingServerAddress);
+    }
 
     public ValueTask DisposeAsync()
     {
-        if (_messagingClient != null)
-        {
-            return _messagingClient.DisposeAsync();
-        }
-
-        return ValueTask.CompletedTask;
+        return _client.DisposeAsync();
     }
 
-    public async Task Connect(string messagingServerAddress, string accessToken, CancellationToken ct)
+    private static HubConnection CreateClient(string accessToken, string messagingServerAddress)
     {
         UriBuilder uriBuilder = new(messagingServerAddress);
         if (uriBuilder.Path.EndsWith('/'))
@@ -32,7 +30,7 @@ public sealed class MessagingClient : IMessagingClient
             uriBuilder.Path += "/chat";
         }
 
-        _messagingClient = new HubConnectionBuilder()
+        HubConnection client = new HubConnectionBuilder()
             .WithUrl(uriBuilder.Uri, http =>
             {
                 http.AccessTokenProvider = () => Task.FromResult(accessToken)!;
@@ -44,13 +42,18 @@ public sealed class MessagingClient : IMessagingClient
         // client times out when there is nothing from the server within the interval
         // potentially reconnects automatically if enabled
         // we don't want the test console client to time out 
-        _messagingClient.ServerTimeout = TimeSpan.FromDays(1);
+        client.ServerTimeout = TimeSpan.FromDays(1);
 
         // interval during which client sends ping to the server
         // we don't want the test console client to keep server resources
-        _messagingClient.KeepAliveInterval = TimeSpan.FromDays(1);
+        client.KeepAliveInterval = TimeSpan.FromDays(1);
 
-        _messagingClient.On<ListenNotification>(nameof(IChatListener.Notify), notification =>
+        return client;
+    }
+
+    public async Task Connect(CancellationToken ct)
+    {
+        _client.On<ListenNotification>(nameof(IChatListener.Notify), notification =>
         {
             switch (notification.Type)
             {
@@ -74,37 +77,43 @@ public sealed class MessagingClient : IMessagingClient
             }
         });
 
-        await _messagingClient.StartAsync(ct);
+        await _client.StartAsync(ct);
     }
 
-    public Task<SendMessageResponse> SendMessage(SendMessageRequest request)
+    public async Task<long> SendPlainTextMessage(long receiverId, string text)
     {
-        if (_messagingClient == null)
+        SendMessageRequest request = new()
         {
-            throw new InvalidOperationException(NotConnectedExMsg);
-        }
+            ReceiverId = receiverId,
+            DataType = DataType.PlainText,
+            Data = text
+        };
+        SendMessageResponse response = await _client.InvokeAsync<SendMessageResponse>(nameof(IChatHub.SendMessage), request);
 
-        return _messagingClient.InvokeAsync<SendMessageResponse>(nameof(IChatHub.SendMessage), request);
+        return response.MessageId;
     }
 
-    public Task<ReactResponse> React(ReactRequest request)
+    public Task React(long messageId, long senderId, long receiverId, string reaction)
     {
-        if (_messagingClient == null)
+        ReactRequest request = new()
         {
-            throw new InvalidOperationException(NotConnectedExMsg);
-        }
-
-        return _messagingClient.InvokeAsync<ReactResponse>(nameof(IChatHub.React), request);
+            MessageId = messageId,
+            SenderId = senderId,
+            ReceiverId = receiverId,
+            Reaction = reaction
+        };
+        return _client.InvokeAsync<ReactResponse>(nameof(IChatHub.React), request);
     }
 
-    public Task<UnReactResponse> UnReact(UnReactRequest request)
+    public Task UnReact(long messageId, long senderId, long receiverId)
     {
-        if (_messagingClient == null)
+        UnReactRequest request = new()
         {
-            throw new InvalidOperationException(NotConnectedExMsg);
-        }
-
-        return _messagingClient.InvokeAsync<UnReactResponse>(nameof(IChatHub.UnReact), request);
+            MessageId = messageId,
+            SenderId = senderId,
+            ReceiverId = receiverId
+        };
+        return _client.InvokeAsync<UnReactResponse>(nameof(IChatHub.UnReact), request);
     }
 
     public event EventHandler<ListenNotification>? MessageReceived;

@@ -17,7 +17,7 @@ public sealed class SendMessageState : State
             return States.OneChat;
         }
 
-        long messageId = await Client.SendPlainTextMessage(Context.UserId, plainText);
+        long messageId = await MessagingClient.SendPlainTextMessage(Context.UserId, plainText);
         Message message = new()
         {
             MessageId = messageId,

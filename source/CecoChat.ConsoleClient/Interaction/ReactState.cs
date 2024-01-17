@@ -28,13 +28,13 @@ public sealed class ReactState : State
 
         if (message.Reactions.ContainsKey(Client.UserId))
         {
-            await Client.UnReact(messageId, message.SenderId, message.ReceiverId);
+            await MessagingClient.UnReact(messageId, message.SenderId, message.ReceiverId);
             message.Reactions.Remove(Client.UserId);
         }
         else
         {
             string reaction = Reactions.ThumbsUp;
-            await Client.React(messageId, message.SenderId, message.ReceiverId, reaction);
+            await MessagingClient.React(messageId, message.SenderId, message.ReceiverId, reaction);
             message.Reactions.Add(Client.UserId, reaction);
         }
 

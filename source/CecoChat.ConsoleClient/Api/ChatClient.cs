@@ -1,20 +1,17 @@
-﻿using CecoChat.Client.Messaging;
-using CecoChat.Contracts.Bff;
+﻿using CecoChat.Contracts.Bff;
 using CecoChat.Contracts.Bff.Auth;
 using CecoChat.Contracts.Bff.Chats;
 using CecoChat.Contracts.Bff.Connections;
 using CecoChat.Contracts.Bff.Files;
 using CecoChat.Contracts.Bff.Profiles;
 using CecoChat.Contracts.Bff.Screens;
-using CecoChat.Contracts.Messaging;
 using Refit;
 
 namespace CecoChat.ConsoleClient.Api;
 
-public sealed class ChatClient : IAsyncDisposable
+public sealed class ChatClient : IDisposable
 {
     private readonly IBffClient _bffClient;
-    private readonly IMessagingClient _messagingClient;
     private ProfileFull? _userProfile;
     private string? _accessToken;
     private string? _messagingServerAddress;
@@ -22,17 +19,16 @@ public sealed class ChatClient : IAsyncDisposable
     public ChatClient(string bffAddress)
     {
         _bffClient = RestService.For<IBffClient>(bffAddress);
-        _messagingClient = new MessagingClient();
     }
 
-    public ValueTask DisposeAsync()
+    public void Dispose()
     {
         _bffClient.Dispose();
-        return _messagingClient.DisposeAsync();
     }
 
+    public string AccessToken => _accessToken!;
+    public string MessagingServerAddress => _messagingServerAddress!;
     public long UserId => _userProfile!.UserId;
-
     public ProfileFull? UserProfile => _userProfile;
 
     public async Task<ClientResponse> Register(string userName, string password, string displayName, string phone, string email)
@@ -63,41 +59,16 @@ public sealed class ChatClient : IAsyncDisposable
 
         ClientResponse response = new();
         ProcessApiResponse(apiResponse, response);
-        if (response.Success)
+
+        if (response.Success && apiResponse.Content != null)
         {
-            _accessToken = apiResponse.Content!.AccessToken;
-            _userProfile = apiResponse.Content.Profile;
+            _accessToken = apiResponse.Content.AccessToken;
             _messagingServerAddress = apiResponse.Content.MessagingServerAddress;
+            _userProfile = apiResponse.Content.Profile;
         }
 
         return response;
     }
-
-    public async Task StartMessaging(CancellationToken ct)
-    {
-        if (_messagingServerAddress == null || _accessToken == null)
-        {
-            throw new InvalidOperationException("Session should be created first.");
-        }
-
-        _messagingClient.MessageReceived += (sender, notification) => MessageReceived?.Invoke(sender, notification);
-        _messagingClient.ReactionReceived += (sender, notification) => ReactionReceived?.Invoke(sender, notification);
-        _messagingClient.MessageDelivered += (sender, notification) => MessageDelivered?.Invoke(sender, notification);
-        _messagingClient.ConnectionNotificationReceived += (sender, notification) => ConnectionNotificationReceived?.Invoke(sender, notification);
-        _messagingClient.Disconnected += (sender, e) => Disconnected?.Invoke(sender, e);
-
-        await _messagingClient.Connect(_messagingServerAddress, _accessToken, ct);
-    }
-
-    public event EventHandler<ListenNotification>? MessageReceived;
-
-    public event EventHandler<ListenNotification>? ReactionReceived;
-
-    public event EventHandler<ListenNotification>? MessageDelivered;
-
-    public event EventHandler<ListenNotification>? ConnectionNotificationReceived;
-
-    public event EventHandler? Disconnected;
 
     public async Task<ClientResponse> ChangePassword(string newPassword)
     {
@@ -160,42 +131,6 @@ public sealed class ChatClient : IAsyncDisposable
         List<LocalStorage.Message> messages = Map.BffMessages(response.Messages);
 
         return messages;
-    }
-
-    public async Task<long> SendPlainTextMessage(long receiverId, string text)
-    {
-        SendMessageRequest request = new()
-        {
-            ReceiverId = receiverId,
-            DataType = Contracts.Messaging.DataType.PlainText,
-            Data = text
-        };
-        SendMessageResponse response = await _messagingClient.SendMessage(request);
-
-        return response.MessageId;
-    }
-
-    public Task React(long messageId, long senderId, long receiverId, string reaction)
-    {
-        ReactRequest request = new()
-        {
-            MessageId = messageId,
-            SenderId = senderId,
-            ReceiverId = receiverId,
-            Reaction = reaction
-        };
-        return _messagingClient.React(request);
-    }
-
-    public Task UnReact(long messageId, long senderId, long receiverId)
-    {
-        UnReactRequest request = new()
-        {
-            MessageId = messageId,
-            SenderId = senderId,
-            ReceiverId = receiverId
-        };
-        return _messagingClient.UnReact(request);
     }
 
     public async Task<LocalStorage.ProfilePublic> GetPublicProfile(long userId)
