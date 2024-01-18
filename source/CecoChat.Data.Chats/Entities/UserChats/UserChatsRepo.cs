@@ -2,7 +2,7 @@ using Cassandra;
 using CecoChat.Contracts.Chats;
 using Microsoft.Extensions.Logging;
 
-namespace CecoChat.Data.Chats.UserChats;
+namespace CecoChat.Data.Chats.Entities.UserChats;
 
 public interface IUserChatsRepo : IDisposable
 {
