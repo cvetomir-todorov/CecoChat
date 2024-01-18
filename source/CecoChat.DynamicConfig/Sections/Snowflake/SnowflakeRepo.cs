@@ -2,7 +2,7 @@ using CecoChat.Client.Config;
 using CecoChat.Contracts.Config;
 using Microsoft.Extensions.Logging;
 
-namespace CecoChat.DynamicConfig.Snowflake;
+namespace CecoChat.DynamicConfig.Sections.Snowflake;
 
 internal sealed class SnowflakeRepo : IRepo<SnowflakeValues>
 {

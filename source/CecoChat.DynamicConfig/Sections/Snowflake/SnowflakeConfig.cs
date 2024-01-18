@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Logging;
 
-namespace CecoChat.DynamicConfig.Snowflake;
+namespace CecoChat.DynamicConfig.Sections.Snowflake;
 
 public interface ISnowflakeConfig
 {

@@ -2,7 +2,7 @@
 using CecoChat.Kafka;
 using Microsoft.Extensions.Logging;
 
-namespace CecoChat.DynamicConfig.Partitioning;
+namespace CecoChat.DynamicConfig.Sections.Partitioning;
 
 public interface IPartitioningConfig : IDisposable
 {

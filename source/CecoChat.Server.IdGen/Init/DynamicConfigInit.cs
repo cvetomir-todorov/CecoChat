@@ -1,5 +1,5 @@
 using CecoChat.AspNet.Init;
-using CecoChat.DynamicConfig.Snowflake;
+using CecoChat.DynamicConfig.Sections.Snowflake;
 using Microsoft.Extensions.Options;
 
 namespace CecoChat.Server.IdGen.Init;

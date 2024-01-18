@@ -1,6 +1,6 @@
 using CecoChat.Contracts.User;
 using CecoChat.Data.User.Entities.Profiles;
-using CecoChat.DynamicConfig.User;
+using CecoChat.DynamicConfig.Sections.User;
 using CecoChat.Server.Identity;
 using Grpc.Core;
 using Microsoft.AspNetCore.Authorization;

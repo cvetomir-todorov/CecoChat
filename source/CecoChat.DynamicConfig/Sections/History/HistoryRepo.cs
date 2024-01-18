@@ -2,7 +2,7 @@
 using CecoChat.Contracts.Config;
 using Microsoft.Extensions.Logging;
 
-namespace CecoChat.DynamicConfig.History;
+namespace CecoChat.DynamicConfig.Sections.History;
 
 internal sealed class HistoryRepo : IRepo<HistoryValues>
 {

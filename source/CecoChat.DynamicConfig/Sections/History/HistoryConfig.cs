@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 
-namespace CecoChat.DynamicConfig.History;
+namespace CecoChat.DynamicConfig.Sections.History;
 
 public interface IHistoryConfig
 {

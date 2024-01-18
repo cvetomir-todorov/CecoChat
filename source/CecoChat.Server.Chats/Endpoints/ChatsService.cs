@@ -2,7 +2,7 @@ using CecoChat.Contracts.Chats;
 using CecoChat.Data;
 using CecoChat.Data.Chats.Entities.ChatMessages;
 using CecoChat.Data.Chats.Entities.UserChats;
-using CecoChat.DynamicConfig.History;
+using CecoChat.DynamicConfig.Sections.History;
 using CecoChat.Server.Identity;
 using Grpc.Core;
 using Microsoft.AspNetCore.Authorization;

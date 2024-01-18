@@ -1,6 +1,6 @@
 using CecoChat.AspNet.Init;
-using CecoChat.DynamicConfig.Partitioning;
-using CecoChat.DynamicConfig.User;
+using CecoChat.DynamicConfig.Sections.Partitioning;
+using CecoChat.DynamicConfig.Sections.User;
 
 namespace CecoChat.Server.User.Init;
 

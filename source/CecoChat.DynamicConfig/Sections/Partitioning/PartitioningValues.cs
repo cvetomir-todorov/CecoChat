@@ -1,6 +1,6 @@
 ﻿using CecoChat.Kafka;
 
-namespace CecoChat.DynamicConfig.Partitioning;
+namespace CecoChat.DynamicConfig.Sections.Partitioning;
 
 internal sealed class PartitioningValues
 {

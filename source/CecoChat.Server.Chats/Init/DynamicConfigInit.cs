@@ -1,5 +1,5 @@
 ﻿using CecoChat.AspNet.Init;
-using CecoChat.DynamicConfig.History;
+using CecoChat.DynamicConfig.Sections.History;
 
 namespace CecoChat.Server.Chats.Init;
 
