@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using StackExchange.Redis;
 
-namespace CecoChat.Data.User.Connections;
+namespace CecoChat.Data.User.Entities.Connections;
 
 public class CachingConnectionQueryRepo : ICachingConnectionQueryRepo
 {

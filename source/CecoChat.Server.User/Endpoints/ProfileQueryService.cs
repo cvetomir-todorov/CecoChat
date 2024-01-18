@@ -1,5 +1,5 @@
 using CecoChat.Contracts.User;
-using CecoChat.Data.User.Profiles;
+using CecoChat.Data.User.Entities.Profiles;
 using CecoChat.DynamicConfig.User;
 using CecoChat.Server.Identity;
 using Grpc.Core;

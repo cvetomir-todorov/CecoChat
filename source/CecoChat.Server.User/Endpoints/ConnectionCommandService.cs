@@ -1,5 +1,5 @@
 using CecoChat.Contracts.User;
-using CecoChat.Data.User.Connections;
+using CecoChat.Data.User.Entities.Connections;
 using CecoChat.Server.Identity;
 using CecoChat.Server.User.Backplane;
 using Google.Protobuf.WellKnownTypes;

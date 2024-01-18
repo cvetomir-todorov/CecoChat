@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Npgsql;
 
-namespace CecoChat.Data.User.Files;
+namespace CecoChat.Data.User.Entities.Files;
 
 internal class FileCommandRepo : IFileCommandRepo
 {

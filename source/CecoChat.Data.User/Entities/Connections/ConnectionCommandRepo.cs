@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Logging;
 using Npgsql;
 
-namespace CecoChat.Data.User.Connections;
+namespace CecoChat.Data.User.Entities.Connections;
 
 internal class ConnectionCommandRepo : IConnectionCommandRepo
 {

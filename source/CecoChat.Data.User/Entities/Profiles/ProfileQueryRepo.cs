@@ -3,7 +3,7 @@ using CecoChat.Contracts.User;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace CecoChat.Data.User.Profiles;
+namespace CecoChat.Data.User.Entities.Profiles;
 
 internal class ProfileQueryRepo : IProfileQueryRepo
 {

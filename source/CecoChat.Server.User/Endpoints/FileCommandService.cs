@@ -1,5 +1,5 @@
 using CecoChat.Contracts.User;
-using CecoChat.Data.User.Files;
+using CecoChat.Data.User.Entities.Files;
 using CecoChat.Server.Identity;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
