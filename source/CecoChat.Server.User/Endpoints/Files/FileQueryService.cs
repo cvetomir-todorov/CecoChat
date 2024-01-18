@@ -4,7 +4,7 @@ using CecoChat.Server.Identity;
 using Grpc.Core;
 using Microsoft.AspNetCore.Authorization;
 
-namespace CecoChat.Server.User.Endpoints;
+namespace CecoChat.Server.User.Endpoints.Files;
 
 public class FileQueryService : FileQuery.FileQueryBase
 {

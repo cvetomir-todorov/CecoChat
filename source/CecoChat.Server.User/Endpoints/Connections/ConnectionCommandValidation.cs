@@ -3,7 +3,7 @@ using CecoChat.Data;
 using CecoChat.Server.Identity;
 using FluentValidation;
 
-namespace CecoChat.Server.User.Endpoints;
+namespace CecoChat.Server.User.Endpoints.Connections;
 
 public sealed class InviteRequestValidator : AbstractValidator<InviteRequest>
 {
