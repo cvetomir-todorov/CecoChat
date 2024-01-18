@@ -6,6 +6,7 @@
   - Register and manage their profile
   - Authenticate and create their session
   - Acquire other users public profiles
+  - Search users by name
   - Manage their connections - invite/accept/cancel/remove
   - Get the list of their files
 * Clients upload/download their files to/from the File storage via the BFF

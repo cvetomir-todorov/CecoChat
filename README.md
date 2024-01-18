@@ -1,7 +1,7 @@
 [Chat engine](docs/intro-capabilities.md) designed for millions of users
 
 * Messaging in real-time
-  - Send and receive messages, (un)react with emojis
+  - Send and receive messages, react/unreact with emojis
   - Notifications when a message has been processed
   - Multiple clients for the same user
 * Chats
@@ -10,6 +10,7 @@
 * Users
   - Register, authenticate, change password, edit trivial profile data
   - Profiles with static full/public-only data
+  - Search users by name
   - Connect with other users - invite/accept/cancel/remove
   - Store small user files - images, text, PDF
 
