@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Logging;
 
-namespace CecoChat.DynamicConfig.User;
+namespace CecoChat.DynamicConfig.Sections.User;
 
 public interface IUserConfig
 {

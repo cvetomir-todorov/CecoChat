@@ -5,7 +5,7 @@ using System.Text;
 using AutoMapper;
 using CecoChat.Client.User;
 using CecoChat.Contracts.Bff.Auth;
-using CecoChat.DynamicConfig.Partitioning;
+using CecoChat.DynamicConfig.Sections.Partitioning;
 using CecoChat.Jwt;
 using CecoChat.Server.Backplane;
 using Microsoft.AspNetCore.Authorization;

@@ -3,7 +3,7 @@ using CecoChat.Contracts.Config;
 using CecoChat.Kafka;
 using Microsoft.Extensions.Logging;
 
-namespace CecoChat.DynamicConfig.Partitioning;
+namespace CecoChat.DynamicConfig.Sections.Partitioning;
 
 internal sealed class PartitioningRepo : IRepo<PartitioningValues>
 {

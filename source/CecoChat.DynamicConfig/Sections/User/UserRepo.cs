@@ -2,7 +2,7 @@ using CecoChat.Client.Config;
 using CecoChat.Contracts.Config;
 using Microsoft.Extensions.Logging;
 
-namespace CecoChat.DynamicConfig.User;
+namespace CecoChat.DynamicConfig.Sections.User;
 
 internal sealed class UserRepo : IRepo<UserValues>
 {

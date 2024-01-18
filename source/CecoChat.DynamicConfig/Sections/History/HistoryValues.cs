@@ -1,4 +1,4 @@
-﻿namespace CecoChat.DynamicConfig.History;
+﻿namespace CecoChat.DynamicConfig.Sections.History;
 
 internal sealed class HistoryValues
 {

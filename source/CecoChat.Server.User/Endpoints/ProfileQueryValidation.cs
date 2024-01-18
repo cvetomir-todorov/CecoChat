@@ -1,6 +1,6 @@
 using CecoChat.Contracts.User;
 using CecoChat.Data;
-using CecoChat.DynamicConfig.User;
+using CecoChat.DynamicConfig.Sections.User;
 using FluentValidation;
 
 namespace CecoChat.Server.User.Endpoints;

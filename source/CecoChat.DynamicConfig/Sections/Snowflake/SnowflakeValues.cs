@@ -1,4 +1,4 @@
-namespace CecoChat.DynamicConfig.Snowflake;
+namespace CecoChat.DynamicConfig.Sections.Snowflake;
 
 internal sealed class SnowflakeValues
 {

@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace CecoChat.DynamicConfig.User;
+namespace CecoChat.DynamicConfig.Sections.User;
 
 internal sealed class UserValidator : AbstractValidator<UserValues>
 {
