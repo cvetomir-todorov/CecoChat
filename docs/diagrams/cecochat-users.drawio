@@ -1,10 +1,10 @@
-<mxfile host="Electron" modified="2024-01-08T11:12:49.132Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.1.16 Chrome/120.0.6099.109 Electron/28.1.0 Safari/537.36" etag="AflTgpZJAqSSRV0207fJ" version="22.1.16" type="device">
+<mxfile host="Electron" modified="2024-01-18T09:27:33.217Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.1.18 Chrome/120.0.6099.199 Electron/28.1.2 Safari/537.36" etag="YcaOg7ulEJ82XLQHPTQ9" version="22.1.18" type="device">
   <diagram id="G4t1x3i_cumIOjZ8GDXV" name="Page-1">
     <mxGraphModel dx="2020" dy="1203" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="ENQS6q1PjWJlhAXhEhIM-2" value="Register&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Create session&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Manage own&amp;nbsp;profile&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Manage connections&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Get public profiles&lt;br&gt;Manage user files" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="4NMri5ObQx2eB0Vx6lmc-1" target="8u_ZxKzGpFRI09v13LqC-1" edge="1">
+        <mxCell id="ENQS6q1PjWJlhAXhEhIM-2" value="Register&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Create session&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Manage own&amp;nbsp;profile&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Manage connections&lt;br&gt;Search users by name&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Get public profiles&lt;br&gt;Manage user files" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="4NMri5ObQx2eB0Vx6lmc-1" target="8u_ZxKzGpFRI09v13LqC-1" edge="1">
           <mxGeometry x="0.0909" relative="1" as="geometry">
             <Array as="points">
               <mxPoint x="110" y="220" />
@@ -19,8 +19,8 @@
         <mxCell id="8u_ZxKzGpFRI09v13LqC-1" value="&lt;font style=&quot;font-size: 12px&quot;&gt;Backend&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;&lt;br&gt;For Frontend&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;gradientColor=#ffa500;fillColor=#ffcd28;strokeColor=#d79b00;" parent="1" vertex="1">
           <mxGeometry x="160" y="60" width="100" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="1yBUMlGvrV6l9ZCw8e4U-2" value="Cache public profiles&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Cache connections" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;exitX=1;exitY=0.75;exitDx=0;exitDy=0;" parent="1" source="u7EXwUm9e5_MvhXn00Du-1" target="1yBUMlGvrV6l9ZCw8e4U-1" edge="1">
-          <mxGeometry x="0.4286" relative="1" as="geometry">
+        <mxCell id="1yBUMlGvrV6l9ZCw8e4U-2" value="Cache user searches&lt;br&gt;Cache public profiles&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Cache connections" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;exitX=1;exitY=0.75;exitDx=0;exitDy=0;" parent="1" source="u7EXwUm9e5_MvhXn00Du-1" target="1yBUMlGvrV6l9ZCw8e4U-1" edge="1">
+          <mxGeometry x="0.3778" relative="1" as="geometry">
             <mxPoint as="offset" />
             <Array as="points">
               <mxPoint x="510" y="105" />
@@ -34,7 +34,7 @@
         <mxCell id="u7EXwUm9e5_MvhXn00Du-4" value="User DB" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;gradientColor=#7ea6e0;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
           <mxGeometry x="640" y="50" width="120" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="u7EXwUm9e5_MvhXn00Du-5" value="&lt;font style=&quot;font-size: 11px&quot;&gt;Create profile&lt;br&gt;Manage own profile&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Manage connections&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Get public profiles&lt;br&gt;Manage user files&lt;br&gt;&lt;/font&gt;" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;startArrow=none;startFill=0;" parent="1" target="u7EXwUm9e5_MvhXn00Du-4" edge="1">
+        <mxCell id="u7EXwUm9e5_MvhXn00Du-5" value="&lt;font style=&quot;font-size: 11px&quot;&gt;Create profile&lt;br&gt;Manage own profile&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Manage connections&lt;br&gt;Search users by name&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Get public profiles&lt;br&gt;Manage user files&lt;br&gt;&lt;/font&gt;" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;startArrow=none;startFill=0;" parent="1" target="u7EXwUm9e5_MvhXn00Du-4" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="500" y="90" as="sourcePoint" />
             <mxPoint x="570" y="140" as="targetPoint" />
@@ -42,7 +42,7 @@
             <Array as="points" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="u7EXwUm9e5_MvhXn00Du-6" value="Create own profile&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Authenticate&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Manage own profile&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Manage connections&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Get public profiles&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Manage user files" style="endArrow=classic;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" parent="1" source="8u_ZxKzGpFRI09v13LqC-1" target="u7EXwUm9e5_MvhXn00Du-1" edge="1">
+        <mxCell id="u7EXwUm9e5_MvhXn00Du-6" value="Create own profile&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Authenticate&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Manage own profile&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Manage connections&lt;br&gt;Search users by name&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Get public profiles&lt;br style=&quot;border-color: var(--border-color);&quot;&gt;Manage user files" style="endArrow=classic;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" parent="1" source="8u_ZxKzGpFRI09v13LqC-1" target="u7EXwUm9e5_MvhXn00Du-1" edge="1">
           <mxGeometry x="0.0444" y="-3" width="50" height="50" relative="1" as="geometry">
             <mxPoint x="290" y="70" as="sourcePoint" />
             <mxPoint x="390" y="320" as="targetPoint" />
