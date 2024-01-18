@@ -1,5 +1,5 @@
 using CecoChat.Contracts.User;
-using CecoChat.Data.User.Profiles;
+using CecoChat.Data.User.Entities.Profiles;
 using CecoChat.Server.User.Security;
 using Grpc.Core;
 using Microsoft.AspNetCore.Authorization;

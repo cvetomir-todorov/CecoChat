@@ -1,6 +1,6 @@
 using CecoChat.Contracts.User;
 
-namespace CecoChat.Data.User.Files;
+namespace CecoChat.Data.User.Entities.Files;
 
 public interface IFileQueryRepo
 {

@@ -1,5 +1,5 @@
 using CecoChat.AspNet.Init;
-using CecoChat.Data.User.Profiles;
+using CecoChat.Data.User.Entities.Profiles;
 
 namespace CecoChat.Server.User.Init;
 

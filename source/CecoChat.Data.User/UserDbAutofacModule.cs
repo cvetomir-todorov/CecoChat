@@ -1,9 +1,9 @@
 using Autofac;
 using CecoChat.Autofac;
-using CecoChat.Data.User.Connections;
-using CecoChat.Data.User.Files;
+using CecoChat.Data.User.Entities.Connections;
+using CecoChat.Data.User.Entities.Files;
+using CecoChat.Data.User.Entities.Profiles;
 using CecoChat.Data.User.Infra;
-using CecoChat.Data.User.Profiles;
 using CecoChat.Npgsql;
 using CecoChat.Redis;
 using Microsoft.Extensions.Configuration;

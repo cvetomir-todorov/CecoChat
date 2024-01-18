@@ -3,7 +3,7 @@ using Google.Protobuf.WellKnownTypes;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace CecoChat.Data.User.Connections;
+namespace CecoChat.Data.User.Entities.Connections;
 
 internal class ConnectionQueryRepo : IConnectionQueryRepo
 {
