@@ -1,30 +1,30 @@
-<mxfile host="Electron" modified="2023-12-15T16:08:03.525Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.1.2 Chrome/114.0.5735.289 Electron/25.9.4 Safari/537.36" etag="td_welfWIGX4VXza2oH5" version="22.1.2" type="device">
+<mxfile host="Electron" modified="2024-01-18T09:21:03.794Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.1.18 Chrome/120.0.6099.199 Electron/28.1.2 Safari/537.36" etag="H-XTIcC2uDj47HZqoHXw" version="22.1.18" type="device">
   <diagram id="G4t1x3i_cumIOjZ8GDXV" name="Page-1">
     <mxGraphModel dx="2020" dy="1203" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="zEOiwxzGmeE4_qA-A_0B-2" value="Dynamic configuration contains:&lt;br&gt;- PUB/SUB backplane partition count&lt;br&gt;- key-value pairs&amp;nbsp;(messaging server ID -&amp;gt; partitions)&lt;br&gt;- key-value pairs&amp;nbsp;(messaging&amp;nbsp;server ID -&amp;gt; address)&lt;br&gt;- chat history settings&lt;br&gt;- key-value pairs (snowflake server ID -&amp;gt; generator ID)&lt;br&gt;&lt;br&gt;Config service publishes notifications about config changes in a dedicated topic&lt;br&gt;&lt;br&gt;Config-aware services consume notifications about config changes and obtain the changes from the Config service" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;align=left;gradientColor=#b3b3b3;fillColor=#f5f5f5;strokeColor=#666666;" parent="1" vertex="1">
-          <mxGeometry x="520" y="180" width="240" height="240" as="geometry" />
+        <mxCell id="zEOiwxzGmeE4_qA-A_0B-2" value="Dynamic configuration contains:&lt;br&gt;- PUB/SUB backplane partition count&lt;br&gt;- key-value pairs&amp;nbsp;(messaging server ID -&amp;gt; partitions)&lt;br&gt;- key-value pairs&amp;nbsp;(messaging&amp;nbsp;server ID -&amp;gt; address)&lt;br&gt;- chat history settings&lt;br&gt;- user profile settings&lt;br&gt;- key-value pairs (snowflake server ID -&amp;gt; generator ID)&lt;br&gt;&lt;br&gt;Config service publishes notifications about config changes in a dedicated topic&lt;br&gt;&lt;br&gt;Config-aware services consume notifications about config changes and obtain the changes from the Config service" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;align=left;gradientColor=#b3b3b3;fillColor=#f5f5f5;strokeColor=#666666;" parent="1" vertex="1">
+          <mxGeometry x="520" y="180" width="240" height="250" as="geometry" />
         </mxCell>
         <mxCell id="WAReTh2NtruZ-ETWnuQE-11" value="&lt;font style=&quot;font-size: 12px&quot;&gt;Messaging&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;gradientColor=#ffa500;fillColor=#ffcd28;strokeColor=#d79b00;" parent="1" vertex="1">
           <mxGeometry x="80" y="290" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="edGWvWXKQ8FDzD90E3AD-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="WAReTh2NtruZ-ETWnuQE-13" target="WAReTh2NtruZ-ETWnuQE-24">
+        <mxCell id="edGWvWXKQ8FDzD90E3AD-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="WAReTh2NtruZ-ETWnuQE-13" target="WAReTh2NtruZ-ETWnuQE-24" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="edGWvWXKQ8FDzD90E3AD-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="WAReTh2NtruZ-ETWnuQE-13" target="WAReTh2NtruZ-ETWnuQE-19">
+        <mxCell id="edGWvWXKQ8FDzD90E3AD-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="WAReTh2NtruZ-ETWnuQE-13" target="WAReTh2NtruZ-ETWnuQE-19" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="edGWvWXKQ8FDzD90E3AD-7" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="WAReTh2NtruZ-ETWnuQE-13" target="vOK45yCCNcbg0Topnff8-3">
+        <mxCell id="edGWvWXKQ8FDzD90E3AD-7" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="WAReTh2NtruZ-ETWnuQE-13" target="vOK45yCCNcbg0Topnff8-3" edge="1">
           <mxGeometry x="-0.4118" relative="1" as="geometry">
             <mxPoint as="offset" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="edGWvWXKQ8FDzD90E3AD-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="WAReTh2NtruZ-ETWnuQE-13" target="WAReTh2NtruZ-ETWnuQE-11">
+        <mxCell id="edGWvWXKQ8FDzD90E3AD-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="WAReTh2NtruZ-ETWnuQE-13" target="WAReTh2NtruZ-ETWnuQE-11" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="edGWvWXKQ8FDzD90E3AD-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="WAReTh2NtruZ-ETWnuQE-13" target="edGWvWXKQ8FDzD90E3AD-1">
+        <mxCell id="edGWvWXKQ8FDzD90E3AD-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="WAReTh2NtruZ-ETWnuQE-13" target="edGWvWXKQ8FDzD90E3AD-1" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="WAReTh2NtruZ-ETWnuQE-13" value="PUB/SUB&lt;br&gt;backplane" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.direct_data;whiteSpace=wrap;gradientColor=#97d077;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
@@ -48,10 +48,10 @@
         <mxCell id="vOK45yCCNcbg0Topnff8-3" value="&lt;font style=&quot;font-size: 12px&quot;&gt;User&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;gradientColor=#ffa500;fillColor=#ffcd28;strokeColor=#d79b00;" parent="1" vertex="1">
           <mxGeometry x="80" y="220" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="edGWvWXKQ8FDzD90E3AD-1" value="&lt;font style=&quot;font-size: 12px&quot;&gt;ID Gen&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;gradientColor=#ffa500;fillColor=#ffcd28;strokeColor=#d79b00;" vertex="1" parent="1">
+        <mxCell id="edGWvWXKQ8FDzD90E3AD-1" value="&lt;font style=&quot;font-size: 12px&quot;&gt;ID Gen&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;gradientColor=#ffa500;fillColor=#ffcd28;strokeColor=#d79b00;" parent="1" vertex="1">
           <mxGeometry x="80" y="360" width="120" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="edGWvWXKQ8FDzD90E3AD-4" value="PUB config changes" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="WAReTh2NtruZ-ETWnuQE-17" target="WAReTh2NtruZ-ETWnuQE-13">
+        <mxCell id="edGWvWXKQ8FDzD90E3AD-4" value="PUB config changes" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="WAReTh2NtruZ-ETWnuQE-17" target="WAReTh2NtruZ-ETWnuQE-13" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
       </root>
