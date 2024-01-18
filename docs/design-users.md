@@ -31,6 +31,10 @@ The profile gets created during registration and is returned when creating a new
 
 The issue of lost updates is considered in the implementation. This occurs when the same user authenticates from 2 different clients and tries to concurrently update his/hers profile. Optimistic concurrency is applied using a separate version column, a date-time value which gets updated on each profile change.
 
+# User search
+
+Searching for users by name supports specifying a desired part of the user name, such as `mar`, which would return all public profiles for user with user names like `maria`, `martin`, `marvel` etc. The implementation relies on PostgreSQL full-text search capabilities implemented with `pg_trgm` extension which creates and updates an index using trigrams. Such an index supports not just prefixes and suffixes but SQL queries `LIKE '%mar%'` with good performance. In order to avoid overloading the database a minimum pattern length of 3 is required and search results are cached as well. The number of public profiles returned is limited to a value from the dynamic configuration in order to avoid returning an excessive amount of data when common names match the pattern.
+
 # Public profiles
 
 Public profiles are obtained by the clients when opening all chats and a single chat. Since the public profile data doesn't change frequently, calling the User database is avoided if the requested public profiles are already in a User cache. This reduces latency and also reduces the load on the User database. The profile entries are added for a certain amount of time, after which they expire.

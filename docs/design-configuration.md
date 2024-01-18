@@ -33,8 +33,8 @@ Each service that is using dynamic configuration loads, validates and outputs th
 
 Here is a mapping of each service and the configuration elements it uses:
 
-* BFF service - partition count, server partitions, server addresses
+* BFF service - partition count, server partitions, server addresses, user profile settings
 * Messaging service - partition count, server partitions
 * Chats service - chat history settings
 * ID Gen service - snowflake generator IDs
-* User service - partition count, server partitions
+* User service - partition count, server partitions, user profile settings
