@@ -2,8 +2,8 @@
 using CecoChat.Autofac;
 using CecoChat.Cassandra;
 using CecoChat.Cassandra.Telemetry;
-using CecoChat.Data.Chats.ChatMessages;
-using CecoChat.Data.Chats.UserChats;
+using CecoChat.Data.Chats.Entities.ChatMessages;
+using CecoChat.Data.Chats.Entities.UserChats;
 using Microsoft.Extensions.Configuration;
 
 namespace CecoChat.Data.Chats;

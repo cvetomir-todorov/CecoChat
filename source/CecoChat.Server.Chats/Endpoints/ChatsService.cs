@@ -1,7 +1,7 @@
 using CecoChat.Contracts.Chats;
 using CecoChat.Data;
-using CecoChat.Data.Chats.ChatMessages;
-using CecoChat.Data.Chats.UserChats;
+using CecoChat.Data.Chats.Entities.ChatMessages;
+using CecoChat.Data.Chats.Entities.UserChats;
 using CecoChat.DynamicConfig.History;
 using CecoChat.Server.Identity;
 using Grpc.Core;

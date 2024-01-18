@@ -1,8 +1,8 @@
 ﻿using CecoChat.AspNet.Init;
 using CecoChat.Cassandra;
 using CecoChat.Data.Chats;
-using CecoChat.Data.Chats.ChatMessages;
-using CecoChat.Data.Chats.UserChats;
+using CecoChat.Data.Chats.Entities.ChatMessages;
+using CecoChat.Data.Chats.Entities.UserChats;
 
 namespace CecoChat.Server.Chats.Init;
 

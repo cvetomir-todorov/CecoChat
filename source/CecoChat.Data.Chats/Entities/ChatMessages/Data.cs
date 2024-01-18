@@ -1,6 +1,6 @@
 ﻿using CecoChat.Contracts.Chats;
 
-namespace CecoChat.Data.Chats.ChatMessages;
+namespace CecoChat.Data.Chats.Entities.ChatMessages;
 
 internal enum DbDataType : sbyte
 {
