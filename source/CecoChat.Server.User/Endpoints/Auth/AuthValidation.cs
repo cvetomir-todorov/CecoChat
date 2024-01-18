@@ -1,9 +1,8 @@
-using CecoChat.Contracts;
 using CecoChat.Contracts.User;
 using CecoChat.Data;
 using FluentValidation;
 
-namespace CecoChat.Server.User.Endpoints;
+namespace CecoChat.Server.User.Endpoints.Auth;
 
 public sealed class RegisterRequestValidator : AbstractValidator<RegisterRequest>
 {

@@ -6,7 +6,7 @@ using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Microsoft.AspNetCore.Authorization;
 
-namespace CecoChat.Server.User.Endpoints;
+namespace CecoChat.Server.User.Endpoints.Profiles;
 
 public class ProfileCommandService : ProfileCommand.ProfileCommandBase
 {

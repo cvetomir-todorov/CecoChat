@@ -4,9 +4,9 @@ using CecoChat.Server.User.Security;
 using Grpc.Core;
 using Microsoft.AspNetCore.Authorization;
 
-namespace CecoChat.Server.User.Endpoints;
+namespace CecoChat.Server.User.Endpoints.Auth;
 
-public class AuthService : Auth.AuthBase
+public class AuthService : Contracts.User.Auth.AuthBase
 {
     private readonly ILogger _logger;
     private readonly IProfileQueryRepo _queryRepo;

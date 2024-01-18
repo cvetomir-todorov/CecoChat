@@ -3,7 +3,7 @@ using CecoChat.Data;
 using CecoChat.DynamicConfig.Sections.User;
 using FluentValidation;
 
-namespace CecoChat.Server.User.Endpoints;
+namespace CecoChat.Server.User.Endpoints.Profiles;
 
 public sealed class GetPublicProfileRequestValidator : AbstractValidator<GetPublicProfileRequest>
 {
