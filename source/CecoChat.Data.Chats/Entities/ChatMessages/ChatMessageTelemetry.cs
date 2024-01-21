@@ -6,7 +6,7 @@ namespace CecoChat.Data.Chats.Entities.ChatMessages;
 
 internal interface IChatMessageTelemetry : IDisposable
 {
-    void AddDataMessage(ISession session, IStatement statement, long messageId);
+    void AddPlainTextMessage(ISession session, IStatement statement, long messageId);
 
     Task<RowSet> GetHistoryAsync(ISession session, IStatement statement, long userId);
 
@@ -30,14 +30,14 @@ internal sealed class ChatMessageTelemetry : IChatMessageTelemetry
         _cassandraTelemetry.Dispose();
     }
 
-    public void AddDataMessage(ISession session, IStatement statement, long messageId)
+    public void AddPlainTextMessage(ISession session, IStatement statement, long messageId)
     {
         _cassandraTelemetry.ExecuteStatement(
             session,
             statement,
             ChatsInstrumentation.ActivitySource,
             ChatsInstrumentation.ActivityName,
-            operationName: ChatsInstrumentation.Operations.AddDataMessage,
+            operationName: ChatsInstrumentation.Operations.AddPlainText,
             enrich: activity =>
             {
                 activity.SetTag("cecochat.message_id", messageId);

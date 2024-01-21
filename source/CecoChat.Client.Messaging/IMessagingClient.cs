@@ -12,7 +12,7 @@ public interface IMessagingClient : IAsyncDisposable
 
     Task UnReact(long messageId, long senderId, long receiverId);
 
-    event EventHandler<ListenNotification>? MessageReceived;
+    event EventHandler<ListenNotification>? PlainTextReceived;
 
     event EventHandler<ListenNotification>? ReactionReceived;
 

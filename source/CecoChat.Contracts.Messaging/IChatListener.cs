@@ -12,15 +12,14 @@ public sealed class ListenNotification
     public long ReceiverId { get; init; }
     public MessageType Type { get; set; }
     public DeliveryStatus DeliveryStatus { get; init; }
-    public NotificationData? Data { get; set; }
+    public NotificationPlainText? PlainText { get; set; }
     public NotificationReaction? Reaction { get; set; }
     public NotificationConnection? Connection { get; set; }
 }
 
-public sealed class NotificationData
+public sealed class NotificationPlainText
 {
-    public DataType Type { get; init; }
-    public string Data { get; init; } = string.Empty;
+    public string Text { get; init; } = string.Empty;
 }
 
 public sealed class NotificationReaction

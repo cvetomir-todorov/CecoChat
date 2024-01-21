@@ -3,7 +3,6 @@ option csharp_namespace = "CecoChat.Contracts.Backplane";
 package CecoChat.Contracts.Backplane;
 import "google/protobuf/timestamp.proto";
 import "Backplane/MessageType.proto";
-import "Backplane/DataType.proto";
 import "Backplane/DeliveryStatus.proto";
 import "Backplane/ConnectionStatus.proto";
 
@@ -15,16 +14,23 @@ message BackplaneMessage {
   int64 target_user_id = 5;
   MessageType type = 6;
   oneof message_data {
-    BackplaneData data = 7;
-    DeliveryStatus status = 8;
-    BackplaneReaction reaction = 9;
-    BackplaneConnection connection = 10;
+    DeliveryStatus status = 7;
+    BackplanePlainText plain_text = 8;
+    BackplaneFile file = 9;
+    BackplaneReaction reaction = 10;
+    BackplaneConnection connection = 11;
   }
 }
 
-message BackplaneData {
-  DataType type = 1;
-  string data = 2;
+message BackplanePlainText {
+  string text = 1;
+}
+
+message BackplaneFile {
+  string text = 1;
+  // TODO: add file type
+  string bucket = 2;
+  string path = 3;
 }
 
 message BackplaneReaction {

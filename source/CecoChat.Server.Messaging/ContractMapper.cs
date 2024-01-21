@@ -5,13 +5,13 @@ namespace CecoChat.Server.Messaging;
 
 public interface IContractMapper
 {
-    BackplaneMessage CreateBackplaneMessage(SendMessageRequest request, long senderId, string initiatorConnection, long messageId);
+    BackplaneMessage CreateBackplaneMessage(SendPlainTextRequest request, long senderId, string initiatorConnection, long messageId);
 
     BackplaneMessage CreateBackplaneMessage(ReactRequest request, string initiatorConnection, long reactorId);
 
     BackplaneMessage CreateBackplaneMessage(UnReactRequest request, string initiatorConnection, long reactorId);
 
-    ListenNotification CreateListenNotification(SendMessageRequest request, long senderId, long messageId);
+    ListenNotification CreateListenNotification(SendPlainTextRequest request, long senderId, long messageId);
 
     ListenNotification CreateListenNotification(ReactRequest request, long reactorId);
 
@@ -22,7 +22,7 @@ public interface IContractMapper
 
 public class ContractMapper : IContractMapper
 {
-    public BackplaneMessage CreateBackplaneMessage(SendMessageRequest request, long senderId, string initiatorConnection, long messageId)
+    public BackplaneMessage CreateBackplaneMessage(SendPlainTextRequest request, long senderId, string initiatorConnection, long messageId)
     {
         BackplaneMessage message = new()
         {
@@ -31,22 +31,13 @@ public class ContractMapper : IContractMapper
             ReceiverId = request.ReceiverId,
             InitiatorConnection = initiatorConnection,
             TargetUserId = request.ReceiverId,
-            Type = Contracts.Backplane.MessageType.Data,
-            Status = Contracts.Backplane.DeliveryStatus.Processed
+            Type = Contracts.Backplane.MessageType.PlainText,
+            Status = Contracts.Backplane.DeliveryStatus.Processed,
+            PlainText = new BackplanePlainText
+            {
+                Text = request.Text
+            }
         };
-
-        switch (request.DataType)
-        {
-            case Contracts.Messaging.DataType.PlainText:
-                message.Data = new BackplaneData
-                {
-                    Type = Contracts.Backplane.DataType.PlainText,
-                    Data = request.Data
-                };
-                break;
-            default:
-                throw new EnumValueNotSupportedException(request.DataType);
-        }
 
         return message;
     }
@@ -110,28 +101,19 @@ public class ContractMapper : IContractMapper
         return targetUserId;
     }
 
-    public ListenNotification CreateListenNotification(SendMessageRequest request, long senderId, long messageId)
+    public ListenNotification CreateListenNotification(SendPlainTextRequest request, long senderId, long messageId)
     {
         ListenNotification notification = new()
         {
             MessageId = messageId,
             SenderId = senderId,
             ReceiverId = request.ReceiverId,
-            Type = Contracts.Messaging.MessageType.Data
+            Type = Contracts.Messaging.MessageType.PlainText,
+            PlainText = new NotificationPlainText
+            {
+                Text = request.Text
+            }
         };
-
-        switch (request.DataType)
-        {
-            case Contracts.Messaging.DataType.PlainText:
-                notification.Data = new NotificationData
-                {
-                    Type = Contracts.Messaging.DataType.PlainText,
-                    Data = request.Data
-                };
-                break;
-            default:
-                throw new EnumValueNotSupportedException(request.DataType);
-        }
 
         return notification;
     }
@@ -182,8 +164,8 @@ public class ContractMapper : IContractMapper
 
         switch (backplaneMessage.Type)
         {
-            case Contracts.Backplane.MessageType.Data:
-                SetData(backplaneMessage, notification);
+            case Contracts.Backplane.MessageType.PlainText:
+                SetPlainText(backplaneMessage, notification);
                 break;
             case Contracts.Backplane.MessageType.Reaction:
                 SetReaction(backplaneMessage, notification);
@@ -198,21 +180,13 @@ public class ContractMapper : IContractMapper
         return notification;
     }
 
-    private static void SetData(BackplaneMessage backplaneMessage, ListenNotification notification)
+    private static void SetPlainText(BackplaneMessage backplaneMessage, ListenNotification notification)
     {
-        notification.Type = Contracts.Messaging.MessageType.Data;
-        switch (backplaneMessage.Data.Type)
+        notification.Type = Contracts.Messaging.MessageType.PlainText;
+        notification.PlainText = new NotificationPlainText
         {
-            case Contracts.Backplane.DataType.PlainText:
-                notification.Data = new NotificationData
-                {
-                    Type = Contracts.Messaging.DataType.PlainText,
-                    Data = backplaneMessage.Data.Data
-                };
-                break;
-            default:
-                throw new EnumValueNotSupportedException(backplaneMessage.Data.Type);
-        }
+            Text = backplaneMessage.PlainText.Text
+        };
     }
 
     private static void SetReaction(BackplaneMessage backplaneMessage, ListenNotification notification)

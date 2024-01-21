@@ -114,11 +114,8 @@ public sealed class SendersProducer : ISendersProducer
     {
         switch (backplaneMessage.Type)
         {
-            case Contracts.Backplane.MessageType.Data:
-                if (backplaneMessage.Data.Type == Contracts.Backplane.DataType.PlainText)
-                {
-                    _messagingTelemetry.NotifyPlainTextProcessed();
-                }
+            case Contracts.Backplane.MessageType.PlainText:
+                _messagingTelemetry.NotifyPlainTextProcessed();
                 break;
             case Contracts.Backplane.MessageType.Reaction:
                 if (!string.IsNullOrWhiteSpace(backplaneMessage.Reaction.Reaction))

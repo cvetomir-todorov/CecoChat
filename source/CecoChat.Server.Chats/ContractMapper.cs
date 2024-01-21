@@ -5,45 +5,36 @@ namespace CecoChat.Server.Chats;
 
 public interface IContractMapper
 {
-    DataMessage CreateDataMessage(BackplaneMessage backplaneMessage);
+    PlainTextMessage CreatePlainTextMessage(BackplaneMessage backplaneMessage);
 
     ReactionMessage CreateReactionMessage(BackplaneMessage backplaneMessage);
 }
 
 public class ContractMapper : IContractMapper
 {
-    public DataMessage CreateDataMessage(BackplaneMessage backplaneMessage)
+    public PlainTextMessage CreatePlainTextMessage(BackplaneMessage backplaneMessage)
     {
-        if (backplaneMessage.Type != Contracts.Backplane.MessageType.Data)
+        if (backplaneMessage.Type != MessageType.PlainText)
         {
-            throw new ArgumentException($"Message should be of type {Contracts.Backplane.MessageType.Data}.");
+            throw new ArgumentException($"Message should be of type {MessageType.PlainText}.");
         }
 
-        DataMessage dataMessage = new()
+        PlainTextMessage plainTextMessage = new()
         {
             MessageId = backplaneMessage.MessageId,
             SenderId = backplaneMessage.SenderId,
-            ReceiverId = backplaneMessage.ReceiverId
+            ReceiverId = backplaneMessage.ReceiverId,
+            Text = backplaneMessage.PlainText.Text
         };
 
-        switch (backplaneMessage.Data.Type)
-        {
-            case Contracts.Backplane.DataType.PlainText:
-                dataMessage.DataType = Contracts.Chats.DataType.PlainText;
-                dataMessage.Data = backplaneMessage.Data.Data;
-                break;
-            default:
-                throw new EnumValueNotSupportedException(backplaneMessage.Data.Type);
-        }
-
-        return dataMessage;
+        return plainTextMessage;
     }
 
     public ReactionMessage CreateReactionMessage(BackplaneMessage backplaneMessage)
     {
-        if (backplaneMessage.Type != Contracts.Backplane.MessageType.Reaction)
+        if (backplaneMessage.Type != MessageType.Reaction)
         {
-            throw new ArgumentException($"Message should be of type {Contracts.Backplane.MessageType.Reaction}.");
+            throw new ArgumentException($"Message should be of type {MessageType.Reaction}.");
         }
 
         ReactionMessage reactionMessage = new()

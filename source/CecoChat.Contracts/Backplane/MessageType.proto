@@ -3,9 +3,10 @@ option csharp_namespace = "CecoChat.Contracts.Backplane";
 package CecoChat.Contracts.Backplane;
 
 enum MessageType {
-  DATA = 0;
-  DISCONNECT = 1;
-  DELIVERY = 2;
-  REACTION = 3;
-  CONNECTION = 4;
+  DISCONNECT = 0;
+  DELIVERY = 1;
+  PLAIN_TEXT = 2;
+  FILE = 3;
+  REACTION = 4;
+  CONNECTION = 5;
 }

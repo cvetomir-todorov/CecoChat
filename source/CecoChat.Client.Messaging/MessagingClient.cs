@@ -57,8 +57,8 @@ public sealed class MessagingClient : IMessagingClient
         {
             switch (notification.Type)
             {
-                case MessageType.Data:
-                    MessageReceived?.Invoke(this, notification);
+                case MessageType.PlainText:
+                    PlainTextReceived?.Invoke(this, notification);
                     break;
                 case MessageType.Disconnect:
                     Disconnected?.Invoke(this, EventArgs.Empty);
@@ -82,13 +82,12 @@ public sealed class MessagingClient : IMessagingClient
 
     public async Task<long> SendPlainTextMessage(long receiverId, string text)
     {
-        SendMessageRequest request = new()
+        SendPlainTextRequest request = new()
         {
             ReceiverId = receiverId,
-            DataType = DataType.PlainText,
-            Data = text
+            Text = text
         };
-        SendMessageResponse response = await _client.InvokeAsync<SendMessageResponse>(nameof(IChatHub.SendMessage), request);
+        SendPlainTextResponse response = await _client.InvokeAsync<SendPlainTextResponse>(nameof(IChatHub.SendPlainText), request);
 
         return response.MessageId;
     }
@@ -116,7 +115,7 @@ public sealed class MessagingClient : IMessagingClient
         return _client.InvokeAsync<UnReactResponse>(nameof(IChatHub.UnReact), request);
     }
 
-    public event EventHandler<ListenNotification>? MessageReceived;
+    public event EventHandler<ListenNotification>? PlainTextReceived;
 
     public event EventHandler<ListenNotification>? ReactionReceived;
 

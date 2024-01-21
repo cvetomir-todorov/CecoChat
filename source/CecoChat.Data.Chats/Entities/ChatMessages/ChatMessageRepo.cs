@@ -10,7 +10,7 @@ public interface IChatMessageRepo : IDisposable
 
     Task<IReadOnlyCollection<HistoryMessage>> GetHistory(long userId, string chatId, DateTime olderThan, int countLimit);
 
-    void AddMessage(DataMessage message);
+    void AddPlainText(PlainTextMessage message);
 
     void SetReaction(ReactionMessage message);
 
@@ -24,7 +24,7 @@ internal sealed class ChatMessageRepo : IChatMessageRepo
     private readonly IChatsDbContext _dbContext;
     private readonly IDataMapper _mapper;
     private readonly Lazy<PreparedStatement> _historyQuery;
-    private readonly Lazy<PreparedStatement> _addMessageCommand;
+    private readonly Lazy<PreparedStatement> _addPlainTextCommand;
     private readonly Lazy<PreparedStatement> _setReactionCommand;
     private readonly Lazy<PreparedStatement> _unsetReactionCommand;
 
@@ -40,7 +40,7 @@ internal sealed class ChatMessageRepo : IChatMessageRepo
         _mapper = mapper;
 
         _historyQuery = new Lazy<PreparedStatement>(() => _dbContext.PrepareQuery(HistoryQuery));
-        _addMessageCommand = new Lazy<PreparedStatement>(() => _dbContext.PrepareQuery(AddMessageCommand));
+        _addPlainTextCommand = new Lazy<PreparedStatement>(() => _dbContext.PrepareQuery(AddPlainTextCommand));
         _setReactionCommand = new Lazy<PreparedStatement>(() => _dbContext.PrepareQuery(SetReactionCommand));
         _unsetReactionCommand = new Lazy<PreparedStatement>(() => _dbContext.PrepareQuery(UnsetReactionCommand));
     }
@@ -54,7 +54,7 @@ internal sealed class ChatMessageRepo : IChatMessageRepo
         "SELECT message_id, sender_id, receiver_id, type, data, reactions " +
         "FROM chat_messages " +
         "WHERE chat_id = ? AND message_id < ? ORDER BY message_id DESC LIMIT ?";
-    private const string AddMessageCommand =
+    private const string AddPlainTextCommand =
         "INSERT INTO chat_messages " +
         "(chat_id, message_id, sender_id, receiver_id, type, data) " +
         "VALUES (?, ?, ?, ?, ?, ?)";
@@ -72,7 +72,7 @@ internal sealed class ChatMessageRepo : IChatMessageRepo
 #pragma warning disable IDE0059
 #pragma warning disable IDE1006
         PreparedStatement _ = _historyQuery.Value;
-        PreparedStatement __ = _addMessageCommand.Value;
+        PreparedStatement __ = _addPlainTextCommand.Value;
         PreparedStatement ___ = _setReactionCommand.Value;
         PreparedStatement ____ = _unsetReactionCommand.Value;
 #pragma warning restore IDE0059
@@ -116,18 +116,18 @@ internal sealed class ChatMessageRepo : IChatMessageRepo
         }
     }
 
-    public void AddMessage(DataMessage message)
+    public void AddPlainText(PlainTextMessage message)
     {
-        sbyte dbMessageType = _mapper.MapContractToDbDataType(message.DataType);
+        sbyte dbMessageType = _mapper.MapContractToDbDataType(DataType.PlainText);
         string chatId = DataUtility.CreateChatId(message.SenderId, message.ReceiverId);
 
-        BoundStatement command = _addMessageCommand.Value.Bind(
-            chatId, message.MessageId, message.SenderId, message.ReceiverId, dbMessageType, message.Data);
+        BoundStatement command = _addPlainTextCommand.Value.Bind(
+            chatId, message.MessageId, message.SenderId, message.ReceiverId, dbMessageType, message.Text);
         command.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
         command.SetIdempotence(false);
 
-        _chatMessageTelemetry.AddDataMessage(_dbContext.Session, command, message.MessageId);
-        _logger.LogTrace("Persisted message {MessageId} type {MessageType} for chat {ChatId}", message.MessageId, message.DataType, chatId);
+        _chatMessageTelemetry.AddPlainTextMessage(_dbContext.Session, command, message.MessageId);
+        _logger.LogTrace("Persisted plain text message {MessageId} for chat {ChatId}", message.MessageId, chatId);
     }
 
     public void SetReaction(ReactionMessage message)

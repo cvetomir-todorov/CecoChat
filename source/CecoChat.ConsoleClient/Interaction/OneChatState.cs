@@ -127,6 +127,6 @@ public sealed class OneChatState : State
         }
 
         Console.WriteLine("[{0:F}] {1}: {2} (ID: {3} |{4} reaction(s):{5})",
-            message.MessageId.ToTimestamp(), sender, message.Data, message.MessageId, message.Reactions.Count, reactions);
+            message.MessageId.ToTimestamp(), sender, message.Text, message.MessageId, message.Reactions.Count, reactions);
     }
 }

@@ -11,9 +11,9 @@ namespace CecoChat.Server.Messaging.Endpoints;
 public partial class ChatHub
 {
     [Authorize(Policy = "user")]
-    public async Task<SendMessageResponse> SendMessage(SendMessageRequest request)
+    public async Task<SendPlainTextResponse> SendPlainText(SendPlainTextRequest request)
     {
-        ValidationResult result = _inputValidator.SendMessageRequest.Validate(request);
+        ValidationResult result = _inputValidator.SendPlainTextRequest.Validate(request);
         if (!result.IsValid)
         {
             throw new ValidationHubException(result.Errors);
@@ -23,8 +23,8 @@ public partial class ChatHub
 
         _messagingTelemetry.NotifyPlainTextReceived();
         long messageId = await GetMessageId();
-        _logger.LogTrace("User {UserId} with client {ClientId} and connection {ConnectionId} sent message {MessageId} with data {DataType} to user {ReceiverId}",
-            userClaims.UserId, userClaims.ClientId, Context.ConnectionId, messageId, request.DataType, request.ReceiverId);
+        _logger.LogTrace("User {UserId} with client {ClientId} and connection {ConnectionId} sent plain text message {MessageId} to user {ReceiverId}",
+            userClaims.UserId, userClaims.ClientId, Context.ConnectionId, messageId, request.ReceiverId);
 
         BackplaneMessage backplaneMessage = _mapper.CreateBackplaneMessage(request, senderId: userClaims.UserId, initiatorConnection: Context.ConnectionId, messageId);
         _sendersProducer.ProduceMessage(backplaneMessage);
@@ -32,7 +32,7 @@ public partial class ChatHub
         ListenNotification notification = _mapper.CreateListenNotification(request, userClaims.UserId, messageId);
         await _clientContainer.NotifyInGroup(notification, userClaims.UserId, excluding: Context.ConnectionId);
 
-        SendMessageResponse response = new() { MessageId = messageId };
+        SendPlainTextResponse response = new() { MessageId = messageId };
         return response;
     }
 

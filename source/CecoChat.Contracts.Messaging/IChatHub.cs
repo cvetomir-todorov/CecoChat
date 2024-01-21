@@ -2,21 +2,20 @@ namespace CecoChat.Contracts.Messaging;
 
 public interface IChatHub
 {
-    Task<SendMessageResponse> SendMessage(SendMessageRequest request);
+    Task<SendPlainTextResponse> SendPlainText(SendPlainTextRequest request);
 
     Task<ReactResponse> React(ReactRequest request);
 
     Task<UnReactResponse> UnReact(UnReactRequest request);
 }
 
-public sealed class SendMessageRequest
+public sealed class SendPlainTextRequest
 {
     public long ReceiverId { get; init; }
-    public DataType DataType { get; init; }
-    public string Data { get; init; } = string.Empty;
+    public string Text { get; init; } = string.Empty;
 }
 
-public sealed class SendMessageResponse
+public sealed class SendPlainTextResponse
 {
     public long MessageId { get; init; }
 }

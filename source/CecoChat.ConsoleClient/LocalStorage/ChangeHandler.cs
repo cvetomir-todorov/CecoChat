@@ -16,33 +16,24 @@ public class ChangeHandler
         _connectionStorage = connectionStorage;
     }
 
-    public void AddReceivedMessage(ListenNotification notification)
+    public void HandlePlainTextMessage(ListenNotification notification)
     {
-        if (notification.Type != MessageType.Data)
+        if (notification.Type != MessageType.PlainText)
         {
-            throw new InvalidOperationException($"Notification {notification} should have type {MessageType.Data}.");
+            throw new InvalidOperationException($"Notification {notification} should have type {MessageType.PlainText}.");
         }
-        if (notification.Data == null)
+        if (notification.PlainText == null)
         {
-            throw new InvalidOperationException($"Notification {notification} should have its {nameof(ListenNotification.Data)} property not null.");
+            throw new InvalidOperationException($"Notification {notification} should have its {nameof(ListenNotification.PlainText)} property not null.");
         }
 
         Message message = new()
         {
             MessageId = notification.MessageId,
             SenderId = notification.SenderId,
-            ReceiverId = notification.ReceiverId
+            ReceiverId = notification.ReceiverId,
+            Text = notification.PlainText.Text
         };
-
-        switch (notification.Data.Type)
-        {
-            case Contracts.Messaging.DataType.PlainText:
-                message.DataType = DataType.PlainText;
-                message.Data = notification.Data.Data;
-                break;
-            default:
-                throw new EnumValueNotSupportedException(notification.Data.Type);
-        }
 
         _messageStorage.AddMessage(message);
     }
