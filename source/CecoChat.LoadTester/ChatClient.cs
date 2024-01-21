@@ -54,7 +54,7 @@ public sealed class ChatClient : IAsyncDisposable
         CreateSessionResponse response = apiResponse.Content;
         _messagingClient = new MessagingClient(response.AccessToken, response.MessagingServerAddress);
         _messagingClient.MessageDelivered += (_, _) => MessagesProcessed++;
-        _messagingClient.MessageReceived += (_, _) => MessagesReceived++;
+        _messagingClient.PlainTextReceived += (_, _) => MessagesReceived++;
 
         await _messagingClient.Connect(ct);
 

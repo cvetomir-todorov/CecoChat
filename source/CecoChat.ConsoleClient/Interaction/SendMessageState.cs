@@ -23,8 +23,7 @@ public sealed class SendMessageState : State
             MessageId = messageId,
             SenderId = Client.UserId,
             ReceiverId = Context.UserId,
-            DataType = DataType.PlainText,
-            Data = plainText,
+            Text = plainText,
         };
         MessageStorage.AddMessage(message);
 

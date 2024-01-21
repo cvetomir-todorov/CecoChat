@@ -72,7 +72,7 @@ public sealed class HistoryConsumer : IHistoryConsumer
     {
         switch (backplaneMessage.Type)
         {
-            case MessageType.Data:
+            case MessageType.PlainText:
                 AddDataMessage(backplaneMessage);
                 break;
             case MessageType.Reaction:
@@ -90,10 +90,10 @@ public sealed class HistoryConsumer : IHistoryConsumer
 
     private void AddDataMessage(BackplaneMessage backplaneMessage)
     {
-        DataMessage dataMessage = _mapper.CreateDataMessage(backplaneMessage);
-        _messageRepo.AddMessage(dataMessage);
-        _logger.LogTrace("Added message {MessageId} type {MessageType} between sender {SenderId} and receiver {ReceiverId}",
-            backplaneMessage.MessageId, backplaneMessage.Data.Type, backplaneMessage.SenderId, backplaneMessage.ReceiverId);
+        PlainTextMessage plainTextMessage = _mapper.CreatePlainTextMessage(backplaneMessage);
+        _messageRepo.AddPlainText(plainTextMessage);
+        _logger.LogTrace("Added plain text message {MessageId} between sender {SenderId} and receiver {ReceiverId}",
+            backplaneMessage.MessageId, backplaneMessage.SenderId, backplaneMessage.ReceiverId);
     }
 
     private void AddReaction(BackplaneMessage backplaneMessage)

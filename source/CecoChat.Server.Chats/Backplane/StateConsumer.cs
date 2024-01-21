@@ -97,7 +97,7 @@ public sealed class StateConsumer : IStateConsumer
     {
         switch (backplaneMessage.Type)
         {
-            case MessageType.Data:
+            case MessageType.PlainText:
                 UpdateReceiverState(backplaneMessage);
                 break;
             case MessageType.Delivery:
@@ -121,7 +121,7 @@ public sealed class StateConsumer : IStateConsumer
     {
         switch (backplaneMessage.Type)
         {
-            case MessageType.Data:
+            case MessageType.PlainText:
                 UpdateSenderState(backplaneMessage);
                 break;
             case MessageType.Delivery:

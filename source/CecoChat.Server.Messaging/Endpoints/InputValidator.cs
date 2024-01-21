@@ -6,7 +6,7 @@ namespace CecoChat.Server.Messaging.Endpoints;
 
 public interface IInputValidator
 {
-    AbstractValidator<SendMessageRequest> SendMessageRequest { get; }
+    AbstractValidator<SendPlainTextRequest> SendPlainTextRequest { get; }
 
     AbstractValidator<ReactRequest> ReactRequest { get; }
 
@@ -15,20 +15,20 @@ public interface IInputValidator
 
 public sealed class InputValidator : IInputValidator
 {
-    public AbstractValidator<SendMessageRequest> SendMessageRequest { get; } = new SendMessageRequestValidator();
+    public AbstractValidator<SendPlainTextRequest> SendPlainTextRequest { get; } = new SendPlainTextRequestValidator();
 
     public AbstractValidator<ReactRequest> ReactRequest { get; } = new ReactRequestValidator();
 
     public AbstractValidator<UnReactRequest> UnReactRequest { get; } = new UnReactRequestValidator();
 }
 
-public sealed class SendMessageRequestValidator : AbstractValidator<SendMessageRequest>
+public sealed class SendPlainTextRequestValidator : AbstractValidator<SendPlainTextRequest>
 {
-    public SendMessageRequestValidator()
+    public SendPlainTextRequestValidator()
     {
         RuleFor(x => x.ReceiverId)
             .ValidUserId();
-        RuleFor(x => x.Data)
+        RuleFor(x => x.Text)
             .ValidMessageData();
     }
 }

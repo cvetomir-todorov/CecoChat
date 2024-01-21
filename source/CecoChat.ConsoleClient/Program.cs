@@ -21,7 +21,7 @@ public static class Program
         IMessagingClient messagingClient = new MessagingClient(client.AccessToken, client.MessagingServerAddress);
 
         messagingClient.Disconnected += (_, _) => Console.WriteLine("Disconnected.");
-        messagingClient.MessageReceived += (_, notification) => changeHandler.AddReceivedMessage(notification);
+        messagingClient.PlainTextReceived += (_, notification) => changeHandler.HandlePlainTextMessage(notification);
         messagingClient.MessageDelivered += (_, notification) => changeHandler.UpdateDeliveryStatus(notification);
         messagingClient.ReactionReceived += (_, notification) => changeHandler.HandleReaction(notification);
         messagingClient.ConnectionNotificationReceived += (_, notification) => changeHandler.HandleConnectionChange(notification);

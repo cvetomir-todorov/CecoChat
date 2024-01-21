@@ -4,14 +4,9 @@ public enum MessageType
 {
     Disconnect = 0,
     DeliveryStatus = 1,
-    Data = 2,
+    PlainText = 2,
     Reaction = 3,
     Connection = 4
-}
-
-public enum DataType
-{
-    PlainText = 0
 }
 
 public enum DeliveryStatus

@@ -45,18 +45,9 @@ public static class Map
         {
             MessageId = bffHistoryMessage.MessageId,
             SenderId = bffHistoryMessage.SenderId,
-            ReceiverId = bffHistoryMessage.ReceiverId
+            ReceiverId = bffHistoryMessage.ReceiverId,
+            Text = bffHistoryMessage.Data
         };
-
-        switch (bffHistoryMessage.DataType)
-        {
-            case Contracts.Bff.Chats.DataType.PlainText:
-                message.DataType = LocalStorage.DataType.PlainText;
-                message.Data = bffHistoryMessage.Data;
-                break;
-            default:
-                throw new EnumValueNotSupportedException(bffHistoryMessage.DataType);
-        }
 
         if (bffHistoryMessage.Reactions.Count > 0)
         {

@@ -15,8 +15,8 @@
 
   <ItemGroup>
     <Protobuf Include="ChatState.proto" />
-    <Protobuf Include="DataMessage.proto" />
     <Protobuf Include="DataType.proto" />
+    <Protobuf Include="PlainTextMessage.proto" />
     <Protobuf Include="HistoryMessage.proto" />
     <Protobuf Include="ChatsService.proto" GrpcServices="All" />
     <Protobuf Include="ReactionMessage.proto" />
