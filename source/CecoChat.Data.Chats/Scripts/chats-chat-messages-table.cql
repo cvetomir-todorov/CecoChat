@@ -1,11 +1,18 @@
-﻿CREATE TABLE chats.chat_messages
+﻿CREATE TYPE chats.file_data
+(
+  bucket text,
+  path text
+);
+
+CREATE TABLE chats.chat_messages
 (
   chat_id text,
   message_id bigint,
   sender_id bigint,
   receiver_id bigint,
   type tinyint,
-  data text,
+  text text,
+  file chats.file_data,
   reactions map<bigint,text>,
   PRIMARY KEY (chat_id, message_id)
 )

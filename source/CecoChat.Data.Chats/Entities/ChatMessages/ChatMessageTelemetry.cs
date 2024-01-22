@@ -8,6 +8,8 @@ internal interface IChatMessageTelemetry : IDisposable
 {
     void AddPlainTextMessage(ISession session, IStatement statement, long messageId);
 
+    void AddFileMessage(ISession session, IStatement statement, long messageId);
+
     Task<RowSet> GetHistoryAsync(ISession session, IStatement statement, long userId);
 
     void SetReaction(ISession session, IStatement statement, long reactorId);
@@ -38,6 +40,20 @@ internal sealed class ChatMessageTelemetry : IChatMessageTelemetry
             ChatsInstrumentation.ActivitySource,
             ChatsInstrumentation.ActivityName,
             operationName: ChatsInstrumentation.Operations.AddPlainText,
+            enrich: activity =>
+            {
+                activity.SetTag("cecochat.message_id", messageId);
+            });
+    }
+
+    public void AddFileMessage(ISession session, IStatement statement, long messageId)
+    {
+        _cassandraTelemetry.ExecuteStatement(
+            session,
+            statement,
+            ChatsInstrumentation.ActivitySource,
+            ChatsInstrumentation.ActivityName,
+            operationName: ChatsInstrumentation.Operations.AddFile,
             enrich: activity =>
             {
                 activity.SetTag("cecochat.message_id", messageId);

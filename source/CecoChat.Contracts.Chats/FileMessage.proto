@@ -1,0 +1,12 @@
+syntax = "proto3";
+option csharp_namespace = "CecoChat.Contracts.Chats";
+package CecoChat.Contracts.Chats;
+
+message FileMessage {
+  int64 message_id = 1;
+  int64 sender_id = 2;
+  int64 receiver_id = 3;
+  string text = 4;
+  string bucket = 5;
+  string path = 6;
+}

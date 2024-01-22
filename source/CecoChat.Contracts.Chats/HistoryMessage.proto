@@ -8,6 +8,12 @@ message HistoryMessage {
   int64 sender_id = 2;
   int64 receiver_id = 3;
   DataType data_type = 4;
-  string data = 5;
-  map<int64, string> reactions = 6;
+  string text = 5;
+  HistoryFileData file = 6;
+  map<int64, string> reactions = 7;
+}
+
+message HistoryFileData {
+  string bucket = 1;
+  string path = 2;
 }
