@@ -7,11 +7,15 @@ public interface IContractMapper
 {
     BackplaneMessage CreateBackplaneMessage(SendPlainTextRequest request, long senderId, string initiatorConnection, long messageId);
 
+    BackplaneMessage CreateBackplaneMessage(SendFileRequest request, long senderId, string initiatorConnection, long messageId);
+
     BackplaneMessage CreateBackplaneMessage(ReactRequest request, string initiatorConnection, long reactorId);
 
     BackplaneMessage CreateBackplaneMessage(UnReactRequest request, string initiatorConnection, long reactorId);
 
     ListenNotification CreateListenNotification(SendPlainTextRequest request, long senderId, long messageId);
+
+    ListenNotification CreateListenNotification(SendFileRequest request, long senderId, long messageId);
 
     ListenNotification CreateListenNotification(ReactRequest request, long reactorId);
 
@@ -36,6 +40,28 @@ public class ContractMapper : IContractMapper
             PlainText = new BackplanePlainText
             {
                 Text = request.Text
+            }
+        };
+
+        return message;
+    }
+
+    public BackplaneMessage CreateBackplaneMessage(SendFileRequest request, long senderId, string initiatorConnection, long messageId)
+    {
+        BackplaneMessage message = new()
+        {
+            MessageId = messageId,
+            SenderId = senderId,
+            ReceiverId = request.ReceiverId,
+            InitiatorConnection = initiatorConnection,
+            TargetUserId = request.ReceiverId,
+            Type = Contracts.Backplane.MessageType.File,
+            Status = Contracts.Backplane.DeliveryStatus.Processed,
+            File = new BackplaneFile
+            {
+                Text = request.Text,
+                Bucket = request.Bucket,
+                Path = request.Path
             }
         };
 
@@ -118,6 +144,25 @@ public class ContractMapper : IContractMapper
         return notification;
     }
 
+    public ListenNotification CreateListenNotification(SendFileRequest request, long senderId, long messageId)
+    {
+        ListenNotification notification = new()
+        {
+            MessageId = messageId,
+            SenderId = senderId,
+            ReceiverId = request.ReceiverId,
+            Type = Contracts.Messaging.MessageType.File,
+            File = new NotificationFile
+            {
+                Text = request.Text,
+                Bucket = request.Bucket,
+                Path = request.Path
+            }
+        };
+
+        return notification;
+    }
+
     public ListenNotification CreateListenNotification(ReactRequest request, long reactorId)
     {
         ListenNotification notification = new()
@@ -167,6 +212,9 @@ public class ContractMapper : IContractMapper
             case Contracts.Backplane.MessageType.PlainText:
                 SetPlainText(backplaneMessage, notification);
                 break;
+            case Contracts.Backplane.MessageType.File:
+                SetFile(backplaneMessage, notification);
+                break;
             case Contracts.Backplane.MessageType.Reaction:
                 SetReaction(backplaneMessage, notification);
                 break;
@@ -186,6 +234,17 @@ public class ContractMapper : IContractMapper
         notification.PlainText = new NotificationPlainText
         {
             Text = backplaneMessage.PlainText.Text
+        };
+    }
+
+    private static void SetFile(BackplaneMessage backplaneMessage, ListenNotification notification)
+    {
+        notification.Type = Contracts.Messaging.MessageType.File;
+        notification.File = new NotificationFile
+        {
+            Text = backplaneMessage.File.Text,
+            Bucket = backplaneMessage.File.Bucket,
+            Path = backplaneMessage.File.Path
         };
     }
 

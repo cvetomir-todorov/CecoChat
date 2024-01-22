@@ -5,8 +5,9 @@ public enum MessageType
     Disconnect = 0,
     DeliveryStatus = 1,
     PlainText = 2,
-    Reaction = 3,
-    Connection = 4
+    File = 3,
+    Reaction = 4,
+    Connection = 5
 }
 
 public enum DeliveryStatus

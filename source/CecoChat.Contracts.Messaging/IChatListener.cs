@@ -13,6 +13,7 @@ public sealed class ListenNotification
     public MessageType Type { get; set; }
     public DeliveryStatus DeliveryStatus { get; init; }
     public NotificationPlainText? PlainText { get; set; }
+    public NotificationFile? File { get; set; }
     public NotificationReaction? Reaction { get; set; }
     public NotificationConnection? Connection { get; set; }
 }
@@ -20,6 +21,13 @@ public sealed class ListenNotification
 public sealed class NotificationPlainText
 {
     public string Text { get; init; } = string.Empty;
+}
+
+public sealed class NotificationFile
+{
+    public string Text { get; init; } = string.Empty;
+    public string Bucket { get; init; } = string.Empty;
+    public string Path { get; init; } = string.Empty;
 }
 
 public sealed class NotificationReaction

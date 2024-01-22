@@ -9,7 +9,7 @@ public static class MessagingValidationRules
         return ruleBuilder.GreaterThan(0);
     }
 
-    public static IRuleBuilderOptions<T, string> ValidMessageData<T>(this IRuleBuilderInitial<T, string> ruleBuilder)
+    public static IRuleBuilderOptions<T, string> ValidMessageText<T>(this IRuleBuilderInitial<T, string> ruleBuilder)
     {
         return ruleBuilder
             .NotEmpty()

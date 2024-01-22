@@ -8,6 +8,8 @@ public interface IInputValidator
 {
     AbstractValidator<SendPlainTextRequest> SendPlainTextRequest { get; }
 
+    AbstractValidator<SendFileRequest> SendFileRequest { get; }
+
     AbstractValidator<ReactRequest> ReactRequest { get; }
 
     AbstractValidator<UnReactRequest> UnReactRequest { get; }
@@ -16,6 +18,8 @@ public interface IInputValidator
 public sealed class InputValidator : IInputValidator
 {
     public AbstractValidator<SendPlainTextRequest> SendPlainTextRequest { get; } = new SendPlainTextRequestValidator();
+
+    public AbstractValidator<SendFileRequest> SendFileRequest { get; } = new SendFileRequestValidator();
 
     public AbstractValidator<ReactRequest> ReactRequest { get; } = new ReactRequestValidator();
 
@@ -29,7 +33,22 @@ public sealed class SendPlainTextRequestValidator : AbstractValidator<SendPlainT
         RuleFor(x => x.ReceiverId)
             .ValidUserId();
         RuleFor(x => x.Text)
-            .ValidMessageData();
+            .ValidMessageText();
+    }
+}
+
+public sealed class SendFileRequestValidator : AbstractValidator<SendFileRequest>
+{
+    public SendFileRequestValidator()
+    {
+        RuleFor(x => x.ReceiverId)
+            .ValidUserId();
+        RuleFor(x => x.Text)
+            .NotNull();
+        RuleFor(x => x.Bucket)
+            .ValidBucketName();
+        RuleFor(x => x.Path)
+            .ValidPath();
     }
 }
 
