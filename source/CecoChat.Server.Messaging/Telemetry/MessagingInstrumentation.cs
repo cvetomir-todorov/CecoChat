@@ -16,8 +16,14 @@ public static class MessagingInstrumentation
         public const string PlainTextsReceived = "messaging.plain_texts.received";
         public const string PlainTextsReceivedDescription = "measures how many plain text messages are received";
 
-        public const string MessagesProcessed = "messaging.plain_texts.processed";
-        public const string MessagesProcessedDescription = "measures how many plain text messages are processed";
+        public const string PlainTextsProcessed = "messaging.plain_texts.processed";
+        public const string PlainTextsProcessedDescription = "measures how many plain text messages are processed";
+
+        public const string FilesReceived = "messaging.files.received";
+        public const string FilesReceivedDescription = "measures how many file messages are received";
+
+        public const string FilesProcessed = "messaging.files.processed";
+        public const string FilesProcessedDescription = "measures how many file messages are processed";
 
         public const string ReactionsReceived = "messaging.reactions.received";
         public const string ReactionsReceivedDescription = "measures how many reactions are received";

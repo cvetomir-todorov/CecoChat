@@ -19,7 +19,7 @@ public partial class ChatHub
 
         UserClaims userClaims = Context.User!.GetUserClaimsSignalR(Context.ConnectionId, _logger);
 
-        // TODO: increase metric counter for files received
+        _messagingTelemetry.NotifyFileReceived();
         long messageId = await GetMessageId();
         _logger.LogTrace("User {UserId} with client {ClientId} and connection {ConnectionId} sent file message {MessageId} to user {ReceiverId}",
             userClaims.UserId, userClaims.ClientId, Context.ConnectionId, messageId, request.ReceiverId);
