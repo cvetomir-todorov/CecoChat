@@ -39,19 +39,36 @@ public sealed class HistoryMessage
 
     [JsonPropertyName("dataType")]
     [AliasAs("dataType")]
-    public DataType DataType { get; set; }
+    public MessageType Type { get; set; }
 
-    [JsonPropertyName("data")]
-    [AliasAs("data")]
-    public string Data { get; set; } = string.Empty;
+    [JsonPropertyName("text")]
+    [AliasAs("text")]
+    public string Text { get; set; } = string.Empty;
+
+    [JsonPropertyName("file")]
+    [AliasAs("file")]
+    public FileData? File { get; set; }
 
     [JsonPropertyName("reactions")]
     [AliasAs("reactions")]
     public IDictionary<long, string> Reactions { get; set; } = ImmutableDictionary<long, string>.Empty;
 }
 
-public enum DataType
+public enum MessageType
 {
     [EnumMember(Value = "plainText")]
-    PlainText
+    PlainText,
+    [EnumMember(Value = "file")]
+    File
+}
+
+public sealed class FileData
+{
+    [JsonPropertyName("bucket")]
+    [AliasAs("bucket")]
+    public string Bucket { get; init; } = string.Empty;
+
+    [JsonPropertyName("path")]
+    [AliasAs("path")]
+    public string Path { get; init; } = string.Empty;
 }
