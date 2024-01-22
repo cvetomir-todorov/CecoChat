@@ -2,9 +2,16 @@
 
 namespace CecoChat.Data.Chats.Entities.ChatMessages;
 
+internal sealed class DbFileData
+{
+    public string Bucket { get; set; } = string.Empty;
+    public string Path { get; set; } = string.Empty;
+}
+
 internal enum DbDataType : sbyte
 {
-    PlainText = 0
+    PlainText = 0,
+    File = 1
 }
 
 internal interface IDataMapper
@@ -22,6 +29,8 @@ internal sealed class DataMapper : IDataMapper
         {
             case DataType.PlainText:
                 return (sbyte)DbDataType.PlainText;
+            case DataType.File:
+                return (sbyte)DbDataType.File;
             default:
                 throw new EnumValueNotSupportedException(dataType);
         }
@@ -35,6 +44,8 @@ internal sealed class DataMapper : IDataMapper
         {
             case DbDataType.PlainText:
                 return DataType.PlainText;
+            case DbDataType.File:
+                return DataType.File;
             default:
                 throw new EnumValueNotSupportedException(dbDataTypeAsEnum);
         }

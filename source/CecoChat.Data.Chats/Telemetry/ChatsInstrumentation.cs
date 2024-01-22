@@ -19,6 +19,7 @@ internal static class ChatsInstrumentation
         public const string UpdateChat = "UpdateChat";
 
         public const string AddPlainText = "AddPlainText";
+        public const string AddFile = "AddFile";
         public const string GetHistory = "GetHistory";
         public const string SetReaction = "SetReaction";
         public const string UnsetReaction = "UnsetReaction";

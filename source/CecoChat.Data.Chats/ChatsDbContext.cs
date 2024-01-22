@@ -12,6 +12,9 @@ public interface IChatsDbContext : ICassandraDbContext
     ISession Session { get; }
 
     PreparedStatement PrepareQuery(string cql);
+
+    void PrepareUdt<TUserDefinedType>(string keyspace, string typeName)
+        where TUserDefinedType : new();
 }
 
 internal sealed class ChatsDbContext : CassandraDbContext, IChatsDbContext
@@ -34,5 +37,13 @@ internal sealed class ChatsDbContext : CassandraDbContext, IChatsDbContext
         PreparedStatement preparedQuery = Session.Prepare(cql);
         _logger.LogInformation("Prepared CQL '{Cql}'", cql);
         return preparedQuery;
+    }
+
+    public void PrepareUdt<TUserDefinedType>(string keyspace, string typeName)
+        where TUserDefinedType : new()
+    {
+        Session.UserDefinedTypes.Define(
+            UdtMap.For<TUserDefinedType>(typeName, keyspace));
+        _logger.LogInformation("Prepared user-defined type {UserDefinedType} to match {Keyspace}.{Udt}", typeof(TUserDefinedType).Name, keyspace, typeName);
     }
 }
