@@ -92,6 +92,20 @@ public sealed class MessagingClient : IMessagingClient
         return response.MessageId;
     }
 
+    public async Task<long> SendFileMessage(long receiverId, string text, string fileBucket, string filePath)
+    {
+        SendFileRequest request = new()
+        {
+            ReceiverId = receiverId,
+            Text = text,
+            Bucket = fileBucket,
+            Path = filePath
+        };
+        SendFileResponse response = await _client.InvokeAsync<SendFileResponse>(nameof(IChatHub.SendFile), request);
+
+        return response.MessageId;
+    }
+
     public Task React(long messageId, long senderId, long receiverId, string reaction)
     {
         ReactRequest request = new()
