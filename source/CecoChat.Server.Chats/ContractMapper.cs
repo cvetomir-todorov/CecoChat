@@ -7,6 +7,8 @@ public interface IContractMapper
 {
     PlainTextMessage CreatePlainTextMessage(BackplaneMessage backplaneMessage);
 
+    FileMessage CreateFileMessage(BackplaneMessage backplaneMessage);
+
     ReactionMessage CreateReactionMessage(BackplaneMessage backplaneMessage);
 }
 
@@ -28,6 +30,26 @@ public class ContractMapper : IContractMapper
         };
 
         return plainTextMessage;
+    }
+
+    public FileMessage CreateFileMessage(BackplaneMessage backplaneMessage)
+    {
+        if (backplaneMessage.Type != MessageType.File)
+        {
+            throw new ArgumentException($"Message should be of type {MessageType.File}.");
+        }
+
+        FileMessage fileMessage = new()
+        {
+            MessageId = backplaneMessage.MessageId,
+            SenderId = backplaneMessage.SenderId,
+            ReceiverId = backplaneMessage.ReceiverId,
+            Text = backplaneMessage.File.Text,
+            Bucket = backplaneMessage.File.Bucket,
+            Path = backplaneMessage.File.Path
+        };
+
+        return fileMessage;
     }
 
     public ReactionMessage CreateReactionMessage(BackplaneMessage backplaneMessage)

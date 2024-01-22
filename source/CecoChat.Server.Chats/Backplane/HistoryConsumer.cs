@@ -73,7 +73,10 @@ public sealed class HistoryConsumer : IHistoryConsumer
         switch (backplaneMessage.Type)
         {
             case MessageType.PlainText:
-                AddDataMessage(backplaneMessage);
+                AddPlainText(backplaneMessage);
+                break;
+            case MessageType.File:
+                AddFile(backplaneMessage);
                 break;
             case MessageType.Reaction:
                 AddReaction(backplaneMessage);
@@ -88,11 +91,19 @@ public sealed class HistoryConsumer : IHistoryConsumer
         }
     }
 
-    private void AddDataMessage(BackplaneMessage backplaneMessage)
+    private void AddPlainText(BackplaneMessage backplaneMessage)
     {
         PlainTextMessage plainTextMessage = _mapper.CreatePlainTextMessage(backplaneMessage);
-        _messageRepo.AddPlainText(plainTextMessage);
+        _messageRepo.AddPlainTextMessage(plainTextMessage);
         _logger.LogTrace("Added plain text message {MessageId} between sender {SenderId} and receiver {ReceiverId}",
+            backplaneMessage.MessageId, backplaneMessage.SenderId, backplaneMessage.ReceiverId);
+    }
+
+    private void AddFile(BackplaneMessage backplaneMessage)
+    {
+        FileMessage fileMessage = _mapper.CreateFileMessage(backplaneMessage);
+        _messageRepo.AddFileMessage(fileMessage);
+        _logger.LogTrace("Added file message {MessageId} between sender {SenderId} and receiver {ReceiverId}",
             backplaneMessage.MessageId, backplaneMessage.SenderId, backplaneMessage.ReceiverId);
     }
 
