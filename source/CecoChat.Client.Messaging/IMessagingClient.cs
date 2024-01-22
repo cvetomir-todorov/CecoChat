@@ -8,6 +8,8 @@ public interface IMessagingClient : IAsyncDisposable
 
     Task<long> SendPlainTextMessage(long receiverId, string text);
 
+    Task<long> SendFileMessage(long receiverId, string text, string fileBucket, string filePath);
+
     Task React(long messageId, long senderId, long receiverId, string reaction);
 
     Task UnReact(long messageId, long senderId, long receiverId);
