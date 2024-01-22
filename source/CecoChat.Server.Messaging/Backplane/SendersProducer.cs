@@ -117,6 +117,9 @@ public sealed class SendersProducer : ISendersProducer
             case Contracts.Backplane.MessageType.PlainText:
                 _messagingTelemetry.NotifyPlainTextProcessed();
                 break;
+            case Contracts.Backplane.MessageType.File:
+                _messagingTelemetry.NotifyFileProcessed();
+                break;
             case Contracts.Backplane.MessageType.Reaction:
                 if (!string.IsNullOrWhiteSpace(backplaneMessage.Reaction.Reaction))
                 {

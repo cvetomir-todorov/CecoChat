@@ -9,6 +9,10 @@ public interface IMessagingTelemetry : IDisposable
 
     void NotifyPlainTextProcessed();
 
+    void NotifyFileReceived();
+
+    void NotifyFileProcessed();
+
     void NotifyReactionReceived();
 
     void NotifyReactionProcessed();
@@ -27,6 +31,8 @@ public sealed class MessagingTelemetry : IMessagingTelemetry
     private readonly Meter _meter;
     private readonly Counter<long> _plainTextsReceived;
     private readonly Counter<long> _plainTextsProcessed;
+    private readonly Counter<long> _filesReceived;
+    private readonly Counter<long> _filesProcessed;
     private readonly Counter<long> _reactionsReceived;
     private readonly Counter<long> _reactionsProcessed;
     private readonly Counter<long> _unreactionsReceived;
@@ -39,7 +45,10 @@ public sealed class MessagingTelemetry : IMessagingTelemetry
         _meter = new Meter(MessagingInstrumentation.ActivitySource.Name);
 
         _plainTextsReceived = _meter.CreateCounter<long>(MessagingInstrumentation.Metrics.PlainTextsReceived, description: MessagingInstrumentation.Metrics.PlainTextsReceivedDescription);
-        _plainTextsProcessed = _meter.CreateCounter<long>(MessagingInstrumentation.Metrics.MessagesProcessed, description: MessagingInstrumentation.Metrics.MessagesProcessedDescription);
+        _plainTextsProcessed = _meter.CreateCounter<long>(MessagingInstrumentation.Metrics.PlainTextsProcessed, description: MessagingInstrumentation.Metrics.PlainTextsProcessedDescription);
+
+        _filesReceived = _meter.CreateCounter<long>(MessagingInstrumentation.Metrics.FilesReceived, description: MessagingInstrumentation.Metrics.FilesReceivedDescription);
+        _filesProcessed = _meter.CreateCounter<long>(MessagingInstrumentation.Metrics.FilesProcessed, description: MessagingInstrumentation.Metrics.FilesProcessedDescription);
 
         _reactionsReceived = _meter.CreateCounter<long>(MessagingInstrumentation.Metrics.ReactionsReceived, description: MessagingInstrumentation.Metrics.ReactionsReceivedDescription);
         _reactionsProcessed = _meter.CreateCounter<long>(MessagingInstrumentation.Metrics.ReactionsProcessed, description: MessagingInstrumentation.Metrics.ReactionsProcessedDescription);
@@ -65,6 +74,16 @@ public sealed class MessagingTelemetry : IMessagingTelemetry
     public void NotifyPlainTextProcessed()
     {
         _plainTextsProcessed.Add(1, _serverIdTag);
+    }
+
+    public void NotifyFileReceived()
+    {
+        _filesReceived.Add(1, _serverIdTag);
+    }
+
+    public void NotifyFileProcessed()
+    {
+        _filesProcessed.Add(1, _serverIdTag);
     }
 
     public void NotifyReactionReceived()
