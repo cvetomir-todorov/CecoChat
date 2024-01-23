@@ -22,6 +22,7 @@ public static class Program
 
         messagingClient.Disconnected += (_, _) => Console.WriteLine("Disconnected.");
         messagingClient.PlainTextReceived += (_, notification) => changeHandler.HandlePlainTextMessage(notification);
+        messagingClient.FileReceived += (_, notification) => changeHandler.HandleFileMessage(notification);
         messagingClient.MessageDelivered += (_, notification) => changeHandler.UpdateDeliveryStatus(notification);
         messagingClient.ReactionReceived += (_, notification) => changeHandler.HandleReaction(notification);
         messagingClient.ConnectionNotificationReceived += (_, notification) => changeHandler.HandleConnectionChange(notification);

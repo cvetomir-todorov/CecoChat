@@ -114,6 +114,14 @@ public sealed class OneChatState : State
     private void DisplayMessage(Message message, ProfilePublic profilePublic)
     {
         string sender = message.SenderId == Client.UserId ? "You" : profilePublic.DisplayName;
+
+        string file = string.Empty;
+        if (message.Type == MessageType.File)
+        {
+            string prefix = message.Text.Length > 0 ? " " : string.Empty;
+            file = $"{prefix}(file: {message.FileBucket}/{message.FilePath})";
+        }
+
         string reactions = string.Empty;
         if (message.Reactions.Count > 0)
         {
@@ -126,7 +134,7 @@ public sealed class OneChatState : State
             reactions = reactionsBuilder.ToString();
         }
 
-        Console.WriteLine("[{0:F}] {1}: {2} (ID: {3} |{4} reaction(s):{5})",
-            message.MessageId.ToTimestamp(), sender, message.Text, message.MessageId, message.Reactions.Count, reactions);
+        Console.WriteLine("[{0:F}] {1}: {2}{3} (ID: {4} |{5} reaction(s):{6})",
+            message.MessageId.ToTimestamp(), sender, message.Text, file, message.MessageId, message.Reactions.Count, reactions);
     }
 }
