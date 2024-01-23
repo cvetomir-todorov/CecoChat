@@ -47,7 +47,7 @@ public sealed class OneChatState : State
         }
 
         DisplaySplitter();
-        Console.WriteLine("Write (press 'w') | React (press 'r') | Send file (press 'i')");
+        Console.WriteLine("Write (press 'w') | React (press 'r') | Send file (press 'i') | Download sent file (press 'd')");
 
         ConsoleKeyInfo keyInfo = Console.ReadKey(intercept: true);
         return HandleKey(keyInfo);
@@ -84,6 +84,11 @@ public sealed class OneChatState : State
         {
             Context.ReloadData = false;
             return States.SendFile;
+        }
+        else if (keyInfo.KeyChar == 'd')
+        {
+            Context.ReloadData = false;
+            return States.DownloadSentFile;
         }
         else
         {

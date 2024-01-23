@@ -28,8 +28,9 @@ public sealed class StateContainer
         SearchUsers = new SearchUsersState(this);
         OneChat = new OneChatState(this);
         SendMessage = new SendMessageState(this);
-        SendFile = new SendFileState(this);
         React = new ReactState(this);
+        SendFile = new SendFileState(this);
+        DownloadSentFile = new DownloadSentFileState(this);
         ManageConnection = new ManageConnectionState(this);
         Files = new FilesState(this);
         UploadFile = new UploadFileState(this);
@@ -55,8 +56,9 @@ public sealed class StateContainer
     public State SearchUsers { get; }
     public State OneChat { get; }
     public State SendMessage { get; }
-    public State SendFile { get; }
     public State React { get; }
+    public State SendFile { get; }
+    public State DownloadSentFile { get; }
     public State ManageConnection { get; }
     public State Files { get; }
     public State UploadFile { get; }

@@ -2,9 +2,9 @@ using CecoChat.ConsoleClient.LocalStorage;
 
 namespace CecoChat.ConsoleClient.Interaction;
 
-public sealed class ReactState : State
+public sealed class DownloadSentFileState : State
 {
-    public ReactState(StateContainer states) : base(states)
+    public DownloadSentFileState(StateContainer states) : base(states)
     { }
 
     public override async Task<State> Execute()
@@ -22,25 +22,18 @@ public sealed class ReactState : State
             Context.ReloadData = false;
             return States.OneChat;
         }
+        if (string.IsNullOrWhiteSpace(message.FileBucket) || string.IsNullOrWhiteSpace(message.FilePath))
+        {
+            Console.Write("Chosen message doesn't have a file. Press ENTER to continue...");
+            Console.ReadLine();
 
-        if (message.Reactions.ContainsKey(Client.UserId))
-        {
-            await MessagingClient.UnReact(messageId, message.SenderId, message.ReceiverId);
-            message.Reactions.Remove(Client.UserId);
+            Context.ReloadData = false;
+            return States.OneChat;
         }
-        else
-        {
-            string reaction = Reactions.ThumbsUp;
-            await MessagingClient.React(messageId, message.SenderId, message.ReceiverId, reaction);
-            message.Reactions.Add(Client.UserId, reaction);
-        }
+
+        await DownloadFile(message.FileBucket, message.FilePath);
 
         Context.ReloadData = false;
         return States.OneChat;
-    }
-
-    private static class Reactions
-    {
-        public static readonly string ThumbsUp = "\\u1F44D";
     }
 }
