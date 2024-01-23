@@ -18,9 +18,9 @@ public class ChangeHandler
 
     public void HandlePlainTextMessage(ListenNotification notification)
     {
-        if (notification.Type != MessageType.PlainText)
+        if (notification.Type != Contracts.Messaging.MessageType.PlainText)
         {
-            throw new InvalidOperationException($"Notification {notification} should have type {MessageType.PlainText}.");
+            throw new InvalidOperationException($"Notification {notification} should have type {Contracts.Messaging.MessageType.PlainText}.");
         }
         if (notification.PlainText == null)
         {
@@ -32,7 +32,33 @@ public class ChangeHandler
             MessageId = notification.MessageId,
             SenderId = notification.SenderId,
             ReceiverId = notification.ReceiverId,
+            Type = MessageType.PlainText,
             Text = notification.PlainText.Text
+        };
+
+        _messageStorage.AddMessage(message);
+    }
+
+    public void HandleFileMessage(ListenNotification notification)
+    {
+        if (notification.Type != Contracts.Messaging.MessageType.File)
+        {
+            throw new InvalidOperationException($"Notification {notification} should have type {Contracts.Messaging.MessageType.File}.");
+        }
+        if (notification.File == null)
+        {
+            throw new InvalidOperationException($"Notification {notification} should have its {nameof(ListenNotification.File)} property not null.");
+        }
+
+        Message message = new()
+        {
+            MessageId = notification.MessageId,
+            SenderId = notification.SenderId,
+            ReceiverId = notification.ReceiverId,
+            Type = MessageType.File,
+            Text = notification.File.Text,
+            FileBucket = notification.File.Bucket,
+            FilePath = notification.File.Path
         };
 
         _messageStorage.AddMessage(message);
@@ -40,9 +66,9 @@ public class ChangeHandler
 
     public void UpdateDeliveryStatus(ListenNotification notification)
     {
-        if (notification.Type != MessageType.DeliveryStatus)
+        if (notification.Type != Contracts.Messaging.MessageType.DeliveryStatus)
         {
-            throw new InvalidOperationException($"Notification {notification} should have type {MessageType.DeliveryStatus}.");
+            throw new InvalidOperationException($"Notification {notification} should have type {Contracts.Messaging.MessageType.DeliveryStatus}.");
         }
 
         if (!_messageStorage.TryGetChat(notification.SenderId, notification.ReceiverId, out Chat? chat))
@@ -73,9 +99,9 @@ public class ChangeHandler
 
     public void HandleReaction(ListenNotification notification)
     {
-        if (notification.Type != MessageType.Reaction)
+        if (notification.Type != Contracts.Messaging.MessageType.Reaction)
         {
-            throw new InvalidOperationException($"Notification {notification} should have type {MessageType.Reaction}.");
+            throw new InvalidOperationException($"Notification {notification} should have type {Contracts.Messaging.MessageType.Reaction}.");
         }
         if (notification.Reaction == null)
         {
@@ -103,9 +129,9 @@ public class ChangeHandler
 
     public void HandleConnectionChange(ListenNotification notification)
     {
-        if (notification.Type != MessageType.Connection)
+        if (notification.Type != Contracts.Messaging.MessageType.Connection)
         {
-            throw new InvalidOperationException($"Notification {notification} should have type {MessageType.Connection}.");
+            throw new InvalidOperationException($"Notification {notification} should have type {Contracts.Messaging.MessageType.Connection}.");
         }
         if (notification.Connection == null)
         {
