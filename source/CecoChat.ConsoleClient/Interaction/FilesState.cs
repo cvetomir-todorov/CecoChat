@@ -73,7 +73,7 @@ public class FilesState : State
         {
             Context.DownloadFile = userFiles[index];
             Context.ReloadData = true;
-            return States.DownloadFile;
+            return States.DownloadOwnFile;
         }
     }
 }

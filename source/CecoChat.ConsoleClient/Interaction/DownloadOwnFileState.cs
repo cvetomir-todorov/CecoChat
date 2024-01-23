@@ -2,9 +2,9 @@ using CecoChat.ConsoleClient.Api;
 
 namespace CecoChat.ConsoleClient.Interaction;
 
-public class DownloadFileState : State
+public class DownloadOwnFileState : State
 {
-    public DownloadFileState(StateContainer states) : base(states)
+    public DownloadOwnFileState(StateContainer states) : base(states)
     { }
 
     public override async Task<State> Execute()
