@@ -61,21 +61,6 @@ public class FilesState : State
         Context.LastKnownFilesState = newLastKnownState;
     }
 
-    private List<FileRef> DisplayUserFiles()
-    {
-        List<FileRef> userFiles = new();
-        int key = 0;
-
-        foreach (FileRef userFile in UserFiles.EnumerateUserFiles().OrderByDescending(file => file.Version))
-        {
-            Console.WriteLine("Press '{0}' for: {1}/{2}    {3:F}", key, userFile.Bucket, userFile.Path, userFile.Version);
-            userFiles.Add(userFile);
-            key++;
-        }
-
-        return userFiles;
-    }
-
     private State ProcessNumberKey(ConsoleKeyInfo keyInfo, List<FileRef> userFiles)
     {
         int index = keyInfo.KeyChar - '0';

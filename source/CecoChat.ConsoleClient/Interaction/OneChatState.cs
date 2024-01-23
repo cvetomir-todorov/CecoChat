@@ -47,7 +47,7 @@ public sealed class OneChatState : State
         }
 
         DisplaySplitter();
-        Console.WriteLine("Write (press 'w') | React (press 'r')");
+        Console.WriteLine("Write (press 'w') | React (press 'r') | Send file (press 'i')");
 
         ConsoleKeyInfo keyInfo = Console.ReadKey(intercept: true);
         return HandleKey(keyInfo);
@@ -55,7 +55,22 @@ public sealed class OneChatState : State
 
     private State HandleKey(ConsoleKeyInfo keyInfo)
     {
-        if (keyInfo.KeyChar == 'w')
+        if (keyInfo.KeyChar == 'm')
+        {
+            Context.ReloadData = true;
+            return States.ManageConnection;
+        }
+        else if (keyInfo.KeyChar == 'f')
+        {
+            Context.ReloadData = true;
+            return States.OneChat;
+        }
+        else if (keyInfo.KeyChar == 'x')
+        {
+            Context.ReloadData = true;
+            return States.AllChats;
+        }
+        else if (keyInfo.KeyChar == 'w')
         {
             Context.ReloadData = false;
             return States.SendMessage;
@@ -65,20 +80,10 @@ public sealed class OneChatState : State
             Context.ReloadData = false;
             return States.React;
         }
-        else if (keyInfo.KeyChar == 'f')
+        else if (keyInfo.KeyChar == 'i')
         {
-            Context.ReloadData = true;
-            return States.OneChat;
-        }
-        else if (keyInfo.KeyChar == 'm')
-        {
-            Context.ReloadData = true;
-            return States.ManageConnection;
-        }
-        else if (keyInfo.KeyChar == 'x')
-        {
-            Context.ReloadData = true;
-            return States.AllChats;
+            Context.ReloadData = false;
+            return States.SendFile;
         }
         else
         {
