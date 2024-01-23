@@ -60,6 +60,9 @@ public sealed class MessagingClient : IMessagingClient
                 case MessageType.PlainText:
                     PlainTextReceived?.Invoke(this, notification);
                     break;
+                case MessageType.File:
+                    FileReceived?.Invoke(this, notification);
+                    break;
                 case MessageType.Disconnect:
                     Disconnected?.Invoke(this, EventArgs.Empty);
                     break;
@@ -130,6 +133,8 @@ public sealed class MessagingClient : IMessagingClient
     }
 
     public event EventHandler<ListenNotification>? PlainTextReceived;
+
+    public event EventHandler<ListenNotification>? FileReceived;
 
     public event EventHandler<ListenNotification>? ReactionReceived;
 

@@ -16,6 +16,8 @@ public interface IMessagingClient : IAsyncDisposable
 
     event EventHandler<ListenNotification>? PlainTextReceived;
 
+    event EventHandler<ListenNotification>? FileReceived; 
+
     event EventHandler<ListenNotification>? ReactionReceived;
 
     event EventHandler<ListenNotification>? MessageDelivered;
