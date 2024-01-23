@@ -115,10 +115,7 @@ public abstract class State
         if (!response.Success)
         {
             Console.WriteLine("Uploading file resulted in {0} errors:", response.Errors.Count);
-            foreach (string error in response.Errors)
-            {
-                Console.WriteLine("  {0}", error);
-            }
+            DisplayErrors(response);
 
             return new UploadFileResult
             {
@@ -134,5 +131,41 @@ public abstract class State
             Bucket = response.Content.File.Bucket,
             Path = response.Content.File.Path
         };
+    }
+
+    protected async Task<bool> DownloadFile(string bucket, string path)
+    {
+        Console.Write("Enter the path to where the file downloaded should be saved or leave empty to exit: ");
+        string? filePath = Console.ReadLine();
+        if (string.IsNullOrWhiteSpace(filePath))
+        {
+            return false;
+        }
+
+        if (File.Exists(filePath))
+        {
+            Console.WriteLine("File {0} already exists, press ENTER to exit", filePath);
+            Console.ReadLine();
+
+            return false;
+        }
+
+        Console.WriteLine("Downloading file {0}/{1}...", bucket, path);
+        ClientResponse<Stream> response = await Client.DownloadFile(bucket, path);
+        if (!response.Success)
+        {
+            Console.WriteLine("Downloading file result in {0} errors:", response.Errors.Count);
+            DisplayErrors(response);
+
+            return false;
+        }
+
+        await using FileStream localFile = new(filePath, FileMode.CreateNew, FileAccess.Write);
+        await response.Content!.CopyToAsync(localFile);
+        Console.WriteLine("Downloaded file successfully to {0}.", filePath);
+        Console.Write("Press ENTER to continue...");
+        Console.ReadLine();
+
+        return true;
     }
 }
