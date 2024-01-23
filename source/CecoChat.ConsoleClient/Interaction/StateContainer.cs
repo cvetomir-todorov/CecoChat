@@ -33,7 +33,7 @@ public sealed class StateContainer
         ManageConnection = new ManageConnectionState(this);
         Files = new FilesState(this);
         UploadFile = new UploadFileState(this);
-        DownloadFile = new DownloadFileState(this);
+        DownloadOwnFile = new DownloadOwnFileState(this);
 
         ChangePassword = new ChangePasswordState(this);
         EditProfile = new EditProfileState(this);
@@ -60,7 +60,7 @@ public sealed class StateContainer
     public State ManageConnection { get; }
     public State Files { get; }
     public State UploadFile { get; }
-    public State DownloadFile { get; }
+    public State DownloadOwnFile { get; }
 
     public State ChangePassword { get; }
     public State EditProfile { get; }
