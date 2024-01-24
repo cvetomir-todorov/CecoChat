@@ -1,5 +1,6 @@
 using System.Web;
 using CecoChat.AspNet.ModelBinding;
+using CecoChat.Client.User;
 using CecoChat.Minio;
 using CecoChat.Server.Identity;
 using Microsoft.AspNetCore.Authorization;
@@ -32,13 +33,16 @@ public class DownloadFileController : ControllerBase
 {
     private readonly ILogger _logger;
     private readonly IMinioContext _minio;
+    private readonly IFileClient _fileClient;
 
     public DownloadFileController(
         ILogger<DownloadFileController> logger,
-        IMinioContext minio)
+        IMinioContext minio,
+        IFileClient fileClient)
     {
         _logger = logger;
         _minio = minio;
+        _fileClient = fileClient;
     }
 
     [Authorize(Policy = "user")]
@@ -47,7 +51,7 @@ public class DownloadFileController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DownloadFile([FromMultiSource][BindRequired] DownloadFileRequest request, CancellationToken ct)
     {
-        if (!HttpContext.TryGetUserClaimsAndAccessToken(_logger, out UserClaims? userClaims, out _))
+        if (!HttpContext.TryGetUserClaimsAndAccessToken(_logger, out UserClaims? userClaims, out string? accessToken))
         {
             return Unauthorized();
         }
@@ -55,22 +59,10 @@ public class DownloadFileController : ControllerBase
         string bucket = request.BucketUrlDecoded;
         string path = request.PathUrlDecoded;
 
-        ObjectTagsResult objectTagsResult = await _minio.GetObjectTags(bucket, path, ct);
-        if (!objectTagsResult.IsFound)
+        bool hasAccess = await _fileClient.HasUserFileAccess(userClaims.UserId, bucket, path, accessToken, ct);
+        if (!hasAccess)
         {
-            _logger.LogTrace("Failed to find file in bucket {Bucket} with path {Path}", bucket, path);
-            return NotFound();
-        }
-        if (!objectTagsResult.Tags.TryGetValue("users", out string? usersTag))
-        {
-            _logger.LogWarning("File in bucket {Bucket} with path {Path} is missing the users tag", bucket, path);
-            return Forbid();
-        }
-
-        bool containsCurrentUserId = ContainsCurrentUserId(usersTag, userClaims.UserId);
-        if (!containsCurrentUserId)
-        {
-            _logger.LogWarning("File in bucket {Bucket} with path {Path} is being requested by user {UserId} but doesn't have the expected users tag", bucket, path, userClaims.UserId);
+            _logger.LogWarning("File in bucket {Bucket} with path {Path} is being requested by user {UserId} without having access", bucket, path, userClaims.UserId);
             return Forbid();
         }
 
@@ -83,25 +75,5 @@ public class DownloadFileController : ControllerBase
 
         _logger.LogTrace("Responding with file from bucket {Bucket} with path {Path} requested by user {UserId}", bucket, path, userClaims.UserId);
         return File(downloadFileResult.Stream, downloadFileResult.ContentType);
-    }
-
-    private static bool ContainsCurrentUserId(string usersTag, long currentUserId)
-    {
-        string[] userIdStrings = usersTag.Split(separator: '_', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-
-        bool containsCurrentUserId = userIdStrings
-            .Select(userIdString =>
-            {
-                if (!long.TryParse(userIdString, out long userId))
-                {
-                    userId = 0;
-                }
-
-                return userId;
-            })
-            .Where(userId => userId > 0)
-            .Any(userId => userId == currentUserId);
-
-        return containsCurrentUserId;
     }
 }

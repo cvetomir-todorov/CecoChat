@@ -9,6 +9,8 @@ public interface IFileClient
     Task<AssociateFileResult> AssociateFile(long userId, string bucket, string path, long allowedUserId, string accessToken, CancellationToken ct);
 
     Task<AddFileAccessResult> AddFileAccess(long userId, string bucket, string path, DateTime version, long allowedUserId, string accessToken, CancellationToken ct);
+
+    Task<bool> HasUserFileAccess(long userId, string bucket, string path, string accessToken, CancellationToken ct);
 }
 
 public readonly struct AssociateFileResult

@@ -39,4 +39,18 @@ internal sealed class FileQueryRepo : IFileQueryRepo
             Version = entity.Version.ToTimestamp()
         };
     }
+
+    public async Task<bool> HasUserFileAccess(long userId, string bucket, string path)
+    {
+        bool hasAccess = await _dbContext.Files
+            .Where(entity =>
+                entity.Bucket == bucket &&
+                entity.Path == path &&
+                (entity.UserId == userId || entity.AllowedUsers.Contains(userId)))
+            .AsNoTracking()
+            .AnyAsync();
+
+        _logger.LogTrace("Fetched user {UserId} {Access} to file in bucket {Bucket} with path {Path}", userId, hasAccess ? "has access" : "has no access", bucket, path);
+        return hasAccess;
+    }
 }
