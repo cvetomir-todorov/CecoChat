@@ -1,4 +1,4 @@
-<mxfile host="Electron" modified="2024-01-18T09:43:02.086Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.1.18 Chrome/120.0.6099.199 Electron/28.1.2 Safari/537.36" etag="6gkeKudRbwPWnV8grP9y" version="22.1.18" type="device">
+<mxfile host="Electron" modified="2024-01-24T17:37:05.988Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.1.21 Chrome/120.0.6099.109 Electron/28.1.0 Safari/537.36" etag="zCJ1iWTDjTCYpbZKf67W" version="22.1.21" type="device">
   <diagram id="G4t1x3i_cumIOjZ8GDXV" name="Page-1">
     <mxGraphModel dx="2020" dy="1203" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
@@ -29,7 +29,7 @@
         <mxCell id="bcZL19yvxoAcIgyFT48z-3" value="Client" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" parent="1" vertex="1">
           <mxGeometry x="40" y="230" width="30" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="bcZL19yvxoAcIgyFT48z-4" value="Send message&lt;br&gt;React to message&lt;br&gt;Receive notifications" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.75;entryDx=0;entryDy=0;startArrow=classic;startFill=1;" parent="1" source="bcZL19yvxoAcIgyFT48z-5" target="bcZL19yvxoAcIgyFT48z-6" edge="1">
+        <mxCell id="bcZL19yvxoAcIgyFT48z-4" value="Send message&lt;br&gt;Send file&lt;br&gt;React to message&lt;br&gt;Receive notifications" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.75;entryDx=0;entryDy=0;startArrow=classic;startFill=1;" parent="1" source="bcZL19yvxoAcIgyFT48z-5" target="bcZL19yvxoAcIgyFT48z-6" edge="1">
           <mxGeometry x="0.0811" relative="1" as="geometry">
             <mxPoint as="offset" />
             <Array as="points">

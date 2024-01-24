@@ -1,4 +1,4 @@
-<mxfile host="Electron" modified="2024-01-18T09:25:22.563Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.1.18 Chrome/120.0.6099.199 Electron/28.1.2 Safari/537.36" etag="3knUPuHNgs32hXe6DJqD" version="22.1.18" type="device">
+<mxfile host="Electron" modified="2024-01-24T17:38:38.488Z" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.1.21 Chrome/120.0.6099.109 Electron/28.1.0 Safari/537.36" etag="LwN6xAT-ZBCslCTBfBnD" version="22.1.21" type="device">
   <diagram id="G4t1x3i_cumIOjZ8GDXV" name="Page-1">
     <mxGraphModel dx="2020" dy="1203" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
@@ -24,7 +24,7 @@
         <mxCell id="4NMri5ObQx2eB0Vx6lmc-1" value="Client" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" parent="1" vertex="1">
           <mxGeometry x="40" y="380" width="30" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="4NMri5ObQx2eB0Vx6lmc-13" value="Send message&lt;br&gt;React to message&lt;br&gt;Receive notifications" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.75;entryDx=0;entryDy=0;startArrow=classic;startFill=1;" parent="1" source="4NMri5ObQx2eB0Vx6lmc-3" target="4NMri5ObQx2eB0Vx6lmc-4" edge="1">
+        <mxCell id="4NMri5ObQx2eB0Vx6lmc-13" value="Send message&lt;br&gt;Send file&lt;br&gt;React to message&lt;br&gt;Receive notifications" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.75;entryDx=0;entryDy=0;startArrow=classic;startFill=1;" parent="1" source="4NMri5ObQx2eB0Vx6lmc-3" target="4NMri5ObQx2eB0Vx6lmc-4" edge="1">
           <mxGeometry x="0.0286" y="-10" relative="1" as="geometry">
             <mxPoint as="offset" />
             <Array as="points">
@@ -155,7 +155,7 @@
         <mxCell id="2VSCiA0DFceLc1Hlk_Zp-1" value="File storage" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;gradientColor=#7ea6e0;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
           <mxGeometry x="640" y="40" width="120" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="2VSCiA0DFceLc1Hlk_Zp-2" value="Upload/download file&lt;br&gt;Manage file metadata&lt;br&gt;Manage buckets" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;exitX=1;exitY=0.25;exitDx=0;exitDy=0;" parent="1" source="8u_ZxKzGpFRI09v13LqC-1" target="2VSCiA0DFceLc1Hlk_Zp-1" edge="1">
+        <mxCell id="2VSCiA0DFceLc1Hlk_Zp-2" value="Upload/download file&lt;br&gt;Manage buckets" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;exitX=1;exitY=0.25;exitDx=0;exitDy=0;" parent="1" source="8u_ZxKzGpFRI09v13LqC-1" target="2VSCiA0DFceLc1Hlk_Zp-1" edge="1">
           <mxGeometry x="0.5862" relative="1" as="geometry">
             <mxPoint x="340" y="140" as="sourcePoint" />
             <Array as="points">
