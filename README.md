@@ -1,24 +1,24 @@
 [Chat engine](docs/intro-capabilities.md) designed for millions of users
 
 * Messaging in real-time
-  - Send and receive messages, react/unreact with emojis
-  - Notifications when a message has been processed
+  - Send and receive messages
+  - Send files - images, text, PDF
+  - React/unreact with emojis
   - Multiple clients for the same user
 * Chats
+  - Notifications when a message has been processed
   - Indication for new messages
   - Review history at a random point in time
-* Users
-  - Register, authenticate, change password, edit trivial profile data
-  - Profiles with static full/public-only data
-  - Search users by name
-  - Connect with other users - invite/accept/cancel/remove
+* User
+  - Register, authenticate
+  - Change password, edit trivial profile data
   - Store small user files - images, text, PDF
+* Other users
+  - Search other users by name
+  - Connect with other users - invite/accept/cancel/remove
+  - Profiles with static full/public-only data
 
 Check out [what next](docs/what-next.md) needs to be implemented. I appreciate all comments so feel free to use the `Discussions` tab.
-
-# Ban
-
-Any use of the project for training large language models, generative AI, or any other similar tools in the past/present/future is done without our permission.
 
 # Code
 
@@ -77,6 +77,10 @@ Any use of the project for training large language models, generative AI, or any
   - [Development process](docs/dev-process.md)
 * [Load test using 2 machines](docs/load-test.md)
 * [What next](docs/what-next.md)
+
+# Ban
+
+Any use of the project for training large language models, generative AI, or any other similar tools in the past/present/future is done without our permission.
 
 # License
 

@@ -6,11 +6,15 @@
   - Register and manage their profile
   - Authenticate and create their session
   - Acquire other users public profiles
-  - Search users by name
+  - Search other users by name
   - Manage their connections - invite/accept/cancel/remove
   - Get the list of their files
-* Clients upload/download their files to/from the File storage via the BFF
-* Clients acquire user chats and chat history from the Chats service via the BFF
+* Clients use the File storage via the BFF to:
+  - Upload/download their files
+  - Download files sent to them
+* Clients use the Chats service via the BFF to:
+  - Acquire the state of their chats
+  - Get chat history at a random point in time
 * Clients connect to Messaging service in order to chat with each other
 * Messaging service instances exchange data between each other indirectly using a PUB/SUB backplane
 * PUB/SUB backplane distributes the traffic between Messaging service instances
