@@ -32,4 +32,19 @@ public class FileQueryService : FileQuery.FileQueryBase
         _logger.LogTrace("Responding with {FileCount} files for user {UserId} which are newer than {NewerThan}", response.Files.Count, userClaims.UserId, request.NewerThan);
         return response;
     }
+
+    public override async Task<HasUserFileAccessResponse> HasUserFileAccess(HasUserFileAccessRequest request, ServerCallContext context)
+    {
+        UserClaims userClaims = context.GetUserClaimsGrpc(_logger);
+
+        bool hasAccess = await _queryRepo.HasUserFileAccess(userClaims.UserId, request.Bucket, request.Path);
+
+        HasUserFileAccessResponse response = new();
+        response.HasAccess = hasAccess;
+
+        _logger.LogTrace(
+            "Responding with user {UserId} {Access} to file in bucket {Bucket} with path {Path}",
+            userClaims.UserId, response.HasAccess ? "has access" : "has no access", request.Bucket, request.Path);
+        return response;
+    }
 }

@@ -12,3 +12,14 @@ public sealed class GetUserFilesRequestValidator : AbstractValidator<GetUserFile
             .ValidNewerThanDateTime();
     }
 }
+
+public sealed class HasUserFileAccessRequestValidator : AbstractValidator<HasUserFileAccessRequest>
+{
+    public HasUserFileAccessRequestValidator()
+    {
+        RuleFor(x => x.Bucket)
+            .ValidBucketName();
+        RuleFor(x => x.Path)
+            .ValidPath();
+    }
+}

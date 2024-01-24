@@ -6,6 +6,7 @@ import "FileRef.proto";
 
 service FileQuery {
   rpc GetUserFiles(GetUserFilesRequest) returns (GetUserFilesResponse);
+  rpc HasUserFileAccess(HasUserFileAccessRequest) returns (HasUserFileAccessResponse);
 }
 
 message GetUserFilesRequest {
@@ -14,4 +15,13 @@ message GetUserFilesRequest {
 
 message GetUserFilesResponse {
   repeated FileRef files = 1;
+}
+
+message HasUserFileAccessRequest {
+  string bucket = 1;
+  string path = 2;
+}
+
+message HasUserFileAccessResponse {
+  bool hasAccess = 1;
 }

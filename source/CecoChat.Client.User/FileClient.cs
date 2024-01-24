@@ -113,4 +113,19 @@ internal sealed class FileClient : IFileClient
 
         throw new ProcessingFailureException(typeof(AddFileAccessResponse));
     }
+
+    public async Task<bool> HasUserFileAccess(long userId, string bucket, string path, string accessToken, CancellationToken ct)
+    {
+        HasUserFileAccessRequest request = new();
+        request.Bucket = bucket;
+        request.Path = path;
+
+        Metadata headers = new();
+        headers.AddAuthorization(accessToken);
+        DateTime deadline = _clock.GetNowUtc().Add(_options.CallTimeout);
+        HasUserFileAccessResponse response = await _fileQueryClient.HasUserFileAccessAsync(request, headers, deadline, ct);
+
+        _logger.LogTrace("Received user {UserId} {Access} to file in bucket {Bucket} with path {Path}", userId, response.HasAccess ? "has access" : "has no access", bucket, path);
+        return response.HasAccess;
+    }
 }
