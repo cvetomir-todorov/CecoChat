@@ -85,14 +85,13 @@ public static class Program
         {
             for (int i = 0; i < commandLine.MessageCount; ++i)
             {
-                SendMessageRequest request = new()
+                SendPlainTextRequest request = new()
                 {
                     ReceiverId = 2,
-                    DataType = DataType.PlainText,
-                    Data = "dummy"
+                    Text= "dummy"
                 };
 
-                await client.Connection.InvokeAsync(nameof(IChatHub.SendMessage), request);
+                await client.Connection.InvokeAsync(nameof(IChatHub.SendPlainText), request);
                 await Task.Delay(TimeSpan.FromSeconds(1));
             }
 
