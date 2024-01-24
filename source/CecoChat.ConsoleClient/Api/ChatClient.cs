@@ -303,10 +303,10 @@ public sealed class ChatClient : IDisposable
         return files;
     }
 
-    public async Task<ClientResponse<UploadFileResponse>> UploadFile(Stream fileStream, string fileName, string contentType)
+    public async Task<ClientResponse<UploadFileResponse>> UploadFile(Stream fileStream, string fileName, string contentType, long allowedUserId)
     {
         StreamPart part = new(fileStream, fileName, contentType, fileName);
-        IApiResponse<UploadFileResponse> apiResponse = await _bffClient.UploadFile(fileStream.Length, part, _accessToken!);
+        IApiResponse<UploadFileResponse> apiResponse = await _bffClient.UploadFile(fileStream.Length, allowedUserId, part, _accessToken!);
 
         ClientResponse<UploadFileResponse> response = new();
         ProcessApiResponse(apiResponse, response);
@@ -329,6 +329,26 @@ public sealed class ChatClient : IDisposable
         if (response.Success)
         {
             response.Content = await apiResponse.Content!.ReadAsStreamAsync();
+        }
+
+        return response;
+    }
+
+    public async Task<ClientResponse<AddFileAccessResponse>> AddFileAccess(string bucket, string path, DateTime version, long allowedUserId)
+    {
+        AddFileAccessRequest request = new()
+        {
+            AllowedUserId = allowedUserId,
+            Version = version
+        };
+        IApiResponse<AddFileAccessResponse> apiResponse = await _bffClient.AddFileAccess(bucket, path, request, _accessToken!);
+
+        ClientResponse<AddFileAccessResponse> response = new();
+        ProcessApiResponse(apiResponse, response);
+
+        if (response.Success)
+        {
+            response.Content = apiResponse.Content;
         }
 
         return response;

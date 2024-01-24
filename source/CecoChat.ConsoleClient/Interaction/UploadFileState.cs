@@ -11,7 +11,7 @@ public class UploadFileState : State
         DisplayUserData();
         DisplaySplitter();
 
-        UploadFileResult result = await UploadFile();
+        UploadFileResult result = await UploadFile(allowedUserId: 0);
         if (!result.Success)
         {
             Context.ReloadData = true;
