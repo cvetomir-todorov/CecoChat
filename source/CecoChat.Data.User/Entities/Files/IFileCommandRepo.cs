@@ -17,6 +17,6 @@ public readonly struct AssociateFileResult
 public readonly struct AddFileAccessResult
 {
     public bool Success { get; init; }
-    public DateTime NewVersion {get; init; }
+    public DateTime NewVersion { get; init; }
     public bool ConcurrentlyUpdated { get; init; }
 }
