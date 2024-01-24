@@ -85,6 +85,7 @@ internal class FileCommandRepo : IFileCommandRepo
                         f.Path == path &&
                         f.Version == version)
             .Select(f => f.AllowedUsers)
+            .AsNoTracking()
             .FirstOrDefaultAsync() ?? Array.Empty<long>();
 
         if (currentlyAllowedUserIds.Contains(allowedUserId))
