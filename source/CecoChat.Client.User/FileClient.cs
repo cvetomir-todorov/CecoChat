@@ -43,11 +43,12 @@ internal sealed class FileClient : IFileClient
         return response.Files;
     }
 
-    public async Task<AssociateFileResult> AssociateFile(long userId, string bucket, string path, string accessToken, CancellationToken ct)
+    public async Task<AssociateFileResult> AssociateFile(long userId, string bucket, string path, long allowedUserId, string accessToken, CancellationToken ct)
     {
         AssociateFileRequest request = new();
         request.Bucket = bucket;
         request.Path = path;
+        request.AllowedUserId = allowedUserId;
 
         Metadata headers = new();
         headers.AddAuthorization(accessToken);

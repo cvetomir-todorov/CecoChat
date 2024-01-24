@@ -25,7 +25,7 @@ public class FileCommandService : FileCommand.FileCommandBase
     {
         UserClaims userClaims = context.GetUserClaimsGrpc(_logger);
 
-        AssociateFileResult result = await _commandRepo.AssociateFile(userClaims.UserId, request.Bucket, request.Path);
+        AssociateFileResult result = await _commandRepo.AssociateFile(userClaims.UserId, request.Bucket, request.Path, request.AllowedUserId);
 
         if (result.Success)
         {

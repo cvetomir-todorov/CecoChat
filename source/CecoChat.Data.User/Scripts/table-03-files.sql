@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS public."Files"
     "Path" text COLLATE pg_catalog."default" NOT NULL,
     "UserId" bigint NOT NULL,
     "Version" timestamp with time zone NOT NULL,
+    "AllowedUsers" bigint[] NOT NULL,
     CONSTRAINT "Files_pkey" PRIMARY KEY ("Bucket", "Path")
 )
 WITH

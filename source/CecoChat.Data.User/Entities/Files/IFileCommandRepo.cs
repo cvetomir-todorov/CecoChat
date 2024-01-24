@@ -2,7 +2,7 @@ namespace CecoChat.Data.User.Entities.Files;
 
 public interface IFileCommandRepo
 {
-    Task<AssociateFileResult> AssociateFile(long userId, string bucket, string path);
+    Task<AssociateFileResult> AssociateFile(long userId, string bucket, string path, long allowedUserId);
 }
 
 public readonly struct AssociateFileResult
