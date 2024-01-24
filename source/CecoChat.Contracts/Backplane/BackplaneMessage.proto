@@ -28,7 +28,6 @@ message BackplanePlainText {
 
 message BackplaneFile {
   string text = 1;
-  // TODO: add file type
   string bucket = 2;
   string path = 3;
 }

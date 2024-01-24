@@ -37,8 +37,8 @@ public sealed class HistoryMessage
     [AliasAs("receiverId")]
     public long ReceiverId { get; init; }
 
-    [JsonPropertyName("dataType")]
-    [AliasAs("dataType")]
+    [JsonPropertyName("type")]
+    [AliasAs("type")]
     public MessageType Type { get; set; }
 
     [JsonPropertyName("text")]
