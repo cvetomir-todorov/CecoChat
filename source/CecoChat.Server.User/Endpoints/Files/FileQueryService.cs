@@ -33,6 +33,7 @@ public class FileQueryService : FileQuery.FileQueryBase
         return response;
     }
 
+    [Authorize(Policy = "user")]
     public override async Task<HasUserFileAccessResponse> HasUserFileAccess(HasUserFileAccessRequest request, ServerCallContext context)
     {
         UserClaims userClaims = context.GetUserClaimsGrpc(_logger);
