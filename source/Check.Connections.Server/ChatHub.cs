@@ -5,9 +5,14 @@ namespace Check.Connections.Server;
 
 public class ChatHub : Hub<IChatListener>, IChatHub
 {
-    public Task<SendMessageResponse> SendMessage(SendMessageRequest request)
+    public Task<SendPlainTextResponse> SendPlainText(SendPlainTextRequest request)
     {
-        return Task.FromResult(new SendMessageResponse());
+        return Task.FromResult(new SendPlainTextResponse());
+    }
+
+    public Task<SendFileResponse> SendFile(SendFileRequest request)
+    {
+        throw new NotSupportedException();
     }
 
     public Task<ReactResponse> React(ReactRequest request)
