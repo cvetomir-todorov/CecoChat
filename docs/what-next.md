@@ -18,7 +18,6 @@ A short list of tasks to do next regarding product features, technical features,
 * Privacy
   - Add end-to-end encryption for messages
 * Media messages
-  - Image
   - Video
   - GIF
 * Delivery notifications

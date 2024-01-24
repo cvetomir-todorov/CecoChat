@@ -5,18 +5,22 @@ The current product and technical features
 # Product
 
 * Messaging in real-time
-  - Send and receive messages, react/unreact with emojis
-  - Notifications when a message has been processed
+  - Send and receive messages
+  - Send files - images, text, PDF
+  - React/unreact with emojis
   - Multiple clients for the same user
 * Chats
+  - Notifications when a message has been processed
   - Indication for new messages
   - Review history at a random point in time
-* Users
-  - Register, authenticate, change password, edit trivial profile data
-  - Profiles with static full/public-only data
-  - Search users by name pattern
-  - Connect with other users - invite/accept/cancel/remove
+* User
+  - Register, authenticate
+  - Change password, edit trivial profile data
   - Store small user files - images, text, PDF
+* Other users
+  - Search other users by name
+  - Connect with other users - invite/accept/cancel/remove
+  - Profiles with static full/public-only data
 
 Note: there is no web/mobile clients (only a client for development purposes)
 
