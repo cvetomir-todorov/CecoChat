@@ -11,7 +11,7 @@ public interface IChatsDbContext : ICassandraDbContext
 
     ISession Session { get; }
 
-    PreparedStatement PrepareQuery(string cql);
+    PreparedStatement PrepareStatement(string cql);
 
     void PrepareUdt<TUserDefinedType>(string keyspace, string typeName)
         where TUserDefinedType : new();
@@ -32,10 +32,10 @@ internal sealed class ChatsDbContext : CassandraDbContext, IChatsDbContext
 
     public ISession Session => GetSession(Keyspace);
 
-    public PreparedStatement PrepareQuery(string cql)
+    public PreparedStatement PrepareStatement(string cql)
     {
         PreparedStatement preparedQuery = Session.Prepare(cql);
-        _logger.LogInformation("Prepared CQL '{Cql}'", cql);
+        _logger.LogInformation("Prepared statement '{Cql}'", cql);
         return preparedQuery;
     }
 

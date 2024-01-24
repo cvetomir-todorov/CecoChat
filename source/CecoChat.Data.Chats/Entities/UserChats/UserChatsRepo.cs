@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Cassandra;
 using CecoChat.Contracts.Chats;
 using Microsoft.Extensions.Logging;
@@ -20,9 +21,9 @@ internal sealed class UserChatsRepo : IUserChatsRepo
     private readonly ILogger _logger;
     private readonly IUserChatsTelemetry _userChatsTelemetry;
     private readonly IChatsDbContext _dbContext;
-    private readonly Lazy<PreparedStatement> _chatsQuery;
-    private readonly Lazy<PreparedStatement> _chatQuery;
-    private readonly Lazy<PreparedStatement> _updateChatCommand;
+    private PreparedStatement? _chatsQuery;
+    private PreparedStatement? _chatQuery;
+    private PreparedStatement? _updateChatCommand;
 
     public UserChatsRepo(
         ILogger<UserChatsRepo> logger,
@@ -32,10 +33,6 @@ internal sealed class UserChatsRepo : IUserChatsRepo
         _logger = logger;
         _userChatsTelemetry = userChatsTelemetry;
         _dbContext = dbContext;
-
-        _chatsQuery = new Lazy<PreparedStatement>(() => _dbContext.PrepareQuery(ChatsQuery));
-        _chatQuery = new Lazy<PreparedStatement>(() => _dbContext.PrepareQuery(ChatQuery));
-        _updateChatCommand = new Lazy<PreparedStatement>(() => _dbContext.PrepareQuery(UpdateChatCommand));
     }
 
     public void Dispose()
@@ -58,19 +55,28 @@ internal sealed class UserChatsRepo : IUserChatsRepo
 
     public void Prepare()
     {
-#pragma warning disable IDE0059
-#pragma warning disable IDE1006
-        PreparedStatement _ = _chatsQuery.Value;
-        PreparedStatement __ = _chatQuery.Value;
-        PreparedStatement ___ = _updateChatCommand.Value;
-#pragma warning restore IDE0059
-#pragma warning restore IDE1006
+        _chatsQuery = _dbContext.PrepareStatement(ChatsQuery);
+        _chatQuery = _dbContext.PrepareStatement(ChatQuery);
+        _updateChatCommand = _dbContext.PrepareStatement(UpdateChatCommand);
+    }
+
+    [MemberNotNull(nameof(_chatsQuery), nameof(_chatQuery), nameof(_updateChatCommand))]
+    private void EnsurePrepared()
+    {
+        if (_chatsQuery == null ||
+            _chatQuery == null ||
+            _updateChatCommand == null)
+        {
+            throw new InvalidOperationException($"Repo should be prepared by calling {nameof(Prepare)}.");
+        }
     }
 
     public async Task<IReadOnlyCollection<ChatState>> GetUserChats(long userId, DateTime newerThan)
     {
+        EnsurePrepared();
+
         long newerThanSnowflake = newerThan.ToSnowflakeFloor();
-        BoundStatement query = _chatsQuery.Value.Bind(userId, newerThanSnowflake);
+        BoundStatement query = _chatsQuery.Bind(userId, newerThanSnowflake);
         query.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
         query.SetIdempotence(true);
 
@@ -96,7 +102,9 @@ internal sealed class UserChatsRepo : IUserChatsRepo
 
     public ChatState? GetUserChat(long userId, string chatId)
     {
-        BoundStatement query = _chatQuery.Value.Bind(userId, chatId);
+        EnsurePrepared();
+
+        BoundStatement query = _chatQuery.Bind(userId, chatId);
         query.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
         query.SetIdempotence(true);
 
@@ -125,7 +133,9 @@ internal sealed class UserChatsRepo : IUserChatsRepo
 
     public void UpdateUserChat(long userId, ChatState chat)
     {
-        BoundStatement command = _updateChatCommand.Value.Bind(userId, chat.OtherUserId, chat.ChatId, chat.NewestMessage, chat.OtherUserDelivered, chat.OtherUserSeen);
+        EnsurePrepared();
+
+        BoundStatement command = _updateChatCommand.Bind(userId, chat.OtherUserId, chat.ChatId, chat.NewestMessage, chat.OtherUserDelivered, chat.OtherUserSeen);
         command.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
         command.SetIdempotence(false);
 

@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Cassandra;
 using CecoChat.Contracts.Chats;
 using Microsoft.Extensions.Logging;
@@ -25,11 +26,11 @@ internal sealed class ChatMessageRepo : IChatMessageRepo
     private readonly IChatMessageTelemetry _chatMessageTelemetry;
     private readonly IChatsDbContext _dbContext;
     private readonly IDataMapper _mapper;
-    private readonly Lazy<PreparedStatement> _historyQuery;
-    private readonly Lazy<PreparedStatement> _addPlainTextCommand;
-    private readonly Lazy<PreparedStatement> _addFileCommand;
-    private readonly Lazy<PreparedStatement> _setReactionCommand;
-    private readonly Lazy<PreparedStatement> _unsetReactionCommand;
+    private PreparedStatement? _historyQuery;
+    private PreparedStatement? _addPlainTextCommand;
+    private PreparedStatement? _addFileCommand;
+    private PreparedStatement? _setReactionCommand;
+    private PreparedStatement? _unsetReactionCommand;
 
     public ChatMessageRepo(
         ILogger<ChatMessageRepo> logger,
@@ -41,12 +42,6 @@ internal sealed class ChatMessageRepo : IChatMessageRepo
         _chatMessageTelemetry = chatMessageTelemetry;
         _dbContext = dbContext;
         _mapper = mapper;
-
-        _historyQuery = new Lazy<PreparedStatement>(() => _dbContext.PrepareQuery(HistoryQuery));
-        _addPlainTextCommand = new Lazy<PreparedStatement>(() => _dbContext.PrepareQuery(AddPlainTextCommand));
-        _addFileCommand = new Lazy<PreparedStatement>(() => _dbContext.PrepareQuery(AddFileCommand));
-        _setReactionCommand = new Lazy<PreparedStatement>(() => _dbContext.PrepareQuery(SetReactionCommand));
-        _unsetReactionCommand = new Lazy<PreparedStatement>(() => _dbContext.PrepareQuery(UnsetReactionCommand));
     }
 
     public void Dispose()
@@ -79,23 +74,32 @@ internal sealed class ChatMessageRepo : IChatMessageRepo
     {
         _dbContext.PrepareUdt<DbFileData>(_dbContext.Keyspace, "file_data");
 
-        // TODO: do not use Lazy and do not prepare these - just leave fields nullable and mark method that it sets their values
-        // TODO: repeat this for the other repo
-#pragma warning disable IDE0059
-#pragma warning disable IDE1006
-        PreparedStatement _ = _historyQuery.Value;
-        PreparedStatement __ = _addPlainTextCommand.Value;
-        PreparedStatement ___ = _addFileCommand.Value;
-        PreparedStatement ____ = _setReactionCommand.Value;
-        PreparedStatement _____ = _unsetReactionCommand.Value;
-#pragma warning restore IDE0059
-#pragma warning restore IDE1006
+        _historyQuery = _dbContext.PrepareStatement(HistoryQuery);
+        _addPlainTextCommand = _dbContext.PrepareStatement(AddPlainTextCommand);
+        _addFileCommand = _dbContext.PrepareStatement(AddFileCommand);
+        _setReactionCommand = _dbContext.PrepareStatement(SetReactionCommand);
+        _unsetReactionCommand = _dbContext.PrepareStatement(UnsetReactionCommand);
+    }
+
+    [MemberNotNull(nameof(_historyQuery), nameof(_addPlainTextCommand), nameof(_addFileCommand), nameof(_setReactionCommand), nameof(_unsetReactionCommand))]
+    private void EnsurePrepared()
+    {
+        if (_historyQuery == null ||
+            _addPlainTextCommand == null ||
+            _addFileCommand == null ||
+            _setReactionCommand == null ||
+            _unsetReactionCommand == null)
+        {
+            throw new InvalidOperationException($"Repo should be prepared by calling {nameof(Prepare)}.");
+        }
     }
 
     public async Task<IReadOnlyCollection<HistoryMessage>> GetHistory(long userId, string chatId, DateTime olderThan, int countLimit)
     {
+        EnsurePrepared();
+
         long olderThanSnowflake = olderThan.ToSnowflakeCeiling();
-        BoundStatement query = _historyQuery.Value.Bind(chatId, olderThanSnowflake, countLimit);
+        BoundStatement query = _historyQuery.Bind(chatId, olderThanSnowflake, countLimit);
         query.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
         query.SetIdempotence(true);
 
@@ -143,10 +147,12 @@ internal sealed class ChatMessageRepo : IChatMessageRepo
 
     public void AddPlainTextMessage(PlainTextMessage message)
     {
+        EnsurePrepared();
+
         sbyte dbMessageType = _mapper.MapContractToDbDataType(DataType.PlainText);
         string chatId = DataUtility.CreateChatId(message.SenderId, message.ReceiverId);
 
-        BoundStatement command = _addPlainTextCommand.Value.Bind(
+        BoundStatement command = _addPlainTextCommand.Bind(
             chatId, message.MessageId, message.SenderId, message.ReceiverId, dbMessageType, message.Text);
         command.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
         command.SetIdempotence(false);
@@ -157,6 +163,8 @@ internal sealed class ChatMessageRepo : IChatMessageRepo
 
     public void AddFileMessage(FileMessage message)
     {
+        EnsurePrepared();
+
         sbyte dbMessageType = _mapper.MapContractToDbDataType(DataType.File);
         string chatId = DataUtility.CreateChatId(message.SenderId, message.ReceiverId);
 
@@ -169,7 +177,7 @@ internal sealed class ChatMessageRepo : IChatMessageRepo
         // avoid setting the value to null which would add a tombstone
         string text = message.Text ?? string.Empty;
 
-        BoundStatement command = _addFileCommand.Value.Bind(
+        BoundStatement command = _addFileCommand.Bind(
             chatId, message.MessageId, message.SenderId, message.ReceiverId, dbMessageType, text, file);
         command.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
         command.SetIdempotence(false);
@@ -180,8 +188,10 @@ internal sealed class ChatMessageRepo : IChatMessageRepo
 
     public void SetReaction(ReactionMessage message)
     {
+        EnsurePrepared();
+
         string chatId = DataUtility.CreateChatId(message.SenderId, message.ReceiverId);
-        BoundStatement command = _setReactionCommand.Value.Bind(message.ReactorId, message.Reaction, chatId, message.MessageId);
+        BoundStatement command = _setReactionCommand.Bind(message.ReactorId, message.Reaction, chatId, message.MessageId);
         command.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
         command.SetIdempotence(false);
 
@@ -191,8 +201,10 @@ internal sealed class ChatMessageRepo : IChatMessageRepo
 
     public void UnsetReaction(ReactionMessage message)
     {
+        EnsurePrepared();
+
         string chatId = DataUtility.CreateChatId(message.SenderId, message.ReceiverId);
-        BoundStatement command = _unsetReactionCommand.Value.Bind(message.ReactorId, chatId, message.MessageId);
+        BoundStatement command = _unsetReactionCommand.Bind(message.ReactorId, chatId, message.MessageId);
         command.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
         command.SetIdempotence(false);
 
