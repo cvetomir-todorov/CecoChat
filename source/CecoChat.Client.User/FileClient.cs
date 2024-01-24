@@ -75,4 +75,42 @@ internal sealed class FileClient : IFileClient
 
         throw new ProcessingFailureException(typeof(AssociateFileResponse));
     }
+
+    public async Task<AddFileAccessResult> AddFileAccess(long userId, string bucket, string path, DateTime version, long allowedUserId, string accessToken, CancellationToken ct)
+    {
+        AddFileAccessRequest request = new();
+        request.Bucket = bucket;
+        request.Path = path;
+        request.AllowedUserId = allowedUserId;
+        request.Version = version.ToTimestamp();
+
+        Metadata headers = new();
+        headers.AddAuthorization(accessToken);
+        DateTime deadline = _clock.GetNowUtc().Add(_options.CallTimeout);
+        AddFileAccessResponse response = await _fileCommandClient.AddFileAccessAsync(request, headers, deadline, ct);
+
+        if (response.Success)
+        {
+            _logger.LogTrace(
+                "Received a successful file-access addition for user ID {AllowedUserId} to file in bucket {Bucket} with path {Path} owned by user {UserId}",
+                allowedUserId, bucket, path, userId);
+            return new AddFileAccessResult
+            {
+                Success = true,
+                NewVersion = response.NewVersion.ToDateTime()
+            };
+        }
+        if (response.ConcurrentlyUpdated)
+        {
+            _logger.LogTrace(
+                "Received a failed file-access addition for user ID {AllowedUserId} to file in bucket {Bucket} with path {Path} owned by user {UserId} because the file has been concurrently updated",
+                allowedUserId, bucket, path, userId);
+            return new AddFileAccessResult
+            {
+                ConcurrentlyUpdated = true
+            };
+        }
+
+        throw new ProcessingFailureException(typeof(AddFileAccessResponse));
+    }
 }

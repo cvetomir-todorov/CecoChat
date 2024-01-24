@@ -73,5 +73,6 @@ public sealed class FileEntity : IVersionEntity
     public string Bucket { get; set; } = string.Empty;
     public string Path { get; set; } = string.Empty;
     public long UserId { get; set; }
+    public long[] AllowedUsers { get; set; } = Array.Empty<long>();
     public DateTime Version { get; set; }
 }
