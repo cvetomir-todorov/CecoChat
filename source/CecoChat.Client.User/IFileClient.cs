@@ -6,7 +6,7 @@ public interface IFileClient
 {
     Task<IReadOnlyCollection<FileRef>> GetUserFiles(long userId, DateTime newerThan, string accessToken, CancellationToken ct);
 
-    Task<AssociateFileResult> AssociateFile(long userId, string bucket, string path, string accessToken, CancellationToken ct);
+    Task<AssociateFileResult> AssociateFile(long userId, string bucket, string path, long allowedUserId, string accessToken, CancellationToken ct);
 }
 
 public readonly struct AssociateFileResult

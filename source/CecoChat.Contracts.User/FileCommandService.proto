@@ -10,6 +10,7 @@ service FileCommand {
 message AssociateFileRequest {
   string bucket = 1;
   string path = 2;
+  int64 allowed_user_id = 3;
 }
 
 message AssociateFileResponse {

@@ -17,7 +17,7 @@ internal class FileCommandRepo : IFileCommandRepo
         _dbContext = dbContext;
     }
 
-    public async Task<AssociateFileResult> AssociateFile(long userId, string bucket, string path)
+    public async Task<AssociateFileResult> AssociateFile(long userId, string bucket, string path, long allowedUserId)
     {
         FileEntity entity = new()
         {
@@ -26,6 +26,11 @@ internal class FileCommandRepo : IFileCommandRepo
             UserId = userId,
             Version = DateTime.UtcNow
         };
+
+        if (allowedUserId > 0)
+        {
+            entity.AllowedUsers = new[] { allowedUserId };
+        }
 
         _dbContext.Files.Add(entity);
 

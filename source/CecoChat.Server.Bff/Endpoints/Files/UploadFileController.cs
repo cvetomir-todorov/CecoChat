@@ -1,4 +1,3 @@
-using System.Globalization;
 using CecoChat.AspNet;
 using CecoChat.AspNet.ModelBinding;
 using CecoChat.Client.User;
@@ -19,6 +18,9 @@ public sealed class UploadFileRequest
 {
     [FromHeader(Name = IBffClient.HeaderUploadedFileSize)]
     public long FileSize { get; init; }
+
+    [FromHeader(Name = IBffClient.HeaderUploadedFileAllowedUserId)]
+    public long AllowedUserId { get; init; }
 }
 
 [ApiController]
@@ -54,7 +56,7 @@ public class UploadFileController : ControllerBase
     [HttpPost]
     [DisableFormValueModelBinding]
     [ProducesResponseType(typeof(UploadFileResponse), StatusCodes.Status200OK)]
-    public async Task<IActionResult> UploadFile([FromHeader][BindRequired] UploadFileRequest request, CancellationToken ct)
+    public async Task<IActionResult> UploadFile([FromMultiSource][BindRequired] UploadFileRequest request, CancellationToken ct)
     {
         if (!HttpContext.TryGetUserClaimsAndAccessToken(_logger, out UserClaims? userClaims, out string? accessToken))
         {
@@ -69,7 +71,7 @@ public class UploadFileController : ControllerBase
 
         UploadFileResult uploadFileResult = await UploadFile(userClaims, prepareUploadResult.FileExtension, prepareUploadResult.FileContentType, prepareUploadResult.FileStream, request.FileSize, ct);
 
-        AssociateFileResult associateFileResult = await AssociateFile(userClaims, uploadFileResult.Bucket, uploadFileResult.Path, accessToken, ct);
+        AssociateFileResult associateFileResult = await AssociateFile(userClaims, uploadFileResult.Bucket, uploadFileResult.Path, request.AllowedUserId, accessToken, ct);
         if (associateFileResult.Failure != null)
         {
             return associateFileResult.Failure;
@@ -165,10 +167,8 @@ public class UploadFileController : ControllerBase
     {
         string bucketName = _objectNaming.GetCurrentBucketName();
         string plannedObjectName = _objectNaming.CreateObjectName(userClaims.UserId, fileExtension);
-        IDictionary<string, string> tags = new SortedList<string, string>(capacity: 1);
-        tags.Add("users", userClaims.UserId.ToString(CultureInfo.InvariantCulture));
 
-        string actualObjectName = await _minio.UploadFile(bucketName, plannedObjectName, fileContentType, tags, fileStream, fileSize, ct);
+        string actualObjectName = await _minio.UploadFile(bucketName, plannedObjectName, fileContentType, tags: null, fileStream, fileSize, ct);
         _logger.LogTrace("Uploaded successfully a new file with content type {ContentType} sized {FileSize}B to bucket {Bucket} with path {Path} for user {UserId}",
             fileContentType, fileSize, bucketName, actualObjectName, userClaims.UserId);
 
@@ -185,9 +185,9 @@ public class UploadFileController : ControllerBase
         public IActionResult? Failure { get; init; }
     }
 
-    private async Task<AssociateFileResult> AssociateFile(UserClaims userClaims, string bucket, string path, string accessToken, CancellationToken ct)
+    private async Task<AssociateFileResult> AssociateFile(UserClaims userClaims, string bucket, string path, long allowedUserId, string accessToken, CancellationToken ct)
     {
-        Client.User.AssociateFileResult result = await _fileClient.AssociateFile(userClaims.UserId, bucket, path, accessToken, ct);
+        Client.User.AssociateFileResult result = await _fileClient.AssociateFile(userClaims.UserId, bucket, path, allowedUserId, accessToken, ct);
 
         if (result.Success)
         {
