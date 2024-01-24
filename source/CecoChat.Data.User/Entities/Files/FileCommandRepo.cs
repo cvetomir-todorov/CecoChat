@@ -133,12 +133,12 @@ internal class FileCommandRepo : IFileCommandRepo
     {
         DbConnection connection = _dbContext.Database.GetDbConnection();
         NpgsqlCommand command = (NpgsqlCommand)connection.CreateCommand();
-        
+
         // append the user ID to the list of allowed user IDs
         // where the bucket and path matches and
         // where the version matches the expected one
         // where the allowed user IDs do not already contain our user ID
-        command.CommandText = 
+        command.CommandText =
             "UPDATE public.\"Files\" SET " +
             "\"AllowedUsers\" = array_append(\"AllowedUsers\", :user_id), \"Version\" = :new_version " +
             " WHERE \"Bucket\" = :bucket AND \"Path\" = :path AND \"Version\" = :version AND NOT (:user_id = ANY(\"AllowedUsers\"))";
