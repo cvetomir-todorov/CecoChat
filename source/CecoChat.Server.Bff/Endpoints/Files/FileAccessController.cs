@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace CecoChat.Server.Bff.Endpoints.Files;
 
-public sealed class AddFileAccessHeaders
+public sealed class AddFileAccessRoute
 {
     [FromRoute(Name = "bucket")]
     public string Bucket { get; init; } = string.Empty;
@@ -47,7 +47,7 @@ public class FileAccessController : ControllerBase
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     [ProducesResponseType(typeof(AddFileAccessResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> AddFileAccess(
-        [FromMultiSource][BindRequired] AddFileAccessHeaders headers,
+        [FromMultiSource][BindRequired] AddFileAccessRoute route,
         [FromBody][BindRequired] AddFileAccessRequest request,
         CancellationToken ct)
     {
@@ -56,8 +56,8 @@ public class FileAccessController : ControllerBase
             return Unauthorized();
         }
 
-        string bucket = headers.BucketUrlDecoded;
-        string path = headers.PathUrlDecoded;
+        string bucket = route.BucketUrlDecoded;
+        string path = route.PathUrlDecoded;
 
         AddFileAccessResult result = await _fileClient.AddFileAccess(userClaims.UserId, bucket, path, request.Version, request.AllowedUserId, accessToken, ct);
 
