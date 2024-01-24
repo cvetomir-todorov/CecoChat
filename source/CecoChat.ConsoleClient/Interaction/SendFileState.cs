@@ -1,3 +1,4 @@
+using CecoChat.ConsoleClient.Api;
 using CecoChat.ConsoleClient.LocalStorage;
 
 namespace CecoChat.ConsoleClient.Interaction;
@@ -18,7 +19,7 @@ public sealed class SendFileState : State
 
         if (keyInfo.KeyChar == 'n')
         {
-            UploadFileResult result = await UploadFile();
+            UploadFileResult result = await UploadFile(allowedUserId: Context.UserId);
             if (!result.Success)
             {
                 Context.ReloadData = false;
@@ -30,14 +31,15 @@ public sealed class SendFileState : State
         }
         else if (keyInfo.KeyChar == 'e')
         {
-            Console.WriteLine("Choose which file to upload:");
-            List<FileRef> userFiles = DisplayUserFiles();
-            keyInfo = Console.ReadKey(intercept: true);
-            int index = keyInfo.KeyChar - '0';
-            FileRef chosenFile = userFiles[index];
+            ExistingFileResult result = await ChooseFileAndAllowAccess();
+            if (!result.Success)
+            {
+                Context.ReloadData = false;
+                return States.OneChat;
+            }
 
-            bucket = chosenFile.Bucket;
-            path = chosenFile.Path;
+            bucket = result.Bucket;
+            path = result.Path;
         }
         else
         {
@@ -63,5 +65,42 @@ public sealed class SendFileState : State
 
         Context.ReloadData = false;
         return States.OneChat;
+    }
+
+    private readonly struct ExistingFileResult
+    {
+        public bool Success { get; init; }
+        public string Bucket { get; init; }
+        public string Path { get; init; }
+    }
+
+    private async Task<ExistingFileResult> ChooseFileAndAllowAccess()
+    {
+        Console.WriteLine("Choose which file to upload:");
+        List<FileRef> userFiles = DisplayUserFiles();
+
+        ConsoleKeyInfo keyInfo = Console.ReadKey(intercept: true);
+        int index = keyInfo.KeyChar - '0';
+        FileRef chosenFile = userFiles[index];
+
+        ClientResponse<Contracts.Bff.Files.AddFileAccessResponse> response = await Client.AddFileAccess(chosenFile.Bucket, chosenFile.Path, chosenFile.Version, allowedUserId: Context.UserId);
+        if (!response.Success)
+        {
+            DisplayErrors(response);
+
+            return new ExistingFileResult
+            {
+                Success = false
+            };
+        }
+
+        chosenFile.Version = response.Content!.NewVersion;
+
+        return new ExistingFileResult
+        {
+            Success = true,
+            Bucket = chosenFile.Bucket,
+            Path = chosenFile.Path
+        };
     }
 }

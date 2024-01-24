@@ -81,7 +81,7 @@ public abstract class State
         public string Path { get; init; }
     }
 
-    protected async Task<UploadFileResult> UploadFile()
+    protected async Task<UploadFileResult> UploadFile(long allowedUserId)
     {
         Console.Write("Enter the path to the file to be uploaded or leave empty to exit: ");
         string? filePath = Console.ReadLine();
@@ -110,7 +110,7 @@ public abstract class State
         Console.WriteLine("Sending file {0} with content type {1}...", filePath, contentType);
         await using Stream fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
         string fileName = Path.GetFileName(filePath);
-        ClientResponse<Contracts.Bff.Files.UploadFileResponse> response = await Client.UploadFile(fileStream, fileName, contentType);
+        ClientResponse<Contracts.Bff.Files.UploadFileResponse> response = await Client.UploadFile(fileStream, fileName, contentType, allowedUserId);
 
         if (!response.Success)
         {
