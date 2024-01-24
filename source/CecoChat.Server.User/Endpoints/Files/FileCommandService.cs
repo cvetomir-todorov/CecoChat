@@ -47,4 +47,36 @@ public class FileCommandService : FileCommand.FileCommandBase
 
         throw new ProcessingFailureException(typeof(AssociateFileResult));
     }
+
+    [Authorize(Policy = "user")]
+    public override async Task<AddFileAccessResponse> AddFileAccess(AddFileAccessRequest request, ServerCallContext context)
+    {
+        UserClaims userClaims = context.GetUserClaimsGrpc(_logger);
+
+        AddFileAccessResult result = await _commandRepo.AddFileAccess(userClaims.UserId, request.Bucket, request.Path, request.Version.ToDateTime(), request.AllowedUserId);
+
+        if (result.Success)
+        {
+            _logger.LogTrace(
+                "Responding with a successful file-access addition for user ID {AllowedUserId} to file in bucket {Bucket} with path {Path} owned by user {UserId}",
+                request.AllowedUserId, request.Bucket, request.Path, userClaims.UserId);
+            return new AddFileAccessResponse
+            {
+                Success = true,
+                NewVersion = result.NewVersion.ToTimestamp()
+            };
+        }
+        if (result.ConcurrentlyUpdated)
+        {
+            _logger.LogTrace(
+                "Responding with a failed file-access addition for user ID {AllowedUserId} to file in bucket {Bucket} with path {Path} owned by user {UserId} because the file has been concurrently updated",
+                request.AllowedUserId, request.Bucket, request.Path, userClaims.UserId);
+            return new AddFileAccessResponse
+            {
+                ConcurrentlyUpdated = true
+            };
+        }
+
+        throw new ProcessingFailureException(typeof(AddFileAccessResult));
+    }
 }

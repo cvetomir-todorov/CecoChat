@@ -24,6 +24,24 @@ public sealed class UploadFileResponse
     public FileRef File { get; set; } = new();
 }
 
+public sealed class AddFileAccessRequest
+{
+    [JsonPropertyName("allowedUserId")]
+    [AliasAs("allowedUserId")]
+    public long AllowedUserId { get; init; }
+
+    [JsonPropertyName("version")]
+    [AliasAs("version")]
+    public DateTime Version { get; init; }
+}
+
+public sealed class AddFileAccessResponse
+{
+    [JsonPropertyName("newVersion")]
+    [AliasAs("newVersion")]
+    public DateTime NewVersion { get; init; }
+}
+
 public sealed class FileRef
 {
     [JsonPropertyName("bucket")]

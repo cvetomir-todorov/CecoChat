@@ -5,6 +5,7 @@ import "google/protobuf/timestamp.proto";
 
 service FileCommand {
   rpc AssociateFile(AssociateFileRequest) returns (AssociateFileResponse);
+  rpc AddFileAccess(AddFileAccessRequest) returns (AddFileAccessResponse);
 }
 
 message AssociateFileRequest {
@@ -17,4 +18,17 @@ message AssociateFileResponse {
   bool success = 1;
   google.protobuf.Timestamp version = 2;
   bool duplicate = 3;
+}
+
+message AddFileAccessRequest {
+  string bucket = 1;
+  string path = 2;
+  int64 allowed_user_id = 3;
+  google.protobuf.Timestamp version = 4;
+}
+
+message AddFileAccessResponse {
+  bool success = 1;
+  google.protobuf.Timestamp new_version = 2;
+  bool concurrently_updated = 3;
 }

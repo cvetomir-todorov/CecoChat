@@ -106,4 +106,11 @@ public interface IBffClient : IDisposable
         [AliasAs("bucket")] string bucket,
         [AliasAs("path")] string path,
         [Authorize(AuthorizationScheme)] string accessToken);
+
+    [Put("/api/files/{bucket}/{path}/access")]
+    Task<IApiResponse<AddFileAccessResponse>> AddFileAccess(
+        [AliasAs("bucket")] string bucket,
+        [AliasAs("path")] string path,
+        [Body] AddFileAccessRequest request,
+        [Authorize(AuthorizationScheme)] string accessToken);
 }
