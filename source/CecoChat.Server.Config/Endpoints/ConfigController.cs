@@ -130,7 +130,7 @@ public class ConfigController : ControllerBase
         catch (DbUpdateException dbUpdateException)
             when (dbUpdateException.InnerException is PostgresException postgresException &&
                   postgresException.SqlState == "23505" &&
-                  postgresException.MessageText.Contains("Elements_pkey"))
+                  postgresException.MessageText.Contains("elements_pkey"))
         {
             _logger.LogError(dbUpdateException, "Failed to update config because some or all of the newly-added elements have keys that are already present");
             ConflictObjectResult conflict = Conflict(new ProblemDetails
