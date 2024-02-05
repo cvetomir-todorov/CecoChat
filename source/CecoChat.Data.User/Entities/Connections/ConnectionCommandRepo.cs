@@ -48,8 +48,8 @@ internal class ConnectionCommandRepo : IConnectionCommandRepo
             // https://www.postgresql.org/docs/current/errcodes-appendix.html
             if (postgresException.SqlState == "23503") // foreign key violation
             {
-                if (postgresException.MessageText.Contains("Connections_User1Id_foreign") ||
-                    postgresException.MessageText.Contains("Connections_User2Id_foreign"))
+                if (postgresException.MessageText.Contains("connections_user1_id_foreign") ||
+                    postgresException.MessageText.Contains("connections_user2_id_foreign"))
                 {
                     return new AddConnectionResult
                     {
@@ -59,7 +59,7 @@ internal class ConnectionCommandRepo : IConnectionCommandRepo
             }
             if (postgresException.SqlState == "23505") // unique key violation
             {
-                if (postgresException.MessageText.Contains("Connections_pkey"))
+                if (postgresException.MessageText.Contains("connections_pkey"))
                 {
                     return new AddConnectionResult
                     {

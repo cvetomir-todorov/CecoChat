@@ -65,7 +65,7 @@ internal class ProfileCommandRepo : IProfileCommandRepo
             // https://www.postgresql.org/docs/current/errcodes-appendix.html
             if (postgresException.SqlState == "23505")
             {
-                if (postgresException.MessageText.Contains("Profiles_UserName_unique"))
+                if (postgresException.MessageText.Contains("profiles_username_unique"))
                 {
                     return new CreateProfileResult
                     {
