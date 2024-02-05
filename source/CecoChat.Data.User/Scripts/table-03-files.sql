@@ -1,11 +1,14 @@
-CREATE TABLE IF NOT EXISTS public."Files"
+CREATE TABLE IF NOT EXISTS public.files
 (
-    "Bucket" text COLLATE pg_catalog."default" NOT NULL,
-    "Path" text COLLATE pg_catalog."default" NOT NULL,
-    "UserId" bigint NOT NULL,
-    "Version" timestamp with time zone NOT NULL,
-    "AllowedUsers" bigint[] NOT NULL,
-    CONSTRAINT "Files_pkey" PRIMARY KEY ("Bucket", "Path")
+    bucket text COLLATE pg_catalog."default" NOT NULL,
+    path text COLLATE pg_catalog."default" NOT NULL,
+    user_id bigint NOT NULL,
+    version timestamp with time zone NOT NULL,
+    allowed_users bigint[] NOT NULL,
+    CONSTRAINT files_pkey
+        PRIMARY KEY (bucket, path),
+    CONSTRAINT files_user_id_foreign
+        FOREIGN KEY (user_id) REFERENCES public.profiles (user_id)
 )
 WITH
 (
@@ -13,15 +16,11 @@ WITH
 )
 TABLESPACE pg_default;
 
-CREATE INDEX "Files_UserId_Version_index"
-    ON public."Files" USING btree
-        ("UserId" ASC NULLS LAST, "Version" ASC NULLS LAST);
+CREATE INDEX files_user_id_version_index
+    ON public.files USING btree
+        (user_id ASC NULLS LAST, version ASC NULLS LAST);
 
-ALTER TABLE IF EXISTS public."Files"
-    ADD CONSTRAINT "Files_UserId_foreign"
-        FOREIGN KEY ("UserId") REFERENCES public."Profiles"("UserId");
-
-ALTER TABLE IF EXISTS public."Files"
+ALTER TABLE IF EXISTS public.files
     OWNER to yugabyte;
-GRANT ALL ON TABLE public."Files" TO cecochat_dev;
-GRANT ALL ON TABLE public."Files" TO yugabyte;
+GRANT ALL ON TABLE public.files TO cecochat_dev;
+GRANT ALL ON TABLE public.files TO yugabyte;
