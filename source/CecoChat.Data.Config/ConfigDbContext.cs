@@ -13,8 +13,17 @@ public class ConfigDbContext : DbContext
     {
         modelBuilder.HasDefaultSchema("public");
 
-        modelBuilder.Entity<ElementEntity>().HasKey(e => e.Name);
-        modelBuilder.Entity<ElementEntity>().Property(e => e.Version).IsConcurrencyToken();
+        modelBuilder.Entity<ElementEntity>(entity =>
+        {
+            entity.ToTable("elements");
+
+            entity.Property(e => e.Name).HasColumnName("name");
+            entity.Property(e => e.Value).HasColumnName("value");
+            entity.Property(e => e.Version).HasColumnName("version");
+
+            entity.HasKey(e => e.Name);
+            entity.Property(e => e.Version).IsConcurrencyToken();
+        });
 
         base.OnModelCreating(modelBuilder);
     }
