@@ -51,7 +51,7 @@ internal class FileCommandRepo : IFileCommandRepo
             // https://www.postgresql.org/docs/current/errcodes-appendix.html
             if (postgresException.SqlState == "23505")
             {
-                if (postgresException.MessageText.Contains("Files_pkey"))
+                if (postgresException.MessageText.Contains("files_pkey"))
                 {
                     _logger.LogTrace("Duplicate association between the file in bucket {Bucket} with path {Path} and user {UserId}", bucket, path, userId);
                     return new AssociateFileResult
@@ -128,6 +128,15 @@ internal class FileCommandRepo : IFileCommandRepo
 
         throw new InvalidOperationException($"Failed to add file-access for user {allowedUserId} to file in bucket {bucket} with path {path} since query affected {affectedRows} rows instead of 0 or 1.");
     }
+    
+    private const string AddFileAccessCommand =
+        "UPDATE public.files SET " +
+        "allowed_users = array_append(allowed_users, :user_id)," +
+        "version = :new_version " +
+        "WHERE " +
+        "bucket = :bucket AND " +
+        "path = :path AND " +
+        "version = :version AND NOT (:user_id = ANY(allowed_users))";
 
     private NpgsqlCommand CreateCommand(string bucket, string path, DateTime version, long allowedUserId, DateTime newVersion)
     {
@@ -138,10 +147,7 @@ internal class FileCommandRepo : IFileCommandRepo
         // where the bucket and path matches and
         // where the version matches the expected one
         // where the allowed user IDs do not already contain our user ID
-        command.CommandText =
-            "UPDATE public.\"Files\" SET " +
-            "\"AllowedUsers\" = array_append(\"AllowedUsers\", :user_id), \"Version\" = :new_version " +
-            " WHERE \"Bucket\" = :bucket AND \"Path\" = :path AND \"Version\" = :version AND NOT (:user_id = ANY(\"AllowedUsers\"))";
+        command.CommandText = AddFileAccessCommand;
 
         command.Parameters.AddWithValue("user_id", NpgsqlDbType.Bigint, allowedUserId);
         command.Parameters.AddWithValue("bucket", NpgsqlDbType.Text, bucket);
