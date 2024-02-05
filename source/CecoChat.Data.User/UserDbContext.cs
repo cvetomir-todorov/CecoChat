@@ -17,21 +17,77 @@ public class UserDbContext : DbContext
     {
         modelBuilder.HasDefaultSchema("public");
 
-        modelBuilder.Entity<ProfileEntity>().HasKey(e => e.UserId);
-        modelBuilder.Entity<ProfileEntity>().Property(e => e.UserId).ValueGeneratedOnAdd();
-        modelBuilder.Entity<ProfileEntity>().Property(e => e.Version).IsConcurrencyToken();
-
-        modelBuilder.Entity<ConnectionEntity>().HasKey(nameof(ConnectionEntity.User1Id), nameof(ConnectionEntity.User2Id));
-        modelBuilder.Entity<ConnectionEntity>().Property(e => e.Status)
-            .HasConversion<string>(
-                status => status.ToString(),
-                statusString => (ConnectionEntityStatus)Enum.Parse(typeof(ConnectionEntityStatus), statusString));
-        modelBuilder.Entity<ConnectionEntity>().Property(e => e.Version).IsConcurrencyToken();
-
-        modelBuilder.Entity<FileEntity>().HasKey(nameof(FileEntity.Bucket), nameof(FileEntity.Path));
-        modelBuilder.Entity<FileEntity>().Property(e => e.Version).IsConcurrencyToken();
+        ConfigureProfiles(modelBuilder);
+        ConfigureConnections(modelBuilder);
+        ConfigureFiles(modelBuilder);
 
         base.OnModelCreating(modelBuilder);
+    }
+
+    private static void ConfigureProfiles(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<ProfileEntity>(entity =>
+        {
+            entity.ToTable("profiles");
+
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.Version).HasColumnName("version");
+            entity.Property(e => e.UserName).HasColumnName("username");
+            entity.Property(e => e.Password).HasColumnName("password");
+            entity.Property(e => e.DisplayName).HasColumnName("display_name");
+            entity.Property(e => e.AvatarUrl).HasColumnName("avatar_url");
+            entity.Property(e => e.Phone).HasColumnName("phone");
+            entity.Property(e => e.Email).HasColumnName("email");
+
+            entity.HasKey(e => e.UserId);
+            entity.Property(e => e.UserId).ValueGeneratedOnAdd();
+            entity.Property(e => e.Version).IsConcurrencyToken();
+            entity.HasIndex(e => e.UserName).IsUnique();
+        });
+    }
+
+    private static void ConfigureConnections(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<ConnectionEntity>(entity =>
+        {
+            entity.ToTable("connections");
+
+            entity.Property(e => e.User1Id).HasColumnName("user1_id");
+            entity.Property(e => e.User2Id).HasColumnName("user2_id");
+            entity.Property(e => e.Version).HasColumnName("version");
+            entity.Property(e => e.Status).HasColumnName("status");
+            entity.Property(e => e.TargetId).HasColumnName("target_id");
+
+            entity.HasKey(nameof(ConnectionEntity.User1Id), nameof(ConnectionEntity.User2Id));
+            entity.Property(e => e.Version).IsConcurrencyToken();
+            entity.HasIndex(e => e.User1Id);
+            entity.HasIndex(e => e.User2Id);
+            entity.HasOne<ProfileEntity>().WithMany().HasForeignKey(e => e.User1Id);
+            entity.HasOne<ProfileEntity>().WithMany().HasForeignKey(e => e.User2Id);
+            entity.Property(e => e.Status)
+                .HasConversion<string>(
+                    status => status.ToString(),
+                    statusString => (ConnectionEntityStatus)Enum.Parse(typeof(ConnectionEntityStatus), statusString));
+        });
+    }
+
+    private static void ConfigureFiles(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<FileEntity>(entity =>
+        {
+            entity.ToTable("files");
+
+            entity.Property(e => e.Bucket).HasColumnName("bucket");
+            entity.Property(e => e.Path).HasColumnName("path");
+            entity.Property(e => e.Version).HasColumnName("version");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.AllowedUsers).HasColumnName("allowed_users");
+
+            entity.HasKey(nameof(FileEntity.Bucket), nameof(FileEntity.Path));
+            entity.Property(e => e.Version).IsConcurrencyToken();
+            entity.HasIndex(nameof(FileEntity.UserId), nameof(FileEntity.Version));
+            entity.HasOne<ProfileEntity>().WithMany().HasForeignKey(e => e.UserId);
+        });
     }
 }
 
@@ -72,7 +128,7 @@ public sealed class FileEntity : IVersionEntity
 {
     public string Bucket { get; set; } = string.Empty;
     public string Path { get; set; } = string.Empty;
+    public DateTime Version { get; set; }
     public long UserId { get; set; }
     public long[] AllowedUsers { get; set; } = Array.Empty<long>();
-    public DateTime Version { get; set; }
 }
