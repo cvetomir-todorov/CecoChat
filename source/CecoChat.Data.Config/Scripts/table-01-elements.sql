@@ -6,10 +6,15 @@ CREATE TABLE IF NOT EXISTS public.elements
     CONSTRAINT elements_pkey
         PRIMARY KEY (name)
 )
-WITH (
+WITH
+(
     OIDS = FALSE
 )
 TABLESPACE pg_default;
+
+CREATE INDEX elements_name
+    ON public.elements USING btree
+        (name ASC NULLS LAST);
 
 ALTER TABLE IF EXISTS public.elements
     OWNER to yugabyte;
