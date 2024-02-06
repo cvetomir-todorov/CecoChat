@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS public.profiles
     phone text COLLATE pg_catalog."default" NOT NULL,
     email text COLLATE pg_catalog."default" NOT NULL,
     CONSTRAINT profiles_pkey
-        PRIMARY KEY (user_id HASH),
+        PRIMARY KEY (user_id),
     CONSTRAINT profiles_username_unique
         UNIQUE (username)
 )
