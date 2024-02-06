@@ -110,15 +110,20 @@ internal class ProfileCache : IProfileCache
 
         for (int i = 0; i < processors; ++i)
         {
+            int processorId = i;
             Task.Run(async () =>
             {
                 try
                 {
                     await ProcessChannel(ct);
                 }
+                catch (OperationCanceledException)
+                {
+                    _logger.LogInformation("Async profile cache processor {Processor} was cancelled", processorId);
+                }
                 catch (Exception exception)
                 {
-                    _logger.LogCritical(exception, "Async profile cache processor failed");
+                    _logger.LogCritical(exception, "Async profile cache processor {Processor} failed", processorId);
                 }
             }, ct);
         }
