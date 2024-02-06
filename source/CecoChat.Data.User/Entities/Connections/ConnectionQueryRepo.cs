@@ -29,11 +29,11 @@ internal class ConnectionQueryRepo : IConnectionQueryRepo
 
         if (entity == null)
         {
-            _logger.LogTrace("Failed to fetch connection {ConnectionId} for {UserId}", connectionId, userId);
+            _logger.LogTrace("Failed to fetch connection {ConnectionId} for user {UserId}", connectionId, userId);
             return null;
         }
 
-        _logger.LogTrace("Fetched connection {ConnectionId} for {UserId}", connectionId, userId);
+        _logger.LogTrace("Fetched connection {ConnectionId} for user {UserId}", connectionId, userId);
         return MapConnection(userId, entity);
     }
 
@@ -46,7 +46,7 @@ internal class ConnectionQueryRepo : IConnectionQueryRepo
             .AsNoTracking()
             .ToListAsync();
 
-        _logger.LogTrace("Fetched {ConnectionCount} connections for {UserId}", connections.Count, userId);
+        _logger.LogTrace("Fetched {ConnectionCount} connections for user {UserId}", connections.Count, userId);
         return connections;
     }
 
