@@ -83,7 +83,7 @@ public class SessionController : ControllerBase
         _logger.LogTrace("User {UserId} named {UserName} assigned to partition {Partition} and messaging server {MessagingServer}",
             authenticateResult.Profile.UserId, authenticateResult.Profile.UserName, partition, messagingServerAddress);
 
-        ProfileFull profile = _mapper.Map<ProfileFull>(authenticateResult.Profile);
+        ProfileFull profile = _mapper.Map<ProfileFull>(authenticateResult.Profile)!;
         _logger.LogTrace("Responding with a new session for user {UserId} named {UserName} with client ID {ClientId}, partition {Partition}, messaging server {MessagingServer}",
             authenticateResult.Profile.UserId, profile.UserName, clientId, partition, messagingServerAddress);
         CreateSessionResponse response = new()

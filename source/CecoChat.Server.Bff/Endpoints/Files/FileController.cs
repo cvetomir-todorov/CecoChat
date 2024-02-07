@@ -42,7 +42,7 @@ public class FileController : ControllerBase
         }
 
         IReadOnlyCollection<Contracts.User.FileRef> serviceFiles = await _fileClient.GetUserFiles(userClaims.UserId, request.NewerThan, accessToken, ct);
-        FileRef[] files = _mapper.Map<FileRef[]>(serviceFiles);
+        FileRef[] files = _mapper.Map<FileRef[]>(serviceFiles)!;
 
         GetUserFilesResponse response = new()
         {

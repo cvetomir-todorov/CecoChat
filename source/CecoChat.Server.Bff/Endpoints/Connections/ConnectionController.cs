@@ -43,7 +43,7 @@ public class ConnectionController : ControllerBase
         IEnumerable<Contracts.User.Connection> connections = await _connectionClient.GetConnections(userClaims.UserId, accessToken, ct);
         GetConnectionsResponse response = new()
         {
-            Connections = _mapper.Map<Connection[]>(connections)
+            Connections = _mapper.Map<Connection[]>(connections)!
         };
 
         _logger.LogTrace("Responding with {ConnectionCount} connections for user {UserId}", response.Connections.Length, userClaims.UserId);

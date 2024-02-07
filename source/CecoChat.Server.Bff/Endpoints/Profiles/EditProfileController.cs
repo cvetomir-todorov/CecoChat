@@ -72,7 +72,7 @@ public class EditProfileController : ControllerBase
             return Unauthorized();
         }
 
-        Contracts.User.ProfileUpdate profile = _mapper.Map<Contracts.User.ProfileUpdate>(request);
+        Contracts.User.ProfileUpdate profile = _mapper.Map<Contracts.User.ProfileUpdate>(request)!;
 
         UpdateProfileResult result = await _profileClient.UpdateProfile(profile, userClaims.UserId, accessToken, ct);
         if (result.Success)

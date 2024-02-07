@@ -41,7 +41,7 @@ internal class ProfileQueryRepo : IProfileQueryRepo
             };
         }
 
-        ProfileFull profile = _mapper.Map<ProfileFull>(entity);
+        ProfileFull? profile = _mapper.Map<ProfileFull>(entity);
         string? password = includePassword ? entity.Password : null;
 
         _logger.LogTrace("Fetched profile for user {UserId} named {UserName}", entity.UserId, entity.UserName);
@@ -63,7 +63,7 @@ internal class ProfileQueryRepo : IProfileQueryRepo
             return null;
         }
 
-        ProfilePublic profile = _mapper.Map<ProfilePublic>(entity);
+        ProfilePublic? profile = _mapper.Map<ProfilePublic>(entity);
         return profile;
     }
 
@@ -71,7 +71,7 @@ internal class ProfileQueryRepo : IProfileQueryRepo
     {
         return await _dbContext.Profiles
             .Where(entity => requestedUserIds.Contains(entity.UserId))
-            .Select(entity => _mapper.Map<ProfilePublic>(entity))
+            .Select(entity => _mapper.Map<ProfilePublic>(entity)!)
             .AsNoTracking()
             .ToListAsync();
     }
@@ -84,7 +84,7 @@ internal class ProfileQueryRepo : IProfileQueryRepo
         return await _dbContext.Profiles
             .Where(entity => EF.Functions.Like(entity.UserName, likePattern))
             .Take(profileCount)
-            .Select(entity => _mapper.Map<ProfilePublic>(entity))
+            .Select(entity => _mapper.Map<ProfilePublic>(entity)!)
             .AsNoTracking()
             .ToListAsync();
     }

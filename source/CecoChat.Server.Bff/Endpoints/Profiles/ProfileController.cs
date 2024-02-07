@@ -62,7 +62,7 @@ public class ProfileController : ControllerBase
 
         GetPublicProfileResponse response = new()
         {
-            Profile = _mapper.Map<ProfilePublic>(profile)
+            Profile = _mapper.Map<ProfilePublic>(profile)!
         };
 
         _logger.LogTrace("Responding with profile for user {RequestedUserId} requested by user {UserId}", requestedUserId, userClaims.UserId);
@@ -100,7 +100,7 @@ public class ProfileController : ControllerBase
 
         GetPublicProfilesResponse response = new()
         {
-            Profiles = profiles.Select(profile => _mapper.Map<ProfilePublic>(profile)).ToArray()
+            Profiles = profiles.Select(profile => _mapper.Map<ProfilePublic>(profile)!).ToArray()
         };
 
         _logger.LogTrace("Responding with {PublicProfileCount} public profiles {PublicProfilesSource} requested by user {UserId}", response.Profiles.Length, source, userClaims.UserId);
