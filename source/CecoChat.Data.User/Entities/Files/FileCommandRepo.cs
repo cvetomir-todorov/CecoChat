@@ -128,7 +128,7 @@ internal class FileCommandRepo : IFileCommandRepo
 
         throw new InvalidOperationException($"Failed to add file-access for user {allowedUserId} to file in bucket {bucket} with path {path} since query affected {affectedRows} rows instead of 0 or 1.");
     }
-    
+
     private const string AddFileAccessCommand =
         "UPDATE public.files SET " +
         "allowed_users = array_append(allowed_users, :user_id)," +
