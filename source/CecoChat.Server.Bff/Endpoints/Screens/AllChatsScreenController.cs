@@ -70,8 +70,8 @@ public class AllChatsScreenController : ControllerBase
 
         ProfilePublic[] profiles = await GetProfiles(request.IncludeProfiles, serviceChats, serviceConnections, userClaims, accessToken, ct);
         ChatState[] chats = serviceChats.Select(chat => _contractMapper.MapChat(chat)).ToArray();
-        Connection[] connections = _mapper.Map<Connection[]>(serviceConnections);
-        FileRef[] files = _mapper.Map<FileRef[]>(serviceFiles);
+        Connection[] connections = _mapper.Map<Connection[]>(serviceConnections)!;
+        FileRef[] files = _mapper.Map<FileRef[]>(serviceFiles)!;
 
         _logger.LogTrace("Responding with {ChatCount} chats newer than {ChatsNewerThan}, {ConnectionCount} connections, {FileCount} files newer than {FilesNewerThan}, {ProfileCount} profiles for all-chats-screen requested by user {UserId}",
             chats.Length, request.ChatsNewerThan, connections.Length, files.Length, request.FilesNewerThan, profiles.Length, userClaims.UserId);
@@ -102,7 +102,7 @@ public class AllChatsScreenController : ControllerBase
             .Distinct()
             .ToArray();
         IReadOnlyCollection<Contracts.User.ProfilePublic> serviceProfiles = await _profileClient.GetPublicProfiles(userClaims.UserId, userIds, accessToken, ct);
-        ProfilePublic[] profiles = _mapper.Map<ProfilePublic[]>(serviceProfiles);
+        ProfilePublic[] profiles = _mapper.Map<ProfilePublic[]>(serviceProfiles)!;
 
         return profiles;
     }
