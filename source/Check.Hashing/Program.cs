@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics;
-using CecoChat;
+using Common;
 
 namespace Check.Hashing;
 

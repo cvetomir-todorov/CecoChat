@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30804.86
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CecoChat", "CecoChat\CecoChat.csproj", "{E1E56F4F-7CC0-4CED-9235-BA6FB5CFC090}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common", "Common\Common.csproj", "{E1E56F4F-7CC0-4CED-9235-BA6FB5CFC090}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Check.Hashing", "Check.Hashing\Check.Hashing.csproj", "{E2EFE6DE-28AB-4D5E-B479-569F81C9814C}"
 EndProject
