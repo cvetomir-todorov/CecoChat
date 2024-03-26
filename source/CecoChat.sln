@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.30804.86
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CecoChat.Server.Messaging", "CecoChat.Server.Messaging\CecoChat.Server.Messaging.csproj", "{C7F0F25B-75B3-4AA1-AA20-9D1E0C25366F}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{C320D788-140F-4A46-A3A8-7A91FD43290B}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{C320D788-140F-4A46-A3A8-7A91FD43290B}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Server", "Server", "{8A833F6F-10A3-4A3B-9B83-90F03DF415E4}"
 EndProject
