@@ -2,7 +2,7 @@ using System.Reflection;
 using Microsoft.Extensions.Logging;
 using Npgsql;
 
-namespace CecoChat.Npgsql;
+namespace Common.Npgsql;
 
 public interface INpgsqlDbInitializer
 {

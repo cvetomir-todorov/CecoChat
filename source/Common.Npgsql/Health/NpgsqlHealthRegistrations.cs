@@ -1,6 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 
-namespace CecoChat.Npgsql.Health;
+namespace Common.Npgsql.Health;
 
 public static class NpgsqlHealthRegistrations
 {

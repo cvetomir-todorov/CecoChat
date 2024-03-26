@@ -19,9 +19,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CecoChat.Contracts.User\CecoChat.Contracts.User.csproj" />
-    <ProjectReference Include="..\CecoChat.Npgsql\CecoChat.Npgsql.csproj" />
     <ProjectReference Include="..\CecoChat.Redis\CecoChat.Redis.csproj" />
     <ProjectReference Include="..\Common\Common.csproj" />
+    <ProjectReference Include="..\Common.Npgsql\Common.Npgsql.csproj" />
   </ItemGroup>
 
 </Project>

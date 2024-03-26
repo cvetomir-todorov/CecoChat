@@ -3,9 +3,9 @@ using CecoChat.Data.User.Entities.Connections;
 using CecoChat.Data.User.Entities.Files;
 using CecoChat.Data.User.Entities.Profiles;
 using CecoChat.Data.User.Infra;
-using CecoChat.Npgsql;
 using CecoChat.Redis;
 using Common.Autofac;
+using Common.Npgsql;
 using Microsoft.Extensions.Configuration;
 
 namespace CecoChat.Data.User;

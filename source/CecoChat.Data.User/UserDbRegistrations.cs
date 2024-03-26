@@ -1,4 +1,4 @@
-using CecoChat.Npgsql;
+using Common.Npgsql;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
