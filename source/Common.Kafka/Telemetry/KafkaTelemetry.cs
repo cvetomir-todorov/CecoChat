@@ -4,7 +4,7 @@ using Common.OpenTelemetry;
 using Confluent.Kafka;
 using OpenTelemetry.Trace;
 
-namespace CecoChat.Kafka.Telemetry;
+namespace Common.Kafka.Telemetry;
 
 public interface IKafkaTelemetry
 {

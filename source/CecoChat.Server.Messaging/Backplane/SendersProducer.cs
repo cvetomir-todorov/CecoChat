@@ -1,11 +1,11 @@
 ﻿using System.Diagnostics;
 using CecoChat.Contracts.Backplane;
 using CecoChat.Contracts.Messaging;
-using CecoChat.Kafka;
 using CecoChat.Server.Backplane;
 using CecoChat.Server.Messaging.Clients;
 using CecoChat.Server.Messaging.Telemetry;
 using Common;
+using Common.Kafka;
 using Confluent.Kafka;
 using Microsoft.Extensions.Options;
 

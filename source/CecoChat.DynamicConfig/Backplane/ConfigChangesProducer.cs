@@ -1,6 +1,6 @@
 using CecoChat.Contracts.Config;
-using CecoChat.Kafka;
 using Common;
+using Common.Kafka;
 using Confluent.Kafka;
 using Google.Protobuf.WellKnownTypes;
 using Microsoft.Extensions.Hosting;

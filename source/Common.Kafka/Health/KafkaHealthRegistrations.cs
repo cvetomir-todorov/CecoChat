@@ -1,7 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
-namespace CecoChat.Kafka.Health;
+namespace Common.Kafka.Health;
 
 public static class KafkaHealthRegistrations
 {

@@ -2,9 +2,9 @@ using CecoChat.Contracts.Backplane;
 using CecoChat.Contracts.Chats;
 using CecoChat.Data;
 using CecoChat.Data.Chats.Entities.UserChats;
-using CecoChat.Kafka;
 using CecoChat.Server.Backplane;
 using Common;
+using Common.Kafka;
 using Confluent.Kafka;
 using Microsoft.Extensions.Options;
 

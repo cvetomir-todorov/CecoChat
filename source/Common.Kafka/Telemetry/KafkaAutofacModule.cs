@@ -1,6 +1,6 @@
 ﻿using Autofac;
 
-namespace CecoChat.Kafka.Telemetry;
+namespace Common.Kafka.Telemetry;
 
 public sealed class KafkaAutofacModule : Module
 {

@@ -1,4 +1,4 @@
-﻿using CecoChat.Kafka;
+﻿using Common.Kafka;
 using FluentValidation;
 
 namespace CecoChat.DynamicConfig.Sections.Partitioning;

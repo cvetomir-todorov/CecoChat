@@ -1,6 +1,6 @@
 using OpenTelemetry.Trace;
 
-namespace CecoChat.Kafka.Telemetry;
+namespace Common.Kafka.Telemetry;
 
 public static class KafkaRegistrations
 {

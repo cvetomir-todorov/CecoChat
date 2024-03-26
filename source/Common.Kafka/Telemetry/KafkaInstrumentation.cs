@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
 
-namespace CecoChat.Kafka.Telemetry;
+namespace Common.Kafka.Telemetry;
 
 internal static class KafkaInstrumentation
 {

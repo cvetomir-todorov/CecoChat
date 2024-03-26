@@ -2,7 +2,7 @@
 using Confluent.Kafka;
 using Microsoft.Extensions.Logging;
 
-namespace CecoChat.Kafka;
+namespace Common.Kafka;
 
 public interface ITopicPartitionFlyweight
 {

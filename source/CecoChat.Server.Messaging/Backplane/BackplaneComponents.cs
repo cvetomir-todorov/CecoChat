@@ -1,5 +1,5 @@
 ﻿using CecoChat.DynamicConfig.Backplane;
-using CecoChat.Kafka;
+using Common.Kafka;
 using Common.Threading;
 using Microsoft.Extensions.Options;
 

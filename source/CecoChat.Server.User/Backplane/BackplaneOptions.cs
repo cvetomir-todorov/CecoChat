@@ -1,4 +1,4 @@
-using CecoChat.Kafka;
+using Common.Kafka;
 
 namespace CecoChat.Server.User.Backplane;
 
