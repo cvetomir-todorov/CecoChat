@@ -18,7 +18,6 @@
     <ProjectReference Include="..\CecoChat.Data.Config\CecoChat.Data.Config.csproj" />
     <ProjectReference Include="..\CecoChat.DynamicConfig\CecoChat.DynamicConfig.csproj" />
     <ProjectReference Include="..\CecoChat.Server\CecoChat.Server.csproj" />
-    <ProjectReference Include="..\CecoChat\CecoChat.csproj" />
   </ItemGroup>
 
 </Project>

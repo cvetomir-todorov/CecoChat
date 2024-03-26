@@ -21,7 +21,6 @@
     <ProjectReference Include="..\CecoChat.Data\CecoChat.Data.csproj" />
     <ProjectReference Include="..\CecoChat.Minio\CecoChat.Minio.csproj" />
     <ProjectReference Include="..\CecoChat.Server\CecoChat.Server.csproj" />
-    <ProjectReference Include="..\CecoChat\CecoChat.csproj" />
   </ItemGroup>
 
 </Project>
