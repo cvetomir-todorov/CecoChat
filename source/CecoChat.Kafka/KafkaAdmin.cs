@@ -102,7 +102,7 @@ public class KafkaAdmin : IKafkaAdmin
         }
         catch (KafkaException kafkaException)
         {
-            _logger.LogError("Failed to create Kafka topic {KafkaTopic}: {KafkaTopicError}", topic, kafkaException.Error);
+            _logger.LogError(kafkaException, "Failed to create Kafka topic {KafkaTopic}: {KafkaTopicError}", topic, kafkaException.Error);
         }
     }
 }
