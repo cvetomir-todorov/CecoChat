@@ -1,8 +1,6 @@
 using System.Reflection;
 using Autofac;
 using Calzolari.Grpc.AspNetCore.Validation;
-using CecoChat.AspNet.Init;
-using CecoChat.AspNet.Prometheus;
 using CecoChat.Client.Config;
 using CecoChat.DynamicConfig;
 using CecoChat.Kafka;
@@ -11,6 +9,8 @@ using CecoChat.Server.Backplane;
 using CecoChat.Server.IdGen.Endpoints;
 using CecoChat.Server.IdGen.Init;
 using Common;
+using Common.AspNet.Init;
+using Common.AspNet.Prometheus;
 using Common.Autofac;
 using Common.OpenTelemetry;
 using FluentValidation;

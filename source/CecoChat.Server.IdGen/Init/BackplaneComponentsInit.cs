@@ -1,5 +1,5 @@
-using CecoChat.AspNet.Init;
 using CecoChat.DynamicConfig.Backplane;
+using Common.AspNet.Init;
 
 namespace CecoChat.Server.IdGen.Init;
 

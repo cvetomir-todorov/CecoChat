@@ -1,5 +1,5 @@
-using CecoChat.AspNet.Prometheus;
 using CecoChat.Client.Config;
+using Common.AspNet.Prometheus;
 using Common.Jwt;
 using Common.OpenTelemetry;
 using Microsoft.Extensions.Configuration;
