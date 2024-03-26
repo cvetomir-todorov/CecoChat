@@ -1,4 +1,4 @@
-namespace CecoChat.Otel;
+namespace Common.OpenTelemetry;
 
 public static class OtelInstrumentation
 {

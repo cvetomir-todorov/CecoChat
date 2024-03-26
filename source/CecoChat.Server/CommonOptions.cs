@@ -1,7 +1,7 @@
 using CecoChat.AspNet.Prometheus;
 using CecoChat.Client.Config;
 using CecoChat.Jwt;
-using CecoChat.Otel;
+using Common.OpenTelemetry;
 using Microsoft.Extensions.Configuration;
 
 namespace CecoChat.Server;
@@ -29,6 +29,6 @@ public sealed class CommonOptions
     public ConfigClientOptions ConfigClient { get; }
     public JwtOptions Jwt { get; }
     public OtelSamplingOptions TracingSampling { get; }
-    public OtlpOptions TracingExport { get; }
+    public OtlpExporterOptions TracingExport { get; }
     public PrometheusOptions Prometheus { get; }
 }

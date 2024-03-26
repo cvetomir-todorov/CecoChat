@@ -1,9 +1,9 @@
 ﻿using OpenTelemetry;
 using OpenTelemetry.Exporter;
 
-namespace CecoChat.Otel;
+namespace Common.OpenTelemetry;
 
-public sealed class OtlpOptions
+public sealed class OtlpExporterOptions
 {
     public string TargetHost { get; init; } = string.Empty;
 

@@ -1,5 +1,5 @@
 ﻿using System.Reflection;
-using CecoChat.Serilog;
+using Common.OpenTelemetry;
 using Serilog;
 using Serilog.Enrichers.Span;
 using Serilog.Events;
@@ -11,7 +11,7 @@ public static class SerilogConfig
 {
     private const string LogEntryConsoleOutputTemplate = "[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext} | {Message:lj}{NewLine}{Exception}";
 
-    public static void Setup(Assembly entryAssembly, string environment, SerilogOtlpOptions otlpOptions)
+    public static void Setup(Assembly entryAssembly, string environment, OtlpLoggingOptions otlpOptions)
     {
         LoggerConfiguration configuration = CreateDefaultConfiguration(entryAssembly, otlpOptions);
 
@@ -30,7 +30,7 @@ public static class SerilogConfig
         Log.Logger = configuration.CreateLogger();
     }
 
-    private static LoggerConfiguration CreateDefaultConfiguration(Assembly entryAssembly, SerilogOtlpOptions otlpOptions)
+    private static LoggerConfiguration CreateDefaultConfiguration(Assembly entryAssembly, OtlpLoggingOptions otlpOptions)
     {
         LoggerConfiguration configuration = new();
 

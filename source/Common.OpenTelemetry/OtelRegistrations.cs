@@ -1,6 +1,7 @@
-﻿using OpenTelemetry.Trace;
+﻿using CecoChat;
+using OpenTelemetry.Trace;
 
-namespace CecoChat.Otel;
+namespace Common.OpenTelemetry;
 
 public static class OtelRegistrations
 {

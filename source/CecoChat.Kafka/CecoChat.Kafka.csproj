@@ -10,7 +10,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CecoChat\CecoChat.csproj" />
+    <ProjectReference Include="../CecoChat/CecoChat.csproj" />
+    <ProjectReference Include="../Common.OpenTelemetry/Common.OpenTelemetry.csproj" />
   </ItemGroup>
 
 </Project>

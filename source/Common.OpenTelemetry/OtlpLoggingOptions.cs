@@ -1,8 +1,8 @@
 using OpenTelemetry.Exporter;
 
-namespace CecoChat.Serilog;
+namespace Common.OpenTelemetry;
 
-public sealed class SerilogOtlpOptions
+public sealed class OtlpLoggingOptions
 {
     public string TargetHost { get; init; } = string.Empty;
 
