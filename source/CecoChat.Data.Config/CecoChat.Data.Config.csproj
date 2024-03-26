@@ -10,7 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CecoChat.Npgsql\CecoChat.Npgsql.csproj" />
-    <ProjectReference Include="..\CecoChat\CecoChat.csproj" />
+    <ProjectReference Include="..\Common\Common.csproj" />
   </ItemGroup>
 
   <ItemGroup>

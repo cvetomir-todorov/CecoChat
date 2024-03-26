@@ -7,7 +7,7 @@
   <ItemGroup>
     <ProjectReference Include="..\CecoChat.Client.Config\CecoChat.Client.Config.csproj" />
     <ProjectReference Include="..\CecoChat.Kafka\CecoChat.Kafka.csproj" />
-    <ProjectReference Include="..\CecoChat\CecoChat.csproj" />
+    <ProjectReference Include="..\Common\Common.csproj" />
   </ItemGroup>
 
 </Project>

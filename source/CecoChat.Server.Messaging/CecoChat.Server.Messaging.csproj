@@ -19,7 +19,6 @@
     <ProjectReference Include="..\CecoChat.Contracts.Messaging\CecoChat.Contracts.Messaging.csproj" />
     <ProjectReference Include="..\CecoChat.Data\CecoChat.Data.csproj" />
     <ProjectReference Include="..\CecoChat.Server\CecoChat.Server.csproj" />
-    <ProjectReference Include="..\CecoChat\CecoChat.csproj" />
   </ItemGroup>
 
 </Project>

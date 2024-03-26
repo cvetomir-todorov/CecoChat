@@ -10,7 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CecoChat.Contracts\CecoChat.Contracts.csproj" />
-    <ProjectReference Include="..\CecoChat\CecoChat.csproj" />
+    <ProjectReference Include="..\Common\Common.csproj" />
   </ItemGroup>
 
 </Project>
