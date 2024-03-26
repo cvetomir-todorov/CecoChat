@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using Autofac.Extensions.DependencyInjection;
 using CecoChat.AspNet.Init;
-using CecoChat.Serilog;
+using Common.OpenTelemetry;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Serilog;
@@ -86,7 +86,7 @@ public static class EntryPoint
             .AddEnvironmentVariables(EnvironmentVariablesPrefix)
             .Build();
 
-        SerilogOtlpOptions otlpOptions = new();
+        OtlpLoggingOptions otlpOptions = new();
         config.GetSection("Telemetry:Logging:Export").Bind(otlpOptions);
 
         SerilogConfig.Setup(entryAssembly, environment, otlpOptions);

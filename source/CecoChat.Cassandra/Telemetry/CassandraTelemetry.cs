@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
 using Cassandra;
-using CecoChat.Otel;
+using Common.OpenTelemetry;
 using OpenTelemetry.Trace;
 
 namespace CecoChat.Cassandra.Telemetry;

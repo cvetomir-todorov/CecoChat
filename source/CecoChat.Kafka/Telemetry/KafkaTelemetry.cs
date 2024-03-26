@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Text;
-using CecoChat.Otel;
+using Common.OpenTelemetry;
 using Confluent.Kafka;
 using OpenTelemetry.Trace;
 

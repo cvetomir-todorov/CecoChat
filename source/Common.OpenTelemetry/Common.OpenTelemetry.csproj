@@ -5,12 +5,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CassandraCSharpDriver" Version="3.20.1" />
+    <PackageReference Include="OpenTelemetry" Version="1.7.0" />
+    <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.7.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="../CecoChat/CecoChat.csproj" />
-    <ProjectReference Include="../Common.OpenTelemetry/Common.OpenTelemetry.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,6 +1,6 @@
 using System.Diagnostics;
 using System.Diagnostics.Metrics;
-using CecoChat.Otel;
+using Common.OpenTelemetry;
 using Microsoft.AspNetCore.SignalR;
 using OpenTelemetry.Trace;
 
