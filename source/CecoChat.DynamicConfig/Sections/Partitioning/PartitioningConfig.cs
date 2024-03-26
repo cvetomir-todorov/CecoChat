@@ -1,5 +1,5 @@
-﻿using CecoChat.Events;
-using CecoChat.Kafka;
+﻿using CecoChat.Kafka;
+using Common.Events;
 using Microsoft.Extensions.Logging;
 
 namespace CecoChat.DynamicConfig.Sections.Partitioning;

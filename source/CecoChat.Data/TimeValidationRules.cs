@@ -1,3 +1,4 @@
+using Common;
 using FluentValidation;
 
 namespace CecoChat.Data;

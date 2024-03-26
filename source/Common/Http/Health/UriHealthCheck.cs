@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
-namespace CecoChat.Http.Health;
+namespace Common.Http.Health;
 
 public class UriHealthCheck : IHealthCheck
 {

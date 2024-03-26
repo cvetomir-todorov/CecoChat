@@ -1,5 +1,6 @@
 using CecoChat.Contracts.Chats;
-using CecoChat.Grpc;
+using Common;
+using Common.Grpc;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Microsoft.Extensions.Logging;

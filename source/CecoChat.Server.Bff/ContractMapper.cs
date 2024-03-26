@@ -1,4 +1,5 @@
 using CecoChat.Contracts.Bff.Chats;
+using Common;
 
 namespace CecoChat.Server.Bff;
 

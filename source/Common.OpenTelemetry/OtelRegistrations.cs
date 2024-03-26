@@ -1,5 +1,4 @@
-﻿using CecoChat;
-using OpenTelemetry.Trace;
+﻿using OpenTelemetry.Trace;
 
 namespace Common.OpenTelemetry;
 

@@ -1,4 +1,6 @@
-﻿namespace CecoChat.Server.Backplane;
+﻿using Common;
+
+namespace CecoChat.Server.Backplane;
 
 public interface IPartitioner
 {

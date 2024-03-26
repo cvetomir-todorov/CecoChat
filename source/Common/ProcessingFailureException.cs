@@ -1,4 +1,4 @@
-namespace CecoChat;
+namespace Common;
 
 /// <summary>
 /// Thrown when a result object cannot be processed.

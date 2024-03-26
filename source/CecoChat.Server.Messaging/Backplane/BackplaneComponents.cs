@@ -1,6 +1,6 @@
 ﻿using CecoChat.DynamicConfig.Backplane;
 using CecoChat.Kafka;
-using CecoChat.Threading;
+using Common.Threading;
 using Microsoft.Extensions.Options;
 
 namespace CecoChat.Server.Messaging.Backplane;

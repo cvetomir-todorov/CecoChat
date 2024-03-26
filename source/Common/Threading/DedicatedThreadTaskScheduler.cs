@@ -1,6 +1,6 @@
 using System.Collections.Concurrent;
 
-namespace CecoChat.Threading;
+namespace Common.Threading;
 
 /// <summary>
 /// Executes all <see cref="Task"/> continuations on a dedicated thread.

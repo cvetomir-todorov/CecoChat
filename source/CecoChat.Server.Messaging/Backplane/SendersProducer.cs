@@ -5,6 +5,7 @@ using CecoChat.Kafka;
 using CecoChat.Server.Backplane;
 using CecoChat.Server.Messaging.Clients;
 using CecoChat.Server.Messaging.Telemetry;
+using Common;
 using Confluent.Kafka;
 using Microsoft.Extensions.Options;
 

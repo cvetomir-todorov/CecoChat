@@ -1,11 +1,11 @@
 using Autofac;
-using CecoChat.Autofac;
 using CecoChat.Data.User.Entities.Connections;
 using CecoChat.Data.User.Entities.Files;
 using CecoChat.Data.User.Entities.Profiles;
 using CecoChat.Data.User.Infra;
 using CecoChat.Npgsql;
 using CecoChat.Redis;
+using Common.Autofac;
 using Microsoft.Extensions.Configuration;
 
 namespace CecoChat.Data.User;

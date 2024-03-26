@@ -1,4 +1,5 @@
 ﻿using CecoChat.DynamicConfig.Sections.Snowflake;
+using Common;
 using IdGen;
 using Microsoft.Extensions.Options;
 

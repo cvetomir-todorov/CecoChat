@@ -1,7 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Polly;
 
-namespace CecoChat.Polly;
+namespace Common.Polly;
 
 public static class HttpClientBuilderExtensions
 {

@@ -3,7 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 
-namespace CecoChat.Autofac;
+namespace Common.Autofac;
 
 /// <summary>
 /// Typical registration but accomplished with Autofac.

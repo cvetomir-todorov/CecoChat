@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Cassandra;
 using CecoChat.Contracts.Chats;
+using Common;
 using Microsoft.Extensions.Logging;
 
 namespace CecoChat.Data.Chats.Entities.ChatMessages;

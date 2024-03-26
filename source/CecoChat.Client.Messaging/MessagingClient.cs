@@ -1,4 +1,5 @@
 using CecoChat.Contracts.Messaging;
+using Common;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
 

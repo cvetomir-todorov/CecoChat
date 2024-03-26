@@ -1,3 +1,4 @@
+using Common;
 using Google.Protobuf.WellKnownTypes;
 
 namespace CecoChat.Server.Bff;

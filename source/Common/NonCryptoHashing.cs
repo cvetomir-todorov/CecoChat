@@ -1,4 +1,4 @@
-﻿namespace CecoChat;
+﻿namespace Common;
 
 public interface INonCryptoHash
 {

@@ -1,5 +1,6 @@
 using CecoChat.Contracts.Messaging;
 using CecoChat.Data;
+using Common;
 
 namespace CecoChat.ConsoleClient.LocalStorage;
 

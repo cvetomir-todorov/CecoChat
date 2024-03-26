@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
-namespace CecoChat;
+namespace Common;
 
 public interface IClock
 {

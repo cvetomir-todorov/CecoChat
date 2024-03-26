@@ -1,5 +1,6 @@
 ﻿using Autofac;
-using CecoChat.Autofac;
+using Common;
+using Common.Autofac;
 
 namespace CecoChat.Server.Backplane;
 

@@ -1,4 +1,4 @@
-namespace CecoChat;
+namespace Common;
 
 /// <summary>
 /// Thrown when an enum value is not supported.

@@ -1,5 +1,5 @@
-using CecoChat.Http.Client;
-using CecoChat.Polly;
+using Common.Http.Client;
+using Common.Polly;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CecoChat.Client.Config;

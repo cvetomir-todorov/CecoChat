@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using CecoChat.Contracts.IdGen;
+using Common;
 using Grpc.Core;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;

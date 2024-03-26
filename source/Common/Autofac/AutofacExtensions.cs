@@ -2,7 +2,7 @@
 using Autofac.Builder;
 using Autofac.Core;
 
-namespace CecoChat.Autofac;
+namespace Common.Autofac;
 
 /// <summary>
 /// Shortcuts for Autofac functionality.

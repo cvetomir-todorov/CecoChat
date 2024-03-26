@@ -1,4 +1,4 @@
-﻿namespace CecoChat.Events;
+﻿namespace Common.Events;
 
 public interface ISubscriber<in TEventData>
 {

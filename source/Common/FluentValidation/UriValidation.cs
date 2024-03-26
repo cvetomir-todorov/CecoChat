@@ -1,7 +1,7 @@
 using FluentValidation;
 using FluentValidation.Validators;
 
-namespace CecoChat.FluentValidation;
+namespace Common.FluentValidation;
 
 public static class UriValidation
 {

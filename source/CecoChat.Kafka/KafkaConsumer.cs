@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using CecoChat.Kafka.Telemetry;
+using Common;
 using Confluent.Kafka;
 using Microsoft.Extensions.Logging;
 
