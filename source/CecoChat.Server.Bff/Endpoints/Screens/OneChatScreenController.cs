@@ -98,8 +98,8 @@ public class OneChatScreenController : ControllerBase
             }
         }
 
-        _logger.LogTrace("Responding with {MessageCount} message(s) older than {OlderThan} for chat between {UserId} and {OtherUserId} and, if requested and existing - the profile of and the connection with the other user {OtherUserId}",
-            messages.Length, request.MessagesOlderThan, userClaims.UserId, request.OtherUserId, request.OtherUserId);
+        _logger.LogTrace("Responding with {MessageCount} message(s) older than {OlderThan} for chat between {UserId} and {OtherUserId} and, if requested and existing - the profile of and the connection with the other user",
+            messages.Length, request.MessagesOlderThan, userClaims.UserId, request.OtherUserId);
         return Ok(new GetOneChatScreenResponse
         {
             Messages = messages,
