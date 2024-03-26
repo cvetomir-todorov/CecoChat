@@ -1,4 +1,4 @@
-﻿namespace CecoChat.Cassandra;
+﻿namespace Common.Cassandra;
 
 public sealed class CassandraOptions
 {

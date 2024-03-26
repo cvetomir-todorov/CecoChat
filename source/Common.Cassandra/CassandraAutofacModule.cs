@@ -2,7 +2,7 @@
 using Common.Autofac;
 using Microsoft.Extensions.Configuration;
 
-namespace CecoChat.Cassandra;
+namespace Common.Cassandra;
 
 public class CassandraAutofacModule<TDbContextImplementation, TDbContext> : Module
     where TDbContext : class, ICassandraDbContext

@@ -2,7 +2,7 @@ using System.Reflection;
 using Cassandra;
 using Microsoft.Extensions.Logging;
 
-namespace CecoChat.Cassandra;
+namespace Common.Cassandra;
 
 public interface ICassandraDbInitializer
 {

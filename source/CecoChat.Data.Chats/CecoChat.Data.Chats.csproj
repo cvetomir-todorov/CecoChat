@@ -11,10 +11,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Common\Common.csproj" />
-    <ProjectReference Include="..\CecoChat.Cassandra\CecoChat.Cassandra.csproj" />
     <ProjectReference Include="..\CecoChat.Contracts.Chats\CecoChat.Contracts.Chats.csproj" />
     <ProjectReference Include="..\CecoChat.Data\CecoChat.Data.csproj" />
+    <ProjectReference Include="..\Common\Common.csproj" />
+    <ProjectReference Include="..\Common.Cassandra\Common.Cassandra.csproj" />
   </ItemGroup>
 
 </Project>

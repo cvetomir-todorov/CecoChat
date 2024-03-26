@@ -45,7 +45,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CecoChat.Contracts.Messagin
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.AspNet", "Common.AspNet\Common.AspNet.csproj", "{FEF5F628-618A-4EAB-AD5D-386D566BA181}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CecoChat.Cassandra", "CecoChat.Cassandra\CecoChat.Cassandra.csproj", "{B39148B8-4539-4A4A-843A-57D543FE8F03}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Cassandra", "Common.Cassandra\Common.Cassandra.csproj", "{B39148B8-4539-4A4A-843A-57D543FE8F03}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Kafka", "Common.Kafka\Common.Kafka.csproj", "{1AB035D7-3B0E-4EEC-A843-1672F9757A68}"
 EndProject

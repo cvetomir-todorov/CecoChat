@@ -1,11 +1,10 @@
 ﻿using System.Collections.Concurrent;
 using System.Net;
 using Cassandra;
-using Common;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace CecoChat.Cassandra;
+namespace Common.Cassandra;
 
 public interface ICassandraDbContext : IDisposable
 {

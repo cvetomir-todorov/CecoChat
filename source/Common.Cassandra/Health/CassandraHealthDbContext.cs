@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace CecoChat.Cassandra.Health;
+namespace Common.Cassandra.Health;
 
 public interface ICassandraHealthDbContext : ICassandraDbContext
 { }
