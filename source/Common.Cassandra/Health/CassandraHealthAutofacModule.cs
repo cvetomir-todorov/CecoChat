@@ -1,7 +1,7 @@
 using Autofac;
 using Microsoft.Extensions.Configuration;
 
-namespace CecoChat.Cassandra.Health;
+namespace Common.Cassandra.Health;
 
 public class CassandraHealthAutofacModule : Module
 {

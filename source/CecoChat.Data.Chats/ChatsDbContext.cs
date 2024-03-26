@@ -1,5 +1,5 @@
 ﻿using Cassandra;
-using CecoChat.Cassandra;
+using Common.Cassandra;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 

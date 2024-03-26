@@ -1,8 +1,6 @@
 using System.Reflection;
 using Autofac;
 using Calzolari.Grpc.AspNetCore.Validation;
-using CecoChat.Cassandra;
-using CecoChat.Cassandra.Health;
 using CecoChat.Client.Config;
 using CecoChat.Contracts.Backplane;
 using CecoChat.Data.Chats;
@@ -18,6 +16,8 @@ using Common.AspNet.Health;
 using Common.AspNet.Init;
 using Common.AspNet.Prometheus;
 using Common.Autofac;
+using Common.Cassandra;
+using Common.Cassandra.Health;
 using Common.Kafka;
 using Common.Kafka.Telemetry;
 using Common.OpenTelemetry;

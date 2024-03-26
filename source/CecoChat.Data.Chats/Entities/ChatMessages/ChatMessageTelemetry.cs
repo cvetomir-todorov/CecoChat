@@ -1,6 +1,6 @@
 ﻿using Cassandra;
-using CecoChat.Cassandra.Telemetry;
 using CecoChat.Data.Chats.Telemetry;
+using Common.Cassandra.Telemetry;
 
 namespace CecoChat.Data.Chats.Entities.ChatMessages;
 

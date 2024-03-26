@@ -4,7 +4,7 @@ using Cassandra;
 using Common.OpenTelemetry;
 using OpenTelemetry.Trace;
 
-namespace CecoChat.Cassandra.Telemetry;
+namespace Common.Cassandra.Telemetry;
 
 public interface ICassandraTelemetry : IDisposable
 {

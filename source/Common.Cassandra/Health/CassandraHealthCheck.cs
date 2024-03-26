@@ -2,7 +2,7 @@ using Cassandra;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
 
-namespace CecoChat.Cassandra.Health;
+namespace Common.Cassandra.Health;
 
 public class CassandraHealthCheck : IHealthCheck
 {

@@ -1,4 +1,4 @@
-namespace CecoChat.Cassandra.Telemetry;
+namespace Common.Cassandra.Telemetry;
 
 internal static class CassandraInstrumentation
 {
