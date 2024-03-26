@@ -3,7 +3,7 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
 using Minio;
 
-namespace CecoChat.Minio.Health;
+namespace Common.Minio.Health;
 
 public static class MinioHealthRegistrations
 {

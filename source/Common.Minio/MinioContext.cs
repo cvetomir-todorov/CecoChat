@@ -7,7 +7,7 @@ using Minio.DataModel.Response;
 using Minio.DataModel.Tags;
 using Minio.Exceptions;
 
-namespace CecoChat.Minio;
+namespace Common.Minio;
 
 public interface IMinioContext
 {

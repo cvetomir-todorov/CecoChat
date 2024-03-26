@@ -1,4 +1,4 @@
-namespace CecoChat.Minio;
+namespace Common.Minio;
 
 public sealed class MinioOptions
 {

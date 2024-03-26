@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Minio;
 
-namespace CecoChat.Minio;
+namespace Common.Minio;
 
 public class MinioAutofacModule : Module
 {

@@ -1,6 +1,6 @@
-using CecoChat.Minio;
 using CecoChat.Server.Bff.Files;
 using Common.AspNet.Init;
+using Common.Minio;
 using Microsoft.Extensions.Options;
 
 namespace CecoChat.Server.Bff.Init;
