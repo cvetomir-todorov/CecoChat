@@ -1,7 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using StackExchange.Redis;
 
-namespace CecoChat.Redis.Health;
+namespace Common.Redis.Health;
 
 public static class RedisHealthRegistrations
 {
