@@ -3,6 +3,7 @@ using CecoChat.AspNet.ModelBinding;
 using CecoChat.Client.User;
 using CecoChat.Contracts.Bff.Files;
 using CecoChat.Server.Identity;
+using Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;

@@ -1,14 +1,14 @@
 using Autofac;
-using CecoChat.Autofac;
 using CecoChat.Contracts.Config;
 using CecoChat.DynamicConfig.Backplane;
 using CecoChat.DynamicConfig.Sections.History;
 using CecoChat.DynamicConfig.Sections.Partitioning;
 using CecoChat.DynamicConfig.Sections.Snowflake;
 using CecoChat.DynamicConfig.Sections.User;
-using CecoChat.Events;
 using CecoChat.Kafka;
 using CecoChat.Kafka.Telemetry;
+using Common.Autofac;
+using Common.Events;
 using Confluent.Kafka;
 using FluentValidation;
 using Microsoft.Extensions.Configuration;

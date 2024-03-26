@@ -1,4 +1,4 @@
-using CecoChat.Health;
+using Common.Health;
 
 namespace CecoChat.Server.Bff;
 

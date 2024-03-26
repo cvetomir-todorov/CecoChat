@@ -1,4 +1,5 @@
 using CecoChat.Contracts.User;
+using Common;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 

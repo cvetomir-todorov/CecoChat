@@ -1,11 +1,11 @@
 ﻿using CecoChat.AspNet.Init;
 using CecoChat.Contracts.Messaging;
 using CecoChat.DynamicConfig.Sections.Partitioning;
-using CecoChat.Events;
 using CecoChat.Kafka;
 using CecoChat.Server.Backplane;
 using CecoChat.Server.Messaging.Backplane;
 using CecoChat.Server.Messaging.Clients;
+using Common.Events;
 using Microsoft.Extensions.Options;
 
 namespace CecoChat.Server.Messaging.Init;

@@ -1,5 +1,5 @@
 using Autofac;
-using CecoChat.Autofac;
+using Common.Autofac;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Minio;

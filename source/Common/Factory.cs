@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace CecoChat;
+namespace Common;
 
 public interface IFactory<out TService>
 {

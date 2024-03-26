@@ -1,4 +1,4 @@
-namespace CecoChat.Polly;
+namespace Common.Polly;
 
 public sealed class RetryOptions
 {

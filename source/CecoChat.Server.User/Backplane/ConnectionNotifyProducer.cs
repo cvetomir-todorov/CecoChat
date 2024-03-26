@@ -2,6 +2,7 @@ using CecoChat.Contracts.Backplane;
 using CecoChat.Contracts.User;
 using CecoChat.Kafka;
 using CecoChat.Server.Backplane;
+using Common;
 using Confluent.Kafka;
 using Microsoft.Extensions.Options;
 

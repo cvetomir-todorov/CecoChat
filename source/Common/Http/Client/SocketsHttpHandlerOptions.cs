@@ -1,4 +1,4 @@
-namespace CecoChat.Http.Client;
+namespace Common.Http.Client;
 
 public sealed class SocketsHttpHandlerOptions
 {

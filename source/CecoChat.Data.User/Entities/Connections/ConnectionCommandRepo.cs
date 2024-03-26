@@ -1,5 +1,6 @@
 using CecoChat.Contracts.User;
 using CecoChat.Data.User.Infra;
+using Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Logging;

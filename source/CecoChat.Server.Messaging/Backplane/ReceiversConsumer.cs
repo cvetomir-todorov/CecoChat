@@ -3,6 +3,7 @@ using CecoChat.Contracts.Messaging;
 using CecoChat.Kafka;
 using CecoChat.Server.Backplane;
 using CecoChat.Server.Messaging.Clients;
+using Common;
 using Confluent.Kafka;
 using Microsoft.Extensions.Options;
 

@@ -2,6 +2,7 @@ using CecoChat.Contracts.User;
 using CecoChat.Data.User.Entities.Connections;
 using CecoChat.Server.Identity;
 using CecoChat.Server.User.Backplane;
+using Common;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Microsoft.AspNetCore.Authorization;

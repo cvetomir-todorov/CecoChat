@@ -1,4 +1,5 @@
 ﻿using CecoChat.Contracts.Chats;
+using Common;
 
 namespace CecoChat.Data.Chats.Entities.ChatMessages;
 

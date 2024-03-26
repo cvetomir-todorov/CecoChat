@@ -1,6 +1,6 @@
 using Grpc.Core;
 
-namespace CecoChat.Grpc;
+namespace Common.Grpc;
 
 public static class MetadataExtensions
 {

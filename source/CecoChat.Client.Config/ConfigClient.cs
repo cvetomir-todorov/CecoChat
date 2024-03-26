@@ -1,4 +1,5 @@
 using CecoChat.Contracts.Config;
+using Common;
 using Grpc.Core;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;

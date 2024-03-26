@@ -1,3 +1,5 @@
+using Common;
+
 namespace CecoChat.Server.Bff.Files;
 
 public interface IObjectNaming

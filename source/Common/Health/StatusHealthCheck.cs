@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
-namespace CecoChat.Health;
+namespace Common.Health;
 
 public class StatusHealthCheck : IHealthCheck
 {

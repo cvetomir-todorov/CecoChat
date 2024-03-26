@@ -1,4 +1,5 @@
 using CecoChat.Contracts.User;
+using Common;
 using Google.Protobuf.WellKnownTypes;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;

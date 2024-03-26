@@ -1,6 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 
-namespace CecoChat.Http.Client;
+namespace Common.Http.Client;
 
 public static class HttpClientBuilderExtensions
 {

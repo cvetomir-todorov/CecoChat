@@ -1,5 +1,6 @@
 using CecoChat.Contracts.Backplane;
 using CecoChat.Contracts.Messaging;
+using Common;
 
 namespace CecoChat.Server.Messaging;
 

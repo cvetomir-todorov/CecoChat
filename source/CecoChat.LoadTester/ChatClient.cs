@@ -2,6 +2,7 @@ using CecoChat.Client.Messaging;
 using CecoChat.Contracts.Bff;
 using CecoChat.Contracts.Bff.Auth;
 using CecoChat.Contracts.Bff.Chats;
+using Common;
 using Refit;
 
 namespace CecoChat.LoadTester;

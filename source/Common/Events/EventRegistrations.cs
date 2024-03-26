@@ -1,6 +1,6 @@
 ﻿using Autofac;
 
-namespace CecoChat.Events;
+namespace Common.Events;
 
 public static class EventRegistrations
 {

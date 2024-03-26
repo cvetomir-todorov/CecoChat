@@ -4,6 +4,7 @@ using CecoChat.Data;
 using CecoChat.Data.Chats.Entities.UserChats;
 using CecoChat.Kafka;
 using CecoChat.Server.Backplane;
+using Common;
 using Confluent.Kafka;
 using Microsoft.Extensions.Options;
 
