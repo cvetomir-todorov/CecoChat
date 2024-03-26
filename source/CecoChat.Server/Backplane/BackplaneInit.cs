@@ -1,5 +1,5 @@
-using CecoChat.AspNet.Init;
 using CecoChat.Kafka;
+using Common.AspNet.Init;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 

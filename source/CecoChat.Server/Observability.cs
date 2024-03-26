@@ -1,8 +1,8 @@
-using CecoChat.AspNet.Health;
-using CecoChat.AspNet.Prometheus;
 using CecoChat.Client.Config;
 using CecoChat.Kafka;
 using CecoChat.Kafka.Health;
+using Common.AspNet.Health;
+using Common.AspNet.Prometheus;
 using Common.Health;
 using Common.Http.Health;
 using Microsoft.AspNetCore.Builder;

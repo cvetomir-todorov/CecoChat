@@ -1,5 +1,5 @@
-﻿using CecoChat.AspNet.Init;
-using CecoChat.DynamicConfig.Sections.Partitioning;
+﻿using CecoChat.DynamicConfig.Sections.Partitioning;
+using Common.AspNet.Init;
 using Microsoft.Extensions.Options;
 
 namespace CecoChat.Server.Messaging.Init;

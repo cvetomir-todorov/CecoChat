@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 using Autofac.Extensions.DependencyInjection;
-using CecoChat.AspNet.Init;
+using Common.AspNet.Init;
 using Common.OpenTelemetry;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
