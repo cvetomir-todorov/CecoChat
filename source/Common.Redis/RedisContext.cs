@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 
-namespace CecoChat.Redis;
+namespace Common.Redis;
 
 public interface IRedisContext : IDisposable, IAsyncDisposable
 {

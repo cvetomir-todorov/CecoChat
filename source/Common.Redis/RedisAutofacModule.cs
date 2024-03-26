@@ -3,7 +3,7 @@ using Common.Autofac;
 using Microsoft.Extensions.Configuration;
 using StackExchange.Redis;
 
-namespace CecoChat.Redis;
+namespace Common.Redis;
 
 public sealed class RedisAutofacModule : Module
 {

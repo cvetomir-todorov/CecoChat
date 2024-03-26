@@ -1,4 +1,4 @@
-﻿namespace CecoChat.Redis;
+﻿namespace Common.Redis;
 
 public sealed class RedisOptions
 {

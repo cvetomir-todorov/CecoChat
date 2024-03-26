@@ -1,6 +1,6 @@
 using System.Threading.Channels;
 using CecoChat.Contracts.User;
-using CecoChat.Redis;
+using Common.Redis;
 using Google.Protobuf;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;

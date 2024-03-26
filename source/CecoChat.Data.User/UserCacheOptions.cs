@@ -1,4 +1,4 @@
-using CecoChat.Redis;
+using Common.Redis;
 
 namespace CecoChat.Data.User;
 

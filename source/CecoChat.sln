@@ -51,7 +51,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Kafka", "Common.Kafk
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Npgsql", "Common.Npgsql\Common.Npgsql.csproj", "{D78E2CAD-9A11-472D-AE31-C3929AAF4666}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CecoChat.Redis", "CecoChat.Redis\CecoChat.Redis.csproj", "{547F97A1-656E-4778-94E9-074A8687558C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Redis", "Common.Redis\Common.Redis.csproj", "{547F97A1-656E-4778-94E9-074A8687558C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Contracts", "Contracts", "{6352A387-10F6-4654-86CA-DDA69BB0C186}"
 EndProject
