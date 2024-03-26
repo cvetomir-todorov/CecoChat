@@ -1,4 +1,4 @@
-namespace CecoChat.Kafka.Health;
+namespace Common.Kafka.Health;
 
 public sealed class KafkaHealthOptions
 {

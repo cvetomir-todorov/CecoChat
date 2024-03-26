@@ -1,4 +1,4 @@
-namespace CecoChat.Kafka;
+namespace Common.Kafka;
 
 /// <summary>
 /// Not inside the <see cref="KafkaConsumer{TKey,TValue}"/> class which uses it since it is generic.

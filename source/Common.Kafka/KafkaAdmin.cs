@@ -4,7 +4,7 @@ using Confluent.Kafka.Admin;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace CecoChat.Kafka;
+namespace Common.Kafka;
 
 public sealed class KafkaTopicSpec
 {

@@ -1,6 +1,6 @@
 ﻿using CecoChat.Client.Config;
 using CecoChat.Contracts.Config;
-using CecoChat.Kafka;
+using Common.Kafka;
 using Microsoft.Extensions.Logging;
 
 namespace CecoChat.DynamicConfig.Sections.Partitioning;

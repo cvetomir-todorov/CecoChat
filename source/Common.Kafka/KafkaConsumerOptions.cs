@@ -1,6 +1,6 @@
 ﻿using Confluent.Kafka;
 
-namespace CecoChat.Kafka;
+namespace Common.Kafka;
 
 public sealed class KafkaConsumerOptions
 {

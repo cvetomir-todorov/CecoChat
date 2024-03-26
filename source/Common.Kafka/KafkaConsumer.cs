@@ -1,10 +1,9 @@
 ﻿using System.Diagnostics;
-using CecoChat.Kafka.Telemetry;
-using Common;
+using Common.Kafka.Telemetry;
 using Confluent.Kafka;
 using Microsoft.Extensions.Logging;
 
-namespace CecoChat.Kafka;
+namespace Common.Kafka;
 
 public interface IKafkaConsumer<TKey, TValue> : IDisposable
 {
