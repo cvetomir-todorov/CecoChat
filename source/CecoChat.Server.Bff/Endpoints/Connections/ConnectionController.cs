@@ -20,6 +20,15 @@ public class ConnectionController : ControllerBase
     private readonly IMapper _mapper;
     private readonly IConnectionClient _connectionClient;
 
+    private static class Details
+    {
+        public const string MissingUser = "Missing user";
+        public const string AlreadyExists = "Already exists";
+        public const string ConcurrentlyUpdated = "Concurrently updated";
+        public const string InvalidTargetIdOrStatus = "Invalid target ID or status";
+        public const string InvalidStatus = "Invalid status";
+    }
+
     public ConnectionController(
         ILogger<ConnectionController> logger,
         IMapper mapper,
@@ -79,7 +88,7 @@ public class ConnectionController : ControllerBase
             _logger.LogTrace("Responding with a failed invite from {UserId} to {ConnectionId} because the user is missing", userClaims.UserId, connectionId);
             return Conflict(new ProblemDetails
             {
-                Detail = "Missing user"
+                Detail = Details.MissingUser
             });
         }
         if (result.AlreadyExists)
@@ -87,7 +96,7 @@ public class ConnectionController : ControllerBase
             _logger.LogTrace("Responding with a failed invite from {UserId} to {ConnectionId} because the connection already exists", userClaims.UserId, connectionId);
             return Conflict(new ProblemDetails
             {
-                Detail = "Already exists"
+                Detail = Details.AlreadyExists
             });
         }
         if (result.ConcurrentlyUpdated)
@@ -95,7 +104,7 @@ public class ConnectionController : ControllerBase
             _logger.LogTrace("Responding with a failed invite from {UserId} to {ConnectionId} because the connection has been concurrently updated", userClaims.UserId, connectionId);
             return Conflict(new ProblemDetails
             {
-                Detail = "Concurrently updated"
+                Detail = Details.ConcurrentlyUpdated
             });
         }
 
@@ -134,7 +143,7 @@ public class ConnectionController : ControllerBase
             _logger.LogTrace("Responding with a failed approval from {UserId} to {ConnectionId} because of invalid target or status", userClaims.UserId, connectionId);
             return Conflict(new ProblemDetails
             {
-                Detail = "Invalid target ID or status"
+                Detail = Details.InvalidTargetIdOrStatus
             });
         }
         if (result.ConcurrentlyUpdated)
@@ -142,7 +151,7 @@ public class ConnectionController : ControllerBase
             _logger.LogTrace("Responding with a failed approval from {UserId} to {ConnectionId} because the connection has been concurrently updated", userClaims.UserId, connectionId);
             return Conflict(new ProblemDetails
             {
-                Detail = "Concurrently updated"
+                Detail = Details.ConcurrentlyUpdated
             });
         }
 
@@ -182,7 +191,7 @@ public class ConnectionController : ControllerBase
             _logger.LogTrace("Responding with a failed cancel from {UserId} to {ConnectionId} because of invalid status", userClaims.UserId, connectionId);
             return Conflict(new ProblemDetails
             {
-                Detail = "Invalid status"
+                Detail = Details.InvalidStatus
             });
         }
         if (result.ConcurrentlyUpdated)
@@ -190,7 +199,7 @@ public class ConnectionController : ControllerBase
             _logger.LogTrace("Responding with a failed cancel from {UserId} to {ConnectionId} because the connection has been concurrently updated", userClaims.UserId, connectionId);
             return Conflict(new ProblemDetails
             {
-                Detail = "Concurrently updated"
+                Detail = Details.ConcurrentlyUpdated
             });
         }
 
@@ -230,7 +239,7 @@ public class ConnectionController : ControllerBase
             _logger.LogTrace("Responding with a failed removal from {UserId} to {ConnectionId} because of invalid status", userClaims.UserId, connectionId);
             return Conflict(new ProblemDetails
             {
-                Detail = "Invalid status"
+                Detail = Details.InvalidStatus
             });
         }
         if (result.ConcurrentlyUpdated)
@@ -238,7 +247,7 @@ public class ConnectionController : ControllerBase
             _logger.LogTrace("Responding with a failed removal from {UserId} to {ConnectionId} because the connection has been concurrently updated", userClaims.UserId, connectionId);
             return Conflict(new ProblemDetails
             {
-                Detail = "Concurrently updated"
+                Detail = Details.ConcurrentlyUpdated
             });
         }
 
