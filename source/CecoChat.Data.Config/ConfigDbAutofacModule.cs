@@ -1,6 +1,6 @@
 ﻿using Autofac;
-using CecoChat.Npgsql;
 using Common.Autofac;
+using Common.Npgsql;
 using Microsoft.Extensions.Configuration;
 
 namespace CecoChat.Data.Config;

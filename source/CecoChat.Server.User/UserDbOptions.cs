@@ -1,4 +1,4 @@
-using CecoChat.Npgsql;
+using Common.Npgsql;
 
 namespace CecoChat.Server.User;
 

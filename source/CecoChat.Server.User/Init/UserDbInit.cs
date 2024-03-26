@@ -1,7 +1,7 @@
 using CecoChat.Data.User;
-using CecoChat.Npgsql;
 using CecoChat.Server.User.Security;
 using Common.AspNet.Init;
+using Common.Npgsql;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Npgsql;

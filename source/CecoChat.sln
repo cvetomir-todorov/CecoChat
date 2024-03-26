@@ -49,7 +49,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Cassandra", "Common.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Kafka", "Common.Kafka\Common.Kafka.csproj", "{1AB035D7-3B0E-4EEC-A843-1672F9757A68}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CecoChat.Npgsql", "CecoChat.Npgsql\CecoChat.Npgsql.csproj", "{D78E2CAD-9A11-472D-AE31-C3929AAF4666}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Npgsql", "Common.Npgsql\Common.Npgsql.csproj", "{D78E2CAD-9A11-472D-AE31-C3929AAF4666}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CecoChat.Redis", "CecoChat.Redis\CecoChat.Redis.csproj", "{547F97A1-656E-4778-94E9-074A8687558C}"
 EndProject

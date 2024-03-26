@@ -1,4 +1,4 @@
-namespace CecoChat.Npgsql;
+namespace Common.Npgsql;
 
 public class NpgsqlOptions
 {
