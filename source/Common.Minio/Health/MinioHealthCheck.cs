@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 using Minio;
 using Minio.DataModel.Args;
 
-namespace CecoChat.Minio.Health;
+namespace Common.Minio.Health;
 
 /// <summary>
 /// Checks the health of MinIO by checking if a bucket exists.
