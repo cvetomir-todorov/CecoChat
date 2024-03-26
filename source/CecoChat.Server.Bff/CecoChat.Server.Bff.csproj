@@ -11,6 +11,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="13.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\CecoChat.Client.Chats\CecoChat.Client.Chats.csproj" />
     <ProjectReference Include="..\CecoChat.Client.User\CecoChat.Client.User.csproj" />
     <ProjectReference Include="..\CecoChat.Contracts.Bff\CecoChat.Contracts.Bff.csproj" />
