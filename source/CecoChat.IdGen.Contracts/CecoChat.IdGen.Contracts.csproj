@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -14,11 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Protobuf Include="Backplane\BackplaneMessage.proto" />
-    <Protobuf Include="Backplane\ConnectionStatus.proto" />
-    <Protobuf Include="Backplane\DeliveryStatus.proto" />
-    <Protobuf Include="Backplane\MessageType.proto" />
-    <Protobuf Include="Uuid.proto" />
+    <Protobuf Include="IdGenService.proto" GrpcServices="All" />
   </ItemGroup>
 
 </Project>

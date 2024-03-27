@@ -18,7 +18,7 @@ public static class IdGenClientRegistrations
         }
 
         services
-            .AddGrpcClient<Contracts.IdGen.IdGen.IdGenClient>(grpc =>
+            .AddGrpcClient<CecoChat.IdGen.Contracts.IdGen.IdGenClient>(grpc =>
             {
                 grpc.Address = options.Address;
             })

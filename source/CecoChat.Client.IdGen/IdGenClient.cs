@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics;
-using CecoChat.Contracts.IdGen;
+using CecoChat.IdGen.Contracts;
 using Common;
 using Grpc.Core;
 using Microsoft.Extensions.Logging;
@@ -22,7 +22,7 @@ internal sealed class IdGenClient : IIdGenClient
 {
     private readonly ILogger _logger;
     private readonly IdGenClientOptions _options;
-    private readonly Contracts.IdGen.IdGen.IdGenClient _client;
+    private readonly CecoChat.IdGen.Contracts.IdGen.IdGenClient _client;
     private readonly IClock _clock;
     private readonly IIdChannel _idChannel;
     private readonly Timer _invalidateIdsTimer;
@@ -33,7 +33,7 @@ internal sealed class IdGenClient : IIdGenClient
     public IdGenClient(
         ILogger<IdGenClient> logger,
         IOptions<IdGenClientOptions> options,
-        Contracts.IdGen.IdGen.IdGenClient client,
+        CecoChat.IdGen.Contracts.IdGen.IdGenClient client,
         IClock clock,
         IIdChannel idChannel)
     {
