@@ -1,3 +1,4 @@
+using CecoChat.Bff.Contracts.Chats;
 using CecoChat.ConsoleClient.LocalStorage;
 using CecoChat.Data;
 using Common;
@@ -6,10 +7,10 @@ namespace CecoChat.ConsoleClient.Api;
 
 public static class Map
 {
-    public static List<Chat> BffChats(Contracts.Bff.Chats.ChatState[] bffChats, long currentUserId)
+    public static List<Chat> BffChats(ChatState[] bffChats, long currentUserId)
     {
         List<Chat> chats = new(capacity: bffChats.Length);
-        foreach (Contracts.Bff.Chats.ChatState bffChat in bffChats)
+        foreach (ChatState bffChat in bffChats)
         {
             long otherUserId = DataUtility.GetOtherUserId(bffChat.ChatId, currentUserId);
             Chat chat = BffChat(bffChat, otherUserId);
@@ -19,7 +20,7 @@ public static class Map
         return chats;
     }
 
-    public static Chat BffChat(Contracts.Bff.Chats.ChatState bffChat, long otherUserId)
+    public static Chat BffChat(ChatState bffChat, long otherUserId)
     {
         return new Chat(otherUserId)
         {
@@ -29,10 +30,10 @@ public static class Map
         };
     }
 
-    public static List<Message> BffMessages(Contracts.Bff.Chats.HistoryMessage[] bffMessages)
+    public static List<Message> BffMessages(HistoryMessage[] bffMessages)
     {
         List<Message> messages = new(bffMessages.Length);
-        foreach (Contracts.Bff.Chats.HistoryMessage bffMessage in bffMessages)
+        foreach (HistoryMessage bffMessage in bffMessages)
         {
             Message message = BffMessage(bffMessage);
             messages.Add(message);
@@ -41,7 +42,7 @@ public static class Map
         return messages;
     }
 
-    public static Message BffMessage(Contracts.Bff.Chats.HistoryMessage bffHistoryMessage)
+    public static Message BffMessage(HistoryMessage bffHistoryMessage)
     {
         Message message = new()
         {
@@ -53,11 +54,11 @@ public static class Map
 
         switch (bffHistoryMessage.Type)
         {
-            case Contracts.Bff.Chats.MessageType.PlainText:
-                message.Type = MessageType.PlainText;
+            case Bff.Contracts.Chats.MessageType.PlainText:
+                message.Type = LocalStorage.MessageType.PlainText;
                 break;
-            case Contracts.Bff.Chats.MessageType.File:
-                message.Type = MessageType.File;
+            case Bff.Contracts.Chats.MessageType.File:
+                message.Type = LocalStorage.MessageType.File;
                 message.FileBucket = bffHistoryMessage.File!.Bucket;
                 message.FilePath = bffHistoryMessage.File!.Path;
                 break;
@@ -76,12 +77,12 @@ public static class Map
         return message;
     }
 
-    public static List<Connection> Connections(Contracts.Bff.Connections.Connection[] bffConnections)
+    public static List<Connection> Connections(Bff.Contracts.Connections.Connection[] bffConnections)
     {
         return bffConnections.Select(Connection).ToList();
     }
 
-    public static Connection Connection(Contracts.Bff.Connections.Connection bffConnection)
+    public static Connection Connection(Bff.Contracts.Connections.Connection bffConnection)
     {
         return new Connection
         {
@@ -91,27 +92,27 @@ public static class Map
         };
     }
 
-    public static ConnectionStatus ConnectionStatus(Contracts.Bff.Connections.ConnectionStatus bffConnectionStatus)
+    public static ConnectionStatus ConnectionStatus(Bff.Contracts.Connections.ConnectionStatus bffConnectionStatus)
     {
         switch (bffConnectionStatus)
         {
-            case Contracts.Bff.Connections.ConnectionStatus.NotConnected:
+            case Bff.Contracts.Connections.ConnectionStatus.NotConnected:
                 return LocalStorage.ConnectionStatus.NotConnected;
-            case Contracts.Bff.Connections.ConnectionStatus.Pending:
+            case Bff.Contracts.Connections.ConnectionStatus.Pending:
                 return LocalStorage.ConnectionStatus.Pending;
-            case Contracts.Bff.Connections.ConnectionStatus.Connected:
+            case Bff.Contracts.Connections.ConnectionStatus.Connected:
                 return LocalStorage.ConnectionStatus.Connected;
             default:
                 throw new EnumValueNotSupportedException(bffConnectionStatus);
         }
     }
 
-    public static List<ProfilePublic> PublicProfiles(Contracts.Bff.Profiles.ProfilePublic[] bffProfiles)
+    public static List<ProfilePublic> PublicProfiles(Bff.Contracts.Profiles.ProfilePublic[] bffProfiles)
     {
         return bffProfiles.Select(PublicProfile).ToList();
     }
 
-    public static ProfilePublic PublicProfile(Contracts.Bff.Profiles.ProfilePublic bffProfile)
+    public static ProfilePublic PublicProfile(Bff.Contracts.Profiles.ProfilePublic bffProfile)
     {
         return new ProfilePublic
         {
@@ -122,12 +123,12 @@ public static class Map
         };
     }
 
-    public static List<FileRef> Files(Contracts.Bff.Files.FileRef[] bffFiles)
+    public static List<FileRef> Files(Bff.Contracts.Files.FileRef[] bffFiles)
     {
         return bffFiles.Select(File).ToList();
     }
 
-    public static FileRef File(Contracts.Bff.Files.FileRef bffFile)
+    public static FileRef File(Bff.Contracts.Files.FileRef bffFile)
     {
         return new FileRef
         {

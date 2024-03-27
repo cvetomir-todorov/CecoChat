@@ -1,4 +1,4 @@
-using CecoChat.Contracts.Bff.Profiles;
+using CecoChat.Bff.Contracts.Profiles;
 using CecoChat.Data;
 using FluentValidation;
 

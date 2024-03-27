@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using Refit;
 
-namespace CecoChat.Contracts.Bff.Files;
+namespace CecoChat.Bff.Contracts.Files;
 
 public sealed class GetUserFilesRequest
 {

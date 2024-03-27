@@ -1,5 +1,5 @@
 using AutoMapper;
-using CecoChat.Contracts.Bff.Profiles;
+using CecoChat.Bff.Contracts.Profiles;
 using CecoChat.Server.Identity;
 using CecoChat.User.Client;
 using Common.AspNet.ModelBinding;

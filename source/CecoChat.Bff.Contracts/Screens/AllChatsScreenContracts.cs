@@ -1,11 +1,11 @@
 using System.Text.Json.Serialization;
-using CecoChat.Contracts.Bff.Chats;
-using CecoChat.Contracts.Bff.Connections;
-using CecoChat.Contracts.Bff.Files;
-using CecoChat.Contracts.Bff.Profiles;
+using CecoChat.Bff.Contracts.Chats;
+using CecoChat.Bff.Contracts.Connections;
+using CecoChat.Bff.Contracts.Files;
+using CecoChat.Bff.Contracts.Profiles;
 using Refit;
 
-namespace CecoChat.Contracts.Bff.Screens;
+namespace CecoChat.Bff.Contracts.Screens;
 
 public sealed class GetAllChatsScreenRequest
 {

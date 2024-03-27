@@ -1,5 +1,5 @@
+using CecoChat.Bff.Contracts.Chats;
 using CecoChat.Chats.Client;
-using CecoChat.Contracts.Bff.Chats;
 using CecoChat.Server.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

@@ -1,10 +1,10 @@
 using AutoMapper;
+using CecoChat.Bff.Contracts.Chats;
+using CecoChat.Bff.Contracts.Connections;
+using CecoChat.Bff.Contracts.Files;
+using CecoChat.Bff.Contracts.Profiles;
+using CecoChat.Bff.Contracts.Screens;
 using CecoChat.Chats.Client;
-using CecoChat.Contracts.Bff.Chats;
-using CecoChat.Contracts.Bff.Connections;
-using CecoChat.Contracts.Bff.Files;
-using CecoChat.Contracts.Bff.Profiles;
-using CecoChat.Contracts.Bff.Screens;
 using CecoChat.Server.Identity;
 using CecoChat.User.Client;
 using Microsoft.AspNetCore.Authorization;

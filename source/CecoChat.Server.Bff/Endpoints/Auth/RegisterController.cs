@@ -1,5 +1,5 @@
 using AutoMapper;
-using CecoChat.Contracts.Bff.Auth;
+using CecoChat.Bff.Contracts.Auth;
 using CecoChat.User.Client;
 using Common;
 using Microsoft.AspNetCore.Authorization;

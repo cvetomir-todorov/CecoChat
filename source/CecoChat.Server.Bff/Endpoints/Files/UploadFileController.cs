@@ -1,5 +1,5 @@
-using CecoChat.Contracts.Bff;
-using CecoChat.Contracts.Bff.Files;
+using CecoChat.Bff.Contracts;
+using CecoChat.Bff.Contracts.Files;
 using CecoChat.Data;
 using CecoChat.Server.Bff.Files;
 using CecoChat.Server.Identity;

@@ -3,7 +3,7 @@ using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
 using Refit;
 
-namespace CecoChat.Contracts.Bff.Chats;
+namespace CecoChat.Bff.Contracts.Chats;
 
 public sealed class GetChatHistoryRequest
 {

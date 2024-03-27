@@ -3,7 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using AutoMapper;
-using CecoChat.Contracts.Bff.Auth;
+using CecoChat.Bff.Contracts.Auth;
 using CecoChat.DynamicConfig.Sections.Partitioning;
 using CecoChat.Server.Backplane;
 using CecoChat.User.Client;

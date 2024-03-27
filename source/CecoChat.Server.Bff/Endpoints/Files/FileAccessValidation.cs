@@ -1,4 +1,4 @@
-using CecoChat.Contracts.Bff.Files;
+using CecoChat.Bff.Contracts.Files;
 using CecoChat.Data;
 using FluentValidation;
 

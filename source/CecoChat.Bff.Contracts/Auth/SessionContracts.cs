@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using Refit;
 
-namespace CecoChat.Contracts.Bff.Auth;
+namespace CecoChat.Bff.Contracts.Auth;
 
 public sealed class ProfileFull
 {

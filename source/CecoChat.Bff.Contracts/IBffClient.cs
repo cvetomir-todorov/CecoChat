@@ -1,12 +1,12 @@
-using CecoChat.Contracts.Bff.Auth;
-using CecoChat.Contracts.Bff.Chats;
-using CecoChat.Contracts.Bff.Connections;
-using CecoChat.Contracts.Bff.Files;
-using CecoChat.Contracts.Bff.Profiles;
-using CecoChat.Contracts.Bff.Screens;
+using CecoChat.Bff.Contracts.Auth;
+using CecoChat.Bff.Contracts.Chats;
+using CecoChat.Bff.Contracts.Connections;
+using CecoChat.Bff.Contracts.Files;
+using CecoChat.Bff.Contracts.Profiles;
+using CecoChat.Bff.Contracts.Screens;
 using Refit;
 
-namespace CecoChat.Contracts.Bff;
+namespace CecoChat.Bff.Contracts;
 
 public interface IBffClient : IDisposable
 {

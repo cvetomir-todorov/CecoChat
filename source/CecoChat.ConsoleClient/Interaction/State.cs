@@ -110,7 +110,7 @@ public abstract class State
         Console.WriteLine("Sending file {0} with content type {1}...", filePath, contentType);
         await using Stream fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
         string fileName = Path.GetFileName(filePath);
-        ClientResponse<Contracts.Bff.Files.UploadFileResponse> response = await Client.UploadFile(fileStream, fileName, contentType, allowedUserId);
+        ClientResponse<Bff.Contracts.Files.UploadFileResponse> response = await Client.UploadFile(fileStream, fileName, contentType, allowedUserId);
 
         if (!response.Success)
         {

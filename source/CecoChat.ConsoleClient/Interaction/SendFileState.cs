@@ -83,7 +83,7 @@ public sealed class SendFileState : State
         int index = keyInfo.KeyChar - '0';
         FileRef chosenFile = userFiles[index];
 
-        ClientResponse<Contracts.Bff.Files.AddFileAccessResponse> response = await Client.AddFileAccess(chosenFile.Bucket, chosenFile.Path, chosenFile.Version, allowedUserId: Context.UserId);
+        ClientResponse<Bff.Contracts.Files.AddFileAccessResponse> response = await Client.AddFileAccess(chosenFile.Bucket, chosenFile.Path, chosenFile.Version, allowedUserId: Context.UserId);
         if (!response.Success)
         {
             DisplayErrors(response);
