@@ -1,7 +1,7 @@
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 
-namespace CecoChat.Data.Chats.Telemetry;
+namespace CecoChat.Chats.Data.Telemetry;
 
 public static class ChatsRegistrations
 {

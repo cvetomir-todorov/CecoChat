@@ -4,7 +4,7 @@ using CecoChat.Chats.Contracts;
 using Common;
 using Microsoft.Extensions.Logging;
 
-namespace CecoChat.Data.Chats.Entities.UserChats;
+namespace CecoChat.Chats.Data.Entities.UserChats;
 
 public interface IUserChatsRepo : IDisposable
 {

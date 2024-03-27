@@ -1,7 +1,7 @@
 ﻿using CecoChat.Chats.Contracts;
 using Common;
 
-namespace CecoChat.Data.Chats.Entities.ChatMessages;
+namespace CecoChat.Chats.Data.Entities.ChatMessages;
 
 internal sealed class DbFileData
 {

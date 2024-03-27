@@ -1,10 +1,11 @@
 using System.Diagnostics.CodeAnalysis;
 using Cassandra;
 using CecoChat.Chats.Contracts;
+using CecoChat.Data;
 using Common;
 using Microsoft.Extensions.Logging;
 
-namespace CecoChat.Data.Chats.Entities.ChatMessages;
+namespace CecoChat.Chats.Data.Entities.ChatMessages;
 
 public interface IChatMessageRepo : IDisposable
 {

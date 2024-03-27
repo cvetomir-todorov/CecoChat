@@ -3,7 +3,7 @@ using Common.Cassandra;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace CecoChat.Data.Chats;
+namespace CecoChat.Chats.Data;
 
 public interface IChatsDbContext : ICassandraDbContext
 {

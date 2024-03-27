@@ -1,10 +1,10 @@
 using System.Reflection;
 using Autofac;
 using Calzolari.Grpc.AspNetCore.Validation;
+using CecoChat.Chats.Data;
+using CecoChat.Chats.Data.Telemetry;
 using CecoChat.Client.Config;
 using CecoChat.Contracts.Backplane;
-using CecoChat.Data.Chats;
-using CecoChat.Data.Chats.Telemetry;
 using CecoChat.DynamicConfig;
 using CecoChat.Server.Backplane;
 using CecoChat.Server.Chats.Backplane;

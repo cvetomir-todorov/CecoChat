@@ -1,12 +1,12 @@
 ﻿using Autofac;
-using CecoChat.Data.Chats.Entities.ChatMessages;
-using CecoChat.Data.Chats.Entities.UserChats;
+using CecoChat.Chats.Data.Entities.ChatMessages;
+using CecoChat.Chats.Data.Entities.UserChats;
 using Common.Autofac;
 using Common.Cassandra;
 using Common.Cassandra.Telemetry;
 using Microsoft.Extensions.Configuration;
 
-namespace CecoChat.Data.Chats;
+namespace CecoChat.Chats.Data;
 
 public sealed class ChatsDbAutofacModule : Module
 {

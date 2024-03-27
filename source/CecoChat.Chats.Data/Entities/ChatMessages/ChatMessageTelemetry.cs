@@ -1,8 +1,8 @@
 ﻿using Cassandra;
-using CecoChat.Data.Chats.Telemetry;
+using CecoChat.Chats.Data.Telemetry;
 using Common.Cassandra.Telemetry;
 
-namespace CecoChat.Data.Chats.Entities.ChatMessages;
+namespace CecoChat.Chats.Data.Entities.ChatMessages;
 
 internal interface IChatMessageTelemetry : IDisposable
 {

@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using System.Reflection;
 
-namespace CecoChat.Data.Chats.Telemetry;
+namespace CecoChat.Chats.Data.Telemetry;
 
 internal static class ChatsInstrumentation
 {
