@@ -3,7 +3,7 @@ using Google.Protobuf.WellKnownTypes;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace CecoChat.Data.User.Entities.Files;
+namespace CecoChat.User.Data.Entities.Files;
 
 internal sealed class FileQueryRepo : IFileQueryRepo
 {

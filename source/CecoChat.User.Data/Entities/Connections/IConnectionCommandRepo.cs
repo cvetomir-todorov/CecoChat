@@ -1,6 +1,6 @@
 using CecoChat.User.Contracts;
 
-namespace CecoChat.Data.User.Entities.Connections;
+namespace CecoChat.User.Data.Entities.Connections;
 
 public interface IConnectionCommandRepo
 {

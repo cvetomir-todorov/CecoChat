@@ -1,6 +1,6 @@
 using CecoChat.User.Contracts;
 
-namespace CecoChat.Data.User.Entities.Profiles;
+namespace CecoChat.User.Data.Entities.Profiles;
 
 public interface IProfileCommandRepo
 {

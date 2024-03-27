@@ -1,6 +1,6 @@
 using Common.Redis;
 
-namespace CecoChat.Data.User;
+namespace CecoChat.User.Data;
 
 public sealed class UserCacheOptions
 {

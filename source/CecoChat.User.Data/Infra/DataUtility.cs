@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
-namespace CecoChat.Data.User.Infra;
+namespace CecoChat.User.Data.Infra;
 
 internal interface IDataUtility
 {

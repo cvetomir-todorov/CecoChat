@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace CecoChat.Data.User;
+namespace CecoChat.User.Data;
 
 public class UserDbContext : DbContext
 {

@@ -1,11 +1,11 @@
-using CecoChat.Data.User.Infra;
 using CecoChat.User.Contracts;
+using CecoChat.User.Data.Infra;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Logging;
 using Npgsql;
 
-namespace CecoChat.Data.User.Entities.Profiles;
+namespace CecoChat.User.Data.Entities.Profiles;
 
 internal class ProfileCommandRepo : IProfileCommandRepo
 {

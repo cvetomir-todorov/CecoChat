@@ -1,7 +1,7 @@
 using CecoChat.User.Contracts;
 using Google.Protobuf.WellKnownTypes;
 
-namespace CecoChat.Data.User.Infra;
+namespace CecoChat.User.Data.Infra;
 
 public class AutoMapperProfile : AutoMapper.Profile
 {

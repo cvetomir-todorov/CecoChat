@@ -1,7 +1,7 @@
-using CecoChat.Data.User.Entities.Profiles;
 using CecoChat.Server.Identity;
 using CecoChat.Server.User.Security;
 using CecoChat.User.Contracts;
+using CecoChat.User.Data.Entities.Profiles;
 using Common;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;

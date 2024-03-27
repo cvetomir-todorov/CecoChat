@@ -1,12 +1,12 @@
-using CecoChat.Data.User.Infra;
 using CecoChat.User.Contracts;
+using CecoChat.User.Data.Infra;
 using Common;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.Extensions.Logging;
 using Npgsql;
 
-namespace CecoChat.Data.User.Entities.Connections;
+namespace CecoChat.User.Data.Entities.Connections;
 
 internal class ConnectionCommandRepo : IConnectionCommandRepo
 {

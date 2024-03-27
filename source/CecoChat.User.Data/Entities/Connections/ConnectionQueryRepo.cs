@@ -4,7 +4,7 @@ using Google.Protobuf.WellKnownTypes;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace CecoChat.Data.User.Entities.Connections;
+namespace CecoChat.User.Data.Entities.Connections;
 
 internal class ConnectionQueryRepo : IConnectionQueryRepo
 {

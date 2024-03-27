@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 using Npgsql;
 using NpgsqlTypes;
 
-namespace CecoChat.Data.User.Entities.Files;
+namespace CecoChat.User.Data.Entities.Files;
 
 internal class FileCommandRepo : IFileCommandRepo
 {

@@ -2,7 +2,7 @@ using Common.Npgsql;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace CecoChat.Data.User;
+namespace CecoChat.User.Data;
 
 public static class UserDbRegistrations
 {

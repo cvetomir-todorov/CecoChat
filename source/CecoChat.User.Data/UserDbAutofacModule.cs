@@ -1,14 +1,14 @@
 using Autofac;
-using CecoChat.Data.User.Entities.Connections;
-using CecoChat.Data.User.Entities.Files;
-using CecoChat.Data.User.Entities.Profiles;
-using CecoChat.Data.User.Infra;
+using CecoChat.User.Data.Entities.Connections;
+using CecoChat.User.Data.Entities.Files;
+using CecoChat.User.Data.Entities.Profiles;
+using CecoChat.User.Data.Infra;
 using Common.Autofac;
 using Common.Npgsql;
 using Common.Redis;
 using Microsoft.Extensions.Configuration;
 
-namespace CecoChat.Data.User;
+namespace CecoChat.User.Data;
 
 public class UserDbAutofacModule : Module
 {
