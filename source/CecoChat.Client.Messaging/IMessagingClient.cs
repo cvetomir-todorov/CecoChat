@@ -1,4 +1,4 @@
-using CecoChat.Contracts.Messaging;
+using CecoChat.Messaging.Contracts;
 
 namespace CecoChat.Client.Messaging;
 

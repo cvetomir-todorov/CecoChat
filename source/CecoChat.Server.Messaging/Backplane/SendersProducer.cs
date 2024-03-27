@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 using CecoChat.Contracts.Backplane;
-using CecoChat.Contracts.Messaging;
+using CecoChat.Messaging.Contracts;
 using CecoChat.Server.Backplane;
 using CecoChat.Server.Messaging.Clients;
 using CecoChat.Server.Messaging.Telemetry;
@@ -91,13 +91,15 @@ public sealed class SendersProducer : ISendersProducer
             UpdateMetrics(backplaneMessage);
         }
 
-        Contracts.Messaging.DeliveryStatus deliveryStatus = isDelivered ? Contracts.Messaging.DeliveryStatus.Processed : Contracts.Messaging.DeliveryStatus.Lost;
+        CecoChat.Messaging.Contracts.DeliveryStatus deliveryStatus = isDelivered ?
+            CecoChat.Messaging.Contracts.DeliveryStatus.Processed :
+            CecoChat.Messaging.Contracts.DeliveryStatus.Lost;
         ListenNotification notification = new()
         {
             MessageId = backplaneMessage.MessageId,
             SenderId = backplaneMessage.SenderId,
             ReceiverId = backplaneMessage.ReceiverId,
-            Type = Contracts.Messaging.MessageType.DeliveryStatus,
+            Type = CecoChat.Messaging.Contracts.MessageType.DeliveryStatus,
             DeliveryStatus = deliveryStatus
         };
 

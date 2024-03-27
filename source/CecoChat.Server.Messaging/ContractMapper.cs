@@ -1,5 +1,5 @@
 using CecoChat.Contracts.Backplane;
-using CecoChat.Contracts.Messaging;
+using CecoChat.Messaging.Contracts;
 using Common;
 
 namespace CecoChat.Server.Messaging;
@@ -135,7 +135,7 @@ public class ContractMapper : IContractMapper
             MessageId = messageId,
             SenderId = senderId,
             ReceiverId = request.ReceiverId,
-            Type = Contracts.Messaging.MessageType.PlainText,
+            Type = CecoChat.Messaging.Contracts.MessageType.PlainText,
             PlainText = new NotificationPlainText
             {
                 Text = request.Text
@@ -152,7 +152,7 @@ public class ContractMapper : IContractMapper
             MessageId = messageId,
             SenderId = senderId,
             ReceiverId = request.ReceiverId,
-            Type = Contracts.Messaging.MessageType.File,
+            Type = CecoChat.Messaging.Contracts.MessageType.File,
             File = new NotificationFile
             {
                 Text = request.Text,
@@ -171,7 +171,7 @@ public class ContractMapper : IContractMapper
             MessageId = request.MessageId,
             SenderId = request.SenderId,
             ReceiverId = request.ReceiverId,
-            Type = Contracts.Messaging.MessageType.Reaction,
+            Type = CecoChat.Messaging.Contracts.MessageType.Reaction,
             Reaction = new NotificationReaction
             {
                 ReactorId = reactorId,
@@ -189,7 +189,7 @@ public class ContractMapper : IContractMapper
             MessageId = request.MessageId,
             SenderId = request.SenderId,
             ReceiverId = request.ReceiverId,
-            Type = Contracts.Messaging.MessageType.Reaction,
+            Type = CecoChat.Messaging.Contracts.MessageType.Reaction,
             Reaction = new NotificationReaction
             {
                 ReactorId = reactorId
@@ -231,7 +231,7 @@ public class ContractMapper : IContractMapper
 
     private static void SetPlainText(BackplaneMessage backplaneMessage, ListenNotification notification)
     {
-        notification.Type = Contracts.Messaging.MessageType.PlainText;
+        notification.Type = CecoChat.Messaging.Contracts.MessageType.PlainText;
         notification.PlainText = new NotificationPlainText
         {
             Text = backplaneMessage.PlainText.Text
@@ -240,7 +240,7 @@ public class ContractMapper : IContractMapper
 
     private static void SetFile(BackplaneMessage backplaneMessage, ListenNotification notification)
     {
-        notification.Type = Contracts.Messaging.MessageType.File;
+        notification.Type = CecoChat.Messaging.Contracts.MessageType.File;
         notification.File = new NotificationFile
         {
             Text = backplaneMessage.File.Text,
@@ -251,7 +251,7 @@ public class ContractMapper : IContractMapper
 
     private static void SetReaction(BackplaneMessage backplaneMessage, ListenNotification notification)
     {
-        notification.Type = Contracts.Messaging.MessageType.Reaction;
+        notification.Type = CecoChat.Messaging.Contracts.MessageType.Reaction;
         notification.Reaction = new NotificationReaction
         {
             ReactorId = backplaneMessage.Reaction.ReactorId,
@@ -261,23 +261,23 @@ public class ContractMapper : IContractMapper
 
     private static void SetConnection(BackplaneMessage backplaneMessage, ListenNotification notification)
     {
-        Contracts.Messaging.ConnectionStatus status;
+        CecoChat.Messaging.Contracts.ConnectionStatus status;
         switch (backplaneMessage.Connection.Status)
         {
             case Contracts.Backplane.ConnectionStatus.NotConnected:
-                status = Contracts.Messaging.ConnectionStatus.NotConnected;
+                status = CecoChat.Messaging.Contracts.ConnectionStatus.NotConnected;
                 break;
             case Contracts.Backplane.ConnectionStatus.Pending:
-                status = Contracts.Messaging.ConnectionStatus.Pending;
+                status = CecoChat.Messaging.Contracts.ConnectionStatus.Pending;
                 break;
             case Contracts.Backplane.ConnectionStatus.Connected:
-                status = Contracts.Messaging.ConnectionStatus.Connected;
+                status = CecoChat.Messaging.Contracts.ConnectionStatus.Connected;
                 break;
             default:
                 throw new EnumValueNotSupportedException(backplaneMessage.Connection.Status);
         }
 
-        notification.Type = Contracts.Messaging.MessageType.Connection;
+        notification.Type = CecoChat.Messaging.Contracts.MessageType.Connection;
         notification.Connection = new NotificationConnection
         {
             Status = status,

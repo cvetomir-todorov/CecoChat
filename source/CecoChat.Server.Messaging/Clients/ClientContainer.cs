@@ -1,7 +1,7 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Globalization;
-using CecoChat.Contracts.Messaging;
+using CecoChat.Messaging.Contracts;
 using CecoChat.Server.Messaging.Endpoints;
 using CecoChat.Server.Messaging.Telemetry;
 using Common.AspNet.SignalR.Telemetry;

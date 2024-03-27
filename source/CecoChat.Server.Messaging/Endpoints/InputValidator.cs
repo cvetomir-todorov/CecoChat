@@ -1,5 +1,5 @@
-using CecoChat.Contracts.Messaging;
 using CecoChat.Data;
+using CecoChat.Messaging.Contracts;
 using FluentValidation;
 
 namespace CecoChat.Server.Messaging.Endpoints;

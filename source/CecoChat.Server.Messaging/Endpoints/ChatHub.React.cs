@@ -1,5 +1,5 @@
 using CecoChat.Contracts.Backplane;
-using CecoChat.Contracts.Messaging;
+using CecoChat.Messaging.Contracts;
 using CecoChat.Server.Identity;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Authorization;

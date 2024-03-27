@@ -1,4 +1,4 @@
-namespace CecoChat.Contracts.Messaging;
+namespace CecoChat.Messaging.Contracts;
 
 public enum MessageType
 {

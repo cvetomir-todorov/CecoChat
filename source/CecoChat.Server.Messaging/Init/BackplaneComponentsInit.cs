@@ -1,5 +1,5 @@
-﻿using CecoChat.Contracts.Messaging;
-using CecoChat.DynamicConfig.Sections.Partitioning;
+﻿using CecoChat.DynamicConfig.Sections.Partitioning;
+using CecoChat.Messaging.Contracts;
 using CecoChat.Server.Backplane;
 using CecoChat.Server.Messaging.Backplane;
 using CecoChat.Server.Messaging.Clients;

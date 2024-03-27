@@ -1,5 +1,5 @@
-using CecoChat.Contracts.Messaging;
 using CecoChat.Data;
+using CecoChat.Messaging.Contracts;
 using Common;
 
 namespace CecoChat.ConsoleClient.LocalStorage;
@@ -19,9 +19,9 @@ public class ChangeHandler
 
     public void HandlePlainTextMessage(ListenNotification notification)
     {
-        if (notification.Type != Contracts.Messaging.MessageType.PlainText)
+        if (notification.Type != Messaging.Contracts.MessageType.PlainText)
         {
-            throw new InvalidOperationException($"Notification {notification} should have type {Contracts.Messaging.MessageType.PlainText}.");
+            throw new InvalidOperationException($"Notification {notification} should have type {Messaging.Contracts.MessageType.PlainText}.");
         }
         if (notification.PlainText == null)
         {
@@ -42,9 +42,9 @@ public class ChangeHandler
 
     public void HandleFileMessage(ListenNotification notification)
     {
-        if (notification.Type != Contracts.Messaging.MessageType.File)
+        if (notification.Type != Messaging.Contracts.MessageType.File)
         {
-            throw new InvalidOperationException($"Notification {notification} should have type {Contracts.Messaging.MessageType.File}.");
+            throw new InvalidOperationException($"Notification {notification} should have type {Messaging.Contracts.MessageType.File}.");
         }
         if (notification.File == null)
         {
@@ -67,9 +67,9 @@ public class ChangeHandler
 
     public void UpdateDeliveryStatus(ListenNotification notification)
     {
-        if (notification.Type != Contracts.Messaging.MessageType.DeliveryStatus)
+        if (notification.Type != Messaging.Contracts.MessageType.DeliveryStatus)
         {
-            throw new InvalidOperationException($"Notification {notification} should have type {Contracts.Messaging.MessageType.DeliveryStatus}.");
+            throw new InvalidOperationException($"Notification {notification} should have type {Messaging.Contracts.MessageType.DeliveryStatus}.");
         }
 
         if (!_messageStorage.TryGetChat(notification.SenderId, notification.ReceiverId, out Chat? chat))
@@ -100,9 +100,9 @@ public class ChangeHandler
 
     public void HandleReaction(ListenNotification notification)
     {
-        if (notification.Type != Contracts.Messaging.MessageType.Reaction)
+        if (notification.Type != Messaging.Contracts.MessageType.Reaction)
         {
-            throw new InvalidOperationException($"Notification {notification} should have type {Contracts.Messaging.MessageType.Reaction}.");
+            throw new InvalidOperationException($"Notification {notification} should have type {Messaging.Contracts.MessageType.Reaction}.");
         }
         if (notification.Reaction == null)
         {
@@ -130,9 +130,9 @@ public class ChangeHandler
 
     public void HandleConnectionChange(ListenNotification notification)
     {
-        if (notification.Type != Contracts.Messaging.MessageType.Connection)
+        if (notification.Type != Messaging.Contracts.MessageType.Connection)
         {
-            throw new InvalidOperationException($"Notification {notification} should have type {Contracts.Messaging.MessageType.Connection}.");
+            throw new InvalidOperationException($"Notification {notification} should have type {Messaging.Contracts.MessageType.Connection}.");
         }
         if (notification.Connection == null)
         {
@@ -142,13 +142,13 @@ public class ChangeHandler
         ConnectionStatus status;
         switch (notification.Connection.Status)
         {
-            case Contracts.Messaging.ConnectionStatus.NotConnected:
+            case Messaging.Contracts.ConnectionStatus.NotConnected:
                 status = ConnectionStatus.NotConnected;
                 break;
-            case Contracts.Messaging.ConnectionStatus.Pending:
+            case Messaging.Contracts.ConnectionStatus.Pending:
                 status = ConnectionStatus.Pending;
                 break;
-            case Contracts.Messaging.ConnectionStatus.Connected:
+            case Messaging.Contracts.ConnectionStatus.Connected:
                 status = ConnectionStatus.Connected;
                 break;
             default:
