@@ -1,7 +1,7 @@
-﻿using CecoChat.Client.Messaging;
-using CecoChat.ConsoleClient.Api;
+﻿using CecoChat.ConsoleClient.Api;
 using CecoChat.ConsoleClient.Interaction;
 using CecoChat.ConsoleClient.LocalStorage;
+using CecoChat.Messaging.Client;
 
 namespace CecoChat.ConsoleClient;
 

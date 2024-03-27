@@ -1,6 +1,6 @@
 using CecoChat.Messaging.Contracts;
 
-namespace CecoChat.Client.Messaging;
+namespace CecoChat.Messaging.Client;
 
 public interface IMessagingClient : IAsyncDisposable
 {

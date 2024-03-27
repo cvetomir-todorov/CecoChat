@@ -3,7 +3,7 @@ using Common;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace CecoChat.Client.Messaging;
+namespace CecoChat.Messaging.Client;
 
 public sealed class MessagingClient : IMessagingClient
 {
