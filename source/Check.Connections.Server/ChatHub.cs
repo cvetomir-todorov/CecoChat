@@ -1,4 +1,4 @@
-using CecoChat.Contracts.Messaging;
+using CecoChat.Messaging.Contracts;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Check.Connections.Server;

@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Check.Connections.Client", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libs", "Libs", "{0437A04A-6168-4697-A90B-A926411A4432}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CecoChat.Contracts.Messaging", "CecoChat.Contracts.Messaging\CecoChat.Contracts.Messaging.csproj", "{EB7FD887-03F3-42B3-BAB4-D378EFF61518}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CecoChat.Messaging.Contracts", "CecoChat.Messaging.Contracts\CecoChat.Messaging.Contracts.csproj", "{EB7FD887-03F3-42B3-BAB4-D378EFF61518}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
