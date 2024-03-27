@@ -17,7 +17,7 @@ public static class ChatsClientRegistrations
             throw new ArgumentNullException(nameof(options), $"{nameof(options.Retry)}");
         }
 
-        services.AddGrpcClient<Contracts.Chats.Chats.ChatsClient>(grpc =>
+        services.AddGrpcClient<CecoChat.Chats.Contracts.Chats.ChatsClient>(grpc =>
             {
                 grpc.Address = options.Address;
             })

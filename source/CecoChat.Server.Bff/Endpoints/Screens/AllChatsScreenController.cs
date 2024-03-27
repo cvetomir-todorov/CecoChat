@@ -58,13 +58,13 @@ public class AllChatsScreenController : ControllerBase
             return Unauthorized();
         }
 
-        Task<IReadOnlyCollection<Contracts.Chats.ChatState>> chatsTask = _chatsClient.GetUserChats(userClaims.UserId, request.ChatsNewerThan, accessToken, ct);
+        Task<IReadOnlyCollection<CecoChat.Chats.Contracts.ChatState>> chatsTask = _chatsClient.GetUserChats(userClaims.UserId, request.ChatsNewerThan, accessToken, ct);
         Task<IReadOnlyCollection<Contracts.User.Connection>> connectionsTask = _connectionClient.GetConnections(userClaims.UserId, accessToken, ct);
         Task<IReadOnlyCollection<Contracts.User.FileRef>> filesTask = _fileClient.GetUserFiles(userClaims.UserId, request.FilesNewerThan, accessToken, ct);
 
         await Task.WhenAll(chatsTask, connectionsTask, filesTask);
 
-        IReadOnlyCollection<Contracts.Chats.ChatState> serviceChats = chatsTask.Result;
+        IReadOnlyCollection<CecoChat.Chats.Contracts.ChatState> serviceChats = chatsTask.Result;
         IReadOnlyCollection<Contracts.User.Connection> serviceConnections = connectionsTask.Result;
         IReadOnlyCollection<Contracts.User.FileRef> serviceFiles = filesTask.Result;
 
@@ -86,7 +86,7 @@ public class AllChatsScreenController : ControllerBase
 
     private async Task<ProfilePublic[]> GetProfiles(
         bool includeProfiles,
-        IReadOnlyCollection<Contracts.Chats.ChatState> chats,
+        IReadOnlyCollection<CecoChat.Chats.Contracts.ChatState> chats,
         IReadOnlyCollection<Contracts.User.Connection> connections,
         UserClaims userClaims,
         string accessToken,

@@ -1,6 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Cassandra;
-using CecoChat.Contracts.Chats;
+using CecoChat.Chats.Contracts;
 using Common;
 using Microsoft.Extensions.Logging;
 

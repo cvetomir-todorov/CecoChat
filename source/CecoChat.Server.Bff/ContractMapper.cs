@@ -5,14 +5,14 @@ namespace CecoChat.Server.Bff;
 
 public interface IContractMapper
 {
-    ChatState MapChat(Contracts.Chats.ChatState fromService);
+    ChatState MapChat(CecoChat.Chats.Contracts.ChatState fromService);
 
-    HistoryMessage MapMessage(Contracts.Chats.HistoryMessage fromService);
+    HistoryMessage MapMessage(CecoChat.Chats.Contracts.HistoryMessage fromService);
 }
 
 public class ContractMapper : IContractMapper
 {
-    public ChatState MapChat(Contracts.Chats.ChatState fromService)
+    public ChatState MapChat(CecoChat.Chats.Contracts.ChatState fromService)
     {
         return new ChatState
         {
@@ -23,7 +23,7 @@ public class ContractMapper : IContractMapper
         };
     }
 
-    public HistoryMessage MapMessage(Contracts.Chats.HistoryMessage fromService)
+    public HistoryMessage MapMessage(CecoChat.Chats.Contracts.HistoryMessage fromService)
     {
         HistoryMessage toClient = new()
         {
@@ -35,10 +35,10 @@ public class ContractMapper : IContractMapper
 
         switch (fromService.DataType)
         {
-            case Contracts.Chats.DataType.PlainText:
+            case Chats.Contracts.DataType.PlainText:
                 toClient.Type = MessageType.PlainText;
                 break;
-            case Contracts.Chats.DataType.File:
+            case Chats.Contracts.DataType.File:
                 toClient.Type = MessageType.File;
                 toClient.File = new FileData
                 {

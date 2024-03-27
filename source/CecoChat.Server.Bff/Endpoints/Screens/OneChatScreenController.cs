@@ -56,7 +56,7 @@ public class OneChatScreenController : ControllerBase
 
         LinkedList<Task> tasks = new();
 
-        Task<IReadOnlyCollection<Contracts.Chats.HistoryMessage>> messagesTask = _chatsClient.GetChatHistory(userClaims.UserId, request.OtherUserId, request.MessagesOlderThan, accessToken, ct);
+        Task<IReadOnlyCollection<CecoChat.Chats.Contracts.HistoryMessage>> messagesTask = _chatsClient.GetChatHistory(userClaims.UserId, request.OtherUserId, request.MessagesOlderThan, accessToken, ct);
         tasks.AddLast(messagesTask);
 
         Task<Contracts.User.ProfilePublic?>? profileTask = null;
@@ -75,7 +75,7 @@ public class OneChatScreenController : ControllerBase
 
         await Task.WhenAll(tasks);
 
-        IReadOnlyCollection<Contracts.Chats.HistoryMessage> serviceMessages = messagesTask.Result;
+        IReadOnlyCollection<CecoChat.Chats.Contracts.HistoryMessage> serviceMessages = messagesTask.Result;
         HistoryMessage[] messages = serviceMessages.Select(message => _contractMapper.MapMessage(message)).ToArray();
 
         ProfilePublic? profile = null;

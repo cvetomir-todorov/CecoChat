@@ -40,7 +40,7 @@ public class ChatsController : ControllerBase
             return Unauthorized();
         }
 
-        IReadOnlyCollection<Contracts.Chats.HistoryMessage> serviceMessages = await _chatsClient.GetChatHistory(userClaims.UserId, request.OtherUserId, request.OlderThan, accessToken, ct);
+        IReadOnlyCollection<CecoChat.Chats.Contracts.HistoryMessage> serviceMessages = await _chatsClient.GetChatHistory(userClaims.UserId, request.OtherUserId, request.OlderThan, accessToken, ct);
         HistoryMessage[] clientMessages = serviceMessages.Select(message => _contractMapper.MapMessage(message)).ToArray();
 
         _logger.LogTrace("Responding with {MessageCount} message(s) for chat between {UserId} and {OtherUserId} older than {OlderThan}",
@@ -64,7 +64,7 @@ public class ChatsController : ControllerBase
             return Unauthorized();
         }
 
-        IReadOnlyCollection<Contracts.Chats.ChatState> serviceChats = await _chatsClient.GetUserChats(userClaims.UserId, request.NewerThan, accessToken, ct);
+        IReadOnlyCollection<CecoChat.Chats.Contracts.ChatState> serviceChats = await _chatsClient.GetUserChats(userClaims.UserId, request.NewerThan, accessToken, ct);
         ChatState[] clientChats = serviceChats.Select(chat => _contractMapper.MapChat(chat)).ToArray();
 
         _logger.LogTrace("Responding with {ChatCount} chats for user {UserId} which are newer than {NewerThan}",

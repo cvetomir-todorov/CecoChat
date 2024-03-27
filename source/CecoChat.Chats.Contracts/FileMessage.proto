@@ -1,6 +1,6 @@
 syntax = "proto3";
-option csharp_namespace = "CecoChat.Contracts.Chats";
-package CecoChat.Contracts.Chats;
+option csharp_namespace = "CecoChat.Chats.Contracts";
+package CecoChat.Chats.Contracts;
 
 message FileMessage {
   int64 message_id = 1;

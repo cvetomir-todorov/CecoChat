@@ -1,5 +1,5 @@
-﻿using CecoChat.Contracts.Backplane;
-using CecoChat.Contracts.Chats;
+﻿using CecoChat.Chats.Contracts;
+using CecoChat.Contracts.Backplane;
 using CecoChat.Data.Chats.Entities.ChatMessages;
 using CecoChat.Server.Backplane;
 using Common;

@@ -1,8 +1,0 @@
-syntax = "proto3";
-option csharp_namespace = "CecoChat.Contracts.Chats";
-package CecoChat.Contracts.Chats;
-
-enum DataType {
-  PLAIN_TEXT = 0;
-  FILE = 1;
-}

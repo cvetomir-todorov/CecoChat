@@ -1,4 +1,4 @@
-using CecoChat.Contracts.Chats;
+using CecoChat.Chats.Contracts;
 using Common;
 using Common.Grpc;
 using Google.Protobuf.WellKnownTypes;
@@ -19,13 +19,13 @@ internal sealed class ChatsClient : IChatsClient
 {
     private readonly ILogger _logger;
     private readonly ChatsClientOptions _options;
-    private readonly Contracts.Chats.Chats.ChatsClient _client;
+    private readonly CecoChat.Chats.Contracts.Chats.ChatsClient _client;
     private readonly IClock _clock;
 
     public ChatsClient(
         ILogger<ChatsClient> logger,
         IOptions<ChatsClientOptions> options,
-        Contracts.Chats.Chats.ChatsClient client,
+        CecoChat.Chats.Contracts.Chats.ChatsClient client,
         IClock clock)
     {
         _logger = logger;

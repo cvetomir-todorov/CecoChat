@@ -1,4 +1,4 @@
-using CecoChat.Contracts.Chats;
+using CecoChat.Chats.Contracts;
 using CecoChat.Data;
 using CecoChat.Data.Chats.Entities.ChatMessages;
 using CecoChat.Data.Chats.Entities.UserChats;
@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace CecoChat.Server.Chats.Endpoints;
 
-public sealed class ChatsService : Contracts.Chats.Chats.ChatsBase
+public sealed class ChatsService : CecoChat.Chats.Contracts.Chats.ChatsBase
 {
     private readonly ILogger _logger;
     private readonly IHistoryConfig _historyConfig;
