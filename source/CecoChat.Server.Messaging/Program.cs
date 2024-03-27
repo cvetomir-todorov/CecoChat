@@ -1,8 +1,8 @@
 using Autofac;
 using CecoChat.Client.Config;
-using CecoChat.Client.IdGen;
 using CecoChat.Contracts.Backplane;
 using CecoChat.DynamicConfig;
+using CecoChat.IdGen.Client;
 using CecoChat.Server.Backplane;
 using CecoChat.Server.Identity;
 using CecoChat.Server.Messaging.Backplane;

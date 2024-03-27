@@ -5,7 +5,7 @@ using Grpc.Core;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace CecoChat.Client.IdGen;
+namespace CecoChat.IdGen.Client;
 
 public interface IIdGenClient : IDisposable
 {

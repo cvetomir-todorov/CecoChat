@@ -1,4 +1,4 @@
-using CecoChat.Client.IdGen;
+using CecoChat.IdGen.Client;
 using Microsoft.AspNetCore.SignalR;
 
 namespace CecoChat.Server.Messaging.Endpoints;

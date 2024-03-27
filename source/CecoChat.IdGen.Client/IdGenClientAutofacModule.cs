@@ -2,7 +2,7 @@ using Autofac;
 using Common.Autofac;
 using Microsoft.Extensions.Configuration;
 
-namespace CecoChat.Client.IdGen;
+namespace CecoChat.IdGen.Client;
 
 public sealed class IdGenClientAutofacModule : Module
 {

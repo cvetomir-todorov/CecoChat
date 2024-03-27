@@ -1,6 +1,6 @@
 using System.Threading.Channels;
 
-namespace CecoChat.Client.IdGen;
+namespace CecoChat.IdGen.Client;
 
 internal interface IIdChannel
 {

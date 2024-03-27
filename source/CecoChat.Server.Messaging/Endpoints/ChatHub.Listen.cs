@@ -1,5 +1,5 @@
-using CecoChat.Client.IdGen;
 using CecoChat.Contracts.Messaging;
+using CecoChat.IdGen.Client;
 using CecoChat.Server.Identity;
 using CecoChat.Server.Messaging.Backplane;
 using CecoChat.Server.Messaging.Clients;
