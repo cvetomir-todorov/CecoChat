@@ -1,9 +1,10 @@
 ﻿using CecoChat.DynamicConfig.Backplane;
+using CecoChat.Server;
 using Common.Kafka;
 using Common.Threading;
 using Microsoft.Extensions.Options;
 
-namespace CecoChat.Server.Messaging.Backplane;
+namespace CecoChat.Messaging.Service.Backplane;
 
 public interface IBackplaneComponents : IDisposable
 {

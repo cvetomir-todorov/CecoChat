@@ -2,12 +2,12 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Globalization;
 using CecoChat.Messaging.Contracts;
-using CecoChat.Server.Messaging.Endpoints;
-using CecoChat.Server.Messaging.Telemetry;
+using CecoChat.Messaging.Service.Endpoints;
+using CecoChat.Messaging.Service.Telemetry;
 using Common.AspNet.SignalR.Telemetry;
 using Microsoft.AspNetCore.SignalR;
 
-namespace CecoChat.Server.Messaging.Clients;
+namespace CecoChat.Messaging.Service.Clients;
 
 public interface IClientContainer
 {

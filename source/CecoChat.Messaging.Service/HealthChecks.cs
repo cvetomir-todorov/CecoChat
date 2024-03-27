@@ -1,6 +1,6 @@
 using Common.Health;
 
-namespace CecoChat.Server.Messaging;
+namespace CecoChat.Messaging.Service;
 
 public class ReceiversConsumerHealthCheck : StatusHealthCheck
 { }

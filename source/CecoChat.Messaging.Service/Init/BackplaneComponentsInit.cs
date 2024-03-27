@@ -1,14 +1,14 @@
 ﻿using CecoChat.DynamicConfig.Sections.Partitioning;
 using CecoChat.Messaging.Contracts;
+using CecoChat.Messaging.Service.Backplane;
+using CecoChat.Messaging.Service.Clients;
 using CecoChat.Server.Backplane;
-using CecoChat.Server.Messaging.Backplane;
-using CecoChat.Server.Messaging.Clients;
 using Common.AspNet.Init;
 using Common.Events;
 using Common.Kafka;
 using Microsoft.Extensions.Options;
 
-namespace CecoChat.Server.Messaging.Init;
+namespace CecoChat.Messaging.Service.Init;
 
 public sealed class BackplaneComponentsInit : InitStep, ISubscriber<PartitionsChangedEventArgs>
 {

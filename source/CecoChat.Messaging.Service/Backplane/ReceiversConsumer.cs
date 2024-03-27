@@ -1,13 +1,13 @@
 ﻿using CecoChat.Contracts.Backplane;
 using CecoChat.Messaging.Contracts;
+using CecoChat.Messaging.Service.Clients;
 using CecoChat.Server.Backplane;
-using CecoChat.Server.Messaging.Clients;
 using Common;
 using Common.Kafka;
 using Confluent.Kafka;
 using Microsoft.Extensions.Options;
 
-namespace CecoChat.Server.Messaging.Backplane;
+namespace CecoChat.Messaging.Service.Backplane;
 
 /// <summary>
 /// Consumes messages partitioned by receiver ID and sends them to the connected receiver clients.

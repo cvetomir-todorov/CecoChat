@@ -1,4 +1,4 @@
-namespace CecoChat.Server.Messaging;
+namespace CecoChat.Messaging.Service;
 
 public sealed class ConfigOptions
 {

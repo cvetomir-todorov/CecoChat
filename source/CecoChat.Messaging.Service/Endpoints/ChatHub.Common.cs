@@ -1,7 +1,7 @@
 using CecoChat.IdGen.Client;
 using Microsoft.AspNetCore.SignalR;
 
-namespace CecoChat.Server.Messaging.Endpoints;
+namespace CecoChat.Messaging.Service.Endpoints;
 
 public partial class ChatHub
 {

@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using System.Reflection;
 
-namespace CecoChat.Server.Messaging.Telemetry;
+namespace CecoChat.Messaging.Service.Telemetry;
 
 public static class MessagingInstrumentation
 {

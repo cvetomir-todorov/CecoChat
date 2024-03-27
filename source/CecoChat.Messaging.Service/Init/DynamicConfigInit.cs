@@ -1,8 +1,9 @@
 ﻿using CecoChat.DynamicConfig.Sections.Partitioning;
+using CecoChat.Server;
 using Common.AspNet.Init;
 using Microsoft.Extensions.Options;
 
-namespace CecoChat.Server.Messaging.Init;
+namespace CecoChat.Messaging.Service.Init;
 
 public sealed class DynamicConfigInit : InitStep
 {

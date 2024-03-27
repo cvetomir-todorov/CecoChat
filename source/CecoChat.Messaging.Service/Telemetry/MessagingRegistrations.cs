@@ -1,6 +1,6 @@
 using OpenTelemetry.Metrics;
 
-namespace CecoChat.Server.Messaging.Telemetry;
+namespace CecoChat.Messaging.Service.Telemetry;
 
 public static class MessagingRegistrations
 {

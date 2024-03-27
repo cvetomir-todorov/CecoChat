@@ -4,7 +4,7 @@ using CecoChat.Server.Identity;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Authorization;
 
-namespace CecoChat.Server.Messaging.Endpoints;
+namespace CecoChat.Messaging.Service.Endpoints;
 
 public partial class ChatHub
 {

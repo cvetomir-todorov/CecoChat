@@ -1,15 +1,15 @@
 ﻿using System.Diagnostics;
 using CecoChat.Contracts.Backplane;
 using CecoChat.Messaging.Contracts;
+using CecoChat.Messaging.Service.Clients;
+using CecoChat.Messaging.Service.Telemetry;
 using CecoChat.Server.Backplane;
-using CecoChat.Server.Messaging.Clients;
-using CecoChat.Server.Messaging.Telemetry;
 using Common;
 using Common.Kafka;
 using Confluent.Kafka;
 using Microsoft.Extensions.Options;
 
-namespace CecoChat.Server.Messaging.Backplane;
+namespace CecoChat.Messaging.Service.Backplane;
 
 public interface ISendersProducer : IDisposable
 {
@@ -117,13 +117,13 @@ public sealed class SendersProducer : ISendersProducer
     {
         switch (backplaneMessage.Type)
         {
-            case Contracts.Backplane.MessageType.PlainText:
+            case CecoChat.Contracts.Backplane.MessageType.PlainText:
                 _messagingTelemetry.NotifyPlainTextProcessed();
                 break;
-            case Contracts.Backplane.MessageType.File:
+            case CecoChat.Contracts.Backplane.MessageType.File:
                 _messagingTelemetry.NotifyFileProcessed();
                 break;
-            case Contracts.Backplane.MessageType.Reaction:
+            case CecoChat.Contracts.Backplane.MessageType.Reaction:
                 if (!string.IsNullOrWhiteSpace(backplaneMessage.Reaction.Reaction))
                 {
                     _messagingTelemetry.NotifyReactionProcessed();

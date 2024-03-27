@@ -2,7 +2,7 @@ using CecoChat.Contracts.Backplane;
 using CecoChat.Messaging.Contracts;
 using Common;
 
-namespace CecoChat.Server.Messaging;
+namespace CecoChat.Messaging.Service;
 
 public interface IContractMapper
 {
@@ -36,8 +36,8 @@ public class ContractMapper : IContractMapper
             ReceiverId = request.ReceiverId,
             InitiatorConnection = initiatorConnection,
             TargetUserId = request.ReceiverId,
-            Type = Contracts.Backplane.MessageType.PlainText,
-            Status = Contracts.Backplane.DeliveryStatus.Processed,
+            Type = CecoChat.Contracts.Backplane.MessageType.PlainText,
+            Status = CecoChat.Contracts.Backplane.DeliveryStatus.Processed,
             PlainText = new BackplanePlainText
             {
                 Text = request.Text
@@ -56,8 +56,8 @@ public class ContractMapper : IContractMapper
             ReceiverId = request.ReceiverId,
             InitiatorConnection = initiatorConnection,
             TargetUserId = request.ReceiverId,
-            Type = Contracts.Backplane.MessageType.File,
-            Status = Contracts.Backplane.DeliveryStatus.Processed,
+            Type = CecoChat.Contracts.Backplane.MessageType.File,
+            Status = CecoChat.Contracts.Backplane.DeliveryStatus.Processed,
             File = new BackplaneFile
             {
                 Text = request.Text,
@@ -78,7 +78,7 @@ public class ContractMapper : IContractMapper
             ReceiverId = request.ReceiverId,
             InitiatorConnection = initiatorConnection,
             TargetUserId = GetReactionTargetUserId(reactorId, request.MessageId, request.SenderId, request.ReceiverId),
-            Type = Contracts.Backplane.MessageType.Reaction,
+            Type = CecoChat.Contracts.Backplane.MessageType.Reaction,
             Reaction = new BackplaneReaction
             {
                 ReactorId = reactorId,
@@ -98,7 +98,7 @@ public class ContractMapper : IContractMapper
             ReceiverId = request.ReceiverId,
             InitiatorConnection = initiatorConnection,
             TargetUserId = GetReactionTargetUserId(reactorId, request.MessageId, request.SenderId, request.ReceiverId),
-            Type = Contracts.Backplane.MessageType.Reaction,
+            Type = CecoChat.Contracts.Backplane.MessageType.Reaction,
             Reaction = new BackplaneReaction
             {
                 ReactorId = reactorId
@@ -210,16 +210,16 @@ public class ContractMapper : IContractMapper
 
         switch (backplaneMessage.Type)
         {
-            case Contracts.Backplane.MessageType.PlainText:
+            case CecoChat.Contracts.Backplane.MessageType.PlainText:
                 SetPlainText(backplaneMessage, notification);
                 break;
-            case Contracts.Backplane.MessageType.File:
+            case CecoChat.Contracts.Backplane.MessageType.File:
                 SetFile(backplaneMessage, notification);
                 break;
-            case Contracts.Backplane.MessageType.Reaction:
+            case CecoChat.Contracts.Backplane.MessageType.Reaction:
                 SetReaction(backplaneMessage, notification);
                 break;
-            case Contracts.Backplane.MessageType.Connection:
+            case CecoChat.Contracts.Backplane.MessageType.Connection:
                 SetConnection(backplaneMessage, notification);
                 break;
             default:
@@ -264,13 +264,13 @@ public class ContractMapper : IContractMapper
         CecoChat.Messaging.Contracts.ConnectionStatus status;
         switch (backplaneMessage.Connection.Status)
         {
-            case Contracts.Backplane.ConnectionStatus.NotConnected:
+            case CecoChat.Contracts.Backplane.ConnectionStatus.NotConnected:
                 status = CecoChat.Messaging.Contracts.ConnectionStatus.NotConnected;
                 break;
-            case Contracts.Backplane.ConnectionStatus.Pending:
+            case CecoChat.Contracts.Backplane.ConnectionStatus.Pending:
                 status = CecoChat.Messaging.Contracts.ConnectionStatus.Pending;
                 break;
-            case Contracts.Backplane.ConnectionStatus.Connected:
+            case CecoChat.Contracts.Backplane.ConnectionStatus.Connected:
                 status = CecoChat.Messaging.Contracts.ConnectionStatus.Connected;
                 break;
             default:

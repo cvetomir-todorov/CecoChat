@@ -3,13 +3,14 @@ using CecoChat.Client.Config;
 using CecoChat.Contracts.Backplane;
 using CecoChat.DynamicConfig;
 using CecoChat.IdGen.Client;
+using CecoChat.Messaging.Service.Backplane;
+using CecoChat.Messaging.Service.Clients;
+using CecoChat.Messaging.Service.Endpoints;
+using CecoChat.Messaging.Service.Init;
+using CecoChat.Messaging.Service.Telemetry;
+using CecoChat.Server;
 using CecoChat.Server.Backplane;
 using CecoChat.Server.Identity;
-using CecoChat.Server.Messaging.Backplane;
-using CecoChat.Server.Messaging.Clients;
-using CecoChat.Server.Messaging.Endpoints;
-using CecoChat.Server.Messaging.Init;
-using CecoChat.Server.Messaging.Telemetry;
 using Common;
 using Common.AspNet.Health;
 using Common.AspNet.Init;
@@ -26,7 +27,7 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 
-namespace CecoChat.Server.Messaging;
+namespace CecoChat.Messaging.Service;
 
 public static class Program
 {

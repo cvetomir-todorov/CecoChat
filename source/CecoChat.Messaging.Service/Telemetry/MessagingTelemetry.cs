@@ -1,7 +1,7 @@
 using System.Diagnostics.Metrics;
 using Microsoft.Extensions.Options;
 
-namespace CecoChat.Server.Messaging.Telemetry;
+namespace CecoChat.Messaging.Service.Telemetry;
 
 public interface IMessagingTelemetry : IDisposable
 {
