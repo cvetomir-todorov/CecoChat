@@ -59,14 +59,14 @@ public class OneChatScreenController : ControllerBase
         Task<IReadOnlyCollection<CecoChat.Chats.Contracts.HistoryMessage>> messagesTask = _chatsClient.GetChatHistory(userClaims.UserId, request.OtherUserId, request.MessagesOlderThan, accessToken, ct);
         tasks.AddLast(messagesTask);
 
-        Task<Contracts.User.ProfilePublic?>? profileTask = null;
+        Task<User.Contracts.ProfilePublic?>? profileTask = null;
         if (request.IncludeProfile)
         {
             profileTask = _profileClient.GetPublicProfile(userClaims.UserId, request.OtherUserId, accessToken, ct);
             tasks.AddLast(profileTask);
         }
 
-        Task<Contracts.User.Connection?>? connectionTask = null;
+        Task<User.Contracts.Connection?>? connectionTask = null;
         if (request.IncludeProfile)
         {
             connectionTask = _connectionClient.GetConnection(userClaims.UserId, request.OtherUserId, accessToken, ct);
@@ -81,7 +81,7 @@ public class OneChatScreenController : ControllerBase
         ProfilePublic? profile = null;
         if (request.IncludeProfile)
         {
-            Contracts.User.ProfilePublic? serviceProfile = profileTask!.Result;
+            User.Contracts.ProfilePublic? serviceProfile = profileTask!.Result;
             if (serviceProfile != null)
             {
                 profile = _mapper.Map<ProfilePublic>(serviceProfile);
@@ -91,7 +91,7 @@ public class OneChatScreenController : ControllerBase
         Connection? connection = null;
         if (request.IncludeConnection)
         {
-            Contracts.User.Connection? serviceConnection = connectionTask!.Result;
+            User.Contracts.Connection? serviceConnection = connectionTask!.Result;
             if (serviceConnection != null)
             {
                 connection = _mapper.Map<Connection>(serviceConnection);

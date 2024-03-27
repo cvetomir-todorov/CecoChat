@@ -59,14 +59,14 @@ public class AllChatsScreenController : ControllerBase
         }
 
         Task<IReadOnlyCollection<CecoChat.Chats.Contracts.ChatState>> chatsTask = _chatsClient.GetUserChats(userClaims.UserId, request.ChatsNewerThan, accessToken, ct);
-        Task<IReadOnlyCollection<Contracts.User.Connection>> connectionsTask = _connectionClient.GetConnections(userClaims.UserId, accessToken, ct);
-        Task<IReadOnlyCollection<Contracts.User.FileRef>> filesTask = _fileClient.GetUserFiles(userClaims.UserId, request.FilesNewerThan, accessToken, ct);
+        Task<IReadOnlyCollection<User.Contracts.Connection>> connectionsTask = _connectionClient.GetConnections(userClaims.UserId, accessToken, ct);
+        Task<IReadOnlyCollection<User.Contracts.FileRef>> filesTask = _fileClient.GetUserFiles(userClaims.UserId, request.FilesNewerThan, accessToken, ct);
 
         await Task.WhenAll(chatsTask, connectionsTask, filesTask);
 
         IReadOnlyCollection<CecoChat.Chats.Contracts.ChatState> serviceChats = chatsTask.Result;
-        IReadOnlyCollection<Contracts.User.Connection> serviceConnections = connectionsTask.Result;
-        IReadOnlyCollection<Contracts.User.FileRef> serviceFiles = filesTask.Result;
+        IReadOnlyCollection<User.Contracts.Connection> serviceConnections = connectionsTask.Result;
+        IReadOnlyCollection<User.Contracts.FileRef> serviceFiles = filesTask.Result;
 
         ProfilePublic[] profiles = await GetProfiles(request.IncludeProfiles, serviceChats, serviceConnections, userClaims, accessToken, ct);
         ChatState[] chats = serviceChats.Select(chat => _contractMapper.MapChat(chat)).ToArray();
@@ -87,7 +87,7 @@ public class AllChatsScreenController : ControllerBase
     private async Task<ProfilePublic[]> GetProfiles(
         bool includeProfiles,
         IReadOnlyCollection<CecoChat.Chats.Contracts.ChatState> chats,
-        IReadOnlyCollection<Contracts.User.Connection> connections,
+        IReadOnlyCollection<User.Contracts.Connection> connections,
         UserClaims userClaims,
         string accessToken,
         CancellationToken ct)
@@ -101,7 +101,7 @@ public class AllChatsScreenController : ControllerBase
             .Union(connections.Select(conn => conn.ConnectionId))
             .Distinct()
             .ToArray();
-        IReadOnlyCollection<Contracts.User.ProfilePublic> serviceProfiles = await _profileClient.GetPublicProfiles(userClaims.UserId, userIds, accessToken, ct);
+        IReadOnlyCollection<User.Contracts.ProfilePublic> serviceProfiles = await _profileClient.GetPublicProfiles(userClaims.UserId, userIds, accessToken, ct);
         ProfilePublic[] profiles = _mapper.Map<ProfilePublic[]>(serviceProfiles)!;
 
         return profiles;

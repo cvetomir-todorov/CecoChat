@@ -41,7 +41,7 @@ public class FileController : ControllerBase
             return Unauthorized();
         }
 
-        IReadOnlyCollection<Contracts.User.FileRef> serviceFiles = await _fileClient.GetUserFiles(userClaims.UserId, request.NewerThan, accessToken, ct);
+        IReadOnlyCollection<User.Contracts.FileRef> serviceFiles = await _fileClient.GetUserFiles(userClaims.UserId, request.NewerThan, accessToken, ct);
         FileRef[] files = _mapper.Map<FileRef[]>(serviceFiles)!;
 
         GetUserFilesResponse response = new()

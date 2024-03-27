@@ -1,5 +1,5 @@
 using System.Threading.Channels;
-using CecoChat.Contracts.User;
+using CecoChat.User.Contracts;
 using Common.Redis;
 using Google.Protobuf;
 using Microsoft.Extensions.Logging;

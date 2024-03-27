@@ -50,7 +50,7 @@ public class ConnectionController : ControllerBase
             return Unauthorized();
         }
 
-        IEnumerable<Contracts.User.Connection> connections = await _connectionClient.GetConnections(userClaims.UserId, accessToken, ct);
+        IEnumerable<User.Contracts.Connection> connections = await _connectionClient.GetConnections(userClaims.UserId, accessToken, ct);
         GetConnectionsResponse response = new()
         {
             Connections = _mapper.Map<Connection[]>(connections)!

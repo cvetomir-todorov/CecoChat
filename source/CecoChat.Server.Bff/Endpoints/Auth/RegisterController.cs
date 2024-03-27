@@ -35,7 +35,7 @@ public class RegisterController : ControllerBase
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> Register([FromBody][BindRequired] RegisterRequest request, CancellationToken ct)
     {
-        Contracts.User.Registration registration = _mapper.Map<Contracts.User.Registration>(request)!;
+        User.Contracts.Registration registration = _mapper.Map<User.Contracts.Registration>(request)!;
         registration.AvatarUrl = $"https://cdn.cecochat.com/avatars/{request.UserName}.jpg";
 
         RegisterResult result = await _authClient.Register(registration, ct);

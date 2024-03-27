@@ -1,4 +1,4 @@
-using CecoChat.Contracts.User;
+using CecoChat.User.Contracts;
 
 namespace CecoChat.Client.User;
 

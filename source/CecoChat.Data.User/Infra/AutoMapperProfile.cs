@@ -1,4 +1,4 @@
-using CecoChat.Contracts.User;
+using CecoChat.User.Contracts;
 using Google.Protobuf.WellKnownTypes;
 
 namespace CecoChat.Data.User.Infra;

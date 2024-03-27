@@ -1,4 +1,4 @@
-using CecoChat.Contracts.User;
+using CecoChat.User.Contracts;
 using Common.Http.Client;
 using Common.Polly;
 using Microsoft.Extensions.DependencyInjection;

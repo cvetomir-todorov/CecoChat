@@ -7,17 +7,17 @@ public class AutoMapperProfile : AutoMapper.Profile
 {
     public AutoMapperProfile()
     {
-        CreateMap<Contracts.Bff.Auth.RegisterRequest, Contracts.User.Registration>();
-        CreateMap<Contracts.Bff.Profiles.EditProfileRequest, Contracts.User.ProfileUpdate>()
+        CreateMap<Contracts.Bff.Auth.RegisterRequest, User.Contracts.Registration>();
+        CreateMap<Contracts.Bff.Profiles.EditProfileRequest, User.Contracts.ProfileUpdate>()
             .ForMember(profileContract => profileContract.Version,
                 options => options.MapFrom(request => request.Version.ToTimestamp()));
-        CreateMap<Contracts.User.ProfileFull, Contracts.Bff.Auth.ProfileFull>()
+        CreateMap<User.Contracts.ProfileFull, Contracts.Bff.Auth.ProfileFull>()
             .ForMember(
                 profileBff => profileBff.Version,
                 options => options.MapFrom(profileContract => profileContract.Version.ToDateTime()));
-        CreateMap<Contracts.User.ProfilePublic, Contracts.Bff.Profiles.ProfilePublic>();
+        CreateMap<User.Contracts.ProfilePublic, Contracts.Bff.Profiles.ProfilePublic>();
 
-        CreateMap<Contracts.User.Connection, Contracts.Bff.Connections.Connection>()
+        CreateMap<User.Contracts.Connection, Contracts.Bff.Connections.Connection>()
             .ForMember(
                 connectionBff => connectionBff.Version,
                 options => options.MapFrom(connectionContract => connectionContract.Version.ToDateTime()))
@@ -27,18 +27,18 @@ public class AutoMapperProfile : AutoMapper.Profile
                 {
                     switch (connectionContract.Status)
                     {
-                        case Contracts.User.ConnectionStatus.NotConnected:
+                        case User.Contracts.ConnectionStatus.NotConnected:
                             return Contracts.Bff.Connections.ConnectionStatus.NotConnected;
-                        case Contracts.User.ConnectionStatus.Pending:
+                        case User.Contracts.ConnectionStatus.Pending:
                             return Contracts.Bff.Connections.ConnectionStatus.Pending;
-                        case Contracts.User.ConnectionStatus.Connected:
+                        case User.Contracts.ConnectionStatus.Connected:
                             return Contracts.Bff.Connections.ConnectionStatus.Connected;
                         default:
                             throw new EnumValueNotSupportedException(connectionContract.Status);
                     }
                 }));
 
-        CreateMap<Contracts.User.FileRef, Contracts.Bff.Files.FileRef>()
+        CreateMap<User.Contracts.FileRef, Contracts.Bff.Files.FileRef>()
             .ForMember(
                 fileBff => fileBff.Version,
                 options => options.MapFrom(fileContract => fileContract.Version.ToDateTime()));

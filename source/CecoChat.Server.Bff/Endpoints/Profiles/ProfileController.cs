@@ -53,7 +53,7 @@ public class ProfileController : ControllerBase
             return Unauthorized();
         }
 
-        Contracts.User.ProfilePublic? profile = await _profileClient.GetPublicProfile(userClaims.UserId, requestedUserId, accessToken, ct);
+        User.Contracts.ProfilePublic? profile = await _profileClient.GetPublicProfile(userClaims.UserId, requestedUserId, accessToken, ct);
         if (profile == null)
         {
             _logger.LogTrace("Responding with missing profile for user {RequestedUserId} requested by user {UserId}", requestedUserId, userClaims.UserId);
@@ -79,7 +79,7 @@ public class ProfileController : ControllerBase
             return Unauthorized();
         }
 
-        IReadOnlyCollection<Contracts.User.ProfilePublic>? profiles;
+        IReadOnlyCollection<User.Contracts.ProfilePublic>? profiles;
         string source;
 
         if (request.UserIds.Length > 0)

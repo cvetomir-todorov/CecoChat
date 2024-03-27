@@ -1,5 +1,5 @@
 using AutoMapper;
-using CecoChat.Contracts.User;
+using CecoChat.User.Contracts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 

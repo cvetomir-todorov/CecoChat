@@ -1,6 +1,6 @@
 using CecoChat.Contracts.Backplane;
-using CecoChat.Contracts.User;
 using CecoChat.Server.Backplane;
+using CecoChat.User.Contracts;
 using Common;
 using Common.Kafka;
 using Confluent.Kafka;
@@ -64,13 +64,13 @@ public sealed class ConnectionNotifyProducer : IConnectionNotifyProducer
 
         switch (connection.Status)
         {
-            case Contracts.User.ConnectionStatus.NotConnected:
+            case CecoChat.User.Contracts.ConnectionStatus.NotConnected:
                 status = Contracts.Backplane.ConnectionStatus.NotConnected;
                 break;
-            case Contracts.User.ConnectionStatus.Pending:
+            case CecoChat.User.Contracts.ConnectionStatus.Pending:
                 status = Contracts.Backplane.ConnectionStatus.Pending;
                 break;
-            case Contracts.User.ConnectionStatus.Connected:
+            case CecoChat.User.Contracts.ConnectionStatus.Connected:
                 status = Contracts.Backplane.ConnectionStatus.Connected;
                 break;
             default:

@@ -1,13 +1,13 @@
-using CecoChat.Contracts.User;
 using CecoChat.Data.User.Entities.Profiles;
 using CecoChat.Server.User.Security;
+using CecoChat.User.Contracts;
 using Common;
 using Grpc.Core;
 using Microsoft.AspNetCore.Authorization;
 
 namespace CecoChat.Server.User.Endpoints.Auth;
 
-public class AuthService : Contracts.User.Auth.AuthBase
+public class AuthService : CecoChat.User.Contracts.Auth.AuthBase
 {
     private readonly ILogger _logger;
     private readonly IProfileQueryRepo _queryRepo;
