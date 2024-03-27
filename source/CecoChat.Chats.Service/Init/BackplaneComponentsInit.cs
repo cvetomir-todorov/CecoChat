@@ -1,9 +1,10 @@
-﻿using CecoChat.DynamicConfig.Backplane;
-using CecoChat.Server.Chats.Backplane;
+﻿using CecoChat.Chats.Service.Backplane;
+using CecoChat.DynamicConfig.Backplane;
+using CecoChat.Server;
 using Common.AspNet.Init;
 using Common.Threading;
 
-namespace CecoChat.Server.Chats.Init;
+namespace CecoChat.Chats.Service.Init;
 
 public sealed class BackplaneComponentsInit : InitStep
 {

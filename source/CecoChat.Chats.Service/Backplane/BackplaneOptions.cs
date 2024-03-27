@@ -1,6 +1,6 @@
 ﻿using Common.Kafka;
 
-namespace CecoChat.Server.Chats.Backplane;
+namespace CecoChat.Chats.Service.Backplane;
 
 public sealed class BackplaneOptions
 {

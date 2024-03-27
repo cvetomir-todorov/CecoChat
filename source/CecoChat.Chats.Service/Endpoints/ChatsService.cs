@@ -7,7 +7,7 @@ using CecoChat.Server.Identity;
 using Grpc.Core;
 using Microsoft.AspNetCore.Authorization;
 
-namespace CecoChat.Server.Chats.Endpoints;
+namespace CecoChat.Chats.Service.Endpoints;
 
 public sealed class ChatsService : CecoChat.Chats.Contracts.Chats.ChatsBase
 {

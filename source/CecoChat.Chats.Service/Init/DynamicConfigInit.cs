@@ -1,7 +1,8 @@
 ﻿using CecoChat.DynamicConfig.Sections.History;
+using CecoChat.Server;
 using Common.AspNet.Init;
 
-namespace CecoChat.Server.Chats.Init;
+namespace CecoChat.Chats.Service.Init;
 
 public sealed class DynamicConfigInit : InitStep
 {

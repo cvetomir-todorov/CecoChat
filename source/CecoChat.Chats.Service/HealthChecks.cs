@@ -1,6 +1,6 @@
 using Common.Health;
 
-namespace CecoChat.Server.Chats;
+namespace CecoChat.Chats.Service;
 
 public class ChatsDbInitHealthCheck : StatusHealthCheck
 { }

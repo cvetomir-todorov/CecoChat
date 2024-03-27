@@ -4,7 +4,7 @@ using CecoChat.Chats.Data.Entities.UserChats;
 using Common.AspNet.Init;
 using Common.Cassandra;
 
-namespace CecoChat.Server.Chats.Init;
+namespace CecoChat.Chats.Service.Init;
 
 public sealed class ChatsDbInit : InitStep
 {

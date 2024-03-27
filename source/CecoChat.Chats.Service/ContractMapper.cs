@@ -1,7 +1,7 @@
 using CecoChat.Chats.Contracts;
 using CecoChat.Contracts.Backplane;
 
-namespace CecoChat.Server.Chats;
+namespace CecoChat.Chats.Service;
 
 public interface IContractMapper
 {

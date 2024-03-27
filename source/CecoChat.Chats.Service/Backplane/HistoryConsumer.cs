@@ -7,7 +7,7 @@ using Common.Kafka;
 using Confluent.Kafka;
 using Microsoft.Extensions.Options;
 
-namespace CecoChat.Server.Chats.Backplane;
+namespace CecoChat.Chats.Service.Backplane;
 
 public interface IHistoryConsumer : IDisposable
 {

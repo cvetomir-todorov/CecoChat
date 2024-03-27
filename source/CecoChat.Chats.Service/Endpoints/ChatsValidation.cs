@@ -2,7 +2,7 @@ using CecoChat.Chats.Contracts;
 using CecoChat.Data;
 using FluentValidation;
 
-namespace CecoChat.Server.Chats.Endpoints;
+namespace CecoChat.Chats.Service.Endpoints;
 
 public sealed class GetChatHistoryRequestValidator : AbstractValidator<GetChatHistoryRequest>
 {
