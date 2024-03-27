@@ -1,6 +1,6 @@
 using System.Reflection;
 using Autofac;
-using CecoChat.Client.Chats;
+using CecoChat.Chats.Client;
 using CecoChat.Client.Config;
 using CecoChat.Client.User;
 using CecoChat.Data;

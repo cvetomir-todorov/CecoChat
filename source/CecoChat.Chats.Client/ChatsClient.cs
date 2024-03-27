@@ -6,7 +6,7 @@ using Grpc.Core;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace CecoChat.Client.Chats;
+namespace CecoChat.Chats.Client;
 
 public interface IChatsClient : IDisposable
 {

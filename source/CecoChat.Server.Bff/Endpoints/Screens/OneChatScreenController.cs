@@ -1,5 +1,5 @@
 using AutoMapper;
-using CecoChat.Client.Chats;
+using CecoChat.Chats.Client;
 using CecoChat.Client.User;
 using CecoChat.Contracts.Bff.Chats;
 using CecoChat.Contracts.Bff.Connections;
