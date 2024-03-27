@@ -1,7 +1,7 @@
 using CecoChat.IdGen.Contracts;
 using FluentValidation;
 
-namespace CecoChat.Server.IdGen.Endpoints;
+namespace CecoChat.IdGen.Service.Endpoints;
 
 public sealed class GenerateManyRequestValidator : AbstractValidator<GenerateManyRequest>
 {

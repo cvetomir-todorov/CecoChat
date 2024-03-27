@@ -1,8 +1,9 @@
 using CecoChat.DynamicConfig.Sections.Snowflake;
+using CecoChat.Server;
 using Common.AspNet.Init;
 using Microsoft.Extensions.Options;
 
-namespace CecoChat.Server.IdGen.Init;
+namespace CecoChat.IdGen.Service.Init;
 
 public sealed class DynamicConfigInit : InitStep
 {

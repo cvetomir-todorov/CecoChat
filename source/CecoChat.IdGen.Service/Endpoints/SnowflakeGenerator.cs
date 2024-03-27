@@ -3,7 +3,7 @@ using Common;
 using IdGen;
 using Microsoft.Extensions.Options;
 
-namespace CecoChat.Server.IdGen.Endpoints;
+namespace CecoChat.IdGen.Service.Endpoints;
 
 public interface IIdentityGenerator
 {

@@ -1,7 +1,8 @@
 using CecoChat.DynamicConfig.Backplane;
+using CecoChat.Server;
 using Common.AspNet.Init;
 
-namespace CecoChat.Server.IdGen.Init;
+namespace CecoChat.IdGen.Service.Init;
 
 public sealed class BackplaneComponentsInit : InitStep
 {

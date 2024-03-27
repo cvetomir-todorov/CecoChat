@@ -3,9 +3,10 @@ using Autofac;
 using Calzolari.Grpc.AspNetCore.Validation;
 using CecoChat.Client.Config;
 using CecoChat.DynamicConfig;
+using CecoChat.IdGen.Service.Endpoints;
+using CecoChat.IdGen.Service.Init;
+using CecoChat.Server;
 using CecoChat.Server.Backplane;
-using CecoChat.Server.IdGen.Endpoints;
-using CecoChat.Server.IdGen.Init;
 using Common;
 using Common.AspNet.Init;
 using Common.AspNet.Prometheus;
@@ -18,7 +19,7 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 
-namespace CecoChat.Server.IdGen;
+namespace CecoChat.IdGen.Service;
 
 public static class Program
 {
