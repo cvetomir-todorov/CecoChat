@@ -3,7 +3,7 @@ using Common;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace CecoChat.Client.User;
+namespace CecoChat.User.Client;
 
 internal sealed class AuthClient : IAuthClient
 {

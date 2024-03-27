@@ -1,6 +1,6 @@
 using System.Web;
-using CecoChat.Client.User;
 using CecoChat.Server.Identity;
+using CecoChat.User.Client;
 using Common.AspNet.ModelBinding;
 using Common.Minio;
 using Microsoft.AspNetCore.Authorization;

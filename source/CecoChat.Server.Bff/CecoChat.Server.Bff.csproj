@@ -16,10 +16,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CecoChat.Chats.Client\CecoChat.Chats.Client.csproj" />
-    <ProjectReference Include="..\CecoChat.Client.User\CecoChat.Client.User.csproj" />
     <ProjectReference Include="..\CecoChat.Contracts.Bff\CecoChat.Contracts.Bff.csproj" />
     <ProjectReference Include="..\CecoChat.Data\CecoChat.Data.csproj" />
     <ProjectReference Include="..\CecoChat.Server\CecoChat.Server.csproj" />
+    <ProjectReference Include="..\CecoChat.User.Client\CecoChat.User.Client.csproj" />
     <ProjectReference Include="..\Common.Minio\Common.Minio.csproj" />
   </ItemGroup>
 

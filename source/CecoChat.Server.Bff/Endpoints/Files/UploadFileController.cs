@@ -1,9 +1,9 @@
-using CecoChat.Client.User;
 using CecoChat.Contracts.Bff;
 using CecoChat.Contracts.Bff.Files;
 using CecoChat.Data;
 using CecoChat.Server.Bff.Files;
 using CecoChat.Server.Identity;
+using CecoChat.User.Client;
 using Common;
 using Common.AspNet;
 using Common.AspNet.ModelBinding;
@@ -188,7 +188,7 @@ public class UploadFileController : ControllerBase
 
     private async Task<AssociateFileResult> AssociateFile(UserClaims userClaims, string bucket, string path, long allowedUserId, string accessToken, CancellationToken ct)
     {
-        Client.User.AssociateFileResult result = await _fileClient.AssociateFile(userClaims.UserId, bucket, path, allowedUserId, accessToken, ct);
+        User.Client.AssociateFileResult result = await _fileClient.AssociateFile(userClaims.UserId, bucket, path, allowedUserId, accessToken, ct);
 
         if (result.Success)
         {
@@ -212,6 +212,6 @@ public class UploadFileController : ControllerBase
             };
         }
 
-        throw new ProcessingFailureException(typeof(Client.User.AssociateFileResult));
+        throw new ProcessingFailureException(typeof(User.Client.AssociateFileResult));
     }
 }

@@ -1,7 +1,7 @@
 using System.Web;
-using CecoChat.Client.User;
 using CecoChat.Contracts.Bff.Files;
 using CecoChat.Server.Identity;
+using CecoChat.User.Client;
 using Common;
 using Common.AspNet.ModelBinding;
 using Microsoft.AspNetCore.Authorization;

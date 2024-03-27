@@ -2,7 +2,7 @@ using Autofac;
 using Common.Autofac;
 using Microsoft.Extensions.Configuration;
 
-namespace CecoChat.Client.User;
+namespace CecoChat.User.Client;
 
 public sealed class UserClientAutofacModule : Module
 {

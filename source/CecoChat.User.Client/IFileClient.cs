@@ -1,6 +1,6 @@
 using CecoChat.User.Contracts;
 
-namespace CecoChat.Client.User;
+namespace CecoChat.User.Client;
 
 public interface IFileClient
 {

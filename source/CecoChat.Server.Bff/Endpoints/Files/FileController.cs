@@ -1,7 +1,7 @@
 using AutoMapper;
-using CecoChat.Client.User;
 using CecoChat.Contracts.Bff.Files;
 using CecoChat.Server.Identity;
+using CecoChat.User.Client;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;

@@ -3,7 +3,7 @@ using Common.Http.Client;
 using Common.Polly;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace CecoChat.Client.User;
+namespace CecoChat.User.Client;
 
 public static class UserClientRegistrations
 {
