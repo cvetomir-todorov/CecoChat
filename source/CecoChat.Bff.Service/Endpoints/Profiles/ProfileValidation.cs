@@ -1,5 +1,5 @@
+using CecoChat.Config.Sections.User;
 using CecoChat.Data;
-using CecoChat.DynamicConfig.Sections.User;
 using FluentValidation;
 
 namespace CecoChat.Bff.Service.Endpoints.Profiles;

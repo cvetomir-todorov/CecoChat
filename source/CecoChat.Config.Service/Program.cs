@@ -4,7 +4,6 @@ using Calzolari.Grpc.AspNetCore.Validation;
 using CecoChat.Config.Data;
 using CecoChat.Config.Service.Endpoints;
 using CecoChat.Config.Service.Init;
-using CecoChat.DynamicConfig;
 using CecoChat.Server;
 using CecoChat.Server.Backplane;
 using Common.AspNet.Health;

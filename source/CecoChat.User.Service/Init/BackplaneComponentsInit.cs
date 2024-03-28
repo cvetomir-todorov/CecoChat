@@ -1,5 +1,5 @@
-using CecoChat.DynamicConfig.Backplane;
-using CecoChat.DynamicConfig.Sections.Partitioning;
+using CecoChat.Config.Backplane;
+using CecoChat.Config.Sections.Partitioning;
 using CecoChat.Server;
 using CecoChat.User.Service.Backplane;
 using Common.AspNet.Init;

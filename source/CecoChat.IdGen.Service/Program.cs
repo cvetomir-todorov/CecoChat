@@ -1,8 +1,8 @@
 using System.Reflection;
 using Autofac;
 using Calzolari.Grpc.AspNetCore.Validation;
+using CecoChat.Config;
 using CecoChat.Config.Client;
-using CecoChat.DynamicConfig;
 using CecoChat.IdGen.Service.Endpoints;
 using CecoChat.IdGen.Service.Init;
 using CecoChat.Server;

@@ -65,7 +65,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CecoChat.Config.Contracts",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CecoChat.Config.Client", "CecoChat.Config.Client\CecoChat.Config.Client.csproj", "{4982A62E-6628-481D-BBE3-49526885D436}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CecoChat.DynamicConfig", "CecoChat.DynamicConfig\CecoChat.DynamicConfig.csproj", "{D5FD0095-9F85-40B2-8AC0-5C93EC6DC06E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CecoChat.Config", "CecoChat.Config\CecoChat.Config.csproj", "{D5FD0095-9F85-40B2-8AC0-5C93EC6DC06E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CecoChat.Config.Service", "CecoChat.Config.Service\CecoChat.Config.Service.csproj", "{AE7B77F6-D35B-45ED-A904-725148AFDC53}"
 EndProject

@@ -1,4 +1,4 @@
-﻿using CecoChat.DynamicConfig.Sections.History;
+﻿using CecoChat.Config.Sections.History;
 using CecoChat.Server;
 using Common.AspNet.Init;
 

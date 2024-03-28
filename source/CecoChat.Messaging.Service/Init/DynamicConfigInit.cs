@@ -1,4 +1,4 @@
-﻿using CecoChat.DynamicConfig.Sections.Partitioning;
+﻿using CecoChat.Config.Sections.Partitioning;
 using CecoChat.Server;
 using Common.AspNet.Init;
 using Microsoft.Extensions.Options;

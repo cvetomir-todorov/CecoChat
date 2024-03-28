@@ -1,4 +1,4 @@
-using CecoChat.DynamicConfig.Sections.User;
+using CecoChat.Config.Sections.User;
 using CecoChat.Server.Identity;
 using CecoChat.User.Contracts;
 using CecoChat.User.Data.Entities.Profiles;

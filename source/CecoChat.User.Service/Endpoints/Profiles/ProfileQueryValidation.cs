@@ -1,5 +1,5 @@
+using CecoChat.Config.Sections.User;
 using CecoChat.Data;
-using CecoChat.DynamicConfig.Sections.User;
 using CecoChat.User.Contracts;
 using FluentValidation;
 

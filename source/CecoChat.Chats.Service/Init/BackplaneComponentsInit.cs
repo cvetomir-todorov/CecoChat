@@ -1,5 +1,5 @@
 ﻿using CecoChat.Chats.Service.Backplane;
-using CecoChat.DynamicConfig.Backplane;
+using CecoChat.Config.Backplane;
 using CecoChat.Server;
 using Common.AspNet.Init;
 using Common.Threading;
