@@ -2,7 +2,7 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 
 WORKDIR /app
 COPY . ./
-RUN dotnet publish CecoChat.Server.User/CecoChat.Server.User.csproj -c Release -o out
+RUN dotnet publish CecoChat.User.Service/CecoChat.User.Service.csproj -c Release -o out
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 LABEL author="Cvetomir Todorov"
@@ -22,4 +22,4 @@ ADD certificates/services.crt /usr/local/share/ca-certificates/services.crt
 RUN chmod 644 /usr/local/share/ca-certificates/services.crt && \
     update-ca-certificates
 
-ENTRYPOINT ["dotnet", "CecoChat.Server.User.dll"]
+ENTRYPOINT ["dotnet", "CecoChat.User.Service.dll"]
