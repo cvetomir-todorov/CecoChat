@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace CecoChat.Data.Config;
+namespace CecoChat.Config.Data;
 
 public class ConfigDbContext : DbContext
 {

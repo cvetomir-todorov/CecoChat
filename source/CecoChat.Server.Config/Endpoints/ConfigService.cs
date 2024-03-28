@@ -1,5 +1,5 @@
 using CecoChat.Config.Contracts;
-using CecoChat.Data.Config;
+using CecoChat.Config.Data;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Microsoft.EntityFrameworkCore;

@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CecoChat.Data.Config\CecoChat.Data.Config.csproj" />
+    <ProjectReference Include="..\CecoChat.Config.Data\CecoChat.Config.Data.csproj" />
     <ProjectReference Include="..\CecoChat.DynamicConfig\CecoChat.DynamicConfig.csproj" />
     <ProjectReference Include="..\CecoChat.Server\CecoChat.Server.csproj" />
   </ItemGroup>

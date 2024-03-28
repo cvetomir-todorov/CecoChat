@@ -1,4 +1,4 @@
-using CecoChat.Data.Config;
+using CecoChat.Config.Data;
 using CecoChat.DynamicConfig.Backplane;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;

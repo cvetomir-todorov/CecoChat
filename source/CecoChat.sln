@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CecoChat.Server", "CecoChat
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CecoChat.ConsoleClient", "CecoChat.ConsoleClient\CecoChat.ConsoleClient.csproj", "{9D560593-98F0-4CED-9B4E-F2EE975264DA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CecoChat.Data.Config", "CecoChat.Data.Config\CecoChat.Data.Config.csproj", "{F5322D17-1D82-4929-A461-F9CB24371ED4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CecoChat.Config.Data", "CecoChat.Config.Data\CecoChat.Config.Data.csproj", "{F5322D17-1D82-4929-A461-F9CB24371ED4}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CecoChat.Contracts", "CecoChat.Contracts\CecoChat.Contracts.csproj", "{29108519-587F-4A7E-8888-1E5F23F9F337}"
 EndProject

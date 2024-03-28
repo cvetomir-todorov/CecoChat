@@ -1,6 +1,6 @@
 using Common.Npgsql;
 
-namespace CecoChat.Data.Config;
+namespace CecoChat.Config.Data;
 
 public sealed class ConfigDbOptions
 {

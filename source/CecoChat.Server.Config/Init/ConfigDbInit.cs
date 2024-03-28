@@ -1,4 +1,4 @@
-using CecoChat.Data.Config;
+using CecoChat.Config.Data;
 using CecoChat.DynamicConfig;
 using Common.AspNet.Init;
 using Common.Npgsql;

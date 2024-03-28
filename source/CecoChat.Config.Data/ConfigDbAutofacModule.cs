@@ -3,7 +3,7 @@ using Common.Autofac;
 using Common.Npgsql;
 using Microsoft.Extensions.Configuration;
 
-namespace CecoChat.Data.Config;
+namespace CecoChat.Config.Data;
 
 public sealed class ConfigDbAutofacModule : Module
 {
