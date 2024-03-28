@@ -1,4 +1,4 @@
-using CecoChat.Contracts.Config;
+using CecoChat.Config.Contracts;
 using CecoChat.Data.Config;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CecoChat.Server.Config.Endpoints;
 
-public class ConfigService : Contracts.Config.Config.ConfigBase
+public class ConfigService : CecoChat.Config.Contracts.Config.ConfigBase
 {
     private readonly ILogger _logger;
     private readonly ConfigDbContext _configDbContext;
@@ -26,7 +26,7 @@ public class ConfigService : Contracts.Config.Config.ConfigBase
 
         foreach (ElementEntity entity in entities)
         {
-            Contracts.Config.ConfigElement element = new()
+            CecoChat.Config.Contracts.ConfigElement element = new()
             {
                 Name = entity.Name,
                 Value = entity.Value,

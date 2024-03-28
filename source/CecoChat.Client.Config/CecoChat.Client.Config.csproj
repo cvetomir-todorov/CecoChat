@@ -9,7 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CecoChat.Contracts.Config\CecoChat.Contracts.Config.csproj" />
+    <ProjectReference Include="..\CecoChat.Config.Contracts\CecoChat.Config.Contracts.csproj" />
     <ProjectReference Include="..\Common\Common.csproj" />
   </ItemGroup>
 

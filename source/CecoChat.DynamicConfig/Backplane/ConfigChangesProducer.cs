@@ -1,4 +1,4 @@
-using CecoChat.Contracts.Config;
+using CecoChat.Config.Contracts;
 using Common;
 using Common.Kafka;
 using Confluent.Kafka;

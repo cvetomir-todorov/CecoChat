@@ -1,6 +1,6 @@
 syntax = "proto3";
-option csharp_namespace = "CecoChat.Contracts.Config";
-package CecoChat.Contracts.Config;
+option csharp_namespace = "CecoChat.Config.Contracts";
+package CecoChat.Config.Contracts;
 import "ConfigElement.proto";
 
 service Config {

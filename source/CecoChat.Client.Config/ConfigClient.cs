@@ -1,4 +1,4 @@
-using CecoChat.Contracts.Config;
+using CecoChat.Config.Contracts;
 using Common;
 using Grpc.Core;
 using Microsoft.Extensions.Logging;
@@ -15,13 +15,13 @@ public sealed class ConfigClient : IConfigClient
 {
     private readonly ILogger _logger;
     private readonly ConfigClientOptions _options;
-    private readonly Contracts.Config.Config.ConfigClient _client;
+    private readonly CecoChat.Config.Contracts.Config.ConfigClient _client;
     private readonly IClock _clock;
 
     public ConfigClient(
         ILogger<ConfigClient> logger,
         IOptions<ConfigClientOptions> options,
-        Contracts.Config.Config.ConfigClient client,
+        CecoChat.Config.Contracts.Config.ConfigClient client,
         IClock clock)
     {
         _logger = logger;

@@ -1,5 +1,5 @@
 using CecoChat.Client.Config;
-using CecoChat.Contracts.Config;
+using CecoChat.Config.Contracts;
 using Microsoft.Extensions.Logging;
 
 namespace CecoChat.DynamicConfig.Sections.Snowflake;

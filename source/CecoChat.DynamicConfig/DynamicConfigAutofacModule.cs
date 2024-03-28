@@ -1,5 +1,5 @@
 using Autofac;
-using CecoChat.Contracts.Config;
+using CecoChat.Config.Contracts;
 using CecoChat.DynamicConfig.Backplane;
 using CecoChat.DynamicConfig.Sections.History;
 using CecoChat.DynamicConfig.Sections.Partitioning;

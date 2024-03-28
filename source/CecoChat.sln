@@ -61,7 +61,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CecoChat.User.Contracts", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CecoChat.Chats.Contracts", "CecoChat.Chats.Contracts\CecoChat.Chats.Contracts.csproj", "{71A9691D-DFE5-46B0-995F-91A5BB056BD2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CecoChat.Contracts.Config", "CecoChat.Contracts.Config\CecoChat.Contracts.Config.csproj", "{49E56454-19D7-4CBC-AF13-ECF26EEAA1E2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CecoChat.Config.Contracts", "CecoChat.Config.Contracts\CecoChat.Config.Contracts.csproj", "{49E56454-19D7-4CBC-AF13-ECF26EEAA1E2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CecoChat.Client.Config", "CecoChat.Client.Config\CecoChat.Client.Config.csproj", "{4982A62E-6628-481D-BBE3-49526885D436}"
 EndProject

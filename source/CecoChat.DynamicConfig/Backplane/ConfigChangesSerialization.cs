@@ -1,4 +1,4 @@
-using CecoChat.Contracts.Config;
+using CecoChat.Config.Contracts;
 using Confluent.Kafka;
 using Google.Protobuf;
 
