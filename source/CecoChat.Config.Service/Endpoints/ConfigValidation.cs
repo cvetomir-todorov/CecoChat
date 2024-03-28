@@ -2,7 +2,7 @@ using System.Text.RegularExpressions;
 using CecoChat.Config.Contracts;
 using FluentValidation;
 
-namespace CecoChat.Server.Config.Endpoints;
+namespace CecoChat.Config.Service.Endpoints;
 
 public sealed class UpdateConfigElementsRequestValidator : AbstractValidator<UpdateConfigElementsRequest>
 {

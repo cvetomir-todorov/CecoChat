@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Npgsql;
 
-namespace CecoChat.Server.Config.Endpoints;
+namespace CecoChat.Config.Service.Endpoints;
 
 [ApiController]
 [Route("api/config")]

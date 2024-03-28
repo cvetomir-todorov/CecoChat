@@ -4,7 +4,7 @@ using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Microsoft.EntityFrameworkCore;
 
-namespace CecoChat.Server.Config.Endpoints;
+namespace CecoChat.Config.Service.Endpoints;
 
 public class ConfigService : CecoChat.Config.Contracts.Config.ConfigBase
 {

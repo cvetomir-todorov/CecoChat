@@ -2,10 +2,11 @@ using System.Reflection;
 using Autofac;
 using Calzolari.Grpc.AspNetCore.Validation;
 using CecoChat.Config.Data;
+using CecoChat.Config.Service.Endpoints;
+using CecoChat.Config.Service.Init;
 using CecoChat.DynamicConfig;
+using CecoChat.Server;
 using CecoChat.Server.Backplane;
-using CecoChat.Server.Config.Endpoints;
-using CecoChat.Server.Config.Init;
 using Common.AspNet.Health;
 using Common.AspNet.Init;
 using Common.AspNet.ModelBinding;
@@ -24,7 +25,7 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 
-namespace CecoChat.Server.Config;
+namespace CecoChat.Config.Service;
 
 public static class Program
 {

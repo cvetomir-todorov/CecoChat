@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Npgsql;
 
-namespace CecoChat.Server.Config.Init;
+namespace CecoChat.Config.Service.Init;
 
 public class ConfigDbInit : InitStep
 {
