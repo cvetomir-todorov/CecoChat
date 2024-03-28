@@ -2,7 +2,7 @@ using Common.Http.Client;
 using Common.Polly;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace CecoChat.Client.Config;
+namespace CecoChat.Config.Client;
 
 public static class ConfigClientRegistrations
 {

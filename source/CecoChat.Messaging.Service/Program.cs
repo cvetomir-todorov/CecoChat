@@ -1,5 +1,5 @@
 using Autofac;
-using CecoChat.Client.Config;
+using CecoChat.Config.Client;
 using CecoChat.Contracts.Backplane;
 using CecoChat.DynamicConfig;
 using CecoChat.IdGen.Client;

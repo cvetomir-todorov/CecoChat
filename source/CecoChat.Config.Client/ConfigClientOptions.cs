@@ -1,7 +1,7 @@
 using Common.Http.Client;
 using Common.Polly;
 
-namespace CecoChat.Client.Config;
+namespace CecoChat.Config.Client;
 
 public sealed class ConfigClientOptions
 {

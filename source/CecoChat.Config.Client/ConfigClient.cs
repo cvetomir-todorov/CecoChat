@@ -4,7 +4,7 @@ using Grpc.Core;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace CecoChat.Client.Config;
+namespace CecoChat.Config.Client;
 
 public interface IConfigClient : IDisposable
 {

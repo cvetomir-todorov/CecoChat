@@ -1,7 +1,7 @@
 using System.Reflection;
 using Autofac;
 using Calzolari.Grpc.AspNetCore.Validation;
-using CecoChat.Client.Config;
+using CecoChat.Config.Client;
 using CecoChat.Contracts.Backplane;
 using CecoChat.DynamicConfig;
 using CecoChat.Server;

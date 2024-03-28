@@ -6,7 +6,7 @@ using CecoChat.Chats.Data.Telemetry;
 using CecoChat.Chats.Service.Backplane;
 using CecoChat.Chats.Service.Endpoints;
 using CecoChat.Chats.Service.Init;
-using CecoChat.Client.Config;
+using CecoChat.Config.Client;
 using CecoChat.Contracts.Backplane;
 using CecoChat.DynamicConfig;
 using CecoChat.Server;

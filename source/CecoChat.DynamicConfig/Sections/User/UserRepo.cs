@@ -1,4 +1,4 @@
-using CecoChat.Client.Config;
+using CecoChat.Config.Client;
 using CecoChat.Config.Contracts;
 using Microsoft.Extensions.Logging;
 

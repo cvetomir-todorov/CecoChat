@@ -3,7 +3,7 @@ using Autofac;
 using CecoChat.Bff.Service.Files;
 using CecoChat.Bff.Service.Init;
 using CecoChat.Chats.Client;
-using CecoChat.Client.Config;
+using CecoChat.Config.Client;
 using CecoChat.Data;
 using CecoChat.DynamicConfig;
 using CecoChat.Server;
