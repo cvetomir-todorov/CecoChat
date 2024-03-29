@@ -3,7 +3,7 @@ using Common.Kafka;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace CecoChat.Server.Backplane;
+namespace CecoChat.Backplane;
 
 public class BackplaneInit : InitStep
 {

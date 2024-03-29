@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -14,7 +14,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Protobuf Include="Uuid.proto" />
+    <Protobuf Include="Contracts\BackplaneMessage.proto" />
+    <Protobuf Include="Contracts\ConnectionStatus.proto" />
+    <Protobuf Include="Contracts\DeliveryStatus.proto" />
+    <Protobuf Include="Contracts\MessageType.proto" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../Common.AspNet/Common.AspNet.csproj" />
+    <ProjectReference Include="../Common.Kafka/Common.Kafka.csproj" />
   </ItemGroup>
 
 </Project>

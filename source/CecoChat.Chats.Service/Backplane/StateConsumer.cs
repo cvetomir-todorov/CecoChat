@@ -1,8 +1,8 @@
+using CecoChat.Backplane;
+using CecoChat.Backplane.Contracts;
 using CecoChat.Chats.Contracts;
 using CecoChat.Chats.Data.Entities.UserChats;
-using CecoChat.Contracts.Backplane;
 using CecoChat.Data;
-using CecoChat.Server.Backplane;
 using Common;
 using Common.Kafka;
 using Confluent.Kafka;

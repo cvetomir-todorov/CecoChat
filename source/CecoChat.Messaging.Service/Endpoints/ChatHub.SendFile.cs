@@ -1,4 +1,4 @@
-using CecoChat.Contracts.Backplane;
+using CecoChat.Backplane.Contracts;
 using CecoChat.Messaging.Contracts;
 using CecoChat.Server.Identity;
 using FluentValidation.Results;

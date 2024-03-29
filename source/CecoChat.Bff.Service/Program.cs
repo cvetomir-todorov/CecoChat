@@ -1,5 +1,6 @@
 using System.Reflection;
 using Autofac;
+using CecoChat.Backplane;
 using CecoChat.Bff.Service.Files;
 using CecoChat.Bff.Service.Init;
 using CecoChat.Chats.Client;
@@ -7,7 +8,6 @@ using CecoChat.Config;
 using CecoChat.Config.Client;
 using CecoChat.Data;
 using CecoChat.Server;
-using CecoChat.Server.Backplane;
 using CecoChat.Server.Identity;
 using CecoChat.User.Client;
 using Common;

@@ -1,7 +1,8 @@
 using Autofac;
+using CecoChat.Backplane;
+using CecoChat.Backplane.Contracts;
 using CecoChat.Config;
 using CecoChat.Config.Client;
-using CecoChat.Contracts.Backplane;
 using CecoChat.IdGen.Client;
 using CecoChat.Messaging.Service.Backplane;
 using CecoChat.Messaging.Service.Clients;
@@ -9,7 +10,6 @@ using CecoChat.Messaging.Service.Endpoints;
 using CecoChat.Messaging.Service.Init;
 using CecoChat.Messaging.Service.Telemetry;
 using CecoChat.Server;
-using CecoChat.Server.Backplane;
 using CecoChat.Server.Identity;
 using Common;
 using Common.AspNet.Health;

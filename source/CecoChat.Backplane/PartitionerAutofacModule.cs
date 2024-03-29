@@ -2,7 +2,7 @@
 using Common;
 using Common.Autofac;
 
-namespace CecoChat.Server.Backplane;
+namespace CecoChat.Backplane;
 
 public sealed class PartitionerAutofacModule : Module
 {

@@ -1,8 +1,8 @@
-﻿using CecoChat.Config.Sections.Partitioning;
+﻿using CecoChat.Backplane;
+using CecoChat.Config.Sections.Partitioning;
 using CecoChat.Messaging.Contracts;
 using CecoChat.Messaging.Service.Backplane;
 using CecoChat.Messaging.Service.Clients;
-using CecoChat.Server.Backplane;
 using Common.AspNet.Init;
 using Common.Events;
 using Common.Kafka;

@@ -1,10 +1,10 @@
 syntax = "proto3";
-option csharp_namespace = "CecoChat.Contracts.Backplane";
-package CecoChat.Contracts.Backplane;
+option csharp_namespace = "CecoChat.Backplane.Contracts";
+package CecoChat.Backplane.Contracts;
 import "google/protobuf/timestamp.proto";
-import "Backplane/MessageType.proto";
-import "Backplane/DeliveryStatus.proto";
-import "Backplane/ConnectionStatus.proto";
+import "Contracts/MessageType.proto";
+import "Contracts/DeliveryStatus.proto";
+import "Contracts/ConnectionStatus.proto";
 
 message BackplaneMessage {
   int64 message_id = 1;

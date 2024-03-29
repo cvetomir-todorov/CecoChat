@@ -1,8 +1,8 @@
-using CecoChat.Contracts.Backplane;
+using CecoChat.Backplane.Contracts;
 using Confluent.Kafka;
 using Google.Protobuf;
 
-namespace CecoChat.Server.Backplane;
+namespace CecoChat.Backplane;
 
 public sealed class BackplaneMessageSerializer : ISerializer<BackplaneMessage>
 {

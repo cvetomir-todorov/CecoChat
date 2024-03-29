@@ -26,8 +26,6 @@
 
   <ItemGroup>
     <ProjectReference Include="../CecoChat.Config/CecoChat.Config.csproj" />
-    <ProjectReference Include="../CecoChat.Contracts/CecoChat.Contracts.csproj" />
-    <ProjectReference Include="../Common/Common.csproj" />
     <ProjectReference Include="../Common.AspNet/Common.AspNet.csproj" />
     <ProjectReference Include="../Common.Kafka/Common.Kafka.csproj" />
     <ProjectReference Include="../Common.OpenTelemetry/Common.OpenTelemetry.csproj" />

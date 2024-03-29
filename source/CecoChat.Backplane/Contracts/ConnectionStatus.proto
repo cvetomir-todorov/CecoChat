@@ -1,6 +1,6 @@
 syntax = "proto3";
-option csharp_namespace = "CecoChat.Contracts.Backplane";
-package CecoChat.Contracts.Backplane;
+option csharp_namespace = "CecoChat.Backplane.Contracts";
+package CecoChat.Backplane.Contracts;
 
 enum ConnectionStatus {
   NOT_CONNECTED = 0;

@@ -1,5 +1,5 @@
-using CecoChat.Contracts.Backplane;
-using CecoChat.Server.Backplane;
+using CecoChat.Backplane;
+using CecoChat.Backplane.Contracts;
 using CecoChat.User.Contracts;
 using Common;
 using Common.Kafka;
@@ -60,18 +60,18 @@ public sealed class ConnectionNotifyProducer : IConnectionNotifyProducer
 
     private static BackplaneMessage MapConnection(long userId, Connection connection)
     {
-        CecoChat.Contracts.Backplane.ConnectionStatus status;
+        CecoChat.Backplane.Contracts.ConnectionStatus status;
 
         switch (connection.Status)
         {
             case CecoChat.User.Contracts.ConnectionStatus.NotConnected:
-                status = CecoChat.Contracts.Backplane.ConnectionStatus.NotConnected;
+                status = CecoChat.Backplane.Contracts.ConnectionStatus.NotConnected;
                 break;
             case CecoChat.User.Contracts.ConnectionStatus.Pending:
-                status = CecoChat.Contracts.Backplane.ConnectionStatus.Pending;
+                status = CecoChat.Backplane.Contracts.ConnectionStatus.Pending;
                 break;
             case CecoChat.User.Contracts.ConnectionStatus.Connected:
-                status = CecoChat.Contracts.Backplane.ConnectionStatus.Connected;
+                status = CecoChat.Backplane.Contracts.ConnectionStatus.Connected;
                 break;
             default:
                 throw new EnumValueNotSupportedException(connection.Status);

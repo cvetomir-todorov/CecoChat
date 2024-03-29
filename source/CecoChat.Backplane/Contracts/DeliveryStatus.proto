@@ -1,0 +1,9 @@
+syntax = "proto3";
+option csharp_namespace = "CecoChat.Backplane.Contracts";
+package CecoChat.Backplane.Contracts;
+
+enum DeliveryStatus {
+  PROCESSED = 0;
+  DELIVERED = 1;
+  SEEN = 2;
+}

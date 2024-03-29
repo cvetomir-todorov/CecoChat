@@ -1,5 +1,5 @@
+using CecoChat.Backplane.Contracts;
 using CecoChat.Chats.Contracts;
-using CecoChat.Contracts.Backplane;
 
 namespace CecoChat.Chats.Service;
 

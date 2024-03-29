@@ -1,11 +1,11 @@
 using System.Reflection;
 using Autofac;
 using Calzolari.Grpc.AspNetCore.Validation;
+using CecoChat.Backplane;
 using CecoChat.Config.Data;
 using CecoChat.Config.Service.Endpoints;
 using CecoChat.Config.Service.Init;
 using CecoChat.Server;
-using CecoChat.Server.Backplane;
 using Common.AspNet.Health;
 using Common.AspNet.Init;
 using Common.AspNet.ModelBinding;
