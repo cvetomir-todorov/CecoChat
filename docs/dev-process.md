@@ -7,12 +7,17 @@ Most services have the following layers and/or libraries associated with them:
 * Service client
 
 .NET projects are grouped into solution folders depending on the functionality:
-* `Contracts` contains the contracts for the different parts of the system
-* `Data` projects are tasked with data access for the different data stores
-* `Server` contains the services which are ran from the IDE or are being containerized, and shared server-side projects
-* `Clients` projects are the .NET clients for calling a specific service
-* `Shared` contains technology-oriented functionality, which could also be reusable in a different project
-* `ClientApp` contains the console client used for testing and the load testing app
+* `Components` contains the projects for each piece of the system design
+  * `Backplane` contains the projects related to the backplane
+  * `BFF` contains the projects related to the BFF service
+  * `Chats` contains the projects related to the Chats service
+  * `Config` contains the projects related to the Config service
+  * `IdGen` contains the projects related to the ID Gen service
+  * `Messaging` contains the projects related to the Messaging service
+  * `User` contains the projects related to the User service
+* `ClientApp` contains the console client used for manual testing and the load testing app
+* `Shared` contains project-specific functionality, reusable across services
+* `Common` contains technology-oriented functionality, which could also be reusable in a different project
 
 # Running
 
