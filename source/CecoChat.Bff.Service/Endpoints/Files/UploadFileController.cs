@@ -169,7 +169,7 @@ public class UploadFileController : ControllerBase
         string bucketName = _objectNaming.GetCurrentBucketName();
         string plannedObjectName = _objectNaming.CreateObjectName(userClaims.UserId, fileExtension);
 
-        string actualObjectName = await _minio.UploadFile(bucketName, plannedObjectName, fileContentType, tags: null, fileStream, fileSize, ct);
+        string actualObjectName = await _minio.UploadObject(bucketName, plannedObjectName, fileContentType, tags: null, fileStream, fileSize, ct);
         _logger.LogTrace("Uploaded successfully a new file with content type {ContentType} sized {FileSize}B to bucket {Bucket} with path {Path} for user {UserId}",
             fileContentType, fileSize, bucketName, actualObjectName, userClaims.UserId);
 

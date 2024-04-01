@@ -49,11 +49,12 @@ public class DownloadFileController : ControllerBase
     [HttpGet("{bucket}/{path}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DownloadFile([FromMultiSource][BindRequired] DownloadFileRequest request, CancellationToken ct)
+    public async Task DownloadFile([FromMultiSource][BindRequired] DownloadFileRequest request, CancellationToken ct)
     {
         if (!HttpContext.TryGetUserClaimsAndAccessToken(_logger, out UserClaims? userClaims, out string? accessToken))
         {
-            return Unauthorized();
+            Response.StatusCode = StatusCodes.Status401Unauthorized;
+            return;
         }
 
         string bucket = request.BucketUrlDecoded;
@@ -63,17 +64,30 @@ public class DownloadFileController : ControllerBase
         if (!hasAccess)
         {
             _logger.LogWarning("File in bucket {Bucket} with path {Path} is being requested by user {UserId} without having access", bucket, path, userClaims.UserId);
-            return Forbid();
+            Response.StatusCode = StatusCodes.Status403Forbidden;
+            return;
         }
 
-        DownloadFileResult downloadFileResult = await _minio.DownloadFile(bucket, path, ct);
+        ObjectMetadataResult objectMetadataResult = await _minio.GetObjectMetadata(bucket, path, ct);
+        if (!objectMetadataResult.IsFound)
+        {
+            _logger.LogTrace("Failed to find the file in bucket {Bucket} with path {Path}", bucket, path);
+            Response.StatusCode = StatusCodes.Status404NotFound;
+            return;
+        }
+
+        Response.StatusCode = StatusCodes.Status200OK;
+        Response.ContentType = objectMetadataResult.ContentType;
+        Response.ContentLength = objectMetadataResult.Size;
+
+        DownloadFileResult downloadFileResult = await _minio.WriteObjectToStream(bucket, path, Response.Body, ct);
         if (!downloadFileResult.IsFound)
         {
             _logger.LogTrace("Failed to find file in bucket {Bucket} with path {Path}", bucket, path);
-            return NotFound();
+            Response.StatusCode = StatusCodes.Status404NotFound;
+            return;
         }
 
         _logger.LogTrace("Responding with file from bucket {Bucket} with path {Path} requested by user {UserId}", bucket, path, userClaims.UserId);
-        return File(downloadFileResult.Stream, downloadFileResult.ContentType);
     }
 }
