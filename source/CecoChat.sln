@@ -95,6 +95,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Backplane", "Backplane", "{
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CecoChat.Backplane", "CecoChat.Backplane\CecoChat.Backplane.csproj", "{D04E96F5-3698-4AC3-BFDF-DFF28B6B3BBB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CecoChat.IdGen.Testing", "CecoChat.IdGen.Testing\CecoChat.IdGen.Testing.csproj", "{83038940-C5C1-4723-AF41-04F2AE05C710}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -241,6 +243,10 @@ Global
 		{D04E96F5-3698-4AC3-BFDF-DFF28B6B3BBB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D04E96F5-3698-4AC3-BFDF-DFF28B6B3BBB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D04E96F5-3698-4AC3-BFDF-DFF28B6B3BBB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{83038940-C5C1-4723-AF41-04F2AE05C710}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83038940-C5C1-4723-AF41-04F2AE05C710}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83038940-C5C1-4723-AF41-04F2AE05C710}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83038940-C5C1-4723-AF41-04F2AE05C710}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -288,6 +294,7 @@ Global
 		{D5FD0095-9F85-40B2-8AC0-5C93EC6DC06E} = {B00A5BC5-E803-44B8-8680-885046D65CBE}
 		{EFDD5358-77F7-4657-AD8F-905845EBDC4A} = {40DD0429-AC4C-4A22-B668-34DC395023D1}
 		{D04E96F5-3698-4AC3-BFDF-DFF28B6B3BBB} = {EFDD5358-77F7-4657-AD8F-905845EBDC4A}
+		{83038940-C5C1-4723-AF41-04F2AE05C710} = {DA6D302C-F6BB-4BC3-BDDD-AE316FB64537}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B5EAA668-8419-44F5-8BE5-9175A9B20BF8}
