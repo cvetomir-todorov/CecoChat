@@ -89,6 +89,7 @@ internal sealed class IdGenClient : IIdGenClient
             Activity.Current = null;
             _idChannel.ClearIds();
             GenerateManyResponse response = _client.GenerateMany(request, deadline: deadline);
+            _logger.LogTrace("Refreshed IDs by {IdCount}", response.Ids.Count);
             _idChannel.AddNewIds(response.Ids);
         }
         catch (RpcException rpcException)

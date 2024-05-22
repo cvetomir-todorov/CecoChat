@@ -5,3 +5,7 @@ https://localhost:31003 bff
 https://localhost:31004 chats
 https://localhost:31005 users
 https://localhost:31006 config
+
+testing:
+
+https://localhost:32002 idgen

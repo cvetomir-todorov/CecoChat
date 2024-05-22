@@ -38,7 +38,7 @@ public static class Program
         await EntryPoint.RunWebApp(app, typeof(Program));
     }
 
-    private static void AddServices(WebApplicationBuilder builder, CommonOptions options)
+    public static void AddServices(WebApplicationBuilder builder, CommonOptions options)
     {
         // dynamic config
         builder.Services.AddConfigClient(options.ConfigClient);
@@ -56,7 +56,7 @@ public static class Program
         builder.Services.AddOptions();
     }
 
-    private static void AddTelemetry(WebApplicationBuilder builder, CommonOptions options)
+    public static void AddTelemetry(WebApplicationBuilder builder, CommonOptions options)
     {
         ResourceBuilder serviceResourceBuilder = ResourceBuilder
             .CreateEmpty()
@@ -85,7 +85,7 @@ public static class Program
             });
     }
 
-    private static void AddHealth(WebApplicationBuilder builder, CommonOptions options)
+    public static void AddHealth(WebApplicationBuilder builder, CommonOptions options)
     {
         builder.Services
             .AddHealthChecks()
@@ -95,7 +95,7 @@ public static class Program
             .AddBackplane(builder.Configuration.GetSection("Backplane"));
     }
 
-    private static void ConfigureContainer(HostBuilderContext host, ContainerBuilder builder)
+    public static void ConfigureContainer(HostBuilderContext host, ContainerBuilder builder)
     {
         // init
         builder.RegisterInitStep<DynamicConfigInit>();
@@ -123,7 +123,7 @@ public static class Program
         builder.RegisterType<MonotonicClock>().As<IClock>().SingleInstance();
     }
 
-    private static void ConfigurePipeline(WebApplication app, CommonOptions options)
+    public static void ConfigurePipeline(WebApplication app, CommonOptions options)
     {
         if (app.Environment.IsDevelopment())
         {
