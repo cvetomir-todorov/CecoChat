@@ -1,7 +1,6 @@
 using System.Reflection;
 using NUnit.Framework;
 using Serilog;
-using Serilog.Enrichers.Span;
 using Serilog.Events;
 
 namespace CecoChat.IdGen.Testing;
@@ -31,9 +30,9 @@ public class TestEnvironment
 
     private static void ConfigureLogging()
     {
-        Assembly entryAssembly = Assembly.GetEntryAssembly()!;
-        string name = entryAssembly.GetName().Name!;
-        string binPath = Path.GetDirectoryName(entryAssembly.Location) ?? Environment.CurrentDirectory;
+        Assembly testAssembly = typeof(TestEnvironment).Assembly;
+        string name = testAssembly.GetName().Name!;
+        string binPath = Path.GetDirectoryName(testAssembly.Location) ?? Environment.CurrentDirectory;
         // going from /source/project/bin/debug/.netX.Y/ to /source/logs/project.txt
         string filePath = Path.Combine(binPath, "..", "..", "..", "..", "logs", $"{name}.txt");
 
@@ -46,13 +45,11 @@ public class TestEnvironment
             .MinimumLevel.Override("Grpc", LogEventLevel.Warning)
             .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
             .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
-            .Enrich.WithSpan()
             .Enrich.FromLogContext()
             .Destructure.ToMaximumDepth(8)
             .Destructure.ToMaximumStringLength(1024)
             .Destructure.ToMaximumCollectionCount(32)
             .WriteTo.Debug()
-            .WriteTo.Console()
             .WriteTo.File(
                 path: filePath,
                 rollingInterval: RollingInterval.Day,
@@ -65,5 +62,6 @@ public class TestEnvironment
     public void AfterAllTests()
     {
         Log.CloseAndFlush();
+        TestContext.Progress.WriteLine("Flushed and waited");
     }
 }
