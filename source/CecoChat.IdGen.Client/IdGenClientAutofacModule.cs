@@ -16,7 +16,6 @@ public sealed class IdGenClientAutofacModule : Module
     protected override void Load(ContainerBuilder builder)
     {
         builder.RegisterType<IdGenClient>().As<IIdGenClient>().SingleInstance();
-        builder.RegisterType<IdChannel>().As<IIdChannel>().SingleInstance();
         builder.RegisterOptions<IdGenClientOptions>(_idGenConfiguration);
     }
 }

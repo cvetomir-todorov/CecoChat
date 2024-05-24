@@ -1,7 +1,6 @@
-﻿using System.Diagnostics;
+using System.Threading.Channels;
 using CecoChat.IdGen.Contracts;
 using Common;
-using Grpc.Core;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -24,8 +23,8 @@ internal sealed class IdGenClient : IIdGenClient
     private readonly IdGenClientOptions _options;
     private readonly CecoChat.IdGen.Contracts.IdGen.IdGenClient _client;
     private readonly IClock _clock;
-    private readonly IIdChannel _idChannel;
-    private readonly Timer _invalidateIdsTimer;
+    private readonly Channel<long> _channel;
+    private readonly Timer _refreshIdsTimer;
     private int _isRefreshing;
     private static readonly int True = 1;
     private static readonly int False = 0;
@@ -34,67 +33,101 @@ internal sealed class IdGenClient : IIdGenClient
         ILogger<IdGenClient> logger,
         IOptions<IdGenClientOptions> options,
         CecoChat.IdGen.Contracts.IdGen.IdGenClient client,
-        IClock clock,
-        IIdChannel idChannel)
+        IClock clock)
     {
         _logger = logger;
         _options = options.Value;
         _client = client;
         _clock = clock;
-        _idChannel = idChannel;
+
+        UnboundedChannelOptions channelOptions = new()
+        {
+            SingleReader = false,
+            SingleWriter = true
+        };
+        _channel = Channel.CreateUnbounded<long>(channelOptions);
+
+        _refreshIdsTimer = new Timer(
+            callback: RefreshIds,
+            state: null,
+            dueTime: TimeSpan.Zero,
+            period: _options.RefreshIdsInterval);
 
         _logger.LogInformation("ID Gen address set to {Address}", _options.Address);
         _logger.LogInformation("Start refreshing message IDs each {RefreshIdsInterval:##} ms with {RefreshIdsCount} IDs",
             _options.RefreshIdsInterval.TotalMilliseconds, _options.RefreshIdsCount);
-        _invalidateIdsTimer = new(
-            callback: _ => RefreshIds(),
-            state: null,
-            dueTime: TimeSpan.Zero,
-            period: _options.RefreshIdsInterval);
     }
 
     public void Dispose()
     {
-        _invalidateIdsTimer.Dispose();
+        _refreshIdsTimer.Dispose();
+        _channel.Writer.Complete();
     }
 
     public async ValueTask<GetIdResult> GetId(CancellationToken ct)
     {
-        (bool success, long id) = await _idChannel.TryTakeId(_options.GetIdWaitInterval, ct);
-        if (!success)
+        if (_channel.Reader.TryRead(out long quicklyReadId))
         {
-            _logger.LogWarning("Timed-out while waiting for new IDs to be generated");
-            return new GetIdResult();
+            return new GetIdResult
+            {
+                Id = quicklyReadId
+            };
+        }
+        else
+        {
+            // channel is empty
+            TryAsynchronousRefreshOnDemand();
         }
 
-        return new GetIdResult { Id = id };
+        CancellationTokenSource? timeoutCts = null;
+        CancellationTokenSource? linkedCts = null;
+
+        try
+        {
+            timeoutCts = new CancellationTokenSource(_options.GetIdWaitInterval);
+            linkedCts = CancellationTokenSource.CreateLinkedTokenSource(timeoutCts.Token, ct);
+
+            long id = await _channel.Reader.ReadAsync(linkedCts.Token);
+            return new GetIdResult
+            {
+                Id = id
+            };
+        }
+        catch (OperationCanceledException)
+        {
+            ct.ThrowIfCancellationRequested();
+            return new GetIdResult();
+        }
+        finally
+        {
+            timeoutCts?.Dispose();
+            linkedCts?.Dispose();
+        }
     }
 
-    private void RefreshIds()
+    private void TryAsynchronousRefreshOnDemand()
+    {
+        if (_isRefreshing == False)
+        {
+            Task.Run(() => RefreshIds(null));
+        }
+    }
+
+    /// <summary>
+    /// Drains the existing IDs while simultaneously requesting new ones.
+    /// Populates the channel with the successfully received new IDs.
+    /// </summary>
+    private async void RefreshIds(object? state)
     {
         if (True == Interlocked.CompareExchange(ref _isRefreshing, True, False))
         {
-            _logger.LogWarning("Failed to refresh IDs since previous refresh hasn't completed yet");
+            _logger.LogTrace("Failed to refresh IDs since previous refresh hasn't completed yet");
             return;
         }
 
         try
         {
-            GenerateManyRequest request = new()
-            {
-                Count = _options.RefreshIdsCount
-            };
-            DateTime deadline = _clock.GetNowUtc().Add(_options.CallTimeout);
-
-            Activity.Current = null;
-            _idChannel.ClearIds();
-            GenerateManyResponse response = _client.GenerateMany(request, deadline: deadline);
-            _logger.LogTrace("Refreshed IDs by {IdCount}", response.Ids.Count);
-            _idChannel.AddNewIds(response.Ids);
-        }
-        catch (RpcException rpcException)
-        {
-            _logger.LogError(rpcException, "Failed to refresh IDs due to error {Error}", rpcException.Status);
+            await DoRefreshIds();
         }
         catch (Exception exception)
         {
@@ -104,5 +137,43 @@ internal sealed class IdGenClient : IIdGenClient
         {
             Interlocked.Exchange(ref _isRefreshing, False);
         }
+    }
+
+    private async Task DoRefreshIds()
+    {
+        Task drainTask = DrainChannel();
+        Task<ICollection<long>> getIdsTask = GetIds();
+
+        Task.WaitAll(drainTask, getIdsTask);
+
+        ICollection<long> newIds = await getIdsTask;
+        foreach (long newId in newIds)
+        {
+            _channel.Writer.TryWrite(newId);
+        }
+
+        _logger.LogTrace("Refreshed IDs by {IdCount}", newIds.Count);
+    }
+
+    private Task DrainChannel()
+    {
+        while (_channel.Reader.TryRead(out _))
+        {
+            // just drain the channel
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private async Task<ICollection<long>> GetIds()
+    {
+        GenerateManyRequest request = new()
+        {
+            Count = _options.RefreshIdsCount
+        };
+        DateTime deadline = _clock.GetNowUtc().Add(_options.CallTimeout);
+
+        GenerateManyResponse response = await _client.GenerateManyAsync(request, deadline: deadline);
+        return response.Ids;
     }
 }
