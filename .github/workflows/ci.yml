@@ -89,7 +89,7 @@ jobs:
 
     - name: Run tests
       run: |
-        dotnet test --no-restore source/CecoChat.sln
+        dotnet test --no-restore source/CecoChat.sln --logger "console;verbosity=detailed"
 
 #  analyze-code-quality:
 #    needs: [verify-code-style, build]
