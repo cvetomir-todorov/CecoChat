@@ -1,4 +1,5 @@
 using System.Reflection;
+using CecoChat.IdGen.Testing.Logging;
 using NUnit.Framework;
 using Serilog;
 using Serilog.Events;
@@ -30,6 +31,8 @@ public class TestEnvironment
 
     private static void ConfigureLogging()
     {
+        const string outputTemplate = "[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext} | {Message:lj}{NewLine}{Exception}";
+
         Assembly testAssembly = typeof(TestEnvironment).Assembly;
         string name = testAssembly.GetName().Name!;
         string binPath = Path.GetDirectoryName(testAssembly.Location) ?? Environment.CurrentDirectory;
@@ -49,11 +52,14 @@ public class TestEnvironment
             .Destructure.ToMaximumDepth(8)
             .Destructure.ToMaximumStringLength(1024)
             .Destructure.ToMaximumCollectionCount(32)
-            .WriteTo.Debug()
+            .WriteTo.Debug(
+                outputTemplate: outputTemplate)
+            .WriteTo.NUnit(
+                outputTemplate: outputTemplate)
             .WriteTo.File(
+                outputTemplate: outputTemplate,
                 path: filePath,
-                rollingInterval: RollingInterval.Day,
-                outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext} | {Message:lj}{NewLine}{Exception}");
+                rollingInterval: RollingInterval.Day);
 
         Log.Logger = loggerConfig.CreateLogger();
     }
@@ -62,6 +68,5 @@ public class TestEnvironment
     public void AfterAllTests()
     {
         Log.CloseAndFlush();
-        TestContext.Progress.WriteLine("Flushed and waited");
     }
 }
