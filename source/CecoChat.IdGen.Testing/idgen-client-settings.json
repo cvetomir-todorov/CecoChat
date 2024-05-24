@@ -4,7 +4,7 @@
     "CallTimeout": "00:00:02.0",
     "RefreshIdsCount": 16,
     "RefreshIdsInterval": "00:00:01.0",
-    "GetIdWaitInterval": "00:00:05.0",
+    "GetIdWaitInterval": "00:00:02.0",
     "SocketsHttpHandler": {
       "KeepAlivePingDelay": "00:01:00.0",
       "KeepAlivePingTimeout": "00:00:30.0",
