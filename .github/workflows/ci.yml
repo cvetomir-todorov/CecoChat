@@ -89,6 +89,9 @@ jobs:
 
     - name: Run tests
       run: |
+        sudo mv source/certificates/services.crt /usr/local/share/ca-certificates/services.crt
+        sudo chmod 644 /usr/local/share/ca-certificates/services.crt
+        sudo update-ca-certificates
         dotnet test --no-restore source/CecoChat.sln --logger "console;verbosity=detailed"
 
 #  analyze-code-quality:
