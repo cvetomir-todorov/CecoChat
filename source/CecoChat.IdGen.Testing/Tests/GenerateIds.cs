@@ -6,20 +6,22 @@ using NUnit.Framework;
 
 namespace CecoChat.IdGen.Testing.Tests;
 
+/// <summary>
+/// Check ID Gen test client configuration in order to see:
+/// * How frequently the IDs are refreshed
+/// * How many new IDs are obtained on each refresh
+/// </summary>
 public class GenerateIds : BaseTest
 {
-    // client is configured to refresh IDs by 16 each second
     [TestCase(1)]
     [TestCase(2)]
-    [TestCase(16)]
-    // should force a new call
     [TestCase(32)]
-    [TestCase(48)]
-    [TestCase(64)]
     [TestCase(128)]
+    [TestCase(256)]
+    [TestCase(1024)]
     public async Task Consecutively(int idCount)
     {
-        List<long> ids = new(capacity: idCount);
+        List<long> idSequence = new(capacity: idCount);
         DateTime start = DateTime.UtcNow;
 
         for (int i = 0; i < idCount; ++i)
@@ -27,69 +29,60 @@ public class GenerateIds : BaseTest
             GetIdResult result = await Client.GetId(CancellationToken.None);
             if (result.Success)
             {
-                ids.Add(result.Id);
+                idSequence.Add(result.Id);
             }
         }
 
         using (new AssertionScope())
         {
-            ids.Count.Should().Be(idCount);
-            ids.Should().BeInAscendingOrder();
-
-            foreach (long id in ids)
-            {
-                DateTime idDateTime = id.ToTimestamp();
-                idDateTime.Should().BeWithin(TimeSpan.FromSeconds(2.5)).After(start.AddSeconds(-0.5));
-            }
+            VerifyIdSequence(idSequence, start, idCount);
         }
     }
 
-    // client is configured to refresh IDs by 16 each second
-    [TestCase(2, 1)]
-    [TestCase(4, 4)]
     [TestCase(16, 1)]
-    // should force a new call
-    [TestCase(16, 2)]
-    [TestCase(16, 4)]
-    [TestCase(16, 8)]
     [TestCase(16, 16)]
     [TestCase(16, 32)]
-    public async Task Simultaneously(int parallelCount, int idCountPerParallel)
+    [TestCase(64, 16)]
+    public async Task Concurrently(int concurrency, int idCount)
     {
-        IEnumerable<int> parallels = Enumerable.Range(0, parallelCount);
-        Dictionary<int, List<long>> ids = new(capacity: parallelCount);
+        IEnumerable<int> concurrencyIds = Enumerable.Range(0, concurrency);
+        Dictionary<int, List<long>> idMap = new(capacity: concurrency);
         DateTime start = DateTime.UtcNow;
 
-        await Parallel.ForEachAsync(parallels, async (parallel, ct) =>
+        await Parallel.ForEachAsync(concurrencyIds, async (concurrencyId, ct) =>
         {
-            int localParallel = parallel;
-            ids[localParallel] = new List<long>();
+            List<long> idSequence = new(capacity: idCount);
 
-            for (int i = 0; i < idCountPerParallel; ++i)
+            for (int i = 0; i < idCount; ++i)
             {
                 GetIdResult result = await Client.GetId(ct);
                 if (result.Success)
                 {
-                    ids[localParallel].Add(result.Id);
+                    idSequence.Add(result.Id);
                 }
             }
+
+            idMap.Add(concurrencyId, idSequence);
         });
 
         using (new AssertionScope())
         {
-            foreach (KeyValuePair<int,List<long>> pair in ids)
+            foreach (KeyValuePair<int,List<long>> pair in idMap)
             {
-                List<long> idsForCurrentParallel = pair.Value;
-
-                idsForCurrentParallel.Count.Should().Be(idCountPerParallel);
-                idsForCurrentParallel.Should().BeInAscendingOrder();
-
-                foreach (long id in idsForCurrentParallel)
-                {
-                    DateTime idDateTime = id.ToTimestamp();
-                    idDateTime.Should().BeWithin(TimeSpan.FromSeconds(2.5)).After(start.AddSeconds(-0.5));
-                }
+                VerifyIdSequence(pair.Value, start, idCount);
             }
+        }
+    }
+
+    private static void VerifyIdSequence(List<long> ids, DateTime start, int expectedCount)
+    {
+        ids.Count.Should().Be(expectedCount);
+        ids.Should().BeInAscendingOrder();
+
+        foreach (long id in ids)
+        {
+            DateTime idDateTime = id.ToTimestamp();
+            idDateTime.Should().BeWithin(TimeSpan.FromSeconds(1)).After(start.AddSeconds(-0.1));
         }
     }
 }

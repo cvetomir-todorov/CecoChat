@@ -2,8 +2,8 @@
   "IdGenClient": {
     "Address": "https://localhost:32002",
     "CallTimeout": "00:00:02.0",
-    "RefreshIdsCount": 16,
-    "RefreshIdsInterval": "00:00:01.0",
+    "RefreshIdsCount": 128,
+    "RefreshIdsInterval": "00:00:00.100",
     "GetIdWaitInterval": "00:00:02.0",
     "SocketsHttpHandler": {
       "KeepAlivePingDelay": "00:01:00.0",
