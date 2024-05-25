@@ -26,7 +26,7 @@ public class GenerateIds : BaseTest
 
         for (int i = 0; i < idCount; ++i)
         {
-            GetIdResult result = await Client.GetId(CancellationToken.None);
+            GetIdResult result = await Client.Instance.GetId(CancellationToken.None);
             if (result.Success)
             {
                 idSequence.Add(result.Id);
@@ -55,7 +55,7 @@ public class GenerateIds : BaseTest
 
             for (int i = 0; i < idCount; ++i)
             {
-                GetIdResult result = await Client.GetId(ct);
+                GetIdResult result = await Client.Instance.GetId(ct);
                 if (result.Success)
                 {
                     idSequence.Add(result.Id);
@@ -67,7 +67,7 @@ public class GenerateIds : BaseTest
 
         using (new AssertionScope())
         {
-            foreach (KeyValuePair<int,List<long>> pair in idMap)
+            foreach (KeyValuePair<int, List<long>> pair in idMap)
             {
                 VerifyIdSequence(pair.Value, start, idCount);
             }
