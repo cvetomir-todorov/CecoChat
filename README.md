@@ -37,7 +37,7 @@ Check out [what next](docs/what-next.md) needs to be implemented. I appreciate a
 # Technology
 
 * [System design](docs/intro-design.md) based on [microservice architecture](https://microservices.io/)
-* [Implementation](source) based on [cloud agnostic technologies](docs/intro-technologies.md)
+* [Implementation](source) based on [cloud-agnostic technologies](docs/intro-technologies.md)
 * [Configurable](docs/design-configuration.md), [observable](docs/design-observability.md), [containerized and runnable](docs/dev-run-prerequisites.md), [deployable](docs/design-deployment.md) local environment
 * [Main technologies](docs/intro-technologies.md)
   - Integration - Kafka, gRPC, WebSocket, HTTP
@@ -45,6 +45,7 @@ Check out [what next](docs/what-next.md) needs to be implemented. I appreciate a
   - Operations - OpenTelemetry, Docker, Kubernetes
   - Services - .NET, ASP.NET, SignalR, EF Core
   - Libraries - Autofac, Serilog, FluentValidation, AutoMapper, Polly, IdGen
+  - Automated testing - NUnit, FluentAssertions, Coverlet
 
 # Design
 

@@ -1,12 +1,13 @@
 # Technologies
 
-The technologies chosen are [cloud agnostic](https://codersociety.com/blog/articles/cloud-agnostic) which makes the solution independent from a specific cloud provider.
+The technologies chosen are [cloud-agnostic](https://codersociety.com/blog/articles/cloud-agnostic) which makes the solution independent of a specific cloud provider.
 
 * Integration - Kafka, gRPC, WebSocket, HTTP
 * Data storage - Yugabyte, Cassandra, MinIO, Redis
 * Operations - OpenTelemetry, Docker, Kubernetes
 * Services - .NET, ASP.NET, SignalR, EF Core
 * Libraries - Autofac, Serilog, FluentValidation, AutoMapper, Polly, IdGen
+* Automated testing - NUnit, FluentAssertions, Coverlet
 
 ![Technologies](images/cecochat-technologies.png)
 
@@ -43,7 +44,7 @@ Services communicate asynchronously via the PUB/SUB backplane which is based on 
 * enables a superb throughput due to its balanced distribution of partition leadership throughout the cluster
 * fault-tolerant and persists messages with customizable durability
 * can be tuned for either low latency, high-throughput or something in-between
-* allows different consumer groups each of which can process messages independently from each other
+* allows different consumer groups each of which can process messages independently of each other
 * has a pull model which allows consumers to process messages at their own rate
 * a good solution for an event log, especially when processing a single message is fast
 * has some known operability issues with partition redistribution among a consumer group
@@ -157,7 +158,7 @@ The services are based on .NET, ASP.NET, SignalR and Entity Framework Core:
 * open-source software backed by Microsoft
 * very mature, feature-rich, lots of tools
 * widely-used with a big community
-* well supported
+* well-supported
 
 ![Autofac](tech-images/autofac.png)
 ![Serilog](tech-images/serilog.png)
@@ -174,6 +175,15 @@ Additional libraries which are all open-source and created, supported and develo
 * Polly is a popular HTTP client policies library
 * IdGen is used to generate Snowflake IDs
 * Refit is one of the most popular REST clients
+
+![NUnit](tech-images/nunit.jpg)
+![FluentAssertions](tech-images/fluent-assertions.png)
+![Coverlet](tech-images/coverlet.png)
+
+Automated testing is done using open-source libraries, supported and developed by the community:
+* NUnit is one of the 2 most popular unit testing frameworks
+* Fluent Assertions is the most mature assertion framework
+* Coverlet is a powerful code coverage toolset
 
 # Tools
 
