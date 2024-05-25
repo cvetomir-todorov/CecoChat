@@ -2,7 +2,7 @@ using Common.Kafka;
 
 namespace CecoChat.IdGen.Testing.Infra;
 
-public class TestKafkaAdmin : IKafkaAdmin
+public sealed class TestKafkaAdmin : IKafkaAdmin
 {
 #pragma warning disable IDE0060 // Remove unused parameter
     public Task CreateTopics(IEnumerable<KafkaTopicSpec> topics)

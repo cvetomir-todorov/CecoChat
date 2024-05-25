@@ -3,7 +3,7 @@ using Confluent.Kafka;
 
 namespace CecoChat.IdGen.Testing.Infra;
 
-public class TestKafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey, TValue>
+public sealed class TestKafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey, TValue>
 {
     public void Dispose()
     { }

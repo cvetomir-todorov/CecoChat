@@ -4,7 +4,7 @@ using CecoChat.Config.Contracts;
 
 namespace CecoChat.IdGen.Testing.Infra;
 
-public class TestConfigClient : IConfigClient
+public sealed class TestConfigClient : IConfigClient
 {
     public void Dispose()
     { }
