@@ -24,7 +24,7 @@ jobs:
       run: dotnet tool update -g dotnet-format
 
     - name: Lint
-      run: dotnet format ./source/CecoChat.sln --no-restore --verify-no-changes --verbosity detailed
+      run: dotnet format source/CecoChat.sln --no-restore --verify-no-changes --verbosity detailed
 
   build:
     runs-on: ubuntu-latest
@@ -146,12 +146,18 @@ jobs:
           name: service-certificates
           path: source/certificates
 
+      - name: Download code coverage file
+        uses: actions/download-artifact@v3
+        with:
+          name: code-coverage
+          path: source/coverage.opencover.xml
+
       - name: Build and analyze
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         shell: powershell
         run: |
-          .\.sonar\scanner\dotnet-sonarscanner begin /k:"cvetomir-todorov_CecoChat" /o:"cvetomirtodorov-cecochat" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io"
+          .\.sonar\scanner\dotnet-sonarscanner begin /k:"cvetomir-todorov_CecoChat" /o:"cvetomirtodorov-cecochat" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.opencover.reportsPaths="source/coverage.opencover.xml"
           dotnet build source/CecoChat.sln
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
