@@ -150,7 +150,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: code-coverage
-          path: source/coverage.opencover.xml
+          path: source
 
       - name: Build and analyze
         env:
@@ -158,6 +158,6 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         shell: powershell
         run: |
-          .\.sonar\scanner\dotnet-sonarscanner begin /k:"cvetomir-todorov_CecoChat" /o:"cvetomirtodorov-cecochat" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.opencover.reportsPaths="source/coverage.opencover.xml"
+          .\.sonar\scanner\dotnet-sonarscanner begin /k:"cvetomir-todorov_CecoChat" /o:"cvetomirtodorov-cecochat" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.opencover.reportsPaths="${GITHUB_WORKSPACE}/source/coverage.opencover.xml"
           dotnet build source/CecoChat.sln
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
