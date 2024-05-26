@@ -7,6 +7,8 @@
 *drawio.bkp
 *drawio.dtmp
 *.dtmp
+source/coverage.json
+source/coverage.opencover.xml
 source/certificates/services.key
 source/certificates/services.csr
 source/certificates/services.crt

@@ -84,12 +84,23 @@ jobs:
         dotnet restore source/CecoChat.sln
 
     - name: Run tests
-      # the service self-signed TLS certificate needs to be trusted so that the client can call the service successfully
+      # The service self-signed TLS certificate needs to be trusted so that the client can call the service successfully
+      #
+      # By default Coverlet creates a code coverage file for each test project in a project-specific dir
+      # Merging all project-specific code coverage files is done using the approach described here: https://github.com/coverlet-coverage/coverlet/issues/357
+      # '/maxcpucount:1' is mandatory
+      # The comma ',' is escaped with '%2c' when converting the JSON output to OpenCover XML
       run: |
         sudo mv source/certificates/services.crt /usr/local/share/ca-certificates/services.crt
         sudo chmod 644 /usr/local/share/ca-certificates/services.crt
         sudo update-ca-certificates
-        dotnet test --no-restore source/CecoChat.sln --logger "console;verbosity=detailed"
+        dotnet test source/CecoChat.sln --no-restore --logger "console;verbosity=detailed" /p:CollectCoverage=true /p:CoverletOutput="${GITHUB_WORKSPACE}/source/" /p:MergeWith="${GITHUB_WORKSPACE}/source/coverage.json" /p:CoverletOutputFormat="json%2copencover" /maxcpucount:1
+
+    - name: Upload code coverage file
+      uses: actions/upload-artifact@v3
+      with:
+        name: code-coverage
+        path: source/coverage.opencover.xml
 
   analyze-code-quality:
     needs: [verify-code-style, build, test]
