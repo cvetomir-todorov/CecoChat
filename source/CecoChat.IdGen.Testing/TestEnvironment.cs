@@ -1,5 +1,5 @@
 using System.Reflection;
-using CecoChat.IdGen.Testing.Logging;
+using Common.Testing.Logging;
 using NUnit.Framework;
 using Serilog;
 using Serilog.Events;

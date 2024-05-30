@@ -5,7 +5,7 @@ using Serilog.Events;
 using Serilog.Formatting;
 using Serilog.Formatting.Display;
 
-namespace CecoChat.IdGen.Testing.Logging;
+namespace Common.Testing.Logging;
 
 public static class NUnitSinkRegistrations
 {

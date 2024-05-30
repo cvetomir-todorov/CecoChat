@@ -3,7 +3,7 @@ using Serilog.Core;
 using Serilog.Events;
 using Serilog.Formatting;
 
-namespace CecoChat.IdGen.Testing.Logging;
+namespace Common.Testing.Logging;
 
 public sealed class NUnitSink : ILogEventSink, IDisposable
 {
