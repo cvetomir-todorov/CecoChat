@@ -18,6 +18,7 @@
   <ItemGroup>
     <ProjectReference Include="..\CecoChat.Chats.Client\CecoChat.Chats.Client.csproj" />
     <ProjectReference Include="..\CecoChat.Chats.Service\CecoChat.Chats.Service.csproj" />
+    <ProjectReference Include="..\Common.Testing\Common.Testing.csproj" />
   </ItemGroup>
 
   <ItemGroup>
