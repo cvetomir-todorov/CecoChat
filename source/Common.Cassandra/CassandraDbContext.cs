@@ -32,7 +32,7 @@ public class CassandraDbContext : ICassandraDbContext
 
     private Cluster CreateCluster()
     {
-        List<IPEndPoint> endpoints = GetEndpoints();
+        List<IPEndPoint> endpoints = GetValidEndpoints();
 
         Builder clusterBuilder = new Builder()
             .AddContactPoints(endpoints)
@@ -57,7 +57,7 @@ public class CassandraDbContext : ICassandraDbContext
         return cluster;
     }
 
-    private List<IPEndPoint> GetEndpoints()
+    private List<IPEndPoint> GetValidEndpoints()
     {
         List<string> errors = new();
         HashSet<string> uniqueEndpoints = new();
@@ -67,18 +67,23 @@ public class CassandraDbContext : ICassandraDbContext
         {
             if (!uniqueEndpoints.Add(contactPoint))
             {
+                errors.Add($"contact point '{contactPoint}' is duplicate");
                 continue;
             }
 
             string[] parts = contactPoint.Split(':', StringSplitOptions.RemoveEmptyEntries);
-            if (parts.Length != 2 || parts[0].Length == 0 || parts[1].Length == 0 || !int.TryParse(parts[1], out int port))
+            if (parts.Length != 2 || parts[0].Length == 0 || parts[1].Length == 0 || !int.TryParse(parts[1], out int hostPort))
             {
                 errors.Add($"contact point '{contactPoint}' should be in format 'host:port'");
             }
             else
             {
-                IPAddress hostIp = Dns.GetHostEntry(parts[0]).AddressList[0];
-                endpoints.Add(new IPEndPoint(hostIp, port));
+                if (!IPAddress.TryParse(parts[0], out IPAddress? hostIp))
+                {
+                    hostIp = Dns.GetHostEntry(parts[0]).AddressList[0];
+                }
+
+                endpoints.Add(new IPEndPoint(hostIp, hostPort));
             }
         }
 
