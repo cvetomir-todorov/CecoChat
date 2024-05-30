@@ -1,11 +1,13 @@
 using System.Net;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using CecoChat.Config;
 using CecoChat.Config.Client;
 using CecoChat.Config.Contracts;
 using CecoChat.IdGen.Service;
-using CecoChat.IdGen.Testing.Infra;
 using CecoChat.Server;
+using CecoChat.Testing.Config;
+using CecoChat.Testing.Kafka;
 using Common.AspNet.Init;
 using Common.Autofac;
 using Common.Kafka;
@@ -51,9 +53,13 @@ public sealed class IdGenService : IAsyncDisposable
             Program.ConfigureContainer(host, autofacBuilder);
 
             // override registrations
-            autofacBuilder.RegisterType<TestConfigClient>().As<IConfigClient>().SingleInstance();
-            autofacBuilder.RegisterType<TestKafkaAdmin>().As<IKafkaAdmin>().SingleInstance();
-            autofacBuilder.RegisterFactory<TestKafkaConsumer<Null, ConfigChange>, IKafkaConsumer<Null, ConfigChange>>();
+            autofacBuilder.Register(_ => new ConfigClientStub(
+                [
+                    new() { Name = ConfigKeys.Snowflake.GeneratorIds, Value = "123=0,1" }
+                ]))
+                .As<IConfigClient>().SingleInstance();
+            autofacBuilder.RegisterType<KafkaAdminDummy>().As<IKafkaAdmin>().SingleInstance();
+            autofacBuilder.RegisterFactory<KafkaConsumerDummy<Null, ConfigChange>, IKafkaConsumer<Null, ConfigChange>>();
         });
 
         _app = builder.Build();

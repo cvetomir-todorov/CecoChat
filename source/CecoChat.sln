@@ -101,6 +101,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CecoChat.Chats.Testing", "C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Testing", "Common.Testing\Common.Testing.csproj", "{F43478E3-5744-4276-9B13-5D35B1529F06}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CecoChat.Testing", "CecoChat.Testing\CecoChat.Testing.csproj", "{B004FE83-64BF-4F59-8722-FC0D8045C875}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -259,6 +261,10 @@ Global
 		{F43478E3-5744-4276-9B13-5D35B1529F06}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F43478E3-5744-4276-9B13-5D35B1529F06}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F43478E3-5744-4276-9B13-5D35B1529F06}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B004FE83-64BF-4F59-8722-FC0D8045C875}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B004FE83-64BF-4F59-8722-FC0D8045C875}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B004FE83-64BF-4F59-8722-FC0D8045C875}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B004FE83-64BF-4F59-8722-FC0D8045C875}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -309,6 +315,7 @@ Global
 		{83038940-C5C1-4723-AF41-04F2AE05C710} = {DA6D302C-F6BB-4BC3-BDDD-AE316FB64537}
 		{864EDCC9-1E20-404A-8F62-66F90E6320F8} = {AD63D00D-89DD-4F1E-A311-DE9EAE1F701A}
 		{F43478E3-5744-4276-9B13-5D35B1529F06} = {C320D788-140F-4A46-A3A8-7A91FD43290B}
+		{B004FE83-64BF-4F59-8722-FC0D8045C875} = {B00A5BC5-E803-44B8-8680-885046D65CBE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B5EAA668-8419-44F5-8BE5-9175A9B20BF8}

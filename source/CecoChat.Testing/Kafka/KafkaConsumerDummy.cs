@@ -1,9 +1,9 @@
 using Common.Kafka;
 using Confluent.Kafka;
 
-namespace CecoChat.IdGen.Testing.Infra;
+namespace CecoChat.Testing.Kafka;
 
-public sealed class TestKafkaConsumer<TKey, TValue> : IKafkaConsumer<TKey, TValue>
+public sealed class KafkaConsumerDummy<TKey, TValue> : IKafkaConsumer<TKey, TValue>
 {
     public void Dispose()
     { }

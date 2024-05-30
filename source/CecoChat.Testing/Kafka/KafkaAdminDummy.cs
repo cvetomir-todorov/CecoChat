@@ -1,8 +1,8 @@
 using Common.Kafka;
 
-namespace CecoChat.IdGen.Testing.Infra;
+namespace CecoChat.Testing.Kafka;
 
-public sealed class TestKafkaAdmin : IKafkaAdmin
+public sealed class KafkaAdminDummy : IKafkaAdmin
 {
 #pragma warning disable IDE0060 // Remove unused parameter
     public Task CreateTopics(IEnumerable<KafkaTopicSpec> topics)
