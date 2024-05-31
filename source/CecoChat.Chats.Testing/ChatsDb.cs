@@ -40,7 +40,7 @@ public sealed class ChatsDb : IAsyncDisposable
             .WithWaitStrategy(Wait.ForUnixContainer()
                 //.UntilMessageIsLogged($"Starting listening for CQL clients on /0.0.0.0:{port}")
                 .UntilCassandraQueryExecuted(_cassandraHostPort, localDc, showErrorInterval: TimeSpan.FromSeconds(10)))
-            .WithLogger(new NUnitProgressLogger<TestContainers>())
+            .WithLogger(new NUnitProgressLogger<ChatsDb>())
             .Build();
     }
 
