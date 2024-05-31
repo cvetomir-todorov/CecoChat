@@ -1,6 +1,6 @@
 using Common.Kafka;
 
-namespace CecoChat.Testing.Kafka;
+namespace Common.Testing.Kafka;
 
 public sealed class KafkaAdminDummy : IKafkaAdmin
 {

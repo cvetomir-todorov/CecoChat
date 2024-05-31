@@ -1,7 +1,7 @@
 using Common.Kafka;
 using Confluent.Kafka;
 
-namespace CecoChat.Testing.Kafka;
+namespace Common.Testing.Kafka;
 
 public sealed class KafkaConsumerDummy<TKey, TValue> : IKafkaConsumer<TKey, TValue>
 {

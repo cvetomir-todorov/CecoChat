@@ -6,7 +6,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CecoChat.Config.Client\CecoChat.Config.Client.csproj" />
-    <ProjectReference Include="..\Common.Kafka\Common.Kafka.csproj" />
   </ItemGroup>
 
 </Project>

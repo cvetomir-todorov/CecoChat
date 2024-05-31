@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Common.Cassandra\Common.Cassandra.csproj" />
+    <ProjectReference Include="..\Common.Kafka\Common.Kafka.csproj" />
     <ProjectReference Include="..\Common\Common.csproj" />
   </ItemGroup>
 
