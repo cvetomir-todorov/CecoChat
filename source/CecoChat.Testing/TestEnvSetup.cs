@@ -4,19 +4,11 @@ using NUnit.Framework;
 using Serilog;
 using Serilog.Events;
 
-namespace CecoChat.IdGen.Testing;
+namespace CecoChat.Testing;
 
-[SetUpFixture]
-public class TestEnvironment
+public static class TestEnvSetup
 {
-    [OneTimeSetUp]
-    public void BeforeAllTests()
-    {
-        InitEnv();
-        ConfigureLogging();
-    }
-
-    private static void InitEnv()
+    public static void InitEnv()
     {
         const string envName = "ASPNETCORE_ENVIRONMENT";
         string? env = Environment.GetEnvironmentVariable(envName);
@@ -29,11 +21,11 @@ public class TestEnvironment
         TestContext.Progress.WriteLine($"{envName}: {env}");
     }
 
-    private static void ConfigureLogging()
+    public static void ConfigureLogging()
     {
         const string outputTemplate = "[{Timestamp:HH:mm:ss} {Level:u3}] {SourceContext} | {Message:lj}{NewLine}{Exception}";
 
-        Assembly testAssembly = typeof(TestEnvironment).Assembly;
+        Assembly testAssembly = Assembly.GetCallingAssembly();
         string name = testAssembly.GetName().Name!;
         string binPath = Path.GetDirectoryName(testAssembly.Location) ?? Environment.CurrentDirectory;
         // going from /source/project/bin/debug/.netX.Y/ to /source/logs/project.txt
@@ -62,11 +54,5 @@ public class TestEnvironment
                 rollingInterval: RollingInterval.Day);
 
         Log.Logger = loggerConfig.CreateLogger();
-    }
-
-    [OneTimeTearDown]
-    public void AfterAllTests()
-    {
-        Log.CloseAndFlush();
     }
 }
