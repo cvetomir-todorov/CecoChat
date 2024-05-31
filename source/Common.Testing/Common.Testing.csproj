@@ -8,9 +8,11 @@
     <PackageReference Include="NUnit" Version="4.1.0" />
     <PackageReference Include="NUnit.Analyzers" Version="4.2.0" />
     <PackageReference Include="Serilog" Version="3.1.1" />
+    <PackageReference Include="Testcontainers" Version="3.8.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Common.Cassandra\Common.Cassandra.csproj" />
     <ProjectReference Include="..\Common\Common.csproj" />
   </ItemGroup>
 
