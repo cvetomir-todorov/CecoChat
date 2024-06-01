@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Scripts\chats-chat-messages-table.cql" />
+    <EmbeddedResource Include="Scripts\chats-file-data-type.cql" />
     <EmbeddedResource Include="Scripts\chats-keyspace.cql" />
     <EmbeddedResource Include="Scripts\chats-user-chats-table.cql" />
   </ItemGroup>

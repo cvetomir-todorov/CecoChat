@@ -1,10 +1,4 @@
-﻿CREATE TYPE chats.file_data
-(
-  bucket text,
-  path text
-);
-
-CREATE TABLE chats.chat_messages
+﻿CREATE TABLE chats.chat_messages
 (
   chat_id text,
   message_id bigint,

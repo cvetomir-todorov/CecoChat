@@ -57,8 +57,8 @@ public sealed class CassandraDbInitializer : ICassandraDbInitializer
             .ToList();
 
         IEnumerable<string> keyspaces = allScripts.Where(name => name.EndsWith("-keyspace.cql"));
-        IEnumerable<string> types = allScripts.Where(name => name.Contains("-type.cql"));
-        IEnumerable<string> tables = allScripts.Where(name => name.Contains("-table.cql"));
+        IEnumerable<string> types = allScripts.Where(name => name.EndsWith("-type.cql"));
+        IEnumerable<string> tables = allScripts.Where(name => name.EndsWith("-table.cql"));
         IEnumerable<string> allOrdered = keyspaces.Union(types).Union(tables);
 
         List<CqlScript> cqls = allOrdered
