@@ -9,6 +9,7 @@ public abstract class BaseTest
     private INetwork _dockerNetwork;
     private ChatsDb _chatsDb;
     private bool _chatsDbStarted;
+    private ChatsService _chatsService;
 
     [OneTimeSetUp]
     public async Task BeforeAllTests()
@@ -20,16 +21,26 @@ public abstract class BaseTest
         _chatsDb = new(_dockerNetwork, name: "cassandra0", cluster: "cecochat", seeds: "cassandra0", localDc: "Europe");
         await _chatsDb.Start(TimeSpan.FromMinutes(5));
         _chatsDbStarted = true;
+
+        _chatsService = new ChatsService(
+            environment: "Test",
+            listenPort: 32004,
+            certificatePath: "services.pfx",
+            certificatePassword: "cecochat",
+            configFilePath: "chats-service-settings.json",
+            _chatsDb);
+        await _chatsService.Run();
     }
 
     [OneTimeTearDown]
     public async Task AfterAllTests()
     {
+        await _chatsService.DisposeAsync();
+
         if (!_chatsDbStarted)
         {
             await _chatsDb.PrintLogs();
         }
-
         await _chatsDb.DisposeAsync();
         await _dockerNetwork.DisposeAsync();
     }

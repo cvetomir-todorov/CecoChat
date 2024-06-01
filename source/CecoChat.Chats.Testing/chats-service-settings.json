@@ -1,0 +1,120 @@
+{
+  "AllowedHosts": "*",
+  "Kestrel": {
+    "EndpointDefaults": {
+      "Protocols": "Http2"
+    }
+  },
+  "ConfigClient": {
+    "Address": "https://localhost:31006",
+    "CallTimeout": "00:00:05.0",
+    "SocketsHttpHandler": {
+      "KeepAlivePingDelay": "00:01:00.0",
+      "KeepAlivePingTimeout": "00:00:30.0",
+      "EnableMultipleHttp2Connections": true
+    },
+    "Retry": {
+      "RetryCount": 4,
+      "InitialBackOff": "00:00:00.500",
+      "BackOffMultiplier": 1.5,
+      "MaxBackOff": "00:00:02.000",
+      "MaxJitterMs": "250"
+    },
+    "HealthPath": "readyz",
+    "HealthTimeout": "00:00:05.0"
+  },
+  "Backplane": {
+    "Kafka": {
+      "BootstrapServers": [
+        "localhost:9091",
+        "localhost:9092"
+      ]
+    },
+    "ConfigChangesConsumer": {
+      "ConsumerGroupId": "chats",
+      "AutoOffsetReset": "Earliest",
+      "EnablePartitionEof": false,
+      "AllowAutoCreateTopics": false,
+      "EnableAutoCommit": false
+    },
+    "TopicConfigChanges": "config-changes",
+    "HistoryConsumer": {
+      "ConsumerGroupId": "history-consumer",
+      "AutoOffsetReset": "Earliest",
+      "EnablePartitionEof": false,
+      "AllowAutoCreateTopics": false,
+      "EnableAutoCommit": false
+    },
+    "ReceiversConsumer": {
+      "ConsumerGroupId": "state-receivers-consumer",
+      "AutoOffsetReset": "Earliest",
+      "EnablePartitionEof": false,
+      "AllowAutoCreateTopics": false,
+      "EnableAutoCommit": false
+    },
+    "SendersConsumer": {
+      "ConsumerGroupId": "state-senders-consumer",
+      "AutoOffsetReset": "Earliest",
+      "EnablePartitionEof": false,
+      "AllowAutoCreateTopics": false,
+      "EnableAutoCommit": false
+    },
+    "TopicMessagesByReceiver": "messages-by-receiver",
+    "Health": {
+      "Producer": {
+        "ProducerId": "health-producer",
+        "Acks": "All",
+        "LingerMs": 0.0,
+        "MessageTimeoutMs": 5000,
+        "MessageSendMaxRetries": 1
+      },
+      "Topic": "health",
+      "Timeout": "00:00:05.0"
+    }
+  },
+  "ChatsDb": {
+    "ContactPoints": [],
+    "LocalDc": "Europe",
+    "SocketConnectTimeout": "00:00:05.0",
+    "ExponentialReconnectPolicy": true,
+    "ExponentialReconnectPolicyBaseDelay": "00:00:00.100",
+    "ExponentialReconnectPolicyMaxDelay": "00:00:05.0",
+    "HealthTimeout": "00:00:05.0"
+  },
+  "Jwt": {
+    "Secret": "secret that is long and hard to guess",
+    "Issuer": "issuer",
+    "Audience": "audience"
+  },
+  "Telemetry": {
+    "Logging": {
+      "Export": {
+        "TargetHost": "localhost",
+        "TargetPort": 4317,
+        "Protocol": "Grpc",
+        "BatchPeriod": "00:00:01.0",
+        "BatchSizeLimit": 1000,
+        "BatchQueueLimit": 100000
+      }
+    },
+    "Tracing": {
+      "Sampling": {
+        "Strategy": "Probability",
+        "Probability": 0.1
+      },
+      "Export": {
+        "TargetHost": "localhost",
+        "TargetPort": 4317,
+        "Protocol": "Grpc",
+        "ExportProcessorType": "Batch",
+        "BatchExportScheduledDelayMillis": 2000
+      }
+    },
+    "Metrics": {
+      "Prometheus": {
+        "ScrapeEndpointPath": "/metrics",
+        "ScrapeResponseCacheDurationMilliseconds": 0
+      }
+    }
+  }
+}

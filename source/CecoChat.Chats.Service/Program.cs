@@ -32,19 +32,17 @@ namespace CecoChat.Chats.Service;
 
 public static class Program
 {
-    private static CassandraOptions _chatsDbOptions = null!;
-
     public static async Task Main(params string[] args)
     {
         WebApplicationBuilder builder = EntryPoint.CreateWebAppBuilder(args);
         CommonOptions options = new(builder.Configuration);
 
-        _chatsDbOptions = new();
-        builder.Configuration.GetSection("ChatsDb").Bind(_chatsDbOptions);
+        CassandraOptions chatsDbOptions = new();
+        builder.Configuration.GetSection("ChatsDb").Bind(chatsDbOptions);
 
         AddServices(builder, options);
         AddTelemetry(builder, options);
-        AddHealth(builder, options);
+        AddHealth(builder, options, chatsDbOptions);
         builder.Host.ConfigureContainer<ContainerBuilder>(ConfigureContainer);
 
         WebApplication app = builder.Build();
@@ -52,7 +50,7 @@ public static class Program
         await EntryPoint.RunWebApp(app, typeof(Program));
     }
 
-    private static void AddServices(WebApplicationBuilder builder, CommonOptions options)
+    public static void AddServices(WebApplicationBuilder builder, CommonOptions options)
     {
         // security
         builder.Services.AddJwtAuthentication(options.Jwt);
@@ -74,7 +72,7 @@ public static class Program
         builder.Services.AddOptions();
     }
 
-    private static void AddTelemetry(WebApplicationBuilder builder, CommonOptions options)
+    public static void AddTelemetry(WebApplicationBuilder builder, CommonOptions options)
     {
         ResourceBuilder serviceResourceBuilder = ResourceBuilder
             .CreateEmpty()
@@ -105,7 +103,7 @@ public static class Program
             });
     }
 
-    private static void AddHealth(WebApplicationBuilder builder, CommonOptions options)
+    public static void AddHealth(WebApplicationBuilder builder, CommonOptions options, CassandraOptions chatsDbOptions)
     {
         builder.Services
             .AddHealthChecks()
@@ -118,7 +116,7 @@ public static class Program
                 tags: new[] { HealthTags.Health, HealthTags.Startup })
             .AddCassandra(
                 name: "chats-db",
-                timeout: _chatsDbOptions.HealthTimeout,
+                timeout: chatsDbOptions.HealthTimeout,
                 tags: new[] { HealthTags.Health, HealthTags.Ready })
             .AddCheck<HistoryConsumerHealthCheck>(
                 "history-consumer",
@@ -136,7 +134,7 @@ public static class Program
         builder.Services.AddSingleton<SendersConsumerHealthCheck>();
     }
 
-    private static void ConfigureContainer(HostBuilderContext host, ContainerBuilder builder)
+    public static void ConfigureContainer(HostBuilderContext host, ContainerBuilder builder)
     {
         // init
         builder.RegisterInitStep<DynamicConfigInit>();
@@ -169,7 +167,7 @@ public static class Program
         builder.RegisterType<MonotonicClock>().As<IClock>().SingleInstance();
     }
 
-    private static void ConfigurePipeline(WebApplication app, CommonOptions options)
+    public static void ConfigurePipeline(WebApplication app, CommonOptions options)
     {
         if (app.Environment.IsDevelopment())
         {

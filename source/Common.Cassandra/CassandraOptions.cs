@@ -2,7 +2,7 @@
 
 public sealed class CassandraOptions
 {
-    public string[] ContactPoints { get; init; } = Array.Empty<string>();
+    public string[] ContactPoints { get; set; } = Array.Empty<string>();
 
     public string LocalDc { get; init; } = string.Empty;
 

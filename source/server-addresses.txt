@@ -9,3 +9,4 @@ https://localhost:31006 config
 testing:
 
 https://localhost:32002 idgen
+https://localhost:32004 chats
