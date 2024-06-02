@@ -25,7 +25,7 @@ public sealed class ChatsService : IAsyncDisposable
 {
     private readonly WebApplication _app;
 
-    public ChatsService(string environment, int listenPort, string certificatePath, string certificatePassword, string configFilePath, ChatsDb chatsDb)
+    public ChatsService(string environment, int listenPort, string certificatePath, string certificatePassword, string configFilePath, IChatsDb chatsDb)
     {
         WebApplicationBuilder builder = WebApplication.CreateEmptyBuilder(new WebApplicationOptions
         {

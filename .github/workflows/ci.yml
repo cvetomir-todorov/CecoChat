@@ -94,6 +94,7 @@ jobs:
         sudo mv source/certificates/services.crt /usr/local/share/ca-certificates/services.crt
         sudo chmod 644 /usr/local/share/ca-certificates/services.crt
         sudo update-ca-certificates
+        export CECOCHAT_START_TEST_CONTAINERS_CHATS_DB=true
         dotnet test source/CecoChat.sln --no-restore --logger "console;verbosity=detailed" /p:CollectCoverage=true /p:CoverletOutput="${GITHUB_WORKSPACE}/source/" /p:MergeWith="${GITHUB_WORKSPACE}/source/coverage.json" /p:CoverletOutputFormat="json%2copencover" /maxcpucount:1
 
     - name: Upload code coverage file

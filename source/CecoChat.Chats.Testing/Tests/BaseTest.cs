@@ -9,7 +9,7 @@ namespace CecoChat.Chats.Testing.Tests;
 public abstract class BaseTest
 {
     private INetwork _dockerNetwork;
-    private ChatsDb _chatsDb;
+    private IChatsDb? _chatsDb;
     private bool _chatsDbStarted;
     private ChatsService _chatsService;
     private ChatsClient _chatsClient;
@@ -18,12 +18,20 @@ public abstract class BaseTest
     public async Task BeforeAllTests()
     {
         _dockerNetwork = new NetworkBuilder()
-            .WithName("cecochat")
+            .WithName("cecochat-test")
             .Build();
 
-        _chatsDb = new(_dockerNetwork, name: "cassandra0", cluster: "cecochat", seeds: "cassandra0", localDc: "Europe");
-        await _chatsDb.Start(TimeSpan.FromMinutes(5));
-        _chatsDbStarted = true;
+        string? startChatsDbEnvVar = Environment.GetEnvironmentVariable("CECOCHAT_START_TEST_CONTAINERS_CHATS_DB");
+        if (string.Equals(startChatsDbEnvVar, "true", StringComparison.OrdinalIgnoreCase))
+        {
+            _chatsDb = new TestContainersChatsDb(_dockerNetwork, name: "cassandra0", cluster: "cecochat", seeds: "cassandra0", localDc: "Europe");
+            await _chatsDb.Start(TimeSpan.FromMinutes(5));
+            _chatsDbStarted = true;
+        }
+        else
+        {
+            _chatsDb = new FakeChatsDb();
+        }
 
         _chatsService = new ChatsService(
             environment: "Test",
@@ -44,15 +52,18 @@ public abstract class BaseTest
         _chatsClient.Dispose();
         await _chatsService.DisposeAsync();
 
-        if (!_chatsDbStarted)
+        if (_chatsDb != null)
         {
-            await _chatsDb.PrintLogs();
+            if (!_chatsDbStarted)
+            {
+                await _chatsDb.PrintLogs();
+            }
+            await _chatsDb.DisposeAsync();
         }
-        await _chatsDb.DisposeAsync();
         await _dockerNetwork.DisposeAsync();
     }
 
-    public ChatsClient Client => _chatsClient;
+    protected ChatsClient Client => _chatsClient;
 
     protected string CreateUserAccessToken(long userId, string userName)
     {

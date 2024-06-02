@@ -8,16 +8,52 @@ using NUnit.Framework;
 
 namespace CecoChat.Chats.Testing;
 
-public sealed class ChatsDb : IAsyncDisposable
+public interface IChatsDb : IAsyncDisposable
+{
+    public string Host { get; }
+
+    public int Port { get; }
+
+    public Task Start(TimeSpan timeout);
+
+    public Task PrintLogs();
+}
+
+/// <summary>
+/// Provides access to a manually started local instance of Cassandra.
+/// Used when running tests locally during development.
+/// </summary>
+public sealed class FakeChatsDb : IChatsDb
+{
+    public FakeChatsDb()
+    {
+        TestContext.Progress.WriteLine($"Using an existing Chats DB @{Host}:{Port}");
+    }
+
+    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+
+    public string Host => "localhost";
+
+    public int Port => 9042;
+
+    public Task Start(TimeSpan timeout) => Task.CompletedTask;
+
+    public Task PrintLogs() => Task.CompletedTask;
+}
+
+/// <summary>
+/// Starts a Cassandra container using Testcontainers package.
+/// Used during the CI pipeline.
+/// </summary>
+public sealed class TestContainersChatsDb : IChatsDb
 {
     private readonly int _cassandraHostPort;
     private readonly IContainer _cassandra;
 
-    public ChatsDb(INetwork dockerNetwork, string name, string cluster, string seeds, string localDc)
+    public TestContainersChatsDb(INetwork dockerNetwork, string name, string cluster, string seeds, string localDc)
     {
         _cassandraHostPort = NetworkUtils.GetNextFreeTcpPort();
         TestContext.Progress.WriteLine($"Setting Cassandra host port to {_cassandraHostPort}");
-
         const int cassandraContainerPort = 9042;
 
         _cassandra = new ContainerBuilder()
@@ -38,10 +74,11 @@ public sealed class ChatsDb : IAsyncDisposable
                 { "MAX_HEAP_SIZE", "512M" }
             })
             .WithWaitStrategy(Wait.ForUnixContainer()
-                //.UntilMessageIsLogged($"Starting listening for CQL clients on /0.0.0.0:{port}")
                 .UntilCassandraQueryExecuted(_cassandraHostPort, localDc, showErrorInterval: TimeSpan.FromSeconds(10)))
-            .WithLogger(new NUnitProgressLogger<ChatsDb>())
+            .WithLogger(new NUnitProgressLogger<TestContainersChatsDb>())
             .Build();
+
+        TestContext.Progress.WriteLine($"Using a Testcontainers Chats DB @{_cassandra.Hostname}:{_cassandraHostPort}");
     }
 
     public async ValueTask DisposeAsync()
