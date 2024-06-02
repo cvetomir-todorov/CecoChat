@@ -22,10 +22,10 @@
     <Content Include="..\certificates\services.pfx" Link="services.pfx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="idgen-client-settings.json">
+    <Content Include="idgen-client.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="idgen-service-settings.json">
+    <Content Include="idgen-service.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

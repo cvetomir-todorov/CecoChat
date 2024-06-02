@@ -22,10 +22,10 @@
     <Content Include="..\certificates\services.pfx" Link="services.pfx">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="chats-service-settings.json">
+    <Content Include="chats-service.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="chats-client-settings.json">
+    <Content Include="chats-client.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

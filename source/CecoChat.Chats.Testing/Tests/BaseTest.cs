@@ -30,12 +30,12 @@ public abstract class BaseTest
             listenPort: 32004,
             certificatePath: "services.pfx",
             certificatePassword: "cecochat",
-            configFilePath: "chats-service-settings.json",
+            configFilePath: "chats-service.json",
             _chatsDb);
         await _chatsService.Run();
 
         _chatsClient = new(
-            configFilePath: "chats-client-settings.json");
+            configFilePath: "chats-client.json");
     }
 
     [OneTimeTearDown]

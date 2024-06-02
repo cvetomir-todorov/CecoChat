@@ -15,11 +15,11 @@ public abstract class BaseTest
             listenPort: 32002,
             certificatePath: "services.pfx",
             certificatePassword: "cecochat",
-            configFilePath: "idgen-service-settings.json");
+            configFilePath: "idgen-service.json");
         await _idGenService.Run();
 
         _idGenClient = new IdGenClient(
-            configFilePath: "idgen-client-settings.json");
+            configFilePath: "idgen-client.json");
     }
 
     [OneTimeTearDown]
