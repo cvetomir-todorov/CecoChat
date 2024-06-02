@@ -8,6 +8,7 @@ using CecoChat.Server;
 using CecoChat.Testing.Config;
 using Common.AspNet.Init;
 using Common.Cassandra;
+using Common.Jwt;
 using Common.Kafka;
 using Common.Testing.Kafka;
 using Microsoft.AspNetCore.Builder;
@@ -72,6 +73,12 @@ public sealed class ChatsService : IAsyncDisposable
         Program.ConfigurePipeline(_app, options);
     }
 
+    public async ValueTask DisposeAsync()
+    {
+        await _app.StopAsync(timeout: TimeSpan.FromSeconds(5));
+        await _app.DisposeAsync();
+    }
+
     public async Task Run()
     {
         bool initialized = await _app.Services.Init();
@@ -86,9 +93,11 @@ public sealed class ChatsService : IAsyncDisposable
             .ContinueWith(_ => TestContext.Progress.WriteLine("Ended successfully"), TaskContinuationOptions.NotOnFaulted);
     }
 
-    public async ValueTask DisposeAsync()
+    public JwtOptions GetJwtOptions()
     {
-        await _app.StopAsync(timeout: TimeSpan.FromSeconds(5));
-        await _app.DisposeAsync();
+        JwtOptions jwtOptions = new();
+        _app.Configuration.GetSection("Jwt").Bind(jwtOptions);
+
+        return jwtOptions;
     }
 }

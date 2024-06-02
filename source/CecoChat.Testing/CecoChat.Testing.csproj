@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.6.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\CecoChat.Config.Client\CecoChat.Config.Client.csproj" />
     <ProjectReference Include="..\Common.Testing\Common.Testing.csproj" />
   </ItemGroup>
