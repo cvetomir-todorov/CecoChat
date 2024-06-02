@@ -22,12 +22,12 @@ public abstract class BaseTest
             configFilePath: "idgen-client-settings.json");
     }
 
-    protected IdGenClient Client => _idGenClient;
-
     [OneTimeTearDown]
     public async Task AfterAllTests()
     {
         _idGenClient.Dispose();
         await _idGenService.DisposeAsync();
     }
+
+    protected IdGenClient Client => _idGenClient;
 }
