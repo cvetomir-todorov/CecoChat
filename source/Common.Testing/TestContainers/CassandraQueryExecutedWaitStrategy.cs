@@ -34,7 +34,7 @@ public class CassandraQueryExecutedWaitStrategy : IWaitUntil
             ExponentialReconnectPolicyMaxDelay = TimeSpan.FromSeconds(5)
         };
 
-        CassandraDbContext? db = null;
+        TestCassandraDbContext? db = null;
 
         try
         {
@@ -65,6 +65,12 @@ public class CassandraQueryExecutedWaitStrategy : IWaitUntil
         {
             db?.Dispose();
         }
+    }
+
+    private class TestCassandraDbContext : CassandraDbContext
+    {
+        public TestCassandraDbContext(ILogger<CassandraDbContext> logger, IOptions<CassandraOptions> options) : base(logger, options)
+        { }
     }
 }
 

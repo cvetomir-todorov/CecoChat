@@ -15,14 +15,14 @@ public interface ICassandraDbContext : IDisposable
     bool ExistsKeyspace(string keyspace);
 }
 
-public class CassandraDbContext : ICassandraDbContext
+public abstract class CassandraDbContext : ICassandraDbContext
 {
     private readonly ILogger _logger;
     private readonly CassandraOptions _options;
     private readonly Lazy<Cluster> _cluster;
     private readonly ConcurrentDictionary<string, ISession> _sessions;
 
-    public CassandraDbContext(ILogger<CassandraDbContext> logger, IOptions<CassandraOptions> options)
+    protected CassandraDbContext(ILogger<CassandraDbContext> logger, IOptions<CassandraOptions> options)
     {
         _logger = logger;
         _options = options.Value;

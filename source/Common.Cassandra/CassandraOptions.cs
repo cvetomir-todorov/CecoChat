@@ -1,6 +1,9 @@
 ﻿namespace Common.Cassandra;
 
-public sealed class CassandraOptions
+public sealed class CassandraOptions<TDbContext> : CassandraOptions
+    where TDbContext : class, ICassandraDbContext;
+
+public class CassandraOptions
 {
     public string[] ContactPoints { get; set; } = Array.Empty<string>();
 

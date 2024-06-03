@@ -17,13 +17,13 @@ public interface IChatsDbContext : ICassandraDbContext
         where TUserDefinedType : new();
 }
 
-internal sealed class ChatsDbContext : CassandraDbContext, IChatsDbContext
+public sealed class ChatsDbContext : CassandraDbContext, IChatsDbContext
 {
     private readonly ILogger _logger;
 
     public ChatsDbContext(
         ILogger<ChatsDbContext> logger,
-        IOptions<CassandraOptions> options) : base(logger, options)
+        IOptions<CassandraOptions<ChatsDbContext>> options) : base(logger, options)
     {
         _logger = logger;
     }

@@ -2,6 +2,7 @@ using System.Net;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using CecoChat.Backplane.Contracts;
+using CecoChat.Chats.Data;
 using CecoChat.Chats.Service;
 using CecoChat.Config;
 using CecoChat.Config.Client;
@@ -37,7 +38,7 @@ public sealed class ChatsService : IAsyncDisposable
             EnvironmentName = environment
         });
         builder.Configuration.AddJsonFile(configFilePath, optional: false);
-        builder.Services.Configure<CassandraOptions>(cassandra =>
+        builder.Services.Configure<CassandraOptions<ChatsDbContext>>(cassandra =>
         {
             cassandra.ContactPoints = [$"{chatsDb.Host}:{chatsDb.Port}"];
         });
