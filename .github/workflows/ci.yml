@@ -97,6 +97,13 @@ jobs:
         export CECOCHAT_START_TEST_CONTAINERS_CHATS_DB=true
         dotnet test source/CecoChat.sln --no-restore --logger "console;verbosity=detailed" /p:CollectCoverage=true /p:CoverletOutput="${GITHUB_WORKSPACE}/source/" /p:MergeWith="${GITHUB_WORKSPACE}/source/coverage.json" /p:CoverletOutputFormat="json%2copencover" /maxcpucount:1
 
+    - name: Upload test logs
+      if: ${{ always() }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-logs
+        path: source/logs
+
     - name: Upload code coverage file
       uses: actions/upload-artifact@v4
       with:
