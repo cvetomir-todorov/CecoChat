@@ -24,7 +24,7 @@ public sealed class ChatsClient : IDisposable
         ChatsClientOptions chatsClientOptions = new();
         chatsClientConfig.Bind(chatsClientOptions);
         services.AddChatsClient(chatsClientOptions);
-        services.AddSerilog(dispose: true);
+        services.AddSerilog(dispose: false);
 
         ContainerBuilder autofacBuilder = new();
         autofacBuilder.RegisterModule(new ChatsClientAutofacModule(chatsClientConfig));

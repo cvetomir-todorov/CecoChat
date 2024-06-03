@@ -48,7 +48,7 @@ public sealed class ChatsService : IAsyncDisposable
                 listenOptions.UseHttps(certificatePath, certificatePassword);
             });
         });
-        builder.Host.UseSerilog(dispose: true);
+        builder.Host.UseSerilog(dispose: false);
 
         CommonOptions options = new(builder.Configuration);
         CassandraOptions chatsDbOptions = new();
