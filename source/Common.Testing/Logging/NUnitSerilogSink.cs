@@ -10,11 +10,13 @@ namespace Common.Testing.Logging;
 
 public sealed class NUnitSerilogSink : ILogEventSink, IDisposable
 {
+    private readonly object _lock;
     private readonly StringWriter _textWriter;
     private readonly ITextFormatter _textFormatter;
 
     public NUnitSerilogSink(ITextFormatter textFormatter)
     {
+        _lock = new();
         _textWriter = new StringWriter();
         _textFormatter = textFormatter;
     }
@@ -26,9 +28,13 @@ public sealed class NUnitSerilogSink : ILogEventSink, IDisposable
 
     public void Emit(LogEvent logEvent)
     {
-        _textFormatter.Format(logEvent, _textWriter);
-        TestContext.Progress.Write(_textWriter.ToString());
-        _textWriter.GetStringBuilder().Clear();
+        lock (_lock)
+        {
+            _textFormatter.Format(logEvent, _textWriter);
+            TestContext.Progress.Write(_textWriter.ToString());
+            TestContext.Progress.Flush();
+            _textWriter.GetStringBuilder().Clear();
+        }
     }
 }
 

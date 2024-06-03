@@ -42,5 +42,6 @@ public class NUnitProgressLogger<TCategoryName> : ILogger<TCategoryName>
         }
 
         TestContext.Progress.WriteLine("[{0:HH:mm:ss.fff} {1}] {2} {3}", DateTime.UtcNow, level, message, exception);
+        TestContext.Progress.Flush();
     }
 }
