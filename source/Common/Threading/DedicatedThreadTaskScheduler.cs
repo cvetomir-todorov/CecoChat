@@ -40,10 +40,9 @@ public sealed class DedicatedThreadTaskScheduler : TaskScheduler, IDisposable
                 Task task = _taskQueue.Take(_cts.Token);
                 TryExecuteTask(task);
             }
-            catch (OperationCanceledException exception) when (exception.CancellationToken == _cts.Token)
+            catch (OperationCanceledException)
             {
-                // means that the cancellation token associated with the scheduler is stopped
-                // which means that the scheduler is disposed, so we ignore it
+                // an operation which the thread was running has been cancelled 
             }
         }
     }
