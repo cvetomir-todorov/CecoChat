@@ -21,8 +21,8 @@
         "ASPNETCORE_ENVIRONMENT": "Development",
         "CECOCHAT_Backplane__Kafka__BootstrapServers__0": "pigpen:9091",
         "CECOCHAT_Backplane__Kafka__BootstrapServers__1": "pigpen:9092",
-        "CECOCHAT_ChatsDb__ContactPoints__0": "pigpen:9042",
-        "CECOCHAT_ChatsDb__ContactPoints__1": "pigpen:9043"
+        "CECOCHAT_ChatsDb__Cluster__ContactPoints__0": "pigpen:9042",
+        "CECOCHAT_ChatsDb__Cluster__ContactPoints__1": "pigpen:9043"
       }
     }
   }

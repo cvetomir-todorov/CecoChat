@@ -38,7 +38,7 @@ public static class Program
         CommonOptions options = new(builder.Configuration);
 
         CassandraOptions chatsDbOptions = new();
-        builder.Configuration.GetSection("ChatsDb").Bind(chatsDbOptions);
+        builder.Configuration.GetSection("ChatsDb:Cluster").Bind(chatsDbOptions);
 
         AddServices(builder, options);
         AddTelemetry(builder, options);
@@ -150,8 +150,8 @@ public static class Program
         builder.RegisterModule(new ConfigClientAutofacModule(host.Configuration.GetSection("ConfigClient")));
 
         // chats db
-        builder.RegisterModule(new ChatsDbAutofacModule(host.Configuration.GetSection("ChatsDb")));
-        builder.RegisterModule(new CassandraHealthAutofacModule(host.Configuration.GetSection("ChatsDb")));
+        builder.RegisterModule(new ChatsDbAutofacModule(host.Configuration.GetSection("ChatsDb:Cluster")));
+        builder.RegisterModule(new CassandraHealthAutofacModule(host.Configuration.GetSection("ChatsDb:Cluster")));
 
         // backplane
         builder.RegisterType<KafkaAdmin>().As<IKafkaAdmin>().SingleInstance();

@@ -73,13 +73,15 @@
     }
   },
   "ChatsDb": {
-    "ContactPoints": [],
-    "LocalDc": "Europe",
-    "SocketConnectTimeout": "00:00:05.0",
-    "ExponentialReconnectPolicy": true,
-    "ExponentialReconnectPolicyBaseDelay": "00:00:00.100",
-    "ExponentialReconnectPolicyMaxDelay": "00:00:05.0",
-    "HealthTimeout": "00:00:05.0"
+    "Cluster": {
+      "ContactPoints": [],
+      "LocalDc": "Europe",
+      "SocketConnectTimeout": "00:00:05.0",
+      "ExponentialReconnectPolicy": true,
+      "ExponentialReconnectPolicyBaseDelay": "00:00:00.100",
+      "ExponentialReconnectPolicyMaxDelay": "00:00:05.0",
+      "HealthTimeout": "00:00:05.0"
+    }
   },
   "Jwt": {
     "Secret": "secret that is long and hard to guess",

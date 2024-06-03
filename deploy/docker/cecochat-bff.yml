@@ -50,13 +50,13 @@ services:
       CECOCHAT_ConfigClient__Address: "https://config"
       CECOCHAT_Backplane__Kafka__BootstrapServers__0: kafka0:19091
       CECOCHAT_Backplane__Kafka__BootstrapServers__1: kafka1:19092
-      CECOCHAT_ChatsDb__ContactPoints__0: cassandra0:9042
-      CECOCHAT_ChatsDb__ContactPoints__1: cassandra1:9042
-      CECOCHAT_ChatsDb__LocalDc: Europe
-      CECOCHAT_ChatsDb__SocketConnectTimeout: 00:00:05.0
-      CECOCHAT_ChatsDb__ExponentialReconnectPolicy: true
-      CECOCHAT_ChatsDb__ExponentialReconnectPolicyBaseDelay: 00:00:00.100
-      CECOCHAT_ChatsDb__ExponentialReconnectPolicyMaxDelay: 00:00:05.0
+      CECOCHAT_ChatsDb__Cluster__ContactPoints__0: cassandra0:9042
+      CECOCHAT_ChatsDb__Cluster__ContactPoints__1: cassandra1:9042
+      CECOCHAT_ChatsDb__Cluster__LocalDc: Europe
+      CECOCHAT_ChatsDb__Cluster__SocketConnectTimeout: 00:00:05.0
+      CECOCHAT_ChatsDb__Cluster__ExponentialReconnectPolicy: true
+      CECOCHAT_ChatsDb__Cluster__ExponentialReconnectPolicyBaseDelay: 00:00:00.100
+      CECOCHAT_ChatsDb__Cluster__ExponentialReconnectPolicyMaxDelay: 00:00:05.0
       CECOCHAT_Telemetry__Tracing__Sampling__Strategy: Probability
       CECOCHAT_Telemetry__Tracing__Sampling__Probability: 0.1
       CECOCHAT_Telemetry__Tracing__Export__TargetHost: otel-collector

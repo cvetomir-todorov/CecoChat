@@ -53,7 +53,7 @@ public sealed class ChatsService : IAsyncDisposable
 
         CommonOptions options = new(builder.Configuration);
         CassandraOptions chatsDbOptions = new();
-        builder.Configuration.GetSection("ChatsDb").Bind(chatsDbOptions);
+        builder.Configuration.GetSection("ChatsDb:Cluster").Bind(chatsDbOptions);
         chatsDbOptions.ContactPoints = [$"{chatsDb.Host}:{chatsDb.Port}"];
 
         Program.AddServices(builder, options);
