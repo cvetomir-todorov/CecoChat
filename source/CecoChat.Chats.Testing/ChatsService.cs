@@ -1,16 +1,20 @@
 using System.Net;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using CecoChat.Backplane.Contracts;
 using CecoChat.Chats.Service;
 using CecoChat.Config;
 using CecoChat.Config.Client;
+using CecoChat.Config.Contracts;
 using CecoChat.Server;
 using CecoChat.Testing.Config;
 using Common.AspNet.Init;
+using Common.Autofac;
 using Common.Cassandra;
 using Common.Jwt;
 using Common.Kafka;
 using Common.Testing.Kafka;
+using Confluent.Kafka;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -67,6 +71,8 @@ public sealed class ChatsService : IAsyncDisposable
                 ]))
                 .As<IConfigClient>().SingleInstance();
             autofacBuilder.RegisterType<KafkaAdminDummy>().As<IKafkaAdmin>().SingleInstance();
+            autofacBuilder.RegisterFactory<KafkaConsumerDummy<Null, BackplaneMessage>, IKafkaConsumer<Null, BackplaneMessage>>();
+            autofacBuilder.RegisterFactory<KafkaConsumerDummy<Null, ConfigChange>, IKafkaConsumer<Null, ConfigChange>>();
         });
 
         _app = builder.Build();

@@ -3,12 +3,15 @@ using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using CecoChat.Config;
 using CecoChat.Config.Client;
+using CecoChat.Config.Contracts;
 using CecoChat.IdGen.Service;
 using CecoChat.Server;
 using CecoChat.Testing.Config;
 using Common.AspNet.Init;
+using Common.Autofac;
 using Common.Kafka;
 using Common.Testing.Kafka;
+using Confluent.Kafka;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -57,6 +60,7 @@ public sealed class IdGenService : IAsyncDisposable
                 ]))
                 .As<IConfigClient>().SingleInstance();
             autofacBuilder.RegisterType<KafkaAdminDummy>().As<IKafkaAdmin>().SingleInstance();
+            autofacBuilder.RegisterFactory<KafkaConsumerDummy<Null, ConfigChange>, IKafkaConsumer<Null, ConfigChange>>();
         });
 
         _app = builder.Build();
