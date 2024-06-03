@@ -150,7 +150,10 @@ public static class Program
         builder.RegisterModule(new ConfigClientAutofacModule(host.Configuration.GetSection("ConfigClient")));
 
         // chats db
-        builder.RegisterModule(new ChatsDbAutofacModule(host.Configuration.GetSection("ChatsDb:Cluster")));
+        builder.RegisterModule(new ChatsDbAutofacModule(
+            clusterConfiguration: host.Configuration.GetSection("ChatsDb:Cluster"),
+            chatMessagesOperationsConfiguration: host.Configuration.GetSection("ChatsDb:Operations:ChatMessages"),
+            userChatsOperationsConfiguration: host.Configuration.GetSection("ChatsDb:Operations:UserChats")));
         builder.RegisterModule(new CassandraHealthAutofacModule(host.Configuration.GetSection("ChatsDb:Cluster")));
 
         // backplane

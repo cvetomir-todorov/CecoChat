@@ -23,7 +23,9 @@ public class CassandraAutofacModule<TDbContextImplementation, TDbContext> : Modu
 
     protected override void Load(ContainerBuilder builder)
     {
-        builder.RegisterType<TDbContextImplementation>().As<TDbContext>()
+        builder
+            .RegisterType<TDbContextImplementation>()
+            .As<TDbContext>()
             .Named<ICassandraDbContext>(_dbContextName)
             .SingleInstance();
         builder.RegisterOptions<CassandraOptions<TDbContextImplementation>>(_cassandraConfiguration);

@@ -10,11 +10,18 @@ namespace CecoChat.Chats.Data;
 
 public sealed class ChatsDbAutofacModule : Module
 {
-    private readonly IConfiguration _chatsDbConfiguration;
+    private readonly IConfiguration _clusterConfiguration;
+    private readonly IConfiguration _chatMessagesOperationsConfiguration;
+    private readonly IConfiguration _userChatsOperationsConfiguration;
 
-    public ChatsDbAutofacModule(IConfiguration chatsDbConfiguration)
+    public ChatsDbAutofacModule(
+        IConfiguration clusterConfiguration,
+        IConfiguration chatMessagesOperationsConfiguration,
+        IConfiguration userChatsOperationsConfiguration)
     {
-        _chatsDbConfiguration = chatsDbConfiguration;
+        _clusterConfiguration = clusterConfiguration;
+        _chatMessagesOperationsConfiguration = chatMessagesOperationsConfiguration;
+        _userChatsOperationsConfiguration = userChatsOperationsConfiguration;
     }
 
     protected override void Load(ContainerBuilder builder)
@@ -23,15 +30,19 @@ public sealed class ChatsDbAutofacModule : Module
         builder.RegisterType<DataMapper>().As<IDataMapper>().SingleInstance();
         builder.RegisterType<ChatMessageRepo>().As<IChatMessageRepo>().SingleInstance();
         builder.RegisterType<ChatMessageTelemetry>().As<IChatMessageTelemetry>().SingleInstance();
+        builder.RegisterOptions<ChatMessagesOperationOptions>(_chatMessagesOperationsConfiguration);
 
         // user chats
         builder.RegisterType<UserChatsRepo>().As<IUserChatsRepo>().SingleInstance();
         builder.RegisterType<UserChatsTelemetry>().As<IUserChatsTelemetry>().SingleInstance();
+        builder.RegisterOptions<UserChatsOperationOptions>(_userChatsOperationsConfiguration);
 
         // db
-        CassandraAutofacModule<ChatsDbContext, IChatsDbContext> chatsDbModule = new(_chatsDbConfiguration);
+        CassandraAutofacModule<ChatsDbContext, IChatsDbContext> chatsDbModule = new(_clusterConfiguration);
         builder.RegisterModule(chatsDbModule);
-        builder.RegisterType<CassandraDbInitializer>().As<ICassandraDbInitializer>()
+        builder
+            .RegisterType<CassandraDbInitializer>()
+            .As<ICassandraDbInitializer>()
             .WithNamedParameter(typeof(ICassandraDbContext), chatsDbModule.DbContextName)
             .SingleInstance();
         builder.RegisterType<CassandraTelemetry>().As<ICassandraTelemetry>().SingleInstance();

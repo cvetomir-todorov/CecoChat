@@ -4,6 +4,7 @@ using CecoChat.Chats.Contracts;
 using CecoChat.Data;
 using Common;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace CecoChat.Chats.Data.Entities.ChatMessages;
 
@@ -28,6 +29,7 @@ internal sealed class ChatMessageRepo : IChatMessageRepo
     private readonly IChatMessageTelemetry _chatMessageTelemetry;
     private readonly IChatsDbContext _dbContext;
     private readonly IDataMapper _mapper;
+    private readonly ChatMessagesOperationOptions _operationOptions;
     private PreparedStatement? _historyQuery;
     private PreparedStatement? _addPlainTextCommand;
     private PreparedStatement? _addFileCommand;
@@ -38,12 +40,14 @@ internal sealed class ChatMessageRepo : IChatMessageRepo
         ILogger<ChatMessageRepo> logger,
         IChatMessageTelemetry chatMessageTelemetry,
         IChatsDbContext dbContext,
-        IDataMapper mapper)
+        IDataMapper mapper,
+        IOptions<ChatMessagesOperationOptions> operationOptions)
     {
         _logger = logger;
         _chatMessageTelemetry = chatMessageTelemetry;
         _dbContext = dbContext;
         _mapper = mapper;
+        _operationOptions = operationOptions.Value;
     }
 
     public void Dispose()
@@ -102,7 +106,7 @@ internal sealed class ChatMessageRepo : IChatMessageRepo
 
         long olderThanSnowflake = olderThan.ToSnowflakeCeiling();
         BoundStatement query = _historyQuery.Bind(chatId, olderThanSnowflake, countLimit);
-        query.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
+        query.SetConsistencyLevel(_operationOptions.GetHistory.ConsistencyLevel);
         query.SetIdempotence(true);
 
         RowSet rows = await _chatMessageTelemetry.GetHistoryAsync(_dbContext.Session, query, userId);
@@ -156,7 +160,7 @@ internal sealed class ChatMessageRepo : IChatMessageRepo
 
         BoundStatement command = _addPlainTextCommand.Bind(
             chatId, message.MessageId, message.SenderId, message.ReceiverId, dbMessageType, message.Text);
-        command.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
+        command.SetConsistencyLevel(_operationOptions.AddPlainTextMessage.ConsistencyLevel);
         command.SetIdempotence(false);
 
         _chatMessageTelemetry.AddPlainTextMessage(_dbContext.Session, command, message.MessageId);
@@ -181,7 +185,7 @@ internal sealed class ChatMessageRepo : IChatMessageRepo
 
         BoundStatement command = _addFileCommand.Bind(
             chatId, message.MessageId, message.SenderId, message.ReceiverId, dbMessageType, text, file);
-        command.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
+        command.SetConsistencyLevel(_operationOptions.AddFileMessage.ConsistencyLevel);
         command.SetIdempotence(false);
 
         _chatMessageTelemetry.AddFileMessage(_dbContext.Session, command, message.MessageId);
@@ -194,7 +198,7 @@ internal sealed class ChatMessageRepo : IChatMessageRepo
 
         string chatId = DataUtility.CreateChatId(message.SenderId, message.ReceiverId);
         BoundStatement command = _setReactionCommand.Bind(message.ReactorId, message.Reaction, chatId, message.MessageId);
-        command.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
+        command.SetConsistencyLevel(_operationOptions.SetReaction.ConsistencyLevel);
         command.SetIdempotence(false);
 
         _chatMessageTelemetry.SetReaction(_dbContext.Session, command, message.ReactorId);
@@ -207,7 +211,7 @@ internal sealed class ChatMessageRepo : IChatMessageRepo
 
         string chatId = DataUtility.CreateChatId(message.SenderId, message.ReceiverId);
         BoundStatement command = _unsetReactionCommand.Bind(message.ReactorId, chatId, message.MessageId);
-        command.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
+        command.SetConsistencyLevel(_operationOptions.UnsetReaction.ConsistencyLevel);
         command.SetIdempotence(false);
 
         _chatMessageTelemetry.UnsetReaction(_dbContext.Session, command, message.ReactorId);

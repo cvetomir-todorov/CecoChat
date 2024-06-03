@@ -3,6 +3,7 @@ using Cassandra;
 using CecoChat.Chats.Contracts;
 using Common;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace CecoChat.Chats.Data.Entities.UserChats;
 
@@ -22,6 +23,7 @@ internal sealed class UserChatsRepo : IUserChatsRepo
     private readonly ILogger _logger;
     private readonly IUserChatsTelemetry _userChatsTelemetry;
     private readonly IChatsDbContext _dbContext;
+    private readonly UserChatsOperationOptions _operationOptions;
     private PreparedStatement? _chatsQuery;
     private PreparedStatement? _chatQuery;
     private PreparedStatement? _updateChatCommand;
@@ -29,11 +31,13 @@ internal sealed class UserChatsRepo : IUserChatsRepo
     public UserChatsRepo(
         ILogger<UserChatsRepo> logger,
         IUserChatsTelemetry userChatsTelemetry,
-        IChatsDbContext dbContext)
+        IChatsDbContext dbContext,
+        IOptions<UserChatsOperationOptions> operationOptions)
     {
         _logger = logger;
         _userChatsTelemetry = userChatsTelemetry;
         _dbContext = dbContext;
+        _operationOptions = operationOptions.Value;
     }
 
     public void Dispose()
@@ -78,7 +82,7 @@ internal sealed class UserChatsRepo : IUserChatsRepo
 
         long newerThanSnowflake = newerThan.ToSnowflakeFloor();
         BoundStatement query = _chatsQuery.Bind(userId, newerThanSnowflake);
-        query.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
+        query.SetConsistencyLevel(_operationOptions.GetUserChats.ConsistencyLevel);
         query.SetIdempotence(true);
 
         RowSet rows = await _userChatsTelemetry.GetChatsAsync(_dbContext.Session, query, userId);
@@ -106,7 +110,7 @@ internal sealed class UserChatsRepo : IUserChatsRepo
         EnsurePrepared();
 
         BoundStatement query = _chatQuery.Bind(userId, chatId);
-        query.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
+        query.SetConsistencyLevel(_operationOptions.GetUserChat.ConsistencyLevel);
         query.SetIdempotence(true);
 
         RowSet rows = _userChatsTelemetry.GetChat(_dbContext.Session, query, userId, chatId);
@@ -137,7 +141,7 @@ internal sealed class UserChatsRepo : IUserChatsRepo
         EnsurePrepared();
 
         BoundStatement command = _updateChatCommand.Bind(userId, chat.OtherUserId, chat.ChatId, chat.NewestMessage, chat.OtherUserDelivered, chat.OtherUserSeen);
-        command.SetConsistencyLevel(ConsistencyLevel.LocalQuorum);
+        command.SetConsistencyLevel(_operationOptions.UpdateUserChat.ConsistencyLevel);
         command.SetIdempotence(false);
 
         _userChatsTelemetry.UpdateChat(_dbContext.Session, command, userId, chat.ChatId);
