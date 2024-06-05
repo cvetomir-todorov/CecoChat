@@ -44,11 +44,17 @@ public abstract class BaseTest
 
         _chatsClient = new(
             configFilePath: "chats-client.json");
+
+        await AddTestData();
     }
+
+    protected virtual Task AddTestData() => Task.CompletedTask;
 
     [OneTimeTearDown]
     public async Task AfterAllTests()
     {
+        await CleanTestData();
+
         _chatsClient.Dispose();
         await _chatsService.DisposeAsync();
 
@@ -62,6 +68,8 @@ public abstract class BaseTest
         }
         await _dockerNetwork.DisposeAsync();
     }
+
+    protected virtual Task CleanTestData() => Task.CompletedTask;
 
     protected ChatsClient Client => _chatsClient;
 

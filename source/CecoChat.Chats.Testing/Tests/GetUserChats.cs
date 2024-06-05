@@ -17,8 +17,7 @@ public class GetUserChats : BaseTest
     private const long UserWithoutAnyChats = 1336;
     private static readonly DateTime StartTime = DateTime.UtcNow;
 
-    [OneTimeSetUp]
-    public void AddTestData()
+    protected override Task AddTestData()
     {
         IUserChatsRepo userChatsRepo = Service.UserChats();
 
@@ -31,6 +30,8 @@ public class GetUserChats : BaseTest
         // not bobby
         AddChatsBetween(UserMaria, UserSofia, StartTime.AddMinutes(1), userChatsRepo);
         AddChatsBetween(UserPeter, UserGeorge, StartTime.AddMinutes(2), userChatsRepo);
+
+        return Task.CompletedTask;
     }
 
     private static void AddChatsBetween(long userId, long otherUserId, DateTime newestMessage, IUserChatsRepo userChatsRepo)
@@ -54,10 +55,10 @@ public class GetUserChats : BaseTest
         };
     }
 
-    [OneTimeTearDown]
-    public void CleanTestData()
+    protected override Task CleanTestData()
     {
         // TODO: delete
+        return Task.CompletedTask;
     }
 
     public static object[] TestCases()
