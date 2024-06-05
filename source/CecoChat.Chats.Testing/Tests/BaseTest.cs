@@ -30,7 +30,7 @@ public abstract class BaseTest
         }
         else
         {
-            _chatsDb = new FakeChatsDb();
+            _chatsDb = new ExistingChatsDb();
         }
 
         _chatsService = new ChatsService(

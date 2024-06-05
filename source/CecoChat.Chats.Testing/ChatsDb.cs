@@ -23,9 +23,9 @@ public interface IChatsDb : IAsyncDisposable
 /// Provides access to a manually started local instance of Cassandra.
 /// Used when running tests locally during development.
 /// </summary>
-public sealed class FakeChatsDb : IChatsDb
+public sealed class ExistingChatsDb : IChatsDb
 {
-    public FakeChatsDb()
+    public ExistingChatsDb()
     {
         TestContext.Progress.WriteLine($"Using an existing Chats DB @{Host}:{Port}");
     }
