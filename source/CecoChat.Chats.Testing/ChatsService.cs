@@ -3,6 +3,7 @@ using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using CecoChat.Backplane.Contracts;
 using CecoChat.Chats.Data;
+using CecoChat.Chats.Data.Entities.UserChats;
 using CecoChat.Chats.Service;
 using CecoChat.Config;
 using CecoChat.Config.Client;
@@ -106,5 +107,10 @@ public sealed class ChatsService : IAsyncDisposable
         _app.Configuration.GetSection("Jwt").Bind(jwtOptions);
 
         return jwtOptions;
+    }
+
+    public IUserChatsRepo UserChats()
+    {
+        return _app.Services.GetRequiredService<IUserChatsRepo>();
     }
 }

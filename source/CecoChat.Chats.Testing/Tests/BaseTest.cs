@@ -65,6 +65,8 @@ public abstract class BaseTest
 
     protected ChatsClient Client => _chatsClient;
 
+    protected ChatsService Service => _chatsService;
+
     protected string CreateUserAccessToken(long userId, string userName)
     {
         JwtOptions jwtOptions = _chatsService.GetJwtOptions();
