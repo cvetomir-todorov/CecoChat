@@ -112,6 +112,9 @@
         },
         "UpdateUserChat": {
           "ConsistencyLevel": "One"
+        },
+        "DeleteUserChat": {
+          "ConsistencyLevel": "One"
         }
       }
     }

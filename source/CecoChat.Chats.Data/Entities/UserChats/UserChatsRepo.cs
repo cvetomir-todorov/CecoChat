@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Cassandra;
 using CecoChat.Chats.Contracts;
+using CecoChat.Data;
 using Common;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -16,6 +17,12 @@ public interface IUserChatsRepo : IDisposable
     ChatState? GetUserChat(long userId, string chatId);
 
     void UpdateUserChat(long userId, ChatState chat);
+
+    /// <summary>
+    /// Deletes user chats for both users.
+    /// Used only in testing to clean up the test data.
+    /// </summary>
+    void DeleteUserChat(long userId1, long userId2);
 }
 
 internal sealed class UserChatsRepo : IUserChatsRepo
@@ -27,6 +34,7 @@ internal sealed class UserChatsRepo : IUserChatsRepo
     private PreparedStatement? _chatsQuery;
     private PreparedStatement? _chatQuery;
     private PreparedStatement? _updateChatCommand;
+    private PreparedStatement? _deleteChatCommand;
 
     public UserChatsRepo(
         ILogger<UserChatsRepo> logger,
@@ -57,20 +65,29 @@ internal sealed class UserChatsRepo : IUserChatsRepo
         "INSERT into user_chats " +
         "(user_id, other_user_id, chat_id, newest_message, other_user_delivered, other_user_seen) " +
         "VALUES (?, ?, ?, ?, ?, ?);";
+    private const string DeleteChatCommand =
+        "DELETE FROM user_chats " +
+        "WHERE user_id = ? AND chat_id = ?;";
 
     public void Prepare()
     {
         _chatsQuery = _dbContext.PrepareStatement(ChatsQuery);
         _chatQuery = _dbContext.PrepareStatement(ChatQuery);
         _updateChatCommand = _dbContext.PrepareStatement(UpdateChatCommand);
+        _deleteChatCommand = _dbContext.PrepareStatement(DeleteChatCommand);
     }
 
-    [MemberNotNull(nameof(_chatsQuery), nameof(_chatQuery), nameof(_updateChatCommand))]
+    [MemberNotNull(
+        nameof(_chatsQuery),
+        nameof(_chatQuery),
+        nameof(_updateChatCommand),
+        nameof(_deleteChatCommand))]
     private void EnsurePrepared()
     {
         if (_chatsQuery == null ||
             _chatQuery == null ||
-            _updateChatCommand == null)
+            _updateChatCommand == null ||
+            _deleteChatCommand == null)
         {
             throw new InvalidOperationException($"Repo should be prepared by calling {nameof(Prepare)}.");
         }
@@ -146,5 +163,24 @@ internal sealed class UserChatsRepo : IUserChatsRepo
 
         _userChatsTelemetry.UpdateChat(_dbContext.Session, command, userId, chat.ChatId);
         _logger.LogTrace("Persisted changes about chat {ChatId} for user {UserId}", chat.ChatId, userId);
+    }
+
+    public void DeleteUserChat(long userId1, long userId2)
+    {
+        EnsurePrepared();
+
+        string chatId = DataUtility.CreateChatId(userId1, userId2);
+
+        BoundStatement user1Command = _deleteChatCommand.Bind(userId1, chatId);
+        user1Command.SetConsistencyLevel(_operationOptions.DeleteUserChat.ConsistencyLevel);
+        user1Command.SetIdempotence(true);
+
+        BoundStatement user2Command = _deleteChatCommand.Bind(userId2, chatId);
+        user2Command.SetConsistencyLevel(_operationOptions.DeleteUserChat.ConsistencyLevel);
+        user2Command.SetIdempotence(true);
+
+        _dbContext.Session.Execute(user1Command);
+        _dbContext.Session.Execute(user2Command);
+        _logger.LogTrace("Deleted user chats between user {User1} and user {User2}", userId1, userId2);
     }
 }

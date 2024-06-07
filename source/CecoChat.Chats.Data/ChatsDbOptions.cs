@@ -17,6 +17,7 @@ public sealed class UserChatsOperationOptions
     public OperationOptions GetUserChats { get; init; } = null!;
     public OperationOptions GetUserChat { get; init; } = null!;
     public OperationOptions UpdateUserChat { get; init; } = null!;
+    public OperationOptions DeleteUserChat { get; init; } = null!;
 }
 
 public sealed class OperationOptions
