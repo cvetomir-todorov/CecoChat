@@ -21,6 +21,11 @@ public interface IChatMessageRepo : IDisposable
     void SetReaction(ReactionMessage message);
 
     void UnsetReaction(ReactionMessage message);
+
+    /// <summary>
+    /// Used only in testing to clean up the test data.
+    /// </summary>
+    void DeleteChat(long userId, long otherUserId);
 }
 
 internal sealed class ChatMessageRepo : IChatMessageRepo
@@ -35,6 +40,7 @@ internal sealed class ChatMessageRepo : IChatMessageRepo
     private PreparedStatement? _addFileCommand;
     private PreparedStatement? _setReactionCommand;
     private PreparedStatement? _unsetReactionCommand;
+    private PreparedStatement? _deleteChatCommand;
 
     public ChatMessageRepo(
         ILogger<ChatMessageRepo> logger,
@@ -75,6 +81,9 @@ internal sealed class ChatMessageRepo : IChatMessageRepo
         "DELETE reactions[?] " +
         "FROM chat_messages " +
         "WHERE chat_id = ? AND message_id = ?";
+    private const string DeleteChatCommand =
+        "DELETE FROM chat_messages " +
+        "WHERE chat_id = ?";
 
     public void Prepare()
     {
@@ -85,16 +94,24 @@ internal sealed class ChatMessageRepo : IChatMessageRepo
         _addFileCommand = _dbContext.PrepareStatement(AddFileCommand);
         _setReactionCommand = _dbContext.PrepareStatement(SetReactionCommand);
         _unsetReactionCommand = _dbContext.PrepareStatement(UnsetReactionCommand);
+        _deleteChatCommand = _dbContext.PrepareStatement(DeleteChatCommand);
     }
 
-    [MemberNotNull(nameof(_historyQuery), nameof(_addPlainTextCommand), nameof(_addFileCommand), nameof(_setReactionCommand), nameof(_unsetReactionCommand))]
+    [MemberNotNull(
+        nameof(_historyQuery),
+        nameof(_addPlainTextCommand),
+        nameof(_addFileCommand),
+        nameof(_setReactionCommand),
+        nameof(_unsetReactionCommand),
+        nameof(_deleteChatCommand))]
     private void EnsurePrepared()
     {
         if (_historyQuery == null ||
             _addPlainTextCommand == null ||
             _addFileCommand == null ||
             _setReactionCommand == null ||
-            _unsetReactionCommand == null)
+            _unsetReactionCommand == null ||
+            _deleteChatCommand == null)
         {
             throw new InvalidOperationException($"Repo should be prepared by calling {nameof(Prepare)}.");
         }
@@ -216,5 +233,18 @@ internal sealed class ChatMessageRepo : IChatMessageRepo
 
         _chatMessageTelemetry.UnsetReaction(_dbContext.Session, command, message.ReactorId);
         _logger.LogTrace("Persisted user {ReactorId} un-reaction to message {MessageId}", message.ReactorId, message.MessageId);
+    }
+
+    public void DeleteChat(long userId, long otherUserId)
+    {
+        EnsurePrepared();
+
+        string chatId = DataUtility.CreateChatId(userId, otherUserId);
+        BoundStatement command = _deleteChatCommand.Bind(chatId);
+        command.SetConsistencyLevel(_operationOptions.DeleteChat.ConsistencyLevel);
+        command.SetIdempotence(true);
+
+        _dbContext.Session.Execute(command);
+        _logger.LogTrace("Deleted all chat messages for chat {ChatId}", chatId);
     }
 }

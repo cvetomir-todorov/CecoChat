@@ -9,6 +9,7 @@ public sealed class ChatMessagesOperationOptions
     public OperationOptions AddFileMessage { get; init; } = null!;
     public OperationOptions SetReaction { get; init; } = null!;
     public OperationOptions UnsetReaction { get; init; } = null!;
+    public OperationOptions DeleteChat { get; init; } = null!;
 }
 
 public sealed class UserChatsOperationOptions
