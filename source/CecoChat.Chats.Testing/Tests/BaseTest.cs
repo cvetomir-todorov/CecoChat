@@ -45,10 +45,9 @@ public abstract class BaseTest
         _chatsClient = new(
             configFilePath: "chats-client.json");
 
+        await CleanTestData();
         await AddTestData();
     }
-
-    protected virtual Task AddTestData() => Task.CompletedTask;
 
     [OneTimeTearDown]
     public async Task AfterAllTests()
@@ -70,6 +69,8 @@ public abstract class BaseTest
     }
 
     protected virtual Task CleanTestData() => Task.CompletedTask;
+
+    protected virtual Task AddTestData() => Task.CompletedTask;
 
     protected ChatsClient Client => _chatsClient;
 

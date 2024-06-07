@@ -3,6 +3,7 @@ using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using CecoChat.Backplane.Contracts;
 using CecoChat.Chats.Data;
+using CecoChat.Chats.Data.Entities.ChatMessages;
 using CecoChat.Chats.Data.Entities.UserChats;
 using CecoChat.Chats.Service;
 using CecoChat.Config;
@@ -69,7 +70,7 @@ public sealed class ChatsService : IAsyncDisposable
             // override registrations
             autofacBuilder.Register(_ => new ConfigClientStub(
                 [
-                    new() { Name = ConfigKeys.History.MessageCount, Value = "16" }
+                    new() { Name = ConfigKeys.History.MessageCount, Value = "4" }
                 ]))
                 .As<IConfigClient>().SingleInstance();
             autofacBuilder.RegisterType<KafkaAdminDummy>().As<IKafkaAdmin>().SingleInstance();
@@ -112,5 +113,10 @@ public sealed class ChatsService : IAsyncDisposable
     public IUserChatsRepo UserChats()
     {
         return _app.Services.GetRequiredService<IUserChatsRepo>();
+    }
+
+    public IChatMessageRepo ChatMessages()
+    {
+        return _app.Services.GetRequiredService<IChatMessageRepo>();
     }
 }
