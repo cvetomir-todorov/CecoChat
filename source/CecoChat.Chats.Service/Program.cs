@@ -114,7 +114,7 @@ public static class Program
             .AddCheck<ChatsDbInitHealthCheck>(
                 "chats-db-init",
                 tags: new[] { HealthTags.Health, HealthTags.Startup })
-            .AddCassandra(
+            .AddCassandra<IChatsDbContext>(
                 name: "chats-db",
                 timeout: chatsDbOptions.HealthTimeout,
                 tags: new[] { HealthTags.Health, HealthTags.Ready })
@@ -154,7 +154,6 @@ public static class Program
             clusterConfiguration: host.Configuration.GetSection("ChatsDb:Cluster"),
             chatMessagesOperationsConfiguration: host.Configuration.GetSection("ChatsDb:Operations:ChatMessages"),
             userChatsOperationsConfiguration: host.Configuration.GetSection("ChatsDb:Operations:UserChats")));
-        builder.RegisterModule(new CassandraHealthAutofacModule(host.Configuration.GetSection("ChatsDb:Cluster")));
 
         // backplane
         builder.RegisterType<KafkaAdmin>().As<IKafkaAdmin>().SingleInstance();

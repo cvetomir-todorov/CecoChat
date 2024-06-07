@@ -7,10 +7,10 @@ namespace Common.Cassandra.Health;
 public class CassandraHealthCheck : IHealthCheck
 {
     private readonly ILogger _logger;
-    private readonly ICassandraHealthDbContext _dbContext;
+    private readonly ICassandraDbContext _dbContext;
     private readonly Lazy<BoundStatement> _query;
 
-    public CassandraHealthCheck(ILogger<CassandraHealthCheck> logger, ICassandraHealthDbContext dbContext, TimeSpan? timeout)
+    public CassandraHealthCheck(ILogger<CassandraHealthCheck> logger, ICassandraDbContext dbContext, TimeSpan? timeout)
     {
         _logger = logger;
         _dbContext = dbContext;

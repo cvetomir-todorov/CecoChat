@@ -6,12 +6,13 @@ namespace Common.Cassandra.Health;
 
 public static class CassandraHealthRegistrations
 {
-    public static IHealthChecksBuilder AddCassandra(
+    public static IHealthChecksBuilder AddCassandra<TDbContext>(
         this IHealthChecksBuilder builder,
         string name,
         HealthStatus failureStatus = HealthStatus.Unhealthy,
         IEnumerable<string>? tags = null,
         TimeSpan? timeout = null)
+        where TDbContext : ICassandraDbContext
     {
         if (string.IsNullOrWhiteSpace(name))
         {
@@ -20,17 +21,18 @@ public static class CassandraHealthRegistrations
 
         return builder.Add(new HealthCheckRegistration(
             name,
-            serviceProvider => CreateHealthCheck(serviceProvider, timeout),
+            serviceProvider => CreateHealthCheck<TDbContext>(serviceProvider, timeout),
             failureStatus,
             tags,
             timeout));
     }
 
-    private static IHealthCheck CreateHealthCheck(IServiceProvider serviceProvider, TimeSpan? timeout)
+    private static IHealthCheck CreateHealthCheck<TDbContext>(IServiceProvider serviceProvider, TimeSpan? timeout)
+        where TDbContext : ICassandraDbContext
     {
         return new CassandraHealthCheck(
             serviceProvider.GetRequiredService<ILogger<CassandraHealthCheck>>(),
-            serviceProvider.GetRequiredService<ICassandraHealthDbContext>(),
+            serviceProvider.GetRequiredService<TDbContext>(),
             timeout);
     }
 }
