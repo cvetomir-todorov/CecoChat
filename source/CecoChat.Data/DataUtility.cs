@@ -6,6 +6,11 @@ public static class DataUtility
 
     public static string CreateChatId(long userId1, long userId2)
     {
+        if (userId1 == userId2)
+        {
+            throw new ArgumentException("User IDs should be different.", paramName: nameof(userId1));
+        }
+
         long min = Math.Min(userId1, userId2);
         long max = Math.Max(userId1, userId2);
 
