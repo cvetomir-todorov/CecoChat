@@ -28,6 +28,6 @@ public class CassandraAutofacModule<TDbContextImplementation, TDbContext> : Modu
             .As<TDbContext>()
             .Named<ICassandraDbContext>(_dbContextName)
             .SingleInstance();
-        builder.RegisterOptions<CassandraOptions<TDbContextImplementation>>(_cassandraConfiguration);
+        builder.RegisterOptions<CassandraOptions<TDbContext>>(_cassandraConfiguration);
     }
 }

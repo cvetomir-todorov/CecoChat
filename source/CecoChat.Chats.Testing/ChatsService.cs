@@ -40,7 +40,7 @@ public sealed class ChatsService : IAsyncDisposable
             EnvironmentName = environment
         });
         builder.Configuration.AddJsonFile(configFilePath, optional: false);
-        builder.Services.Configure<CassandraOptions<ChatsDbContext>>(cassandra =>
+        builder.Services.Configure<CassandraOptions<IChatsDbContext>>(cassandra =>
         {
             cassandra.ContactPoints = [$"{chatsDb.Host}:{chatsDb.Port}"];
         });
