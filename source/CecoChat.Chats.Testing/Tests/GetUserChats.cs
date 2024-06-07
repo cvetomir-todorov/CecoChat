@@ -57,22 +57,15 @@ public class GetUserChats : BaseTest
         userChatsRepo.UpdateUserChat(otherUserId, CreateChatState(otherUserId, userId, newestMessage));
     }
 
-    private static ChatState CreateChatState(long userId, long otherUserId, DateTime newestMessage)
+    [TestCaseSource(nameof(AllTestCases))]
+    public async Task All(string testName, long userId, DateTime newerThan, ChatState[] expectedChats)
     {
-        long newestMessageSnowflake = newestMessage.ToSnowflake();
-        string chatId = DataUtility.CreateChatId(userId, otherUserId);
-
-        return new ChatState
-        {
-            OtherUserId = otherUserId,
-            ChatId = chatId,
-            NewestMessage = newestMessageSnowflake,
-            OtherUserDelivered = newestMessageSnowflake,
-            OtherUserSeen = newestMessageSnowflake
-        };
+        string accessToken = CreateUserAccessToken(userId, userName: "test");
+        IReadOnlyCollection<ChatState> actualChats = await Client.Instance.GetUserChats(userId, newerThan, accessToken, CancellationToken.None);
+        actualChats.Should().BeEquivalentTo(expectedChats, config => config.WithStrictOrdering());
     }
 
-    public static object[] TestCases()
+    public static object[] AllTestCases()
     {
         return
         [
@@ -127,11 +120,18 @@ public class GetUserChats : BaseTest
         ];
     }
 
-    [TestCaseSource(nameof(TestCases))]
-    public async Task AllCases(string testName, long userId, DateTime newerThan, ChatState[] expectedChats)
+    private static ChatState CreateChatState(long userId, long otherUserId, DateTime newestMessage)
     {
-        string accessToken = CreateUserAccessToken(userId, userName: "test");
-        IReadOnlyCollection<ChatState> actualChats = await Client.Instance.GetUserChats(userId, newerThan, accessToken, CancellationToken.None);
-        actualChats.Should().BeEquivalentTo(expectedChats, config => config.WithStrictOrdering());
+        long newestMessageSnowflake = newestMessage.ToSnowflake();
+        string chatId = DataUtility.CreateChatId(userId, otherUserId);
+
+        return new ChatState
+        {
+            OtherUserId = otherUserId,
+            ChatId = chatId,
+            NewestMessage = newestMessageSnowflake,
+            OtherUserDelivered = newestMessageSnowflake,
+            OtherUserSeen = newestMessageSnowflake
+        };
     }
 }
