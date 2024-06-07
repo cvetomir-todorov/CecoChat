@@ -45,7 +45,7 @@ Check out [what next](docs/what-next.md) needs to be implemented. I appreciate a
   - Operations - OpenTelemetry, Docker, Kubernetes
   - Services - .NET, ASP.NET, SignalR, EF Core
   - Libraries - Autofac, Serilog, FluentValidation, AutoMapper, Polly, IdGen
-  - Automated testing - NUnit, FluentAssertions, Coverlet
+  - Automated testing - NUnit, Testcontainers, FluentAssertions, Coverlet
 
 # Design
 

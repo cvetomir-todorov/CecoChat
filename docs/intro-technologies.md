@@ -177,11 +177,13 @@ Additional libraries which are all open-source and created, supported and develo
 * Refit is one of the most popular REST clients
 
 ![NUnit](tech-images/nunit.jpg)
+![Testcontainers](tech-images/testcontainers.png)
 ![FluentAssertions](tech-images/fluent-assertions.png)
 ![Coverlet](tech-images/coverlet.png)
 
 Automated testing is done using open-source libraries, supported and developed by the community:
 * NUnit is one of the 2 most popular unit testing frameworks
+* Testcontainers is a framework for spinning up Docker containers
 * Fluent Assertions is the most mature assertion framework
 * Coverlet is a powerful code coverage toolset
 
