@@ -111,7 +111,7 @@ public class GetChatHistory : BaseTest
         actualMessages.Should().BeEquivalentTo(expectedMessages, config => config.Including(x => x.Text));
     }
 
-    public static object[] MessagesOlderThanAndLimitedInCountTestCases()
+    private static object[] MessagesOlderThanAndLimitedInCountTestCases()
     {
         return
         [
@@ -181,7 +181,7 @@ public class GetChatHistory : BaseTest
         actualMessages.First().Should().Be(expectedMessage);
     }
 
-    public static object[] AllTypesOfMessagesTestCases()
+    private static object[] AllTypesOfMessagesTestCases()
     {
         return
         [

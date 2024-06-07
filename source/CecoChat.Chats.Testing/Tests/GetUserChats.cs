@@ -65,7 +65,7 @@ public class GetUserChats : BaseTest
         actualChats.Should().BeEquivalentTo(expectedChats, config => config.WithStrictOrdering());
     }
 
-    public static object[] AllTestCases()
+    private static object[] AllTestCases()
     {
         return
         [
