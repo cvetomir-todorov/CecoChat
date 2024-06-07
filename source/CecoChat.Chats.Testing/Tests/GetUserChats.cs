@@ -17,6 +17,23 @@ public class GetUserChats : BaseTest
     private const long UserWithoutAnyChats = 1336;
     private static readonly DateTime StartTime = DateTime.UtcNow;
 
+    protected override Task CleanTestData()
+    {
+        IUserChatsRepo userChatsRepo = Service.UserChats();
+
+        // bobby
+        userChatsRepo.DeleteUserChat(UserBobby, UserMaria);
+        userChatsRepo.DeleteUserChat(UserBobby, UserPeter);
+        userChatsRepo.DeleteUserChat(UserBobby, UserSofia);
+        userChatsRepo.DeleteUserChat(UserBobby, UserGeorge);
+
+        // not bobby
+        userChatsRepo.DeleteUserChat(UserMaria, UserSofia);
+        userChatsRepo.DeleteUserChat(UserPeter, UserGeorge);
+
+        return Task.CompletedTask;
+    }
+
     protected override Task AddTestData()
     {
         IUserChatsRepo userChatsRepo = Service.UserChats();
@@ -53,12 +70,6 @@ public class GetUserChats : BaseTest
             OtherUserDelivered = newestMessageSnowflake,
             OtherUserSeen = newestMessageSnowflake
         };
-    }
-
-    protected override Task CleanTestData()
-    {
-        // TODO: delete
-        return Task.CompletedTask;
     }
 
     public static object[] TestCases()
