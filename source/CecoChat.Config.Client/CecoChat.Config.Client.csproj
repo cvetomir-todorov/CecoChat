@@ -1,9 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-  </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="Grpc.Net.ClientFactory" Version="2.61.0" />
   </ItemGroup>
