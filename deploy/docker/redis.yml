@@ -17,7 +17,7 @@ services:
     volumes:
       - ./redis/redis.conf:/redis.conf
       - cecochat-redis0-data:/data
-    command: [ "redis-server", "/redis.conf" ]
+    command: [ "redis-server", "/redis.conf", "--cluster-announce-hostname redis0" ]
   redis1:
     image: redis:7.2.3
     container_name: cecochat-redis1
@@ -32,7 +32,7 @@ services:
     volumes:
       - ./redis/redis.conf:/redis.conf
       - cecochat-redis1-data:/data
-    command: [ "redis-server", "/redis.conf" ]
+    command: [ "redis-server", "/redis.conf", "--cluster-announce-hostname redis1" ]
   redis2:
     image: redis:7.2.3
     container_name: cecochat-redis2
@@ -47,7 +47,7 @@ services:
     volumes:
       - ./redis/redis.conf:/redis.conf
       - cecochat-redis2-data:/data
-    command: [ "redis-server", "/redis.conf" ]
+    command: [ "redis-server", "/redis.conf", "--cluster-announce-hostname redis2" ]
   redis-cluster-setup:
     image: redis:7.2.3
     container_name: cecochat-redis-cluster-setup
