@@ -1,15 +1,9 @@
 version: '3'
-networks:
-  cecochat:
 services:
   redis0:
     image: redis:7.2.3
     container_name: cecochat-redis0
-    hostname: redis0
-    networks: &networks
-      - cecochat
-    ports:
-      - "6379:6379"
+    network_mode: host
     deploy:
       resources:
         limits:
@@ -17,14 +11,26 @@ services:
     volumes:
       - ./redis/redis.conf:/redis.conf
       - cecochat-redis0-data:/data
-    command: [ "redis-server", "/redis.conf", "--cluster-announce-hostname redis0" ]
+    command:
+      - redis-server
+      - /redis.conf
+      - port
+      - "6379"
+      - --cluster-announce-ip
+      - "127.0.0.1"
+      - --cluster-announce-port
+      - "6379"
+      - --cluster-announce-bus-port
+      - "16379"
+    healthcheck:
+      test: [ "CMD", "redis-cli", "-h", "127.0.0.1", "-p", "6379", "PING" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
   redis1:
     image: redis:7.2.3
     container_name: cecochat-redis1
-    hostname: redis1
-    networks: *networks
-    ports:
-      - "6380:6379"
+    network_mode: host
     deploy:
       resources:
         limits:
@@ -32,14 +38,26 @@ services:
     volumes:
       - ./redis/redis.conf:/redis.conf
       - cecochat-redis1-data:/data
-    command: [ "redis-server", "/redis.conf", "--cluster-announce-hostname redis1" ]
+    command:
+      - redis-server
+      - /redis.conf
+      - port
+      - "6380"
+      - --cluster-announce-ip
+      - "127.0.0.1"
+      - --cluster-announce-port
+      - "6380"
+      - --cluster-announce-bus-port
+      - "16380"
+    healthcheck:
+      test: [ "CMD", "redis-cli", "-h", "127.0.0.1", "-p", "6380", "PING" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
   redis2:
     image: redis:7.2.3
     container_name: cecochat-redis2
-    hostname: redis2
-    networks: *networks
-    ports:
-      - "6381:6379"
+    network_mode: host
     deploy:
       resources:
         limits:
@@ -47,17 +65,31 @@ services:
     volumes:
       - ./redis/redis.conf:/redis.conf
       - cecochat-redis2-data:/data
-    command: [ "redis-server", "/redis.conf", "--cluster-announce-hostname redis2" ]
+    command:
+      - redis-server
+      - /redis.conf
+      - port
+      - "6381"
+      - --cluster-announce-ip
+      - "127.0.0.1"
+      - --cluster-announce-port
+      - "6381"
+      - --cluster-announce-bus-port
+      - "16381"
+    healthcheck:
+      test: [ "CMD", "redis-cli", "-h", "127.0.0.1", "-p", "6381", "PING" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
   redis-cluster-setup:
     image: redis:7.2.3
     container_name: cecochat-redis-cluster-setup
-    hostname: redis-cluster-setup
-    networks: *networks
+    network_mode: host
     deploy:
       resources:
         limits:
           memory: 64M
-    entrypoint: "redis-cli --cluster create redis0:6379 redis1:6379 redis2:6379 --cluster-yes"
+    entrypoint: "redis-cli --cluster create 127.0.0.1:6379 127.0.0.1:6380 127.0.0.1:6381 --cluster-yes"
     depends_on:
       - redis0
       - redis1
