@@ -7,7 +7,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="IdGen" Version="3.0.5" />
+    <PackageReference Include="IdGen" />
   </ItemGroup>
 
   <ItemGroup>

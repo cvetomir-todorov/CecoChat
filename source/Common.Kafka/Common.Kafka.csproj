@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <PackageReference Include="AspNetCore.HealthChecks.Kafka" Version="8.0.0" />
-    <PackageReference Include="Confluent.Kafka" Version="2.3.0" />
+    <PackageReference Include="AspNetCore.HealthChecks.Kafka" />
+    <PackageReference Include="Confluent.Kafka" />
   </ItemGroup>
 
   <ItemGroup>

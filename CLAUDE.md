@@ -19,6 +19,7 @@ All commands run from the repo root unless noted.
 * Run all tests: `dotnet test source/CecoChat.sln`
 * Run a single test project: `dotnet test source/<Project>.Testing/<Project>.Testing.csproj`
 * Integration tests (`CecoChat.Chats.Testing`, `CecoChat.IdGen.Testing`) self-host the real service in-process against the generated certificate and hit it over the network — they are not pure unit tests. Each such test project needs a `CECOCHAT_START_TEST_CONTAINERS_<X>_DB=true` env var (e.g. `CECOCHAT_START_TEST_CONTAINERS_CHATS_DB`) to spin up its database via Testcontainers; without it, the test expects an already-running database (`ExistingChatsDb`-style fallback) at the address in `deploy/testing`.
+* Package versions are managed centrally via `source/Directory.Packages.props` (NuGet Central Package Management, covers both `CecoChat.sln` and `Check.sln`). `.csproj` files use bare `<PackageReference Include="..." />` with no `Version` attribute — add or bump a version only in `Directory.Packages.props`.
 
 # Architecture
 
