@@ -46,7 +46,7 @@ internal sealed class FileQueryRepo : IFileQueryRepo
             .Where(entity =>
                 entity.Bucket == bucket &&
                 entity.Path == path &&
-                (entity.UserId == userId || entity.AllowedUsers.Contains(userId)))
+                (entity.UserId == userId || ((IEnumerable<long>)entity.AllowedUsers).Contains(userId)))
             .AsNoTracking()
             .AnyAsync();
 
