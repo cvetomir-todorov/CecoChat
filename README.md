@@ -76,6 +76,7 @@ Check out [what next](docs/what-next.md) needs to be implemented. I appreciate a
   - [Local run in Docker](docs/dev-run-docker.md)
   - [Local run in Minikube](docs/dev-run-minikube.md)
   - [Development process](docs/dev-process.md)
+* [AI-detected issues](docs/ai-detected-issues.md)
 * [Load test using 2 machines](docs/load-test.md)
 * [What next](docs/what-next.md)
 
