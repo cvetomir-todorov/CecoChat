@@ -1,5 +1,18 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(git diff --stat)",
+      "Bash(dotnet --version)",
+      "Bash(dotnet restore source/CecoChat.sln)",
+      "Bash(dotnet restore source/Check.sln)",
+      "Bash(dotnet build --no-restore source/CecoChat.sln)",
+      "Bash(dotnet build --no-restore source/Check.sln)",
+      "Bash(dotnet format source/CecoChat.sln --no-restore --verify-no-changes --verbosity minimal)",
+      "Bash(dotnet format source/CecoChat.sln --no-restore --verify-no-changes --verbosity diagnostic)",
+      "Read(//tmp/**)"
+    ]
+  },
   "enabledPlugins": {
     "csharp-lsp@claude-plugins-official": true
   }
