@@ -8,8 +8,7 @@
       "Bash(dotnet restore source/Check.sln)",
       "Bash(dotnet build --no-restore source/CecoChat.sln)",
       "Bash(dotnet build --no-restore source/Check.sln)",
-      "Bash(dotnet format source/CecoChat.sln --no-restore --verify-no-changes --verbosity minimal)",
-      "Bash(dotnet format source/CecoChat.sln --no-restore --verify-no-changes --verbosity diagnostic)",
+      "Bash(dotnet format source/CecoChat.sln --no-restore --verify-no-changes --verbosity detailed)",
       "Read(//tmp/**)"
     ]
   },
