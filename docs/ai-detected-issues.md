@@ -54,6 +54,15 @@ Config service Swagger endpoints propagates to all subscribers and turns
 `Math.Abs(hash) % partitionCount` in `CecoChat.Backplane/Partitioner.cs:23` into a
 `DivideByZeroException` on every message, across the whole fleet.
 
+Nothing on the write path catches it either. `CecoChat.Config.Service/Endpoints/ConfigValidation.cs`
+validates only that the element *name* matches a regex and that the *value* is non-empty - the
+semantic validators (`PartitioningValidator`, `SnowflakeValidator`) live exclusively on the subscriber
+side, which is the path that skips them. So there is no layer anywhere that rejects
+`partitioning.partition-count = 0`.
+
+The logs actively disguise this: `NotifyConfigChange` writes `"Using existing config for {X}"` and
+then immediately `"Using new {X} configuration"` before assigning.
+
 ## Lost updates on user chat state
 
 `CecoChat.Chats.Service/Backplane/StateConsumer.cs:147,178`,
@@ -220,9 +229,8 @@ documented operational lever, this path deserves to be serialized.
 * `deploy/minikube/messaging/templates/messaging-services.yml` - the per-pod Services are hardcoded to
   ordinals `-0` and `-1` while `StatefulSet.Replicas` is a chart value. Raising the replica count
   leaves the new pod without a Service, unreachable even though the partitioning config may route
-  users to it. The same applies to the `idgen` chart.
-* `design-users.md:50` states a 512KB upload limit and `CLAUDE.md` repeats it, but
-  `CecoChat.Bff.Service/appsettings.json` sets `MaxUploadedFileBytes` to 10485760 (10MB).
+  users to it. The `idgen` chart is not affected - it exposes a single headless Service
+  (`idgen-service.yml`, `clusterIP: None`), which gives every pod DNS regardless of replica count.
 * The `UserIds` count limit is enforced as `Length < userConfig.ProfileCount` in
   `CecoChat.Bff.Service/Endpoints/Profiles/ProfileValidation.cs` but as `Count <= ProfileCount` in
   `CecoChat.User.Service/Endpoints/Profiles/ProfileQueryValidation.cs` - off by one between the two
