@@ -11,8 +11,5 @@
       "Bash(dotnet format source/CecoChat.sln --no-restore --verify-no-changes --verbosity detailed)",
       "Read(//tmp/**)"
     ]
-  },
-  "enabledPlugins": {
-    "csharp-lsp@claude-plugins-official": true
   }
 }
