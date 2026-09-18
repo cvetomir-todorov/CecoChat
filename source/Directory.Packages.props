@@ -13,7 +13,7 @@
     <PackageVersion Include="AutoMapper" Version="16.1.1" />
     <PackageVersion Include="Calzolari.Grpc.AspNetCore.Validation" Version="8.0.0" />
     <PackageVersion Include="Calzolari.Grpc.Net.Client.Validation" Version="8.0.0" />
-    <PackageVersion Include="CassandraCSharpDriver" Version="3.20.1" />
+    <PackageVersion Include="CassandraCSharpDriver" Version="3.22.1" />
     <PackageVersion Include="CommandLineParser" Version="2.9.1" />
     <PackageVersion Include="Confluent.Kafka" Version="2.3.0" />
     <PackageVersion Include="coverlet.msbuild" Version="6.0.2" />
