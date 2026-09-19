@@ -1,6 +1,6 @@
 apiVersion: v2
-name: backplane
-description: The backplane in CecoChat
+name: kafka
+description: The Kafka backplane in CecoChat
 type: application
 version: 0.1.0
 appVersion: "0.1.0"
