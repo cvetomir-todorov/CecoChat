@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{.Release.Name}}-kafka
+  name: {{.Release.Name}}
   namespace: {{.Release.Namespace}}
   labels:
-    app: {{.Release.Name}}-kafka
+    app: {{.Release.Name}}
 data:
-  {{.Values.Kafka.Entrypoint.ConfigName}}: |-
+  {{.Values.Entrypoint.ConfigName}}: |-
     #!/bin/bash
-    export KAFKA_BROKER_ID=${HOSTNAME##*-}
+    export KAFKA_NODE_ID=${HOSTNAME##*-}
     /etc/confluent/docker/run
