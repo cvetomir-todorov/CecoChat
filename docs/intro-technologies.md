@@ -48,7 +48,6 @@ Services communicate asynchronously via the PUB/SUB backplane which is based on 
 * has a pull model which allows consumers to process messages at their own rate
 * a good solution for an event log, especially when processing a single message is fast
 * has some known operability issues with partition redistribution among a consumer group
-* relies on ZooKeeper as an additional element in the infrastructure
 
 # User database
 

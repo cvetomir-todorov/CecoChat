@@ -5,7 +5,7 @@ Make sure that the [prerequisites](dev-run-prerequisites.md) have been met befor
 # Instances
 
 * Integration
-  - Kafka - 1 Zookeeper, 2 brokers
+  - Kafka - 2 brokers
 * Data storage
   - YugabyteDB - 1 master, 1 tserver
   - Cassandra - 2 nodes
