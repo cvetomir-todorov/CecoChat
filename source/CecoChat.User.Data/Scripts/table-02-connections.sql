@@ -12,10 +12,6 @@ CREATE TABLE IF NOT EXISTS public.connections
     CONSTRAINT connections_user2_id_foreign
         FOREIGN KEY (user2_id) REFERENCES public.Profiles (user_id)
 )
-WITH
-(
-    OIDS = FALSE
-)
 TABLESPACE pg_default;
 
 CREATE INDEX connections_user1_id_index
