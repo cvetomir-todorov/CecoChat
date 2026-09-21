@@ -57,7 +57,7 @@ public sealed class TestContainersChatsDb : IChatsDb
         const int cassandraContainerPort = 9042;
 
         _cassandra = new ContainerBuilder()
-            .WithImage("cassandra:4.1.3")
+            .WithImage("cassandra:5.0.8")
             .WithName($"cecochat-test-{name}")
             .WithHostname(name)
             .WithNetwork(dockerNetwork)
