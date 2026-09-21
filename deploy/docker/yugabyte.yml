@@ -27,6 +27,13 @@ services:
         "--master_replication_factor=1",
         "--replication_factor=2",
         "--logtostderr" ]
+    healthcheck:
+      # use built-in health check and make sure the dead nodes array is empty
+      test: >-
+        curl -sf http://yb-master:7000/api/v1/health-check | grep -Fq '"dead_nodes":[]'
+      interval: 5s
+      timeout: 5s
+      retries: 10
   yb-tserver0:
     image: yugabytedb/yugabyte:2026.1.1.2-b9
     container_name: cecochat-yb-tserver0
@@ -51,6 +58,11 @@ services:
         "--tserver_master_addrs=yb-master:7100",
         "--start_pgsql_proxy",
         "--logtostderr" ]
+    healthcheck: &tserver-healthcheck
+      test: [ "CMD", "/home/yugabyte/postgres/bin/pg_isready", "-h", "yb-tserver0", "-p", "5433" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
     depends_on:
       - yb-master
   yb-tserver1:
@@ -76,6 +88,9 @@ services:
         "--tserver_master_addrs=yb-master:7100",
         "--start_pgsql_proxy",
         "--logtostderr" ]
+    healthcheck:
+      <<: *tserver-healthcheck
+      test: [ "CMD", "/home/yugabyte/postgres/bin/pg_isready", "-h", "yb-tserver1", "-p", "5433" ]
     depends_on:
       - yb-master
 volumes:
