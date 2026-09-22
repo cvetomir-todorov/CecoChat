@@ -2,6 +2,8 @@
 
   <ItemGroup>
     <PackageReference Include="CassandraCSharpDriver" />
+    <!-- Not used directly, but referenced explicitly since the Cassandra driver .nuspec file specifies and older version which contains security vulnerabilities -->
+    <PackageReference Include="Newtonsoft.Json" />
   </ItemGroup>
 
   <ItemGroup>
