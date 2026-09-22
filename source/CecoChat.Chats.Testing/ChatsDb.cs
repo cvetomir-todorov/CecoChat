@@ -56,8 +56,7 @@ public sealed class TestContainersChatsDb : IChatsDb
         TestContext.Progress.WriteLine($"Setting Cassandra host port to {_cassandraHostPort}");
         const int cassandraContainerPort = 9042;
 
-        _cassandra = new ContainerBuilder()
-            .WithImage("cassandra:5.0.8")
+        _cassandra = new ContainerBuilder("cassandra:5.0.8")
             .WithName($"cecochat-test-{name}")
             .WithHostname(name)
             .WithNetwork(dockerNetwork)

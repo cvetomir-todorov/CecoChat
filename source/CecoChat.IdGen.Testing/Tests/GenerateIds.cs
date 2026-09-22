@@ -1,7 +1,7 @@
+using AwesomeAssertions;
+using AwesomeAssertions.Execution;
 using CecoChat.IdGen.Client;
 using Common;
-using FluentAssertions;
-using FluentAssertions.Execution;
 using NUnit.Framework;
 
 namespace CecoChat.IdGen.Testing.Tests;
