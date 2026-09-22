@@ -8,9 +8,9 @@
     <PackageVersion Include="AspNetCore.HealthChecks.Kafka" Version="9.0.0" />
     <PackageVersion Include="AspNetCore.HealthChecks.NpgSql" Version="9.0.0" />
     <PackageVersion Include="AspNetCore.HealthChecks.Redis" Version="9.0.0" />
-    <PackageVersion Include="Autofac" Version="8.0.0" />
-    <PackageVersion Include="Autofac.Extensions.DependencyInjection" Version="9.0.0" />
-    <PackageVersion Include="AutoMapper" Version="16.1.1" />
+    <PackageVersion Include="Autofac" Version="9.3.4" />
+    <PackageVersion Include="Autofac.Extensions.DependencyInjection" Version="11.0.2" />
+    <PackageVersion Include="AutoMapper" Version="16.2.0" />
     <PackageVersion Include="Calzolari.Grpc.AspNetCore.Validation" Version="10.0.0" />
     <PackageVersion Include="Calzolari.Grpc.Net.Client.Validation" Version="10.0.0" />
     <PackageVersion Include="CassandraCSharpDriver" Version="3.22.1" />
@@ -26,7 +26,7 @@
     <PackageVersion Include="Grpc.Net.Client" Version="2.84.0" />
     <PackageVersion Include="Grpc.Net.ClientFactory" Version="2.84.0" />
     <PackageVersion Include="Grpc.Tools" Version="2.84.0" />
-    <PackageVersion Include="IdGen" Version="3.0.5" />
+    <PackageVersion Include="IdGen" Version="3.0.7" />
     <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.12" />
     <PackageVersion Include="Microsoft.AspNetCore.SignalR.Client" Version="10.0.12" />
     <PackageVersion Include="Microsoft.AspNetCore.SignalR.Protocols.MessagePack" Version="10.0.12" />
@@ -55,9 +55,9 @@
     <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.19.0" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.GrpcNetClient" Version="1.19.1-beta.1" />
     <PackageVersion Include="OpenTelemetry.Instrumentation.StackExchangeRedis" Version="1.19.0-beta.1" />
-    <PackageVersion Include="Polly" Version="8.3.1" />
+    <PackageVersion Include="Polly" Version="8.8.0" />
     <PackageVersion Include="Polly.Extensions.Http" Version="3.0.0" />
-    <PackageVersion Include="Refit" Version="8.0.0" />
+    <PackageVersion Include="Refit" Version="16.1.0" />
     <PackageVersion Include="Serilog" Version="4.4.0" />
     <PackageVersion Include="Serilog.AspNetCore" Version="10.0.0" />
     <PackageVersion Include="Serilog.Enrichers.Environment" Version="3.0.1" />

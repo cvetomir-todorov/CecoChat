@@ -359,29 +359,29 @@ public sealed class ChatClient : IDisposable
         if (apiResponse.IsSuccessStatusCode)
         {
             response.Success = true;
+            return;
         }
-        else if (apiResponse.Error is ValidationApiException validationApiException)
+
+        if (apiResponse.Error is ValidationApiException validationApiException &&
+            validationApiException.Content != null &&
+            validationApiException.Content.Errors.Count > 0)
         {
-            if (validationApiException.Content != null)
+            response.Errors.Add(apiResponse.Error.Message);
+            
+            foreach (KeyValuePair<string, string[]> errorPair in validationApiException.Content.Errors)
             {
-                foreach (KeyValuePair<string, string[]> errorPair in validationApiException.Content.Errors)
-                {
-                    response.Errors.AddRange(errorPair.Value);
-                }
+                response.Errors.AddRange(errorPair.Value);
             }
 
-            if (response.Errors.Count == 0)
-            {
-                response.Errors.Add($"{apiResponse.Error.Message}");
-            }
+            return;
         }
-        else if (!string.IsNullOrWhiteSpace(apiResponse.Error.Content))
+
+        if (apiResponse.Error is ApiException apiException && !string.IsNullOrWhiteSpace(apiException.Content))
         {
-            response.Errors.Add($"{(int)apiResponse.StatusCode} {apiResponse.StatusCode}: {apiResponse.Error.Content}");
+            response.Errors.Add($"{(int)apiException.StatusCode} {apiException.StatusCode}: {apiException.Content}");
+            return;
         }
-        else
-        {
-            response.Errors.Add($"{apiResponse.Error.Message}");
-        }
+
+        response.Errors.Add($"{apiResponse.Error?.Message ?? "Unknown error"}");
     }
 }
