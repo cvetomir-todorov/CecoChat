@@ -1,0 +1,16 @@
+StatefulSet:
+  Replicas: 2
+Image:
+  Name: confluentinc/cp-kafka
+  Tag: 8.3.2
+  PullPolicy: IfNotPresent
+Networking:
+  Port: 9092
+  ControllerPort: 19092
+  ClusterId: Pap9mM2uRoaI3RAvQbpL0A
+Entrypoint:
+  ConfigName: entrypoint.sh
+  MountPath: /bin/entrypoint.sh
+Resources:
+  Requests:
+    Storage: 512Mi

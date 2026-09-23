@@ -11,6 +11,7 @@ using CecoChat.Server;
 using CecoChat.Server.Identity;
 using CecoChat.User.Client;
 using Common;
+using Common.AspNet.FluentValidation;
 using Common.AspNet.Health;
 using Common.AspNet.Init;
 using Common.AspNet.ModelBinding;
@@ -25,7 +26,6 @@ using Common.Minio;
 using Common.Minio.Health;
 using Common.OpenTelemetry;
 using FluentValidation;
-using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
@@ -82,15 +82,18 @@ public static class Program
         builder.Services.AddConfigClient(options.ConfigClient);
 
         // rest
-        builder.Services.AddControllers(mvc =>
-        {
-            mvc.Filters.Add(new RequestFormLimitsAttribute
+        builder.Services
+            .AddControllers(mvc =>
             {
-                MultipartBodyLengthLimit = _filesOptions.MaxMultipartBodyBytes
-            });
-            // insert it before the default one so that it takes effect
-            mvc.ModelBinderProviders.Insert(0, new DateTimeModelBinderProvider());
-        });
+                mvc.Filters.Add(new RequestFormLimitsAttribute
+                {
+                    MultipartBodyLengthLimit = _filesOptions.MaxMultipartBodyBytes
+                });
+                // insert it before the default one so that it takes effect
+                mvc.ModelBinderProviders.Insert(0, new DateTimeModelBinderProvider());
+                mvc.AddFluentValidationAutoValidation();
+            })
+            .DisableDataAnnotationsValidation();
         builder.Services.AddSwaggerServices(_swaggerOptions);
 
         // downstream services
@@ -101,10 +104,6 @@ public static class Program
         builder.Services.AddAutoMapper(config =>
         {
             config.AddMaps(typeof(AutoMapperProfile));
-        });
-        builder.Services.AddFluentValidationAutoValidation(fluentValidation =>
-        {
-            fluentValidation.DisableDataAnnotationsValidation = true;
         });
         builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
         builder.Services.AddOptions();

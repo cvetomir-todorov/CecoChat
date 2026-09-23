@@ -1,11 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-  </PropertyGroup>
-
   <ItemGroup>
-    <PackageReference Include="CassandraCSharpDriver" Version="3.20.1" />
+    <PackageReference Include="CassandraCSharpDriver" />
+    <!-- Not used directly, but referenced explicitly since the Cassandra driver .nuspec file specifies an older version which contains security vulnerabilities -->
+    <PackageReference Include="Newtonsoft.Json" />
   </ItemGroup>
 
   <ItemGroup>

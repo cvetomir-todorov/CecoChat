@@ -10,10 +10,6 @@ CREATE TABLE IF NOT EXISTS public.files
     CONSTRAINT files_user_id_foreign
         FOREIGN KEY (user_id) REFERENCES public.profiles (user_id)
 )
-WITH
-(
-    OIDS = FALSE
-)
 TABLESPACE pg_default;
 
 CREATE INDEX files_user_id_version_index

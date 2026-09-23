@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{.Release.Name}}
+  namespace: {{.Release.Namespace}}
+  labels:
+    app: {{.Release.Name}}
+spec:
+  selector:
+    matchLabels:
+      app: {{.Release.Name}}
+  serviceName: {{.Release.Name}}
+  replicas: {{.Values.StatefulSet.Replicas}}
+  podManagementPolicy: Parallel
+  template:
+    metadata:
+      labels:
+        app: {{.Release.Name}}
+    spec:
+      containers:
+        - name: {{.Release.Name}}
+          image: {{.Values.Image.Name}}:{{.Values.Image.Tag}}
+          imagePullPolicy: {{.Values.Image.PullPolicy}}
+          ports:
+            - containerPort: {{.Values.Networking.Port}}
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: CLUSTER_ID
+              value: {{.Values.Networking.ClusterId}}
+            - name: KAFKA_PROCESS_ROLES
+              value: broker,controller
+            - name: KAFKA_CONTROLLER_QUORUM_VOTERS
+              value: 0@{{.Release.Name}}-0.{{.Release.Name}}.{{.Release.Namespace}}.svc.cluster.local:{{.Values.Networking.ControllerPort}},1@{{.Release.Name}}-1.{{.Release.Name}}.{{.Release.Namespace}}.svc.cluster.local:{{.Values.Networking.ControllerPort}}
+            - name: KAFKA_CONTROLLER_LISTENER_NAMES
+              value: CONTROLLER
+            - name: KAFKA_ADVERTISED_LISTENERS
+              value: "MINIKUBE://$(POD_IP):{{.Values.Networking.Port}}"
+            - name: KAFKA_LISTENERS
+              value: "MINIKUBE://0.0.0.0:{{.Values.Networking.Port}},CONTROLLER://0.0.0.0:{{.Values.Networking.ControllerPort}}"
+            - name: KAFKA_LISTENER_SECURITY_PROTOCOL_MAP
+              value: "MINIKUBE:PLAINTEXT,CONTROLLER:PLAINTEXT"
+            - name: KAFKA_INTER_BROKER_LISTENER_NAME
+              value: MINIKUBE
+            - name: KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR
+              value: "1"
+            - name: KAFKA_LOG4J_ROOT_LOGLEVEL
+              value: WARN
+            - name: KAFKA_TOOLS_LOG4J_LOGLEVEL
+              value: ERROR
+            - name: KAFKA_HEAP_OPTS
+              value: "-Xms256M -Xmx256M"
+          volumeMounts:
+            - name: config
+              mountPath: {{.Values.Entrypoint.MountPath}}
+              subPath: {{.Values.Entrypoint.ConfigName}}
+              readOnly: true
+            - name: data
+              mountPath: /var/lib/kafka/data
+          command:
+            - {{.Values.Entrypoint.MountPath}}
+      volumes:
+        - name: config
+          configMap:
+            name: {{.Release.Name}}
+            defaultMode: 0777
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: [ReadWriteOnce]
+        resources:
+          requests:
+            storage: {{.Values.Resources.Requests.Storage}}

@@ -1,3 +1,4 @@
+using System.Buffers;
 using System.Threading.Channels;
 using CecoChat.User.Contracts;
 using Common.Redis;
@@ -59,7 +60,7 @@ internal class ProfileCache : IProfileCache
             return null;
         }
 
-        ProfilePublic profile = ProfilePublic.Parser.ParseFrom(entry);
+        ProfilePublic profile = ProfilePublic.Parser.ParseFrom((ReadOnlySequence<byte>)entry);
         return profile;
     }
 

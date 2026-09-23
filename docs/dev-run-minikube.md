@@ -5,7 +5,7 @@ Make sure that the [prerequisites](dev-run-prerequisites.md) have been met befor
 # Instances
 
 * Integration
-  - Kafka - 2 Zookeepers, 2 brokers
+  - Kafka - 2 brokers
 * Data storage
   - YugabyteDB - 2 masters, 2 tservers
   - Cassandra - 2 nodes
@@ -124,7 +124,7 @@ Commands useful when troubleshooting and investigating issues include:
 ```shell
 $ helm list
 NAME     	NAMESPACE	REVISION	UPDATED                                	STATUS  	CHART          	APP VERSION
-backplane	cecochat 	1       	2023-12-19 11:19:43.275872281 +0200 EET	deployed	backplane-0.1.0	0.1.0      
+kafka    	cecochat 	1       	2023-12-19 11:19:43.275872281 +0200 EET	deployed	kafka-0.1.0    	0.1.0      
 bff      	cecochat 	1       	2023-12-19 12:11:16.477186671 +0200 EET	deployed	bff-0.1.0      	0.1.0      
 cassandra	cecochat 	1       	2023-12-19 11:19:55.588187972 +0200 EET	deployed	cassandra-0.1.0	0.1.0      
 chats    	cecochat 	1       	2023-12-19 12:11:17.202963604 +0200 EET	deployed	chats-0.1.0    	0.1.0      
@@ -143,10 +143,8 @@ yb       	cecochat 	1       	2023-12-19 11:20:17.985851232 +0200 EET	deployed	yu
 ```shell
 $ kubectl get pod
 NAME                                        READY   STATUS    RESTARTS      AGE
-backplane-kafka-0                           1/1     Running   0             85m
-backplane-kafka-1                           1/1     Running   0             85m
-backplane-zk-0                              1/1     Running   0             85m
-backplane-zk-1                              1/1     Running   0             85m
+kafka-0                                     1/1     Running   0             85m
+kafka-1                                     1/1     Running   0             85m
 bff-6dd88cdc4f-687ls                        1/1     Running   0             33m
 bff-6dd88cdc4f-wq4nx                        1/1     Running   0             33m
 cassandra-0                                 1/1     Running   0             85m
@@ -179,8 +177,7 @@ yb-tserver-1                                1/1     Running   0             84m
 ```shell
 $ kubectl get service
 NAME                       TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)                               AGE
-backplane-kafka            ClusterIP   None             <none>        9092/TCP                              85m
-backplane-zk               ClusterIP   None             <none>        2181/TCP,2888/TCP,3888/TCP,8080/TCP   85m
+kafka                      ClusterIP   None             <none>        9092/TCP                              85m
 bff                        ClusterIP   10.107.196.138   <none>        443/TCP                               34m
 cassandra                  ClusterIP   None             <none>        9042/TCP                              85m
 chats                      ClusterIP   10.105.229.37    <none>        443/TCP                               34m
@@ -223,8 +220,7 @@ user-6ccb5c897                        2         2         2       34m
 ```shell
 $ kubectl get statefulsets
 NAME              READY   AGE
-backplane-kafka   2/2     86m
-backplane-zk      2/2     86m
+kafka             2/2     86m
 cassandra         2/2     86m
 idgen             2/2     35m
 logging-es        1/1     3m2s
@@ -251,15 +247,14 @@ tracing-jaeger   nginx   jaeger.cecochat.com      192.168.49.2   80, 443   3m20s
 ```shell
 $ kubectl get configmaps
 NAME                       DATA   AGE
-backplane-kafka            1      88m
-backplane-zk               1      88m
+kafka                      1      88m
 cassandra-env              8      87m
 cassandra-scripts          2      87m
 idgen                      1      36m
 messaging                  1      36m
 redis                      1      83m
 service-aspnet             6      17d
-service-backplane          2      17d
+service-kafka              2      17d
 service-config-client      1      89m
 service-logging            2      17d
 service-tracing            4      17d
@@ -275,10 +270,8 @@ ingress-tls                       kubernetes.io/tls    2      17d
 ```shell
 $ kubectl get pvc
 NAME                     STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   AGE
-data-backplane-kafka-0   Bound    pvc-4c7e8aec-8826-401f-824e-59d8be53023e   512Mi      RWO            standard       21d
-data-backplane-kafka-1   Bound    pvc-9bffdb58-9fca-47d5-bacf-7524537489ac   512Mi      RWO            standard       21d
-data-backplane-zk-0      Bound    pvc-bf06aff7-5ef6-4c6a-a818-af457bfaf6c4   128Mi      RWO            standard       21d
-data-backplane-zk-1      Bound    pvc-87899679-02d6-4195-9f2d-7a4064cba59a   128Mi      RWO            standard       21d
+data-kafka-0             Bound    pvc-4c7e8aec-8826-401f-824e-59d8be53023e   512Mi      RWO            standard       21d
+data-kafka-1             Bound    pvc-9bffdb58-9fca-47d5-bacf-7524537489ac   512Mi      RWO            standard       21d
 data-cassandra-0         Bound    pvc-f94f74de-008f-446f-8003-f44cf2b65d4b   1Gi        RWO            standard       17d
 data-cassandra-1         Bound    pvc-2aa65930-bef4-4e85-8bab-c5abb0568456   1Gi        RWO            standard       17d
 data-logging-es-0        Bound    pvc-9f6817a1-5f5c-4961-ba8f-c16f57c24cf9   1Gi        RWO            standard       15d

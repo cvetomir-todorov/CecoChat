@@ -3,7 +3,7 @@ Master:
     Replicas: 2
   Image:
     Name: yugabytedb/yugabyte
-    Tag: 2.20.0.0-b76
+    Tag: 2026.1.1.2-b9
     PullPolicy: IfNotPresent
   Networking:
     UiPort: 7000
@@ -20,7 +20,7 @@ TServer:
     Replicas: 2
   Image:
     Name: yugabytedb/yugabyte
-    Tag: 2.20.0.0-b76
+    Tag: 2026.1.1.2-b9
     PullPolicy: IfNotPresent
   Networking:
     SqlPort: 5433

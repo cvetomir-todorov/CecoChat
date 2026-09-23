@@ -76,6 +76,9 @@ A short list of tasks to do next regarding product features, technical features,
   - Add Open Telemetry metrics to UserDB when Npgsql adds support
   - Use Cassandra instrumentation from .NET contrib
   - Add metrics infrastructure to Minikube deployment
+* Partitioning
+  - Validate the dynamic partition count against the actual Kafka topic partition count
+  - Disconnect clients when partitions have been reassigned between servers
 * Misc
   - Clean up periodically the empty consumer groups for config-changes Kafka topic
   - Control sending notifications to SignalR connected clients as previously with gRPC clients

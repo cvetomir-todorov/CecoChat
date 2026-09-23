@@ -2,7 +2,6 @@ using System.Diagnostics;
 using System.Diagnostics.Metrics;
 using Common.OpenTelemetry;
 using Microsoft.AspNetCore.SignalR;
-using OpenTelemetry.Trace;
 
 namespace Common.AspNet.SignalR.Telemetry;
 
@@ -108,7 +107,7 @@ public sealed class SignalRTelemetry : ISignalRTelemetry
 
         if (activity.IsAllDataRequested && exception != null)
         {
-            activity.SetStatus(Status.Error.WithDescription(exception.Message));
+            activity.SetStatus(ActivityStatusCode.Error, exception.Message);
         }
         else
         {

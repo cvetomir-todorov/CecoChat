@@ -1,8 +1,8 @@
+using AwesomeAssertions;
 using CecoChat.Chats.Contracts;
 using CecoChat.Chats.Data.Entities.UserChats;
 using CecoChat.Data;
 using Common;
-using FluentAssertions;
 using NUnit.Framework;
 
 namespace CecoChat.Chats.Testing.Tests;

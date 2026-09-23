@@ -1,0 +1,11 @@
+{
+  "identities": [
+    {
+      "name": "cecochat",
+      "credentials": [
+        { "accessKey": "admin", "secretKey": "secret12" }
+      ],
+      "actions": [ "Admin", "Read", "Write", "List", "Tagging" ]
+    }
+  ]
+}

@@ -136,11 +136,11 @@ public sealed class UserDbInit : InitStep
 
     private Task<int> DeleteAllConnections(CancellationToken ct)
     {
-        return _dbContext.Database.ExecuteSqlRawAsync("DELETE from public.\"Connections\"", ct);
+        return _dbContext.Database.ExecuteSqlRawAsync("DELETE from public.\"connections\"", ct);
     }
 
     private Task<int> DeleteAllProfiles(CancellationToken ct)
     {
-        return _dbContext.Database.ExecuteSqlRawAsync("DELETE from public.\"Profiles\"", ct);
+        return _dbContext.Database.ExecuteSqlRawAsync("DELETE from public.\"profiles\"", ct);
     }
 }

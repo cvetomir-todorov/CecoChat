@@ -6,6 +6,7 @@ using CecoChat.Config.Data;
 using CecoChat.Config.Service.Endpoints;
 using CecoChat.Config.Service.Init;
 using CecoChat.Server;
+using Common.AspNet.FluentValidation;
 using Common.AspNet.Health;
 using Common.AspNet.Init;
 using Common.AspNet.ModelBinding;
@@ -18,7 +19,6 @@ using Common.Npgsql;
 using Common.Npgsql.Health;
 using Common.OpenTelemetry;
 using FluentValidation;
-using FluentValidation.AspNetCore;
 using Npgsql;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
@@ -62,21 +62,20 @@ public static class Program
         builder.Services.AddGrpcValidation();
 
         // rest
-        builder.Services.AddControllers(mvc =>
-        {
-            // insert it before the default one so that it takes effect
-            mvc.ModelBinderProviders.Insert(0, new DateTimeModelBinderProvider());
-        });
+        builder.Services
+            .AddControllers(mvc =>
+            {
+                // insert it before the default one so that it takes effect
+                mvc.ModelBinderProviders.Insert(0, new DateTimeModelBinderProvider());
+                mvc.AddFluentValidationAutoValidation();
+            })
+            .DisableDataAnnotationsValidation();
         builder.Services.AddSwaggerServices(_swaggerOptions);
 
         // config db
         builder.Services.AddConfigDb(_configDbOptions.Connect);
 
         // common
-        builder.Services.AddFluentValidationAutoValidation(fluentValidation =>
-        {
-            fluentValidation.DisableDataAnnotationsValidation = true;
-        });
         builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
         builder.Services.AddOptions();
     }

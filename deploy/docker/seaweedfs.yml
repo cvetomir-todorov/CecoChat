@@ -1,0 +1,111 @@
+version: '3'
+networks:
+  cecochat:
+x-seaweedfs-image: &seaweedfs-image chrislusf/seaweedfs:4.47
+services:
+  sw-master:
+    image: *seaweedfs-image
+    container_name: cecochat-sw-master
+    hostname: sw-master
+    networks: &networks
+      - cecochat
+    ports:
+      - "9333:9333"
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+    command:
+      [ "master",
+        "-ip=sw-master",
+        "-ip.bind=0.0.0.0",
+        "-mdir=/data",
+        "-volumeSizeLimitMB=512",
+        "-metricsPort=9324"]
+    volumes:
+      - cecochat-sw-master:/data
+    healthcheck: &healthcheck
+      test: [ "CMD", "curl", "-f", "http://localhost:9333/cluster/healthz" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+  sw-volume0:
+    image: *seaweedfs-image
+    container_name: cecochat-sw-volume0
+    hostname: sw-volume0
+    networks: *networks
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+    command:
+      [ "volume",
+        "-ip=sw-volume0",
+        "-ip.bind=0.0.0.0",
+        "-dir=/data",
+        "-max=0",
+        "-master=sw-master:9333",
+        "-metricsPort=9324"]
+    volumes:
+      - cecochat-sw-volume0:/data
+    healthcheck:
+      <<: *healthcheck
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/healthz" ]
+    depends_on:
+      - sw-master
+  sw-filer:
+    image: *seaweedfs-image
+    container_name: cecochat-sw-filer
+    hostname: sw-filer
+    networks: *networks
+    ports:
+      - "8888:8888"
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    command:
+      [ "filer",
+        "-ip=sw-filer",
+        "-ip.bind=0.0.0.0",
+        "-master=sw-master:9333",
+        "-metricsPort=9324"]
+    volumes:
+      - cecochat-sw-filer:/data
+    healthcheck:
+      <<: *healthcheck
+      test: [ "CMD", "curl", "-f", "http://localhost:8888/healthz" ]
+    depends_on:
+      - sw-master
+      - sw-volume0
+  sw-s3:
+    image: *seaweedfs-image
+    container_name: cecochat-sw-s3
+    hostname: sw-s3
+    networks: *networks
+    ports:
+      - "8333:8333"
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+    command:
+      [ "s3",
+        "-filer=sw-filer:8888",
+        "-port=8333",
+        "-config=/etc/seaweedfs/s3.json",
+        "-metricsPort=9324"]
+    volumes:
+      - ./seaweedfs/s3.json:/etc/seaweedfs/s3.json:ro
+    healthcheck:
+      <<: *healthcheck
+      test: [ "CMD", "curl", "-f", "http://localhost:8333/healthz" ]
+    depends_on:
+      - sw-filer
+volumes:
+  cecochat-sw-master:
+    external: true
+  cecochat-sw-volume0:
+    external: true
+  cecochat-sw-filer:
+    external: true
