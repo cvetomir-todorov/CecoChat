@@ -1,7 +1,7 @@
 version: '3'
 services:
   redis0:
-    image: redis:7.2.3
+    image: redis:8.10.2
     container_name: cecochat-redis0
     network_mode: host
     deploy:
@@ -28,7 +28,7 @@ services:
       timeout: 5s
       retries: 10
   redis1:
-    image: redis:7.2.3
+    image: redis:8.10.2
     container_name: cecochat-redis1
     network_mode: host
     deploy:
@@ -55,7 +55,7 @@ services:
       timeout: 5s
       retries: 10
   redis2:
-    image: redis:7.2.3
+    image: redis:8.10.2
     container_name: cecochat-redis2
     network_mode: host
     deploy:
@@ -82,7 +82,7 @@ services:
       timeout: 5s
       retries: 10
   redis-cluster-setup:
-    image: redis:7.2.3
+    image: redis:8.10.2
     container_name: cecochat-redis-cluster-setup
     network_mode: host
     deploy:
