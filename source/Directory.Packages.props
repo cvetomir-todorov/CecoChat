@@ -42,7 +42,7 @@
     <PackageVersion Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="8.23.0" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.10.1" />
     <PackageVersion Include="Minio" Version="6.0.1" />
-    <!-- Not used directly, but referenced explicitly since the Cassandra driver .nuspec file specifies and older version which contains security vulnerabilities -->
+    <!-- Not used directly, but referenced explicitly since the Cassandra driver .nuspec file specifies an older version which contains security vulnerabilities -->
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageVersion Include="Npgsql" Version="10.0.3" />
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
