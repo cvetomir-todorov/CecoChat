@@ -69,7 +69,7 @@
     <PackageVersion Include="Serilog.Sinks.Debug" Version="3.0.0" />
     <PackageVersion Include="Serilog.Sinks.File" Version="7.0.0" />
     <PackageVersion Include="Serilog.Sinks.OpenTelemetry" Version="4.2.0" />
-    <PackageVersion Include="StackExchange.Redis" Version="2.7.33" />
+    <PackageVersion Include="StackExchange.Redis" Version="3.3.0" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="9.0.6" />
     <PackageVersion Include="Swashbuckle.AspNetCore.Annotations" Version="9.0.6" />
     <PackageVersion Include="System.IdentityModel.Tokens.Jwt" Version="8.23.0" />
