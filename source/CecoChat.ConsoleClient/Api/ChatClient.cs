@@ -1,4 +1,6 @@
-﻿using CecoChat.Bff.Contracts;
+﻿using System.Net.Http.Headers;
+using System.Net.Mime;
+using CecoChat.Bff.Contracts;
 using CecoChat.Bff.Contracts.Auth;
 using CecoChat.Bff.Contracts.Chats;
 using CecoChat.Bff.Contracts.Connections;
@@ -305,8 +307,15 @@ public sealed class ChatClient : IDisposable
 
     public async Task<ClientResponse<UploadFileResponse>> UploadFile(Stream fileStream, string fileName, string contentType, long allowedUserId)
     {
-        StreamPart part = new(fileStream, fileName, contentType, fileName);
-        IApiResponse<UploadFileResponse> apiResponse = await _bffClient.UploadFile(fileStream.Length, allowedUserId, part, _accessToken!);
+        using StreamContent content = new(fileStream);
+        content.Headers.ContentType = new MediaTypeHeaderValue(contentType);
+        content.Headers.ContentLength = fileStream.Length;
+        content.Headers.ContentDisposition = new ContentDispositionHeaderValue(DispositionTypeNames.Attachment)
+        {
+            FileNameStar = fileName
+        };
+
+        IApiResponse<UploadFileResponse> apiResponse = await _bffClient.UploadFile(allowedUserId, content, _accessToken!);
 
         ClientResponse<UploadFileResponse> response = new();
         ProcessApiResponse(apiResponse, response);

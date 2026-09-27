@@ -5,19 +5,19 @@ using CecoChat.Data;
 using CecoChat.Server.Identity;
 using CecoChat.User.Client;
 using Common;
-using Common.AspNet;
 using Common.AspNet.ModelBinding;
-using Common.Minio;
+using Common.Seaweed;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Net.Http.Headers;
+using ContentDispositionHeaderValue = System.Net.Http.Headers.ContentDispositionHeaderValue;
 
 namespace CecoChat.Bff.Service.Endpoints.Files;
 
 public sealed class UploadFileRequest
 {
-    [FromHeader(Name = IBffClient.HeaderUploadedFileSize)]
+    [FromHeader(Name = "Content-Length")]
     public long FileSize { get; init; }
 
     [FromHeader(Name = IBffClient.HeaderUploadedFileAllowedUserId)]
@@ -34,20 +34,20 @@ public sealed class UploadFileRequest
 public class UploadFileController : ControllerBase
 {
     private readonly ILogger _logger;
-    private readonly IMinioContext _minio;
+    private readonly ISeaweedContext _seaweed;
     private readonly IFileUtility _fileUtility;
     private readonly IObjectNaming _objectNaming;
     private readonly IFileClient _fileClient;
 
     public UploadFileController(
         ILogger<UploadFileController> logger,
-        IMinioContext minio,
+        ISeaweedContext seaweed,
         IFileUtility fileUtility,
         IObjectNaming objectNaming,
         IFileClient fileClient)
     {
         _logger = logger;
-        _minio = minio;
+        _seaweed = seaweed;
         _fileUtility = fileUtility;
         _objectNaming = objectNaming;
         _fileClient = fileClient;
@@ -55,7 +55,6 @@ public class UploadFileController : ControllerBase
 
     [Authorize(Policy = "user")]
     [HttpPost]
-    [DisableFormValueModelBinding]
     [ProducesResponseType(typeof(UploadFileResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> UploadFile([FromMultiSource][BindRequired] UploadFileRequest request, CancellationToken ct)
     {
@@ -64,13 +63,13 @@ public class UploadFileController : ControllerBase
             return Unauthorized();
         }
 
-        PrepareUploadResult prepareUploadResult = await PrepareUpload(Request.ContentType ?? string.Empty, Request.Body, ct);
+        PrepareUploadResult prepareUploadResult = PrepareUpload();
         if (prepareUploadResult.Failure != null)
         {
             return prepareUploadResult.Failure;
         }
 
-        UploadFileResult uploadFileResult = await UploadFile(userClaims, prepareUploadResult.FileExtension, prepareUploadResult.FileContentType, prepareUploadResult.FileStream, request.FileSize, ct);
+        UploadFileResult uploadFileResult = await UploadFile(userClaims, prepareUploadResult.FileExtension, prepareUploadResult.FileContentType, Request.Body, request.FileSize, ct);
 
         AssociateFileResult associateFileResult = await AssociateFile(userClaims, uploadFileResult.Bucket, uploadFileResult.Path, request.AllowedUserId, accessToken, ct);
         if (associateFileResult.Failure != null)
@@ -93,35 +92,32 @@ public class UploadFileController : ControllerBase
     {
         public string FileExtension { get; init; }
         public string FileContentType { get; init; }
-        public Stream FileStream { get; init; }
         public IActionResult? Failure { get; init; }
     }
 
-    private async Task<PrepareUploadResult> PrepareUpload(string requestContentType, Stream requestBody, CancellationToken ct)
+    private PrepareUploadResult PrepareUpload()
     {
-        if (!MultipartUtility.IsMultipartContentType(requestContentType))
+        if (!ContentDispositionHeaderValue.TryParse(Request.Headers.ContentDisposition.ToString(), out ContentDispositionHeaderValue? contentDisposition))
         {
-            ModelState.AddModelError("File", "The request content type should be multipart.");
+            ModelState.AddModelError("File", "The Content-Disposition header with the file name is missing or invalid.");
             return new PrepareUploadResult
             {
                 Failure = BadRequest(ModelState)
             };
         }
 
-        string boundary = MultipartUtility.GetMultipartBoundary(requestContentType);
-        MultipartReader reader = new(boundary, requestBody);
-        MultipartSection? section = await reader.ReadNextSectionAsync(ct);
-        FileMultipartSection? fileSection = section?.AsFileSection();
-        if (section == null || fileSection == null || fileSection.FileStream == null)
+        string? headerValue = contentDisposition.FileNameStar ?? contentDisposition.FileName;
+        string fileName = HeaderUtilities.RemoveQuotes(headerValue).Value ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(fileName))
         {
-            ModelState.AddModelError("File", "There is no file multipart section.");
+            ModelState.AddModelError("File", "The Content-Disposition header with the file name is empty.");
             return new PrepareUploadResult
             {
                 Failure = BadRequest(ModelState)
             };
         }
 
-        string extension = Path.GetExtension(fileSection.FileName);
+        string extension = Path.GetExtension(fileName);
         if (!_fileUtility.IsExtensionKnown(extension))
         {
             ModelState.AddModelError("File", $"File extension '{extension}' is not supported.");
@@ -131,19 +127,10 @@ public class UploadFileController : ControllerBase
             };
         }
 
-        if (string.IsNullOrWhiteSpace(section.ContentType))
+        string contentType = _fileUtility.GetContentType(extension);
+        if (!string.Equals(Request.ContentType, contentType, StringComparison.OrdinalIgnoreCase))
         {
-            ModelState.AddModelError("File", "File content type is not specified.");
-            return new PrepareUploadResult
-            {
-                Failure = BadRequest(ModelState)
-            };
-        }
-
-        string correspondingContentType = _fileUtility.GetContentType(extension);
-        if (!string.Equals(section.ContentType, correspondingContentType, StringComparison.OrdinalIgnoreCase))
-        {
-            ModelState.AddModelError("File", $"Provided content type '{section.ContentType}' doesn't have the correct value.");
+            ModelState.AddModelError("File", $"Provided content type '{Request.ContentType}' doesn't match the content type of the file.");
             return new PrepareUploadResult
             {
                 Failure = BadRequest(ModelState)
@@ -153,8 +140,7 @@ public class UploadFileController : ControllerBase
         return new PrepareUploadResult
         {
             FileExtension = extension,
-            FileContentType = correspondingContentType,
-            FileStream = fileSection.FileStream
+            FileContentType = contentType
         };
     }
 
@@ -167,16 +153,16 @@ public class UploadFileController : ControllerBase
     private async Task<UploadFileResult> UploadFile(UserClaims userClaims, string fileExtension, string fileContentType, Stream fileStream, long fileSize, CancellationToken ct)
     {
         string bucketName = _objectNaming.GetCurrentBucketName();
-        string plannedObjectName = _objectNaming.CreateObjectName(userClaims.UserId, fileExtension);
+        string objectName = _objectNaming.CreateObjectName(userClaims.UserId, fileExtension);
 
-        string actualObjectName = await _minio.UploadObject(bucketName, plannedObjectName, fileContentType, tags: null, fileStream, fileSize, ct);
+        await _seaweed.UploadObject(bucketName, objectName, fileContentType, fileStream, fileSize, ct);
         _logger.LogTrace("Uploaded successfully a new file with content type {ContentType} sized {FileSize}B to bucket {Bucket} with path {Path} for user {UserId}",
-            fileContentType, fileSize, bucketName, actualObjectName, userClaims.UserId);
+            fileContentType, fileSize, bucketName, objectName, userClaims.UserId);
 
         return new UploadFileResult
         {
             Bucket = bucketName,
-            Path = actualObjectName
+            Path = objectName
         };
     }
 

@@ -22,11 +22,9 @@ using Common.Http.Health;
 using Common.Jwt;
 using Common.Kafka;
 using Common.Kafka.Telemetry;
-using Common.Minio;
-using Common.Minio.Health;
 using Common.OpenTelemetry;
+using Common.Seaweed;
 using FluentValidation;
-using Microsoft.AspNetCore.Mvc;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
@@ -37,7 +35,7 @@ public static class Program
 {
     private static ChatsClientOptions _chatsClientOptions = null!;
     private static UserClientOptions _userClientOptions = null!;
-    private static MinioOptions _minioOptions = null!;
+    private static SeaweedOptions _seaweedOptions = null!;
     private static FilesOptions _filesOptions = null!;
     private static SwaggerOptions _swaggerOptions = null!;
 
@@ -50,8 +48,8 @@ public static class Program
         builder.Configuration.GetSection("ChatsClient").Bind(_chatsClientOptions);
         _userClientOptions = new();
         builder.Configuration.GetSection("UserClient").Bind(_userClientOptions);
-        _minioOptions = new();
-        builder.Configuration.GetSection("FileStorage").Bind(_minioOptions);
+        _seaweedOptions = new();
+        builder.Configuration.GetSection("FileStorage").Bind(_seaweedOptions);
         _filesOptions = new();
         builder.Configuration.GetSection("Files").Bind(_filesOptions);
         _swaggerOptions = new();
@@ -85,10 +83,6 @@ public static class Program
         builder.Services
             .AddControllers(mvc =>
             {
-                mvc.Filters.Add(new RequestFormLimitsAttribute
-                {
-                    MultipartBodyLengthLimit = _filesOptions.MaxMultipartBodyBytes
-                });
                 // insert it before the default one so that it takes effect
                 mvc.ModelBinderProviders.Insert(0, new DateTimeModelBinderProvider());
                 mvc.AddFluentValidationAutoValidation();
@@ -159,12 +153,13 @@ public static class Program
                 new Uri(_userClientOptions.Address!, _userClientOptions.HealthPath),
                 configureHttpClient: (_, client) => client.DefaultRequestVersion = new Version(2, 0),
                 timeout: _userClientOptions.HealthTimeout,
-                tags: new[] { HealthTags.Health, HealthTags.Ready })
-            .AddMinio(
-                "file-storage",
-                bucket: _minioOptions.HealthBucket,
-                timeout: _minioOptions.HealthTimeout,
                 tags: new[] { HealthTags.Health, HealthTags.Ready });
+        // TODO: add the new health check
+            // .AddMinio(
+            //     "file-storage",
+            //     bucket: _minioOptions.HealthBucket,
+            //     timeout: _minioOptions.HealthTimeout,
+            //     tags: new[] { HealthTags.Health, HealthTags.Ready });
 
         builder.Services.AddSingleton<FileStorageInitHealthCheck>();
     }
@@ -195,7 +190,7 @@ public static class Program
         builder.RegisterModule(new UserClientAutofacModule(host.Configuration.GetSection("UserClient")));
 
         // files
-        builder.RegisterModule(new MinioAutofacModule(host.Configuration.GetSection("FileStorage")));
+        builder.RegisterModule(new SeaweedAutofacModule(host.Configuration.GetSection("FileStorage")));
         builder.RegisterType<ObjectNaming>().As<IObjectNaming>().SingleInstance();
         builder.RegisterType<FileUtility>().As<IFileUtility>().SingleInstance();
         builder.RegisterOptions<FilesOptions>(host.Configuration.GetSection("Files"));
