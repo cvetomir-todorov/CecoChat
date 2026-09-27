@@ -140,6 +140,8 @@ public abstract class CassandraDbContext : ICassandraDbContext
     private static void ValidateKeyspace(string keyspace)
     {
         if (string.IsNullOrWhiteSpace(keyspace))
+        {
             throw new ArgumentException($"Parameter '{nameof(keyspace)}' should not be null or whitespace.");
+        }
     }
 }
