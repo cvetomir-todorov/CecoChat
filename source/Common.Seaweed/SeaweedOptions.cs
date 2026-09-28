@@ -5,4 +5,11 @@ public sealed class SeaweedOptions
     public Uri Endpoint { get; init; } = null!;
     public string AccessKey { get; init; } = string.Empty;
     public string SecretKey { get; init; } = string.Empty;
+    public SeaweedHealthOptions Health { get; init; } = new();
+}
+
+public sealed class SeaweedHealthOptions
+{
+    public string Path { get; init; } = string.Empty;
+    public TimeSpan Timeout { get; init; }
 }

@@ -24,6 +24,7 @@ using Common.Kafka;
 using Common.Kafka.Telemetry;
 using Common.OpenTelemetry;
 using Common.Seaweed;
+using Common.Seaweed.Health;
 using FluentValidation;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
@@ -153,13 +154,11 @@ public static class Program
                 new Uri(_userClientOptions.Address!, _userClientOptions.HealthPath),
                 configureHttpClient: (_, client) => client.DefaultRequestVersion = new Version(2, 0),
                 timeout: _userClientOptions.HealthTimeout,
+                tags: new[] { HealthTags.Health, HealthTags.Ready })
+            .AddSeaweed(
+                "file-storage",
+                _seaweedOptions,
                 tags: new[] { HealthTags.Health, HealthTags.Ready });
-        // TODO: add the new health check
-            // .AddMinio(
-            //     "file-storage",
-            //     bucket: _minioOptions.HealthBucket,
-            //     timeout: _minioOptions.HealthTimeout,
-            //     tags: new[] { HealthTags.Health, HealthTags.Ready });
 
         builder.Services.AddSingleton<FileStorageInitHealthCheck>();
     }
