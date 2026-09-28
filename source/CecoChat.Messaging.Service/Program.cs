@@ -125,13 +125,13 @@ public static class Program
             .AddBackplane(builder.Configuration.GetSection("Backplane"))
             .AddCheck<ReceiversConsumerHealthCheck>(
                 "receivers-consumer",
-                tags: new[] { HealthTags.Health, HealthTags.Startup, HealthTags.Live })
+                tags: [HealthTags.Health, HealthTags.Startup, HealthTags.Live])
             .AddUri(
                 "idgen-svc",
                 new Uri(_idGenClientOptions.Address!, _idGenClientOptions.HealthPath),
                 configureHttpClient: (_, client) => client.DefaultRequestVersion = new Version(2, 0),
                 timeout: _idGenClientOptions.HealthTimeout,
-                tags: new[] { HealthTags.Health, HealthTags.Ready });
+                tags: [HealthTags.Health, HealthTags.Ready]);
 
         builder.Services.AddSingleton<ReceiversConsumerHealthCheck>();
     }

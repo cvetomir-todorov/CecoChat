@@ -94,7 +94,7 @@ public class AllChatsScreenController : ControllerBase
     {
         if (!includeProfiles || (chats.Count == 0 && connections.Count == 0))
         {
-            return Array.Empty<ProfilePublic>();
+            return [];
         }
 
         long[] userIds = chats.Select(chat => chat.OtherUserId)

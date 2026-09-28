@@ -153,7 +153,7 @@ public sealed class ChatClient : IDisposable
 
     public async Task<List<LocalStorage.ProfilePublic>> GetPublicProfiles(string searchPattern)
     {
-        GetPublicProfilesResponse response = await _bffClient.GetPublicProfiles(Array.Empty<long>(), searchPattern, _accessToken!);
+        GetPublicProfilesResponse response = await _bffClient.GetPublicProfiles([], searchPattern, _accessToken!);
         List<LocalStorage.ProfilePublic> profiles = Map.PublicProfiles(response.Profiles);
 
         return profiles;

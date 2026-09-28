@@ -94,31 +94,31 @@ public class ConfigDbInit : InitStep
 
         if (string.Equals(deploymentEnvironment, "docker", StringComparison.InvariantCultureIgnoreCase))
         {
-            elements = new ElementEntity[]
-            {
+            elements =
+            [
                 new() { Name = ConfigKeys.Partitioning.Count, Value = "12" },
                 new() { Name = ConfigKeys.Partitioning.Partitions, Value = "0=0-5;1=6-11" },
                 new() { Name = ConfigKeys.Partitioning.Addresses, Value = "0=https://localhost:31000;1=https://localhost:31001" },
                 new() { Name = ConfigKeys.History.MessageCount, Value = "32" },
                 new() { Name = ConfigKeys.Snowflake.GeneratorIds, Value = "0=0,1,2,3" },
                 new() { Name = ConfigKeys.User.ProfileCount, Value = "32"}
-            };
+            ];
         }
         else if (string.Equals(deploymentEnvironment, "minikube", StringComparison.InvariantCultureIgnoreCase))
         {
-            elements = new ElementEntity[]
-            {
+            elements =
+            [
                 new() { Name = ConfigKeys.Partitioning.Count, Value = "12" },
                 new() { Name = ConfigKeys.Partitioning.Partitions, Value = "0=0-5;1=6-11" },
                 new() { Name = ConfigKeys.Partitioning.Addresses, Value = "0=https://messaging.cecochat.com/m0;1=https://messaging.cecochat.com/m1" },
                 new() { Name = ConfigKeys.History.MessageCount, Value = "32" },
                 new() { Name = ConfigKeys.Snowflake.GeneratorIds, Value = "0=0,1;1=2,3" },
                 new() { Name = ConfigKeys.User.ProfileCount, Value = "128"}
-            };
+            ];
         }
         else
         {
-            elements = Array.Empty<ElementEntity>();
+            elements = [];
         }
 
         return (deploymentEnvironment, elements);

@@ -4,7 +4,7 @@ public sealed class RedisOptions
 {
     public string Name { get; init; } = string.Empty;
 
-    public string[] Endpoints { get; init; } = Array.Empty<string>();
+    public string[] Endpoints { get; init; } = [];
 
     public int ConnectRetry { get; init; }
 

@@ -14,7 +14,7 @@ public sealed class GetUserFilesResponse
 {
     [JsonPropertyName("files")]
     [AliasAs("files")]
-    public FileRef[] Files { get; init; } = Array.Empty<FileRef>();
+    public FileRef[] Files { get; init; } = [];
 }
 
 public sealed class UploadFileResponse

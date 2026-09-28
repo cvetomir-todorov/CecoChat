@@ -132,15 +132,15 @@ public static class Program
             .AddBackplane(builder.Configuration.GetSection("Backplane"))
             .AddCheck<UserDbInitHealthCheck>(
                 "user-db-init",
-                tags: new[] { HealthTags.Health, HealthTags.Startup })
+                tags: [HealthTags.Health, HealthTags.Startup])
             .AddNpgsql(
                 "user-db",
                 _userDbOptions.Connect,
-                tags: new[] { HealthTags.Health, HealthTags.Ready })
+                tags: [HealthTags.Health, HealthTags.Ready])
             .AddRedis(
                 "user-cache",
                 _userCacheStoreOptions,
-                tags: new[] { HealthTags.Health, HealthTags.Ready });
+                tags: [HealthTags.Health, HealthTags.Ready]);
 
         builder.Services.AddSingleton<UserDbInitHealthCheck>();
     }

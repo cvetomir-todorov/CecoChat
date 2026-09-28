@@ -116,11 +116,11 @@ public static class Program
             .AddBackplane(builder.Configuration.GetSection("Backplane"))
             .AddCheck<ConfigDbInitHealthCheck>(
                 "config-db-init",
-                tags: new[] { HealthTags.Health, HealthTags.Startup })
+                tags: [HealthTags.Health, HealthTags.Startup])
             .AddNpgsql(
                 "config-db",
                 _configDbOptions.Connect,
-                tags: new[] { HealthTags.Health, HealthTags.Ready });
+                tags: [HealthTags.Health, HealthTags.Ready]);
 
         builder.Services.AddSingleton<ConfigDbInitHealthCheck>();
     }

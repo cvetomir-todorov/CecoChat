@@ -142,23 +142,23 @@ public static class Program
             .AddBackplane(builder.Configuration.GetSection("Backplane"))
             .AddCheck<FileStorageInitHealthCheck>(
                 "file-storage-init",
-                tags: new[] { HealthTags.Health, HealthTags.Startup })
+                tags: [HealthTags.Health, HealthTags.Startup])
             .AddUri(
                 "chats-svc",
                 new Uri(_chatsClientOptions.Address!, _chatsClientOptions.HealthPath),
                 configureHttpClient: (_, client) => client.DefaultRequestVersion = new Version(2, 0),
                 timeout: _chatsClientOptions.HealthTimeout,
-                tags: new[] { HealthTags.Health, HealthTags.Ready })
+                tags: [HealthTags.Health, HealthTags.Ready])
             .AddUri(
                 "user-svc",
                 new Uri(_userClientOptions.Address!, _userClientOptions.HealthPath),
                 configureHttpClient: (_, client) => client.DefaultRequestVersion = new Version(2, 0),
                 timeout: _userClientOptions.HealthTimeout,
-                tags: new[] { HealthTags.Health, HealthTags.Ready })
+                tags: [HealthTags.Health, HealthTags.Ready])
             .AddSeaweed(
                 "file-storage",
                 _seaweedOptions,
-                tags: new[] { HealthTags.Health, HealthTags.Ready });
+                tags: [HealthTags.Health, HealthTags.Ready]);
 
         builder.Services.AddSingleton<FileStorageInitHealthCheck>();
     }

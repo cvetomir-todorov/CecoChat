@@ -5,7 +5,7 @@ public sealed class CassandraOptions<TDbContext> : CassandraOptions
 
 public class CassandraOptions
 {
-    public string[] ContactPoints { get; set; } = Array.Empty<string>();
+    public string[] ContactPoints { get; set; } = [];
 
     public string LocalDc { get; init; } = string.Empty;
 

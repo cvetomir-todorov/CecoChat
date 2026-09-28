@@ -14,7 +14,7 @@ public sealed class GetUserChatsResponse
 {
     [JsonPropertyName("chats")]
     [AliasAs("chats")]
-    public ChatState[] Chats { get; init; } = Array.Empty<ChatState>();
+    public ChatState[] Chats { get; init; } = [];
 }
 
 public sealed class ChatState
