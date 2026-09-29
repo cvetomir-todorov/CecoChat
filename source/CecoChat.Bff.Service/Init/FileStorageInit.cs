@@ -26,8 +26,6 @@ public class FileStorageInit : InitStep
 
     protected override async Task<bool> DoExecute(CancellationToken ct)
     {
-        //await _minio.EnsureBucketExists(_minioOptions.HealthBucket, ct);
-
         string bucketName = _objectNaming.GetCurrentBucketName();
         _fileStorageInitHealthCheck.IsReady = await _seaweed.EnsureBucketExists(bucketName, ct);
 
