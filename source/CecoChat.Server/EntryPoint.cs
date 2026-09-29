@@ -5,6 +5,7 @@ using Common.OpenTelemetry;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Serilog;
+using Serilog.Core;
 
 namespace CecoChat.Server;
 
@@ -14,23 +15,24 @@ public static class EntryPoint
 
     public static async Task<int> Run(string[] args, Type loggerContext, Action<WebApplicationBuilder> configureBuilder, Action<WebApplication> configurePipeline)
     {
-        Assembly entryAssembly = GetEntryAssembly();
-        string environment = GetEnvironment();
-
-        SetupSerilog(environment, entryAssembly);
-        ILogger logger = Log.ForContext(loggerContext);
         WebApplication? app = null;
+        await using Logger fallbackLogger = new LoggerConfiguration().WriteTo.Console().CreateLogger();
+        ILogger logger = fallbackLogger;
 
         try
         {
-            logger.Information("Starting in {Environment} environment...", environment);
-
             WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
-
             builder.Configuration.AddEnvironmentVariables(EnvironmentVariablesPrefix);
             // command line args over env vars
             builder.Configuration.AddCommandLine(args);
             builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
+
+            Assembly entryAssembly = GetEntryAssembly();
+            SetupSerilog(builder.Configuration, builder.Environment.EnvironmentName, entryAssembly);
+            logger = Log.ForContext(loggerContext);
+
+            logger.Information("Starting in {Environment} environment...", builder.Environment.EnvironmentName);
+
             builder.Host.UseSerilog(dispose: false);
 
             configureBuilder(builder);
@@ -83,28 +85,10 @@ public static class EntryPoint
         return entryAssembly;
     }
 
-    private static string GetEnvironment()
+    private static void SetupSerilog(IConfiguration configuration, string environment, Assembly entryAssembly)
     {
-        const string aspnetEnvVarName = "ASPNETCORE_ENVIRONMENT";
-        string? environment = Environment.GetEnvironmentVariable(aspnetEnvVarName);
-        if (string.IsNullOrWhiteSpace(environment))
-        {
-            throw new InvalidOperationException($"Environment variable '{aspnetEnvVarName}' is not set or is whitespace.");
-        }
-
-        return environment;
-    }
-
-    private static void SetupSerilog(string environment, Assembly entryAssembly)
-    {
-        IConfiguration config = new ConfigurationBuilder()
-            .AddJsonFile("appsettings.json", optional: false)
-            .AddJsonFile($"appsettings.{environment}.json", optional: true)
-            .AddEnvironmentVariables(EnvironmentVariablesPrefix)
-            .Build();
-
         OtlpLoggingOptions otlpOptions = new();
-        config.GetSection("Telemetry:Logging:Export").Bind(otlpOptions);
+        configuration.GetSection("Telemetry:Logging:Export").Bind(otlpOptions);
 
         SerilogConfig.Setup(entryAssembly, environment, otlpOptions);
     }
