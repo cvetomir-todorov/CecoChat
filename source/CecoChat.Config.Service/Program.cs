@@ -31,27 +31,28 @@ public static class Program
     private static ConfigDbOptions _configDbOptions = null!;
     private static SwaggerOptions _swaggerOptions = null!;
 
-    public static async Task Main(params string[] args)
+    public static async Task<int> Main(params string[] args)
     {
-        WebApplicationBuilder builder = EntryPoint.CreateWebAppBuilder(args);
-        CommonOptions options = new(builder.Configuration);
+        return await EntryPoint.Run(args, typeof(Program), ConfigureBuilder, ConfigurePipeline);
+    }
+
+    private static void ConfigureBuilder(WebApplicationBuilder builder)
+    {
+        CommonOptions commonOptions = new(builder.Configuration);
 
         _configDbOptions = new();
         builder.Configuration.GetSection("ConfigDb").Bind(_configDbOptions);
         _swaggerOptions = new();
         builder.Configuration.GetSection("Swagger").Bind(_swaggerOptions);
 
-        AddServices(builder);
-        AddTelemetry(builder, options);
+        AddServices(builder, commonOptions);
+        AddTelemetry(builder, commonOptions);
         AddHealth(builder);
-        builder.Host.ConfigureContainer<ContainerBuilder>(ConfigureContainer);
 
-        WebApplication app = builder.Build();
-        ConfigurePipeline(app, options);
-        await EntryPoint.RunWebApp(app, typeof(Program));
+        builder.Host.ConfigureContainer<ContainerBuilder>(ConfigureContainer);
     }
 
-    private static void AddServices(WebApplicationBuilder builder)
+    private static void AddServices(WebApplicationBuilder builder, CommonOptions commonOptions)
     {
         // grpc
         builder.Services.AddGrpc(grpc =>
@@ -78,6 +79,7 @@ public static class Program
         // common
         builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
         builder.Services.AddOptions();
+        builder.Services.AddSingleton(commonOptions);
     }
 
     private static void AddTelemetry(WebApplicationBuilder builder, CommonOptions options)
@@ -145,7 +147,7 @@ public static class Program
         builder.RegisterOptions<KafkaOptions>(host.Configuration.GetSection("Backplane:Kafka"));
     }
 
-    private static void ConfigurePipeline(WebApplication app, CommonOptions options)
+    private static void ConfigurePipeline(WebApplication app)
     {
         if (app.Environment.IsDevelopment())
         {
@@ -163,7 +165,8 @@ public static class Program
         app.MapControllers();
         app.MapCustomHttpHealthEndpoints(app.Environment, serviceName: "config");
 
-        app.UseOpenTelemetryPrometheusScrapingEndpoint(context => context.Request.Path == options.Prometheus.ScrapeEndpointPath);
+        CommonOptions commonOptions = app.Services.GetRequiredService<CommonOptions>();
+        app.UseOpenTelemetryPrometheusScrapingEndpoint(context => context.Request.Path == commonOptions.Prometheus.ScrapeEndpointPath);
         app.MapWhen(context => context.Request.Path.StartsWithSegments("/swagger"), _ =>
         {
             app.UseSwaggerMiddlewares(_swaggerOptions);

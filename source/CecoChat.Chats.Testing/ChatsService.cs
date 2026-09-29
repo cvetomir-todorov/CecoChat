@@ -53,14 +53,14 @@ public sealed class ChatsService : IAsyncDisposable
         });
         builder.Host.UseSerilog(dispose: false);
 
-        CommonOptions options = new(builder.Configuration);
+        CommonOptions commonOptions = new(builder.Configuration);
         CassandraOptions chatsDbOptions = new();
         builder.Configuration.GetSection("ChatsDb:Cluster").Bind(chatsDbOptions);
         chatsDbOptions.ContactPoints = [$"{chatsDb.Host}:{chatsDb.Port}"];
 
-        Program.AddServices(builder, options);
-        Program.AddHealth(builder, options, chatsDbOptions);
-        Program.AddTelemetry(builder, options);
+        Program.AddServices(builder, commonOptions);
+        Program.AddHealth(builder, commonOptions, chatsDbOptions);
+        Program.AddTelemetry(builder, commonOptions);
 
         builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
         builder.Host.ConfigureContainer<ContainerBuilder>((host, autofacBuilder) =>
@@ -79,7 +79,7 @@ public sealed class ChatsService : IAsyncDisposable
         });
 
         _app = builder.Build();
-        Program.ConfigurePipeline(_app, options);
+        Program.ConfigurePipeline(_app);
     }
 
     public async ValueTask DisposeAsync()

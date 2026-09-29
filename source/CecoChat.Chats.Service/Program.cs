@@ -32,32 +32,33 @@ namespace CecoChat.Chats.Service;
 
 public static class Program
 {
-    public static async Task Main(params string[] args)
+    public static async Task<int> Main(params string[] args)
     {
-        WebApplicationBuilder builder = EntryPoint.CreateWebAppBuilder(args);
-        CommonOptions options = new(builder.Configuration);
+        return await EntryPoint.Run(args, typeof(Program), ConfigureBuilder, ConfigurePipeline);
+    }
+
+    private static void ConfigureBuilder(WebApplicationBuilder builder)
+    {
+        CommonOptions commonOptions = new(builder.Configuration);
 
         CassandraOptions chatsDbOptions = new();
         builder.Configuration.GetSection("ChatsDb:Cluster").Bind(chatsDbOptions);
 
-        AddServices(builder, options);
-        AddTelemetry(builder, options);
-        AddHealth(builder, options, chatsDbOptions);
-        builder.Host.ConfigureContainer<ContainerBuilder>(ConfigureContainer);
+        AddServices(builder, commonOptions);
+        AddTelemetry(builder, commonOptions);
+        AddHealth(builder, commonOptions, chatsDbOptions);
 
-        WebApplication app = builder.Build();
-        ConfigurePipeline(app, options);
-        await EntryPoint.RunWebApp(app, typeof(Program));
+        builder.Host.ConfigureContainer<ContainerBuilder>(ConfigureContainer);
     }
 
-    public static void AddServices(WebApplicationBuilder builder, CommonOptions options)
+    public static void AddServices(WebApplicationBuilder builder, CommonOptions commonOptions)
     {
         // security
-        builder.Services.AddJwtAuthentication(options.Jwt);
+        builder.Services.AddJwtAuthentication(commonOptions.Jwt);
         builder.Services.AddUserPolicyAuthorization();
 
         // dynamic config
-        builder.Services.AddConfigClient(options.ConfigClient);
+        builder.Services.AddConfigClient(commonOptions.ConfigClient);
 
         // grpc
         builder.Services.AddGrpc(grpc =>
@@ -70,6 +71,7 @@ public static class Program
         // common
         builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
         builder.Services.AddOptions();
+        builder.Services.AddSingleton(commonOptions);
     }
 
     public static void AddTelemetry(WebApplicationBuilder builder, CommonOptions options)
@@ -169,7 +171,7 @@ public static class Program
         builder.RegisterType<MonotonicClock>().As<IClock>().SingleInstance();
     }
 
-    public static void ConfigurePipeline(WebApplication app, CommonOptions options)
+    public static void ConfigurePipeline(WebApplication app)
     {
         if (app.Environment.IsDevelopment())
         {
@@ -186,6 +188,7 @@ public static class Program
         app.MapGrpcService<ChatsService>();
         app.MapCustomHttpHealthEndpoints(app.Environment, serviceName: "chats");
 
-        app.UseOpenTelemetryPrometheusScrapingEndpoint(context => context.Request.Path == options.Prometheus.ScrapeEndpointPath);
+        CommonOptions commonOptions = app.Services.GetRequiredService<CommonOptions>();
+        app.UseOpenTelemetryPrometheusScrapingEndpoint(context => context.Request.Path == commonOptions.Prometheus.ScrapeEndpointPath);
     }
 }

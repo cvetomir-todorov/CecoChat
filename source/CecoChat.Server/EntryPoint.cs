@@ -12,44 +12,61 @@ public static class EntryPoint
 {
     private const string EnvironmentVariablesPrefix = "CECOCHAT_";
 
-    public static WebApplicationBuilder CreateWebAppBuilder(string[] args)
-    {
-        WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
-
-        builder.Configuration.AddEnvironmentVariables(EnvironmentVariablesPrefix);
-        builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
-        builder.Host.UseSerilog(dispose: true);
-
-        return builder;
-    }
-
-    public static async Task RunWebApp(WebApplication app, Type loggerContext)
+    public static async Task<int> Run(string[] args, Type loggerContext, Action<WebApplicationBuilder> configureBuilder, Action<WebApplication> configurePipeline)
     {
         Assembly entryAssembly = GetEntryAssembly();
         string environment = GetEnvironment();
 
         SetupSerilog(environment, entryAssembly);
         ILogger logger = Log.ForContext(loggerContext);
+        WebApplication? app = null;
 
         try
         {
             logger.Information("Starting in {Environment} environment...", environment);
 
+            WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+
+            builder.Configuration.AddEnvironmentVariables(EnvironmentVariablesPrefix);
+            // command line args over env vars
+            builder.Configuration.AddCommandLine(args);
+            builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
+            builder.Host.UseSerilog(dispose: false);
+
+            configureBuilder(builder);
+
+            app = builder.Build();
+            configurePipeline(app);
+
             bool initialized = await app.Services.Init();
             if (!initialized)
             {
                 logger.Fatal("Failed to initialize");
-                return;
+                return 1;
             }
 
             await app.RunAsync();
+            return 0;
         }
         catch (Exception exception)
         {
             logger.Fatal(exception, "Unexpected failure");
+            return 2;
         }
         finally
         {
+            try
+            {
+                if (app != null)
+                {
+                    await app.DisposeAsync();
+                }
+            }
+            catch (Exception exception)
+            {
+                logger.Error(exception, "Failure during disposal");
+            }
+
             logger.Information("Ended");
             await Log.CloseAndFlushAsync();
         }

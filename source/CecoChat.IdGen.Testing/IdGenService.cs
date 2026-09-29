@@ -42,11 +42,11 @@ public sealed class IdGenService : IAsyncDisposable
         });
         builder.Host.UseSerilog(dispose: true);
 
-        CommonOptions options = new(builder.Configuration);
+        CommonOptions commonOptions = new(builder.Configuration);
 
-        Program.AddServices(builder, options);
-        Program.AddHealth(builder, options);
-        Program.AddTelemetry(builder, options);
+        Program.AddServices(builder, commonOptions);
+        Program.AddHealth(builder, commonOptions);
+        Program.AddTelemetry(builder, commonOptions);
 
         builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
         builder.Host.ConfigureContainer<ContainerBuilder>((host, autofacBuilder) =>
@@ -64,7 +64,7 @@ public sealed class IdGenService : IAsyncDisposable
         });
 
         _app = builder.Build();
-        Program.ConfigurePipeline(_app, options);
+        Program.ConfigurePipeline(_app);
     }
 
     public async ValueTask DisposeAsync()

@@ -34,34 +34,35 @@ public static class Program
     private static ClientOptions _clientOptions = null!;
     private static IdGenClientOptions _idGenClientOptions = null!;
 
-    public static async Task Main(params string[] args)
+    public static async Task<int> Main(params string[] args)
     {
-        WebApplicationBuilder builder = EntryPoint.CreateWebAppBuilder(args);
-        CommonOptions options = new(builder.Configuration);
+        return await EntryPoint.Run(args, typeof(Program), ConfigureBuilder, ConfigurePipeline);
+    }
+
+    private static void ConfigureBuilder(WebApplicationBuilder builder)
+    {
+        CommonOptions commonOptions = new(builder.Configuration);
 
         _clientOptions = new();
         builder.Configuration.GetSection("Clients").Bind(_clientOptions);
         _idGenClientOptions = new();
         builder.Configuration.GetSection("IdGenClient").Bind(_idGenClientOptions);
 
-        AddServices(builder, options);
-        AddTelemetry(builder, options);
-        AddHealth(builder, options);
-        builder.Host.ConfigureContainer<ContainerBuilder>(ConfigureContainer);
+        AddServices(builder, commonOptions);
+        AddTelemetry(builder, commonOptions);
+        AddHealth(builder, commonOptions);
 
-        WebApplication app = builder.Build();
-        ConfigurePipeline(app, options);
-        await EntryPoint.RunWebApp(app, typeof(Program));
+        builder.Host.ConfigureContainer<ContainerBuilder>(ConfigureContainer);
     }
 
-    private static void AddServices(WebApplicationBuilder builder, CommonOptions options)
+    private static void AddServices(WebApplicationBuilder builder, CommonOptions commonOptions)
     {
         // security
-        builder.Services.AddJwtAuthentication(options.Jwt);
+        builder.Services.AddJwtAuthentication(commonOptions.Jwt);
         builder.Services.AddUserPolicyAuthorization();
 
         // dynamic config
-        builder.Services.AddConfigClient(options.ConfigClient);
+        builder.Services.AddConfigClient(commonOptions.ConfigClient);
 
         // signalr
         builder.Services
@@ -84,6 +85,7 @@ public static class Program
 
         // common
         builder.Services.AddOptions();
+        builder.Services.AddSingleton(commonOptions);
     }
 
     private static void AddTelemetry(WebApplicationBuilder builder, CommonOptions options)
@@ -180,7 +182,7 @@ public static class Program
         builder.RegisterType<ContractMapper>().As<IContractMapper>().SingleInstance();
     }
 
-    private static void ConfigurePipeline(WebApplication app, CommonOptions options)
+    private static void ConfigurePipeline(WebApplication app)
     {
         if (app.Environment.IsDevelopment())
         {
@@ -197,6 +199,7 @@ public static class Program
         app.MapHub<ChatHub>("/chat");
         app.MapCustomHttpHealthEndpoints(app.Environment, serviceName: "messaging");
 
-        app.UseOpenTelemetryPrometheusScrapingEndpoint(context => context.Request.Path == options.Prometheus.ScrapeEndpointPath);
+        CommonOptions commonOptions = app.Services.GetRequiredService<CommonOptions>();
+        app.UseOpenTelemetryPrometheusScrapingEndpoint(context => context.Request.Path == commonOptions.Prometheus.ScrapeEndpointPath);
     }
 }
