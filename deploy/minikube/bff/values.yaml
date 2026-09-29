@@ -13,7 +13,7 @@ Networking:
     Service: minio
     Port: 9000
     AccessKey: admin
-    Secret: secret12
+    SecretKey: secret12
 Ingress:
   Host: bff.cecochat.com
   SecretName: ingress-tls
