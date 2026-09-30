@@ -4,8 +4,6 @@ using Common.Seaweed;
 
 namespace CecoChat.Bff.Service.Init;
 
-// TODO: figure out how to have the buckets pre-built
-// TODO: consider whether this is needed when there is a better health check
 public class FileStorageInit : InitStep
 {
     private readonly ISeaweedContext _seaweed;
