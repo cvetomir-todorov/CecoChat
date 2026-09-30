@@ -44,7 +44,7 @@ A short list of tasks to do next regarding product features, technical features,
     - Restrict service-to-service communication
     - Use pepper instead of just salt for passwords
   - Rate limiting
-  - Secure access to data storage components - Yugabyte, Cassandra, Redis
+  - Secure access to data storage components - YugabyteDB, Cassandra, Redis
   - Secure access to integration components - Kafka
   - Secure access to observability components - logs database, Prometheus, Jaeger
 * Observability

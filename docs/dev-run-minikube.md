@@ -67,7 +67,7 @@ Redis cluster is initialized manually by executing the content of the `cluster.s
 kubectl exec -it redis-0 -- bash
 ```
 
-The topics in Kafka, the keyspaces in Cassandra, the databases in Yugabyte, the buckets in SeaweedFS, are all created when the respective service is started, if they do not exist.
+The topics in Kafka, the keyspaces in Cassandra, the databases in YugabyteDB, the buckets in SeaweedFS, are all created when the respective service is started, if they do not exist.
 
 ## Observability
 

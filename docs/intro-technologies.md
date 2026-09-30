@@ -3,7 +3,7 @@
 The technologies chosen are [cloud-agnostic](https://codersociety.com/blog/articles/cloud-agnostic) which makes the solution independent of a specific cloud provider.
 
 * Integration - Kafka, gRPC, WebSocket, HTTP
-* Data storage - Yugabyte, Cassandra, SeaweedFS, Redis
+* Data storage - YugabyteDB, Cassandra, SeaweedFS, Redis
 * Operations - OpenTelemetry, Docker, Kubernetes
 * Services - .NET, ASP.NET, SignalR, EF Core
 * Libraries - Autofac, Serilog, FluentValidation, AutoMapper, Polly, IdGen
@@ -51,10 +51,10 @@ Services communicate asynchronously via the PUB/SUB backplane which is based on 
 
 # User database
 
-![Yugabyte](tech-images/yugabyte.png)
+![YugabyteDB](tech-images/yugabyte.png)
 ![Postgres](tech-images/postgres.webp)
 
-User database is based on Yugabyte DB
+User database is based on YugabyteDB
 
 * distributed SQL database
 * based on Postgres and driver-compatible with it
@@ -109,14 +109,14 @@ File storage is based on SeaweedFS:
 
 # Dynamic configuration
 
-![Yugabyte](tech-images/yugabyte.png)
+![YugabyteDB](tech-images/yugabyte.png)
 ![Postgres](tech-images/postgres.webp)
 ![Kafka](tech-images/kafka.png)
 ![gRPC](tech-images/grpc.png)
 ![Protocol Buffers](tech-images/protocol-buffers.png)
 
 Dynamic configuration is based on multiple technologies:
-* storage is based on Yugabyte DB which is Postgres driver-compatible
+* storage is based on YugabyteDB which is Postgres driver-compatible
 * services are notified for configuration changes via dedicated Kafka topic
 * services acquire configuration both initially and when changed using gRPC
 * both Kafka and gRPC data format is Protocol Buffers

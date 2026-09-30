@@ -41,7 +41,7 @@ Check out [what next](docs/what-next.md) needs to be implemented. I appreciate a
 * [Configurable](docs/design-configuration.md), [observable](docs/design-observability.md), [containerized and runnable](docs/dev-run-prerequisites.md), [deployable](docs/design-deployment.md) local environment
 * [Main technologies](docs/intro-technologies.md)
   - Integration - Kafka, gRPC, WebSocket, HTTP
-  - Data storage - Yugabyte, Cassandra, SeaweedFS, Redis
+  - Data storage - YugabyteDB, Cassandra, SeaweedFS, Redis
   - Operations - OpenTelemetry, Docker, Kubernetes
   - Services - .NET, ASP.NET, SignalR, EF Core
   - Libraries - Autofac, Serilog, FluentValidation, AutoMapper, Polly, IdGen

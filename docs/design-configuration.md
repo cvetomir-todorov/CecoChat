@@ -15,7 +15,7 @@ Some parts of the configuration are designed to be changed while it is running.
 
 ## Seeding
 
-Dynamic configuration is stored in Yugabyte DB which can be seeded manually using scripts for the [docker](../deploy/docker/yugabyte/config.sql) or [minikube](../deploy/minikube/yugabyte/config.sql) deployments, respectively. Alternatively, if there are no values, the Config service seeds the configuration at startup with values depending on the environment the service is configured for.
+Dynamic configuration is stored in YugabyteDB which can be seeded manually using scripts for the [docker](../deploy/docker/yugabyte/config.sql) or [minikube](../deploy/minikube/yugabyte/config.sql) deployments, respectively. Alternatively, if there are no values, the Config service seeds the configuration at startup with values depending on the environment the service is configured for.
 
 ## Changing
 
