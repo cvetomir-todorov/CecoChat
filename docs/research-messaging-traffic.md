@@ -14,10 +14,10 @@ Pros
 
 Cons
 * Each messaging server needs to know which other messaging server the recipient of the message is connected to:
-    - One option is each messaging server to keep an in-memory data structure for the up to 10 mln clients. It's a challenge to implement one considering thread-safety. Additionally it is expensive in terms of memory.
-    - Another option is to offload the storage of this knowledge to a data store. This would increase the latency a bit and add an additional element in the architecture.
+  - One option is each messaging server to keep an in-memory data structure for the up to 10 mln clients. It's a challenge to implement one considering thread-safety. Additionally, it is expensive in terms of memory.
+  - Another option is to offload the storage of this knowledge to a data store. This would increase the latency a bit and add an element to the architecture.
 * When a user connects or disconnects the storage which maps the user with its messaging server needs to be updated.
-* Messaging servers need to keep open connections between each other. This does not play well with the concurrent connection limits.
+* Messaging servers need to keep open connections between each other.
 * Messaging servers need to know when one of them fails, find about new nodes and establish connections to them.
 * Consistency of the data would be more challenging since the two main operations required for message processing would be separate:
     - Sending the message to its recipient(s) by calling one (or multiple for group chats) messaging server(s)
@@ -42,4 +42,4 @@ Cons
 
 # Decision
 
-The approach using a PUB/SUB backplane was chosen because of the pros listed at the cost of complexity increase in deployment and configuration. Kafka is particularly suitable to this approach, although partition assignment for the messaging server's Kafka consumer group need to be manual. There needs to be centralized dynamic configuration with mapping between messaging server and partitions assigned to it. Additionally the addresses of all messaging servers would need to be present so clients know where to connect to.
+The approach using a PUB/SUB backplane was chosen because of the pros listed at the cost of complexity increase in deployment and configuration. Kafka is particularly suitable to this approach, although partition assignment for the messaging server's Kafka consumer group need to be manual. There needs to be centralized dynamic configuration with mapping between messaging server and partitions assigned to it. Additionally, the addresses of all messaging servers would need to be present so clients know where to connect to.
