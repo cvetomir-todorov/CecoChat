@@ -9,8 +9,8 @@ Networking:
   UserService: user
   ChatsService: chats
   FileStorage:
-    Host: minio
-    Service: minio
+    Host: seaweed
+    Service: seaweed
     Port: 9000
     AccessKey: admin
     SecretKey: secret12
