@@ -3,7 +3,7 @@
 The technologies chosen are [cloud-agnostic](https://codersociety.com/blog/articles/cloud-agnostic) which makes the solution independent of a specific cloud provider.
 
 * Integration - Kafka, gRPC, WebSocket, HTTP
-* Data storage - Yugabyte, Cassandra, MinIO, Redis
+* Data storage - Yugabyte, Cassandra, SeaweedFS, Redis
 * Operations - OpenTelemetry, Docker, Kubernetes
 * Services - .NET, ASP.NET, SignalR, EF Core
 * Libraries - Autofac, Serilog, FluentValidation, AutoMapper, Polly, IdGen
@@ -95,18 +95,16 @@ Chats database is based on Cassandra:
 
 # File storage
 
-![Minio](tech-images/minio.webp)
+![SeaweedFS](tech-images/seaweed.png)
 
-File storage is based on MinIO:
+File storage is based on SeaweedFS:
+* open-source software
 * object store - stores both file and metadata
-* horizontally scalable
-* supports multi-site replication
-* has global identity and access management
-* supports bucket encryption
-* supports immutability and versioning of objects
-* provides tools for monitoring
-* provides data-management interfaces
-* HTTP-accessible with a native client out of the box
+* designed for many files - small-file reads and writes need a single disk seek
+* horizontally scalable - separate components can be scaled independently
+* supports replication, including cross-data-center and cross-cluster
+* supports erasure coding and tiering of cold data to cloud storage
+* supports server-side encryption
 * AWS S3-compatible
 
 # Dynamic configuration
