@@ -11,7 +11,6 @@ using CecoChat.Config.Client;
 using CecoChat.Config.Contracts;
 using CecoChat.Server;
 using CecoChat.Testing.Config;
-using Common.AspNet.Init;
 using Common.Autofac;
 using Common.Cassandra;
 using Common.Jwt;
@@ -23,7 +22,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using NUnit.Framework;
 using Serilog;
 
 namespace CecoChat.Chats.Testing;
@@ -90,16 +88,7 @@ public sealed class ChatsService : IAsyncDisposable
 
     public async Task Run()
     {
-        bool initialized = await _app.Services.Init();
-        if (!initialized)
-        {
-            throw new Exception("Failed to initialize");
-        }
-
-        _ = _app
-            .RunAsync()
-            .ContinueWith(task => TestContext.Progress.WriteLine($"Unexpected error occurred: {task.Exception}"), TaskContinuationOptions.OnlyOnFaulted)
-            .ContinueWith(_ => TestContext.Progress.WriteLine("Ended successfully"), TaskContinuationOptions.NotOnFaulted);
+        await _app.StartAsync();
     }
 
     public JwtOptions GetJwtOptions()

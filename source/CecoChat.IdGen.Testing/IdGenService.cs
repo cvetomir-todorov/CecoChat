@@ -7,7 +7,6 @@ using CecoChat.Config.Contracts;
 using CecoChat.IdGen.Service;
 using CecoChat.Server;
 using CecoChat.Testing.Config;
-using Common.AspNet.Init;
 using Common.Autofac;
 using Common.Kafka;
 using Common.Testing.Kafka;
@@ -16,7 +15,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using NUnit.Framework;
 using Serilog;
 
 namespace CecoChat.IdGen.Testing;
@@ -75,15 +73,6 @@ public sealed class IdGenService : IAsyncDisposable
 
     public async Task Run()
     {
-        bool initialized = await _app.Services.Init();
-        if (!initialized)
-        {
-            throw new Exception("Failed to initialize");
-        }
-
-        _ = _app
-            .RunAsync()
-            .ContinueWith(task => TestContext.Progress.WriteLine($"Unexpected error occurred: {task.Exception}"), TaskContinuationOptions.OnlyOnFaulted)
-            .ContinueWith(_ => TestContext.Progress.WriteLine("Ended successfully"), TaskContinuationOptions.NotOnFaulted);
+        await _app.StartAsync();
     }
 }
