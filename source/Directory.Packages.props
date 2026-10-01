@@ -15,7 +15,7 @@
     <PackageVersion Include="AWSSDK.S3" Version="4.0.103.3" />
     <PackageVersion Include="Calzolari.Grpc.AspNetCore.Validation" Version="10.0.0" />
     <PackageVersion Include="Calzolari.Grpc.Net.Client.Validation" Version="10.0.0" />
-    <PackageVersion Include="CassandraCSharpDriver" Version="3.22.1" />
+    <PackageVersion Include="CassandraCSharpDriver" Version="3.23.0" />
     <PackageVersion Include="CommandLineParser" Version="2.9.1" />
     <PackageVersion Include="Confluent.Kafka" Version="2.15.1" />
     <PackageVersion Include="coverlet.msbuild" Version="10.0.1" />
@@ -42,8 +42,6 @@
     <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.12" />
     <PackageVersion Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="8.23.0" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.10.1" />
-    <!-- Not used directly, but referenced explicitly since the Cassandra driver .nuspec file specifies an older version which contains security vulnerabilities -->
-    <PackageVersion Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageVersion Include="Npgsql" Version="10.0.3" />
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
     <PackageVersion Include="Npgsql.OpenTelemetry" Version="10.0.3" />
