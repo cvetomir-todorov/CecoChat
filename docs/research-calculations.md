@@ -4,11 +4,11 @@ The calculations below are based on the [concurrent connections limit](research-
 
 ### Daily 24 hour usage
 
-Calculating the daily usage with **64 mln users** spread throughout the day each of which sends **128 messages per day** gives us **95 000 messages/s for the cell** and **23 MB/s for the cell** with **0.58 MB/s per messaging server**.
+Calculating the daily usage with **64 mln users** spread throughout the day each of which sends **128 messages per day** gives us **95 000 messages/s** and **23 MB/s** in total with **2 400 messages/s** and **0.58 MB/s** per messaging server.
 
 ### Peak 1 hour usage
 
-Calculating a peak usage for **1 hour** daily where **80%** of the maximum users - **8 mln active users** send **50%** of their daily messages - **64 messages** we get **142 200 messages/s for the cell** and **35 MB/s for the cell** with **0.88 MB/s per messaging server**.
+Calculating a peak usage for **1 hour** daily where **80%** of the maximum users - **8 mln active users** send **50%** of their daily messages - **64 messages** we get **142 200 messages/s** and **35 MB/s** in total with **3 600 messages/s** and **0.88 MB/s** per messaging server.
 
 ### Conclusion
 
