@@ -141,6 +141,7 @@ public static class Program
     private static void ConfigureContainer(HostBuilderContext host, ContainerBuilder builder)
     {
         // init
+        builder.RegisterInit();
         builder.RegisterInitStep<DynamicConfigInit>();
         builder.RegisterInitStep<BackplaneInit>();
         builder.RegisterInitStep<BackplaneComponentsInit>();

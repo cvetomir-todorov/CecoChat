@@ -130,6 +130,7 @@ public static class Program
     private static void ConfigureContainer(HostBuilderContext host, ContainerBuilder builder)
     {
         // init
+        builder.RegisterInit();
         builder.RegisterInitStep<ConfigDbInit>();
         builder.RegisterInitStep<BackplaneInit>();
 

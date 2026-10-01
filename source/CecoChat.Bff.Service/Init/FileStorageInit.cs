@@ -13,16 +13,14 @@ public class FileStorageInit : InitStep
     public FileStorageInit(
         ISeaweedContext seaweed,
         IObjectNaming objectNaming,
-        FileStorageInitHealthCheck fileStorageInitHealthCheck,
-        IHostApplicationLifetime applicationLifetime)
-        : base(applicationLifetime)
+        FileStorageInitHealthCheck fileStorageInitHealthCheck)
     {
         _seaweed = seaweed;
         _objectNaming = objectNaming;
         _fileStorageInitHealthCheck = fileStorageInitHealthCheck;
     }
 
-    protected override async Task<bool> DoExecute(CancellationToken ct)
+    public override async Task<bool> Execute(CancellationToken ct)
     {
         string bucketName = _objectNaming.GetCurrentBucketName();
         _fileStorageInitHealthCheck.IsReady = await _seaweed.EnsureBucketExists(bucketName, ct);

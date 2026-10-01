@@ -20,9 +20,7 @@ public class ConfigDbInit : InitStep
         IOptions<ConfigDbOptions> configDbOptions,
         ConfigDbContext configDbContext,
         INpgsqlDbInitializer initializer,
-        ConfigDbInitHealthCheck configDbInitHealthCheck,
-        IHostApplicationLifetime applicationLifetime)
-        : base(applicationLifetime)
+        ConfigDbInitHealthCheck configDbInitHealthCheck)
     {
         _logger = logger;
         _configDbOptions = configDbOptions.Value;
@@ -31,7 +29,7 @@ public class ConfigDbInit : InitStep
         _configDbInitHealthCheck = configDbInitHealthCheck;
     }
 
-    protected override async Task<bool> DoExecute(CancellationToken ct)
+    public override async Task<bool> Execute(CancellationToken ct)
     {
         string database = new NpgsqlConnectionStringBuilder(_configDbOptions.Connect.ConnectionString).Database!;
         _initializer.Initialize(_configDbOptions.Init, database, typeof(ConfigDbAutofacModule).Assembly);

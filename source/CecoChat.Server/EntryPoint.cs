@@ -40,15 +40,18 @@ public static class EntryPoint
             app = builder.Build();
             configurePipeline(app);
 
-            bool initialized = await app.Services.Init();
-            if (!initialized)
-            {
-                logger.Fatal("Failed to initialize");
-                return 1;
-            }
-
             await app.RunAsync();
             return 0;
+        }
+        catch (OperationCanceledException)
+        {
+            logger.Information("Starting cancelled");
+            return 0;
+        }
+        catch (InitException initException)
+        {
+            logger.Fatal(initException, "Failed to initialize");
+            return 1;
         }
         catch (Exception exception)
         {
