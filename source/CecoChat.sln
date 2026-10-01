@@ -103,6 +103,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CecoChat.Testing", "CecoCha
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Seaweed", "Common.Seaweed\Common.Seaweed.csproj", "{23F71F07-D4A1-440B-B82E-6BE0A8AD77DE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Testing.AspNet", "Common.Testing.AspNet\Common.Testing.AspNet.csproj", "{A909B8B9-9931-40C4-957A-987495F31522}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -265,6 +267,10 @@ Global
 		{23F71F07-D4A1-440B-B82E-6BE0A8AD77DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{23F71F07-D4A1-440B-B82E-6BE0A8AD77DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{23F71F07-D4A1-440B-B82E-6BE0A8AD77DE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A909B8B9-9931-40C4-957A-987495F31522}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A909B8B9-9931-40C4-957A-987495F31522}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A909B8B9-9931-40C4-957A-987495F31522}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A909B8B9-9931-40C4-957A-987495F31522}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -316,6 +322,7 @@ Global
 		{F43478E3-5744-4276-9B13-5D35B1529F06} = {C320D788-140F-4A46-A3A8-7A91FD43290B}
 		{B004FE83-64BF-4F59-8722-FC0D8045C875} = {B00A5BC5-E803-44B8-8680-885046D65CBE}
 		{23F71F07-D4A1-440B-B82E-6BE0A8AD77DE} = {C320D788-140F-4A46-A3A8-7A91FD43290B}
+		{A909B8B9-9931-40C4-957A-987495F31522} = {C320D788-140F-4A46-A3A8-7A91FD43290B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B5EAA668-8419-44F5-8BE5-9175A9B20BF8}

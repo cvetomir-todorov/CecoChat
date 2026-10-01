@@ -1,5 +1,6 @@
 using CecoChat.Testing;
 using Common.Jwt;
+using Common.Testing.AspNet;
 using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Networks;
 using NUnit.Framework;
@@ -33,17 +34,18 @@ public abstract class BaseTest
             _chatsDb = new ExistingChatsDb();
         }
 
-        _chatsService = new ChatsService(
-            environment: "Test",
-            listenPort: 32004,
-            certificatePath: "services.pfx",
-            certificatePassword: "cecochat",
-            configFilePath: "chats-service.json",
-            _chatsDb);
-        await _chatsService.Run();
+        ServiceOptions options = new()
+        {
+            Environment = "Test",
+            ListenPort = 32004,
+            CertificatePath = "services.pfx",
+            CertificatePassword = "cecochat",
+            ConfigFilePath = "chats-service.json"
+        };
+        _chatsService = new ChatsService(options, _chatsDb);
+        await _chatsService.Start();
 
-        _chatsClient = new(
-            configFilePath: "chats-client.json");
+        _chatsClient = new(configFilePath: "chats-client.json");
 
         await CleanTestData();
         await AddTestData();
