@@ -60,7 +60,7 @@ public static class SerilogConfig
                     otel.IncludedData = IncludedData.TraceIdField | IncludedData.SpanIdField;
 
                     otel.BatchingOptions.EagerlyEmitFirstEvent = true;
-                    otel.BatchingOptions.Period = otlpOptions.BatchPeriod;
+                    otel.BatchingOptions.BufferingTimeLimit = otlpOptions.BatchPeriod;
                     otel.BatchingOptions.BatchSizeLimit = otlpOptions.BatchSizeLimit;
                     otel.BatchingOptions.QueueLimit = otlpOptions.BatchQueueLimit;
                 });

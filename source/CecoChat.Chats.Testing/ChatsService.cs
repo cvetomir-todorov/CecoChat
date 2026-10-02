@@ -1,6 +1,4 @@
-using System.Net;
 using Autofac;
-using Autofac.Extensions.DependencyInjection;
 using CecoChat.Backplane.Contracts;
 using CecoChat.Chats.Data;
 using CecoChat.Chats.Data.Entities.ChatMessages;
@@ -11,58 +9,42 @@ using CecoChat.Config.Client;
 using CecoChat.Config.Contracts;
 using CecoChat.Server;
 using CecoChat.Testing.Config;
-using Common.AspNet.Init;
 using Common.Autofac;
 using Common.Cassandra;
 using Common.Jwt;
 using Common.Kafka;
+using Common.Testing.AspNet;
 using Common.Testing.Kafka;
 using Confluent.Kafka;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using NUnit.Framework;
-using Serilog;
 
 namespace CecoChat.Chats.Testing;
 
-public sealed class ChatsService : IAsyncDisposable
+public sealed class ChatsService : BaseService
 {
-    private readonly WebApplication _app;
-
-    public ChatsService(string environment, int listenPort, string certificatePath, string certificatePassword, string configFilePath, IChatsDb chatsDb)
+    public ChatsService(ServiceOptions options, IChatsDb chatsDb)
     {
-        WebApplicationBuilder builder = WebApplication.CreateEmptyBuilder(new WebApplicationOptions
-        {
-            ApplicationName = typeof(Program).Assembly.GetName().Name,
-            EnvironmentName = environment
-        });
-        builder.Configuration.AddJsonFile(configFilePath, optional: false);
+        WebApplicationBuilder builder = CreateBuilder(typeof(Program), options);
+
+        string[] chatsDbContactPoints = [$"{chatsDb.Host}:{chatsDb.Port}"];
+
         builder.Services.Configure<CassandraOptions<IChatsDbContext>>(cassandra =>
         {
-            cassandra.ContactPoints = [$"{chatsDb.Host}:{chatsDb.Port}"];
+            cassandra.ContactPoints = chatsDbContactPoints;
         });
-        builder.WebHost.UseKestrel(kestrel =>
-        {
-            kestrel.Listen(IPAddress.Loopback, listenPort, listenOptions =>
-            {
-                listenOptions.UseHttps(certificatePath, certificatePassword);
-            });
-        });
-        builder.Host.UseSerilog(dispose: false);
 
-        CommonOptions options = new(builder.Configuration);
+        CommonOptions commonOptions = new(builder.Configuration);
+
         CassandraOptions chatsDbOptions = new();
         builder.Configuration.GetSection("ChatsDb:Cluster").Bind(chatsDbOptions);
-        chatsDbOptions.ContactPoints = [$"{chatsDb.Host}:{chatsDb.Port}"];
+        chatsDbOptions.ContactPoints = chatsDbContactPoints;
 
-        Program.AddServices(builder, options);
-        Program.AddHealth(builder, options, chatsDbOptions);
-        Program.AddTelemetry(builder, options);
+        Program.AddServices(builder, commonOptions);
+        Program.AddHealth(builder, commonOptions, chatsDbOptions);
+        Program.AddTelemetry(builder, commonOptions);
 
-        builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
         builder.Host.ConfigureContainer<ContainerBuilder>((host, autofacBuilder) =>
         {
             Program.ConfigureContainer(host, autofacBuilder);
@@ -78,45 +60,25 @@ public sealed class ChatsService : IAsyncDisposable
             autofacBuilder.RegisterFactory<KafkaConsumerDummy<Null, ConfigChange>, IKafkaConsumer<Null, ConfigChange>>();
         });
 
-        _app = builder.Build();
-        Program.ConfigurePipeline(_app, options);
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        await _app.StopAsync(timeout: TimeSpan.FromSeconds(5));
-        await _app.DisposeAsync();
-    }
-
-    public async Task Run()
-    {
-        bool initialized = await _app.Services.Init();
-        if (!initialized)
-        {
-            throw new Exception("Failed to initialize");
-        }
-
-        _ = _app
-            .RunAsync()
-            .ContinueWith(task => TestContext.Progress.WriteLine($"Unexpected error occurred: {task.Exception}"), TaskContinuationOptions.OnlyOnFaulted)
-            .ContinueWith(_ => TestContext.Progress.WriteLine("Ended successfully"), TaskContinuationOptions.NotOnFaulted);
+        App = builder.Build();
+        Program.ConfigurePipeline(App);
     }
 
     public JwtOptions GetJwtOptions()
     {
         JwtOptions jwtOptions = new();
-        _app.Configuration.GetSection("Jwt").Bind(jwtOptions);
+        App.Configuration.GetSection("Jwt").Bind(jwtOptions);
 
         return jwtOptions;
     }
 
     public IUserChatsRepo UserChats()
     {
-        return _app.Services.GetRequiredService<IUserChatsRepo>();
+        return App.Services.GetRequiredService<IUserChatsRepo>();
     }
 
     public IChatMessageRepo ChatMessages()
     {
-        return _app.Services.GetRequiredService<IChatMessageRepo>();
+        return App.Services.GetRequiredService<IChatMessageRepo>();
     }
 }

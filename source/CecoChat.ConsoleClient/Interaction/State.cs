@@ -125,6 +125,13 @@ public abstract class State
 
         Console.WriteLine("Uploaded file {0}/{1} successfully.", response.Content!.File.Bucket, response.Content!.File.Path);
 
+        UserFiles.UpdateUserFile(new FileRef
+        {
+            Bucket = response.Content.File.Bucket,
+            Path = response.Content.File.Path,
+            Version = response.Content.File.Version
+        });
+
         return new UploadFileResult
         {
             Success = true,

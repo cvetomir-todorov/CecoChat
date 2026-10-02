@@ -43,7 +43,7 @@ public static class CustomHealth
 
     private static CustomHealthDependencyReport[] GetDependencies(HealthReport report)
     {
-        CustomHealthDependencyReport[] dependencies = Array.Empty<CustomHealthDependencyReport>();
+        CustomHealthDependencyReport[] dependencies = [];
 
         if (report.Entries.Count > 0)
         {

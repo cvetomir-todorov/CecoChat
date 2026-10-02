@@ -9,15 +9,15 @@ Each messaging server is uniquely assigned part of the messages from the PUB/SUB
 Recipient Kafka partition = Hash(Recipient ID) % Partition count
 ```
 
-The hash function from the formula needs to be stable because it would be run on different servers. It needs to provide an **excellent** distribution since we don't want hot partitions. And since this is the same function which is used to decide which messaging server each client connects to - we don't want to hit our messaging server connection number limit. The performance requirements are not key, it just doesn't need to be slow. I used [FNV](https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function) which satisfied the requirements. The code in `Check.sln` checks how it behaves and verifies its total distribution deviation and max one are small enough.
+The hash function from the formula needs to be stable because it would be run on different servers. It needs to provide an **excellent** distribution since we don't want hot partitions. The performance requirements are not key, it just doesn't need to be slow. I used [FNV](https://en.wikipedia.org/wiki/Fowler%E2%80%93Noll%E2%80%93Vo_hash_function) which satisfied the requirements. The code in `Check.sln` checks how it behaves and verifies its total distribution deviation and max one are small enough.
 
 # Send
 
 ![Send messages](images/cecochat-message-send.png)
 
-The Kafka producer doesn't use the default auto-partitioning when sending messages. Instead it is choosing a partition for the sent message manually. It is required since each messaging server is stateful - the clients connected to it are assigned to specific partitions. Fortunately the Kafka .NET client API has these capabilities.
+The Kafka producer doesn't use the default auto-partitioning when sending messages. Instead, it is choosing a partition for the message manually. It is required since each messaging server is stateful - the clients connected to it are assigned to specific partitions. Fortunately the Kafka .NET client API has these capabilities.
 
-Additionally we use the Kafka delivery handler in order to send the client a positive or negative ACK. It is used by the client to know whether the message has been processed.
+Additionally, we use the Kafka delivery handler in order to send the client a positive or negative ACK. It is used by the client to know whether the message has been processed.
 
 # Receive
 
@@ -29,4 +29,4 @@ Messages for a client are enqueued in a bounded message queue. That helps limit 
 
 # Multiple clients
 
-Sometimes a user has multiple clients with the same user ID. Each client should be able to receive messages sent from one of the other clients. From the formula we know that clients for the same user ID are using the same Kafka partition. Therefore they are all connected to the same messaging server. Which means we can asynchronously enqueue the message from the sending client to the other clients.
+Sometimes a user has multiple clients with the same user ID. Each client should be able to receive messages sent from one of the other clients. From the formula we know that clients for the same user ID are using the same Kafka partition. Therefore, they are all connected to the same messaging server. Which means we can asynchronously enqueue the message from the sending client to the other clients.

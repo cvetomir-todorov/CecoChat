@@ -13,9 +13,7 @@ public sealed class BackplaneComponentsInit : InitStep
     public BackplaneComponentsInit(
         ILogger<BackplaneComponentsInit> logger,
         IConfigChangesConsumer configChangesConsumer,
-        ConfigChangesConsumerHealthCheck configChangesConsumerHealthCheck,
-        IHostApplicationLifetime applicationLifetime)
-        : base(applicationLifetime)
+        ConfigChangesConsumerHealthCheck configChangesConsumerHealthCheck)
     {
         _logger = logger;
         _configChangesConsumer = configChangesConsumer;
@@ -30,7 +28,7 @@ public sealed class BackplaneComponentsInit : InitStep
         }
     }
 
-    protected override Task<bool> DoExecute(CancellationToken ct)
+    public override Task<bool> Execute(CancellationToken ct)
     {
         _configChangesConsumer.Prepare();
 

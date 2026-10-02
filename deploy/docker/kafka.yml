@@ -2,52 +2,41 @@ version: '3'
 networks:
   cecochat:
 services:
-  zookeeper:
-    image: zookeeper:3.9.1
-    container_name: cecochat-zookeeper
-    hostname: zookeeper
-    networks: &networks
-      - cecochat
-    ports:
-      - "2181:2181"
-      - "8080:8080"
-    deploy:
-      resources:
-        limits:
-          memory: 128M
-    environment:
-      ZOO_MY_ID: 1
-      ZOO_SERVERS: server.1=zookeeper:2888:3888;2181
-    volumes:
-      - cecochat-zookeeper-data:/data
-      - cecochat-zookeeper-datalog:/datalog
   kafka0:
-    image: confluentinc/cp-kafka:7.5.2
+    image: confluentinc/cp-kafka:8.3.2
     container_name: cecochat-kafka0
     hostname: kafka0
-    networks: *networks
+    networks: &networks
+      - cecochat
     ports:
       - "9091:9091"
     deploy:
       resources:
         limits:
           memory: 512M
-    environment: 
+    healthcheck: &healthcheck
+      test: ["CMD", "kafka-broker-api-versions", "--bootstrap-server", "localhost:19091"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    environment:
+      CLUSTER_ID: Pap9mM2uRoaI3RAvQbpL0A
+      KAFKA_NODE_ID: 0
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: "0@kafka0:19093,1@kafka1:19094"
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
       KAFKA_ADVERTISED_LISTENERS: LISTENER_DOCKER_INTERNAL://kafka0:19091,LISTENER_DOCKER_EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9091
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_DOCKER_INTERNAL:PLAINTEXT,LISTENER_DOCKER_EXTERNAL:PLAINTEXT
+      KAFKA_LISTENERS: LISTENER_DOCKER_INTERNAL://0.0.0.0:19091,LISTENER_DOCKER_EXTERNAL://0.0.0.0:9091,CONTROLLER://0.0.0.0:19093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_DOCKER_INTERNAL:PLAINTEXT,LISTENER_DOCKER_EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: LISTENER_DOCKER_INTERNAL
-      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
-      KAFKA_BROKER_ID: 0
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_LOG4J_ROOT_LOGLEVEL: WARN
       KAFKA_TOOLS_LOG4J_LOGLEVEL: ERROR
       KAFKA_HEAP_OPTS: "-Xms256M -Xmx256M"
     volumes: 
       - cecochat-kafka0-data:/var/lib/kafka/data
-    depends_on: 
-      - zookeeper
   kafka1:
-    image: confluentinc/cp-kafka:7.5.2
+    image: confluentinc/cp-kafka:8.3.2
     container_name: cecochat-kafka1
     hostname: kafka1
     networks: *networks
@@ -57,25 +46,26 @@ services:
       resources:
         limits:
           memory: 512M
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD", "kafka-broker-api-versions", "--bootstrap-server", "localhost:19092"]
     environment:
+      CLUSTER_ID: Pap9mM2uRoaI3RAvQbpL0A
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: "0@kafka0:19093,1@kafka1:19094"
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
       KAFKA_ADVERTISED_LISTENERS: LISTENER_DOCKER_INTERNAL://kafka1:19092,LISTENER_DOCKER_EXTERNAL://${DOCKER_HOST_IP:-127.0.0.1}:9092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_DOCKER_INTERNAL:PLAINTEXT,LISTENER_DOCKER_EXTERNAL:PLAINTEXT
+      KAFKA_LISTENERS: LISTENER_DOCKER_INTERNAL://0.0.0.0:19092,LISTENER_DOCKER_EXTERNAL://0.0.0.0:9092,CONTROLLER://0.0.0.0:19094
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LISTENER_DOCKER_INTERNAL:PLAINTEXT,LISTENER_DOCKER_EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: LISTENER_DOCKER_INTERNAL
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_BROKER_ID: 1
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_LOG4J_ROOT_LOGLEVEL: WARN
       KAFKA_TOOLS_LOG4J_LOGLEVEL: ERROR
       KAFKA_HEAP_OPTS: "-Xms256M -Xmx256M"
     volumes: 
       - cecochat-kafka1-data:/var/lib/kafka/data
-    depends_on:
-      - zookeeper
 volumes:
-  cecochat-zookeeper-data:
-    external: true
-  cecochat-zookeeper-datalog:
-    external: true
   cecochat-kafka0-data:
     external: true
   cecochat-kafka1-data:

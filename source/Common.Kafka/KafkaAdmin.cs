@@ -97,7 +97,7 @@ public class KafkaAdmin : IKafkaAdmin
 
         try
         {
-            await _adminClient.CreateTopicsAsync(new[] { topicSpec });
+            await _adminClient.CreateTopicsAsync([topicSpec]);
             _logger.LogInformation("Kafka topic {KafkaTopic} created successfully", topic);
         }
         catch (KafkaException kafkaException)

@@ -21,9 +21,7 @@ public sealed class UserDbInit : InitStep
         IOptions<UserDbOptions> options,
         INpgsqlDbInitializer initializer,
         UserDbContext dbContext,
-        UserDbInitHealthCheck userDbInitHealthCheck,
-        IHostApplicationLifetime applicationLifetime)
-        : base(applicationLifetime)
+        UserDbInitHealthCheck userDbInitHealthCheck)
     {
         _logger = logger;
         _options = options.Value;
@@ -32,7 +30,7 @@ public sealed class UserDbInit : InitStep
         _userDbInitHealthCheck = userDbInitHealthCheck;
     }
 
-    protected override async Task<bool> DoExecute(CancellationToken ct)
+    public override async Task<bool> Execute(CancellationToken ct)
     {
         string database = new NpgsqlConnectionStringBuilder(_options.Connect.ConnectionString).Database!;
         _initializer.Initialize(_options.Init, database, typeof(UserDbContext).Assembly);
@@ -136,11 +134,11 @@ public sealed class UserDbInit : InitStep
 
     private Task<int> DeleteAllConnections(CancellationToken ct)
     {
-        return _dbContext.Database.ExecuteSqlRawAsync("DELETE from public.\"Connections\"", ct);
+        return _dbContext.Database.ExecuteSqlRawAsync("DELETE from public.\"connections\"", ct);
     }
 
     private Task<int> DeleteAllProfiles(CancellationToken ct)
     {
-        return _dbContext.Database.ExecuteSqlRawAsync("DELETE from public.\"Profiles\"", ct);
+        return _dbContext.Database.ExecuteSqlRawAsync("DELETE from public.\"profiles\"", ct);
     }
 }

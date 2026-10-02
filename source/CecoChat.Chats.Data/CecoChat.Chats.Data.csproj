@@ -1,9 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-  </PropertyGroup>
-
   <ItemGroup>
     <EmbeddedResource Include="Scripts\chats-chat-messages-table.cql" />
     <EmbeddedResource Include="Scripts\chats-file-data-type.cql" />

@@ -2,7 +2,7 @@ using System.Web;
 using CecoChat.Server.Identity;
 using CecoChat.User.Client;
 using Common.AspNet.ModelBinding;
-using Common.Minio;
+using Common.Seaweed;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -32,16 +32,16 @@ public sealed class DownloadFileRequest
 public class DownloadFileController : ControllerBase
 {
     private readonly ILogger _logger;
-    private readonly IMinioContext _minio;
+    private readonly ISeaweedContext _seaweed;
     private readonly IFileClient _fileClient;
 
     public DownloadFileController(
         ILogger<DownloadFileController> logger,
-        IMinioContext minio,
+        ISeaweedContext seaweed,
         IFileClient fileClient)
     {
         _logger = logger;
-        _minio = minio;
+        _seaweed = seaweed;
         _fileClient = fileClient;
     }
 
@@ -68,22 +68,16 @@ public class DownloadFileController : ControllerBase
             return;
         }
 
-        ObjectMetadataResult objectMetadataResult = await _minio.GetObjectMetadata(bucket, path, ct);
-        if (!objectMetadataResult.IsFound)
+        Action<ObjectMetadata> metadataReceived = metadata =>
+        {
+            Response.StatusCode = StatusCodes.Status200OK;
+            Response.ContentType = metadata.ContentType;
+            Response.ContentLength = metadata.ContentLength;
+        };
+        DownloadObjectResult downloadResult = await _seaweed.DownloadObjectToStream(bucket, path, metadataReceived, Response.Body, ct);
+        if (!downloadResult.IsFound)
         {
             _logger.LogTrace("Failed to find the file in bucket {Bucket} with path {Path}", bucket, path);
-            Response.StatusCode = StatusCodes.Status404NotFound;
-            return;
-        }
-
-        Response.StatusCode = StatusCodes.Status200OK;
-        Response.ContentType = objectMetadataResult.ContentType;
-        Response.ContentLength = objectMetadataResult.Size;
-
-        DownloadFileResult downloadFileResult = await _minio.WriteObjectToStream(bucket, path, Response.Body, ct);
-        if (!downloadFileResult.IsFound)
-        {
-            _logger.LogTrace("Failed to find file in bucket {Bucket} with path {Path}", bucket, path);
             Response.StatusCode = StatusCodes.Status404NotFound;
             return;
         }

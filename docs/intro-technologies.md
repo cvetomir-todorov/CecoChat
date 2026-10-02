@@ -3,7 +3,7 @@
 The technologies chosen are [cloud-agnostic](https://codersociety.com/blog/articles/cloud-agnostic) which makes the solution independent of a specific cloud provider.
 
 * Integration - Kafka, gRPC, WebSocket, HTTP
-* Data storage - Yugabyte, Cassandra, MinIO, Redis
+* Data storage - YugabyteDB, Cassandra, SeaweedFS, Redis
 * Operations - OpenTelemetry, Docker, Kubernetes
 * Services - .NET, ASP.NET, SignalR, EF Core
 * Libraries - Autofac, Serilog, FluentValidation, AutoMapper, Polly, IdGen
@@ -48,14 +48,13 @@ Services communicate asynchronously via the PUB/SUB backplane which is based on 
 * has a pull model which allows consumers to process messages at their own rate
 * a good solution for an event log, especially when processing a single message is fast
 * has some known operability issues with partition redistribution among a consumer group
-* relies on ZooKeeper as an additional element in the infrastructure
 
 # User database
 
-![Yugabyte](tech-images/yugabyte.png)
+![YugabyteDB](tech-images/yugabyte.png)
 ![Postgres](tech-images/postgres.webp)
 
-User database is based on Yugabyte DB
+User database is based on YugabyteDB
 
 * distributed SQL database
 * based on Postgres and driver-compatible with it
@@ -96,30 +95,28 @@ Chats database is based on Cassandra:
 
 # File storage
 
-![Minio](tech-images/minio.webp)
+![SeaweedFS](tech-images/seaweed.png)
 
-File storage is based on MinIO:
+File storage is based on SeaweedFS:
+* open-source software
 * object store - stores both file and metadata
-* horizontally scalable
-* supports multi-site replication
-* has global identity and access management
-* supports bucket encryption
-* supports immutability and versioning of objects
-* provides tools for monitoring
-* provides data-management interfaces
-* HTTP-accessible with a native client out of the box
+* designed for many files - small-file reads and writes need a single disk seek
+* horizontally scalable - separate components can be scaled independently
+* supports replication, including cross-data-center and cross-cluster
+* supports erasure coding and tiering of cold data to cloud storage
+* supports server-side encryption
 * AWS S3-compatible
 
 # Dynamic configuration
 
-![Yugabyte](tech-images/yugabyte.png)
+![YugabyteDB](tech-images/yugabyte.png)
 ![Postgres](tech-images/postgres.webp)
 ![Kafka](tech-images/kafka.png)
 ![gRPC](tech-images/grpc.png)
 ![Protocol Buffers](tech-images/protocol-buffers.png)
 
 Dynamic configuration is based on multiple technologies:
-* storage is based on Yugabyte DB which is Postgres driver-compatible
+* storage is based on YugabyteDB which is Postgres driver-compatible
 * services are notified for configuration changes via dedicated Kafka topic
 * services acquire configuration both initially and when changed using gRPC
 * both Kafka and gRPC data format is Protocol Buffers

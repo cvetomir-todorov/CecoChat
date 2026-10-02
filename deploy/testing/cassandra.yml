@@ -3,7 +3,7 @@ networks:
   cecochat-test:
 services:
   cassandra0:
-    image: cassandra:4.1.3
+    image: cassandra:5.0.8
     container_name: cecochat-test-cassandra0
     hostname: cassandra0
     networks:

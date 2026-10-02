@@ -37,7 +37,7 @@ public sealed class CustomHealthReport
 
     public TimeSpan Duration { get; init; } = TimeSpan.Zero;
 
-    public CustomHealthDependencyReport[] Dependencies { get; init; } = Array.Empty<CustomHealthDependencyReport>();
+    public CustomHealthDependencyReport[] Dependencies { get; init; } = [];
 }
 
 public sealed class CustomHealthDependencyReport

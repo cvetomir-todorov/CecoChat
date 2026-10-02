@@ -1,5 +1,5 @@
 using Autofac;
-using Microsoft.Extensions.DependencyInjection;
+using Common.Autofac;
 
 namespace Common.AspNet.Init;
 
@@ -11,19 +11,8 @@ public static class Extensions
         builder.RegisterType<TInitStep>().As<InitStep>().SingleInstance();
     }
 
-    public static async Task<bool> Init(this IServiceProvider serviceProvider)
+    public static void RegisterInit(this ContainerBuilder builder)
     {
-        IEnumerable<InitStep> initSteps = serviceProvider.GetServices<InitStep>();
-
-        foreach (InitStep initStep in initSteps)
-        {
-            bool success = await initStep.Execute();
-            if (!success)
-            {
-                return false;
-            }
-        }
-
-        return true;
+        builder.RegisterHostedService<InitHostedService>();
     }
 }

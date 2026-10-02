@@ -44,7 +44,7 @@ A short list of tasks to do next regarding product features, technical features,
     - Restrict service-to-service communication
     - Use pepper instead of just salt for passwords
   - Rate limiting
-  - Secure access to data storage components - Yugabyte, Cassandra, Redis
+  - Secure access to data storage components - YugabyteDB, Cassandra, Redis
   - Secure access to integration components - Kafka
   - Secure access to observability components - logs database, Prometheus, Jaeger
 * Observability
@@ -76,6 +76,9 @@ A short list of tasks to do next regarding product features, technical features,
   - Add Open Telemetry metrics to UserDB when Npgsql adds support
   - Use Cassandra instrumentation from .NET contrib
   - Add metrics infrastructure to Minikube deployment
+* Partitioning
+  - Validate the dynamic partition count against the actual Kafka topic partition count
+  - Disconnect clients when partitions have been reassigned between servers
 * Misc
   - Clean up periodically the empty consumer groups for config-changes Kafka topic
   - Control sending notifications to SignalR connected clients as previously with gRPC clients

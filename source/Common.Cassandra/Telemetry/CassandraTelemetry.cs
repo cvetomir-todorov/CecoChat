@@ -2,7 +2,6 @@ using System.Diagnostics;
 using System.Diagnostics.Metrics;
 using Cassandra;
 using Common.OpenTelemetry;
-using OpenTelemetry.Trace;
 
 namespace Common.Cassandra.Telemetry;
 
@@ -112,7 +111,7 @@ public sealed class CassandraTelemetry : ICassandraTelemetry
 
         if (activity.IsAllDataRequested && exception != null)
         {
-            activity.SetStatus(Status.Error.WithDescription(exception.Message));
+            activity.SetStatus(ActivityStatusCode.Error, exception.Message);
         }
         else
         {

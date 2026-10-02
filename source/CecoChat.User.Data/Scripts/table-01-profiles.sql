@@ -13,10 +13,6 @@ CREATE TABLE IF NOT EXISTS public.profiles
     CONSTRAINT profiles_username_unique
         UNIQUE (username)
 )
-WITH
-(
-    OIDS = FALSE
-)
 TABLESPACE pg_default;
 
 CREATE INDEX profiles_username_index

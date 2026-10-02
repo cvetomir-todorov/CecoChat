@@ -2,7 +2,6 @@
 using System.Text;
 using Common.OpenTelemetry;
 using Confluent.Kafka;
-using OpenTelemetry.Trace;
 
 namespace Common.Kafka.Telemetry;
 
@@ -137,24 +136,20 @@ internal sealed class KafkaTelemetry : IKafkaTelemetry
     {
         if (activity != null)
         {
-            Status status;
+            ActivityStatusCode statusCode;
+            string? description = null;
+
             if (success)
             {
-                status = Status.Ok;
+                statusCode = ActivityStatusCode.Ok;
             }
             else
             {
-                if (exception != null)
-                {
-                    status = Status.Error.WithDescription(exception.Message);
-                }
-                else
-                {
-                    status = Status.Error;
-                }
+                statusCode = ActivityStatusCode.Error;
+                description = exception?.Message;
             }
 
-            activity.SetStatus(status);
+            activity.SetStatus(statusCode, description);
             activity.Stop();
         }
     }

@@ -27,8 +27,8 @@ metadata:
   name: service-backplane
   namespace: cecochat
 data:
-  CECOCHAT_Backplane__Kafka__BootstrapServers__0: "backplane-kafka-0.backplane-kafka.cecochat.svc.cluster.local:9092"
-  CECOCHAT_Backplane__Kafka__BootstrapServers__1: "backplane-kafka-1.backplane-kafka.cecochat.svc.cluster.local:9092"
+  CECOCHAT_Backplane__Kafka__BootstrapServers__0: "kafka-0.kafka.cecochat.svc.cluster.local:9092"
+  CECOCHAT_Backplane__Kafka__BootstrapServers__1: "kafka-1.kafka.cecochat.svc.cluster.local:9092"
 ---
 
 apiVersion: v1

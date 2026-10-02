@@ -7,16 +7,16 @@ public sealed class GetConfigRequest
 
 public sealed class GetConfigResponse
 {
-    public ConfigElement[] Elements { get; init; } = Array.Empty<ConfigElement>();
+    public ConfigElement[] Elements { get; init; } = [];
 }
 
 public sealed class UpdateConfigElementsRequest
 {
-    public ConfigElement[] ExistingElements { get; init; } = Array.Empty<ConfigElement>();
+    public ConfigElement[] ExistingElements { get; init; } = [];
 
-    public ConfigElement[] NewElements { get; init; } = Array.Empty<ConfigElement>();
+    public ConfigElement[] NewElements { get; init; } = [];
 
-    public ConfigElement[] DeletedElements { get; init; } = Array.Empty<ConfigElement>();
+    public ConfigElement[] DeletedElements { get; init; } = [];
 }
 
 public sealed class ConfigElement
