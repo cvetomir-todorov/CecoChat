@@ -13,10 +13,10 @@ jobs:
     steps:
 
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v7
 
     - name: Setup .NET
-      uses: actions/setup-dotnet@v4
+      uses: actions/setup-dotnet@v6
       with:
         dotnet-version: 10.0.x
 
@@ -31,10 +31,10 @@ jobs:
     steps:
 
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v7
 
     - name: Setup .NET
-      uses: actions/setup-dotnet@v4
+      uses: actions/setup-dotnet@v6
       with:
         dotnet-version: 10.0.x
 
@@ -55,7 +55,7 @@ jobs:
         dotnet build --no-restore source/Check.sln
 
     - name: Upload certificates needed for running the tests and code analysis
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: service-certificates
         path: source/certificates/services.*
@@ -66,15 +66,15 @@ jobs:
     steps:
 
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v7
 
     - name: Setup .NET
-      uses: actions/setup-dotnet@v4
+      uses: actions/setup-dotnet@v6
       with:
         dotnet-version: 10.0.x
       
     - name: Download certificate needed for testing
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@v8
       with:
         name: service-certificates
         path: source/certificates
@@ -99,13 +99,13 @@ jobs:
 
     - name: Upload test logs
       if: ${{ always() }}
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: test-logs
         path: source/logs
 
     - name: Upload code coverage file
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: code-coverage
         path: source/coverage.opencover.xml
@@ -115,19 +115,19 @@ jobs:
     runs-on: windows-latest
     steps:
 
-      - name: JDK 11 setup
-        uses: actions/setup-java@v4
+      - name: JDK 17 setup
+        uses: actions/setup-java@v6
         with:
           distribution: oracle
           java-version: 17
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
       - name: Cache SonarCloud packages
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~\sonar\cache
           key: ${{ runner.os }}-sonar
@@ -135,7 +135,7 @@ jobs:
 
       - name: Cache SonarCloud scanner
         id: cache-sonar-scanner
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: .\.sonar\scanner
           key: ${{ runner.os }}-sonar-scanner
@@ -149,13 +149,13 @@ jobs:
           dotnet tool update dotnet-sonarscanner --tool-path .\.sonar\scanner
 
       - name: Download certificate needed for code analysis
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: service-certificates
           path: source/certificates
 
       - name: Download code coverage file
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: code-coverage
           path: source
