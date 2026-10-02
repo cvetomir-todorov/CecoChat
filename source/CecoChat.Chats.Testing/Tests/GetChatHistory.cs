@@ -104,7 +104,7 @@ public class GetChatHistory : BaseTest
     }
 
     [TestCaseSource(nameof(MessagesOlderThanAndLimitedInCountTestCases))]
-    public async Task MessagesOlderThanAndLimitedInCount(string testName, long userId, long otherUserId, DateTime olderThan, HistoryMessage[] expectedMessages)
+    public async Task MessagesOlderThanAndLimitedInCount(string _, long userId, long otherUserId, DateTime olderThan, HistoryMessage[] expectedMessages)
     {
         string accessToken = CreateUserAccessToken(userId, "test");
         IReadOnlyCollection<HistoryMessage> actualMessages = await Client.Instance.GetChatHistory(userId, otherUserId, olderThan, accessToken, CancellationToken.None);
@@ -172,7 +172,7 @@ public class GetChatHistory : BaseTest
     }
 
     [TestCaseSource(nameof(AllTypesOfMessagesTestCases))]
-    public async Task AllTypesOfMessages(string testName, long userId, long otherUserId, HistoryMessage expectedMessage)
+    public async Task AllTypesOfMessages(string _, long userId, long otherUserId, HistoryMessage expectedMessage)
     {
         string accessToken = CreateUserAccessToken(userId, "test");
         IReadOnlyCollection<HistoryMessage> actualMessages = await Client.Instance.GetChatHistory(userId, otherUserId, olderThan: DateTime.UtcNow, accessToken, CancellationToken.None);

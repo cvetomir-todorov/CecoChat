@@ -376,7 +376,7 @@ public sealed class ChatClient : IDisposable
             validationApiException.Content.Errors.Count > 0)
         {
             response.Errors.Add(apiResponse.Error.Message);
-            
+
             foreach (KeyValuePair<string, string[]> errorPair in validationApiException.Content.Errors)
             {
                 response.Errors.AddRange(errorPair.Value);

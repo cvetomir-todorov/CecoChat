@@ -58,7 +58,7 @@ public class GetUserChats : BaseTest
     }
 
     [TestCaseSource(nameof(AllTestCases))]
-    public async Task All(string testName, long userId, DateTime newerThan, ChatState[] expectedChats)
+    public async Task All(string _, long userId, DateTime newerThan, ChatState[] expectedChats)
     {
         string accessToken = CreateUserAccessToken(userId, userName: "test");
         IReadOnlyCollection<ChatState> actualChats = await Client.Instance.GetUserChats(userId, newerThan, accessToken, CancellationToken.None);
