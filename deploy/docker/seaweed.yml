@@ -96,7 +96,7 @@ services:
         "-config=/etc/seaweedfs/s3.json",
         "-metricsPort=9324"]
     volumes:
-      - ./seaweedfs/s3.json:/etc/seaweedfs/s3.json:ro
+      - ./seaweed/s3.json:/etc/seaweedfs/s3.json:ro
     healthcheck:
       <<: *healthcheck
       test: [ "CMD", "curl", "-f", "http://localhost:8333/healthz" ]
