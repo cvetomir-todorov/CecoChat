@@ -39,9 +39,10 @@ public sealed class UserDbInit : InitStep
         {
             _logger.LogInformation("Seeding the database...");
 
+            int fileCount = await DeleteAllFiles(ct);
             int connectionCount = await DeleteAllConnections(ct);
             int profileCount = await DeleteAllProfiles(ct);
-            _logger.LogInformation("Deleted {ProfileCount} profiles and {ConnectionCount} connections", profileCount, connectionCount);
+            _logger.LogInformation("Deleted {ProfileCount} profiles, {ConnectionCount} connections and {FileCount} files", profileCount, connectionCount, fileCount);
 
             if (_options.SeedConsoleClientUsers)
             {
@@ -132,13 +133,18 @@ public sealed class UserDbInit : InitStep
         _dbContext.ChangeTracker.Clear();
     }
 
+    private Task<int> DeleteAllFiles(CancellationToken ct)
+    {
+        return _dbContext.Database.ExecuteSqlRawAsync("delete from public.\"files\"", ct);
+    }
+
     private Task<int> DeleteAllConnections(CancellationToken ct)
     {
-        return _dbContext.Database.ExecuteSqlRawAsync("DELETE from public.\"connections\"", ct);
+        return _dbContext.Database.ExecuteSqlRawAsync("delete from public.\"connections\"", ct);
     }
 
     private Task<int> DeleteAllProfiles(CancellationToken ct)
     {
-        return _dbContext.Database.ExecuteSqlRawAsync("DELETE from public.\"profiles\"", ct);
+        return _dbContext.Database.ExecuteSqlRawAsync("delete from public.\"profiles\"", ct);
     }
 }
