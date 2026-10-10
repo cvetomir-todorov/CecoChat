@@ -23,6 +23,8 @@ jobs:
 
     - name: Checkout
       uses: actions/checkout@v7
+      with:
+        persist-credentials: 'false'
 
     - name: BFF image
       uses: docker/build-push-action@v7
