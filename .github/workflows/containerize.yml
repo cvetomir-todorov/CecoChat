@@ -1,4 +1,6 @@
 name: Containerize
+permissions:
+  contents: read
 
 on:
   workflow_run:
