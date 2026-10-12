@@ -200,6 +200,9 @@ jobs:
     if: >-
       (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
       (github.ref == 'refs/heads/dev' || startsWith(github.ref, 'refs/tags/v'))
+    strategy:
+      matrix:
+        service: [config, idgen, messaging, chats, user, bff]
     steps:
 
       - name: Docker Hub login
@@ -223,62 +226,12 @@ jobs:
             echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
           fi
 
-      - name: Config image
+      - name: Build and push image
         uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
-          file: package/cecochat/config.dockerfile
+          file: package/cecochat/${{ matrix.service }}.dockerfile
           context: ./source
           push: true
           tags: |
-            cvetomirtodorov/cecochat-config:sha-${{ env.SHORT_SHA }}
-            ${{ env.VERSION && format('cvetomirtodorov/cecochat-config:{0}', env.VERSION) || 'cvetomirtodorov/cecochat-config:dev' }}
-
-      - name: BFF image
-        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
-        with:
-          file: package/cecochat/bff.dockerfile
-          context: ./source
-          push: true
-          tags: |
-            cvetomirtodorov/cecochat-bff:sha-${{ env.SHORT_SHA }}
-            ${{ env.VERSION && format('cvetomirtodorov/cecochat-bff:{0}', env.VERSION) || 'cvetomirtodorov/cecochat-bff:dev' }}
-
-      - name: Messaging image
-        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
-        with:
-          file: package/cecochat/messaging.dockerfile
-          context: ./source
-          push: true
-          tags: |
-            cvetomirtodorov/cecochat-messaging:sha-${{ env.SHORT_SHA }}
-            ${{ env.VERSION && format('cvetomirtodorov/cecochat-messaging:{0}', env.VERSION) || 'cvetomirtodorov/cecochat-messaging:dev' }}
-
-      - name: Chats image
-        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
-        with:
-          file: package/cecochat/chats.dockerfile
-          context: ./source
-          push: true
-          tags: |
-            cvetomirtodorov/cecochat-chats:sha-${{ env.SHORT_SHA }}
-            ${{ env.VERSION && format('cvetomirtodorov/cecochat-chats:{0}', env.VERSION) || 'cvetomirtodorov/cecochat-chats:dev' }}
-
-      - name: IDGen image
-        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
-        with:
-          file: package/cecochat/idgen.dockerfile
-          context: ./source
-          push: true
-          tags: |
-            cvetomirtodorov/cecochat-idgen:sha-${{ env.SHORT_SHA }}
-            ${{ env.VERSION && format('cvetomirtodorov/cecochat-idgen:{0}', env.VERSION) || 'cvetomirtodorov/cecochat-idgen:dev' }}
-
-      - name: User image
-        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
-        with:
-          file: package/cecochat/user.dockerfile
-          context: ./source
-          push: true
-          tags: |
-            cvetomirtodorov/cecochat-user:sha-${{ env.SHORT_SHA }}
-            ${{ env.VERSION && format('cvetomirtodorov/cecochat-user:{0}', env.VERSION) || 'cvetomirtodorov/cecochat-user:dev' }}
+            cvetomirtodorov/cecochat-${{ matrix.service }}:sha-${{ env.SHORT_SHA }}
+            cvetomirtodorov/cecochat-${{ matrix.service }}:${{ env.VERSION || 'dev' }}
