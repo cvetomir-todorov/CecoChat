@@ -11,6 +11,7 @@ on:
     branches: [dev]
 
 jobs:
+
   verify-code-style:
     runs-on: ubuntu-latest
     steps:
@@ -25,11 +26,8 @@ jobs:
       with:
         dotnet-version: 10.0.x
 
-    - name: Install dotnet-format
-      run: dotnet tool update -g dotnet-format
-
     - name: Lint
-      run: dotnet format source/CecoChat.sln --no-restore --verify-no-changes --verbosity detailed
+      run: dotnet format source/CecoChat.sln --verify-no-changes --verbosity detailed
 
   build:
     runs-on: ubuntu-latest
