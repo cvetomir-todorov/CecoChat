@@ -1,42 +1,53 @@
 name: CI
+permissions:
+  contents: read
 
 on:
   workflow_dispatch:
   push:
-    branches: [dev, main]
+    branches: [dev]
+    tags: ['v*']
   pull_request:
     branches: [dev]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
+
   verify-code-style:
     runs-on: ubuntu-latest
+    timeout-minutes: 3
     steps:
 
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        persist-credentials: 'false'
 
     - name: Setup .NET
-      uses: actions/setup-dotnet@v4
+      uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
       with:
-        dotnet-version: 8.0.x
-
-    - name: Install dotnet-format
-      run: dotnet tool update -g dotnet-format
+        dotnet-version: 10.0.x
 
     - name: Lint
-      run: dotnet format source/CecoChat.sln --no-restore --verify-no-changes --verbosity detailed
+      run: dotnet format source/CecoChat.sln --verify-no-changes --verbosity detailed
 
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 3
     steps:
 
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        persist-credentials: 'false'
 
     - name: Setup .NET
-      uses: actions/setup-dotnet@v4
+      uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
       with:
-        dotnet-version: 8.0.x
+        dotnet-version: 10.0.x
 
     - name: Generate certificate
       working-directory: source/certificates
@@ -55,7 +66,7 @@ jobs:
         dotnet build --no-restore source/Check.sln
 
     - name: Upload certificates needed for running the tests and code analysis
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
       with:
         name: service-certificates
         path: source/certificates/services.*
@@ -63,18 +74,21 @@ jobs:
   test:
     needs: [build]
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
 
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        persist-credentials: 'false'
 
     - name: Setup .NET
-      uses: actions/setup-dotnet@v4
+      uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
       with:
-        dotnet-version: 8.0.x
+        dotnet-version: 10.0.x
       
     - name: Download certificate needed for testing
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
       with:
         name: service-certificates
         path: source/certificates
@@ -99,13 +113,13 @@ jobs:
 
     - name: Upload test logs
       if: ${{ always() }}
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
       with:
         name: test-logs
         path: source/logs
 
     - name: Upload code coverage file
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
       with:
         name: code-coverage
         path: source/coverage.opencover.xml
@@ -113,21 +127,26 @@ jobs:
   analyze-code-quality:
     needs: [verify-code-style, build, test]
     runs-on: windows-latest
+    timeout-minutes: 6
+    permissions:
+      contents: read
+      pull-requests: read
     steps:
 
-      - name: JDK 11 setup
-        uses: actions/setup-java@v4
+      - name: JDK 17 setup
+        uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
         with:
           distribution: oracle
           java-version: 17
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
+          persist-credentials: 'false'
 
       - name: Cache SonarCloud packages
-        uses: actions/cache@v4
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~\sonar\cache
           key: ${{ runner.os }}-sonar
@@ -135,7 +154,7 @@ jobs:
 
       - name: Cache SonarCloud scanner
         id: cache-sonar-scanner
-        uses: actions/cache@v4
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .\.sonar\scanner
           key: ${{ runner.os }}-sonar-scanner
@@ -149,13 +168,13 @@ jobs:
           dotnet tool update dotnet-sonarscanner --tool-path .\.sonar\scanner
 
       - name: Download certificate needed for code analysis
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: service-certificates
           path: source/certificates
 
       - name: Download code coverage file
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: code-coverage
           path: source
@@ -169,3 +188,50 @@ jobs:
           .\.sonar\scanner\dotnet-sonarscanner begin /k:"cvetomir-todorov_CecoChat" /o:"cvetomirtodorov-cecochat" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.opencover.reportsPaths="${GITHUB_WORKSPACE}/source/coverage.opencover.xml"
           dotnet build source/CecoChat.sln
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+
+  containerize:
+    needs: [analyze-code-quality]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # runs only when:
+    # - there is a push or the workflow is dispatched
+    # - branch is dev or a version tag is pushed (e.g. v0.1.0)
+    # avoids being run on every commit to the PR
+    if: >-
+      (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
+      (github.ref == 'refs/heads/dev' || startsWith(github.ref, 'refs/tags/v'))
+    strategy:
+      matrix:
+        service: [config, idgen, messaging, chats, user, bff]
+    steps:
+
+      - name: Docker Hub login
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+      - name: Docker setup
+        uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: 'false'
+
+      - name: Image tags
+        run: |
+          echo "SHORT_SHA=${GITHUB_SHA::7}" >> "$GITHUB_ENV"
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
+          fi
+
+      - name: Build and push image
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          file: package/cecochat/${{ matrix.service }}.dockerfile
+          context: ./source
+          push: true
+          tags: |
+            cvetomirtodorov/cecochat-${{ matrix.service }}:sha-${{ env.SHORT_SHA }}
+            cvetomirtodorov/cecochat-${{ matrix.service }}:${{ env.VERSION || 'dev' }}

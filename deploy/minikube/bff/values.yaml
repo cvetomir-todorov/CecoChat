@@ -9,11 +9,11 @@ Networking:
   UserService: user
   ChatsService: chats
   FileStorage:
-    Host: minio
-    Service: minio
+    Host: seaweed
+    Service: seaweed
     Port: 9000
     AccessKey: admin
-    Secret: secret12
+    SecretKey: secret12
 Ingress:
   Host: bff.cecochat.com
   SecretName: ingress-tls

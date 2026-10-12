@@ -11,15 +11,13 @@ public sealed class DynamicConfigInit : InitStep
 
     public DynamicConfigInit(
         IHistoryConfig historyConfig,
-        DynamicConfigInitHealthCheck dynamicConfigInitHealthCheck,
-        IHostApplicationLifetime applicationLifetime)
-        : base(applicationLifetime)
+        DynamicConfigInitHealthCheck dynamicConfigInitHealthCheck)
     {
         _historyConfig = historyConfig;
         _dynamicConfigInitHealthCheck = dynamicConfigInitHealthCheck;
     }
 
-    protected override async Task<bool> DoExecute(CancellationToken ct)
+    public override async Task<bool> Execute(CancellationToken ct)
     {
         _dynamicConfigInitHealthCheck.IsReady = await _historyConfig.Initialize(ct);
 

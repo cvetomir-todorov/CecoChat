@@ -26,6 +26,9 @@ public static class RedisHealthRegistrations
     {
         ConfigurationOptions redisConfiguration = new()
         {
+            // the health check runs CLUSTER INFO against cluster nodes
+            // StackExchange.Redis treats it as an admin command
+            AllowAdmin = true,
             ConnectRetry = redisOptions.ConnectRetry,
             ConnectTimeout = redisOptions.ConnectTimeout,
             KeepAlive = redisOptions.KeepAlive,

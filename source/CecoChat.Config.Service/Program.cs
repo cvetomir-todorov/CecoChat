@@ -6,6 +6,7 @@ using CecoChat.Config.Data;
 using CecoChat.Config.Service.Endpoints;
 using CecoChat.Config.Service.Init;
 using CecoChat.Server;
+using Common.AspNet.FluentValidation;
 using Common.AspNet.Health;
 using Common.AspNet.Init;
 using Common.AspNet.ModelBinding;
@@ -18,7 +19,6 @@ using Common.Npgsql;
 using Common.Npgsql.Health;
 using Common.OpenTelemetry;
 using FluentValidation;
-using FluentValidation.AspNetCore;
 using Npgsql;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
@@ -31,27 +31,28 @@ public static class Program
     private static ConfigDbOptions _configDbOptions = null!;
     private static SwaggerOptions _swaggerOptions = null!;
 
-    public static async Task Main(params string[] args)
+    public static async Task<int> Main(params string[] args)
     {
-        WebApplicationBuilder builder = EntryPoint.CreateWebAppBuilder(args);
-        CommonOptions options = new(builder.Configuration);
+        return await EntryPoint.Run(args, typeof(Program), ConfigureBuilder, ConfigurePipeline);
+    }
+
+    private static void ConfigureBuilder(WebApplicationBuilder builder)
+    {
+        CommonOptions commonOptions = new(builder.Configuration);
 
         _configDbOptions = new();
         builder.Configuration.GetSection("ConfigDb").Bind(_configDbOptions);
         _swaggerOptions = new();
         builder.Configuration.GetSection("Swagger").Bind(_swaggerOptions);
 
-        AddServices(builder);
-        AddTelemetry(builder, options);
+        AddServices(builder, commonOptions);
+        AddTelemetry(builder, commonOptions);
         AddHealth(builder);
-        builder.Host.ConfigureContainer<ContainerBuilder>(ConfigureContainer);
 
-        WebApplication app = builder.Build();
-        ConfigurePipeline(app, options);
-        await EntryPoint.RunWebApp(app, typeof(Program));
+        builder.Host.ConfigureContainer<ContainerBuilder>(ConfigureContainer);
     }
 
-    private static void AddServices(WebApplicationBuilder builder)
+    private static void AddServices(WebApplicationBuilder builder, CommonOptions commonOptions)
     {
         // grpc
         builder.Services.AddGrpc(grpc =>
@@ -62,23 +63,23 @@ public static class Program
         builder.Services.AddGrpcValidation();
 
         // rest
-        builder.Services.AddControllers(mvc =>
-        {
-            // insert it before the default one so that it takes effect
-            mvc.ModelBinderProviders.Insert(0, new DateTimeModelBinderProvider());
-        });
+        builder.Services
+            .AddControllers(mvc =>
+            {
+                // insert it before the default one so that it takes effect
+                mvc.ModelBinderProviders.Insert(0, new DateTimeModelBinderProvider());
+                mvc.AddFluentValidationAutoValidation();
+            })
+            .DisableDataAnnotationsValidation();
         builder.Services.AddSwaggerServices(_swaggerOptions);
 
         // config db
         builder.Services.AddConfigDb(_configDbOptions.Connect);
 
         // common
-        builder.Services.AddFluentValidationAutoValidation(fluentValidation =>
-        {
-            fluentValidation.DisableDataAnnotationsValidation = true;
-        });
         builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
         builder.Services.AddOptions();
+        builder.Services.AddSingleton(commonOptions);
     }
 
     private static void AddTelemetry(WebApplicationBuilder builder, CommonOptions options)
@@ -117,11 +118,11 @@ public static class Program
             .AddBackplane(builder.Configuration.GetSection("Backplane"))
             .AddCheck<ConfigDbInitHealthCheck>(
                 "config-db-init",
-                tags: new[] { HealthTags.Health, HealthTags.Startup })
+                tags: [HealthTags.Health, HealthTags.Startup])
             .AddNpgsql(
                 "config-db",
                 _configDbOptions.Connect,
-                tags: new[] { HealthTags.Health, HealthTags.Ready });
+                tags: [HealthTags.Health, HealthTags.Ready]);
 
         builder.Services.AddSingleton<ConfigDbInitHealthCheck>();
     }
@@ -129,6 +130,7 @@ public static class Program
     private static void ConfigureContainer(HostBuilderContext host, ContainerBuilder builder)
     {
         // init
+        builder.RegisterInit();
         builder.RegisterInitStep<ConfigDbInit>();
         builder.RegisterInitStep<BackplaneInit>();
 
@@ -146,7 +148,7 @@ public static class Program
         builder.RegisterOptions<KafkaOptions>(host.Configuration.GetSection("Backplane:Kafka"));
     }
 
-    private static void ConfigurePipeline(WebApplication app, CommonOptions options)
+    private static void ConfigurePipeline(WebApplication app)
     {
         if (app.Environment.IsDevelopment())
         {
@@ -164,7 +166,8 @@ public static class Program
         app.MapControllers();
         app.MapCustomHttpHealthEndpoints(app.Environment, serviceName: "config");
 
-        app.UseOpenTelemetryPrometheusScrapingEndpoint(context => context.Request.Path == options.Prometheus.ScrapeEndpointPath);
+        CommonOptions commonOptions = app.Services.GetRequiredService<CommonOptions>();
+        app.UseOpenTelemetryPrometheusScrapingEndpoint(context => context.Request.Path == commonOptions.Prometheus.ScrapeEndpointPath);
         app.MapWhen(context => context.Request.Path.StartsWithSegments("/swagger"), _ =>
         {
             app.UseSwaggerMiddlewares(_swaggerOptions);

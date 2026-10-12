@@ -21,9 +21,7 @@ public sealed class UserDbInit : InitStep
         IOptions<UserDbOptions> options,
         INpgsqlDbInitializer initializer,
         UserDbContext dbContext,
-        UserDbInitHealthCheck userDbInitHealthCheck,
-        IHostApplicationLifetime applicationLifetime)
-        : base(applicationLifetime)
+        UserDbInitHealthCheck userDbInitHealthCheck)
     {
         _logger = logger;
         _options = options.Value;
@@ -32,7 +30,7 @@ public sealed class UserDbInit : InitStep
         _userDbInitHealthCheck = userDbInitHealthCheck;
     }
 
-    protected override async Task<bool> DoExecute(CancellationToken ct)
+    public override async Task<bool> Execute(CancellationToken ct)
     {
         string database = new NpgsqlConnectionStringBuilder(_options.Connect.ConnectionString).Database!;
         _initializer.Initialize(_options.Init, database, typeof(UserDbContext).Assembly);
@@ -41,9 +39,10 @@ public sealed class UserDbInit : InitStep
         {
             _logger.LogInformation("Seeding the database...");
 
+            int fileCount = await DeleteAllFiles(ct);
             int connectionCount = await DeleteAllConnections(ct);
             int profileCount = await DeleteAllProfiles(ct);
-            _logger.LogInformation("Deleted {ProfileCount} profiles and {ConnectionCount} connections", profileCount, connectionCount);
+            _logger.LogInformation("Deleted {ProfileCount} profiles, {ConnectionCount} connections and {FileCount} files", profileCount, connectionCount, fileCount);
 
             if (_options.SeedConsoleClientUsers)
             {
@@ -134,13 +133,18 @@ public sealed class UserDbInit : InitStep
         _dbContext.ChangeTracker.Clear();
     }
 
+    private Task<int> DeleteAllFiles(CancellationToken ct)
+    {
+        return _dbContext.Database.ExecuteSqlRawAsync("delete from public.\"files\"", ct);
+    }
+
     private Task<int> DeleteAllConnections(CancellationToken ct)
     {
-        return _dbContext.Database.ExecuteSqlRawAsync("DELETE from public.\"Connections\"", ct);
+        return _dbContext.Database.ExecuteSqlRawAsync("delete from public.\"connections\"", ct);
     }
 
     private Task<int> DeleteAllProfiles(CancellationToken ct)
     {
-        return _dbContext.Database.ExecuteSqlRawAsync("DELETE from public.\"Profiles\"", ct);
+        return _dbContext.Database.ExecuteSqlRawAsync("delete from public.\"profiles\"", ct);
     }
 }

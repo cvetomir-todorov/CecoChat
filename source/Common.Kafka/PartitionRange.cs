@@ -5,7 +5,9 @@ public readonly struct PartitionRange : IEquatable<PartitionRange>
     public PartitionRange(ushort lower, ushort upper)
     {
         if (lower > upper)
+        {
             throw new ArgumentException($"'{nameof(lower)}' should be <= '{nameof(upper)}'.");
+        }
 
         Lower = lower;
         Upper = upper;

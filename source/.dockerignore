@@ -2,3 +2,6 @@
 .git/
 */[Oo]bj/
 */[Bb]in/
+.idea/
+logs/
+*.user

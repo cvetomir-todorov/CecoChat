@@ -13,7 +13,7 @@ public sealed class GetPublicProfilesRequest
 {
     [FromQuery(Name = "userIds")]
     [ModelBinder(BinderType = typeof(LongArrayCsvModelBinder))]
-    public long[] UserIds { get; init; } = Array.Empty<long>();
+    public long[] UserIds { get; init; } = [];
 
     [FromQuery(Name = "searchPattern")]
     public string SearchPattern { get; init; } = string.Empty;

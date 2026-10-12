@@ -4,7 +4,7 @@ The aim is to bring online as many clients as possible and each of them to behav
 
 The behavior of each user is:
 * Log in
-* Perform **3** sessions
+* Perform **3** times:
   - Pause for random seconds within [1, 9]
   - Load user chats
     - Get user chats
@@ -61,7 +61,6 @@ A customized Docker deployment was used. The application servers were built in R
   - TLS takes its toll
   - Storage and messaging infrastructure is quite CPU intensive under stress
   - Application servers didn't use a lot of CPU compared to the storage and messaging infrastructure
-  - Reminder that the bottleneck during the [connection limit research](research-connection-limit.md) where clients were sending a message each second (and where we didn't have TLS and storage and messaging infrastructure) was port exhaustion 
 * It was easy to see by the CPU load whether clients are sending messages (and putting stress on Backplane, ChatsDB) or are requesting user profiles (and putting stress on UserDB)
 * Adding caching to the User service should probably reduce the load on UserDB
 * For a realistic load test much more compute power is needed

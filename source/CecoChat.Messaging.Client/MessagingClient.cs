@@ -36,7 +36,7 @@ public sealed class MessagingClient : IMessagingClient
             {
                 http.AccessTokenProvider = () => Task.FromResult(accessToken)!;
             })
-            .WithAutomaticReconnect(new[] { TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(2), TimeSpan.FromSeconds(5) })
+            .WithAutomaticReconnect([TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(2), TimeSpan.FromSeconds(5)])
             .AddMessagePackProtocol()
             .Build();
 

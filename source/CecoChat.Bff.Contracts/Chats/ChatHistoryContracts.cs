@@ -20,7 +20,7 @@ public sealed class GetChatHistoryResponse
 {
     [JsonPropertyName("messages")]
     [AliasAs("messages")]
-    public HistoryMessage[] Messages { get; init; } = Array.Empty<HistoryMessage>();
+    public HistoryMessage[] Messages { get; init; } = [];
 }
 
 public sealed class HistoryMessage

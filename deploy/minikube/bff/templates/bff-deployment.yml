@@ -68,5 +68,5 @@ spec:
               value: "http://{{.Values.Networking.FileStorage.Host}}-0.{{.Values.Networking.FileStorage.Service}}.$(NAMESPACE).svc.cluster.local:{{.Values.Networking.FileStorage.Port}}"
             - name: CECOCHAT_FileStorage__AccessKey
               value: {{.Values.Networking.FileStorage.AccessKey}}
-            - name: CECOCHAT_FileStorage__Secret
-              value: {{.Values.Networking.FileStorage.Secret}}
+            - name: CECOCHAT_FileStorage__SecretKey
+              value: {{.Values.Networking.FileStorage.SecretKey}}

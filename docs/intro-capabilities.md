@@ -35,7 +35,7 @@ Note: there is no web/mobile clients (only a client for development purposes)
 * Scalability
   - Designed for up to 10 mln of simultaneously active users
   - Unfortunately, expensive to validate due to the infrastructure required
-  - Linear scalability of the main technologies (Kafka, Cassandra, Yugabyte)
+  - Linear scalability of the main technologies (Kafka, Cassandra, YugabyteDB)
   - Supported by numbers from the [calculations](research-calculations.md)
   - Minimal [load test on 2 machines](load-test.md)
 * Security

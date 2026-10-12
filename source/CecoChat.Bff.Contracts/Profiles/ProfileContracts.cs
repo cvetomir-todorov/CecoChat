@@ -33,5 +33,5 @@ public sealed class GetPublicProfilesResponse
 {
     [JsonPropertyName("profiles")]
     [AliasAs("profiles")]
-    public ProfilePublic[] Profiles { get; init; } = Array.Empty<ProfilePublic>();
+    public ProfilePublic[] Profiles { get; init; } = [];
 }

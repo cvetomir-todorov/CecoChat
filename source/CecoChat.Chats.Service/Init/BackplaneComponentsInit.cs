@@ -28,9 +28,7 @@ public sealed class BackplaneComponentsInit : InitStep
         HistoryConsumerHealthCheck historyConsumerHealthCheck,
         ReceiversConsumerHealthCheck receiversConsumerHealthCheck,
         SendersConsumerHealthCheck sendersConsumerHealthCheck,
-        ConfigChangesConsumerHealthCheck configChangesConsumerHealthCheck,
-        IHostApplicationLifetime applicationLifetime)
-        : base(applicationLifetime)
+        ConfigChangesConsumerHealthCheck configChangesConsumerHealthCheck)
     {
         _logger = logger;
         _historyConsumer = historyConsumer;
@@ -56,7 +54,7 @@ public sealed class BackplaneComponentsInit : InitStep
         }
     }
 
-    protected override Task<bool> DoExecute(CancellationToken ct)
+    public override Task<bool> Execute(CancellationToken ct)
     {
         _historyConsumer.Prepare();
         _stateConsumer.Prepare();

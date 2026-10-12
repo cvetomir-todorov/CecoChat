@@ -53,7 +53,7 @@ public static class HealthExtensions
 
         return builder.AddCheck<DynamicConfigInitHealthCheck>(
             name,
-            tags: new[] { HealthTags.Health, HealthTags.Startup });
+            tags: [HealthTags.Health, HealthTags.Startup]);
     }
 
     public static IHealthChecksBuilder AddConfigChangesConsumer(
@@ -64,7 +64,7 @@ public static class HealthExtensions
 
         return builder.AddCheck<ConfigChangesConsumerHealthCheck>(
             name,
-            tags: new[] { HealthTags.Health, HealthTags.Startup, HealthTags.Live });
+            tags: [HealthTags.Health, HealthTags.Startup, HealthTags.Live]);
     }
 
     public static IHealthChecksBuilder AddConfigService(
@@ -77,7 +77,7 @@ public static class HealthExtensions
             new Uri(configClientOptions.Address!, configClientOptions.HealthPath),
             configureHttpClient: (_, client) => client.DefaultRequestVersion = new Version(2, 0),
             timeout: configClientOptions.HealthTimeout,
-            tags: new[] { HealthTags.Health, HealthTags.Ready });
+            tags: [HealthTags.Health, HealthTags.Ready]);
     }
 
     public static IHealthChecksBuilder AddBackplane(
@@ -92,7 +92,7 @@ public static class HealthExtensions
             name,
             backplaneOptions.Kafka,
             backplaneOptions.Health,
-            tags: new[] { HealthTags.Health, HealthTags.Ready });
+            tags: [HealthTags.Health, HealthTags.Ready]);
     }
 
     public static void MapCustomHttpHealthEndpoints(

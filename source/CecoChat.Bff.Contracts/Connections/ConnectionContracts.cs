@@ -29,7 +29,7 @@ public sealed class GetConnectionsResponse
 {
     [JsonPropertyName("connections")]
     [AliasAs("connections")]
-    public Connection[] Connections { get; init; } = Array.Empty<Connection>();
+    public Connection[] Connections { get; init; } = [];
 }
 
 public sealed class InviteConnectionRequest

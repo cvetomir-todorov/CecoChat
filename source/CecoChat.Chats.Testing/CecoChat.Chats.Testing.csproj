@@ -1,20 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-  </PropertyGroup>
-
   <ItemGroup>
-    <PackageReference Include="coverlet.msbuild" Version="6.0.2" />
-    <PackageReference Include="FluentAssertions" Version="6.12.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
-    <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
+    <PackageReference Include="AwesomeAssertions" />
+    <PackageReference Include="coverlet.msbuild" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="NUnit3TestAdapter" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\CecoChat.Chats.Client\CecoChat.Chats.Client.csproj" />
     <ProjectReference Include="..\CecoChat.Chats.Service\CecoChat.Chats.Service.csproj" />
     <ProjectReference Include="..\CecoChat.Testing\CecoChat.Testing.csproj" />
+    <ProjectReference Include="..\Common.Testing.AspNet\Common.Testing.AspNet.csproj" />
     <ProjectReference Include="..\Common.Testing\Common.Testing.csproj" />
   </ItemGroup>
 

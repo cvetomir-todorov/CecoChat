@@ -16,9 +16,7 @@ public sealed class DynamicConfigInit : InitStep
         ILogger<DynamicConfigInit> logger,
         IOptions<ConfigOptions> configOptions,
         ISnowflakeConfig snowflakeConfig,
-        DynamicConfigInitHealthCheck dynamicConfigInitHealthCheck,
-        IHostApplicationLifetime applicationLifetime)
-        : base(applicationLifetime)
+        DynamicConfigInitHealthCheck dynamicConfigInitHealthCheck)
     {
         _logger = logger;
         _configOptions = configOptions.Value;
@@ -26,7 +24,7 @@ public sealed class DynamicConfigInit : InitStep
         _dynamicConfigInitHealthCheck = dynamicConfigInitHealthCheck;
     }
 
-    protected override async Task<bool> DoExecute(CancellationToken ct)
+    public override async Task<bool> Execute(CancellationToken ct)
     {
         _logger.LogInformation("Configured server ID is {ServerId}", _configOptions.ServerId);
         _dynamicConfigInitHealthCheck.IsReady = await _snowflakeConfig.Initialize(ct);

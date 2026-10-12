@@ -14,16 +14,14 @@ public class DynamicConfigInit : InitStep
     public DynamicConfigInit(
         IPartitioningConfig partitioningConfig,
         IUserConfig userConfig,
-        DynamicConfigInitHealthCheck dynamicConfigInitHealthCheck,
-        IHostApplicationLifetime applicationLifetime)
-        : base(applicationLifetime)
+        DynamicConfigInitHealthCheck dynamicConfigInitHealthCheck)
     {
         _partitioningConfig = partitioningConfig;
         _userConfig = userConfig;
         _dynamicConfigInitHealthCheck = dynamicConfigInitHealthCheck;
     }
 
-    protected override async Task<bool> DoExecute(CancellationToken ct)
+    public override async Task<bool> Execute(CancellationToken ct)
     {
         _dynamicConfigInitHealthCheck.IsReady =
             await _partitioningConfig.Initialize(ct) &&

@@ -6,10 +6,6 @@ CREATE TABLE IF NOT EXISTS public.elements
     CONSTRAINT elements_pkey
         PRIMARY KEY (name)
 )
-WITH
-(
-    OIDS = FALSE
-)
 TABLESPACE pg_default;
 
 CREATE INDEX elements_name

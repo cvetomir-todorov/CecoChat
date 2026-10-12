@@ -1,3 +1,4 @@
+using Common.Testing.AspNet;
 using NUnit.Framework;
 
 namespace CecoChat.IdGen.Testing.Tests;
@@ -10,16 +11,18 @@ public abstract class BaseTest
     [OneTimeSetUp]
     public async Task BeforeAllTests()
     {
-        _idGenService = new(
-            environment: "Test",
-            listenPort: 32002,
-            certificatePath: "services.pfx",
-            certificatePassword: "cecochat",
-            configFilePath: "idgen-service.json");
-        await _idGenService.Run();
+        ServiceOptions options = new()
+        {
+            Environment = "Test",
+            ListenPort = 32002,
+            CertificatePath = "services.pfx",
+            CertificatePassword = "cecochat",
+            ConfigFilePath = "idgen-service.json"
+        };
+        _idGenService = new(options);
+        await _idGenService.Start();
 
-        _idGenClient = new IdGenClient(
-            configFilePath: "idgen-client.json");
+        _idGenClient = new IdGenClient(configFilePath: "idgen-client.json");
     }
 
     [OneTimeTearDown]

@@ -23,14 +23,12 @@ public sealed class BackplaneComponentsInit : InitStep, ISubscriber<PartitionsCh
 
     public BackplaneComponentsInit(
         ILogger<BackplaneComponentsInit> logger,
-        IHostApplicationLifetime applicationLifetime,
         IOptions<ConfigOptions> configOptions,
         IBackplaneComponents backplaneComponents,
         IPartitioningConfig partitioningConfig,
         IPartitioner partitioner,
         IClientContainer clientContainer,
         IEvent<PartitionsChangedEventArgs> partitionsChanged)
-        : base(applicationLifetime)
     {
         _logger = logger;
         _configOptions = configOptions.Value;
@@ -52,7 +50,7 @@ public sealed class BackplaneComponentsInit : InitStep, ISubscriber<PartitionsCh
         }
     }
 
-    protected override Task<bool> DoExecute(CancellationToken ct)
+    public override Task<bool> Execute(CancellationToken ct)
     {
         int partitionCount = _partitioningConfig.PartitionCount;
         PartitionRange partitions = _partitioningConfig.GetPartitions(_configOptions.ServerId);

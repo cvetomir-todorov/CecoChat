@@ -1,3 +1,4 @@
+using System.Buffers;
 using CecoChat.User.Contracts;
 using Common.Redis;
 using Google.Protobuf;
@@ -129,7 +130,7 @@ public class CachingProfileQueryRepo : IProfileQueryRepo
             }
             else
             {
-                ProfilePublic profile = ProfilePublic.Parser.ParseFrom(cachedProfile);
+                ProfilePublic profile = ProfilePublic.Parser.ParseFrom((ReadOnlySequence<byte>)cachedProfile);
                 output.Add(profile);
             }
         }
@@ -173,7 +174,7 @@ public class CachingProfileQueryRepo : IProfileQueryRepo
         }
         else
         {
-            ProfileSearchResult searchResult = ProfileSearchResult.Parser.ParseFrom(value);
+            ProfileSearchResult searchResult = ProfileSearchResult.Parser.ParseFrom((ReadOnlySequence<byte>)value);
             cachedProfiles = searchResult.Profiles;
             LogProfileSearch(dataSourceAndAction: "cache", cachedProfiles.Count, searchPattern, userId);
         }

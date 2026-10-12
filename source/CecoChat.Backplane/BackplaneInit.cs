@@ -1,6 +1,5 @@
 using Common.AspNet.Init;
 using Common.Kafka;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace CecoChat.Backplane;
@@ -12,15 +11,13 @@ public class BackplaneInit : InitStep
 
     public BackplaneInit(
         ILogger<BackplaneInit> logger,
-        IKafkaAdmin kafkaAdmin,
-        IHostApplicationLifetime applicationLifetime)
-        : base(applicationLifetime)
+        IKafkaAdmin kafkaAdmin)
     {
         _logger = logger;
         _kafkaAdmin = kafkaAdmin;
     }
 
-    protected override async Task<bool> DoExecute(CancellationToken ct)
+    public override async Task<bool> Execute(CancellationToken ct)
     {
         KafkaTopicSpec[] topics =
         {

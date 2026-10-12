@@ -19,9 +19,7 @@ public sealed class ChatsDbInit : InitStep
         ICassandraDbInitializer dbInitializer,
         IChatMessageRepo chatMessageRepo,
         IUserChatsRepo userChatsRepo,
-        ChatsDbInitHealthCheck chatsDbInitHealthCheck,
-        IHostApplicationLifetime applicationLifetime)
-        : base(applicationLifetime)
+        ChatsDbInitHealthCheck chatsDbInitHealthCheck)
     {
         _logger = logger;
         _dbInitializer = dbInitializer;
@@ -39,9 +37,9 @@ public sealed class ChatsDbInit : InitStep
         }
     }
 
-    protected override Task<bool> DoExecute(CancellationToken ct)
+    public override Task<bool> Execute(CancellationToken ct)
     {
-        Task<bool> success = Task.FromResult(false);
+        bool success;
 
         try
         {
@@ -55,13 +53,14 @@ public sealed class ChatsDbInit : InitStep
 
             _logger.LogInformation("Completed preparing queries");
 
-            success = Task.FromResult(true);
+            success = true;
         }
-        catch (Exception exception)
+        catch (Exception exception) when (exception is not OperationCanceledException)
         {
             _logger.LogCritical(exception, "Failed to prepare queries");
+            success = false;
         }
 
-        return success;
+        return Task.FromResult(success);
     }
 }

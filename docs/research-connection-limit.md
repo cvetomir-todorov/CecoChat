@@ -1,6 +1,6 @@
 # Concurrent connections limit
 
-Below is a benchmark for the number of concurrent connections per messaging server. The code is in `Check.sln`.
+Below is an attempt to reach a limit for the concurrent connections per messaging server using the desired technologies and approach. If such is not met, for example the messaging server doesn't stop at an unrealistically low connection count, that means the real limits should be OS/configuration/hardware related ones. The code is in `Check.sln`.
 
 # Hardware setup
 
@@ -28,4 +28,9 @@ Strangely when clients were on the weaker machine the client time required in or
 
 # Conclusion
 
-The client-side port exhaustion limitation will be mitigated by the fact that each client is typically on a separate device. Therefore the server-side limitations remaining are the resources allocated for each connected client. Based on these numbers **64 k concurrent connections** per messaging server could be a realistic number and would be a useful limit in the calculations. It is a round number close to the **65535 max number of ports** for the current OS-es.
+The client-side port exhaustion limitation will be mitigated by the fact that each client is typically on a separate device. Therefore, the server-side limitations include the resources allocated for all connected clients:
+* File descriptors (fd), one per socket or client connection - this number is configurable
+* Memory related to each connection - includes kernel and .NET resources
+* CPU for TLS and handling messaging
+
+Realistically, a server configured properly that has powerful-enough hardware can handle hundreds of thousands or even 1 million connections. Confirming that requires a more realistic benchmark with more powerful and expensive hardware than what we have available. If we choose a number of 250 000 connections per server, for 10 million active users this means 40 servers.

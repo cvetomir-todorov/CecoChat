@@ -26,17 +26,17 @@ public sealed class GetAllChatsScreenResponse
 {
     [JsonPropertyName("chats")]
     [AliasAs("chats")]
-    public ChatState[] Chats { get; init; } = Array.Empty<ChatState>();
+    public ChatState[] Chats { get; init; } = [];
 
     [JsonPropertyName("connections")]
     [AliasAs("connections")]
-    public Connection[] Connections { get; init; } = Array.Empty<Connection>();
+    public Connection[] Connections { get; init; } = [];
 
     [JsonPropertyName("files")]
     [AliasAs("files")]
-    public FileRef[] Files { get; init; } = Array.Empty<FileRef>();
+    public FileRef[] Files { get; init; } = [];
 
     [JsonPropertyName("profiles")]
     [AliasAs("profiles")]
-    public ProfilePublic[] Profiles { get; init; } = Array.Empty<ProfilePublic>();
+    public ProfilePublic[] Profiles { get; init; } = [];
 }

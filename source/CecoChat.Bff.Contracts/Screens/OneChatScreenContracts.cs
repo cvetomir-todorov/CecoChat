@@ -29,7 +29,7 @@ public sealed class GetOneChatScreenResponse
 {
     [JsonPropertyName("messages")]
     [AliasAs("messages")]
-    public HistoryMessage[] Messages { get; init; } = Array.Empty<HistoryMessage>();
+    public HistoryMessage[] Messages { get; init; } = [];
 
     [JsonPropertyName("profile")]
     [AliasAs("profile")]

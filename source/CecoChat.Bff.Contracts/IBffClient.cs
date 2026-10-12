@@ -90,15 +90,12 @@ public interface IBffClient : IDisposable
         [Query] GetUserFilesRequest request,
         [Authorize(AuthorizationScheme)] string accessToken);
 
-    public const string HeaderUploadedFileSize = "Uploaded-File-Size";
     public const string HeaderUploadedFileAllowedUserId = "Uploaded-File-Allowed-UserId";
 
     [Post("/api/files")]
-    [Multipart(boundaryText: "----UserFileBoundary")]
     Task<IApiResponse<UploadFileResponse>> UploadFile(
-        [Header(HeaderUploadedFileSize)] long fileSize,
         [Header(HeaderUploadedFileAllowedUserId)] long allowedUser,
-        [AliasAs("file")] StreamPart stream,
+        [Body] HttpContent content,
         [Authorize(AuthorizationScheme)] string accessToken);
 
     [Get("/api/files/{bucket}/{path}")]

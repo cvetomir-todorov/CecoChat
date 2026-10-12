@@ -31,7 +31,7 @@ internal class FileCommandRepo : IFileCommandRepo
 
         if (allowedUserId > 0)
         {
-            entity.AllowedUsers = new[] { allowedUserId };
+            entity.AllowedUsers = [allowedUserId];
         }
 
         _dbContext.Files.Add(entity);
