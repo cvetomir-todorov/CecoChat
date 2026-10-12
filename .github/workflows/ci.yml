@@ -18,6 +18,7 @@ jobs:
 
   verify-code-style:
     runs-on: ubuntu-latest
+    timeout-minutes: 3
     steps:
 
     - name: Checkout
@@ -35,6 +36,7 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 3
     steps:
 
     - name: Checkout
@@ -72,6 +74,7 @@ jobs:
   test:
     needs: [build]
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
 
     - name: Checkout
@@ -124,6 +127,7 @@ jobs:
   analyze-code-quality:
     needs: [verify-code-style, build, test]
     runs-on: windows-latest
+    timeout-minutes: 6
     permissions:
       contents: read
       pull-requests: read
@@ -188,6 +192,7 @@ jobs:
   containerize:
     needs: [analyze-code-quality]
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     # runs only when:
     # - there is a push or the workflow is dispatched
     # - branch is dev or a version tag is pushed (e.g. v0.1.0)
